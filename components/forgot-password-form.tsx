@@ -1,7 +1,8 @@
 "use client";
 
+import { useActionState } from "react";
+import { resetPassword, type AuthActionState } from "@/lib/actions/auth";
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,40 +14,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { useState } from "react";
 
 export function ForgotPasswordForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-  const [email, setEmail] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const supabase = createClient();
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // The url which will be included in the email. This URL needs to be configured in your redirect URLs in the Supabase dashboard at https://supabase.com/dashboard/project/_/auth/url-configuration
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/update-password`,
-      });
-      if (error) throw error;
-      setSuccess(true);
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const [state, formAction, pending] = useActionState<AuthActionState | null, FormData>(resetPassword, null);
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      {success ? (
+      {state?.success ? (
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl">Check Your Email</CardTitle>
@@ -69,22 +46,24 @@ export function ForgotPasswordForm({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleForgotPassword}>
+            <form action={formAction}>
               <div className="flex flex-col gap-6">
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
+                    name="email"
                     type="email"
                     placeholder="m@example.com"
                     required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
                   />
+                  {state?.fieldErrors?.email && (
+                    <p className="text-sm text-red-500">{state.fieldErrors.email[0]}</p>
+                  )}
                 </div>
-                {error && <p className="text-sm text-red-500">{error}</p>}
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Sending..." : "Send reset email"}
+                {state?.error && <p className="text-sm text-red-500">{state.error}</p>}
+                <Button type="submit" className="w-full" disabled={pending}>
+                  {pending ? "Sending..." : "Send reset email"}
                 </Button>
               </div>
               <div className="mt-4 text-center text-sm">

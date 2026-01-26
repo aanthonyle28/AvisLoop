@@ -1,7 +1,8 @@
 "use client";
 
+import { useActionState } from "react";
+import { updatePassword, type AuthActionState } from "@/lib/actions/auth";
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,35 +13,12 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 export function UpdatePasswordForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
-
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const supabase = createClient();
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const { error } = await supabase.auth.updateUser({ password });
-      if (error) throw error;
-      // Update this route to redirect to an authenticated route. The user already has an active session.
-      router.push("/protected");
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const [state, formAction, pending] = useActionState<AuthActionState | null, FormData>(updatePassword, null);
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -52,22 +30,37 @@ export function UpdatePasswordForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleForgotPassword}>
+          <form action={formAction}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="password">New password</Label>
                 <Input
                   id="password"
+                  name="password"
                   type="password"
                   placeholder="New password"
                   required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
                 />
+                {state?.fieldErrors?.password && (
+                  <p className="text-sm text-red-500">{state.fieldErrors.password[0]}</p>
+                )}
               </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Saving..." : "Save new password"}
+              <div className="grid gap-2">
+                <Label htmlFor="confirmPassword">Confirm password</Label>
+                <Input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  placeholder="Confirm password"
+                  required
+                />
+                {state?.fieldErrors?.confirmPassword && (
+                  <p className="text-sm text-red-500">{state.fieldErrors.confirmPassword[0]}</p>
+                )}
+              </div>
+              {state?.error && <p className="text-sm text-red-500">{state.error}</p>}
+              <Button type="submit" className="w-full" disabled={pending}>
+                {pending ? "Saving..." : "Save new password"}
               </Button>
             </div>
           </form>
