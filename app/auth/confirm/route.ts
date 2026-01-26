@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
 
   // For recovery (password reset), redirect to update password page
   if (type === 'recovery') {
-    return NextResponse.redirect(new URL('/update-password', request.url))
+    return NextResponse.redirect(new URL('/auth/update-password', request.url))
   }
 
   // For signup/email confirmation, redirect to dashboard
