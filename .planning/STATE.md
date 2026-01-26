@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 1 of 8 (Foundation & Auth)
-Plan: 5 of 5 complete in current phase (all gap closures done)
+Plan: 6 of 6 complete in current phase
 Status: Phase complete
-Last activity: 2026-01-26 - Completed 01-05-PLAN.md (Database Migration Files - Gap Closure)
+Last activity: 2026-01-26 - Completed 01-06-PLAN.md (Auth Form Wiring - Gap Closure)
 
-Progress: [████░░░░░░] ~20% (5 plans complete)
+Progress: [████░░░░░░] ~24% (6 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
+- Total plans completed: 6
 - Average duration: 3 min
-- Total execution time: 0.27 hours
+- Total execution time: 0.32 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-foundation-auth | 5 | 16 min | 3 min |
+| 01-foundation-auth | 6 | 19 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-05 (1 min), 01-04 (1 min), 01-03 (2 min), 01-02 (1 min), 01-01 (11 min)
-- Trend: Accelerating
+- Last 5 plans: 01-06 (3 min), 01-05 (1 min), 01-04 (1 min), 01-03 (2 min), 01-02 (1 min)
+- Trend: Stable
 
 *Updated after each plan completion*
 
@@ -51,6 +51,9 @@ Recent decisions affecting current work:
 - AuthActionState returns fieldErrors separately for per-field form validation
 - signOut returns Promise<never> (always redirects)
 - Recovery type in email confirmation redirects to /update-password
+- useActionState pattern used for all auth forms with pending state
+- Per-field error display using fieldErrors from Server Action response
+- LogoutButton simplified to form action without 'use client' directive
 
 ### Pending Todos
 
@@ -68,5 +71,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Completed 01-05-PLAN.md (Database Migration Files - Gap Closure) - Phase 1 fully complete
+Stopped at: Completed 01-06-PLAN.md (Auth Form Wiring - Gap Closure) - Phase 1 fully complete
 Resume file: None
