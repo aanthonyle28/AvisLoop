@@ -33,11 +33,15 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can reset forgotten password via email link
   4. User can log out from any page
   5. Database has RLS policies preventing cross-user data leakage
-**Plans**: TBD
+**Plans**: 6 plans (3 initial + 3 gap closure)
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [x] 01-01-PLAN.md - Project setup with Supabase template, client factories, proxy
+- [x] 01-02-PLAN.md - Database foundation (profiles table, RLS policies)
+- [x] 01-03-PLAN.md - Auth Server Actions (signUp, signIn, signOut, resetPassword, updatePassword)
+- [ ] 01-04-PLAN.md - Fix middleware naming (proxy.ts -> middleware.ts) [GAP CLOSURE]
+- [ ] 01-05-PLAN.md - Create database migration files [GAP CLOSURE]
+- [ ] 01-06-PLAN.md - Wire Server Actions to auth forms [GAP CLOSURE]
 
 ### Phase 2: Business Setup
 **Goal**: Users can configure their business profile and review settings
@@ -165,7 +169,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Auth | 0/TBD | Not started | - |
+| 1. Foundation & Auth | 3/6 | Gap closure in progress | - |
 | 2. Business Setup | 0/TBD | Not started | - |
 | 3. Contact Management | 0/TBD | Not started | - |
 | 4. Core Sending | 0/TBD | Not started | - |
