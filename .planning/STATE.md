@@ -10,27 +10,27 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 1 of 8 (Foundation & Auth)
-Plan: 3 of 3 complete in current phase
+Plan: 4 of 4 complete in current phase (gap closure)
 Status: Phase complete
-Last activity: 2026-01-26 - Completed 01-03-PLAN.md (Auth Server Actions)
+Last activity: 2026-01-26 - Completed 01-04-PLAN.md (Middleware Rename)
 
-Progress: [███░░░░░░░] ~12% (3 plans complete)
+Progress: [████░░░░░░] ~16% (4 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 5 min
-- Total execution time: 0.23 hours
+- Total plans completed: 4
+- Average duration: 4 min
+- Total execution time: 0.25 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-foundation-auth | 3 | 14 min | 5 min |
+| 01-foundation-auth | 4 | 15 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-03 (2 min), 01-02 (1 min), 01-01 (11 min)
+- Last 5 plans: 01-04 (1 min), 01-03 (2 min), 01-02 (1 min), 01-01 (11 min)
 - Trend: Accelerating
 
 *Updated after each plan completion*
@@ -46,7 +46,7 @@ Recent decisions affecting current work:
 - SECURITY DEFINER on handle_new_user trigger for auth.users access
 - Cascade delete profiles when auth.users deleted
 - Use NEXT_PUBLIC_SUPABASE_ANON_KEY over PUBLISHABLE_KEY for compatibility
-- Use Next.js 16 proxy.ts convention instead of deprecated middleware.ts
+- UPDATED: Renamed proxy.ts to middleware.ts per gap closure plan (Next.js 16 shows deprecation warning but still works)
 - Use getUser() for JWT validation (security best practice)
 - AuthActionState returns fieldErrors separately for per-field form validation
 - signOut returns Promise<never> (always redirects)
@@ -67,5 +67,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Completed 01-03-PLAN.md (Auth Server Actions) - Phase 1 complete
+Stopped at: Completed 01-04-PLAN.md (Middleware Rename) - Phase 1 complete
 Resume file: None
