@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 1 of 8 (Foundation & Auth)
-Plan: 2 of 3 complete in current phase
-Status: In progress
-Last activity: 2026-01-26 - Completed 01-01-PLAN.md (Project Setup & Supabase Config)
+Plan: 3 of 3 complete in current phase
+Status: Phase complete
+Last activity: 2026-01-26 - Completed 01-03-PLAN.md (Auth Server Actions)
 
-Progress: [██░░░░░░░░] ~8% (2 plans complete)
+Progress: [███░░░░░░░] ~12% (3 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: 6 min
-- Total execution time: 0.2 hours
+- Total plans completed: 3
+- Average duration: 5 min
+- Total execution time: 0.23 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-foundation-auth | 2 | 12 min | 6 min |
+| 01-foundation-auth | 3 | 14 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (1 min), 01-01 (11 min)
-- Trend: N/A (need more data)
+- Last 5 plans: 01-03 (2 min), 01-02 (1 min), 01-01 (11 min)
+- Trend: Accelerating
 
 *Updated after each plan completion*
 
@@ -48,6 +48,9 @@ Recent decisions affecting current work:
 - Use NEXT_PUBLIC_SUPABASE_ANON_KEY over PUBLISHABLE_KEY for compatibility
 - Use Next.js 16 proxy.ts convention instead of deprecated middleware.ts
 - Use getUser() for JWT validation (security best practice)
+- AuthActionState returns fieldErrors separately for per-field form validation
+- signOut returns Promise<never> (always redirects)
+- Recovery type in email confirmation redirects to /update-password
 
 ### Pending Todos
 
@@ -64,5 +67,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Completed 01-01-PLAN.md (Project Setup & Supabase Config)
+Stopped at: Completed 01-03-PLAN.md (Auth Server Actions) - Phase 1 complete
 Resume file: None
