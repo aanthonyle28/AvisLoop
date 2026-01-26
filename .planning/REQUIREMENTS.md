@@ -135,63 +135,63 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | TBD | Pending |
-| AUTH-02 | TBD | Pending |
-| AUTH-03 | TBD | Pending |
-| AUTH-04 | TBD | Pending |
-| BUSI-01 | TBD | Pending |
-| BUSI-02 | TBD | Pending |
-| BUSI-03 | TBD | Pending |
-| BUSI-04 | TBD | Pending |
-| CONT-01 | TBD | Pending |
-| CONT-02 | TBD | Pending |
-| CONT-03 | TBD | Pending |
-| CONT-04 | TBD | Pending |
-| CONT-05 | TBD | Pending |
-| CONT-06 | TBD | Pending |
-| CONT-07 | TBD | Pending |
-| CONT-08 | TBD | Pending |
-| CONT-09 | TBD | Pending |
-| CONT-10 | TBD | Pending |
-| SEND-01 | TBD | Pending |
-| SEND-02 | TBD | Pending |
-| SEND-03 | TBD | Pending |
-| SEND-04 | TBD | Pending |
-| SEND-05 | TBD | Pending |
-| SEND-06 | TBD | Pending |
-| SEND-07 | TBD | Pending |
-| SEND-08 | TBD | Pending |
-| SEND-09 | TBD | Pending |
-| SEND-10 | TBD | Pending |
-| HIST-01 | TBD | Pending |
-| HIST-02 | TBD | Pending |
-| HIST-03 | TBD | Pending |
-| HIST-04 | TBD | Pending |
-| ONBD-01 | TBD | Pending |
-| ONBD-02 | TBD | Pending |
-| ONBD-03 | TBD | Pending |
-| ONBD-04 | TBD | Pending |
-| ONBD-05 | TBD | Pending |
-| ONBD-06 | TBD | Pending |
-| ONBD-07 | TBD | Pending |
-| ONBD-08 | TBD | Pending |
-| BILL-01 | TBD | Pending |
-| BILL-02 | TBD | Pending |
-| BILL-03 | TBD | Pending |
-| BILL-04 | TBD | Pending |
-| BILL-05 | TBD | Pending |
-| BILL-06 | TBD | Pending |
-| BILL-07 | TBD | Pending |
-| PAGE-01 | TBD | Pending |
-| PAGE-02 | TBD | Pending |
-| PAGE-03 | TBD | Pending |
-| PAGE-04 | TBD | Pending |
+| AUTH-01 | Phase 1 | Pending |
+| AUTH-02 | Phase 1 | Pending |
+| AUTH-03 | Phase 1 | Pending |
+| AUTH-04 | Phase 1 | Pending |
+| BUSI-01 | Phase 2 | Pending |
+| BUSI-02 | Phase 2 | Pending |
+| BUSI-03 | Phase 2 | Pending |
+| BUSI-04 | Phase 2 | Pending |
+| CONT-01 | Phase 3 | Pending |
+| CONT-02 | Phase 3 | Pending |
+| CONT-03 | Phase 3 | Pending |
+| CONT-04 | Phase 3 | Pending |
+| CONT-05 | Phase 3 | Pending |
+| CONT-06 | Phase 3 | Pending |
+| CONT-07 | Phase 3 | Pending |
+| CONT-08 | Phase 3 | Pending |
+| CONT-09 | Phase 3 | Pending |
+| CONT-10 | Phase 3 | Pending |
+| SEND-01 | Phase 4 | Pending |
+| SEND-02 | Phase 4 | Pending |
+| SEND-03 | Phase 4 | Pending |
+| SEND-04 | Phase 4 | Pending |
+| SEND-05 | Phase 4 | Pending |
+| SEND-06 | Phase 4 | Pending |
+| SEND-07 | Phase 4 | Pending |
+| SEND-08 | Phase 4 | Pending |
+| SEND-09 | Phase 4 | Pending |
+| SEND-10 | Phase 4 | Pending |
+| HIST-01 | Phase 5 | Pending |
+| HIST-02 | Phase 5 | Pending |
+| HIST-03 | Phase 5 | Pending |
+| HIST-04 | Phase 5 | Pending |
+| ONBD-01 | Phase 7 | Pending |
+| ONBD-02 | Phase 7 | Pending |
+| ONBD-03 | Phase 7 | Pending |
+| ONBD-04 | Phase 7 | Pending |
+| ONBD-05 | Phase 7 | Pending |
+| ONBD-06 | Phase 7 | Pending |
+| ONBD-07 | Phase 7 | Pending |
+| ONBD-08 | Phase 7 | Pending |
+| BILL-01 | Phase 6 | Pending |
+| BILL-02 | Phase 6 | Pending |
+| BILL-03 | Phase 6 | Pending |
+| BILL-04 | Phase 6 | Pending |
+| BILL-05 | Phase 6 | Pending |
+| BILL-06 | Phase 6 | Pending |
+| BILL-07 | Phase 6 | Pending |
+| PAGE-01 | Phase 8 | Pending |
+| PAGE-02 | Phase 8 | Pending |
+| PAGE-03 | Phase 8 | Pending |
+| PAGE-04 | Phase 8 | Pending |
 
 **Coverage:**
 - v1 requirements: 44 total
-- Mapped to phases: 0
-- Unmapped: 44 ⚠️
+- Mapped to phases: 44
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-25*
-*Last updated: 2026-01-25 after scope adjustment*
+*Last updated: 2026-01-25 after roadmap creation*
