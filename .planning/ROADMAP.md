@@ -12,7 +12,7 @@ ReviewLoop progresses from foundational authentication and data security through
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation & Auth** - Users can create accounts and access the app securely
+- [x] **Phase 1: Foundation & Auth** - Users can create accounts and access the app securely
 - [ ] **Phase 2: Business Setup** - Users can configure their business profile and review settings
 - [ ] **Phase 3: Contact Management** - Users can add, organize, and manage customer contacts
 - [ ] **Phase 4: Core Sending** - Users can send review request emails and see immediate confirmation
@@ -39,9 +39,9 @@ Plans:
 - [x] 01-01-PLAN.md - Project setup with Supabase template, client factories, proxy
 - [x] 01-02-PLAN.md - Database foundation (profiles table, RLS policies)
 - [x] 01-03-PLAN.md - Auth Server Actions (signUp, signIn, signOut, resetPassword, updatePassword)
-- [ ] 01-04-PLAN.md - Fix middleware naming (proxy.ts -> middleware.ts) [GAP CLOSURE]
-- [ ] 01-05-PLAN.md - Create database migration files [GAP CLOSURE]
-- [ ] 01-06-PLAN.md - Wire Server Actions to auth forms [GAP CLOSURE]
+- [x] 01-04-PLAN.md - Fix middleware naming (proxy.ts -> middleware.ts) [GAP CLOSURE]
+- [x] 01-05-PLAN.md - Create database migration files [GAP CLOSURE]
+- [x] 01-06-PLAN.md - Wire Server Actions to auth forms [GAP CLOSURE]
 
 ### Phase 2: Business Setup
 **Goal**: Users can configure their business profile and review settings
@@ -169,7 +169,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Auth | 3/6 | Gap closure in progress | - |
+| 1. Foundation & Auth | 6/6 | Complete | 2026-01-26 |
 | 2. Business Setup | 0/TBD | Not started | - |
 | 3. Contact Management | 0/TBD | Not started | - |
 | 4. Core Sending | 0/TBD | Not started | - |

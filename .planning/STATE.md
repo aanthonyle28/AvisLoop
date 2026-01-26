@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Make requesting reviews so simple that business owners actually do it — one contact, one click, done.
-**Current focus:** Phase 1 - Foundation & Auth
+**Current focus:** Phase 1 complete, ready for Phase 2
 
 ## Current Position
 
-Phase: 1 of 8 (Foundation & Auth)
-Plan: 6 of 6 complete in current phase
-Status: Phase complete
-Last activity: 2026-01-26 - Completed 01-06-PLAN.md (Auth Form Wiring - Gap Closure)
+Phase: 1 of 8 (Foundation & Auth) - COMPLETE
+Plan: 6 of 6 complete
+Status: Phase verified and complete
+Last activity: 2026-01-26 - Phase 1 verified, all gaps closed
 
-Progress: [████░░░░░░] ~24% (6 plans complete)
+Progress: [██░░░░░░░░] ~12.5% (1/8 phases complete)
 
 ## Performance Metrics
 
@@ -50,7 +50,7 @@ Recent decisions affecting current work:
 - Use getUser() for JWT validation (security best practice)
 - AuthActionState returns fieldErrors separately for per-field form validation
 - signOut returns Promise<never> (always redirects)
-- Recovery type in email confirmation redirects to /update-password
+- Recovery type in email confirmation redirects to /auth/update-password
 - useActionState pattern used for all auth forms with pending state
 - Per-field error display using fieldErrors from Server Action response
 - LogoutButton simplified to form action without 'use client' directive
@@ -71,5 +71,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Completed 01-06-PLAN.md (Auth Form Wiring - Gap Closure) - Phase 1 fully complete
+Stopped at: Phase 1 complete and verified
 Resume file: None
