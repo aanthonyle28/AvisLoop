@@ -9,7 +9,7 @@ import type { Contact } from '@/lib/types/database'
  * Escape special characters for LIKE/ILIKE patterns.
  * Prevents SQL injection via pattern characters.
  */
-function escapeLikePattern(str: string): string {
+export function escapeLikePattern(str: string): string {
   return str
     .replace(/\\/g, '\\\\')  // Escape backslash first
     .replace(/%/g, '\\%')    // Escape percent

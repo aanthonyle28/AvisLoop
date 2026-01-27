@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { escapeLikePattern } from '@/lib/actions/contact'
 import type { SendLogWithContact } from '@/lib/types/database'
 
 /**
@@ -9,6 +10,10 @@ export async function getSendLogs(options?: {
   limit?: number
   offset?: number
   contactId?: string
+  query?: string          // NEW: Search by contact name or email
+  status?: string         // NEW: Filter by status (pending, sent, delivered, etc.)
+  dateFrom?: string       // NEW: Filter by date range start (ISO string)
+  dateTo?: string         // NEW: Filter by date range end (ISO string)
 }): Promise<{ logs: SendLogWithContact[]; total: number }> {
   const supabase = await createClient()
 
@@ -40,6 +45,30 @@ export async function getSendLogs(options?: {
 
   if (options?.contactId) {
     query = query.eq('contact_id', options.contactId)
+  }
+
+  // Search filter (query): Use Supabase's or filter with referencedTable option
+  if (options?.query) {
+    const escapedQuery = escapeLikePattern(options.query)
+    query = query.or(`name.ilike.%${escapedQuery}%,email.ilike.%${escapedQuery}%`, {
+      referencedTable: 'contacts'
+    })
+  }
+
+  // Status filter: Simple equality filter on status column
+  if (options?.status) {
+    query = query.eq('status', options.status)
+  }
+
+  // Date range filter: Use gte/lte on created_at
+  if (options?.dateFrom) {
+    query = query.gte('created_at', options.dateFrom)
+  }
+  if (options?.dateTo) {
+    // Add time component to include the entire end day
+    const endOfDay = new Date(options.dateTo)
+    endOfDay.setHours(23, 59, 59, 999)
+    query = query.lte('created_at', endOfDay.toISOString())
   }
 
   query = query.range(offset, offset + limit - 1)
