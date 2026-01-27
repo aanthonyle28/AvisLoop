@@ -29,6 +29,18 @@ yarn-error.log*
 # OS
 .DS_Store
 Thumbs.db
+nul
 
 # TypeScript
 *.tsbuildinfo
+
+# Claude Code / AI tools
+.claude/
+.agents/
+.playwright-mcp/
+
+# Test files
+test-*.csv
+
+# Scratch notes
+docs/notes
