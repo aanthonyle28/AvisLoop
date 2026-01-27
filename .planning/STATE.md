@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 5 of 9 (Send History & Analytics)
-Plan: 1 of 3
+Plan: 2 of 3
 Status: In progress
-Last activity: 2026-01-27 - Completed 05-01-PLAN.md (Data Layer & Filter UI)
+Last activity: 2026-01-27 - Completed 05-02-PLAN.md (History Table Page)
 
-Progress: [█████░░░░░] ~46% (5/9 phases, 24/~52 plans complete)
+Progress: [█████░░░░░] ~48% (5/9 phases, 25/~52 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 24
+- Total plans completed: 25
 - Average duration: 3 min
-- Total execution time: 1.10 hours
+- Total execution time: 1.12 hours
 
 **By Phase:**
 
@@ -32,10 +32,10 @@ Progress: [█████░░░░░] ~46% (5/9 phases, 24/~52 plans comple
 | 03-contact-management | 6 | 19 min | 3 min |
 | 03.1-critical-fixes | 1 | 3 min | 3 min |
 | 04-core-sending | 4 | 8 min | 2 min |
-| 05-message-history | 1 | 2 min | 2 min |
+| 05-message-history | 2 | 4 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 05-01 (2 min), 04-04 (2 min), 04-03 (2 min), 04-02 (2 min), 04-01 (2 min)
+- Last 5 plans: 05-02 (2 min), 05-01 (2 min), 04-04 (2 min), 04-03 (2 min), 04-02 (2 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -114,6 +114,9 @@ Recent decisions affecting current work:
 - [05-01] Native HTML select with Tailwind styling (ui/select doesn't exist)
 - [05-01] 300ms debounce on search to reduce server load
 - [05-01] Semantic color scheme for statuses: green (success), red (failures), blue/gray (in-progress)
+- [05-02] No pagination UI in this phase - server returns first 50 results
+- [05-02] Empty state shows different content for 'no messages' vs 'no filtered results'
+- [05-02] HistoryClient manages filter visibility (show when logs exist OR filters active)
 
 ### Pending Todos
 
@@ -143,6 +146,6 @@ None currently.
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Completed 05-01-PLAN.md - Data Layer & Filter UI complete
+Stopped at: Completed 05-02-PLAN.md - History Table Page complete
 Resume file: None
-Next: 05-02 - History Table Page
+Next: 05-03 - Message detail view (if planned)
