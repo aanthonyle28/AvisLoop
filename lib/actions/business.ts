@@ -199,11 +199,12 @@ export async function getBusiness() {
     return null
   }
 
+  // Use explicit FK hint to resolve ambiguity from circular relationship
   const { data: business } = await supabase
     .from('businesses')
     .select(`
       *,
-      email_templates (
+      email_templates!email_templates_business_id_fkey (
         id,
         name,
         subject,

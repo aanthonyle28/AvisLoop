@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
-import { getBusiness, getEmailTemplates } from '@/lib/actions/business'
+// Data fetching is done inline in SettingsContent
 import { BusinessSettingsForm } from '@/components/business-settings-form'
 import { EmailTemplateForm } from '@/components/email-template-form'
 import { TemplateList } from '@/components/template-list'
@@ -36,9 +36,35 @@ async function SettingsContent() {
     redirect('/login')
   }
 
-  // Fetch existing business data (null if new user)
-  const business = await getBusiness()
-  const templates = await getEmailTemplates()
+  // Fetch business data directly
+  // Use explicit FK hint (!inner) to resolve ambiguity from circular relationship
+  const { data: business, error: businessError } = await supabase
+    .from('businesses')
+    .select(`
+      *,
+      email_templates!email_templates_business_id_fkey (
+        id,
+        name,
+        subject,
+        body,
+        is_default,
+        created_at
+      )
+    `)
+    .eq('user_id', user.id)
+    .single()
+
+  // Get templates
+  let templates: any[] = []
+  if (business) {
+    const { data } = await supabase
+      .from('email_templates')
+      .select('*')
+      .eq('business_id', business.id)
+      .order('is_default', { ascending: false })
+      .order('created_at', { ascending: true })
+    templates = data || []
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
