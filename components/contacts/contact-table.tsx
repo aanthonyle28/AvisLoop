@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import {
   useReactTable,
   getCoreRowModel,
@@ -54,65 +54,37 @@ export function ContactTable({
 
   // Filter state
   const [searchQuery, setSearchQuery] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'archived'>('all')
 
-  // Debounced search
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      // Apply search to name and email columns
-      if (searchQuery) {
-        setColumnFilters([
-          {
-            id: 'name',
-            value: searchQuery,
-          },
-        ])
-      } else {
-        setColumnFilters([])
+  // Filter data based on search query and status
+  const filteredData = useMemo(() => {
+    return data.filter((contact) => {
+      // Status filter
+      if (statusFilter !== 'all' && contact.status !== statusFilter) {
+        return false
       }
-    }, 300)
 
-    return () => clearTimeout(timer)
-  }, [searchQuery])
-
-  // Apply status filter
-  useEffect(() => {
-    const statusColumn = table.getColumn('status')
-    if (statusColumn) {
-      if (statusFilter === 'all') {
-        statusColumn.setFilterValue(undefined)
-      } else {
-        statusColumn.setFilterValue(statusFilter)
+      // Search filter (name or email)
+      if (debouncedSearch) {
+        const query = debouncedSearch.toLowerCase()
+        return (
+          contact.name.toLowerCase().includes(query) ||
+          contact.email.toLowerCase().includes(query)
+        )
       }
-    }
-  }, [statusFilter])
 
-  // Filter data based on search query
-  const filteredData = data.filter((contact) => {
-    // Status filter
-    if (statusFilter !== 'all' && contact.status !== statusFilter) {
-      return false
-    }
+      return true
+    })
+  }, [data, statusFilter, debouncedSearch])
 
-    // Search filter (name or email)
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase()
-      return (
-        contact.name.toLowerCase().includes(query) ||
-        contact.email.toLowerCase().includes(query)
-      )
-    }
-
-    return true
-  })
-
-  // Create columns with handlers
-  const columns = createColumns({
+  // Memoize columns with handlers to prevent recreation
+  const columns = useMemo(() => createColumns({
     onEdit,
     onArchive,
     onRestore,
     onDelete,
-  })
+  }), [onEdit, onArchive, onRestore, onDelete])
 
   // Initialize table
   const table = useReactTable({
@@ -142,7 +114,11 @@ export function ContactTable({
       {/* Filters */}
       <ContactFilters
         searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
+        onSearchChange={(query) => {
+          setSearchQuery(query)
+          // Debounce the actual filter update
+          setTimeout(() => setDebouncedSearch(query), 300)
+        }}
         statusFilter={statusFilter}
         onStatusFilterChange={setStatusFilter}
       />
