@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 Phase: 4 of 9 (Core Sending)
 Plan: 2 of 5
 Status: In progress
-Last activity: 2026-01-27 - Completed 04-02-PLAN.md (Email infrastructure setup)
+Last activity: 2026-01-27 - Completed 04-01-PLAN.md (Database schema and types)
 
 Progress: [████░░░░░░] ~38% (4/9 phases, 21/~52 plans complete)
 
@@ -91,6 +91,10 @@ Recent decisions affecting current work:
 - [03.1-01] escapeLikePattern helper escapes %, _, \ for ILIKE sanitization
 - [03.1-01] 100-item limit for bulk operations prevents memory/performance issues
 - [03.1-01] getContacts returns { contacts, total } for pagination support
+- [04-01] TEXT with CHECK constraint for send status enum (matches existing pattern)
+- [04-01] Store provider_id for webhook correlation with Resend/Postmark
+- [04-01] opted_out boolean on contacts for GDPR/CAN-SPAM compliance
+- [04-01] tier column on businesses for MVP send limit enforcement
 - [04-02] Resend singleton with environment variable validation at module load
 - [04-02] React Email components for type-safe, maintainable templates
 - [04-02] Rate limiter with dev-mode bypass (returns success if Upstash not configured)
@@ -115,6 +119,7 @@ None currently.
 - ⚠️ Migration 00002 pending (businesses/email_templates) - run in Supabase SQL Editor
 - ✅ Migration 00003 applied (contacts table with RLS)
 - ✅ Migration 00004 applied (businesses unique constraint)
+- ⚠️ Migration 00005 pending (send_logs table, opted_out/tier columns) - run in Supabase SQL Editor
 - ⚠️ Optional: Enable "Leaked password protection" in Supabase Auth settings
 - ⚠️ Resend API key required (RESEND_API_KEY) - see 04-02-SUMMARY.md User Setup section
 - ⚠️ Upstash Redis optional (UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN) - bypasses in dev
@@ -122,6 +127,6 @@ None currently.
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Completed 04-02-PLAN.md - Email infrastructure setup complete
+Stopped at: Completed 04-01-PLAN.md - Database schema and types complete
 Resume file: None
-Next: 04-03 - Send Server Action
+Next: 04-03 - Send Server Action (04-02 already complete)
