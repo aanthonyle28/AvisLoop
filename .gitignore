@@ -6,6 +6,9 @@ node_modules/
 .env.local
 .env.*.local
 
+# MCP config (contains secrets)
+.mcp.json
+
 # Build outputs
 .next/
 out/

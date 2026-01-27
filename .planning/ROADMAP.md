@@ -14,7 +14,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation & Auth** - Users can create accounts and access the app securely
 - [x] **Phase 2: Business Setup** - Users can configure their business profile and review settings
-- [ ] **Phase 3: Contact Management** - Users can add, organize, and manage customer contacts
+- [x] **Phase 3: Contact Management** - Users can add, organize, and manage customer contacts
+- [ ] **Phase 3.1: Critical Fixes** - Fix security vulnerabilities and scalability issues (INSERTED)
 - [ ] **Phase 4: Core Sending** - Users can send review request emails and see immediate confirmation
 - [ ] **Phase 5: Message History** - Users can view and track all sent review requests
 - [ ] **Phase 6: Billing & Limits** - Users can subscribe and system enforces tier limits
@@ -74,16 +75,30 @@ Plans:
 **Plans**: 6 plans
 
 Plans:
-- [ ] 03-01-PLAN.md - Database schema (contacts table), Zod validations, TypeScript types
-- [ ] 03-02-PLAN.md - Server Actions for contact CRUD and bulk operations
-- [ ] 03-03-PLAN.md - Install deps, DataTable with columns, search and filter UI
-- [ ] 03-04-PLAN.md - Add Contact dialog and Edit Contact sheet
-- [ ] 03-05-PLAN.md - CSV import dialog with preview and duplicate detection
-- [ ] 03-06-PLAN.md - Contacts page with empty state and full integration
+- [x] 03-01-PLAN.md - Database schema (contacts table), Zod validations, TypeScript types
+- [x] 03-02-PLAN.md - Server Actions for contact CRUD and bulk operations
+- [x] 03-03-PLAN.md - Install deps, DataTable with columns, search and filter UI
+- [x] 03-04-PLAN.md - Add Contact dialog and Edit Contact sheet
+- [x] 03-05-PLAN.md - CSV import dialog with preview and duplicate detection
+- [x] 03-06-PLAN.md - Contacts page with empty state and full integration
+
+### Phase 3.1: Critical Fixes (INSERTED)
+**Goal**: Fix critical security vulnerabilities and medium-priority issues identified in code review
+**Depends on**: Phase 3
+**Requirements**: None (fixes, not new features)
+**Success Criteria** (what must be TRUE):
+  1. searchContacts properly escapes special SQL characters (%, _, \) in query parameter
+  2. getContacts returns paginated results with limit and offset support
+  3. Bulk operations reject arrays larger than 100 items with clear error message
+  4. Database enforces one business per user via unique constraint
+**Plans**: 1 plan
+
+Plans:
+- [ ] 03.1-01-PLAN.md - Fix SQL injection, add pagination, add bulk limits, add DB unique constraint
 
 ### Phase 4: Core Sending
 **Goal**: Users can send review request emails and see immediate confirmation
-**Depends on**: Phase 3
+**Depends on**: Phase 3.1
 **Requirements**: SEND-01, SEND-02, SEND-03, SEND-04, SEND-05, SEND-06, SEND-07, SEND-08, SEND-09, SEND-10
 **Success Criteria** (what must be TRUE):
   1. User can select a contact and send a review request email
@@ -193,13 +208,14 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
+Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Auth | 6/6 | Complete | 2026-01-26 |
 | 2. Business Setup | 3/3 | Complete | 2026-01-27 |
-| 3. Contact Management | 0/6 | Planned | - |
+| 3. Contact Management | 6/6 | Complete | 2026-01-27 |
+| 3.1 Critical Fixes | 0/1 | Not started | - |
 | 4. Core Sending | 0/TBD | Not started | - |
 | 5. Message History | 0/TBD | Not started | - |
 | 6. Billing & Limits | 0/TBD | Not started | - |
