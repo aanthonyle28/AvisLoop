@@ -13,13 +13,13 @@ AvisLoop progresses from foundational authentication and data security through t
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation & Auth** - Users can create accounts and access the app securely
-- [ ] **Phase 2: Business Setup** - Users can configure their business profile and review settings
+- [x] **Phase 2: Business Setup** - Users can configure their business profile and review settings
 - [ ] **Phase 3: Contact Management** - Users can add, organize, and manage customer contacts
 - [ ] **Phase 4: Core Sending** - Users can send review request emails and see immediate confirmation
 - [ ] **Phase 5: Message History** - Users can view and track all sent review requests
 - [ ] **Phase 6: Billing & Limits** - Users can subscribe and system enforces tier limits
 - [ ] **Phase 7: Onboarding Flow** - New users are guided through first-time setup
-- [ ] **Phase 8: Public Pages** - Visitors can learn about and sign up for ReviewLoop
+- [ ] **Phase 8: Public Pages** - Visitors can learn about and sign up for AvisLoop
 
 ## Phase Details
 
@@ -55,9 +55,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 02-01-PLAN.md - Database schema (businesses + email_templates tables), Zod validations, TypeScript types
-- [ ] 02-02-PLAN.md - Server Actions for business CRUD (updateBusiness, createEmailTemplate, deleteEmailTemplate)
-- [ ] 02-03-PLAN.md - Settings page UI with business profile form and template management
+- [x] 02-01-PLAN.md - Database schema (businesses + email_templates tables), Zod validations, TypeScript types
+- [x] 02-02-PLAN.md - Server Actions for business CRUD (updateBusiness, createEmailTemplate, deleteEmailTemplate)
+- [x] 02-03-PLAN.md - Settings page UI with business profile form and template management
 
 ### Phase 3: Contact Management
 **Goal**: Users can add, organize, and manage customer contacts
@@ -171,7 +171,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Auth | 6/6 | Complete | 2026-01-26 |
-| 2. Business Setup | 0/3 | Planned | - |
+| 2. Business Setup | 3/3 | Complete | 2026-01-27 |
 | 3. Contact Management | 0/TBD | Not started | - |
 | 4. Core Sending | 0/TBD | Not started | - |
 | 5. Message History | 0/TBD | Not started | - |

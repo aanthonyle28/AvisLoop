@@ -14,10 +14,10 @@
 
 ### Business Profile
 
-- [ ] **BUSI-01**: User can create a business with name
-- [ ] **BUSI-02**: User can add/edit Google review link for their business
-- [ ] **BUSI-03**: User can select a default email template
-- [ ] **BUSI-04**: User can set a default sender name for emails (optional)
+- [x] **BUSI-01**: User can create a business with name
+- [x] **BUSI-02**: User can add/edit Google review link for their business
+- [x] **BUSI-03**: User can select a default email template
+- [x] **BUSI-04**: User can set a default sender name for emails (optional)
 
 ### Contacts
 
@@ -139,10 +139,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTH-02 | Phase 1 | Complete |
 | AUTH-03 | Phase 1 | Complete |
 | AUTH-04 | Phase 1 | Complete |
-| BUSI-01 | Phase 2 | Pending |
-| BUSI-02 | Phase 2 | Pending |
-| BUSI-03 | Phase 2 | Pending |
-| BUSI-04 | Phase 2 | Pending |
+| BUSI-01 | Phase 2 | Complete |
+| BUSI-02 | Phase 2 | Complete |
+| BUSI-03 | Phase 2 | Complete |
+| BUSI-04 | Phase 2 | Complete |
 | CONT-01 | Phase 3 | Pending |
 | CONT-02 | Phase 3 | Pending |
 | CONT-03 | Phase 3 | Pending |
