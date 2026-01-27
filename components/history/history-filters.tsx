@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { X, Search, Loader2 } from 'lucide-react'
-import type { SendStatus } from './status-badge'
 
 const STATUS_OPTIONS: { value: string; label: string }[] = [
   { value: 'all', label: 'All statuses' },

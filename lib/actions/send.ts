@@ -131,7 +131,6 @@ export async function sendReviewRequest(
   }
 
   // === Get template (optional - fall back to default) ===
-  let subject: string
   let template: { name: string; subject: string; body: string } | null = null
 
   if (templateId) {
@@ -145,7 +144,7 @@ export async function sendReviewRequest(
   }
 
   // Use custom subject or template subject or default
-  subject = customSubject || template?.subject || `${business.name} would love your feedback!`
+  const subject = customSubject || template?.subject || `${business.name} would love your feedback!`
 
   // === 7. Create send_log (status: 'pending') BEFORE calling API ===
   const { data: sendLog, error: logError } = await supabase
@@ -178,7 +177,7 @@ export async function sendReviewRequest(
 
   const { data: emailData, error: emailError } = await resend.emails.send(
     {
-      from: `${senderName} <reviews@avisloop.com>`, // Platform domain for MVP
+      from: `${senderName} <${process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'}>`,
       to: contact.email,
       subject,
       html,
