@@ -52,11 +52,12 @@ Plans:
   2. User can add and edit their Google review link
   3. User can select or customize an email template for review requests
   4. User can set a sender name that appears in review request emails
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md - Database schema (businesses + email_templates tables), Zod validations, TypeScript types
+- [ ] 02-02-PLAN.md - Server Actions for business CRUD (updateBusiness, createEmailTemplate, deleteEmailTemplate)
+- [ ] 02-03-PLAN.md - Settings page UI with business profile form and template management
 
 ### Phase 3: Contact Management
 **Goal**: Users can add, organize, and manage customer contacts
@@ -134,7 +135,7 @@ Plans:
 **Depends on**: Phase 6
 **Requirements**: ONBD-01, ONBD-02, ONBD-03, ONBD-04, ONBD-05, ONBD-06, ONBD-07, ONBD-08
 **Success Criteria** (what must be TRUE):
-  1. New user sees setup wizard after signup (business → review link → contact → first send)
+  1. New user sees setup wizard after signup (business -> review link -> contact -> first send)
   2. Wizard shows progress indicator (step X of Y)
   3. User can skip steps in wizard
   4. Dashboard shows "next best action" after onboarding completion
@@ -165,12 +166,12 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Auth | 6/6 | Complete | 2026-01-26 |
-| 2. Business Setup | 0/TBD | Not started | - |
+| 2. Business Setup | 0/3 | Planned | - |
 | 3. Contact Management | 0/TBD | Not started | - |
 | 4. Core Sending | 0/TBD | Not started | - |
 | 5. Message History | 0/TBD | Not started | - |
