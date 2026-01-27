@@ -34,3 +34,19 @@ export type BusinessUpdate = Partial<Omit<Business, 'id' | 'user_id' | 'created_
 
 export type EmailTemplateInsert = Omit<EmailTemplate, 'id' | 'created_at' | 'updated_at'>
 export type EmailTemplateUpdate = Partial<Omit<EmailTemplate, 'id' | 'business_id' | 'created_at' | 'updated_at'>>
+
+export interface Contact {
+  id: string
+  business_id: string
+  name: string
+  email: string
+  phone: string | null
+  status: 'active' | 'archived'
+  last_sent_at: string | null
+  send_count: number
+  created_at: string
+  updated_at: string
+}
+
+export type ContactInsert = Omit<Contact, 'id' | 'created_at' | 'updated_at' | 'last_sent_at' | 'send_count'>
+export type ContactUpdate = Partial<Omit<Contact, 'id' | 'business_id' | 'created_at' | 'updated_at'>>
