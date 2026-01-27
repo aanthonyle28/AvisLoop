@@ -128,11 +128,11 @@ Plans:
   2. User can see message status (sent, delivered, failed, opened)
   3. User can filter message history by date range
   4. User can search message history by recipient name or email
-**Plans**: TBD
+**Plans**: 2 plans in 2 waves
 
 Plans:
-- [ ] 05-01: TBD
-- [ ] 05-02: TBD
+- [ ] 05-01-PLAN.md — Data layer with filtering (getSendLogs extension) and reusable components (StatusBadge, HistoryFilters)
+- [ ] 05-02-PLAN.md — History table UI and page integration (columns, table, client, page)
 
 ### Phase 6: Billing & Limits
 **Goal**: Users can subscribe and system enforces tier limits
@@ -219,7 +219,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 6 -> 7 -> 8 -> 
 | 3. Contact Management | 6/6 | Complete | 2026-01-27 |
 | 3.1 Critical Fixes | 1/1 | Complete | 2026-01-27 |
 | 4. Core Sending | 0/5 | Not started | - |
-| 5. Message History | 0/TBD | Not started | - |
+| 5. Message History | 0/2 | Not started | - |
 | 6. Billing & Limits | 0/TBD | Not started | - |
 | 7. Onboarding Flow | 0/TBD | Not started | - |
 | 8. Public Pages | 0/TBD | Not started | - |
