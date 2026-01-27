@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 4 of 9 (Core Sending)
-Plan: 3 of 5
+Plan: 4 of 5
 Status: In progress
-Last activity: 2026-01-27 - Completed 04-03-PLAN.md (Send Server Action)
+Last activity: 2026-01-27 - Completed 04-04-PLAN.md (Resend Webhook Handler)
 
-Progress: [████░░░░░░] ~40% (4/9 phases, 22/~52 plans complete)
+Progress: [████░░░░░░] ~42% (4/9 phases, 23/~52 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 22
+- Total plans completed: 23
 - Average duration: 3 min
-- Total execution time: 1.04 hours
+- Total execution time: 1.07 hours
 
 **By Phase:**
 
@@ -31,10 +31,10 @@ Progress: [████░░░░░░] ~40% (4/9 phases, 22/~52 plans comple
 | 02-business-setup | 3 | 6 min | 2 min |
 | 03-contact-management | 6 | 19 min | 3 min |
 | 03.1-critical-fixes | 1 | 3 min | 3 min |
-| 04-core-sending | 3 | 6 min | 2 min |
+| 04-core-sending | 4 | 8 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-03 (2 min), 04-02 (2 min), 04-01 (2 min), 03.1-01 (3 min), 03-06 (8 min)
+- Last 5 plans: 04-04 (2 min), 04-03 (2 min), 04-02 (2 min), 04-01 (2 min), 03.1-01 (3 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -105,6 +105,9 @@ Recent decisions affecting current work:
 - [04-03] 14-day cooldown per contact enforced before send
 - [04-03] Monthly tier limits: trial (25), basic (200), pro (500)
 - [04-03] Update contact.last_sent_at and send_count after successful send
+- [04-04] Use service role key in webhook handler (no user context)
+- [04-04] Always return 200 from webhooks to prevent retry storms
+- [04-04] Auto opt-out contacts on bounced and complained events for GDPR/CAN-SPAM compliance
 
 ### Pending Todos
 
@@ -129,10 +132,11 @@ None currently.
 - ⚠️ Optional: Enable "Leaked password protection" in Supabase Auth settings
 - ⚠️ Resend API key required (RESEND_API_KEY) - see 04-02-SUMMARY.md User Setup section
 - ⚠️ Upstash Redis optional (UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN) - bypasses in dev
+- ⚠️ Resend webhook secret required (RESEND_WEBHOOK_SECRET) - see 04-04-SUMMARY.md User Setup section
 
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Completed 04-03-PLAN.md - Send Server Action complete
+Stopped at: Completed 04-04-PLAN.md - Resend Webhook Handler complete
 Resume file: None
-Next: 04-04 - Send Flow UI
+Next: 04-05 - Send History UI
