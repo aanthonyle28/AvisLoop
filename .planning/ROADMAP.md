@@ -71,12 +71,15 @@ Plans:
   4. User can search and filter contacts by name, email, date, or archived status
   5. System prevents duplicate contacts with the same email address
   6. Empty states show helpful prompts when no contacts exist
-**Plans**: TBD
+**Plans**: 6 plans
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
-- [ ] 03-03: TBD
+- [ ] 03-01-PLAN.md - Database schema (contacts table), Zod validations, TypeScript types
+- [ ] 03-02-PLAN.md - Server Actions for contact CRUD and bulk operations
+- [ ] 03-03-PLAN.md - Install deps, DataTable with columns, search and filter UI
+- [ ] 03-04-PLAN.md - Add Contact dialog and Edit Contact sheet
+- [ ] 03-05-PLAN.md - CSV import dialog with preview and duplicate detection
+- [ ] 03-06-PLAN.md - Contacts page with empty state and full integration
 
 ### Phase 4: Core Sending
 **Goal**: Users can send review request emails and see immediate confirmation
@@ -196,7 +199,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 |-------|----------------|--------|-----------|
 | 1. Foundation & Auth | 6/6 | Complete | 2026-01-26 |
 | 2. Business Setup | 3/3 | Complete | 2026-01-27 |
-| 3. Contact Management | 0/TBD | Not started | - |
+| 3. Contact Management | 0/6 | Planned | - |
 | 4. Core Sending | 0/TBD | Not started | - |
 | 5. Message History | 0/TBD | Not started | - |
 | 6. Billing & Limits | 0/TBD | Not started | - |
