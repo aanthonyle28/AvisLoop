@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 3 of 8 (Contact Management)
-Plan: 2 of 4 complete
+Plan: 3 of 4 complete
 Status: In progress
-Last activity: 2026-01-27 - Completed 03-02-PLAN.md
+Last activity: 2026-01-27 - Completed 03-04-PLAN.md
 
-Progress: [██░░░░░░░░] ~26% (2.5/9 phases, 13/~51 plans complete)
+Progress: [███░░░░░░░] ~27% (2.75/9 phases, 14/~51 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
+- Total plans completed: 14
 - Average duration: 2 min
-- Total execution time: 0.62 hours
+- Total execution time: 0.66 hours
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [██░░░░░░░░] ~26% (2.5/9 phases, 13/~51 plans comp
 |-------|-------|-------|----------|
 | 01-foundation-auth | 6 | 19 min | 3 min |
 | 02-business-setup | 3 | 6 min | 2 min |
-| 03-contact-management | 2 | 4 min | 2 min |
+| 03-contact-management | 3 | 6 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-02 (3 min), 03-01 (1 min), 02-03 (15 min w/ checkpoint), 02-02 (2 min), 02-01 (2 min)
+- Last 5 plans: 03-04 (2 min), 03-02 (3 min), 03-01 (1 min), 02-03 (15 min w/ checkpoint), 02-02 (2 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -70,6 +70,10 @@ Recent decisions affecting current work:
 - [03-02] Server-side business_id fetch (never trust client) for security
 - [03-02] bulkCreateContacts skips duplicates and returns detailed report for CSV import UX
 - [03-02] Collocate data fetching (getContacts, searchContacts) with mutations in contact.ts
+- [03-04] Use Dialog for add (not Sheet) for focused, blocking interaction
+- [03-04] Sheet slides from right, shows edit form + activity summary
+- [03-04] Auto-close on success by checking result.success in useActionState callback
+- [03-04] Form reset on contact change using useEffect + formRef
 
 ### Pending Todos
 
@@ -94,5 +98,5 @@ None currently.
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Completed 03-02-PLAN.md (Contact Server Actions)
+Stopped at: Completed 03-04-PLAN.md (Contact Forms UI)
 Resume file: None
