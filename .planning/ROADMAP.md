@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation & Auth** - Users can create accounts and access the app securely
 - [x] **Phase 2: Business Setup** - Users can configure their business profile and review settings
 - [x] **Phase 3: Contact Management** - Users can add, organize, and manage customer contacts
-- [ ] **Phase 3.1: Critical Fixes** - Fix security vulnerabilities and scalability issues (INSERTED)
+- [x] **Phase 3.1: Critical Fixes** - Fix security vulnerabilities and scalability issues (INSERTED)
 - [ ] **Phase 4: Core Sending** - Users can send review request emails and see immediate confirmation
 - [ ] **Phase 5: Message History** - Users can view and track all sent review requests
 - [ ] **Phase 6: Billing & Limits** - Users can subscribe and system enforces tier limits
@@ -94,7 +94,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 03.1-01-PLAN.md - Fix SQL injection, add pagination, add bulk limits, add DB unique constraint
+- [x] 03.1-01-PLAN.md - Fix SQL injection, add pagination, add bulk limits, add DB unique constraint
 
 ### Phase 4: Core Sending
 **Goal**: Users can send review request emails and see immediate confirmation
@@ -215,7 +215,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 6 -> 7 -> 8 -> 
 | 1. Foundation & Auth | 6/6 | Complete | 2026-01-26 |
 | 2. Business Setup | 3/3 | Complete | 2026-01-27 |
 | 3. Contact Management | 6/6 | Complete | 2026-01-27 |
-| 3.1 Critical Fixes | 0/1 | Not started | - |
+| 3.1 Critical Fixes | 1/1 | Complete | 2026-01-27 |
 | 4. Core Sending | 0/TBD | Not started | - |
 | 5. Message History | 0/TBD | Not started | - |
 | 6. Billing & Limits | 0/TBD | Not started | - |
