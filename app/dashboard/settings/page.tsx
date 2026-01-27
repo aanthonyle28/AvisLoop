@@ -1,11 +1,33 @@
 import { redirect } from 'next/navigation'
+import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { getBusiness, getEmailTemplates } from '@/lib/actions/business'
 import { BusinessSettingsForm } from '@/components/business-settings-form'
 import { EmailTemplateForm } from '@/components/email-template-form'
 import { TemplateList } from '@/components/template-list'
 
-export default async function SettingsPage() {
+// Loading skeleton for settings content
+function SettingsLoadingSkeleton() {
+  return (
+    <div className="max-w-4xl mx-auto p-6 space-y-8 animate-pulse">
+      <div>
+        <div className="h-9 w-32 bg-gray-200 rounded mb-2" />
+        <div className="h-5 w-80 bg-gray-200 rounded" />
+      </div>
+      <div className="border rounded-lg p-6 bg-white shadow-sm">
+        <div className="h-6 w-40 bg-gray-200 rounded mb-4" />
+        <div className="space-y-4">
+          <div className="h-10 bg-gray-200 rounded" />
+          <div className="h-10 bg-gray-200 rounded" />
+          <div className="h-10 bg-gray-200 rounded" />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Async component that fetches and renders settings content
+async function SettingsContent() {
   const supabase = await createClient()
 
   // Verify user is authenticated
@@ -59,5 +81,13 @@ export default async function SettingsPage() {
         )}
       </section>
     </div>
+  )
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={<SettingsLoadingSkeleton />}>
+      <SettingsContent />
+    </Suspense>
   )
 }
