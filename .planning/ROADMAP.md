@@ -20,6 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 6: Billing & Limits** - Users can subscribe and system enforces tier limits
 - [ ] **Phase 7: Onboarding Flow** - New users are guided through first-time setup
 - [ ] **Phase 8: Public Pages** - Visitors can learn about and sign up for AvisLoop
+- [ ] **Phase 9: Polish & UX** - App has consistent, polished visual design across all screens
 
 ## Phase Details
 
@@ -163,10 +164,33 @@ Plans:
 Plans:
 - [ ] 08-01: TBD
 
+### Phase 9: Polish & UX
+**Goal**: App has consistent, polished visual design across all screens
+**Depends on**: Phase 8 (all functionality complete)
+**Requirements**: None (quality pass, not new functionality)
+**Success Criteria** (what must be TRUE):
+  1. All screens follow consistent visual design system
+  2. Empty states, loading states, and error states are polished
+  3. Responsive design works on mobile, tablet, desktop
+  4. Micro-interactions and transitions feel smooth
+  5. Typography, spacing, and colors are consistent
+**Plans**: TBD
+
+**Implementation Notes:**
+- Use `/web-design-guidelines` skill for design system decisions
+- Use `/senior-frontend` skill for component implementation
+- User may provide Figma designs to implement — if so, match designs exactly
+- If no Figma provided, create clean minimal design following shadcn/ui patterns
+
+Plans:
+- [ ] 09-01: TBD (design audit + system)
+- [ ] 09-02: TBD (component polish)
+- [ ] 09-03: TBD (responsive + states)
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -178,3 +202,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 6. Billing & Limits | 0/TBD | Not started | - |
 | 7. Onboarding Flow | 0/TBD | Not started | - |
 | 8. Public Pages | 0/TBD | Not started | - |
+| 9. Polish & UX | 0/TBD | Not started | - |
