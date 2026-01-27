@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 Phase: 3 of 8 (Contact Management)
 Plan: 3 of 4 complete
 Status: In progress
-Last activity: 2026-01-27 - Completed 03-04-PLAN.md
+Last activity: 2026-01-27 - Completed 03-03-PLAN.md
 
 Progress: [███░░░░░░░] ~27% (2.75/9 phases, 14/~51 plans complete)
 
@@ -70,6 +70,10 @@ Recent decisions affecting current work:
 - [03-02] Server-side business_id fetch (never trust client) for security
 - [03-02] bulkCreateContacts skips duplicates and returns detailed report for CSV import UX
 - [03-02] Collocate data fetching (getContacts, searchContacts) with mutations in contact.ts
+- [03-03] Use TanStack Table for headless table functionality
+- [03-03] Debounce search with 300ms delay for performance
+- [03-03] Default sort by last_sent_at DESC (most recent first)
+- [03-03] Client-side filtering for performance on small datasets
 - [03-04] Use Dialog for add (not Sheet) for focused, blocking interaction
 - [03-04] Sheet slides from right, shows edit form + activity summary
 - [03-04] Auto-close on success by checking result.success in useActionState callback
@@ -98,5 +102,5 @@ None currently.
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Completed 03-04-PLAN.md (Contact Forms UI)
+Stopped at: Completed 03-03-PLAN.md (Contact List UI)
 Resume file: None
