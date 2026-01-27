@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 4 of 9 (Core Sending)
-Plan: 2 of 5
+Plan: 3 of 5
 Status: In progress
-Last activity: 2026-01-27 - Completed 04-01-PLAN.md (Database schema and types)
+Last activity: 2026-01-27 - Completed 04-03-PLAN.md (Send Server Action)
 
-Progress: [████░░░░░░] ~38% (4/9 phases, 21/~52 plans complete)
+Progress: [████░░░░░░] ~40% (4/9 phases, 22/~52 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 21
+- Total plans completed: 22
 - Average duration: 3 min
-- Total execution time: 1.00 hours
+- Total execution time: 1.04 hours
 
 **By Phase:**
 
@@ -31,10 +31,10 @@ Progress: [████░░░░░░] ~38% (4/9 phases, 21/~52 plans comple
 | 02-business-setup | 3 | 6 min | 2 min |
 | 03-contact-management | 6 | 19 min | 3 min |
 | 03.1-critical-fixes | 1 | 3 min | 3 min |
-| 04-core-sending | 2 | 4 min | 2 min |
+| 04-core-sending | 3 | 6 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-02 (2 min), 04-01 (2 min), 03.1-01 (3 min), 03-06 (8 min), 03-05 (5 min)
+- Last 5 plans: 04-03 (2 min), 04-02 (2 min), 04-01 (2 min), 03.1-01 (3 min), 03-06 (8 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -99,6 +99,12 @@ Recent decisions affecting current work:
 - [04-02] React Email components for type-safe, maintainable templates
 - [04-02] Rate limiter with dev-mode bypass (returns success if Upstash not configured)
 - [04-02] Sliding window rate limit: 10 sends per minute per user
+- [04-03] Create send_log BEFORE calling email API for audit trail even on failures
+- [04-03] Use idempotency key (send-{sendLogId}) to prevent duplicate sends
+- [04-03] Tag emails with send_log_id and business_id for webhook correlation
+- [04-03] 14-day cooldown per contact enforced before send
+- [04-03] Monthly tier limits: trial (25), basic (200), pro (500)
+- [04-03] Update contact.last_sent_at and send_count after successful send
 
 ### Pending Todos
 
@@ -127,6 +133,6 @@ None currently.
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Completed 04-01-PLAN.md - Database schema and types complete
+Stopped at: Completed 04-03-PLAN.md - Send Server Action complete
 Resume file: None
-Next: 04-03 - Send Server Action (04-02 already complete)
+Next: 04-04 - Send Flow UI
