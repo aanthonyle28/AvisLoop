@@ -110,12 +110,14 @@ Plans:
   7. System enforces monthly send limits per tier (Basic: 200, Pro: 500)
   8. System rate-limits sending to prevent abuse
   9. System updates message status on delivery/failure via webhooks
-**Plans**: TBD
+**Plans**: 5 plans in 3 waves
 
 Plans:
-- [ ] 04-01: TBD
-- [ ] 04-02: TBD
-- [ ] 04-03: TBD
+- [ ] 04-01-PLAN.md — Database schema (send_logs table, opted_out column, tier column, RLS)
+- [ ] 04-02-PLAN.md — Email infrastructure (Resend client, React Email template, rate limiter)
+- [ ] 04-03-PLAN.md — Send Server Action with all validation checks
+- [ ] 04-04-PLAN.md — Webhook handler for delivery status updates
+- [ ] 04-05-PLAN.md — Send UI (contact selection, preview, confirmation)
 
 ### Phase 5: Message History
 **Goal**: Users can view and track all sent review requests
@@ -216,7 +218,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 6 -> 7 -> 8 -> 
 | 2. Business Setup | 3/3 | Complete | 2026-01-27 |
 | 3. Contact Management | 6/6 | Complete | 2026-01-27 |
 | 3.1 Critical Fixes | 1/1 | Complete | 2026-01-27 |
-| 4. Core Sending | 0/TBD | Not started | - |
+| 4. Core Sending | 0/5 | Not started | - |
 | 5. Message History | 0/TBD | Not started | - |
 | 6. Billing & Limits | 0/TBD | Not started | - |
 | 7. Onboarding Flow | 0/TBD | Not started | - |
