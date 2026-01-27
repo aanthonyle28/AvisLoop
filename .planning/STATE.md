@@ -5,32 +5,33 @@
 See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Make requesting reviews so simple that business owners actually do it — one contact, one click, done.
-**Current focus:** Phase 1 complete, ready for Phase 2
+**Current focus:** Phase 2 - Business Setup (plan 01 complete)
 
 ## Current Position
 
-Phase: 1 of 8 (Foundation & Auth) - COMPLETE
-Plan: 6 of 6 complete
-Status: Phase verified and complete
-Last activity: 2026-01-26 - Phase 1 verified, all gaps closed
+Phase: 2 of 8 (Business Setup)
+Plan: 1 of 4 complete
+Status: In progress
+Last activity: 2026-01-26 - Completed 02-01-PLAN.md (Business Schema)
 
-Progress: [██░░░░░░░░] ~12.5% (1/8 phases complete)
+Progress: [██░░░░░░░░] ~15% (1/8 phases, 7/~48 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
+- Total plans completed: 7
 - Average duration: 3 min
-- Total execution time: 0.32 hours
+- Total execution time: 0.35 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation-auth | 6 | 19 min | 3 min |
+| 02-business-setup | 1 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-06 (3 min), 01-05 (1 min), 01-04 (1 min), 01-03 (2 min), 01-02 (1 min)
+- Last 5 plans: 02-01 (2 min), 01-06 (3 min), 01-05 (1 min), 01-04 (1 min), 01-03 (2 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -54,6 +55,9 @@ Recent decisions affecting current work:
 - useActionState pattern used for all auth forms with pending state
 - Per-field error display using fieldErrors from Server Action response
 - LogoutButton simplified to form action without 'use client' directive
+- [02-01] Use subquery pattern for child table RLS (email_templates)
+- [02-01] Store default templates in code, clone on business creation
+- [02-01] Use .optional().or(z.literal('')) for optional form fields
 
 ### Pending Todos
 
@@ -65,11 +69,17 @@ None yet.
 
 [Issues that affect future work]
 
-- User needs to configure Supabase project and add env vars before auth will work
-- User needs to run migration in Supabase Dashboard SQL Editor
+None currently.
+
+### Completed Setup
+
+- ✅ Supabase project configured (env vars in .env.local)
+- ✅ Migration 00001 applied (profiles table with RLS)
+- ⚠️ Migration 00002 pending (businesses/email_templates) - run in Supabase SQL Editor
+- ⚠️ Optional: Enable "Leaked password protection" in Supabase Auth settings
 
 ## Session Continuity
 
 Last session: 2026-01-26
-Stopped at: Phase 1 complete and verified
+Stopped at: Completed 02-01-PLAN.md
 Resume file: None
