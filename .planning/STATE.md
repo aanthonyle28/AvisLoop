@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 3 of 8 (Contact Management)
-Plan: 1 of 4 complete
+Plan: 2 of 4 complete
 Status: In progress
-Last activity: 2026-01-27 - Completed 03-01-PLAN.md
+Last activity: 2026-01-27 - Completed 03-02-PLAN.md
 
-Progress: [██░░░░░░░░] ~24% (2.25/9 phases, 12/~51 plans complete)
+Progress: [██░░░░░░░░] ~26% (2.5/9 phases, 13/~51 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
+- Total plans completed: 13
 - Average duration: 2 min
-- Total execution time: 0.57 hours
+- Total execution time: 0.62 hours
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [██░░░░░░░░] ~24% (2.25/9 phases, 12/~51 plans com
 |-------|-------|-------|----------|
 | 01-foundation-auth | 6 | 19 min | 3 min |
 | 02-business-setup | 3 | 6 min | 2 min |
-| 03-contact-management | 1 | 1 min | 1 min |
+| 03-contact-management | 2 | 4 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01 (1 min), 02-03 (15 min w/ checkpoint), 02-02 (2 min), 02-01 (2 min), 01-06 (3 min)
+- Last 5 plans: 03-02 (3 min), 03-01 (1 min), 02-03 (15 min w/ checkpoint), 02-02 (2 min), 02-01 (2 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -66,6 +66,10 @@ Recent decisions affecting current work:
 - [03-01] Status field limited to 'active'/'archived' via CHECK constraint for contact archival
 - [03-01] Optional phone field for future SMS support (nullable TEXT, max 20 chars)
 - [03-01] Tracking fields (last_sent_at, send_count) for send analytics and spam prevention
+- [03-02] Lowercase email normalization prevents case-sensitive duplicates
+- [03-02] Server-side business_id fetch (never trust client) for security
+- [03-02] bulkCreateContacts skips duplicates and returns detailed report for CSV import UX
+- [03-02] Collocate data fetching (getContacts, searchContacts) with mutations in contact.ts
 
 ### Pending Todos
 
@@ -90,5 +94,5 @@ None currently.
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Completed 03-01-PLAN.md (Contact Database Schema)
+Stopped at: Completed 03-02-PLAN.md (Contact Server Actions)
 Resume file: None
