@@ -8,7 +8,7 @@ export const metadata = {
 }
 
 async function ContactsContent() {
-  const contacts = await getContacts()
+  const { contacts } = await getContacts()
   return <ContactsClient initialContacts={contacts} />
 }
 

@@ -446,15 +446,18 @@ export async function bulkCreateContacts(
 }
 
 /**
- * Fetch all contacts for the current user's business.
+ * Fetch contacts for the current user's business with pagination.
  * For use in Server Components.
  */
-export async function getContacts(): Promise<Contact[]> {
+export async function getContacts(options?: {
+  limit?: number
+  offset?: number
+}): Promise<{ contacts: Contact[]; total: number }> {
   const supabase = await createClient()
 
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
-    return []
+    return { contacts: [], total: 0 }
   }
 
   // Get user's business first
@@ -465,18 +468,28 @@ export async function getContacts(): Promise<Contact[]> {
     .single()
 
   if (!business) {
-    return []
+    return { contacts: [], total: 0 }
   }
 
-  // Fetch contacts ordered by last_sent_at DESC NULLS LAST, then created_at DESC
+  const limit = options?.limit ?? 50
+  const offset = options?.offset ?? 0
+
+  // Get total count first
+  const { count } = await supabase
+    .from('contacts')
+    .select('*', { count: 'exact', head: true })
+    .eq('business_id', business.id)
+
+  // Fetch paginated contacts ordered by last_sent_at DESC NULLS LAST, then created_at DESC
   const { data: contacts } = await supabase
     .from('contacts')
     .select('*')
     .eq('business_id', business.id)
     .order('last_sent_at', { ascending: false, nullsFirst: false })
     .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1)
 
-  return contacts || []
+  return { contacts: contacts || [], total: count || 0 }
 }
 
 /**

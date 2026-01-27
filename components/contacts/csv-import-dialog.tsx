@@ -70,7 +70,7 @@ export function CSVImportDialog() {
       skipEmptyLines: true,
       complete: async (results) => {
         // Fetch existing emails from database
-        const contacts = await getContacts()
+        const { contacts } = await getContacts()
         const existingEmailsSet = new Set(contacts.map(c => c.email.toLowerCase()))
         setExistingEmails(existingEmailsSet)
 
