@@ -5,6 +5,17 @@ import { revalidatePath } from 'next/cache'
 import { contactSchema } from '@/lib/validations/contact'
 import type { Contact } from '@/lib/types/database'
 
+/**
+ * Escape special characters for LIKE/ILIKE patterns.
+ * Prevents SQL injection via pattern characters.
+ */
+function escapeLikePattern(str: string): string {
+  return str
+    .replace(/\\/g, '\\\\')  // Escape backslash first
+    .replace(/%/g, '\\%')    // Escape percent
+    .replace(/_/g, '\\_')    // Escape underscore
+}
+
 export type ContactActionState = {
   error?: string
   fieldErrors?: Record<string, string[]>
@@ -289,6 +300,10 @@ export async function bulkArchiveContacts(
     return { error: 'No contacts selected' }
   }
 
+  if (contactIds.length > 100) {
+    return { error: 'Cannot archive more than 100 contacts at once' }
+  }
+
   // Update all contacts to archived (RLS handles ownership check)
   const { error } = await supabase
     .from('contacts')
@@ -319,6 +334,10 @@ export async function bulkDeleteContacts(
 
   if (!contactIds || contactIds.length === 0) {
     return { error: 'No contacts selected' }
+  }
+
+  if (contactIds.length > 100) {
+    return { error: 'Cannot delete more than 100 contacts at once' }
   }
 
   // Delete all contacts (RLS handles ownership check)
@@ -363,6 +382,10 @@ export async function bulkCreateContacts(
 
   if (!contacts || contacts.length === 0) {
     return { error: 'No contacts provided' }
+  }
+
+  if (contacts.length > 100) {
+    return { error: 'Cannot import more than 100 contacts at once' }
   }
 
   // Lowercase all emails
@@ -493,7 +516,8 @@ export async function searchContacts(
 
   // Search by name or email if query provided
   if (query) {
-    queryBuilder = queryBuilder.or(`name.ilike.%${query}%,email.ilike.%${query}%`)
+    const escapedQuery = escapeLikePattern(query)
+    queryBuilder = queryBuilder.or(`name.ilike.%${escapedQuery}%,email.ilike.%${escapedQuery}%`)
   }
 
   // Apply status filter
