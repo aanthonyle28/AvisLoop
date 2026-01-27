@@ -5,33 +5,33 @@
 See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Make requesting reviews so simple that business owners actually do it — one contact, one click, done.
-**Current focus:** Phase 2 - Business Setup (plan 01 complete)
+**Current focus:** Phase 2 - Business Setup (plan 02 complete)
 
 ## Current Position
 
 Phase: 2 of 8 (Business Setup)
-Plan: 1 of 4 complete
+Plan: 2 of 4 complete
 Status: In progress
-Last activity: 2026-01-26 - Completed 02-01-PLAN.md (Business Schema)
+Last activity: 2026-01-27 - Completed 02-02-PLAN.md (Business Server Actions)
 
-Progress: [██░░░░░░░░] ~15% (1/8 phases, 7/~48 plans complete)
+Progress: [██░░░░░░░░] ~17% (1/8 phases, 8/~48 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
+- Total plans completed: 8
 - Average duration: 3 min
-- Total execution time: 0.35 hours
+- Total execution time: 0.38 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation-auth | 6 | 19 min | 3 min |
-| 02-business-setup | 1 | 2 min | 2 min |
+| 02-business-setup | 2 | 4 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (2 min), 01-06 (3 min), 01-05 (1 min), 01-04 (1 min), 01-03 (2 min)
+- Last 5 plans: 02-02 (2 min), 02-01 (2 min), 01-06 (3 min), 01-05 (1 min), 01-04 (1 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -58,6 +58,8 @@ Recent decisions affecting current work:
 - [02-01] Use subquery pattern for child table RLS (email_templates)
 - [02-01] Store default templates in code, clone on business creation
 - [02-01] Use .optional().or(z.literal('')) for optional form fields
+- [02-02] Use upsert pattern (check existing then insert/update) for business profile
+- [02-02] Collocate data fetching functions with Server Actions in business.ts
 
 ### Pending Todos
 
@@ -80,6 +82,6 @@ None currently.
 
 ## Session Continuity
 
-Last session: 2026-01-26
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-01-27
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None
