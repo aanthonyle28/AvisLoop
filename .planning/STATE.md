@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 
 ## Current Position
 
-Phase: 4 of 9 (Core Sending)
-Plan: 4 of 5
+Phase: 5 of 9 (Send History & Analytics)
+Plan: 1 of 3
 Status: In progress
-Last activity: 2026-01-27 - Completed 04-04-PLAN.md (Resend Webhook Handler)
+Last activity: 2026-01-27 - Completed 05-01-PLAN.md (Data Layer & Filter UI)
 
-Progress: [████░░░░░░] ~42% (4/9 phases, 23/~52 plans complete)
+Progress: [█████░░░░░] ~46% (5/9 phases, 24/~52 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 23
+- Total plans completed: 24
 - Average duration: 3 min
-- Total execution time: 1.07 hours
+- Total execution time: 1.10 hours
 
 **By Phase:**
 
@@ -32,9 +32,10 @@ Progress: [████░░░░░░] ~42% (4/9 phases, 23/~52 plans comple
 | 03-contact-management | 6 | 19 min | 3 min |
 | 03.1-critical-fixes | 1 | 3 min | 3 min |
 | 04-core-sending | 4 | 8 min | 2 min |
+| 05-message-history | 1 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-04 (2 min), 04-03 (2 min), 04-02 (2 min), 04-01 (2 min), 03.1-01 (3 min)
+- Last 5 plans: 05-01 (2 min), 04-04 (2 min), 04-03 (2 min), 04-02 (2 min), 04-01 (2 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -108,6 +109,11 @@ Recent decisions affecting current work:
 - [04-04] Use service role key in webhook handler (no user context)
 - [04-04] Always return 200 from webhooks to prevent retry storms
 - [04-04] Auto opt-out contacts on bounced and complained events for GDPR/CAN-SPAM compliance
+- [05-01] Export escapeLikePattern from contact.ts for reuse across features
+- [05-01] URL searchParams for filter state (not useState) for shareable URLs
+- [05-01] Native HTML select with Tailwind styling (ui/select doesn't exist)
+- [05-01] 300ms debounce on search to reduce server load
+- [05-01] Semantic color scheme for statuses: green (success), red (failures), blue/gray (in-progress)
 
 ### Pending Todos
 
@@ -137,6 +143,6 @@ None currently.
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Completed 04-04-PLAN.md - Resend Webhook Handler complete
+Stopped at: Completed 05-01-PLAN.md - Data Layer & Filter UI complete
 Resume file: None
-Next: 04-05 - Send History UI
+Next: 05-02 - History Table Page
