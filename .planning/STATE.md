@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Make requesting reviews so simple that business owners actually do it — one contact, one click, done.
-**Current focus:** Phase 3.1 - Critical Fixes (complete)
+**Current focus:** Phase 4 - Core Sending
 
 ## Current Position
 
-Phase: 3.1 of 9 (Critical Fixes) - COMPLETE
-Plan: 1 of 1 complete
-Status: Ready for Phase 4
-Last activity: 2026-01-27 - Completed 03.1-01-PLAN.md (Critical fixes complete)
+Phase: 4 of 9 (Core Sending)
+Plan: 2 of 5
+Status: In progress
+Last activity: 2026-01-27 - Completed 04-02-PLAN.md (Email infrastructure setup)
 
-Progress: [████░░░░░░] ~35% (3.1/9 phases, 19/~52 plans complete)
+Progress: [████░░░░░░] ~38% (4/9 phases, 21/~52 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 19
+- Total plans completed: 21
 - Average duration: 3 min
-- Total execution time: 0.93 hours
+- Total execution time: 1.00 hours
 
 **By Phase:**
 
@@ -31,9 +31,10 @@ Progress: [████░░░░░░] ~35% (3.1/9 phases, 19/~52 plans comp
 | 02-business-setup | 3 | 6 min | 2 min |
 | 03-contact-management | 6 | 19 min | 3 min |
 | 03.1-critical-fixes | 1 | 3 min | 3 min |
+| 04-core-sending | 2 | 4 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 03.1-01 (3 min), 03-06 (8 min), 03-05 (5 min), 03-04 (2 min), 03-03 (3 min)
+- Last 5 plans: 04-02 (2 min), 04-01 (2 min), 03.1-01 (3 min), 03-06 (8 min), 03-05 (5 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -90,6 +91,10 @@ Recent decisions affecting current work:
 - [03.1-01] escapeLikePattern helper escapes %, _, \ for ILIKE sanitization
 - [03.1-01] 100-item limit for bulk operations prevents memory/performance issues
 - [03.1-01] getContacts returns { contacts, total } for pagination support
+- [04-02] Resend singleton with environment variable validation at module load
+- [04-02] React Email components for type-safe, maintainable templates
+- [04-02] Rate limiter with dev-mode bypass (returns success if Upstash not configured)
+- [04-02] Sliding window rate limit: 10 sends per minute per user
 
 ### Pending Todos
 
@@ -111,10 +116,12 @@ None currently.
 - ✅ Migration 00003 applied (contacts table with RLS)
 - ✅ Migration 00004 applied (businesses unique constraint)
 - ⚠️ Optional: Enable "Leaked password protection" in Supabase Auth settings
+- ⚠️ Resend API key required (RESEND_API_KEY) - see 04-02-SUMMARY.md User Setup section
+- ⚠️ Upstash Redis optional (UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN) - bypasses in dev
 
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Completed 03.1-01-PLAN.md - Critical fixes complete
+Stopped at: Completed 04-02-PLAN.md - Email infrastructure setup complete
 Resume file: None
-Next: Phase 4 - Core Sending
+Next: 04-03 - Send Server Action
