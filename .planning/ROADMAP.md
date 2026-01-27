@@ -16,8 +16,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Business Setup** - Users can configure their business profile and review settings
 - [x] **Phase 3: Contact Management** - Users can add, organize, and manage customer contacts
 - [x] **Phase 3.1: Critical Fixes** - Fix security vulnerabilities and scalability issues (INSERTED)
-- [ ] **Phase 4: Core Sending** - Users can send review request emails and see immediate confirmation
-- [ ] **Phase 5: Message History** - Users can view and track all sent review requests
+- [x] **Phase 4: Core Sending** - Users can send review request emails and see immediate confirmation
+- [x] **Phase 5: Message History** - Users can view and track all sent review requests
 - [ ] **Phase 6: Billing & Limits** - Users can subscribe and system enforces tier limits
 - [ ] **Phase 7: Onboarding Flow** - New users are guided through first-time setup
 - [ ] **Phase 8: Public Pages** - Visitors can learn about and sign up for AvisLoop
@@ -113,11 +113,11 @@ Plans:
 **Plans**: 5 plans in 3 waves
 
 Plans:
-- [ ] 04-01-PLAN.md — Database schema (send_logs table, opted_out column, tier column, RLS)
-- [ ] 04-02-PLAN.md — Email infrastructure (Resend client, React Email template, rate limiter)
-- [ ] 04-03-PLAN.md — Send Server Action with all validation checks
-- [ ] 04-04-PLAN.md — Webhook handler for delivery status updates
-- [ ] 04-05-PLAN.md — Send UI (contact selection, preview, confirmation)
+- [x] 04-01-PLAN.md — Database schema (send_logs table, opted_out column, tier column, RLS)
+- [x] 04-02-PLAN.md — Email infrastructure (Resend client, React Email template, rate limiter)
+- [x] 04-03-PLAN.md — Send Server Action with all validation checks
+- [x] 04-04-PLAN.md — Webhook handler for delivery status updates
+- [x] 04-05-PLAN.md — Send UI (contact selection, preview, confirmation)
 
 ### Phase 5: Message History
 **Goal**: Users can view and track all sent review requests
@@ -131,8 +131,8 @@ Plans:
 **Plans**: 2 plans in 2 waves
 
 Plans:
-- [ ] 05-01-PLAN.md — Data layer with filtering (getSendLogs extension) and reusable components (StatusBadge, HistoryFilters)
-- [ ] 05-02-PLAN.md — History table UI and page integration (columns, table, client, page)
+- [x] 05-01-PLAN.md — Data layer with filtering (getSendLogs extension) and reusable components (StatusBadge, HistoryFilters)
+- [x] 05-02-PLAN.md — History table UI and page integration (columns, table, client, page)
 
 ### Phase 6: Billing & Limits
 **Goal**: Users can subscribe and system enforces tier limits
@@ -218,8 +218,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 6 -> 7 -> 8 -> 
 | 2. Business Setup | 3/3 | Complete | 2026-01-27 |
 | 3. Contact Management | 6/6 | Complete | 2026-01-27 |
 | 3.1 Critical Fixes | 1/1 | Complete | 2026-01-27 |
-| 4. Core Sending | 0/5 | Not started | - |
-| 5. Message History | 0/2 | Not started | - |
+| 4. Core Sending | 5/5 | Complete | 2026-01-27 |
+| 5. Message History | 2/2 | Complete | 2026-01-27 |
 | 6. Billing & Limits | 0/TBD | Not started | - |
 | 7. Onboarding Flow | 0/TBD | Not started | - |
 | 8. Public Pages | 0/TBD | Not started | - |
