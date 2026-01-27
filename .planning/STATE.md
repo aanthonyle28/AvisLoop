@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Make requesting reviews so simple that business owners actually do it — one contact, one click, done.
-**Current focus:** Phase 3 - Contact Management (in progress)
+**Current focus:** Phase 3.1 - Critical Fixes (complete)
 
 ## Current Position
 
-Phase: 3 of 8 (Contact Management)
-Plan: 4 of 4 complete
-Status: Phase complete
-Last activity: 2026-01-27 - Completed 03-05-PLAN.md
+Phase: 3.1 of 9 (Critical Fixes) - COMPLETE
+Plan: 1 of 1 complete
+Status: Ready for Phase 4
+Last activity: 2026-01-27 - Completed 03.1-01-PLAN.md (Critical fixes complete)
 
-Progress: [███░░░░░░░] ~29% (3/9 phases, 15/~51 plans complete)
+Progress: [████░░░░░░] ~35% (3.1/9 phases, 19/~52 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
-- Average duration: 2 min
-- Total execution time: 0.74 hours
+- Total plans completed: 19
+- Average duration: 3 min
+- Total execution time: 0.93 hours
 
 **By Phase:**
 
@@ -29,10 +29,11 @@ Progress: [███░░░░░░░] ~29% (3/9 phases, 15/~51 plans comple
 |-------|-------|-------|----------|
 | 01-foundation-auth | 6 | 19 min | 3 min |
 | 02-business-setup | 3 | 6 min | 2 min |
-| 03-contact-management | 4 | 11 min | 3 min |
+| 03-contact-management | 6 | 19 min | 3 min |
+| 03.1-critical-fixes | 1 | 3 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-05 (5 min), 03-04 (2 min), 03-02 (3 min), 03-01 (1 min), 02-03 (15 min w/ checkpoint)
+- Last 5 plans: 03.1-01 (3 min), 03-06 (8 min), 03-05 (5 min), 03-04 (2 min), 03-03 (3 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -86,6 +87,9 @@ Recent decisions affecting current work:
 - [03-05] Fetch existing emails from database for duplicate detection before import
 - [03-05] Multi-step dialog flow: upload -> preview -> importing -> complete
 - [03-05] Filter duplicates and invalid rows before calling bulkCreateContacts
+- [03.1-01] escapeLikePattern helper escapes %, _, \ for ILIKE sanitization
+- [03.1-01] 100-item limit for bulk operations prevents memory/performance issues
+- [03.1-01] getContacts returns { contacts, total } for pagination support
 
 ### Pending Todos
 
@@ -104,11 +108,13 @@ None currently.
 - ✅ Supabase project configured (env vars in .env.local)
 - ✅ Migration 00001 applied (profiles table with RLS)
 - ⚠️ Migration 00002 pending (businesses/email_templates) - run in Supabase SQL Editor
-- ⚠️ Migration 00003 pending (contacts) - run in Supabase SQL Editor
+- ✅ Migration 00003 applied (contacts table with RLS)
+- ⚠️ Migration 00004 pending (businesses unique constraint) - run in Supabase SQL Editor
 - ⚠️ Optional: Enable "Leaked password protection" in Supabase Auth settings
 
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Completed 03-05-PLAN.md (CSV Import Dialog) - Phase 3 complete
+Stopped at: Completed 03.1-01-PLAN.md - Critical fixes complete
 Resume file: None
+Next: Phase 4 - Core Sending
