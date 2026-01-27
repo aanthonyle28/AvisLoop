@@ -1,4 +1,4 @@
-# Pitfalls Research: ReviewLoop
+# Pitfalls Research: AvisLoop
 
 **Researched:** 2026-01-25
 

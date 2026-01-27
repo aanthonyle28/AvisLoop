@@ -1,4 +1,4 @@
-# Features Research: ReviewLoop
+# Features Research: AvisLoop
 
 **Researched:** 2026-01-25
 
@@ -60,7 +60,7 @@ Things to deliberately avoid.
 ### Pricing Benchmarks
 - Entry-level review management: $23-124/month
 - Mid-market: $50-150/month
-- ReviewLoop positioning: $49 Basic / $99 Pro is competitive
+- AvisLoop positioning: $49 Basic / $99 Pro is competitive
 
 ### Key Success Factors
 - **Automation saves time**: Users save ~3.5 hours/week with automated tools

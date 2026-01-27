@@ -1,4 +1,4 @@
-# Stack Research: ReviewLoop
+# Stack Research: AvisLoop
 
 **Researched:** 2026-01-25
 
