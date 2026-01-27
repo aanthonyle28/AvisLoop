@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 3 of 8 (Contact Management)
-Plan: 3 of 4 complete
-Status: In progress
-Last activity: 2026-01-27 - Completed 03-03-PLAN.md
+Plan: 4 of 4 complete
+Status: Phase complete
+Last activity: 2026-01-27 - Completed 03-05-PLAN.md
 
-Progress: [███░░░░░░░] ~27% (2.75/9 phases, 14/~51 plans complete)
+Progress: [███░░░░░░░] ~29% (3/9 phases, 15/~51 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14
+- Total plans completed: 15
 - Average duration: 2 min
-- Total execution time: 0.66 hours
+- Total execution time: 0.74 hours
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [███░░░░░░░] ~27% (2.75/9 phases, 14/~51 plans com
 |-------|-------|-------|----------|
 | 01-foundation-auth | 6 | 19 min | 3 min |
 | 02-business-setup | 3 | 6 min | 2 min |
-| 03-contact-management | 3 | 6 min | 2 min |
+| 03-contact-management | 4 | 11 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-04 (2 min), 03-02 (3 min), 03-01 (1 min), 02-03 (15 min w/ checkpoint), 02-02 (2 min)
+- Last 5 plans: 03-05 (5 min), 03-04 (2 min), 03-02 (3 min), 03-01 (1 min), 02-03 (15 min w/ checkpoint)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -70,6 +70,10 @@ Recent decisions affecting current work:
 - [03-02] Server-side business_id fetch (never trust client) for security
 - [03-02] bulkCreateContacts skips duplicates and returns detailed report for CSV import UX
 - [03-02] Collocate data fetching (getContacts, searchContacts) with mutations in contact.ts
+- [03-05] Use PapaParse for CSV parsing with header auto-mapping
+- [03-05] Fetch existing emails from database for duplicate detection before import
+- [03-05] Multi-step dialog flow: upload -> preview -> importing -> complete
+- [03-05] Filter duplicates and invalid rows before calling bulkCreateContacts
 - [03-03] Use TanStack Table for headless table functionality
 - [03-03] Debounce search with 300ms delay for performance
 - [03-03] Default sort by last_sent_at DESC (most recent first)
@@ -78,6 +82,10 @@ Recent decisions affecting current work:
 - [03-04] Sheet slides from right, shows edit form + activity summary
 - [03-04] Auto-close on success by checking result.success in useActionState callback
 - [03-04] Form reset on contact change using useEffect + formRef
+- [03-05] Use PapaParse for CSV parsing with header auto-mapping
+- [03-05] Fetch existing emails from database for duplicate detection before import
+- [03-05] Multi-step dialog flow: upload -> preview -> importing -> complete
+- [03-05] Filter duplicates and invalid rows before calling bulkCreateContacts
 
 ### Pending Todos
 
@@ -102,5 +110,5 @@ None currently.
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Completed 03-03-PLAN.md (Contact List UI)
+Stopped at: Completed 03-05-PLAN.md (CSV Import Dialog) - Phase 3 complete
 Resume file: None
