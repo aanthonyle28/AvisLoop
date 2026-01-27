@@ -109,7 +109,7 @@ None currently.
 - ✅ Migration 00001 applied (profiles table with RLS)
 - ⚠️ Migration 00002 pending (businesses/email_templates) - run in Supabase SQL Editor
 - ✅ Migration 00003 applied (contacts table with RLS)
-- ⚠️ Migration 00004 pending (businesses unique constraint) - run in Supabase SQL Editor
+- ✅ Migration 00004 applied (businesses unique constraint)
 - ⚠️ Optional: Enable "Leaked password protection" in Supabase Auth settings
 
 ## Session Continuity

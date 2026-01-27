@@ -25,8 +25,7 @@
 - **Security hardening**: SQL injection protection, pagination, bulk limits, DB constraints
 
 ## Next tasks (ordered)
-1. Run migration 00004 in Supabase SQL Editor (UNIQUE constraint)
-2. `/gsd:plan-phase 4` — Core Sending
+1. `/gsd:plan-phase 4` — Core Sending
 3. Create messages/send_logs table with RLS
 4. Build send flow UI with contact selection and preview
 5. Integrate email provider (Resend/Postmark)
