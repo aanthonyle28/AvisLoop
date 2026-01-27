@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { ContactTable } from './contact-table'
-import { AddContactDialog } from './add-contact-dialog'
+import { AddContactSheet } from './add-contact-sheet'
 import { EditContactSheet } from './edit-contact-sheet'
 import { CSVImportDialog } from './csv-import-dialog'
 import { Button } from '@/components/ui/button'
@@ -21,6 +21,9 @@ interface ContactsClientProps {
 }
 
 export function ContactsClient({ initialContacts }: ContactsClientProps) {
+  // State for add contact sheet
+  const [addSheetOpen, setAddSheetOpen] = useState(false)
+
   // State for editing contact
   const [editingContact, setEditingContact] = useState<Contact | null>(null)
   const [editSheetOpen, setEditSheetOpen] = useState(false)
@@ -85,14 +88,10 @@ export function ContactsClient({ initialContacts }: ContactsClientProps) {
 
         {hasContacts && (
           <div className="flex gap-2">
-            <AddContactDialog
-              trigger={
-                <Button variant="outline">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Contact
-                </Button>
-              }
-            />
+            <Button variant="outline" onClick={() => setAddSheetOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Contact
+            </Button>
             <CSVImportDialog />
           </div>
         )}
@@ -124,18 +123,20 @@ export function ContactsClient({ initialContacts }: ContactsClientProps) {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <AddContactDialog
-              trigger={
-                <Button>
-                  <Users className="mr-2 h-4 w-4" />
-                  Add Contact
-                </Button>
-              }
-            />
+            <Button onClick={() => setAddSheetOpen(true)}>
+              <Users className="mr-2 h-4 w-4" />
+              Add Contact
+            </Button>
             <CSVImportDialog />
           </div>
         </div>
       )}
+
+      {/* Add Contact Sheet */}
+      <AddContactSheet
+        open={addSheetOpen}
+        onOpenChange={setAddSheetOpen}
+      />
 
       {/* Edit Contact Sheet */}
       <EditContactSheet

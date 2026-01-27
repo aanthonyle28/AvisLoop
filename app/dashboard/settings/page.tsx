@@ -1,10 +1,10 @@
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
-// Data fetching is done inline in SettingsContent
 import { BusinessSettingsForm } from '@/components/business-settings-form'
 import { EmailTemplateForm } from '@/components/email-template-form'
 import { TemplateList } from '@/components/template-list'
+import type { EmailTemplate } from '@/lib/types/database'
 
 // Loading skeleton for settings content
 function SettingsLoadingSkeleton() {
@@ -38,7 +38,7 @@ async function SettingsContent() {
 
   // Fetch business data directly
   // Use explicit FK hint (!inner) to resolve ambiguity from circular relationship
-  const { data: business, error: businessError } = await supabase
+  const { data: business } = await supabase
     .from('businesses')
     .select(`
       *,
@@ -55,7 +55,7 @@ async function SettingsContent() {
     .single()
 
   // Get templates
-  let templates: any[] = []
+  let templates: EmailTemplate[] = []
   if (business) {
     const { data } = await supabase
       .from('email_templates')
