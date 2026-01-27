@@ -5,9 +5,8 @@ import { ContactTable } from './contact-table'
 import { AddContactDialog } from './add-contact-dialog'
 import { EditContactSheet } from './edit-contact-sheet'
 import { CSVImportDialog } from './csv-import-dialog'
-import { ContactsEmptyState } from './empty-state'
 import { Button } from '@/components/ui/button'
-import { Plus, Upload, Users } from 'lucide-react'
+import { Plus, Users } from 'lucide-react'
 import {
   archiveContact,
   restoreContact,
@@ -27,7 +26,7 @@ export function ContactsClient({ initialContacts }: ContactsClientProps) {
   const [editSheetOpen, setEditSheetOpen] = useState(false)
 
   // Transition for action feedback
-  const [isPending, startTransition] = useTransition()
+  const [, startTransition] = useTransition()
 
   // Action handlers
   const handleEdit = (contact: Contact) => {
