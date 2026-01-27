@@ -1,4 +1,4 @@
-# Architecture Research: ReviewLoop
+# Architecture Research: AvisLoop
 
 **Researched:** 2026-01-25
 

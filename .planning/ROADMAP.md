@@ -1,8 +1,8 @@
-# Roadmap: ReviewLoop
+# Roadmap: AvisLoop
 
 ## Overview
 
-ReviewLoop progresses from foundational authentication and data security through the core value loop of managing contacts and sending review requests, then adds billing enforcement and polished onboarding before completing public-facing marketing pages. Each phase delivers observable user value while building toward a complete, shippable MVP that makes requesting reviews "so simple business owners actually do it."
+AvisLoop progresses from foundational authentication and data security through the core value loop of managing contacts and sending review requests, then adds billing enforcement and polished onboarding before completing public-facing marketing pages. Each phase delivers observable user value while building toward a complete, shippable MVP that makes requesting reviews "so simple business owners actually do it."
 
 ## Phases
 
@@ -150,7 +150,7 @@ Plans:
 - [ ] 07-02: TBD
 
 ### Phase 8: Public Pages
-**Goal**: Visitors can learn about and sign up for ReviewLoop
+**Goal**: Visitors can learn about and sign up for AvisLoop
 **Depends on**: Phase 1
 **Requirements**: PAGE-01, PAGE-02, PAGE-03, PAGE-04
 **Success Criteria** (what must be TRUE):

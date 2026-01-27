@@ -1,4 +1,4 @@
-# Requirements: ReviewLoop
+# Requirements: AvisLoop
 
 **Defined:** 2026-01-25
 **Core Value:** Make requesting reviews so simple that business owners actually do it — one contact, one click, done.

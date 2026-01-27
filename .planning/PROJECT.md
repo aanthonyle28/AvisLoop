@@ -1,8 +1,8 @@
-# ReviewLoop
+# AvisLoop
 
 ## What This Is
 
-ReviewLoop is a SaaS web app that helps local service businesses (dentists, salons, contractors, gyms, restaurants, etc.) request more Google reviews by sending customers a simple email with their review link, and tracking what was sent. The core promise: "In 2 minutes, add a contact, hit send, and start collecting more reviews — no marketing setup, no CRM, no learning curve."
+AvisLoop is a SaaS web app that helps local service businesses (dentists, salons, contractors, gyms, restaurants, etc.) request more Google reviews by sending customers a simple email with their review link, and tracking what was sent. The core promise: "In 2 minutes, add a contact, hit send, and start collecting more reviews — no marketing setup, no CRM, no learning curve."
 
 ## Core Value
 
