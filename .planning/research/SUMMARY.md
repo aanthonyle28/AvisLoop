@@ -1,4 +1,4 @@
-# Research Summary: ReviewLoop
+# Research Summary: AvisLoop
 
 **Synthesized:** 2026-01-25
 
@@ -78,7 +78,7 @@
 - Entry pricing: $23-124/month
 - Most tools are "too complex" for small business owners
 
-**ReviewLoop Positioning:**
+**AvisLoop Positioning:**
 - Simpler than any competitor
 - Transparent pricing ($49/$99)
 - "2-minute" promise vs "powerful platform"
