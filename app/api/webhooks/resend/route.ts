@@ -2,6 +2,28 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { createClient } from '@supabase/supabase-js'
 
+// === In-memory rate limiting for webhook endpoint ===
+const ipRequestCounts = new Map<string, { count: number; resetAt: number }>()
+const RATE_LIMIT = 100 // requests per minute
+const RATE_WINDOW = 60 * 1000 // 1 minute in ms
+
+function checkWebhookRateLimit(ip: string): boolean {
+  const now = Date.now()
+  const record = ipRequestCounts.get(ip)
+
+  if (!record || now > record.resetAt) {
+    ipRequestCounts.set(ip, { count: 1, resetAt: now + RATE_WINDOW })
+    return true
+  }
+
+  if (record.count >= RATE_LIMIT) {
+    return false
+  }
+
+  record.count++
+  return true
+}
+
 // Use service role for webhook handler - no user context available
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -34,6 +56,12 @@ interface ResendWebhookEvent {
 }
 
 export async function POST(req: NextRequest) {
+  // === Rate limit check BEFORE signature verification (save CPU) ===
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown'
+  if (!checkWebhookRateLimit(ip)) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+  }
+
   try {
     const payload = await req.text()
 
