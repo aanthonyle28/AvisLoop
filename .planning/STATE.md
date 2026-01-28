@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Make requesting reviews so simple that business owners actually do it — one contact, one click, done.
-**Current focus:** Phase 7 - Onboarding Flow
+**Current focus:** Phase 8 - Public Pages
 
 ## Current Position
 
-Phase: 7 of 10 (Onboarding Flow)
-Plan: 1 of 4
+Phase: 8 of 10 (Public Pages)
+Plan: 1 of 3
 Status: In progress
-Last activity: 2026-01-27 - Completed 07-01-PLAN.md (Onboarding data layer)
+Last activity: 2026-01-28 - Completed 08-01-PLAN.md (Landing page & marketing layout)
 
-Progress: [███████░░░] ~68% (7/10 phases, 32/~53 plans complete)
+Progress: [███████░░░] ~70% (8/10 phases, 33/~53 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 32
+- Total plans completed: 33
 - Average duration: 3 min
-- Total execution time: 1.55 hours
+- Total execution time: 1.6 hours
 
 **By Phase:**
 
@@ -36,9 +36,10 @@ Progress: [███████░░░] ~68% (7/10 phases, 32/~53 plans compl
 | 05.1-code-review-fixes | 1 | 3 min | 3 min |
 | 06-billing-limits | 5 | 18 min | 4 min |
 | 07-onboarding-flow | 1 | 4 min | 4 min |
+| 08-public-pages | 1 | 5 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 07-01 (4 min), 06-05 (3 min), 06-04 (3 min), 06-03 (4 min), 06-02 (4 min)
+- Last 5 plans: 08-01 (5 min), 07-01 (4 min), 06-05 (3 min), 06-04 (3 min), 06-03 (4 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -141,6 +142,9 @@ Recent decisions affecting current work:
 - [07-01] Partial index on user_id WHERE onboarding_completed_at IS NULL for efficient incomplete onboarding queries
 - [07-01] Count queries use { count: 'exact', head: true } pattern (no data transfer, just count)
 - [07-01] getOnboardingStatus returns null for unauthenticated users (not throwing)
+- [08-01] Use route group (marketing) for public pages with separate layout
+- [08-01] Static year in footer to avoid Next.js 16 prerender errors
+- [08-01] Server Components only for marketing content (no "use client")
 
 ### Pending Todos
 
@@ -174,7 +178,7 @@ None currently.
 
 ## Session Continuity
 
-Last session: 2026-01-27
-Stopped at: Completed 07-01-PLAN.md (Onboarding data layer)
+Last session: 2026-01-28
+Stopped at: Completed 08-01-PLAN.md (Landing page & marketing layout)
 Resume file: None
-Next: 07-02-PLAN.md (Onboarding wizard UI)
+Next: 08-02-PLAN.md (Pricing page)
