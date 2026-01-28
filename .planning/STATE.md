@@ -1,208 +1,155 @@
 # Project State
 
-## Project Reference
-
-See: .planning/PROJECT.md (updated 2026-01-25)
-
-**Core value:** Make requesting reviews so simple that business owners actually do it — one contact, one click, done.
-**Current focus:** Phase 9 - Polish & UX
+**Last updated:** 2026-01-28T07:39:43Z
 
 ## Current Position
 
-Phase: 8.1 of 11 (Code Review Fixes)
-Plan: 2 of 2
-Status: Phase complete
-Last activity: 2026-01-28 - Completed 08.1-02-PLAN.md (Maintainability, UX, SEO, Accessibility)
+**Phase:** 09 of 12 (Polish & UX)
+**Plan:** 1 of 4
+**Status:** In progress
+**Last activity:** 2026-01-28 - Completed 09-01-PLAN.md (Design System Foundation)
 
-Progress: [████████░░] ~82% (8.1/11 phases complete, 39/~52 plans complete)
+**Progress:** [█████████░░] ~90% (37/41 plans complete)
 
-## Performance Metrics
+```
+Phase 01: ██████ Foundation & Auth (6/6 complete)
+Phase 02: ███ Business Setup (3/3 complete)
+Phase 03: ██████ Contact Management (6/6 complete)
+Phase 3.1: █ Critical Fixes (1/1 complete)
+Phase 04: ████ Core Sending (4/5 complete - 04-05 missing SUMMARY)
+Phase 05: ██ Message History (2/2 complete)
+Phase 5.1: █ Code Review Fixes (1/1 complete)
+Phase 06: █████ Billing & Limits (5/5 complete)
+Phase 07: ████ Onboarding Flow (4/4 complete)
+Phase 08: ██ Public Pages (2/2 complete)
+Phase 8.1: ██ Code Review Fixes (2/2 complete)
+Phase 09: █░░░ Polish & UX (1/4 in progress) ← YOU ARE HERE
+```
 
-**Velocity:**
-- Total plans completed: 39
-- Average duration: 3 min
-- Total execution time: 2.0 hours
+## What's Been Built
 
-**By Phase:**
+### Completed Phases (1-8.1)
+- **Phase 01:** Auth system (sign up, sign in, password reset, session management)
+- **Phase 02:** Business profiles, email templates
+- **Phase 03:** Contact CRUD, bulk ops, CSV import, search/filter
+- **Phase 3.1:** Security hardening, SQL injection protection
+- **Phase 04:** Send page, Resend integration, rate limiting, webhooks
+- **Phase 05:** Message history with filters, search, status tracking
+- **Phase 5.1:** Security review fixes, webhook rate limiting
+- **Phase 06:** Tier enforcement, usage tracking, monthly quotas
+- **Phase 07:** Onboarding flow with steps, business setup wizard
+- **Phase 08:** Public review pages, embeddable widgets
+- **Phase 8.1:** Maintainability, UX improvements, accessibility, SEO
 
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 01-foundation-auth | 6 | 19 min | 3 min |
-| 02-business-setup | 3 | 6 min | 2 min |
-| 03-contact-management | 6 | 19 min | 3 min |
-| 03.1-critical-fixes | 1 | 3 min | 3 min |
-| 04-core-sending | 4 | 8 min | 2 min |
-| 05-message-history | 2 | 4 min | 2 min |
-| 05.1-code-review-fixes | 1 | 3 min | 3 min |
-| 06-billing-limits | 5 | 18 min | 4 min |
-| 07-onboarding-flow | 4 | 14 min | 4 min |
-| 08-public-pages | 2 | 8 min | 4 min |
-| 08.1-code-review-fixes | 2 | 13 min | 7 min |
+### Current Phase (09 - Polish & UX)
+**Objective:** Polish visual design, loading states, empty states, responsive design
 
-**Recent Trend:**
-- Last 5 plans: 08.1-02 (5 min), 08.1-01 (8 min), 07-04 (4 min), 08-02 (3 min), 07-03 (2 min)
-- Trend: Stable
+**Completed Plans:**
+1. ✅ **09-01: Design System Foundation** (2026-01-28)
+   - Design tokens (light gray bg, blue accent, 12px radius)
+   - Sonner toast notifications
+   - Skeleton loading component
+   - Responsive hooks (useLocalStorage, useMediaQuery)
 
-*Updated after each plan completion*
+**Remaining Plans:**
+2. ⏳ **09-02:** Loading states & skeletons
+3. ⏳ **09-03:** Empty states & error handling
+4. ⏳ **09-04:** Responsive design & mobile navigation
 
-## Accumulated Context
+## Tech Stack
 
-### Decisions
+### Core
+- Next.js 15 (App Router)
+- TypeScript
+- Supabase (Postgres + Auth)
+- Tailwind CSS
 
-Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
+### Key Libraries
+- shadcn/ui components
+- Resend (email sending)
+- Stripe (billing)
+- Upstash Redis (rate limiting)
+- React Hook Form + Zod (forms)
+- TanStack Table (data tables)
+- **Sonner** (toast notifications) ← NEW
 
-- Use (SELECT auth.uid()) wrapper for RLS policy performance optimization
-- SECURITY DEFINER on handle_new_user trigger for auth.users access
-- Cascade delete profiles when auth.users deleted
-- Use NEXT_PUBLIC_SUPABASE_ANON_KEY over PUBLISHABLE_KEY for compatibility
-- UPDATED: Renamed proxy.ts to middleware.ts per gap closure plan (Next.js 16 shows deprecation warning but still works)
-- Use getUser() for JWT validation (security best practice)
-- AuthActionState returns fieldErrors separately for per-field form validation
-- signOut returns Promise<never> (always redirects)
-- Recovery type in email confirmation redirects to /auth/update-password
-- useActionState pattern used for all auth forms with pending state
-- Per-field error display using fieldErrors from Server Action response
-- LogoutButton simplified to form action without 'use client' directive
-- [02-01] Use subquery pattern for child table RLS (email_templates)
-- [02-01] Store default templates in code, clone on business creation
-- [02-01] Use .optional().or(z.literal('')) for optional form fields
-- [02-02] Use upsert pattern (check existing then insert/update) for business profile
-- [02-02] Collocate data fetching functions with Server Actions in business.ts
-- [02-03] Use explicit FK hint (email_templates!email_templates_business_id_fkey) for PostgREST ambiguous relationship
-- [03-01] Unique constraint on (business_id, email) prevents duplicate contacts per business
-- [03-01] Status field limited to 'active'/'archived' via CHECK constraint for contact archival
-- [03-01] Optional phone field for future SMS support (nullable TEXT, max 20 chars)
-- [03-01] Tracking fields (last_sent_at, send_count) for send analytics and spam prevention
-- [03-02] Lowercase email normalization prevents case-sensitive duplicates
-- [03-02] Server-side business_id fetch (never trust client) for security
-- [03-02] bulkCreateContacts skips duplicates and returns detailed report for CSV import UX
-- [03-02] Collocate data fetching (getContacts, searchContacts) with mutations in contact.ts
-- [03-05] Use PapaParse for CSV parsing with header auto-mapping
-- [03-05] Fetch existing emails from database for duplicate detection before import
-- [03-05] Multi-step dialog flow: upload -> preview -> importing -> complete
-- [03-05] Filter duplicates and invalid rows before calling bulkCreateContacts
-- [03-03] Use TanStack Table for headless table functionality
-- [03-03] Debounce search with 300ms delay for performance
-- [03-03] Default sort by last_sent_at DESC (most recent first)
-- [03-03] Client-side filtering for performance on small datasets
-- [03-04] Use Dialog for add (not Sheet) for focused, blocking interaction
-- [03-04] Sheet slides from right, shows edit form + activity summary
-- [03-04] Auto-close on success by checking result.success in useActionState callback
-- [03-04] Form reset on contact change using useEffect + formRef
-- [03-05] Use PapaParse for CSV parsing with header auto-mapping
-- [03-05] Fetch existing emails from database for duplicate detection before import
-- [03-05] Multi-step dialog flow: upload -> preview -> importing -> complete
-- [03-05] Filter duplicates and invalid rows before calling bulkCreateContacts
-- [03.1-01] escapeLikePattern helper escapes %, _, \ for ILIKE sanitization
-- [03.1-01] 100-item limit for bulk operations prevents memory/performance issues
-- [03.1-01] getContacts returns { contacts, total } for pagination support
-- [04-01] TEXT with CHECK constraint for send status enum (matches existing pattern)
-- [04-01] Store provider_id for webhook correlation with Resend/Postmark
-- [04-01] opted_out boolean on contacts for GDPR/CAN-SPAM compliance
-- [04-01] tier column on businesses for MVP send limit enforcement
-- [04-02] Resend singleton with environment variable validation at module load
-- [04-02] React Email components for type-safe, maintainable templates
-- [04-02] Rate limiter with dev-mode bypass (returns success if Upstash not configured)
-- [04-02] Sliding window rate limit: 10 sends per minute per user
-- [04-03] Create send_log BEFORE calling email API for audit trail even on failures
-- [04-03] Use idempotency key (send-{sendLogId}) to prevent duplicate sends
-- [04-03] Tag emails with send_log_id and business_id for webhook correlation
-- [04-03] 14-day cooldown per contact enforced before send
-- [04-03] Monthly tier limits: trial (25), basic (200), pro (500)
-- [04-03] Update contact.last_sent_at and send_count after successful send
-- [04-04] Use service role key in webhook handler (no user context)
-- [04-04] Always return 200 from webhooks to prevent retry storms
-- [04-04] Auto opt-out contacts on bounced and complained events for GDPR/CAN-SPAM compliance
-- [05-01] Export escapeLikePattern from contact.ts for reuse across features
-- [05-01] URL searchParams for filter state (not useState) for shareable URLs
-- [05-01] Native HTML select with Tailwind styling (ui/select doesn't exist)
-- [05-01] 300ms debounce on search to reduce server load
-- [05-01] Semantic color scheme for statuses: green (success), red (failures), blue/gray (in-progress)
-- [05-02] No pagination UI in this phase - server returns first 50 results
-- [05-02] Empty state shows different content for 'no messages' vs 'no filtered results'
-- [05-02] HistoryClient manages filter visibility (show when logs exist OR filters active)
-- [05.1-01] In-memory rate limiting for webhook (100 req/min per IP, checked before signature verification)
-- [05.1-01] Single source of truth for billing constants in lib/constants/billing.ts
-- [05.1-01] Export RESEND_FROM_EMAIL from resend.ts with warning on missing env var
-- [06-01] Migration numbered 00007 (00006 already existed for monthly index)
-- [06-01] API version 2025-12-15.clover (latest stable in SDK)
-- [06-01] Throw error if STRIPE_SECRET_KEY missing at module load
-- [06-02] Create Stripe customer on first checkout, not on registration
-- [06-02] Use redirect() return type never for checkout/portal actions
-- [06-02] Include business_id in subscription metadata for webhook correlation
-- [06-02] Require existing stripe_customer_id for portal access
-- [06-03] Build PRICE_TO_TIER inside POST handler (env vars may be undefined at module load)
-- [06-03] Use subscription.items.data[0].current_period_* for API 2025-12-15.clover
-- [06-03] Grace period for past_due status (access continues during payment retry)
-- [06-03] Always return 200 from Stripe webhook even on handler errors
-- [06-05] Show warning at 80% threshold, destructive at 100%
-- [06-05] Contact limit warning has priority over send limit warning
-- [06-05] Replace send button with upgrade prompt instead of just disabling
-- [07-01] Use JSONB array for onboarding_steps_completed to support granular step tracking
-- [07-01] Partial index on user_id WHERE onboarding_completed_at IS NULL for efficient incomplete onboarding queries
-- [07-01] Count queries use { count: 'exact', head: true } pattern (no data transfer, just count)
-- [07-01] getOnboardingStatus returns null for unauthenticated users (not throwing)
-- [07-02] Render props pattern for wizard children to pass navigation functions
-- [07-02] isSubmitting state prevents navigation during saves (race condition prevention)
-- [07-02] Step clamp to 1-3 range for URL validation
-- [07-02] OnboardingWizard render props: { draftData, setDraftData, goToNext, goToStep, handleComplete }
-- [07-03] useForm + useActionState integration uses formRef.requestSubmit() pattern for form submission
-- [07-03] Server field errors mapped to form errors via useEffect for seamless validation
-- [07-03] Steps use callback props (onComplete, onSkip, onGoToStep) for navigation decoupling from wizard container
-- [07-03] SendStep shows three conditional states: missing review link, missing contact, and ready to send
-- [08-01] Use route group (marketing) for public pages with separate layout
-- [08-01] Static year in footer to avoid Next.js 16 prerender errors
-- [08-01] Server Components only for marketing content (no "use client")
-- [08-02] Keep tier data in PricingTable (not imported from billing.ts) because marketing copy differs
-- [08-02] Basic tier highlighted as recommended with border-primary, shadow-lg, RECOMMENDED badge
-- [07-04] OnboardingSteps client component separates step rendering from server-side data fetching
-- [07-04] Dashboard fetches status/business/usage/contacts in parallel via Promise.all
-- [07-04] OnboardingChecklist auto-hides when all 4 steps complete (returns null)
-- [07-04] NextActionCard priority: review link -> contacts -> send -> history
-- [08.1-01] Use safeParse instead of catch() for Zod 4 compatibility
-- [08.1-01] Pass supabase client as parameter to handler functions for explicit dependency
-- [08.1-01] Rate limit check before signature verification to save CPU on attacks
-- [08.1-01] Use Promise.all for independent DB queries (PERF-01)
-- [08.1-02] CONTACT_LIMITS centralized in lib/constants/billing.ts
-- [08.1-02] Shared onboarding types extracted to lib/types/onboarding.ts
-- [08.1-02] Footer uses dynamic copyright year via new Date().getFullYear()
-- [08.1-02] Auth pages have AvisLoop branding header linking to home
-- [08.1-02] Progress indicator uses nav landmark with ARIA attributes
+### Patterns
+- Server Components by default
+- Server Actions for mutations
+- RLS policies for multi-tenancy
+- CSS variables for design tokens
+- Custom hooks for utilities
 
-### Pending Todos
+## Decisions Made
 
-[From .planning/todos/pending/ — ideas captured during sessions]
+| ID | Decision | Phase | Rationale |
+|----|----------|-------|-----------|
+| DS-001 | Blue accent with light gray background | 09-01 | Modern SaaS aesthetic matching reference design |
+| DS-002 | Sonner for toast notifications | 09-01 | Theme-aware, accessible, shadcn/ui integration |
+| DS-003 | Medium border radius (12px) | 09-01 | Matches reference, modern feel |
+| AUTH-001 | Supabase Auth for authentication | 01 | Built-in security, session management |
+| SEND-001 | Resend for email delivery | 04 | Developer experience, reliability |
+| RATE-001 | Upstash Redis for rate limiting | 04 | Serverless, global edge caching |
+| TIER-001 | Three-tier pricing (Free/Pro/Enterprise) | 06 | Standard SaaS model |
 
-None yet.
+## Key Files
 
-### Blockers/Concerns
+### Design System (Phase 09-01)
+- `app/globals.css` - Design tokens (CSS variables)
+- `components/ui/sonner.tsx` - Toast notifications
+- `components/ui/skeleton.tsx` - Loading skeletons
+- `lib/hooks/use-local-storage.ts` - SSR-safe localStorage
+- `lib/hooks/use-media-query.ts` - Responsive breakpoints
 
-[Issues that affect future work]
+### Authentication
+- `app/(auth)/*` - Auth pages
+- `lib/supabase/server.ts` - Server-side Supabase client
+- `lib/supabase/middleware.ts` - Auth middleware
 
-None currently.
+### Business & Contacts
+- `app/dashboard/business/*` - Business settings
+- `app/dashboard/contacts/*` - Contact management
+- `lib/validations/contact.ts` - Contact schema
 
-### Completed Setup
+### Sending
+- `app/dashboard/send/*` - Send page
+- `app/api/resend/webhook/*` - Delivery webhooks
+- `lib/resend.ts` - Email service
 
-- ✅ Supabase project configured (env vars in .env.local)
-- ✅ Migration 00001 applied (profiles table with RLS)
-- ⚠️ Migration 00002 pending (businesses/email_templates) - run in Supabase SQL Editor
-- ✅ Migration 00003 applied (contacts table with RLS)
-- ✅ Migration 00004 applied (businesses unique constraint)
-- ⚠️ Migration 00005 pending (send_logs table, opted_out/tier columns) - run in Supabase SQL Editor
-- ⚠️ Migration 00006 pending (monthly usage index) - run in Supabase SQL Editor
-- ⚠️ Migration 00007 pending (billing: subscriptions, stripe_customer_id) - run in Supabase SQL Editor
-- ⚠️ Migration 00008 pending (onboarding: onboarding_completed_at, onboarding_steps_completed) - run in Supabase SQL Editor
-- ⚠️ Optional: Enable "Leaked password protection" in Supabase Auth settings
-- ⚠️ Resend API key required (RESEND_API_KEY) - see 04-02-SUMMARY.md User Setup section
-- ⚠️ Upstash Redis optional (UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN) - bypasses in dev
-- ⚠️ Resend webhook secret required (RESEND_WEBHOOK_SECRET) - see 04-04-SUMMARY.md User Setup section
-- ⚠️ Stripe keys required - see 06-01-SUMMARY.md User Setup section
-- ⚠️ Stripe webhook secret required (STRIPE_WEBHOOK_SECRET) - see 06-03-SUMMARY.md User Setup section
+### Billing
+- `lib/constants/billing.ts` - Tier definitions
+- `lib/services/usage-tracker.ts` - Usage tracking
+- `app/api/stripe/webhook/*` - Stripe webhooks
+
+## Blockers & Concerns
+
+**None** - Phase 09-01 completed successfully with no blockers.
+
+## Next Steps
+
+1. **Execute 09-02-PLAN.md** - Add loading states and skeletons to key pages
+2. **Execute 09-03-PLAN.md** - Implement empty states and error handling
+3. **Execute 09-04-PLAN.md** - Add responsive design and mobile navigation
+4. Complete Phase 09, then move to remaining phases
 
 ## Session Continuity
 
-Last session: 2026-01-28
-Stopped at: Completed Phase 8.1 (Code Review Fixes)
-Resume file: None
-Next: Phase 9 - Polish & UX (consistent visual design, empty/loading/error states, responsive design)
+**Last session:** 2026-01-28T07:39:43Z
+**Stopped at:** Completed 09-01-PLAN.md
+**Resume file:** None
+**Next action:** Execute 09-02-PLAN.md
+
+## Notes
+
+### Phase 09-01 Execution
+- Smooth execution, ~3.4 minutes
+- One deviation: Fixed React hooks rules violation in useIsTablet
+- Visual impact: Light gray background immediately improves polish
+- All verification passing (lint, typecheck)
+
+### Design System Impact
+The new design tokens fundamentally change the app's visual identity:
+- **Before:** White background, monochrome, minimal
+- **After:** Light gray background, blue accents, white cards, modern SaaS feel
+
+All future UI work will build on these foundations.
