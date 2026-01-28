@@ -180,13 +180,15 @@ Plans:
   4. Dashboard shows "next best action" after onboarding completion
   5. Onboarding pre-fills smart defaults where possible
   6. Dashboard shows onboarding checklist until all steps complete
-  7. System blocks sending if review link is missing or invalid
-  8. System blocks sending if no contacts exist
-**Plans**: TBD
+  7. System blocks sending if review link is missing or invalid (ALREADY SATISFIED - send/page.tsx lines 17-35)
+  8. System blocks sending if no contacts exist (ALREADY SATISFIED - send/page.tsx lines 82-93)
+**Plans**: 4 plans in 3 waves
 
 Plans:
-- [ ] 07-01: TBD
-- [ ] 07-02: TBD
+- [ ] 07-01-PLAN.md — Database migration (onboarding tracking) + data layer (getOnboardingStatus)
+- [ ] 07-02-PLAN.md — Wizard shell (OnboardingProgress, OnboardingWizard, onboarding page route)
+- [ ] 07-03-PLAN.md — Wizard step forms (BusinessStep, ContactStep, SendStep)
+- [ ] 07-04-PLAN.md — Dashboard integration (OnboardingChecklist, NextActionCard, dashboard page)
 
 ### Phase 8: Public Pages
 **Goal**: Visitors can learn about and sign up for AvisLoop
@@ -240,6 +242,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -
 | 5. Message History | 2/2 | Complete | 2026-01-27 |
 | 5.1 Code Review Fixes | 1/1 | Complete | 2026-01-27 |
 | 6. Billing & Limits | 5/5 | Complete | 2026-01-28 |
-| 7. Onboarding Flow | 0/TBD | Not started | - |
+| 7. Onboarding Flow | 0/4 | Not started | - |
 | 8. Public Pages | 0/TBD | Not started | - |
 | 9. Polish & UX | 0/TBD | Not started | - |
