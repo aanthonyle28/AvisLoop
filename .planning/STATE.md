@@ -1,15 +1,15 @@
 # Project State
 
-**Last updated:** 2026-01-28T08:45:30Z
+**Last updated:** 2026-01-28T08:52:30Z
 
 ## Current Position
 
 **Phase:** 10 of 12 (Landing Page Redesign)
-**Plan:** 4 of 5
-**Status:** In progress
-**Last activity:** 2026-01-28 - Completed 10-04-PLAN.md (Feature Sections Redesign)
+**Plan:** 5 of 5 (Complete)
+**Status:** Phase complete
+**Last activity:** 2026-01-28 - Completed 10-05-PLAN.md (Testimonials & CTA Simplification)
 
-**Progress:** [█████████░░] ~98% (44/46 plans complete)
+**Progress:** [██████████░] ~98% (45/46 plans complete)
 
 ```
 Phase 01: ██████ Foundation & Auth (6/6 complete)
@@ -24,7 +24,7 @@ Phase 07: ████ Onboarding Flow (4/4 complete)
 Phase 08: ██ Public Pages (2/2 complete)
 Phase 8.1: ██ Code Review Fixes (2/2 complete)
 Phase 09: ████ Polish & UX (4/4 complete)
-Phase 10: ████░ Landing Page Redesign (4/5 complete) <- YOU ARE HERE
+Phase 10: █████ Landing Page Redesign (5/5 complete) <- COMPLETE
 ```
 
 ## What's Been Built
@@ -42,33 +42,20 @@ Phase 10: ████░ Landing Page Redesign (4/5 complete) <- YOU ARE HERE
 - **Phase 08:** Public review pages, embeddable widgets
 - **Phase 8.1:** Maintainability, UX improvements, accessibility, SEO
 
-### Current Phase (09 - Polish & UX)
-**Objective:** Polish visual design, loading states, empty states, responsive design
+### Phase 09 - Polish & UX (Complete)
+- Design tokens (light gray bg, blue accent, 12px radius)
+- Sonner toast notifications
+- Responsive navigation (collapsible sidebar, mobile bottom nav)
+- Loading states (skeletons) and empty states
+- Micro-interactions (hover/press animations)
+- Accessibility (reduced-motion support)
 
-**Completed Plans:**
-1. ✅ **09-01: Design System Foundation** (2026-01-28)
-   - Design tokens (light gray bg, blue accent, 12px radius)
-   - Sonner toast notifications
-   - Skeleton loading component
-   - Responsive hooks (useLocalStorage, useMediaQuery)
-
-2. ✅ **09-02: Responsive App Shell** (2026-01-28)
-   - Collapsible sidebar with auto-collapse on tablet
-   - Mobile bottom navigation (4 routes)
-   - AppShell layout wrapper
-   - Dashboard layouts for route groups
-
-3. ✅ **09-03: Loading & Empty States** (2026-01-28)
-   - Reusable skeleton components (Table, Card, Dashboard)
-   - loading.tsx for all dashboard routes
-   - Polished empty states with consistent format
-
-4. ✅ **09-04: Micro-Interactions & Polish** (2026-01-28)
-   - Button micro-interactions (hover lift, press scale)
-   - InteractiveCard variant with hover effects
-   - Marketing pages polished with animations
-   - Color consistency audit (semantic tokens enforced)
-   - All animations respect prefers-reduced-motion
+### Phase 10 - Landing Page Redesign (Complete)
+- **10-01:** Design tokens updated (white bg, lime/coral accents, GeometricMarker)
+- **10-02:** Hero section with asymmetric layout, dark CTA
+- **10-03:** SocialProof (text-only brands), StatsSection (triangle markers)
+- **10-04:** Feature sections (alternating layouts, 3 core features)
+- **10-05:** Testimonials (minimal quote format), CTA (clean), FAQ (6 items)
 
 ## Tech Stack
 
@@ -85,7 +72,7 @@ Phase 10: ████░ Landing Page Redesign (4/5 complete) <- YOU ARE HERE
 - Upstash Redis (rate limiting)
 - React Hook Form + Zod (forms)
 - TanStack Table (data tables)
-- **Sonner** (toast notifications) ← NEW
+- Sonner (toast notifications)
 
 ### Patterns
 - Server Components by default
@@ -96,9 +83,11 @@ Phase 10: ████░ Landing Page Redesign (4/5 complete) <- YOU ARE HERE
 - loading.tsx for route-level loading states
 - Skeleton components matching content structure
 - Empty states with icon + text + CTA format
-- **motion-safe prefix for animations** (prefers-reduced-motion support) ← NEW
-- **InteractiveCard vs static Card distinction** ← NEW
-- **200ms transition timing for consistency** ← NEW
+- motion-safe prefix for animations
+- InteractiveCard vs static Card distinction
+- 200ms transition timing for consistency
+- **Minimal testimonial format (quote + author only)** <- NEW
+- **Anchor navigation with scroll-mt-20** <- NEW
 
 ## Decisions Made
 
@@ -124,6 +113,10 @@ Phase 10: ████░ Landing Page Redesign (4/5 complete) <- YOU ARE HERE
 | STATS-001 | Geometric triangle markers in StatsSection | 10-03 | Visual interest without card borders, lime/coral accents |
 | FEAT-001 | Alternating left/right feature layouts | 10-04 | Creates visual rhythm, prevents monotony, matches reference design |
 | FEAT-002 | 3 core features instead of 8-grid | 10-04 | Focus on key differentiators, less overwhelming |
+| TEST-001 | Minimal testimonial format without stars | 10-05 | Clean quote format speaks for itself without visual noise |
+| CTA-001 | Clean CTA with border-top separator | 10-05 | Visual break without heavy gradient |
+| FAQ-001 | Reduced FAQ to 6 items | 10-05 | Focus on most important questions |
+| NAV-003 | Section order: Hero -> Social -> Features -> Stats -> Testimonials -> FAQ -> CTA | 10-05 | Better flow with features immediately after social proof |
 | AUTH-001 | Supabase Auth for authentication | 01 | Built-in security, session management |
 | SEND-001 | Resend for email delivery | 04 | Developer experience, reliability |
 | RATE-001 | Upstash Redis for rate limiting | 04 | Serverless, global edge caching |
@@ -131,7 +124,7 @@ Phase 10: ████░ Landing Page Redesign (4/5 complete) <- YOU ARE HERE
 
 ## Key Files
 
-### Design System & UX (Phase 09-01, 09-02, 09-03, 09-04, 10-01)
+### Design System & UX (Phase 09, 10)
 - `app/globals.css` - Design tokens (CSS variables, lime/coral accents)
 - `components/ui/button.tsx` - Polished with micro-interactions
 - `components/ui/card.tsx` - InteractiveCard variant for hover effects
@@ -146,8 +139,16 @@ Phase 10: ████░ Landing Page Redesign (4/5 complete) <- YOU ARE HERE
 - `components/layout/sidebar.tsx` - Collapsible sidebar
 - `components/layout/bottom-nav.tsx` - Mobile navigation
 - `components/layout/app-shell.tsx` - Layout wrapper
-- `app/(dashboard)/layout.tsx` - Dashboard group layout
-- `app/dashboard/layout.tsx` - Dashboard page layout
+
+### Marketing Pages (Phase 10)
+- `app/(marketing)/page.tsx` - Landing page with section order
+- `components/marketing/hero.tsx` - Asymmetric hero section
+- `components/marketing/social-proof.tsx` - Text-only brand names
+- `components/marketing/stats-section.tsx` - Stats with triangle markers
+- `components/marketing/features.tsx` - Alternating feature sections
+- `components/marketing/testimonials.tsx` - Minimal quote format
+- `components/marketing/faq-section.tsx` - Accordion FAQ (6 items)
+- `components/marketing/cta-section.tsx` - Clean CTA section
 
 ### Authentication
 - `app/(auth)/*` - Auth pages
@@ -171,111 +172,44 @@ Phase 10: ████░ Landing Page Redesign (4/5 complete) <- YOU ARE HERE
 
 ## Blockers & Concerns
 
-**None** - Phase 09 execution proceeding smoothly.
+**None** - Phase 10 complete.
 
 ## Next Steps
 
-1. **Phase 09 complete** - All polish & UX work finished
-2. Move to Phase 10 (Analytics Dashboard)
-3. Then Phase 11 (Review Integrations)
-4. Then Phase 12 (Production Ready)
+1. **Phase 10 complete** - Landing page redesign finished
+2. Move to Phase 11 (Analytics Dashboard or Review Integrations)
+3. Then Phase 12 (Production Ready)
 
 ## Session Continuity
 
-**Last session:** 2026-01-28T08:45:30Z
-**Stopped at:** Completed 10-04-PLAN.md
+**Last session:** 2026-01-28T08:52:30Z
+**Stopped at:** Completed 10-05-PLAN.md (Phase 10 complete)
 **Resume file:** None
-**Next action:** Execute 10-05-PLAN.md (Final Polish & CTA)
+**Next action:** Start next phase planning
 
 ## Notes
 
-### Phase 09-01 Execution
-- Smooth execution, ~3.4 minutes
-- One deviation: Fixed React hooks rules violation in useIsTablet
-- Visual impact: Light gray background immediately improves polish
+### Phase 10-05 Execution
+- Fast execution, ~4 minutes
+- Simplified testimonials: removed cards, stars, quote icons, avatars
+- Simplified CTA: removed gradient, decorative circles, benefit list
+- Updated FAQ: reduced from 8 to 6 items, lighter borders
+- Reordered page sections: Features now before Stats
+- Added anchor IDs: #features, #testimonials (already has #faq)
+- No deviations - plan executed exactly as written
 - All verification passing (lint, typecheck)
 
-### Phase 09-02 Execution
-- Fast execution, ~4 minutes
-- One deviation: Removed unused imports causing lint errors
-- Responsive navigation structure complete
-- Sidebar auto-collapses on tablet (768-1024px) for content space
-- Mobile bottom nav with 4 core routes
-- All dashboard routes now wrapped with AppShell
+### Phase 10 Complete
+Landing page redesign finished. Marketing pages now have:
+- Clean, minimal design matching reference
+- Pure white background with lime/coral accents
+- Asymmetric hero with dark CTA
+- Text-only social proof
+- Stats with geometric triangle markers
+- 3 alternating feature sections
+- Minimal testimonials (quote + author only)
+- Streamlined FAQ (6 items)
+- Clean CTA section
+- Anchor navigation for all major sections
 
-### Phase 09-03 Execution
-- Fast execution, ~4 minutes
-- Created reusable skeleton components (Table, Card, Dashboard)
-- Added loading.tsx for all 5 dashboard routes
-- Polished empty states with consistent icon + text + CTA format
-- One deviation: Fixed unused import in sidebar.tsx
-- All skeletons use explicit heights to prevent CLS
-
-### Design System Impact
-The new design tokens fundamentally change the app's visual identity:
-- **Before:** White background, monochrome, minimal
-- **After:** Light gray background, blue accents, white cards, modern SaaS feel
-
-### Phase 09-04 Execution
-- Very fast execution, ~8 minutes
-- No deviations - plan executed exactly as written
-- Button micro-interactions: hover lift, press scale, shadow changes
-- InteractiveCard created for clickable cards (billing, pricing)
-- Color consistency audit: replaced all hardcoded blues with semantic tokens
-- All animations use motion-safe prefix for accessibility
-- 200ms transitions standardized across all components
-
-### Navigation Structure
-- **Desktop (1024px+):** Full sidebar, collapsible to icons
-- **Tablet (768-1024px):** Auto-collapsed sidebar with icons only
-- **Mobile (<768px):** Hidden sidebar, visible bottom nav with 4 items
-
-### Phase 09 Complete
-All polish & UX work finished. App now has:
-- Professional design system (light gray bg, blue accents, 12px radius)
-- Responsive layouts (sidebar, bottom nav, app shell)
-- Loading states (skeletons) and empty states
-- Micro-interactions (hover/press animations)
-- Accessibility (reduced-motion support)
-- Semantic color tokens throughout
-
-Ready for Phase 10 (Analytics Dashboard).
-
-### Phase 10-01 Execution
-- Fast execution, ~3 minutes
-- Updated design system: pure white background, lime/coral accents
-- Created GeometricMarker component for decorative elements
-- Updated marketing layout footer/nav styling
-- One deviation: Fixed lint errors in hero.tsx (unused imports, missing TrendingUp)
-- All verification passing (lint, typecheck)
-
-### Phase 10-02 Execution
-- Fast execution, ~2.5 minutes
-- Redesigned hero section with asymmetric 55%/45% layout
-- Created ImagePlaceholder component for hero photo slot
-- Integrated GeometricMarker triangle in stat badge (lime color)
-- Updated CTAs: dark primary + light outline secondary
-- Simplified trust indicators to bullet-separated text
-- Added motion-safe prefix to all floating card animations
-- All must_haves verified and passing (lint, typecheck)
-
-### Phase 10-03 Execution
-- Fast execution, ~3 minutes
-- Redesigned SocialProof: text-only brands, removed cards and animation
-- Redesigned StatsSection: triangle markers, removed cards and count-up animation
-- Using GeometricMarker with alternating lime/coral colors
-- Simplified stats data and section heading
-- No deviations - plan executed exactly as written
-- All must_haves verified and passing (lint, typecheck)
-
-### Phase 10-04 Execution
-- Fast execution, ~1.5 minutes
-- Created FeatureSection component with alternating left/right layouts
-- Defined 3 core features: Simple, Organized, Trackable
-- Each feature has badge, title, description, bullet list, inline stats
-- Bullet points use GeometricMarker circles (lime color)
-- Image placeholders with 4:3 aspect ratio for future screenshots
-- Alternating backgrounds (white, bg-muted/30) for visual rhythm
-- Removed HowItWorks from page (integrated into feature messaging)
-- No deviations - plan executed exactly as written
-- All must_haves verified and passing (lint, typecheck)
+Ready for production review and screenshot integration.
