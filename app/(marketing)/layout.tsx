@@ -107,7 +107,7 @@ export default function MarketingLayout({
           </div>
 
           <div className="mt-8 pt-8 border-t border-border/40 text-center text-sm text-muted-foreground">
-            <p>&copy; {new Date().getFullYear()} AvisLoop. All rights reserved.</p>
+            <p>&copy; 2025 AvisLoop. All rights reserved.</p>
           </div>
         </div>
       </footer>
