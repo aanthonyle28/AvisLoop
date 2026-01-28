@@ -1,15 +1,15 @@
 # Project State
 
-**Last updated:** 2026-01-28T08:40:00Z
+**Last updated:** 2026-01-28T08:40:41Z
 
 ## Current Position
 
 **Phase:** 10 of 12 (Landing Page Redesign)
-**Plan:** 1 of 5
+**Plan:** 2 of 5
 **Status:** In progress
-**Last activity:** 2026-01-28 - Completed 10-01-PLAN.md (Design System Update)
+**Last activity:** 2026-01-28 - Completed 10-02-PLAN.md (Hero Section Redesign)
 
-**Progress:** [█████████░░] ~98% (41/46 plans complete)
+**Progress:** [█████████░░] ~98% (42/46 plans complete)
 
 ```
 Phase 01: ██████ Foundation & Auth (6/6 complete)
@@ -24,7 +24,7 @@ Phase 07: ████ Onboarding Flow (4/4 complete)
 Phase 08: ██ Public Pages (2/2 complete)
 Phase 8.1: ██ Code Review Fixes (2/2 complete)
 Phase 09: ████ Polish & UX (4/4 complete)
-Phase 10: █░░░░ Landing Page Redesign (1/5 complete) ← YOU ARE HERE
+Phase 10: ██░░░ Landing Page Redesign (2/5 complete) <- YOU ARE HERE
 ```
 
 ## What's Been Built
@@ -117,6 +117,9 @@ Phase 10: █░░░░ Landing Page Redesign (1/5 complete) ← YOU ARE HERE
 | UX-006 | Semantic color tokens over hardcoded colors | 09-04 | Theme consistency, easier maintenance |
 | DS-007 | Pure white background for light mode | 10-01 | Cleaner, more modern aesthetic matching reference design |
 | DS-008 | Lime (75 85% 55%) and Coral (0 85% 65%) accent colors | 10-01 | High-contrast accent colors for visual interest in marketing pages |
+| HERO-001 | Dark headline text instead of primary blue | 10-02 | Matches reference design for cleaner look |
+| HERO-002 | Asymmetric 55%/45% grid layout | 10-02 | Emphasizes content with visual mockup prominence |
+| HERO-003 | Dark primary CTA with light outline secondary | 10-02 | Strong visual hierarchy |
 | AUTH-001 | Supabase Auth for authentication | 01 | Built-in security, session management |
 | SEND-001 | Resend for email delivery | 04 | Developer experience, reliability |
 | RATE-001 | Upstash Redis for rate limiting | 04 | Serverless, global edge caching |
@@ -175,10 +178,10 @@ Phase 10: █░░░░ Landing Page Redesign (1/5 complete) ← YOU ARE HERE
 
 ## Session Continuity
 
-**Last session:** 2026-01-28T08:40:00Z
-**Stopped at:** Completed 10-01-PLAN.md
+**Last session:** 2026-01-28T08:40:41Z
+**Stopped at:** Completed 10-02-PLAN.md
 **Resume file:** None
-**Next action:** Execute 10-02-PLAN.md (Hero Section)
+**Next action:** Execute 10-03-PLAN.md (Features Section Redesign)
 
 ## Notes
 
@@ -241,3 +244,13 @@ Ready for Phase 10 (Analytics Dashboard).
 - Updated marketing layout footer/nav styling
 - One deviation: Fixed lint errors in hero.tsx (unused imports, missing TrendingUp)
 - All verification passing (lint, typecheck)
+
+### Phase 10-02 Execution
+- Fast execution, ~2.5 minutes
+- Redesigned hero section with asymmetric 55%/45% layout
+- Created ImagePlaceholder component for hero photo slot
+- Integrated GeometricMarker triangle in stat badge (lime color)
+- Updated CTAs: dark primary + light outline secondary
+- Simplified trust indicators to bullet-separated text
+- Added motion-safe prefix to all floating card animations
+- All must_haves verified and passing (lint, typecheck)
