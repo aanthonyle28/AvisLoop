@@ -43,12 +43,13 @@ export async function getSubscription(): Promise<Subscription | null> {
 
 /**
  * Get combined billing info for the billing page.
- * Includes business tier, subscription status, and monthly usage.
+ * Includes business tier, subscription status, monthly usage, and contact count.
  */
 export async function getBusinessBillingInfo(): Promise<{
   business: { id: string; tier: string; stripe_customer_id: string | null } | null
   subscription: Subscription | null
   usage: { count: number; limit: number }
+  contactCount: number  // For BILL-07 contact limit display
 }> {
   const supabase = await createClient()
 
@@ -58,6 +59,7 @@ export async function getBusinessBillingInfo(): Promise<{
       business: null,
       subscription: null,
       usage: { count: 0, limit: 0 },
+      contactCount: 0,
     }
   }
 
@@ -73,6 +75,7 @@ export async function getBusinessBillingInfo(): Promise<{
       business: null,
       subscription: null,
       usage: { count: 0, limit: 0 },
+      contactCount: 0,
     }
   }
 
@@ -88,6 +91,13 @@ export async function getBusinessBillingInfo(): Promise<{
   // Fetch monthly usage using existing function
   const usageData = await getMonthlyUsage()
 
+  // Fetch active contact count for contact limit display (BILL-07)
+  const { count: contactCount } = await supabase
+    .from('contacts')
+    .select('*', { count: 'exact', head: true })
+    .eq('business_id', business.id)
+    .eq('status', 'active')
+
   return {
     business: {
       id: business.id,
@@ -99,5 +109,6 @@ export async function getBusinessBillingInfo(): Promise<{
       count: usageData.count,
       limit: usageData.limit,
     },
+    contactCount: contactCount ?? 0,
   }
 }
