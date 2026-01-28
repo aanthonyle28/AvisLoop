@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 6 of 10 (Billing & Limits)
-Plan: 1 of 4
+Plan: 2 of 4
 Status: In progress
-Last activity: 2026-01-27 - Completed 06-01-PLAN.md (billing infrastructure)
+Last activity: 2026-01-27 - Completed 06-02-PLAN.md (checkout flow)
 
-Progress: [██████░░░░] ~58% (6/10 phases, 27/~53 plans complete)
+Progress: [██████░░░░] ~60% (6/10 phases, 28/~53 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 27
+- Total plans completed: 28
 - Average duration: 3 min
-- Total execution time: 1.24 hours
+- Total execution time: 1.31 hours
 
 **By Phase:**
 
@@ -34,10 +34,10 @@ Progress: [██████░░░░] ~58% (6/10 phases, 27/~53 plans compl
 | 04-core-sending | 4 | 8 min | 2 min |
 | 05-message-history | 2 | 4 min | 2 min |
 | 05.1-code-review-fixes | 1 | 3 min | 3 min |
-| 06-billing-limits | 1 | 4 min | 4 min |
+| 06-billing-limits | 2 | 8 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: 06-01 (4 min), 05.1-01 (3 min), 05-02 (2 min), 05-01 (2 min), 04-04 (2 min)
+- Last 5 plans: 06-02 (4 min), 06-01 (4 min), 05.1-01 (3 min), 05-02 (2 min), 05-01 (2 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -125,6 +125,10 @@ Recent decisions affecting current work:
 - [06-01] Migration numbered 00007 (00006 already existed for monthly index)
 - [06-01] API version 2025-12-15.clover (latest stable in SDK)
 - [06-01] Throw error if STRIPE_SECRET_KEY missing at module load
+- [06-02] Create Stripe customer on first checkout, not on registration
+- [06-02] Use redirect() return type never for checkout/portal actions
+- [06-02] Include business_id in subscription metadata for webhook correlation
+- [06-02] Require existing stripe_customer_id for portal access
 
 ### Pending Todos
 
@@ -157,6 +161,6 @@ None currently.
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Completed 06-01-PLAN.md (billing infrastructure)
+Stopped at: Completed 06-02-PLAN.md (checkout flow)
 Resume file: None
-Next: 06-02-PLAN.md (checkout flow)
+Next: 06-03-PLAN.md (billing page UI)
