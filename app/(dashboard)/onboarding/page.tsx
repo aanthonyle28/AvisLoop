@@ -4,7 +4,6 @@ import { getOnboardingStatus } from '@/lib/data/onboarding'
 import { getBusiness, getEmailTemplates } from '@/lib/actions/business'
 import { getContacts } from '@/lib/actions/contact'
 import { OnboardingWizard } from '@/components/onboarding/onboarding-wizard'
-import { OnboardingSteps } from '@/components/onboarding/onboarding-steps'
 
 /**
  * Onboarding page - guides new users through initial setup.
@@ -68,19 +67,12 @@ export default async function OnboardingPage({
         </p>
       </div>
 
-      <OnboardingWizard initialStep={currentStep}>
-        {({ goToNext, goToStep, handleComplete }) => (
-          <OnboardingSteps
-            currentStep={currentStep}
-            business={business}
-            firstContact={firstContact}
-            defaultTemplate={defaultTemplate}
-            onGoToNext={goToNext}
-            onGoToStep={goToStep}
-            onComplete={handleComplete}
-          />
-        )}
-      </OnboardingWizard>
+      <OnboardingWizard
+        initialStep={currentStep}
+        business={business}
+        firstContact={firstContact}
+        defaultTemplate={defaultTemplate}
+      />
     </div>
   )
 }

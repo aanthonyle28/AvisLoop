@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect, useCallback, ReactNode } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { OnboardingProgress } from './onboarding-progress'
+import { OnboardingSteps } from './onboarding-steps'
 import { markOnboardingComplete } from '@/lib/actions/onboarding'
 import { Button } from '@/components/ui/button'
 
@@ -20,12 +21,28 @@ const STEPS: StepConfig[] = [
 
 const STORAGE_KEY = 'onboarding-draft'
 
-type WizardChildProps = {
-  draftData: Record<string, unknown>
-  setDraftData: (key: string, value: unknown) => void
-  goToNext: () => void
-  goToStep: (step: number) => void
-  handleComplete: () => Promise<void>
+type Business = {
+  name: string
+  google_review_link: string | null
+} | null
+
+type Contact = {
+  id: string
+  name: string
+  email: string
+} | null
+
+type Template = {
+  id: string
+  subject: string
+  body: string
+} | null
+
+interface OnboardingWizardProps {
+  initialStep: number
+  business: Business
+  firstContact: Contact
+  defaultTemplate: Template
 }
 
 /**
@@ -36,15 +53,14 @@ type WizardChildProps = {
  * - Draft data persistence in localStorage
  * - Completion marking in database
  *
- * Children receive render props for navigation and data management.
+ * Renders OnboardingSteps internally with navigation callbacks.
  */
 export function OnboardingWizard({
   initialStep,
-  children,
-}: {
-  initialStep: number
-  children: (props: WizardChildProps) => ReactNode
-}) {
+  business,
+  firstContact,
+  defaultTemplate,
+}: OnboardingWizardProps) {
   const router = useRouter()
   const [currentStep, setCurrentStep] = useState(initialStep)
   const [draftData, setDraftDataState] = useState<Record<string, unknown>>({})
@@ -126,13 +142,15 @@ export function OnboardingWizard({
 
       {/* Step content */}
       <div className="bg-card rounded-lg border p-6 shadow-sm">
-        {children({
-          draftData,
-          setDraftData,
-          goToNext,
-          goToStep,
-          handleComplete,
-        })}
+        <OnboardingSteps
+          currentStep={currentStep}
+          business={business}
+          firstContact={firstContact}
+          defaultTemplate={defaultTemplate}
+          onGoToNext={goToNext}
+          onGoToStep={goToStep}
+          onComplete={handleComplete}
+        />
       </div>
 
       {/* Skip button for skippable steps */}
