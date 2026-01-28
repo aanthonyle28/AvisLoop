@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Make requesting reviews so simple that business owners actually do it — one contact, one click, done.
-**Current focus:** Phase 8.1 - Code Review Fixes
+**Current focus:** Phase 9 - Polish & UX
 
 ## Current Position
 
@@ -205,4 +205,4 @@ None currently.
 Last session: 2026-01-28
 Stopped at: Completed Phase 8.1 (Code Review Fixes)
 Resume file: None
-Next: Phase 9 - Subscription & Billing (Stripe integration, tier upgrades)
+Next: Phase 9 - Polish & UX (consistent visual design, empty/loading/error states, responsive design)

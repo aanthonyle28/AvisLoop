@@ -22,7 +22,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 6: Billing & Limits** - Users can subscribe and system enforces tier limits
 - [x] **Phase 7: Onboarding Flow** - New users are guided through first-time setup
 - [x] **Phase 8: Public Pages** - Visitors can learn about and sign up for AvisLoop
-- [ ] **Phase 8.1: Code Review Fixes** - Fix security, maintainability, and UX issues from phases 6-8 review (INSERTED)
+- [x] **Phase 8.1: Code Review Fixes** - Fix security, maintainability, and UX issues from phases 6-8 review (INSERTED)
 - [ ] **Phase 9: Polish & UX** - App has consistent, polished visual design across all screens
 
 ## Phase Details
@@ -226,8 +226,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 08.1-01-PLAN.md — Security and performance fixes (SEC-01, SEC-02, SEC-03, SEC-04, PERF-01)
-- [ ] 08.1-02-PLAN.md — Maintainability, UX, SEO, and accessibility fixes (MAINT-01, MAINT-02, MAINT-03, UX-01, UX-02, SEO-01, A11Y-01)
+- [x] 08.1-01-PLAN.md — Security and performance fixes (SEC-01, SEC-02, SEC-03, SEC-04, PERF-01)
+- [x] 08.1-02-PLAN.md — Maintainability, UX, SEO, and accessibility fixes (MAINT-01, MAINT-02, MAINT-03, UX-01, UX-02, SEO-01, A11Y-01)
 
 ### Phase 9: Polish & UX
 **Goal**: App has consistent, polished visual design across all screens
@@ -269,5 +269,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -
 | 6. Billing & Limits | 5/5 | Complete | 2026-01-28 |
 | 7. Onboarding Flow | 4/4 | Complete | 2026-01-27 |
 | 8. Public Pages | 2/2 | Complete | 2026-01-28 |
-| 8.1 Code Review Fixes | 0/2 | Not started | - |
+| 8.1 Code Review Fixes | 2/2 | Complete | 2026-01-27 |
 | 9. Polish & UX | 0/TBD | Not started | - |

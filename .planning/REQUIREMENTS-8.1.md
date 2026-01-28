@@ -9,50 +9,50 @@ Code review fixes for phases 6, 7, and 8.
 
 ### Security
 
-- [ ] **SEC-01**: Stripe webhook has rate limiting for failed signature verification attempts
-- [ ] **SEC-02**: Service role Supabase client is scoped inside webhook handler function
-- [ ] **SEC-03**: Billing page validates STRIPE_BASIC_PRICE_ID and STRIPE_PRO_PRICE_ID env vars
-- [ ] **SEC-04**: Onboarding wizard validates localStorage draft data with Zod schema
+- [x] **SEC-01**: Stripe webhook has rate limiting for failed signature verification attempts
+- [x] **SEC-02**: Service role Supabase client is scoped inside webhook handler function
+- [x] **SEC-03**: Billing page validates STRIPE_BASIC_PRICE_ID and STRIPE_PRO_PRICE_ID env vars
+- [x] **SEC-04**: Onboarding wizard validates localStorage draft data with Zod schema
 
 ### Maintainability
 
-- [ ] **MAINT-01**: Contact limits are centralized in lib/constants/billing.ts
-- [ ] **MAINT-02**: Business/Contact/Template types extracted to shared types file
-- [ ] **MAINT-03**: Onboarding page comment matches actual step count (3 steps)
+- [x] **MAINT-01**: Contact limits are centralized in lib/constants/billing.ts
+- [x] **MAINT-02**: Business/Contact/Template types extracted to shared types file
+- [x] **MAINT-03**: Onboarding page comment matches actual step count (3 steps)
 
 ### UX
 
-- [ ] **UX-01**: Footer links point to existing pages or are removed
-- [ ] **UX-02**: Auth pages have consistent branding with marketing layout
+- [x] **UX-01**: Footer links point to existing pages or are removed
+- [x] **UX-02**: Auth pages have consistent branding with marketing layout
 
 ### SEO
 
-- [ ] **SEO-01**: Copyright year is dynamically generated
+- [x] **SEO-01**: Copyright year is dynamically generated
 
 ### Performance
 
-- [ ] **PERF-01**: getBusinessBillingInfo() runs independent queries in parallel
+- [x] **PERF-01**: getBusinessBillingInfo() runs independent queries in parallel
 
 ### Accessibility
 
-- [ ] **A11Y-01**: Onboarding progress indicator has proper ARIA attributes
+- [x] **A11Y-01**: Onboarding progress indicator has proper ARIA attributes
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SEC-01 | Phase 8.1 | Pending |
-| SEC-02 | Phase 8.1 | Pending |
-| SEC-03 | Phase 8.1 | Pending |
-| SEC-04 | Phase 8.1 | Pending |
-| MAINT-01 | Phase 8.1 | Pending |
-| MAINT-02 | Phase 8.1 | Pending |
-| MAINT-03 | Phase 8.1 | Pending |
-| UX-01 | Phase 8.1 | Pending |
-| UX-02 | Phase 8.1 | Pending |
-| SEO-01 | Phase 8.1 | Pending |
-| PERF-01 | Phase 8.1 | Pending |
-| A11Y-01 | Phase 8.1 | Pending |
+| SEC-01 | Phase 8.1 | Complete |
+| SEC-02 | Phase 8.1 | Complete |
+| SEC-03 | Phase 8.1 | Complete |
+| SEC-04 | Phase 8.1 | Complete |
+| MAINT-01 | Phase 8.1 | Complete |
+| MAINT-02 | Phase 8.1 | Complete |
+| MAINT-03 | Phase 8.1 | Complete |
+| UX-01 | Phase 8.1 | Complete |
+| UX-02 | Phase 8.1 | Complete |
+| SEO-01 | Phase 8.1 | Complete |
+| PERF-01 | Phase 8.1 | Complete |
+| A11Y-01 | Phase 8.1 | Complete |
 
 **Coverage:**
 - v8.1 requirements: 12 total
