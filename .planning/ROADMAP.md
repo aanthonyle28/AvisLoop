@@ -21,7 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5.1: Code Review Fixes** - Fix security and maintainability issues from code review (INSERTED)
 - [x] **Phase 6: Billing & Limits** - Users can subscribe and system enforces tier limits
 - [ ] **Phase 7: Onboarding Flow** - New users are guided through first-time setup
-- [ ] **Phase 8: Public Pages** - Visitors can learn about and sign up for AvisLoop
+- [x] **Phase 8: Public Pages** - Visitors can learn about and sign up for AvisLoop
 - [ ] **Phase 9: Polish & UX** - App has consistent, polished visual design across all screens
 
 ## Phase Details
@@ -202,8 +202,8 @@ Plans:
 **Plans**: 2 plans in 2 waves
 
 Plans:
-- [ ] 08-01-PLAN.md — Marketing layout + landing page (hero, features, CTAs)
-- [ ] 08-02-PLAN.md — Pricing page with tier comparison table
+- [x] 08-01-PLAN.md — Marketing layout + landing page (hero, features, CTAs)
+- [x] 08-02-PLAN.md — Pricing page with tier comparison table
 
 ### Phase 9: Polish & UX
 **Goal**: App has consistent, polished visual design across all screens
@@ -244,5 +244,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -
 | 5.1 Code Review Fixes | 1/1 | Complete | 2026-01-27 |
 | 6. Billing & Limits | 5/5 | Complete | 2026-01-28 |
 | 7. Onboarding Flow | 0/4 | Not started | - |
-| 8. Public Pages | 0/2 | Not started | - |
+| 8. Public Pages | 2/2 | Complete | 2026-01-28 |
 | 9. Polish & UX | 0/TBD | Not started | - |

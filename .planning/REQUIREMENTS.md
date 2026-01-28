@@ -75,10 +75,10 @@
 
 ### Public Pages
 
-- [ ] **PAGE-01**: Landing page explains product value proposition
-- [ ] **PAGE-02**: Pricing page shows tier comparison
-- [ ] **PAGE-03**: Login page for returning users
-- [ ] **PAGE-04**: Signup page for new users
+- [x] **PAGE-01**: Landing page explains product value proposition
+- [x] **PAGE-02**: Pricing page shows tier comparison
+- [x] **PAGE-03**: Login page for returning users
+- [x] **PAGE-04**: Signup page for new users
 
 ## v2 Requirements
 
@@ -182,10 +182,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BILL-05 | Phase 6 | Pending |
 | BILL-06 | Phase 6 | Pending |
 | BILL-07 | Phase 6 | Pending |
-| PAGE-01 | Phase 8 | Pending |
-| PAGE-02 | Phase 8 | Pending |
-| PAGE-03 | Phase 8 | Pending |
-| PAGE-04 | Phase 8 | Pending |
+| PAGE-01 | Phase 8 | Complete |
+| PAGE-02 | Phase 8 | Complete |
+| PAGE-03 | Phase 8 | Complete |
+| PAGE-04 | Phase 8 | Complete |
 
 **Coverage:**
 - v1 requirements: 44 total

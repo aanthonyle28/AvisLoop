@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Make requesting reviews so simple that business owners actually do it — one contact, one click, done.
-**Current focus:** Phase 8 - Public Pages
+**Current focus:** Phase 9 - Polish & UX
 
 ## Current Position
 
 Phase: 8 of 10 (Public Pages)
-Plan: 2 of 3
-Status: In progress
-Last activity: 2026-01-28 - Completed 08-02-PLAN.md (Pricing page)
+Plan: 2 of 2
+Status: Phase complete
+Last activity: 2026-01-28 - Completed Phase 8 (Public Pages)
 
-Progress: [███████░░░] ~72% (8/10 phases, 36/~53 plans complete)
+Progress: [████████░░] ~78% (8/10 phases, 35/~45 plans complete)
 
 ## Performance Metrics
 
@@ -189,6 +189,6 @@ None currently.
 ## Session Continuity
 
 Last session: 2026-01-28
-Stopped at: Completed 08-02-PLAN.md (Pricing page)
+Stopped at: Completed Phase 8 (Public Pages)
 Resume file: None
-Next: 08-03-PLAN.md (Legal pages - optional)
+Next: Phase 9 - Polish & UX
