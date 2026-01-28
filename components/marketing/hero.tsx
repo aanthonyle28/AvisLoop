@@ -1,6 +1,42 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Star, Send, TrendingUp } from "lucide-react";
+import { GeometricMarker } from "@/components/ui/geometric-marker";
+import { Star, Send } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+// Image placeholder component for hero section
+function ImagePlaceholder({
+  src,
+  alt,
+  className,
+}: {
+  src?: string;
+  alt: string;
+  className?: string;
+}) {
+  if (src) {
+    return (
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        className={cn("object-cover", className)}
+      />
+    );
+  }
+
+  return (
+    <div
+      className={cn(
+        "flex items-center justify-center bg-muted/50 border-2 border-dashed border-border rounded-lg",
+        className
+      )}
+    >
+      <span className="text-sm text-muted-foreground">Your photo here</span>
+    </div>
+  );
+}
 
 export function Hero() {
   return (
@@ -56,7 +92,7 @@ export function Hero() {
           {/* Right: Product Mockup */}
           <div className="relative lg:pl-8">
             {/* Main dashboard card */}
-            <div className="relative rounded-2xl border border-border/50 bg-card shadow-2xl shadow-primary/5 p-6 transform rotate-1 hover:rotate-0 transition-transform duration-500">
+            <div className="relative rounded-2xl border border-border/50 bg-card shadow-2xl shadow-primary/5 p-6 motion-safe:transform motion-safe:rotate-1 motion-safe:hover:rotate-0 motion-safe:transition-transform motion-safe:duration-500">
               {/* Browser dots */}
               <div className="flex gap-1.5 mb-4">
                 <div className="w-3 h-3 rounded-full bg-red-400" />
@@ -71,31 +107,17 @@ export function Hero() {
                   <div className="text-xs text-muted-foreground">AvisLoop</div>
                 </div>
 
-                {/* Contact selector mock */}
-                <div className="bg-muted/50 rounded-lg p-3">
-                  <div className="text-xs text-muted-foreground mb-2">Selected Contact</div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold">
-                      JD
-                    </div>
-                    <div>
-                      <div className="font-medium text-sm">John Doe</div>
-                      <div className="text-xs text-muted-foreground">john@example.com</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Preview mock */}
-                <div className="bg-muted/30 rounded-lg p-3 border border-border/30">
-                  <div className="text-xs text-muted-foreground mb-2">Message Preview</div>
-                  <div className="text-sm">
-                    Hi John, thank you for choosing us! We&apos;d love your feedback…
-                  </div>
+                {/* Image placeholder area */}
+                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
+                  <ImagePlaceholder
+                    alt="Happy customer using AvisLoop"
+                    className="w-full h-full"
+                  />
                 </div>
 
                 {/* Send button mock */}
                 <div className="flex gap-2">
-                  <div className="flex-1 bg-primary text-primary-foreground rounded-lg py-2.5 text-center text-sm font-medium flex items-center justify-center gap-2">
+                  <div className="flex-1 bg-foreground text-background rounded-lg py-2.5 text-center text-sm font-medium flex items-center justify-center gap-2">
                     <Send className="h-4 w-4" />
                     Send Request
                   </div>
@@ -104,20 +126,18 @@ export function Hero() {
             </div>
 
             {/* Floating stat card - top right */}
-            <div className="absolute -top-4 -right-4 md:right-0 rounded-xl border border-border/50 bg-card shadow-lg p-4 transform -rotate-3 hover:rotate-0 transition-transform duration-300">
+            <div className="absolute -top-4 -right-4 md:right-0 rounded-xl border border-border/50 bg-card shadow-lg p-4 motion-safe:transform motion-safe:-rotate-3 motion-safe:hover:rotate-0 motion-safe:transition-transform motion-safe:duration-300">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center">
-                  <TrendingUp className="h-5 w-5 text-green-500" />
-                </div>
+                <GeometricMarker variant="triangle" color="lime" size="md" />
                 <div>
-                  <div className="text-2xl font-bold text-green-500">+47%</div>
+                  <div className="text-2xl font-bold text-lime">+47%</div>
                   <div className="text-xs text-muted-foreground">More reviews</div>
                 </div>
               </div>
             </div>
 
             {/* Floating review card - bottom left */}
-            <div className="absolute -bottom-4 -left-4 md:left-0 rounded-xl border border-border/50 bg-card shadow-lg p-4 transform rotate-2 hover:rotate-0 transition-transform duration-300">
+            <div className="absolute -bottom-4 -left-4 md:left-0 rounded-xl border border-border/50 bg-card shadow-lg p-4 motion-safe:transform motion-safe:rotate-2 motion-safe:hover:rotate-0 motion-safe:transition-transform motion-safe:duration-300">
               <div className="flex items-center gap-1 mb-1">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
