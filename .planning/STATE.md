@@ -19,9 +19,9 @@ Progress: [███████░░░] ~70% (8/10 phases, 33/~53 plans compl
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 33
+- Total plans completed: 34
 - Average duration: 3 min
-- Total execution time: 1.6 hours
+- Total execution time: 1.67 hours
 
 **By Phase:**
 
@@ -35,11 +35,11 @@ Progress: [███████░░░] ~70% (8/10 phases, 33/~53 plans compl
 | 05-message-history | 2 | 4 min | 2 min |
 | 05.1-code-review-fixes | 1 | 3 min | 3 min |
 | 06-billing-limits | 5 | 18 min | 4 min |
-| 07-onboarding-flow | 1 | 4 min | 4 min |
+| 07-onboarding-flow | 2 | 8 min | 4 min |
 | 08-public-pages | 1 | 5 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 08-01 (5 min), 07-01 (4 min), 06-05 (3 min), 06-04 (3 min), 06-03 (4 min)
+- Last 5 plans: 07-02 (4 min), 08-01 (5 min), 07-01 (4 min), 06-05 (3 min), 06-04 (3 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -142,6 +142,10 @@ Recent decisions affecting current work:
 - [07-01] Partial index on user_id WHERE onboarding_completed_at IS NULL for efficient incomplete onboarding queries
 - [07-01] Count queries use { count: 'exact', head: true } pattern (no data transfer, just count)
 - [07-01] getOnboardingStatus returns null for unauthenticated users (not throwing)
+- [07-02] Render props pattern for wizard children to pass navigation functions
+- [07-02] isSubmitting state prevents navigation during saves (race condition prevention)
+- [07-02] Step clamp to 1-3 range for URL validation
+- [07-02] OnboardingWizard render props: { draftData, setDraftData, goToNext, goToStep, handleComplete }
 - [08-01] Use route group (marketing) for public pages with separate layout
 - [08-01] Static year in footer to avoid Next.js 16 prerender errors
 - [08-01] Server Components only for marketing content (no "use client")
