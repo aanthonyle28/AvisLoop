@@ -18,6 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3.1: Critical Fixes** - Fix security vulnerabilities and scalability issues (INSERTED)
 - [x] **Phase 4: Core Sending** - Users can send review request emails and see immediate confirmation
 - [x] **Phase 5: Message History** - Users can view and track all sent review requests
+- [ ] **Phase 5.1: Code Review Fixes** - Fix security and maintainability issues from code review (INSERTED)
 - [ ] **Phase 6: Billing & Limits** - Users can subscribe and system enforces tier limits
 - [ ] **Phase 7: Onboarding Flow** - New users are guided through first-time setup
 - [ ] **Phase 8: Public Pages** - Visitors can learn about and sign up for AvisLoop
@@ -106,9 +107,9 @@ Plans:
   3. User sees immediate "Sent" confirmation after sending
   4. System logs every send attempt with status (sent/failed)
   5. System enforces cooldown period between sends to same contact
-  6. System respects contact opt-out preferences
-  7. System enforces monthly send limits per tier (Basic: 200, Pro: 500)
-  8. System rate-limits sending to prevent abuse
+  6. System rate-limits sending to prevent abuse
+  7. System respects contact opt-out preferences
+  8. System enforces monthly send limits per tier (Basic: 200, Pro: 500)
   9. System updates message status on delivery/failure via webhooks
 **Plans**: 5 plans in 3 waves
 
@@ -134,6 +135,20 @@ Plans:
 - [x] 05-01-PLAN.md — Data layer with filtering (getSendLogs extension) and reusable components (StatusBadge, HistoryFilters)
 - [x] 05-02-PLAN.md — History table UI and page integration (columns, table, client, page)
 
+### Phase 5.1: Code Review Fixes (INSERTED)
+**Goal**: Fix security vulnerabilities and maintainability issues identified in code review
+**Depends on**: Phase 5
+**Requirements**: None (fixes, not new features)
+**Success Criteria** (what must be TRUE):
+  1. Webhook endpoint has rate limiting to prevent abuse
+  2. Monthly send count query uses optimized index
+  3. Billing constants defined in single source of truth
+  4. History page has error boundary for graceful error handling
+**Plans**: 1 plan
+
+Plans:
+- [ ] 05.1-01-PLAN.md — Rate limit webhook, add index, extract constants, add error boundary
+
 ### Phase 6: Billing & Limits
 **Goal**: Users can subscribe and system enforces tier limits
 **Depends on**: Phase 4
@@ -145,11 +160,14 @@ Plans:
   4. User can view current plan and manage subscription (cancel/update) via billing page
   5. System enforces tier limits on contacts and sends per month
   6. System blocks sending when limits are exceeded or subscription is inactive
-**Plans**: TBD
+**Plans**: 5 plans in 3 waves
 
 Plans:
-- [ ] 06-01: TBD
-- [ ] 06-02: TBD
+- [ ] 06-01-PLAN.md — Database schema + Stripe SDK + client (billing foundation)
+- [ ] 06-02-PLAN.md — Checkout session + portal session server actions
+- [ ] 06-03-PLAN.md — Webhook handler for subscription lifecycle events
+- [ ] 06-04-PLAN.md — Billing page with usage display and subscription management
+- [ ] 06-05-PLAN.md — Usage warnings + send page limit enforcement
 
 ### Phase 7: Onboarding Flow
 **Goal**: New users are guided through first-time setup
@@ -210,7 +228,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
+Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -> 8 -> 9
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -220,7 +238,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 6 -> 7 -> 8 -> 
 | 3.1 Critical Fixes | 1/1 | Complete | 2026-01-27 |
 | 4. Core Sending | 5/5 | Complete | 2026-01-27 |
 | 5. Message History | 2/2 | Complete | 2026-01-27 |
-| 6. Billing & Limits | 0/TBD | Not started | - |
+| 5.1 Code Review Fixes | 0/1 | Not started | - |
+| 6. Billing & Limits | 0/5 | Not started | - |
 | 7. Onboarding Flow | 0/TBD | Not started | - |
 | 8. Public Pages | 0/TBD | Not started | - |
 | 9. Polish & UX | 0/TBD | Not started | - |
