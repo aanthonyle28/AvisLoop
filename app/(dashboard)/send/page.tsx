@@ -2,7 +2,10 @@ import { getBusiness } from '@/lib/actions/business'
 import { getContacts } from '@/lib/actions/contact'
 import { getMonthlyUsage } from '@/lib/data/send-logs'
 import { SendForm } from '@/components/send/send-form'
+import { UsageWarningBanner } from '@/components/billing/usage-warning-banner'
+import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 
 export default async function SendPage() {
   const business = await getBusiness()
@@ -31,10 +34,25 @@ export default async function SendPage() {
     )
   }
 
-  const [{ contacts }, usage] = await Promise.all([
+  const supabase = await createClient()
+
+  const [{ contacts }, usage, { count: contactCount }] = await Promise.all([
     getContacts({ limit: 200 }),
     getMonthlyUsage(),
+    supabase
+      .from('contacts')
+      .select('*', { count: 'exact', head: true })
+      .eq('business_id', business.id)
+      .eq('status', 'active'),
   ])
+
+  // Contact limits by tier (BILL-07)
+  const CONTACT_LIMITS: Record<string, number | undefined> = {
+    trial: undefined,
+    basic: 200,
+    pro: undefined,
+  }
+  const contactLimit = CONTACT_LIMITS[usage.tier]
 
   // Filter to only sendable contacts (active, not opted out)
   const sendableContacts = contacts.filter(
@@ -45,10 +63,21 @@ export default async function SendPage() {
     <div className="container mx-auto py-6 px-4">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Send Review Request</h1>
-        <div className="text-sm text-muted-foreground">
+        <Link
+          href="/billing"
+          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
           {usage.count} / {usage.limit} sends this month
-        </div>
+        </Link>
       </div>
+
+      <UsageWarningBanner
+        count={usage.count}
+        limit={usage.limit}
+        tier={usage.tier}
+        contactCount={contactCount ?? undefined}
+        contactLimit={contactLimit}
+      />
 
       {sendableContacts.length === 0 ? (
         <div className="rounded-lg border border-muted p-6 text-center">
@@ -68,6 +97,8 @@ export default async function SendPage() {
           business={business}
           templates={business.email_templates || []}
           monthlyUsage={usage}
+          contactCount={contactCount ?? 0}
+          contactLimit={contactLimit}
         />
       )}
     </div>
