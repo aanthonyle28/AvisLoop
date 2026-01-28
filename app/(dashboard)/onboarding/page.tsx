@@ -42,6 +42,7 @@ export default async function OnboardingPage({
   const stepParam = parseInt(params.step || '1', 10)
 
   // Validate step range (1-3), clamp if out of range
+  // Note: Wizard has 3 steps (Business, Contact, Send). Review Link is part of Business step.
   const currentStep = Math.min(Math.max(1, stepParam), 3)
 
   // Fetch data needed for step components in parallel
