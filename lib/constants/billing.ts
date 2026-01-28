@@ -15,4 +15,11 @@ export const MONTHLY_SEND_LIMITS: Record<string, number> = {
 
 export const COOLDOWN_DAYS = 14
 
+// Contact limits by tier (undefined means unlimited)
+export const CONTACT_LIMITS: Record<string, number | undefined> = {
+  trial: undefined,  // Unlimited for trial
+  basic: 200,        // 200 for basic
+  pro: undefined,    // Unlimited for pro
+}
+
 export type TierName = keyof typeof TIER_LIMITS

@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { PlanCard } from '@/components/billing/plan-card'
 import { UsageDisplay } from '@/components/billing/usage-display'
 import { SubscriptionStatus } from '@/components/billing/subscription-status'
+import { CONTACT_LIMITS } from '@/lib/constants/billing'
 import { CheckCircle2 } from 'lucide-react'
 
 // Plan configuration
@@ -31,13 +32,6 @@ const PLANS = [
     ],
   },
 ]
-
-// Contact limits by tier (BILL-07)
-const CONTACT_LIMITS: Record<string, number | undefined> = {
-  trial: undefined,    // Unlimited contacts for trial
-  basic: 200,          // 200 contact limit for basic
-  pro: undefined,      // Unlimited contacts for pro
-}
 
 export default async function BillingPage({
   searchParams,
