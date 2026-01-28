@@ -3,18 +3,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { contactSchema } from '@/lib/validations/contact'
+import { escapeLikePattern } from '@/lib/utils'
 import type { Contact } from '@/lib/types/database'
-
-/**
- * Escape special characters for LIKE/ILIKE patterns.
- * Prevents SQL injection via pattern characters.
- */
-export function escapeLikePattern(str: string): string {
-  return str
-    .replace(/\\/g, '\\\\')  // Escape backslash first
-    .replace(/%/g, '\\%')    // Escape percent
-    .replace(/_/g, '\\_')    // Escape underscore
-}
 
 export type ContactActionState = {
   error?: string

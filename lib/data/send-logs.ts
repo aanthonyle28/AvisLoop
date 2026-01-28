@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { escapeLikePattern } from '@/lib/actions/contact'
+import { escapeLikePattern } from '@/lib/utils'
 import type { SendLogWithContact } from '@/lib/types/database'
 import { COOLDOWN_DAYS, MONTHLY_SEND_LIMITS } from '@/lib/constants/billing'
 

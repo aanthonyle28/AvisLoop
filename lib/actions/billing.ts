@@ -48,6 +48,7 @@ export async function createCheckoutSession(priceId: string): Promise<never> {
     line_items: [{ price: priceId, quantity: 1 }],
     success_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/billing?success=1`,
     cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/billing?canceled=1`,
+    metadata: { business_id: business.id },
     subscription_data: {
       metadata: { business_id: business.id }
     }
