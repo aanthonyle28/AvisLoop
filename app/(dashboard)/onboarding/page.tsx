@@ -1,7 +1,10 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getOnboardingStatus } from '@/lib/data/onboarding'
+import { getBusiness, getEmailTemplates } from '@/lib/actions/business'
+import { getContacts } from '@/lib/actions/contact'
 import { OnboardingWizard } from '@/components/onboarding/onboarding-wizard'
+import { OnboardingSteps } from '@/components/onboarding/onboarding-steps'
 
 /**
  * Onboarding page - guides new users through initial setup.
@@ -9,9 +12,8 @@ import { OnboardingWizard } from '@/components/onboarding/onboarding-wizard'
  * Server component that:
  * - Redirects to /login if not authenticated
  * - Redirects to /dashboard if onboarding already complete
- * - Renders wizard shell with step from URL params
- *
- * Step content is wired in 07-04 after step components are created.
+ * - Fetches data needed for all step components
+ * - Renders wizard shell with step components
  */
 export default async function OnboardingPage({
   searchParams,
@@ -43,6 +45,20 @@ export default async function OnboardingPage({
   // Validate step range (1-3), clamp if out of range
   const currentStep = Math.min(Math.max(1, stepParam), 3)
 
+  // Fetch data needed for step components in parallel
+  const [business, contactsData, templates] = await Promise.all([
+    getBusiness(),
+    getContacts({ limit: 1 }), // Get first contact for SendStep
+    getEmailTemplates(),
+  ])
+
+  // First contact for SendStep (if any exist)
+  const firstContact = contactsData.contacts[0] || null
+
+  // Default template for SendStep
+  const defaultTemplate =
+    templates.find((t) => t.is_default) || templates[0] || null
+
   return (
     <div className="container mx-auto py-8 px-4 max-w-2xl">
       <div className="mb-8">
@@ -53,28 +69,16 @@ export default async function OnboardingPage({
       </div>
 
       <OnboardingWizard initialStep={currentStep}>
-        {({ goToNext, handleComplete }) => (
-          <div className="p-4 text-center text-muted-foreground">
-            {/* Step components wired in 07-04 Task 4 */}
-            <p>Step {currentStep} content will be added in the next plan.</p>
-            <div className="mt-4 space-x-2">
-              {currentStep < 3 ? (
-                <button
-                  onClick={goToNext}
-                  className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-                >
-                  Continue
-                </button>
-              ) : (
-                <button
-                  onClick={handleComplete}
-                  className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-                >
-                  Complete Setup
-                </button>
-              )}
-            </div>
-          </div>
+        {({ goToNext, goToStep, handleComplete }) => (
+          <OnboardingSteps
+            currentStep={currentStep}
+            business={business}
+            firstContact={firstContact}
+            defaultTemplate={defaultTemplate}
+            onGoToNext={goToNext}
+            onGoToStep={goToStep}
+            onComplete={handleComplete}
+          />
         )}
       </OnboardingWizard>
     </div>
