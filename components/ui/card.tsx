@@ -8,6 +8,7 @@ const Card = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
+    data-slot="card"
     className={cn(
       "rounded-xl border bg-card text-card-foreground shadow",
       className,
@@ -16,6 +17,24 @@ const Card = React.forwardRef<
   />
 ));
 Card.displayName = "Card";
+
+const InteractiveCard = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    data-slot="interactive-card"
+    className={cn(
+      "rounded-xl border bg-card text-card-foreground shadow",
+      "transition-all duration-200 cursor-pointer",
+      "motion-safe:hover:shadow-lg motion-safe:hover:-translate-y-1",
+      className,
+    )}
+    {...props}
+  />
+));
+InteractiveCard.displayName = "InteractiveCard";
 
 const CardHeader = React.forwardRef<
   HTMLDivElement,
@@ -75,6 +94,7 @@ CardFooter.displayName = "CardFooter";
 
 export {
   Card,
+  InteractiveCard,
   CardHeader,
   CardFooter,
   CardTitle,
