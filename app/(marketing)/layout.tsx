@@ -71,43 +71,25 @@ export default function MarketingLayout({
               </ul>
             </div>
 
-            {/* Company links */}
+            {/* Company links - placeholder for future pages */}
             <div>
               <h3 className="font-semibold mb-3">Company</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <Link href="/about" className="hover:text-foreground transition-colors">
-                    About
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/contact" className="hover:text-foreground transition-colors">
-                    Contact
-                  </Link>
-                </li>
-              </ul>
+              <p className="text-sm text-muted-foreground">
+                Coming soon
+              </p>
             </div>
 
-            {/* Legal links */}
+            {/* Legal links - placeholder for future pages */}
             <div>
               <h3 className="font-semibold mb-3">Legal</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <Link href="/privacy" className="hover:text-foreground transition-colors">
-                    Privacy Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/terms" className="hover:text-foreground transition-colors">
-                    Terms of Service
-                  </Link>
-                </li>
-              </ul>
+              <p className="text-sm text-muted-foreground">
+                Coming soon
+              </p>
             </div>
           </div>
 
           <div className="mt-8 pt-8 border-t border-border/40 text-center text-sm text-muted-foreground">
-            <p>&copy; 2025 AvisLoop. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} AvisLoop. All rights reserved.</p>
           </div>
         </div>
       </footer>
