@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 
 ## Current Position
 
-Phase: 6 of 10 (Billing & Limits)
-Plan: 5 of 5
-Status: Phase complete
-Last activity: 2026-01-28 - Completed 06-05-PLAN.md (Send limit enforcement)
+Phase: 7 of 10 (Onboarding Flow)
+Plan: 1 of 4
+Status: In progress
+Last activity: 2026-01-27 - Completed 07-01-PLAN.md (Onboarding data layer)
 
-Progress: [███████░░░] ~67% (6/10 phases, 31/~53 plans complete)
+Progress: [███████░░░] ~68% (7/10 phases, 32/~53 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 31
+- Total plans completed: 32
 - Average duration: 3 min
-- Total execution time: 1.48 hours
+- Total execution time: 1.55 hours
 
 **By Phase:**
 
@@ -35,9 +35,10 @@ Progress: [███████░░░] ~67% (6/10 phases, 31/~53 plans compl
 | 05-message-history | 2 | 4 min | 2 min |
 | 05.1-code-review-fixes | 1 | 3 min | 3 min |
 | 06-billing-limits | 5 | 18 min | 4 min |
+| 07-onboarding-flow | 1 | 4 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: 06-05 (3 min), 06-04 (3 min), 06-03 (4 min), 06-02 (4 min), 06-01 (4 min)
+- Last 5 plans: 07-01 (4 min), 06-05 (3 min), 06-04 (3 min), 06-03 (4 min), 06-02 (4 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -136,6 +137,10 @@ Recent decisions affecting current work:
 - [06-05] Show warning at 80% threshold, destructive at 100%
 - [06-05] Contact limit warning has priority over send limit warning
 - [06-05] Replace send button with upgrade prompt instead of just disabling
+- [07-01] Use JSONB array for onboarding_steps_completed to support granular step tracking
+- [07-01] Partial index on user_id WHERE onboarding_completed_at IS NULL for efficient incomplete onboarding queries
+- [07-01] Count queries use { count: 'exact', head: true } pattern (no data transfer, just count)
+- [07-01] getOnboardingStatus returns null for unauthenticated users (not throwing)
 
 ### Pending Todos
 
@@ -159,6 +164,7 @@ None currently.
 - ⚠️ Migration 00005 pending (send_logs table, opted_out/tier columns) - run in Supabase SQL Editor
 - ⚠️ Migration 00006 pending (monthly usage index) - run in Supabase SQL Editor
 - ⚠️ Migration 00007 pending (billing: subscriptions, stripe_customer_id) - run in Supabase SQL Editor
+- ⚠️ Migration 00008 pending (onboarding: onboarding_completed_at, onboarding_steps_completed) - run in Supabase SQL Editor
 - ⚠️ Optional: Enable "Leaked password protection" in Supabase Auth settings
 - ⚠️ Resend API key required (RESEND_API_KEY) - see 04-02-SUMMARY.md User Setup section
 - ⚠️ Upstash Redis optional (UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN) - bypasses in dev
@@ -168,7 +174,7 @@ None currently.
 
 ## Session Continuity
 
-Last session: 2026-01-28
-Stopped at: Completed 06-05-PLAN.md (Send limit enforcement)
+Last session: 2026-01-27
+Stopped at: Completed 07-01-PLAN.md (Onboarding data layer)
 Resume file: None
-Next: Phase 7 - Onboarding Flow
+Next: 07-02-PLAN.md (Onboarding wizard UI)
