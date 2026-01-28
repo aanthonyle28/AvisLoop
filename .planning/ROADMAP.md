@@ -199,10 +199,11 @@ Plans:
   2. Pricing page shows tier comparison (free trial, Basic, Pro)
   3. Login page allows returning users to access their account
   4. Signup page allows new users to create an account
-**Plans**: TBD
+**Plans**: 2 plans in 2 waves
 
 Plans:
-- [ ] 08-01: TBD
+- [ ] 08-01-PLAN.md — Marketing layout + landing page (hero, features, CTAs)
+- [ ] 08-02-PLAN.md — Pricing page with tier comparison table
 
 ### Phase 9: Polish & UX
 **Goal**: App has consistent, polished visual design across all screens
@@ -243,5 +244,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -
 | 5.1 Code Review Fixes | 1/1 | Complete | 2026-01-27 |
 | 6. Billing & Limits | 5/5 | Complete | 2026-01-28 |
 | 7. Onboarding Flow | 0/4 | Not started | - |
-| 8. Public Pages | 0/TBD | Not started | - |
+| 8. Public Pages | 0/2 | Not started | - |
 | 9. Polish & UX | 0/TBD | Not started | - |
