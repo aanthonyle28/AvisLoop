@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { useLocalStorage } from '@/lib/hooks/use-local-storage'
-import { useIsDesktop } from '@/lib/hooks/use-media-query'
 import {
   LayoutDashboard,
   Users,
@@ -41,7 +40,6 @@ const secondaryNav: NavItem[] = [
 
 export function Sidebar() {
   const pathname = usePathname()
-  const isDesktop = useIsDesktop()
   const [isCollapsed, setIsCollapsed] = useLocalStorage('sidebarCollapsed', false)
 
   // Auto-collapse on medium screens (tablet), expand on large
