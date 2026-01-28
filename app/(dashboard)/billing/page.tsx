@@ -6,12 +6,20 @@ import { SubscriptionStatus } from '@/components/billing/subscription-status'
 import { CONTACT_LIMITS } from '@/lib/constants/billing'
 import { CheckCircle2 } from 'lucide-react'
 
+// Validate env vars at module load (SEC-03)
+const basicPriceId = process.env.STRIPE_BASIC_PRICE_ID
+const proPriceId = process.env.STRIPE_PRO_PRICE_ID
+
+if (!basicPriceId || !proPriceId) {
+  console.error('Missing Stripe price IDs in environment variables')
+}
+
 // Plan configuration
 const PLANS = [
   {
     name: 'Basic',
     price: '$49',
-    priceId: process.env.STRIPE_BASIC_PRICE_ID!,
+    priceId: basicPriceId || '',
     tier: 'basic',
     features: [
       '200 review requests/month',
@@ -22,7 +30,7 @@ const PLANS = [
   {
     name: 'Pro',
     price: '$99',
-    priceId: process.env.STRIPE_PRO_PRICE_ID!,
+    priceId: proPriceId || '',
     tier: 'pro',
     recommended: true,
     features: [
