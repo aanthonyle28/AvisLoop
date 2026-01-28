@@ -18,9 +18,13 @@ export function OnboardingProgress({
   const steps = Array.from({ length: totalSteps }, (_, i) => i + 1)
 
   return (
-    <div className="w-full">
+    <div
+      className="w-full"
+      role="group"
+      aria-label={`Onboarding progress: Step ${currentStep} of ${totalSteps}`}
+    >
       {/* Mobile: Compact step indicator */}
-      <div className="md:hidden text-center">
+      <div className="md:hidden text-center" aria-hidden="true">
         <span className="text-sm font-medium text-muted-foreground">
           Step {currentStep} of {totalSteps}
         </span>
@@ -28,7 +32,10 @@ export function OnboardingProgress({
       </div>
 
       {/* Desktop: Full horizontal stepper */}
-      <div className="hidden md:flex items-start justify-between">
+      <nav
+        className="hidden md:flex items-start justify-between"
+        aria-label="Onboarding steps"
+      >
         {steps.map((step, index) => (
           <div key={step} className="flex items-center flex-1">
             {/* Step circle and title */}
@@ -42,11 +49,13 @@ export function OnboardingProgress({
                   step > currentStep &&
                     'border-muted-foreground/30 text-muted-foreground/50'
                 )}
+                aria-current={step === currentStep ? 'step' : undefined}
+                aria-label={`Step ${step}: ${stepTitles[index]}${step < currentStep ? ' (completed)' : ''}`}
               >
                 {step < currentStep ? (
-                  <CheckCircle className="h-5 w-5" />
+                  <CheckCircle className="h-5 w-5" aria-hidden="true" />
                 ) : (
-                  <span className="text-sm font-medium">{step}</span>
+                  <span className="text-sm font-medium" aria-hidden="true">{step}</span>
                 )}
               </div>
               {/* Step title */}
@@ -57,6 +66,7 @@ export function OnboardingProgress({
                   step === currentStep && 'text-foreground',
                   step > currentStep && 'text-muted-foreground/50'
                 )}
+                aria-hidden="true"
               >
                 {stepTitles[index]}
               </span>
@@ -69,11 +79,12 @@ export function OnboardingProgress({
                   'flex-1 h-0.5 mx-4 mt-5 -translate-y-1/2',
                   step < currentStep ? 'bg-primary' : 'bg-muted-foreground/30'
                 )}
+                aria-hidden="true"
               />
             )}
           </div>
         ))}
-      </div>
+      </nav>
     </div>
   )
 }

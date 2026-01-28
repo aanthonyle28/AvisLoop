@@ -14,7 +14,8 @@ import type {
 } from '@/lib/types/onboarding'
 
 // Schema for localStorage draft data validation (SEC-04)
-const draftDataSchema = z.record(z.unknown()).catch({})
+// Using safeParse instead of catch for Zod 4 compatibility
+const draftDataSchema = z.record(z.string(), z.unknown())
 
 type StepConfig = {
   id: number
@@ -64,8 +65,13 @@ export function OnboardingWizard({
     if (saved) {
       try {
         const parsed = JSON.parse(saved)
-        const validated = draftDataSchema.parse(parsed)
-        setDraftDataState(validated)
+        const result = draftDataSchema.safeParse(parsed)
+        if (result.success) {
+          setDraftDataState(result.data)
+        } else {
+          console.error('Invalid onboarding draft data:', result.error)
+          localStorage.removeItem(STORAGE_KEY)
+        }
       } catch (e) {
         console.error('Failed to parse onboarding draft:', e)
         localStorage.removeItem(STORAGE_KEY)
@@ -116,11 +122,6 @@ export function OnboardingWizard({
       setIsSubmitting(false)
     }
   }, [isSubmitting, router])
-
-  // Draft data setter
-  const setDraftData = useCallback((key: string, value: unknown) => {
-    setDraftDataState(prev => ({ ...prev, [key]: value }))
-  }, [])
 
   const currentStepConfig = STEPS[currentStep - 1]
   const stepTitles = STEPS.map(s => s.title)
