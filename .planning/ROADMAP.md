@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3.1: Critical Fixes** - Fix security vulnerabilities and scalability issues (INSERTED)
 - [x] **Phase 4: Core Sending** - Users can send review request emails and see immediate confirmation
 - [x] **Phase 5: Message History** - Users can view and track all sent review requests
-- [ ] **Phase 5.1: Code Review Fixes** - Fix security and maintainability issues from code review (INSERTED)
+- [x] **Phase 5.1: Code Review Fixes** - Fix security and maintainability issues from code review (INSERTED)
 - [ ] **Phase 6: Billing & Limits** - Users can subscribe and system enforces tier limits
 - [ ] **Phase 7: Onboarding Flow** - New users are guided through first-time setup
 - [ ] **Phase 8: Public Pages** - Visitors can learn about and sign up for AvisLoop
@@ -147,7 +147,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 05.1-01-PLAN.md — Rate limit webhook, add index, extract constants, add error boundary
+- [x] 05.1-01-PLAN.md — Rate limit webhook, add index, extract constants, add error boundary
 
 ### Phase 6: Billing & Limits
 **Goal**: Users can subscribe and system enforces tier limits
@@ -238,7 +238,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -
 | 3.1 Critical Fixes | 1/1 | Complete | 2026-01-27 |
 | 4. Core Sending | 5/5 | Complete | 2026-01-27 |
 | 5. Message History | 2/2 | Complete | 2026-01-27 |
-| 5.1 Code Review Fixes | 0/1 | Not started | - |
+| 5.1 Code Review Fixes | 1/1 | Complete | 2026-01-27 |
 | 6. Billing & Limits | 0/5 | Not started | - |
 | 7. Onboarding Flow | 0/TBD | Not started | - |
 | 8. Public Pages | 0/TBD | Not started | - |
