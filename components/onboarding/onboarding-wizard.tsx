@@ -6,6 +6,11 @@ import { OnboardingProgress } from './onboarding-progress'
 import { OnboardingSteps } from './onboarding-steps'
 import { markOnboardingComplete } from '@/lib/actions/onboarding'
 import { Button } from '@/components/ui/button'
+import type {
+  OnboardingBusiness,
+  OnboardingContact,
+  OnboardingTemplate,
+} from '@/lib/types/onboarding'
 
 type StepConfig = {
   id: number
@@ -21,28 +26,11 @@ const STEPS: StepConfig[] = [
 
 const STORAGE_KEY = 'onboarding-draft'
 
-type Business = {
-  name: string
-  google_review_link: string | null
-} | null
-
-type Contact = {
-  id: string
-  name: string
-  email: string
-} | null
-
-type Template = {
-  id: string
-  subject: string
-  body: string
-} | null
-
 interface OnboardingWizardProps {
   initialStep: number
-  business: Business
-  firstContact: Contact
-  defaultTemplate: Template
+  business: OnboardingBusiness
+  firstContact: OnboardingContact
+  defaultTemplate: OnboardingTemplate
 }
 
 /**

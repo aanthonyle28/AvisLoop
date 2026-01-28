@@ -3,29 +3,17 @@
 import { BusinessStep } from './steps/business-step'
 import { ContactStep } from './steps/contact-step'
 import { SendStep } from './steps/send-step'
-
-type Business = {
-  name: string
-  google_review_link: string | null
-} | null
-
-type Contact = {
-  id: string
-  name: string
-  email: string
-} | null
-
-type Template = {
-  id: string
-  subject: string
-  body: string
-} | null
+import type {
+  OnboardingBusiness,
+  OnboardingContact,
+  OnboardingTemplate,
+} from '@/lib/types/onboarding'
 
 interface OnboardingStepsProps {
   currentStep: number
-  business: Business
-  firstContact: Contact
-  defaultTemplate: Template
+  business: OnboardingBusiness
+  firstContact: OnboardingContact
+  defaultTemplate: OnboardingTemplate
   onGoToNext: () => void
   onGoToStep: (step: number) => void
   onComplete: () => Promise<void>
