@@ -239,18 +239,19 @@ Plans:
   3. Responsive design works on mobile, tablet, desktop
   4. Micro-interactions and transitions feel smooth
   5. Typography, spacing, and colors are consistent
-**Plans**: TBD
+**Plans**: 4 plans in 3 waves
 
 **Implementation Notes:**
 - Use `/web-design-guidelines` skill for design system decisions
 - Use `/senior-frontend` skill for component implementation
-- User may provide Figma designs to implement — if so, match designs exactly
-- If no Figma provided, create clean minimal design following shadcn/ui patterns
+- Reference design: Clean SaaS dashboard with light gray background, white cards, blue accent
+- Match shadcn/ui patterns while customizing to reference aesthetic
 
 Plans:
-- [ ] 09-01: TBD (design audit + system)
-- [ ] 09-02: TBD (component polish)
-- [ ] 09-03: TBD (responsive + states)
+- [ ] 09-01-PLAN.md — Design system foundation (CSS variables, Sonner toast, Skeleton, utility hooks)
+- [ ] 09-02-PLAN.md — Layout and navigation (collapsible sidebar, bottom nav, AppShell)
+- [ ] 09-03-PLAN.md — Loading states and feedback (skeleton screens, polished empty states)
+- [ ] 09-04-PLAN.md — Component polish (micro-interactions, hover effects, consistency pass)
 
 ## Progress
 
@@ -270,4 +271,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -
 | 7. Onboarding Flow | 4/4 | Complete | 2026-01-27 |
 | 8. Public Pages | 2/2 | Complete | 2026-01-28 |
 | 8.1 Code Review Fixes | 2/2 | Complete | 2026-01-27 |
-| 9. Polish & UX | 0/TBD | Not started | - |
+| 9. Polish & UX | 0/4 | Not started | - |

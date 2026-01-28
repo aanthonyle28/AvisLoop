@@ -80,3 +80,32 @@ Before considering a change “done”:
   - what changed
   - current state
   - next step + open questions
+
+## Workflow shortcut: qwrap
+
+`qwrap` runs the “wrap-up” sequence:
+1) `pnpm lint`
+2) `pnpm typecheck`
+3) Open `docs/PROJECT_STATE.md` (baton-pass update)
+4) `git add -A && git commit -m "..." && git push`
+
+### Setup (zsh/bash)
+Add to `~/.zshrc` or `~/.bashrc`:
+
+```bash
+qwrap () {
+  set -euo pipefail
+
+  pnpm lint
+  pnpm typecheck
+
+  "${EDITOR:-nano}" docs/PROJECT_STATE.md
+
+  if git diff --quiet -- docs/PROJECT_STATE.md; then
+    echo "⚠️  Warning: docs/PROJECT_STATE.md has no changes."
+  fi
+
+  git add -A
+  git commit -m "${1:-chore: wrap}"
+  git push
+}
