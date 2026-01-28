@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { UserMenu } from "@/components/marketing/user-menu";
 import { createClient } from "@/lib/supabase/server";
+import { Star } from "lucide-react";
 
 export default async function MarketingLayout({
   children,
@@ -20,35 +21,45 @@ export default async function MarketingLayout({
         fullName: user.user_metadata?.full_name as string | undefined,
       }
     : null;
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navbar */}
-      <nav className="w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <nav className="sticky top-0 z-50 w-full border-b border-border/30 bg-background/80 backdrop-blur-lg supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto max-w-6xl flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Logo and nav links */}
-          <div className="flex items-center gap-6">
-            <Link href="/" className="text-xl font-bold">
-              AvisLoop
+          <div className="flex items-center gap-8">
+            <Link href="/" className="flex items-center gap-2 font-bold text-xl">
+              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+                <Star className="w-4 h-4 text-primary-foreground fill-current" />
+              </div>
+              <span>AvisLoop</span>
             </Link>
-            <div className="hidden md:flex items-center gap-4">
-              <Button variant="ghost" asChild>
+            <div className="hidden md:flex items-center gap-1">
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/#features">Features</Link>
+              </Button>
+              <Button variant="ghost" size="sm" asChild>
                 <Link href="/pricing">Pricing</Link>
+              </Button>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/#faq">FAQ</Link>
               </Button>
             </div>
           </div>
 
           {/* Right side: theme switcher and auth/user menu */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <ThemeSwitcher />
             {userMenuData ? (
               <UserMenu user={userMenuData} />
             ) : (
               <>
-                <Button variant="ghost" asChild className="hidden sm:inline-flex">
-                  <Link href="/auth/login">Login</Link>
+                <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex">
+                  <Link href="/auth/login">Log in</Link>
                 </Button>
-                <Button asChild>
-                  <Link href="/auth/sign-up">Sign Up</Link>
+                <Button size="sm" asChild>
+                  <Link href="/auth/sign-up">Start Free</Link>
                 </Button>
               </>
             )}
@@ -60,55 +71,97 @@ export default async function MarketingLayout({
       <main className="flex-1">{children}</main>
 
       {/* Footer */}
-      <footer className="border-t border-border/40 bg-muted/30">
-        <div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+      <footer className="border-t border-border/40 bg-muted/50">
+        <div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
             {/* Company info */}
             <div className="col-span-2 md:col-span-1">
-              <Link href="/" className="text-lg font-bold">
-                AvisLoop
+              <Link href="/" className="flex items-center gap-2 font-bold text-lg mb-4">
+                <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
+                  <Star className="w-3.5 h-3.5 text-primary-foreground fill-current" />
+                </div>
+                <span>AvisLoop</span>
               </Link>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Simple review requests for busy businesses.
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Simple review requests for busy businesses. Get more reviews without the hassle.
               </p>
             </div>
 
             {/* Product links */}
             <div>
-              <h3 className="font-semibold mb-3">Product</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
+              <h3 className="font-semibold mb-4">Product</h3>
+              <ul className="space-y-3 text-sm">
                 <li>
-                  <Link href="/pricing" className="hover:text-foreground transition-colors">
+                  <Link
+                    href="/#features"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Features
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/pricing"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
                     Pricing
                   </Link>
                 </li>
                 <li>
-                  <Link href="/auth/sign-up" className="hover:text-foreground transition-colors">
-                    Get Started
+                  <Link
+                    href="/#faq"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    FAQ
                   </Link>
                 </li>
               </ul>
             </div>
 
-            {/* Company links - placeholder for future pages */}
+            {/* Company links */}
             <div>
-              <h3 className="font-semibold mb-3">Company</h3>
-              <p className="text-sm text-muted-foreground">
-                Coming soon
-              </p>
+              <h3 className="font-semibold mb-4">Company</h3>
+              <ul className="space-y-3 text-sm">
+                <li>
+                  <Link
+                    href="/auth/sign-up"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Get Started
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/auth/login"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Log In
+                  </Link>
+                </li>
+              </ul>
             </div>
 
-            {/* Legal links - placeholder for future pages */}
+            {/* Legal links */}
             <div>
-              <h3 className="font-semibold mb-3">Legal</h3>
-              <p className="text-sm text-muted-foreground">
-                Coming soon
-              </p>
+              <h3 className="font-semibold mb-4">Legal</h3>
+              <ul className="space-y-3 text-sm text-muted-foreground">
+                <li>
+                  <span className="cursor-not-allowed">Privacy Policy</span>
+                </li>
+                <li>
+                  <span className="cursor-not-allowed">Terms of Service</span>
+                </li>
+              </ul>
             </div>
           </div>
 
-          <div className="mt-8 pt-8 border-t border-border/40 text-center text-sm text-muted-foreground">
-            <p>&copy; {new Date().getFullYear()} AvisLoop. All rights reserved.</p>
+          <div className="mt-12 pt-8 border-t border-border/40 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-sm text-muted-foreground">
+              &copy; {new Date().getFullYear()} AvisLoop. All rights reserved.
+            </p>
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <span>Made for local businesses</span>
+            </div>
           </div>
         </div>
       </footer>
