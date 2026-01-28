@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 6 of 10 (Billing & Limits)
-Plan: 3 of 4
-Status: In progress
-Last activity: 2026-01-27 - Completed 06-03-PLAN.md (Stripe webhook handler)
+Plan: 5 of 5
+Status: Phase complete
+Last activity: 2026-01-28 - Completed 06-05-PLAN.md (Send limit enforcement)
 
-Progress: [██████░░░░] ~62% (6/10 phases, 29/~53 plans complete)
+Progress: [███████░░░] ~67% (6/10 phases, 31/~53 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 29
+- Total plans completed: 31
 - Average duration: 3 min
-- Total execution time: 1.38 hours
+- Total execution time: 1.48 hours
 
 **By Phase:**
 
@@ -34,10 +34,10 @@ Progress: [██████░░░░] ~62% (6/10 phases, 29/~53 plans compl
 | 04-core-sending | 4 | 8 min | 2 min |
 | 05-message-history | 2 | 4 min | 2 min |
 | 05.1-code-review-fixes | 1 | 3 min | 3 min |
-| 06-billing-limits | 3 | 12 min | 4 min |
+| 06-billing-limits | 5 | 18 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: 06-03 (4 min), 06-02 (4 min), 06-01 (4 min), 05.1-01 (3 min), 05-02 (2 min)
+- Last 5 plans: 06-05 (3 min), 06-04 (3 min), 06-03 (4 min), 06-02 (4 min), 06-01 (4 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -133,6 +133,9 @@ Recent decisions affecting current work:
 - [06-03] Use subscription.items.data[0].current_period_* for API 2025-12-15.clover
 - [06-03] Grace period for past_due status (access continues during payment retry)
 - [06-03] Always return 200 from Stripe webhook even on handler errors
+- [06-05] Show warning at 80% threshold, destructive at 100%
+- [06-05] Contact limit warning has priority over send limit warning
+- [06-05] Replace send button with upgrade prompt instead of just disabling
 
 ### Pending Todos
 
@@ -165,7 +168,7 @@ None currently.
 
 ## Session Continuity
 
-Last session: 2026-01-27
-Stopped at: Completed 06-03-PLAN.md (Stripe webhook handler)
+Last session: 2026-01-28
+Stopped at: Completed 06-05-PLAN.md (Send limit enforcement)
 Resume file: None
-Next: 06-04-PLAN.md (billing page UI)
+Next: Phase 6 complete - ready for Phase 7 (Public Widget)
