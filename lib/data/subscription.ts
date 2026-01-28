@@ -44,6 +44,7 @@ export async function getSubscription(): Promise<Subscription | null> {
 /**
  * Get combined billing info for the billing page.
  * Includes business tier, subscription status, monthly usage, and contact count.
+ * Optimized: runs subscription, usage, and contact queries in parallel (PERF-01)
  */
 export async function getBusinessBillingInfo(): Promise<{
   business: { id: string; tier: string; stripe_customer_id: string | null } | null
@@ -63,7 +64,7 @@ export async function getBusinessBillingInfo(): Promise<{
     }
   }
 
-  // Fetch business with tier and stripe_customer_id
+  // Fetch business first (needed for other queries)
   const { data: business } = await supabase
     .from('businesses')
     .select('id, tier, stripe_customer_id')
@@ -79,24 +80,22 @@ export async function getBusinessBillingInfo(): Promise<{
     }
   }
 
-  // Fetch subscription (if any)
-  const { data: subscription } = await supabase
-    .from('subscriptions')
-    .select('*')
-    .eq('business_id', business.id)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .single()
-
-  // Fetch monthly usage using existing function
-  const usageData = await getMonthlyUsage()
-
-  // Fetch active contact count for contact limit display (BILL-07)
-  const { count: contactCount } = await supabase
-    .from('contacts')
-    .select('*', { count: 'exact', head: true })
-    .eq('business_id', business.id)
-    .eq('status', 'active')
+  // Run remaining queries in parallel (PERF-01)
+  const [subscriptionResult, usageData, contactCountResult] = await Promise.all([
+    supabase
+      .from('subscriptions')
+      .select('*')
+      .eq('business_id', business.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single(),
+    getMonthlyUsage(),
+    supabase
+      .from('contacts')
+      .select('*', { count: 'exact', head: true })
+      .eq('business_id', business.id)
+      .eq('status', 'active'),
+  ])
 
   return {
     business: {
@@ -104,11 +103,11 @@ export async function getBusinessBillingInfo(): Promise<{
       tier: business.tier,
       stripe_customer_id: business.stripe_customer_id,
     },
-    subscription: subscription as Subscription | null,
+    subscription: subscriptionResult.data as Subscription | null,
     usage: {
       count: usageData.count,
       limit: usageData.limit,
     },
-    contactCount: contactCount ?? 0,
+    contactCount: contactCountResult.count ?? 0,
   }
 }
