@@ -1,12 +1,25 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ThemeSwitcher } from "@/components/theme-switcher";
+import { UserMenu } from "@/components/marketing/user-menu";
+import { createClient } from "@/lib/supabase/server";
 
-export default function MarketingLayout({
+export default async function MarketingLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const userMenuData = user
+    ? {
+        email: user.email ?? "",
+        fullName: user.user_metadata?.full_name as string | undefined,
+      }
+    : null;
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navbar */}
@@ -24,15 +37,21 @@ export default function MarketingLayout({
             </div>
           </div>
 
-          {/* Right side: theme switcher and auth buttons */}
+          {/* Right side: theme switcher and auth/user menu */}
           <div className="flex items-center gap-2">
             <ThemeSwitcher />
-            <Button variant="ghost" asChild className="hidden sm:inline-flex">
-              <Link href="/auth/login">Login</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/auth/sign-up">Sign Up</Link>
-            </Button>
+            {userMenuData ? (
+              <UserMenu user={userMenuData} />
+            ) : (
+              <>
+                <Button variant="ghost" asChild className="hidden sm:inline-flex">
+                  <Link href="/auth/login">Login</Link>
+                </Button>
+                <Button asChild>
+                  <Link href="/auth/sign-up">Sign Up</Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </nav>
