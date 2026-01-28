@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { z } from 'zod'
 import { OnboardingProgress } from './onboarding-progress'
 import { OnboardingSteps } from './onboarding-steps'
 import { markOnboardingComplete } from '@/lib/actions/onboarding'
@@ -11,6 +12,9 @@ import type {
   OnboardingContact,
   OnboardingTemplate,
 } from '@/lib/types/onboarding'
+
+// Schema for localStorage draft data validation (SEC-04)
+const draftDataSchema = z.record(z.unknown()).catch({})
 
 type StepConfig = {
   id: number
@@ -54,12 +58,14 @@ export function OnboardingWizard({
   const [draftData, setDraftDataState] = useState<Record<string, unknown>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Load draft data from localStorage on mount
+  // Load draft data from localStorage on mount with Zod validation (SEC-04)
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY)
     if (saved) {
       try {
-        setDraftDataState(JSON.parse(saved))
+        const parsed = JSON.parse(saved)
+        const validated = draftDataSchema.parse(parsed)
+        setDraftDataState(validated)
       } catch (e) {
         console.error('Failed to parse onboarding draft:', e)
         localStorage.removeItem(STORAGE_KEY)
