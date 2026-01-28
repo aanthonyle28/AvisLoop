@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 8.1 of 11 (Code Review Fixes)
-Plan: 0 of 2
-Status: Not started
-Last activity: 2026-01-27 - Milestone v8.1 started (Code Review Fixes for phases 6-8)
+Plan: 1 of 2
+Status: In progress
+Last activity: 2026-01-27 - Completed 08.1-01-PLAN.md (Security and Performance Fixes)
 
-Progress: [████████░░] ~80% (8/11 phases complete, 37/~52 plans complete)
+Progress: [████████░░] ~81% (8/11 phases complete, 38/~52 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 37
+- Total plans completed: 38
 - Average duration: 3 min
-- Total execution time: 1.82 hours
+- Total execution time: 1.95 hours
 
 **By Phase:**
 
@@ -37,9 +37,10 @@ Progress: [████████░░] ~80% (8/11 phases complete, 37/~52 pl
 | 06-billing-limits | 5 | 18 min | 4 min |
 | 07-onboarding-flow | 4 | 14 min | 4 min |
 | 08-public-pages | 2 | 8 min | 4 min |
+| 08.1-code-review-fixes | 1 | 8 min | 8 min |
 
 **Recent Trend:**
-- Last 5 plans: 07-04 (4 min), 08-02 (3 min), 07-03 (2 min), 07-02 (4 min), 08-01 (5 min)
+- Last 5 plans: 08.1-01 (8 min), 07-04 (4 min), 08-02 (3 min), 07-03 (2 min), 07-02 (4 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -159,6 +160,10 @@ Recent decisions affecting current work:
 - [07-04] Dashboard fetches status/business/usage/contacts in parallel via Promise.all
 - [07-04] OnboardingChecklist auto-hides when all 4 steps complete (returns null)
 - [07-04] NextActionCard priority: review link -> contacts -> send -> history
+- [08.1-01] Use safeParse instead of catch() for Zod 4 compatibility
+- [08.1-01] Pass supabase client as parameter to handler functions for explicit dependency
+- [08.1-01] Rate limit check before signature verification to save CPU on attacks
+- [08.1-01] Use Promise.all for independent DB queries (PERF-01)
 
 ### Pending Todos
 
@@ -193,6 +198,6 @@ None currently.
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Started milestone v8.1 (Code Review Fixes)
+Stopped at: Completed 08.1-01-PLAN.md (Security and Performance Fixes)
 Resume file: None
-Next: Phase 8.1 - Code Review Fixes (12 issues from phases 6-8 review)
+Next: 08.1-02-PLAN.md (Maintainability Improvements) if exists, otherwise Phase 9
