@@ -19,9 +19,9 @@ Progress: [███████░░░] ~70% (8/10 phases, 33/~53 plans compl
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 34
+- Total plans completed: 35
 - Average duration: 3 min
-- Total execution time: 1.67 hours
+- Total execution time: 1.70 hours
 
 **By Phase:**
 
@@ -35,11 +35,11 @@ Progress: [███████░░░] ~70% (8/10 phases, 33/~53 plans compl
 | 05-message-history | 2 | 4 min | 2 min |
 | 05.1-code-review-fixes | 1 | 3 min | 3 min |
 | 06-billing-limits | 5 | 18 min | 4 min |
-| 07-onboarding-flow | 2 | 8 min | 4 min |
+| 07-onboarding-flow | 3 | 10 min | 3 min |
 | 08-public-pages | 1 | 5 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 07-02 (4 min), 08-01 (5 min), 07-01 (4 min), 06-05 (3 min), 06-04 (3 min)
+- Last 5 plans: 07-03 (2 min), 07-02 (4 min), 08-01 (5 min), 07-01 (4 min), 06-05 (3 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -146,6 +146,10 @@ Recent decisions affecting current work:
 - [07-02] isSubmitting state prevents navigation during saves (race condition prevention)
 - [07-02] Step clamp to 1-3 range for URL validation
 - [07-02] OnboardingWizard render props: { draftData, setDraftData, goToNext, goToStep, handleComplete }
+- [07-03] useForm + useActionState integration uses formRef.requestSubmit() pattern for form submission
+- [07-03] Server field errors mapped to form errors via useEffect for seamless validation
+- [07-03] Steps use callback props (onComplete, onSkip, onGoToStep) for navigation decoupling from wizard container
+- [07-03] SendStep shows three conditional states: missing review link, missing contact, and ready to send
 - [08-01] Use route group (marketing) for public pages with separate layout
 - [08-01] Static year in footer to avoid Next.js 16 prerender errors
 - [08-01] Server Components only for marketing content (no "use client")
