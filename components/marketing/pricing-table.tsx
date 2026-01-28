@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Check } from "lucide-react";
 import {
-  Card,
+  InteractiveCard,
   CardHeader,
   CardTitle,
   CardDescription,
@@ -75,7 +75,7 @@ export function PricingTable() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
       {tiers.map((tier) => (
-        <Card
+        <InteractiveCard
           key={tier.name}
           className={cn(
             "relative flex flex-col",
@@ -122,7 +122,7 @@ export function PricingTable() {
               <Link href={tier.href}>{tier.cta}</Link>
             </Button>
           </CardFooter>
-        </Card>
+        </InteractiveCard>
       ))}
     </div>
   );
