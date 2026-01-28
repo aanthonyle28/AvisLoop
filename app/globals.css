@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 96%;
+    --background: 0 0% 100%;
     --foreground: 0 0% 9%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 9%;
@@ -14,10 +14,12 @@
     --primary-foreground: 0 0% 98%;
     --secondary: 0 0% 92%;
     --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 92%;
+    --muted: 0 0% 97%;
     --muted-foreground: 0 0% 45%;
     --accent: 217 91% 60%;
     --accent-foreground: 0 0% 98%;
+    --accent-lime: 75 85% 55%;
+    --accent-coral: 0 85% 65%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 89%;
@@ -45,6 +47,8 @@
     --muted-foreground: 0 0% 64%;
     --accent: 217 91% 65%;
     --accent-foreground: 0 0% 9%;
+    --accent-lime: 75 85% 50%;
+    --accent-coral: 0 85% 60%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 20%;
@@ -75,4 +79,20 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Smooth scrolling for anchor links */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Text balance for modern browsers */
+.text-balance {
+  text-wrap: balance;
 }
