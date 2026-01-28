@@ -20,7 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Message History** - Users can view and track all sent review requests
 - [x] **Phase 5.1: Code Review Fixes** - Fix security and maintainability issues from code review (INSERTED)
 - [x] **Phase 6: Billing & Limits** - Users can subscribe and system enforces tier limits
-- [ ] **Phase 7: Onboarding Flow** - New users are guided through first-time setup
+- [x] **Phase 7: Onboarding Flow** - New users are guided through first-time setup
 - [x] **Phase 8: Public Pages** - Visitors can learn about and sign up for AvisLoop
 - [ ] **Phase 9: Polish & UX** - App has consistent, polished visual design across all screens
 
@@ -185,10 +185,10 @@ Plans:
 **Plans**: 4 plans in 3 waves
 
 Plans:
-- [ ] 07-01-PLAN.md — Database migration (onboarding tracking) + data layer (getOnboardingStatus)
-- [ ] 07-02-PLAN.md — Wizard shell (OnboardingProgress, OnboardingWizard, onboarding page route)
-- [ ] 07-03-PLAN.md — Wizard step forms (BusinessStep, ContactStep, SendStep)
-- [ ] 07-04-PLAN.md — Dashboard integration (OnboardingChecklist, NextActionCard, dashboard page)
+- [x] 07-01-PLAN.md — Database migration (onboarding tracking) + data layer (getOnboardingStatus)
+- [x] 07-02-PLAN.md — Wizard shell (OnboardingProgress, OnboardingWizard, onboarding page route)
+- [x] 07-03-PLAN.md — Wizard step forms (BusinessStep, ContactStep, SendStep)
+- [x] 07-04-PLAN.md — Dashboard integration (OnboardingChecklist, NextActionCard, dashboard page)
 
 ### Phase 8: Public Pages
 **Goal**: Visitors can learn about and sign up for AvisLoop
@@ -243,6 +243,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -
 | 5. Message History | 2/2 | Complete | 2026-01-27 |
 | 5.1 Code Review Fixes | 1/1 | Complete | 2026-01-27 |
 | 6. Billing & Limits | 5/5 | Complete | 2026-01-28 |
-| 7. Onboarding Flow | 0/4 | Not started | - |
+| 7. Onboarding Flow | 4/4 | Complete | 2026-01-27 |
 | 8. Public Pages | 2/2 | Complete | 2026-01-28 |
 | 9. Polish & UX | 0/TBD | Not started | - |

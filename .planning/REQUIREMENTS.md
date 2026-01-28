@@ -21,57 +21,57 @@
 
 ### Contacts
 
-- [ ] **CONT-01**: User can add a contact with name and email
-- [ ] **CONT-02**: User can edit an existing contact's details
-- [ ] **CONT-03**: User can archive a contact
-- [ ] **CONT-04**: User can view a list of all contacts
-- [ ] **CONT-05**: User can import contacts via CSV upload
-- [ ] **CONT-06**: User can search contacts by name or email
-- [ ] **CONT-07**: User can filter contacts (e.g., by date added, archived)
-- [ ] **CONT-08**: User can restore an archived contact
-- [ ] **CONT-09**: System prevents duplicate contacts (same email)
-- [ ] **CONT-10**: Empty states show helpful prompts when no contacts exist
+- [x] **CONT-01**: User can add a contact with name and email
+- [x] **CONT-02**: User can edit an existing contact's details
+- [x] **CONT-03**: User can archive a contact
+- [x] **CONT-04**: User can view a list of all contacts
+- [x] **CONT-05**: User can import contacts via CSV upload
+- [x] **CONT-06**: User can search contacts by name or email
+- [x] **CONT-07**: User can filter contacts (e.g., by date added, archived)
+- [x] **CONT-08**: User can restore an archived contact
+- [x] **CONT-09**: System prevents duplicate contacts (same email)
+- [x] **CONT-10**: Empty states show helpful prompts when no contacts exist
 
 ### Send Review Request
 
-- [ ] **SEND-01**: User can select a contact and send a review request email
-- [ ] **SEND-02**: User can preview the message before sending
-- [ ] **SEND-03**: User can edit the message template (subject + body)
-- [ ] **SEND-04**: User sees immediate "Sent ✅" confirmation after sending
-- [ ] **SEND-05**: System logs every send attempt with status
-- [ ] **SEND-06**: System enforces cooldown period between sends to same contact
-- [ ] **SEND-07**: System respects contact opt-out preferences
-- [ ] **SEND-08**: System enforces monthly send limits per tier
-- [ ] **SEND-09**: System rate-limits sending to prevent abuse
-- [ ] **SEND-10**: System updates message status on delivery/failure via webhooks
+- [x] **SEND-01**: User can select a contact and send a review request email
+- [x] **SEND-02**: User can preview the message before sending
+- [x] **SEND-03**: User can edit the message template (subject + body)
+- [x] **SEND-04**: User sees immediate "Sent ✅" confirmation after sending
+- [x] **SEND-05**: System logs every send attempt with status
+- [x] **SEND-06**: System enforces cooldown period between sends to same contact
+- [x] **SEND-07**: System respects contact opt-out preferences
+- [x] **SEND-08**: System enforces monthly send limits per tier
+- [x] **SEND-09**: System rate-limits sending to prevent abuse
+- [x] **SEND-10**: System updates message status on delivery/failure via webhooks
 
 ### Message History
 
-- [ ] **HIST-01**: User can view list of all sent messages
-- [ ] **HIST-02**: User can see message status (sent, delivered, failed, opened)
-- [ ] **HIST-03**: User can filter message history by date range
-- [ ] **HIST-04**: User can search message history by recipient
+- [x] **HIST-01**: User can view list of all sent messages
+- [x] **HIST-02**: User can see message status (sent, delivered, failed, opened)
+- [x] **HIST-03**: User can filter message history by date range
+- [x] **HIST-04**: User can search message history by recipient
 
 ### Onboarding
 
-- [ ] **ONBD-01**: New user is guided through setup wizard (business → review link → contact → first send)
-- [ ] **ONBD-02**: Wizard shows progress indicator (step X of Y)
-- [ ] **ONBD-03**: User can skip onboarding steps
-- [ ] **ONBD-04**: Dashboard shows "next best action" after onboarding
-- [ ] **ONBD-05**: Onboarding pre-fills smart defaults where possible
-- [ ] **ONBD-06**: Dashboard shows onboarding checklist until complete
-- [ ] **ONBD-07**: System blocks sending if review link is missing or invalid
-- [ ] **ONBD-08**: System blocks sending if no contacts exist
+- [x] **ONBD-01**: New user is guided through setup wizard (business → review link → contact → first send)
+- [x] **ONBD-02**: Wizard shows progress indicator (step X of Y)
+- [x] **ONBD-03**: User can skip onboarding steps
+- [x] **ONBD-04**: Dashboard shows "next best action" after onboarding
+- [x] **ONBD-05**: Onboarding pre-fills smart defaults where possible
+- [x] **ONBD-06**: Dashboard shows onboarding checklist until complete
+- [x] **ONBD-07**: System blocks sending if review link is missing or invalid
+- [x] **ONBD-08**: System blocks sending if no contacts exist
 
 ### Billing
 
-- [ ] **BILL-01**: New users get 25 free trial sends
-- [ ] **BILL-02**: Basic tier ($49/mo) includes 200 sends/month, 200 contacts
-- [ ] **BILL-03**: Pro tier ($99/mo) includes 500 sends/month, unlimited contacts
-- [ ] **BILL-04**: User can subscribe via Stripe checkout
-- [ ] **BILL-05**: User is prompted to subscribe when trial sends exhausted
-- [ ] **BILL-06**: User can manage subscription (view plan, cancel) via billing page
-- [ ] **BILL-07**: System enforces tier limits (contacts, sends)
+- [x] **BILL-01**: New users get 25 free trial sends
+- [x] **BILL-02**: Basic tier ($49/mo) includes 200 sends/month, 200 contacts
+- [x] **BILL-03**: Pro tier ($99/mo) includes 500 sends/month, unlimited contacts
+- [x] **BILL-04**: User can subscribe via Stripe checkout
+- [x] **BILL-05**: User is prompted to subscribe when trial sends exhausted
+- [x] **BILL-06**: User can manage subscription (view plan, cancel) via billing page
+- [x] **BILL-07**: System enforces tier limits (contacts, sends)
 
 ### Public Pages
 
@@ -143,45 +143,45 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BUSI-02 | Phase 2 | Complete |
 | BUSI-03 | Phase 2 | Complete |
 | BUSI-04 | Phase 2 | Complete |
-| CONT-01 | Phase 3 | Pending |
-| CONT-02 | Phase 3 | Pending |
-| CONT-03 | Phase 3 | Pending |
-| CONT-04 | Phase 3 | Pending |
-| CONT-05 | Phase 3 | Pending |
-| CONT-06 | Phase 3 | Pending |
-| CONT-07 | Phase 3 | Pending |
-| CONT-08 | Phase 3 | Pending |
-| CONT-09 | Phase 3 | Pending |
-| CONT-10 | Phase 3 | Pending |
-| SEND-01 | Phase 4 | Pending |
-| SEND-02 | Phase 4 | Pending |
-| SEND-03 | Phase 4 | Pending |
-| SEND-04 | Phase 4 | Pending |
-| SEND-05 | Phase 4 | Pending |
-| SEND-06 | Phase 4 | Pending |
-| SEND-07 | Phase 4 | Pending |
-| SEND-08 | Phase 4 | Pending |
-| SEND-09 | Phase 4 | Pending |
-| SEND-10 | Phase 4 | Pending |
-| HIST-01 | Phase 5 | Pending |
-| HIST-02 | Phase 5 | Pending |
-| HIST-03 | Phase 5 | Pending |
-| HIST-04 | Phase 5 | Pending |
-| ONBD-01 | Phase 7 | Pending |
-| ONBD-02 | Phase 7 | Pending |
-| ONBD-03 | Phase 7 | Pending |
-| ONBD-04 | Phase 7 | Pending |
-| ONBD-05 | Phase 7 | Pending |
-| ONBD-06 | Phase 7 | Pending |
-| ONBD-07 | Phase 7 | Pending |
-| ONBD-08 | Phase 7 | Pending |
-| BILL-01 | Phase 6 | Pending |
-| BILL-02 | Phase 6 | Pending |
-| BILL-03 | Phase 6 | Pending |
-| BILL-04 | Phase 6 | Pending |
-| BILL-05 | Phase 6 | Pending |
-| BILL-06 | Phase 6 | Pending |
-| BILL-07 | Phase 6 | Pending |
+| CONT-01 | Phase 3 | Complete |
+| CONT-02 | Phase 3 | Complete |
+| CONT-03 | Phase 3 | Complete |
+| CONT-04 | Phase 3 | Complete |
+| CONT-05 | Phase 3 | Complete |
+| CONT-06 | Phase 3 | Complete |
+| CONT-07 | Phase 3 | Complete |
+| CONT-08 | Phase 3 | Complete |
+| CONT-09 | Phase 3 | Complete |
+| CONT-10 | Phase 3 | Complete |
+| SEND-01 | Phase 4 | Complete |
+| SEND-02 | Phase 4 | Complete |
+| SEND-03 | Phase 4 | Complete |
+| SEND-04 | Phase 4 | Complete |
+| SEND-05 | Phase 4 | Complete |
+| SEND-06 | Phase 4 | Complete |
+| SEND-07 | Phase 4 | Complete |
+| SEND-08 | Phase 4 | Complete |
+| SEND-09 | Phase 4 | Complete |
+| SEND-10 | Phase 4 | Complete |
+| HIST-01 | Phase 5 | Complete |
+| HIST-02 | Phase 5 | Complete |
+| HIST-03 | Phase 5 | Complete |
+| HIST-04 | Phase 5 | Complete |
+| ONBD-01 | Phase 7 | Complete |
+| ONBD-02 | Phase 7 | Complete |
+| ONBD-03 | Phase 7 | Complete |
+| ONBD-04 | Phase 7 | Complete |
+| ONBD-05 | Phase 7 | Complete |
+| ONBD-06 | Phase 7 | Complete |
+| ONBD-07 | Phase 7 | Complete |
+| ONBD-08 | Phase 7 | Complete |
+| BILL-01 | Phase 6 | Complete |
+| BILL-02 | Phase 6 | Complete |
+| BILL-03 | Phase 6 | Complete |
+| BILL-04 | Phase 6 | Complete |
+| BILL-05 | Phase 6 | Complete |
+| BILL-06 | Phase 6 | Complete |
+| BILL-07 | Phase 6 | Complete |
 | PAGE-01 | Phase 8 | Complete |
 | PAGE-02 | Phase 8 | Complete |
 | PAGE-03 | Phase 8 | Complete |
