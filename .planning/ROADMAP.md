@@ -24,6 +24,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 8: Public Pages** - Visitors can learn about and sign up for AvisLoop
 - [x] **Phase 8.1: Code Review Fixes** - Fix security, maintainability, and UX issues from phases 6-8 review (INSERTED)
 - [x] **Phase 9: Polish & UX** - App has consistent, polished visual design across all screens
+- [x] **Phase 10: Landing Page Redesign** - Landing page matches reference design aesthetic
 
 ## Phase Details
 
@@ -253,6 +254,32 @@ Plans:
 - [x] 09-03-PLAN.md — Loading states and feedback (skeleton screens, polished empty states)
 - [x] 09-04-PLAN.md — Component polish (micro-interactions, hover effects, consistency pass)
 
+### Phase 10: Landing Page Redesign
+**Goal**: Landing page matches reference design aesthetic (white bg, lime accents, geometric markers, asymmetric layouts)
+**Depends on**: Phase 9
+**Requirements**: None (visual refinement, not new functionality)
+**Success Criteria** (what must be TRUE):
+  1. Background is white with subtle lime/coral accent colors
+  2. Hero has floating mockup with image placeholder slots
+  3. Social proof shows text-only brand names (no cards)
+  4. Stats use geometric triangle markers (no boxes)
+  5. Features use alternating left/right image layouts
+  6. Testimonials use minimal quote format
+  7. Overall aesthetic matches provided reference image
+**Plans**: 5 plans in 3 waves
+
+**Implementation Notes:**
+- User will provide images for hero mockup and feature screenshots
+- Until images provided, placeholders will be used
+- Design system updated with lime (#c4f441) and coral (#ff6b6b) accents
+
+Plans:
+- [x] 10-01-PLAN.md — Design system update (white bg, lime/coral accents, GeometricMarker)
+- [x] 10-02-PLAN.md — Hero section redesign (asymmetric layout, floating mockups, image slots)
+- [x] 10-03-PLAN.md — Social proof & stats overhaul (text-only logos, triangle markers)
+- [x] 10-04-PLAN.md — Feature sections redesign (alternating layouts, inline stats)
+- [x] 10-05-PLAN.md — Testimonials & CTA simplification (minimal quotes, clean CTA)
+
 ## Progress
 
 **Execution Order:**
@@ -272,3 +299,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -
 | 8. Public Pages | 2/2 | Complete | 2026-01-28 |
 | 8.1 Code Review Fixes | 2/2 | Complete | 2026-01-27 |
 | 9. Polish & UX | 4/4 | Complete | 2026-01-28 |
+| 10. Landing Page Redesign | 5/5 | Complete | 2026-01-28 |
