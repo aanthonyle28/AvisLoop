@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Make requesting reviews so simple that business owners actually do it — one contact, one click, done.
-**Current focus:** Phase 9 - Polish & UX
+**Current focus:** Phase 8.1 - Code Review Fixes
 
 ## Current Position
 
-Phase: 7 of 10 (Onboarding Flow)
-Plan: 4 of 4
-Status: Phase complete
-Last activity: 2026-01-27 - Completed Phase 7 (Onboarding Flow)
+Phase: 8.1 of 11 (Code Review Fixes)
+Plan: 0 of 2
+Status: Not started
+Last activity: 2026-01-27 - Milestone v8.1 started (Code Review Fixes for phases 6-8)
 
-Progress: [███████░░░] ~75% (7.5/10 phases, 37/~50 plans complete)
+Progress: [████████░░] ~80% (8/11 phases complete, 37/~52 plans complete)
 
 ## Performance Metrics
 
@@ -193,6 +193,6 @@ None currently.
 ## Session Continuity
 
 Last session: 2026-01-27
-Stopped at: Completed Phase 7 (Onboarding Flow)
+Stopped at: Started milestone v8.1 (Code Review Fixes)
 Resume file: None
-Next: Phase 9 - Polish & UX (Phase 8 already complete)
+Next: Phase 8.1 - Code Review Fixes (12 issues from phases 6-8 review)

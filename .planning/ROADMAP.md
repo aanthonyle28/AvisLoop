@@ -22,6 +22,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 6: Billing & Limits** - Users can subscribe and system enforces tier limits
 - [x] **Phase 7: Onboarding Flow** - New users are guided through first-time setup
 - [x] **Phase 8: Public Pages** - Visitors can learn about and sign up for AvisLoop
+- [ ] **Phase 8.1: Code Review Fixes** - Fix security, maintainability, and UX issues from phases 6-8 review (INSERTED)
 - [ ] **Phase 9: Polish & UX** - App has consistent, polished visual design across all screens
 
 ## Phase Details
@@ -205,9 +206,32 @@ Plans:
 - [x] 08-01-PLAN.md — Marketing layout + landing page (hero, features, CTAs)
 - [x] 08-02-PLAN.md — Pricing page with tier comparison table
 
+### Phase 8.1: Code Review Fixes (INSERTED)
+**Goal**: Fix security, maintainability, and UX issues identified in phases 6-8 code review
+**Depends on**: Phase 8
+**Requirements**: SEC-01, SEC-02, SEC-03, SEC-04, MAINT-01, MAINT-02, MAINT-03, UX-01, UX-02, SEO-01, PERF-01, A11Y-01
+**Success Criteria** (what must be TRUE):
+  1. Stripe webhook has rate limiting for failed signature attempts
+  2. Service role client is scoped inside handler function (not module-level)
+  3. Billing page handles missing env vars gracefully
+  4. Onboarding draft data is validated before use
+  5. Contact limits are centralized in billing constants file
+  6. Shared types extracted from duplicated definitions
+  7. Comments match actual implementation
+  8. Footer links work or are removed
+  9. Auth pages have consistent branding
+  10. Copyright year is dynamic
+  11. getBusinessBillingInfo runs queries in parallel
+  12. Progress indicator has ARIA attributes
+**Plans**: 2 plans
+
+Plans:
+- [ ] 08.1-01-PLAN.md — Security and performance fixes (SEC-01, SEC-02, SEC-03, SEC-04, PERF-01)
+- [ ] 08.1-02-PLAN.md — Maintainability, UX, SEO, and accessibility fixes (MAINT-01, MAINT-02, MAINT-03, UX-01, UX-02, SEO-01, A11Y-01)
+
 ### Phase 9: Polish & UX
 **Goal**: App has consistent, polished visual design across all screens
-**Depends on**: Phase 8 (all functionality complete)
+**Depends on**: Phase 8.1 (all fixes complete)
 **Requirements**: None (quality pass, not new functionality)
 **Success Criteria** (what must be TRUE):
   1. All screens follow consistent visual design system
@@ -231,7 +255,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -> 8 -> 9
+Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -> 8 -> 8.1 -> 9
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -245,4 +269,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -
 | 6. Billing & Limits | 5/5 | Complete | 2026-01-28 |
 | 7. Onboarding Flow | 4/4 | Complete | 2026-01-27 |
 | 8. Public Pages | 2/2 | Complete | 2026-01-28 |
+| 8.1 Code Review Fixes | 0/2 | Not started | - |
 | 9. Polish & UX | 0/TBD | Not started | - |

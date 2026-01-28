@@ -95,6 +95,18 @@ Make requesting reviews so simple that business owners actually do it — one co
 - **Mobile-friendly**: App must work well on phones (business owners use mobile)
 - **UX**: Minimal UI, zero clutter, 1 primary action per screen, no jargon
 
+## Current Milestone: v8.1 Code Review Fixes
+
+**Goal:** Fix 12 issues identified in code review of phases 6, 7, and 8
+
+**Target fixes:**
+- Security: Webhook rate limiting, service client scope, env validation, localStorage sanitization
+- Maintainability: Centralize constants, extract shared types, fix comments
+- UX: Fix broken footer links, auth page layout consistency
+- SEO: Dynamic copyright year
+- Performance: Parallelize DB queries
+- Accessibility: ARIA attributes on progress indicator
+
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
@@ -106,4 +118,4 @@ Make requesting reviews so simple that business owners actually do it — one co
 | Multi-location for Pro | Pro users get multiple business locations | — Pending |
 
 ---
-*Last updated: 2025-01-25 after initialization*
+*Last updated: 2026-01-27 after milestone v8.1 started*
