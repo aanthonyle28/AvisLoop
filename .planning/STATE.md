@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 
 ## Current Position
 
-Phase: 5 of 9 (Message History) - COMPLETE
-Plan: 2 of 2
-Status: Phase complete, verified
-Last activity: 2026-01-27 - Completed Phase 5: Message History (all plans verified)
+Phase: 5.1 of 10 (Code Review Fixes) - COMPLETE
+Plan: 1 of 1
+Status: Phase complete
+Last activity: 2026-01-28 - Completed 05.1-01-PLAN.md (code review fixes)
 
-Progress: [██████░░░░] ~54% (5/9 phases, 25/~52 plans complete)
+Progress: [██████░░░░] ~56% (5.1/10 phases, 26/~53 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 25
+- Total plans completed: 26
 - Average duration: 3 min
-- Total execution time: 1.12 hours
+- Total execution time: 1.17 hours
 
 **By Phase:**
 
@@ -33,9 +33,10 @@ Progress: [██████░░░░] ~54% (5/9 phases, 25/~52 plans comple
 | 03.1-critical-fixes | 1 | 3 min | 3 min |
 | 04-core-sending | 4 | 8 min | 2 min |
 | 05-message-history | 2 | 4 min | 2 min |
+| 05.1-code-review-fixes | 1 | 3 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 05-02 (2 min), 05-01 (2 min), 04-04 (2 min), 04-03 (2 min), 04-02 (2 min)
+- Last 5 plans: 05.1-01 (3 min), 05-02 (2 min), 05-01 (2 min), 04-04 (2 min), 04-03 (2 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -117,6 +118,9 @@ Recent decisions affecting current work:
 - [05-02] No pagination UI in this phase - server returns first 50 results
 - [05-02] Empty state shows different content for 'no messages' vs 'no filtered results'
 - [05-02] HistoryClient manages filter visibility (show when logs exist OR filters active)
+- [05.1-01] In-memory rate limiting for webhook (100 req/min per IP, checked before signature verification)
+- [05.1-01] Single source of truth for billing constants in lib/constants/billing.ts
+- [05.1-01] Export RESEND_FROM_EMAIL from resend.ts with warning on missing env var
 
 ### Pending Todos
 
@@ -138,6 +142,7 @@ None currently.
 - ✅ Migration 00003 applied (contacts table with RLS)
 - ✅ Migration 00004 applied (businesses unique constraint)
 - ⚠️ Migration 00005 pending (send_logs table, opted_out/tier columns) - run in Supabase SQL Editor
+- ⚠️ Migration 00006 pending (monthly usage index) - run in Supabase SQL Editor
 - ⚠️ Optional: Enable "Leaked password protection" in Supabase Auth settings
 - ⚠️ Resend API key required (RESEND_API_KEY) - see 04-02-SUMMARY.md User Setup section
 - ⚠️ Upstash Redis optional (UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN) - bypasses in dev
@@ -145,7 +150,7 @@ None currently.
 
 ## Session Continuity
 
-Last session: 2026-01-27
-Stopped at: Completed Phase 5 - Message History phase verified and complete
+Last session: 2026-01-28
+Stopped at: Completed Phase 5.1 - Code Review Fixes
 Resume file: None
 Next: Phase 6 - Billing & Limits
