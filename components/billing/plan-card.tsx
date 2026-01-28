@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { InteractiveCard, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { createCheckoutSession } from '@/lib/actions/billing'
 import { useTransition } from 'react'
 
@@ -24,7 +24,7 @@ export function PlanCard({ name, price, priceId, features, current, recommended 
   }
 
   return (
-    <Card className={`relative ${recommended ? 'border-primary' : ''}`}>
+    <InteractiveCard className={`relative ${recommended ? 'border-primary' : ''}`}>
       {recommended && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-medium">
           Recommended
@@ -64,6 +64,6 @@ export function PlanCard({ name, price, priceId, features, current, recommended 
           </Button>
         )}
       </CardFooter>
-    </Card>
+    </InteractiveCard>
   )
 }

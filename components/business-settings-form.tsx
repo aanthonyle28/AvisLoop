@@ -3,6 +3,7 @@
 import { useActionState } from 'react'
 import { updateBusiness, type BusinessActionState } from '@/lib/actions/business'
 import type { Business, EmailTemplate } from '@/lib/types/database'
+import { Button } from '@/components/ui/button'
 
 interface BusinessSettingsFormProps {
   initialData: Business | null
@@ -117,13 +118,9 @@ export function BusinessSettingsForm({ initialData, templates }: BusinessSetting
 
       {/* Submit Button */}
       <div className="pt-4">
-        <button
-          type="submit"
-          disabled={isPending}
-          className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+        <Button type="submit" disabled={isPending}>
           {isPending ? 'Saving...' : 'Save Settings'}
-        </button>
+        </Button>
       </div>
     </form>
   )

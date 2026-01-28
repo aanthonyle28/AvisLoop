@@ -97,7 +97,7 @@ export function MessagePreview({
           )}
 
           <div className="text-center mb-6">
-            <span className="inline-block bg-blue-600 text-white px-6 py-3 rounded-md font-medium">
+            <span className="inline-block bg-primary text-primary-foreground px-6 py-3 rounded-md font-medium">
               Leave a Review
             </span>
           </div>

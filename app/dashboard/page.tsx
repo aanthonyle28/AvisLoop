@@ -83,8 +83,8 @@ export default async function DashboardPage({
             {/* Sends this month */}
             <div className="rounded-lg border bg-card p-6">
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900">
-                  <Send className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Send className="h-4 w-4 text-primary" />
                 </div>
                 <h3 className="font-medium">Sends This Month</h3>
               </div>
@@ -103,8 +103,8 @@ export default async function DashboardPage({
             {/* Contacts */}
             <div className="rounded-lg border bg-card p-6">
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900">
-                  <Users className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Users className="h-4 w-4 text-primary" />
                 </div>
                 <h3 className="font-medium">Contacts</h3>
               </div>
