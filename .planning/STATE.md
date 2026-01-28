@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Make requesting reviews so simple that business owners actually do it — one contact, one click, done.
-**Current focus:** Phase 9 - Polish & UX
+**Current focus:** Phase 8 - Public Pages
 
 ## Current Position
 
 Phase: 8 of 10 (Public Pages)
-Plan: 2 of 2
-Status: Phase complete
-Last activity: 2026-01-28 - Completed Phase 8 (Public Pages)
+Plan: 2 of 3
+Status: In progress
+Last activity: 2026-01-28 - Completed 07-04-PLAN.md (Dashboard integration)
 
-Progress: [████████░░] ~78% (8/10 phases, 35/~45 plans complete)
+Progress: [███████░░░] ~75% (7.5/10 phases, 37/~50 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 36
+- Total plans completed: 37
 - Average duration: 3 min
-- Total execution time: 1.75 hours
+- Total execution time: 1.82 hours
 
 **By Phase:**
 
@@ -35,11 +35,11 @@ Progress: [████████░░] ~78% (8/10 phases, 35/~45 plans compl
 | 05-message-history | 2 | 4 min | 2 min |
 | 05.1-code-review-fixes | 1 | 3 min | 3 min |
 | 06-billing-limits | 5 | 18 min | 4 min |
-| 07-onboarding-flow | 3 | 10 min | 3 min |
+| 07-onboarding-flow | 4 | 14 min | 4 min |
 | 08-public-pages | 2 | 8 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: 08-02 (3 min), 07-03 (2 min), 07-02 (4 min), 08-01 (5 min), 07-01 (4 min)
+- Last 5 plans: 07-04 (4 min), 08-02 (3 min), 07-03 (2 min), 07-02 (4 min), 08-01 (5 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -155,6 +155,10 @@ Recent decisions affecting current work:
 - [08-01] Server Components only for marketing content (no "use client")
 - [08-02] Keep tier data in PricingTable (not imported from billing.ts) because marketing copy differs
 - [08-02] Basic tier highlighted as recommended with border-primary, shadow-lg, RECOMMENDED badge
+- [07-04] OnboardingSteps client component separates step rendering from server-side data fetching
+- [07-04] Dashboard fetches status/business/usage/contacts in parallel via Promise.all
+- [07-04] OnboardingChecklist auto-hides when all 4 steps complete (returns null)
+- [07-04] NextActionCard priority: review link -> contacts -> send -> history
 
 ### Pending Todos
 
@@ -189,6 +193,6 @@ None currently.
 ## Session Continuity
 
 Last session: 2026-01-28
-Stopped at: Completed Phase 8 (Public Pages)
+Stopped at: Completed 07-04-PLAN.md (Dashboard integration)
 Resume file: None
-Next: Phase 9 - Polish & UX
+Next: 08-03-PLAN.md (Legal pages - optional)
