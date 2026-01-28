@@ -1,6 +1,7 @@
 'use client'
 
 import { useActionState, useEffect, useState } from 'react'
+import Link from 'next/link'
 import { sendReviewRequest } from '@/lib/actions/send'
 import { ContactSelector } from './contact-selector'
 import { MessagePreview } from './message-preview'
@@ -12,6 +13,8 @@ interface SendFormProps {
   business: Business & { email_templates?: EmailTemplate[] }
   templates: EmailTemplate[]
   monthlyUsage: { count: number; limit: number; tier: string }
+  contactCount: number
+  contactLimit?: number
 }
 
 export function SendForm({
@@ -19,6 +22,8 @@ export function SendForm({
   business,
   templates,
   monthlyUsage,
+  contactCount,
+  contactLimit,
 }: SendFormProps) {
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null)
   const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(
@@ -44,7 +49,14 @@ export function SendForm({
     }
   }, [state?.success])
 
-  const atLimit = monthlyUsage.count >= monthlyUsage.limit
+  // Limit checks
+  const sendLimitReached = monthlyUsage.count >= monthlyUsage.limit
+
+  // BILL-07: Contact limit enforcement for Basic tier
+  const contactsOverLimit =
+    contactLimit !== undefined && contactCount > contactLimit
+
+  const limitReached = sendLimitReached || contactsOverLimit
 
   if (showSuccess) {
     return (
@@ -73,16 +85,6 @@ export function SendForm({
         </div>
       )}
 
-      {/* Limit warning */}
-      {atLimit && (
-        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
-          <p className="font-medium text-yellow-800">Monthly limit reached</p>
-          <p className="text-sm text-yellow-700">
-            You&apos;ve used all {monthlyUsage.limit} sends this month.
-            {monthlyUsage.tier !== 'pro' && ' Upgrade to Pro for more sends.'}
-          </p>
-        </div>
-      )}
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* Left column: Contact selection + template */}
@@ -131,22 +133,46 @@ export function SendForm({
         </div>
       </div>
 
-      {/* Submit button */}
+      {/* Submit button or upgrade prompt */}
       <div className="flex justify-end pt-4 border-t">
-        <button
-          type="submit"
-          disabled={!selectedContact || isPending || atLimit}
-          className="inline-flex items-center px-6 py-3 rounded-md bg-primary text-primary-foreground font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isPending ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Sending...
-            </>
-          ) : (
-            'Send Review Request'
-          )}
-        </button>
+        {limitReached ? (
+          <div className="w-full rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-center">
+            <p className="text-sm text-destructive mb-3">
+              {contactsOverLimit
+                ? `Contact limit exceeded (${contactCount}/${contactLimit}). Remove contacts or upgrade.`
+                : `${monthlyUsage.tier === 'trial' ? 'Trial' : 'Plan'} limit reached.`}
+            </p>
+            <div className="flex gap-2 justify-center">
+              <Link
+                href="/billing"
+                className="inline-flex items-center px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90"
+              >
+                {monthlyUsage.tier === 'trial' ? 'Start a plan' : 'Upgrade'}
+              </Link>
+              <Link
+                href="/billing#plans"
+                className="inline-flex items-center px-4 py-2 rounded-md border text-sm font-medium hover:bg-muted"
+              >
+                View pricing
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <button
+            type="submit"
+            disabled={!selectedContact || isPending}
+            className="inline-flex items-center px-6 py-3 rounded-md bg-primary text-primary-foreground font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isPending ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Sending...
+              </>
+            ) : (
+              'Send Review Request'
+            )}
+          </button>
+        )}
       </div>
     </form>
   )
