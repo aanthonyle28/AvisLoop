@@ -36,8 +36,8 @@ export default function LandingPage() {
     <>
       <Hero />
       <SocialProof />
-      <StatsSection />
       <Features />
+      <StatsSection />
       <Testimonials />
       <FAQSection />
       <CTASection />
