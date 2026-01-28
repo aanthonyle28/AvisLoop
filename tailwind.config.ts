@@ -38,6 +38,14 @@ export default {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
+        lime: {
+          DEFAULT: "hsl(var(--accent-lime))",
+          foreground: "hsl(0 0% 10%)",
+        },
+        coral: {
+          DEFAULT: "hsl(var(--accent-coral))",
+          foreground: "hsl(0 0% 100%)",
+        },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
