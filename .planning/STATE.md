@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-01-25)
 
 **Core value:** Make requesting reviews so simple that business owners actually do it — one contact, one click, done.
-**Current focus:** Phase 6 - Billing & Limits
+**Current focus:** Phase 7 - Onboarding Flow
 
 ## Current Position
 
@@ -171,4 +171,4 @@ None currently.
 Last session: 2026-01-28
 Stopped at: Completed 06-05-PLAN.md (Send limit enforcement)
 Resume file: None
-Next: Phase 6 complete - ready for Phase 7 (Public Widget)
+Next: Phase 7 - Onboarding Flow

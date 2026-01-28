@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Core Sending** - Users can send review request emails and see immediate confirmation
 - [x] **Phase 5: Message History** - Users can view and track all sent review requests
 - [x] **Phase 5.1: Code Review Fixes** - Fix security and maintainability issues from code review (INSERTED)
-- [ ] **Phase 6: Billing & Limits** - Users can subscribe and system enforces tier limits
+- [x] **Phase 6: Billing & Limits** - Users can subscribe and system enforces tier limits
 - [ ] **Phase 7: Onboarding Flow** - New users are guided through first-time setup
 - [ ] **Phase 8: Public Pages** - Visitors can learn about and sign up for AvisLoop
 - [ ] **Phase 9: Polish & UX** - App has consistent, polished visual design across all screens
@@ -163,11 +163,11 @@ Plans:
 **Plans**: 5 plans in 3 waves
 
 Plans:
-- [ ] 06-01-PLAN.md — Database schema + Stripe SDK + client (billing foundation)
-- [ ] 06-02-PLAN.md — Checkout session + portal session server actions
-- [ ] 06-03-PLAN.md — Webhook handler for subscription lifecycle events
-- [ ] 06-04-PLAN.md — Billing page with usage display and subscription management
-- [ ] 06-05-PLAN.md — Usage warnings + send page limit enforcement
+- [x] 06-01-PLAN.md — Database schema + Stripe SDK + client (billing foundation)
+- [x] 06-02-PLAN.md — Checkout session + portal session server actions
+- [x] 06-03-PLAN.md — Webhook handler for subscription lifecycle events
+- [x] 06-04-PLAN.md — Billing page with usage display and subscription management
+- [x] 06-05-PLAN.md — Usage warnings + send page limit enforcement
 
 ### Phase 7: Onboarding Flow
 **Goal**: New users are guided through first-time setup
@@ -239,7 +239,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -
 | 4. Core Sending | 5/5 | Complete | 2026-01-27 |
 | 5. Message History | 2/2 | Complete | 2026-01-27 |
 | 5.1 Code Review Fixes | 1/1 | Complete | 2026-01-27 |
-| 6. Billing & Limits | 0/5 | Not started | - |
+| 6. Billing & Limits | 5/5 | Complete | 2026-01-28 |
 | 7. Onboarding Flow | 0/TBD | Not started | - |
 | 8. Public Pages | 0/TBD | Not started | - |
 | 9. Polish & UX | 0/TBD | Not started | - |
