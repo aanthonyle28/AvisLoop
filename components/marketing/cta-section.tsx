@@ -3,20 +3,20 @@ import { Button } from "@/components/ui/button";
 
 export function CTASection() {
   return (
-    <section className="py-20">
-      <div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="bg-primary/5 rounded-2xl p-8 md:p-12 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold">
-            Ready to get more reviews?
+    <section className="py-20 md:py-28">
+      <div className="container mx-auto max-w-4xl px-4 text-center">
+        <div className="border-t border-border/50 pt-20">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            Start getting more reviews today
           </h2>
-          <p className="mt-4 text-lg text-muted-foreground max-w-xl mx-auto">
-            Start with 25 free sends. No credit card required.
+          <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto">
+            25 free sends included. No credit card required.
           </p>
-          <div className="mt-8">
-            <Button size="lg" asChild>
-              <Link href="/auth/sign-up">Start Free Trial</Link>
-            </Button>
-          </div>
+          <Button size="lg" className="text-base px-8" asChild>
+            <Link href="/auth/sign-up">
+              Get Started Free
+            </Link>
+          </Button>
         </div>
       </div>
     </section>
