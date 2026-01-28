@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import type { Contact } from '@/lib/types/database'
+import { COOLDOWN_DAYS } from '@/lib/constants/billing'
 
 interface ContactSelectorProps {
   contacts: Contact[]
@@ -30,7 +31,7 @@ export function ContactSelector({
   const getCooldownStatus = (contact: Contact) => {
     if (!contact.last_sent_at) return null
     const lastSent = new Date(contact.last_sent_at)
-    const cooldownEnd = new Date(lastSent.getTime() + 14 * 24 * 60 * 60 * 1000)
+    const cooldownEnd = new Date(lastSent.getTime() + COOLDOWN_DAYS * 24 * 60 * 60 * 1000)
     if (new Date() < cooldownEnd) {
       const daysLeft = Math.ceil((cooldownEnd.getTime() - Date.now()) / (24 * 60 * 60 * 1000))
       return `${daysLeft}d cooldown`

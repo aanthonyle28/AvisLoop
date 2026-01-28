@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { escapeLikePattern } from '@/lib/actions/contact'
 import type { SendLogWithContact } from '@/lib/types/database'
+import { COOLDOWN_DAYS, MONTHLY_SEND_LIMITS } from '@/lib/constants/billing'
 
 /**
  * Get send logs for the current user's business.
@@ -122,15 +123,9 @@ export async function getMonthlyUsage(): Promise<{
     .gte('created_at', startOfMonth.toISOString())
     .in('status', ['sent', 'delivered', 'opened'])
 
-  const limits: Record<string, number> = {
-    trial: 25,
-    basic: 200,
-    pro: 500,
-  }
-
   return {
     count: count || 0,
-    limit: limits[business.tier] || limits.basic,
+    limit: MONTHLY_SEND_LIMITS[business.tier] || MONTHLY_SEND_LIMITS.basic,
     tier: business.tier,
   }
 }
@@ -161,7 +156,6 @@ export async function getContactSendStats(contactId: string): Promise<{
     return { totalSent: 0, lastSentAt: null, canSend: false, cooldownEnds: null }
   }
 
-  const COOLDOWN_DAYS = 14
   let canSend = contact.status === 'active' && !contact.opted_out
   let cooldownEnds: string | null = null
 

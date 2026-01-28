@@ -3,18 +3,11 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { render } from '@react-email/render'
-import { resend } from '@/lib/email/resend'
+import { resend, RESEND_FROM_EMAIL } from '@/lib/email/resend'
 import { ReviewRequestEmail } from '@/lib/email/templates/review-request'
 import { checkSendRateLimit } from '@/lib/rate-limit'
 import { sendRequestSchema } from '@/lib/validations/send'
-
-// Constants
-const COOLDOWN_DAYS = 14
-const MONTHLY_LIMITS: Record<string, number> = {
-  trial: 25,
-  basic: 200,
-  pro: 500,
-}
+import { COOLDOWN_DAYS, MONTHLY_SEND_LIMITS } from '@/lib/constants/billing'
 
 export type SendActionState = {
   error?: string
@@ -121,7 +114,7 @@ export async function sendReviewRequest(
   }
 
   // === 6. Check monthly limit ===
-  const monthlyLimit = MONTHLY_LIMITS[business.tier] || MONTHLY_LIMITS.basic
+  const monthlyLimit = MONTHLY_SEND_LIMITS[business.tier] || MONTHLY_SEND_LIMITS.basic
   const { count: monthlyCount } = await getMonthlyCount(supabase, business.id)
 
   if (monthlyCount >= monthlyLimit) {
@@ -177,7 +170,7 @@ export async function sendReviewRequest(
 
   const { data: emailData, error: emailError } = await resend.emails.send(
     {
-      from: `${senderName} <${process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'}>`,
+      from: `${senderName} <${RESEND_FROM_EMAIL}>`,
       to: contact.email,
       subject,
       html,
