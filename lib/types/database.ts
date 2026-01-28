@@ -9,6 +9,7 @@ export interface Business {
   default_sender_name: string | null
   default_template_id: string | null
   tier: 'basic' | 'pro' | 'trial'
+  stripe_customer_id: string | null
   created_at: string
   updated_at: string
 }
@@ -73,3 +74,20 @@ export type SendLogUpdate = Partial<Pick<SendLog, 'status' | 'provider_id' | 'er
 export interface SendLogWithContact extends SendLog {
   contacts: Pick<Contact, 'name' | 'email'>
 }
+
+// Subscription types for Stripe billing
+export interface Subscription {
+  id: string                    // Stripe subscription ID (sub_xxx)
+  business_id: string
+  status: 'active' | 'past_due' | 'canceled' | 'incomplete' | 'incomplete_expired' | 'trialing' | 'unpaid'
+  price_id: string
+  current_period_start: string | null
+  current_period_end: string | null
+  cancel_at_period_end: boolean
+  canceled_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type SubscriptionInsert = Omit<Subscription, 'created_at' | 'updated_at'>
+export type SubscriptionUpdate = Partial<Omit<Subscription, 'id' | 'business_id' | 'created_at' | 'updated_at'>>
