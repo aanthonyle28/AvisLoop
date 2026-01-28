@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 8.1 of 11 (Code Review Fixes)
-Plan: 1 of 2
-Status: In progress
-Last activity: 2026-01-27 - Completed 08.1-01-PLAN.md (Security and Performance Fixes)
+Plan: 2 of 2
+Status: Phase complete
+Last activity: 2026-01-28 - Completed 08.1-02-PLAN.md (Maintainability, UX, SEO, Accessibility)
 
-Progress: [████████░░] ~81% (8/11 phases complete, 38/~52 plans complete)
+Progress: [████████░░] ~82% (8.1/11 phases complete, 39/~52 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 38
+- Total plans completed: 39
 - Average duration: 3 min
-- Total execution time: 1.95 hours
+- Total execution time: 2.0 hours
 
 **By Phase:**
 
@@ -37,10 +37,10 @@ Progress: [████████░░] ~81% (8/11 phases complete, 38/~52 pl
 | 06-billing-limits | 5 | 18 min | 4 min |
 | 07-onboarding-flow | 4 | 14 min | 4 min |
 | 08-public-pages | 2 | 8 min | 4 min |
-| 08.1-code-review-fixes | 1 | 8 min | 8 min |
+| 08.1-code-review-fixes | 2 | 13 min | 7 min |
 
 **Recent Trend:**
-- Last 5 plans: 08.1-01 (8 min), 07-04 (4 min), 08-02 (3 min), 07-03 (2 min), 07-02 (4 min)
+- Last 5 plans: 08.1-02 (5 min), 08.1-01 (8 min), 07-04 (4 min), 08-02 (3 min), 07-03 (2 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -164,6 +164,11 @@ Recent decisions affecting current work:
 - [08.1-01] Pass supabase client as parameter to handler functions for explicit dependency
 - [08.1-01] Rate limit check before signature verification to save CPU on attacks
 - [08.1-01] Use Promise.all for independent DB queries (PERF-01)
+- [08.1-02] CONTACT_LIMITS centralized in lib/constants/billing.ts
+- [08.1-02] Shared onboarding types extracted to lib/types/onboarding.ts
+- [08.1-02] Footer uses dynamic copyright year via new Date().getFullYear()
+- [08.1-02] Auth pages have AvisLoop branding header linking to home
+- [08.1-02] Progress indicator uses nav landmark with ARIA attributes
 
 ### Pending Todos
 
@@ -197,7 +202,7 @@ None currently.
 
 ## Session Continuity
 
-Last session: 2026-01-27
-Stopped at: Completed 08.1-01-PLAN.md (Security and Performance Fixes)
+Last session: 2026-01-28
+Stopped at: Completed Phase 8.1 (Code Review Fixes)
 Resume file: None
-Next: 08.1-02-PLAN.md (Maintainability Improvements) if exists, otherwise Phase 9
+Next: Phase 9 - Subscription & Billing (Stripe integration, tier upgrades)
