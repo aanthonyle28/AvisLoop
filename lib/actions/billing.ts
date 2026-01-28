@@ -55,3 +55,31 @@ export async function createCheckoutSession(priceId: string): Promise<never> {
 
   redirect(session.url!)
 }
+
+/**
+ * Create a Stripe Customer Portal session for subscription management.
+ * Redirects user to Stripe-hosted portal page.
+ * Requires existing stripe_customer_id (user must have subscribed before).
+ */
+export async function createPortalSession(): Promise<never> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Not authenticated')
+
+  const { data: business } = await supabase
+    .from('businesses')
+    .select('stripe_customer_id')
+    .eq('user_id', user.id)
+    .single()
+
+  if (!business?.stripe_customer_id) {
+    throw new Error('No billing account found. Please subscribe first.')
+  }
+
+  const session = await stripe.billingPortal.sessions.create({
+    customer: business.stripe_customer_id,
+    return_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/billing`
+  })
+
+  redirect(session.url)
+}
