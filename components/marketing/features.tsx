@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { GeometricMarker } from "@/components/ui/geometric-marker";
 
 interface FeatureSectionProps {
+  id?: string;
   badge?: string;
   title: string;
   description: string;
@@ -13,6 +14,7 @@ interface FeatureSectionProps {
 }
 
 export function FeatureSection({
+  id,
   badge,
   title,
   description,
@@ -65,7 +67,7 @@ export function FeatureSection({
   );
 
   return (
-    <section className={cn("py-20 md:py-28", className)}>
+    <section id={id} className={cn("py-20 md:py-28", id && "scroll-mt-20", className)}>
       <div className="container mx-auto max-w-6xl px-4">
         <div
           className={cn(
@@ -138,6 +140,7 @@ export function Features() {
       {featureData.map((feature, i) => (
         <FeatureSection
           key={i}
+          id={i === 0 ? "features" : undefined}
           {...feature}
           className={cn(i % 2 === 1 && "bg-muted/30")}
         />
