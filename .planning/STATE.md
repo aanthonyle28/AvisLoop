@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-25)
 ## Current Position
 
 Phase: 8 of 10 (Public Pages)
-Plan: 1 of 3
+Plan: 2 of 3
 Status: In progress
-Last activity: 2026-01-28 - Completed 08-01-PLAN.md (Landing page & marketing layout)
+Last activity: 2026-01-28 - Completed 08-02-PLAN.md (Pricing page)
 
-Progress: [███████░░░] ~70% (8/10 phases, 33/~53 plans complete)
+Progress: [███████░░░] ~72% (8/10 phases, 36/~53 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 35
+- Total plans completed: 36
 - Average duration: 3 min
-- Total execution time: 1.70 hours
+- Total execution time: 1.75 hours
 
 **By Phase:**
 
@@ -36,10 +36,10 @@ Progress: [███████░░░] ~70% (8/10 phases, 33/~53 plans compl
 | 05.1-code-review-fixes | 1 | 3 min | 3 min |
 | 06-billing-limits | 5 | 18 min | 4 min |
 | 07-onboarding-flow | 3 | 10 min | 3 min |
-| 08-public-pages | 1 | 5 min | 5 min |
+| 08-public-pages | 2 | 8 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: 07-03 (2 min), 07-02 (4 min), 08-01 (5 min), 07-01 (4 min), 06-05 (3 min)
+- Last 5 plans: 08-02 (3 min), 07-03 (2 min), 07-02 (4 min), 08-01 (5 min), 07-01 (4 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -153,6 +153,8 @@ Recent decisions affecting current work:
 - [08-01] Use route group (marketing) for public pages with separate layout
 - [08-01] Static year in footer to avoid Next.js 16 prerender errors
 - [08-01] Server Components only for marketing content (no "use client")
+- [08-02] Keep tier data in PricingTable (not imported from billing.ts) because marketing copy differs
+- [08-02] Basic tier highlighted as recommended with border-primary, shadow-lg, RECOMMENDED badge
 
 ### Pending Todos
 
@@ -187,6 +189,6 @@ None currently.
 ## Session Continuity
 
 Last session: 2026-01-28
-Stopped at: Completed 08-01-PLAN.md (Landing page & marketing layout)
+Stopped at: Completed 08-02-PLAN.md (Pricing page)
 Resume file: None
-Next: 08-02-PLAN.md (Pricing page)
+Next: 08-03-PLAN.md (Legal pages - optional)
