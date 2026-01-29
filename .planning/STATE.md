@@ -1,15 +1,15 @@
 # Project State
 
-**Last updated:** 2026-01-28T19:43:58Z
+**Last updated:** 2026-01-28T19:44:36Z
 
 ## Current Position
 
 **Phase:** 11 of 12 (Bulk Send & Resend Integrations)
-**Plan:** 1 of 5 (In progress)
+**Plan:** 2 of 5 (In progress)
 **Status:** In progress
-**Last activity:** 2026-01-28 - Completed 11-01-PLAN.md (Batch Send Backend)
+**Last activity:** 2026-01-28 - Completed 11-02-PLAN.md (Webhook API & Authentication)
 
-**Progress:** [██████████░] ~98% (46/51 plans complete)
+**Progress:** [██████████░] ~98% (47/51 plans complete)
 
 ```
 Phase 01: ██████ Foundation & Auth (6/6 complete)
@@ -25,7 +25,7 @@ Phase 08: ██ Public Pages (2/2 complete)
 Phase 8.1: ██ Code Review Fixes (2/2 complete)
 Phase 09: ████ Polish & UX (4/4 complete)
 Phase 10: █████ Landing Page Redesign (5/5 complete)
-Phase 11: █░░░░ Bulk Send & Resend (1/5 complete) <- IN PROGRESS
+Phase 11: ██░░░ Bulk Send & Resend (2/5 complete) <- IN PROGRESS
 ```
 
 ## What's Been Built
@@ -60,6 +60,7 @@ Phase 11: █░░░░ Bulk Send & Resend (1/5 complete) <- IN PROGRESS
 
 ### Phase 11 - Bulk Send & Resend Integrations (In Progress)
 - **11-01:** Batch send backend, validation schema, re-send ready query (Complete)
+- **11-02:** Webhook API with API key auth, rate limiting, Settings UI (Complete)
 
 ## Tech Stack
 
@@ -92,8 +93,11 @@ Phase 11: █░░░░ Bulk Send & Resend (1/5 complete) <- IN PROGRESS
 - 200ms transition timing for consistency
 - Minimal testimonial format (quote + author only)
 - Anchor navigation with scroll-mt-20
-- **Batch processing: single query + memory categorization** <- NEW
-- **Structured action responses with details arrays** <- NEW
+- **Batch processing: single query + memory categorization** <- NEW (11-01)
+- **Structured action responses with details arrays** <- NEW (11-01)
+- **API key authentication with scrypt hashing** <- NEW (11-02)
+- **Webhook rate limiting (60/min per key)** <- NEW (11-02)
+- **Contact deduplication via upsert** <- NEW (11-02)
 
 ## Decisions Made
 
@@ -130,6 +134,10 @@ Phase 11: █░░░░ Bulk Send & Resend (1/5 complete) <- IN PROGRESS
 | BATCH-001 | 25 contact batch limit | 11-01 | Balance bulk efficiency with quota management |
 | BATCH-002 | No rate limit on batch sends | 11-01 | Batch has its own 25-cap control, rate limit unnecessary |
 | BATCH-003 | Quota check before starting batch | 11-01 | Fail fast if entire batch won't fit in remaining quota |
+| API-001 | Use scrypt for API key hashing | 11-02 | Industry-standard KDF, timing-safe, built into Node.js crypto |
+| API-002 | Linear scan for API key verification | 11-02 | Acceptable for MVP with small number of businesses |
+| WEBHOOK-001 | 60 requests/minute rate limit | 11-02 | Allows batch operations while preventing abuse |
+| WEBHOOK-002 | Upsert contacts by business_id + email | 11-02 | Automatic deduplication prevents duplicates from repeated webhook calls |
 
 ## Key Files
 
@@ -177,6 +185,13 @@ Phase 11: █░░░░ Bulk Send & Resend (1/5 complete) <- IN PROGRESS
 - `lib/data/send-logs.ts` - Send history queries, re-send ready contacts
 - `lib/validations/send.ts` - Send request validation schemas
 
+### Integrations (Phase 11)
+- `lib/crypto/api-key.ts` - API key generation and verification
+- `lib/actions/api-key.ts` - generateApiKeyAction server action
+- `lib/validations/webhook.ts` - Webhook contact schema
+- `app/api/webhooks/contacts/route.ts` - Webhook endpoint
+- `components/settings/integrations-section.tsx` - API key management UI
+
 ### Billing
 - `lib/constants/billing.ts` - Tier definitions
 - `lib/services/usage-tracker.ts` - Usage tracking
@@ -188,34 +203,34 @@ Phase 11: █░░░░ Bulk Send & Resend (1/5 complete) <- IN PROGRESS
 
 ## Next Steps
 
-1. **Plan 11-02** - Batch send UI components (contact selector, results display)
-2. **Plan 11-03** - Re-send ready UI integration
-3. **Plan 11-04** - Resend webhook enhancements
-4. **Plan 11-05** - Email templates with dynamic merge fields
+1. **Plan 11-03** - Batch send UI components (contact selector, results display)
+2. **Plan 11-04** - Re-send ready UI integration
+3. **Plan 11-05** - Resend webhook enhancements or email template improvements
 
 ## Session Continuity
 
-**Last session:** 2026-01-28T19:43:58Z
-**Stopped at:** Completed 11-01-PLAN.md
+**Last session:** 2026-01-28T19:44:36Z
+**Stopped at:** Completed 11-02-PLAN.md (Webhook API & Authentication)
 **Resume file:** None
-**Next action:** Execute plan 11-02 (Batch Send UI)
+**Next action:** Execute plan 11-03
 
 ## Notes
 
-### Phase 11-01 Execution
+### Phase 11-02 Execution
 - Fast execution, ~3 minutes
-- Updated batchSendSchema: max 25 contacts (down from 50)
-- Added customSubject field to batch schema
-- Created getResendReadyContacts query (returns contacts past 14-day cooldown)
-- Implemented batchSendReviewRequest server action:
-  - Quota check before starting (full batch must fit)
-  - Single query fetches all contacts
-  - Memory categorization: eligible vs skipped
-  - Individual error handling per contact
-  - Structured response with sent/skipped/failed counts + details
-- No rate limit on batch sends (intentional - batch has 25-cap control)
+- Created API key crypto utilities with scrypt hashing
+- Built webhook endpoint with x-api-key authentication
+- Added rate limiting (60/min per key)
+- Contact deduplication via upsert on (business_id, email)
+- Settings UI with key generation and usage instructions
+- Created migration for api_key_hash column and unique constraint
 - No deviations - plan executed exactly as written
 - All verification passing (lint, typecheck)
+
+**Migration required before use:**
+```bash
+supabase db reset  # local dev
+```
 
 ### Phase 10 Complete
 Landing page redesign finished. Marketing pages now have:
