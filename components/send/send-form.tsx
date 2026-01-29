@@ -2,11 +2,12 @@
 
 import { useActionState, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { sendReviewRequest } from '@/lib/actions/send'
+import { batchSendReviewRequest } from '@/lib/actions/send'
 import { ContactSelector } from './contact-selector'
 import { MessagePreview } from './message-preview'
+import { BatchResults } from './batch-results'
 import type { Contact, Business, EmailTemplate } from '@/lib/types/database'
-import { CheckCircle2, Loader2, AlertCircle } from 'lucide-react'
+import { Loader2, AlertCircle } from 'lucide-react'
 
 interface SendFormProps {
   contacts: Contact[]
@@ -15,6 +16,7 @@ interface SendFormProps {
   monthlyUsage: { count: number; limit: number; tier: string }
   contactCount: number
   contactLimit?: number
+  resendReadyContactIds: string[]
 }
 
 export function SendForm({
@@ -24,30 +26,37 @@ export function SendForm({
   monthlyUsage,
   contactCount,
   contactLimit,
+  resendReadyContactIds,
 }: SendFormProps) {
-  const [selectedContact, setSelectedContact] = useState<Contact | null>(null)
+  const [selectedContacts, setSelectedContacts] = useState<Set<string>>(new Set())
   const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(
     templates.find(t => t.is_default) || templates[0] || null
   )
   const [customSubject, setCustomSubject] = useState('')
-  const [customBody, setCustomBody] = useState('')
-  const [showSuccess, setShowSuccess] = useState(false)
+  const [showResults, setShowResults] = useState(false)
 
-  const [state, formAction, isPending] = useActionState(sendReviewRequest, null)
+  const [batchState, batchFormAction, isBatchPending] = useActionState(batchSendReviewRequest, null)
 
-  // Handle successful send
+  // Convert resendReadyContactIds array to Set for efficient lookup
+  const resendReadyIds = new Set(resendReadyContactIds)
+
+  // Get list of selected contact objects for preview
+  const selectedContactsList = contacts.filter(c => selectedContacts.has(c.id))
+  const previewContact = selectedContactsList[0] || null
+
+  // Handle successful batch send
   useEffect(() => {
-    if (state?.success) {
-      setShowSuccess(true)
-      // Reset form after showing success
-      setTimeout(() => {
-        setSelectedContact(null)
-        setCustomSubject('')
-        setCustomBody('')
-        setShowSuccess(false)
-      }, 3000)
+    if (batchState?.success && batchState.data) {
+      setShowResults(true)
     }
-  }, [state?.success])
+  }, [batchState?.success, batchState?.data])
+
+  // Reset form and hide results
+  const handleSendMore = () => {
+    setSelectedContacts(new Set())
+    setCustomSubject('')
+    setShowResults(false)
+  }
 
   // Limit checks
   const sendLimitReached = monthlyUsage.count >= monthlyUsage.limit
@@ -58,44 +67,41 @@ export function SendForm({
 
   const limitReached = sendLimitReached || contactsOverLimit
 
-  if (showSuccess) {
+  // Show results if batch completed
+  if (showResults && batchState?.success && batchState.data) {
     return (
-      <div className="rounded-lg border border-green-200 bg-green-50 p-8 text-center">
-        <CheckCircle2 className="w-12 h-12 text-green-600 mx-auto mb-4" />
-        <h2 className="text-xl font-semibold text-green-800 mb-2">
-          Review Request Sent!
-        </h2>
-        <p className="text-green-700">
-          Your message to {selectedContact?.name} has been sent successfully.
-        </p>
+      <div>
+        <h2 className="text-xl font-semibold mb-6">Batch Send Results</h2>
+        <BatchResults results={batchState.data} onSendMore={handleSendMore} />
       </div>
     )
   }
 
   return (
-    <form action={formAction} className="space-y-6">
+    <form action={batchFormAction} className="space-y-6">
       {/* Error display */}
-      {state?.error && (
+      {batchState?.error && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-4 flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
           <div>
             <p className="font-medium text-red-800">Unable to send</p>
-            <p className="text-sm text-red-700">{state.error}</p>
+            <p className="text-sm text-red-700">{batchState.error}</p>
           </div>
         </div>
       )}
-
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* Left column: Contact selection + template */}
         <div className="space-y-6">
           <ContactSelector
             contacts={contacts}
-            selectedId={selectedContact?.id || null}
-            onSelect={setSelectedContact}
+            selectedIds={selectedContacts}
+            onSelectionChange={setSelectedContacts}
+            maxSelection={25}
+            resendReadyIds={resendReadyIds}
           />
 
-          {templates.length > 1 && (
+          {templates.length > 0 && (
             <div className="space-y-2">
               <label className="block text-sm font-medium">Template</label>
               <select
@@ -104,8 +110,7 @@ export function SendForm({
                 onChange={e => {
                   const tpl = templates.find(t => t.id === e.target.value)
                   setSelectedTemplate(tpl || null)
-                  setCustomSubject('') // Reset custom values when template changes
-                  setCustomBody('')
+                  setCustomSubject('') // Reset custom subject when template changes
                 }}
               >
                 {templates.map(t => (
@@ -117,21 +122,44 @@ export function SendForm({
               <input type="hidden" name="templateId" value={selectedTemplate?.id || ''} />
             </div>
           )}
+
+          {/* Pre-send summary */}
+          {selectedContacts.size > 0 && (
+            <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
+              <h3 className="font-medium text-sm mb-2">Ready to Send</h3>
+              <p className="text-sm text-muted-foreground">
+                Sending to <strong>{selectedContacts.size}</strong> contact{selectedContacts.size !== 1 ? 's' : ''}
+              </p>
+              {selectedTemplate && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  Using template: <strong>{selectedTemplate.name}</strong>
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Right column: Preview */}
         <div>
           <MessagePreview
-            contact={selectedContact}
+            contact={previewContact}
             business={business}
             template={selectedTemplate}
             customSubject={customSubject}
-            customBody={customBody}
+            customBody={''}
             onSubjectChange={setCustomSubject}
-            onBodyChange={setCustomBody}
+            onBodyChange={() => {}}
           />
+          {selectedContacts.size > 1 && previewContact && (
+            <p className="text-xs text-muted-foreground mt-2">
+              Preview showing first selected contact. Message will be personalized for each recipient.
+            </p>
+          )}
         </div>
       </div>
+
+      {/* Custom subject input */}
+      <input type="hidden" name="customSubject" value={customSubject} />
 
       {/* Submit button or upgrade prompt */}
       <div className="flex justify-end pt-4 border-t">
@@ -160,16 +188,18 @@ export function SendForm({
         ) : (
           <button
             type="submit"
-            disabled={!selectedContact || isPending}
-            className="inline-flex items-center px-6 py-3 rounded-md bg-primary text-primary-foreground font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={selectedContacts.size === 0 || isBatchPending}
+            className="inline-flex items-center px-6 py-3 rounded-md bg-primary text-primary-foreground font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {isPending ? (
+            {isBatchPending ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 Sending...
               </>
             ) : (
-              'Send Review Request'
+              <>
+                Send to {selectedContacts.size} Contact{selectedContacts.size !== 1 ? 's' : ''}
+              </>
             )}
           </button>
         )}

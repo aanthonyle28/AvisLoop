@@ -1,6 +1,6 @@
 import { getBusiness } from '@/lib/actions/business'
 import { getContacts } from '@/lib/actions/contact'
-import { getMonthlyUsage } from '@/lib/data/send-logs'
+import { getMonthlyUsage, getResendReadyContacts } from '@/lib/data/send-logs'
 import { SendForm } from '@/components/send/send-form'
 import { UsageWarningBanner } from '@/components/billing/usage-warning-banner'
 import { createClient } from '@/lib/supabase/server'
@@ -36,7 +36,7 @@ export default async function SendPage() {
 
   const supabase = await createClient()
 
-  const [{ contacts }, usage, { count: contactCount }] = await Promise.all([
+  const [{ contacts }, usage, { count: contactCount }, resendReadyContacts] = await Promise.all([
     getContacts({ limit: 200 }),
     getMonthlyUsage(),
     supabase
@@ -44,6 +44,7 @@ export default async function SendPage() {
       .select('*', { count: 'exact', head: true })
       .eq('business_id', business.id)
       .eq('status', 'active'),
+    getResendReadyContacts(supabase, business.id),
   ])
 
   // Contact limits by tier (BILL-07)
@@ -58,6 +59,9 @@ export default async function SendPage() {
   const sendableContacts = contacts.filter(
     c => c.status === 'active' && !c.opted_out
   )
+
+  // Extract IDs from resend-ready contacts
+  const resendReadyContactIds = resendReadyContacts.map(c => c.id)
 
   return (
     <div className="container mx-auto py-6 px-4">
@@ -99,6 +103,7 @@ export default async function SendPage() {
           monthlyUsage={usage}
           contactCount={contactCount ?? 0}
           contactLimit={contactLimit}
+          resendReadyContactIds={resendReadyContactIds}
         />
       )}
     </div>
