@@ -91,3 +91,20 @@ export interface Subscription {
 
 export type SubscriptionInsert = Omit<Subscription, 'created_at' | 'updated_at'>
 export type SubscriptionUpdate = Partial<Omit<Subscription, 'id' | 'business_id' | 'created_at' | 'updated_at'>>
+
+// Batch send action state for server actions
+export type BatchSendActionState = {
+  error?: string
+  success?: boolean
+  data?: {
+    sent: number
+    skipped: number
+    failed: number
+    details?: Array<{
+      contactId: string
+      contactName: string
+      status: 'sent' | 'skipped' | 'failed'
+      reason?: string
+    }>
+  }
+}
