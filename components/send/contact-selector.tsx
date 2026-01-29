@@ -68,13 +68,11 @@ export function ContactSelector({
     const eligibleContacts = filteredContacts.filter(c => !getCooldownStatus(c))
 
     const newSelectedIds = new Set(selectedIds)
-    let addedCount = 0
 
     for (const contact of eligibleContacts) {
       if (newSelectedIds.size >= maxSelection) break
       if (!newSelectedIds.has(contact.id)) {
         newSelectedIds.add(contact.id)
-        addedCount++
       }
     }
 
