@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { LoginForm } from "@/components/login-form";
 
-export const dynamic = "force-dynamic";
-
 export default function Page() {
   return (
     <div className="flex min-h-svh flex-col">
