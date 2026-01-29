@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Key, Copy, Check, RefreshCw } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -14,10 +14,11 @@ export function IntegrationsSection({ hasExistingKey }: IntegrationsSectionProps
   const [apiKey, setApiKey] = useState<string | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
   const [copied, setCopied] = useState<'key' | 'url' | null>(null)
+  const [webhookUrl, setWebhookUrl] = useState('/api/webhooks/contacts')
 
-  const webhookUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/api/webhooks/contacts`
-    : '/api/webhooks/contacts'
+  useEffect(() => {
+    setWebhookUrl(`${window.location.origin}/api/webhooks/contacts`)
+  }, [])
 
   const handleGenerateKey = async () => {
     setIsGenerating(true)
