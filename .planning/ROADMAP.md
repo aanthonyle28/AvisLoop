@@ -4,7 +4,15 @@
 
 AvisLoop progresses from foundational authentication and data security through the core value loop of managing contacts and sending review requests, then adds billing enforcement and polished onboarding before completing public-facing marketing pages. Each phase delivers observable user value while building toward a complete, shippable MVP that makes requesting reviews "so simple business owners actually do it."
 
+## Milestones
+
+- ✅ **v1.0 MVP** - Phases 1-11 (shipped 2026-01-28)
+- 🚧 **v1.1 Scheduled Sending** - Phases 12-14 (in progress)
+
 ## Phases
+
+<details>
+<summary>✅ v1.0 MVP (Phases 1-11) - SHIPPED 2026-01-28</summary>
 
 **Phase Numbering:**
 - Integer phases (1, 2, 3): Planned milestone work
@@ -26,8 +34,6 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 9: Polish & UX** - App has consistent, polished visual design across all screens
 - [x] **Phase 10: Landing Page Redesign** - Landing page matches reference design aesthetic
 - [x] **Phase 11: Bulk Send, Re-send & Integrations** - Users can bulk send, re-send to cooled-down contacts, and receive contacts via webhook
-
-## Phase Details
 
 ### Phase 1: Foundation & Auth
 **Goal**: Users can create accounts and access the app securely
@@ -243,12 +249,6 @@ Plans:
   5. Typography, spacing, and colors are consistent
 **Plans**: 4 plans in 3 waves
 
-**Implementation Notes:**
-- Use `/web-design-guidelines` skill for design system decisions
-- Use `/senior-frontend` skill for component implementation
-- Reference design: Clean SaaS dashboard with light gray background, white cards, blue accent
-- Match shadcn/ui patterns while customizing to reference aesthetic
-
 Plans:
 - [x] 09-01-PLAN.md — Design system foundation (CSS variables, Sonner toast, Skeleton, utility hooks)
 - [x] 09-02-PLAN.md — Layout and navigation (collapsible sidebar, bottom nav, AppShell)
@@ -268,11 +268,6 @@ Plans:
   6. Testimonials use minimal quote format
   7. Overall aesthetic matches provided reference image
 **Plans**: 5 plans in 3 waves
-
-**Implementation Notes:**
-- User will provide images for hero mockup and feature screenshots
-- Until images provided, placeholders will be used
-- Design system updated with lime (#c4f441) and coral (#ff6b6b) accents
 
 Plans:
 - [x] 10-01-PLAN.md — Design system update (white bg, lime/coral accents, GeometricMarker)
@@ -301,24 +296,76 @@ Plans:
 - [x] 11-02-PLAN.md — Webhook API + API key management (crypto, route, settings UI)
 - [x] 11-03-PLAN.md — Bulk send frontend (multi-select, batch results, re-send filter)
 
+</details>
+
+### 🚧 v1.1 Scheduled Sending (In Progress)
+
+**Milestone Goal:** Let users schedule review request emails for future delivery with preset and custom timing options, manage pending sends, and rely on background processing to deliver them on time.
+
+**Existing code:** ScheduleSelector component, schedule server actions, Zod validation, database types, service role client, and scheduled_sends table migration already exist from earlier manual work. Phases complete what is missing.
+
+- [ ] **Phase 12: Cron Processing** - System reliably processes scheduled sends in the background every minute
+- [ ] **Phase 13: Scheduling & Navigation** - Users can schedule sends and find the scheduling feature in navigation
+- [ ] **Phase 14: Scheduled Send Management** - Users can view, cancel, and reschedule their pending sends
+
+## Phase Details
+
+### Phase 12: Cron Processing
+**Goal**: System reliably processes scheduled sends in the background every minute
+**Depends on**: Phase 11 (existing send infrastructure)
+**Requirements**: PROC-01, PROC-02, PROC-03, PROC-04
+**Success Criteria** (what must be TRUE):
+  1. Cron endpoint fetches due scheduled sends and processes them using existing email send logic
+  2. System re-validates opt-out, cooldown, and quota at send time (not just at schedule time)
+  3. Service role client bypasses RLS so cron can operate without a user session
+  4. Each cron run produces structured JSON log output with counts (processed, sent, failed, skipped)
+  5. Concurrent cron invocations cannot process the same scheduled send (FOR UPDATE SKIP LOCKED)
+**Plans**: TBD
+
+### Phase 13: Scheduling & Navigation
+**Goal**: Users can schedule sends and find the scheduling feature throughout the app
+**Depends on**: Phase 12 (sends must process before users schedule them)
+**Requirements**: SCHED-01, SCHED-02, SCHED-03, NAV-01, NAV-02
+**Success Criteria** (what must be TRUE):
+  1. User can choose a preset schedule (In 1 hour, Next morning, In 24 hours) from the send form
+  2. User can pick a custom date and time for future delivery
+  3. User sees confirmation toast with the scheduled date/time after scheduling
+  4. Sidebar and mobile bottom nav include a "Scheduled" link with pending count badge
+  5. Dashboard shows count of pending scheduled sends
+**Plans**: TBD
+
+### Phase 14: Scheduled Send Management
+**Goal**: Users can view, cancel, and reschedule their pending sends
+**Depends on**: Phase 13 (must have scheduled sends to manage)
+**Requirements**: MGMT-01, MGMT-02, MGMT-03, MGMT-04
+**Success Criteria** (what must be TRUE):
+  1. User can view a list of all scheduled sends showing recipient, scheduled time, and status
+  2. User can cancel a pending scheduled send before it processes
+  3. User can see partial send results (sent/skipped/failed counts) for completed scheduled sends
+  4. User can select multiple pending sends and reschedule them to a different time
+**Plans**: TBD
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -> 8 -> 8.1 -> 9 -> 10 -> 11
+Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -> 8 -> 8.1 -> 9 -> 10 -> 11 -> 12 -> 13 -> 14
 
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. Foundation & Auth | 6/6 | Complete | 2026-01-26 |
-| 2. Business Setup | 3/3 | Complete | 2026-01-27 |
-| 3. Contact Management | 6/6 | Complete | 2026-01-27 |
-| 3.1 Critical Fixes | 1/1 | Complete | 2026-01-27 |
-| 4. Core Sending | 5/5 | Complete | 2026-01-27 |
-| 5. Message History | 2/2 | Complete | 2026-01-27 |
-| 5.1 Code Review Fixes | 1/1 | Complete | 2026-01-27 |
-| 6. Billing & Limits | 5/5 | Complete | 2026-01-28 |
-| 7. Onboarding Flow | 4/4 | Complete | 2026-01-27 |
-| 8. Public Pages | 2/2 | Complete | 2026-01-28 |
-| 8.1 Code Review Fixes | 2/2 | Complete | 2026-01-27 |
-| 9. Polish & UX | 4/4 | Complete | 2026-01-28 |
-| 10. Landing Page Redesign | 5/5 | Complete | 2026-01-28 |
-| 11. Bulk Send & Integrations | 3/3 | Complete | 2026-01-28 |
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| 1. Foundation & Auth | v1.0 | 6/6 | Complete | 2026-01-26 |
+| 2. Business Setup | v1.0 | 3/3 | Complete | 2026-01-27 |
+| 3. Contact Management | v1.0 | 6/6 | Complete | 2026-01-27 |
+| 3.1 Critical Fixes | v1.0 | 1/1 | Complete | 2026-01-27 |
+| 4. Core Sending | v1.0 | 5/5 | Complete | 2026-01-27 |
+| 5. Message History | v1.0 | 2/2 | Complete | 2026-01-27 |
+| 5.1 Code Review Fixes | v1.0 | 1/1 | Complete | 2026-01-27 |
+| 6. Billing & Limits | v1.0 | 5/5 | Complete | 2026-01-28 |
+| 7. Onboarding Flow | v1.0 | 4/4 | Complete | 2026-01-27 |
+| 8. Public Pages | v1.0 | 2/2 | Complete | 2026-01-28 |
+| 8.1 Code Review Fixes | v1.0 | 2/2 | Complete | 2026-01-27 |
+| 9. Polish & UX | v1.0 | 4/4 | Complete | 2026-01-28 |
+| 10. Landing Page Redesign | v1.0 | 5/5 | Complete | 2026-01-28 |
+| 11. Bulk Send & Integrations | v1.0 | 3/3 | Complete | 2026-01-28 |
+| 12. Cron Processing | v1.1 | 0/TBD | Not started | - |
+| 13. Scheduling & Navigation | v1.1 | 0/TBD | Not started | - |
+| 14. Scheduled Send Management | v1.1 | 0/TBD | Not started | - |

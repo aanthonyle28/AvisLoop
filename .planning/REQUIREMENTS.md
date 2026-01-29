@@ -1,7 +1,7 @@
 # Requirements: AvisLoop
 
 **Defined:** 2026-01-25
-**Core Value:** Make requesting reviews so simple that business owners actually do it — one contact, one click, done.
+**Core Value:** Make requesting reviews so simple that business owners actually do it -- one contact, one click, done.
 
 ## v1 Requirements
 
@@ -37,7 +37,7 @@
 - [x] **SEND-01**: User can select a contact and send a review request email
 - [x] **SEND-02**: User can preview the message before sending
 - [x] **SEND-03**: User can edit the message template (subject + body)
-- [x] **SEND-04**: User sees immediate "Sent ✅" confirmation after sending
+- [x] **SEND-04**: User sees immediate "Sent" confirmation after sending
 - [x] **SEND-05**: System logs every send attempt with status
 - [x] **SEND-06**: System enforces cooldown period between sends to same contact
 - [x] **SEND-07**: System respects contact opt-out preferences
@@ -54,7 +54,7 @@
 
 ### Onboarding
 
-- [x] **ONBD-01**: New user is guided through setup wizard (business → review link → contact → first send)
+- [x] **ONBD-01**: New user is guided through setup wizard (business -> review link -> contact -> first send)
 - [x] **ONBD-02**: Wizard shows progress indicator (step X of Y)
 - [x] **ONBD-03**: User can skip onboarding steps
 - [x] **ONBD-04**: Dashboard shows "next best action" after onboarding
@@ -228,27 +228,26 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INTG-01 | Phase 11 | Complete |
 | INTG-02 | Phase 11 | Complete |
 | INTG-03 | Phase 11 | Complete |
-
-| SCHED-01 | Phase TBD | Pending |
-| SCHED-02 | Phase TBD | Pending |
-| SCHED-03 | Phase TBD | Pending |
-| MGMT-01 | Phase TBD | Pending |
-| MGMT-02 | Phase TBD | Pending |
-| MGMT-03 | Phase TBD | Pending |
-| MGMT-04 | Phase TBD | Pending |
-| PROC-01 | Phase TBD | Pending |
-| PROC-02 | Phase TBD | Pending |
-| PROC-03 | Phase TBD | Pending |
-| PROC-04 | Phase TBD | Pending |
-| NAV-01 | Phase TBD | Pending |
-| NAV-02 | Phase TBD | Pending |
+| SCHED-01 | Phase 13 | Pending |
+| SCHED-02 | Phase 13 | Pending |
+| SCHED-03 | Phase 13 | Pending |
+| MGMT-01 | Phase 14 | Pending |
+| MGMT-02 | Phase 14 | Pending |
+| MGMT-03 | Phase 14 | Pending |
+| MGMT-04 | Phase 14 | Pending |
+| PROC-01 | Phase 12 | Pending |
+| PROC-02 | Phase 12 | Pending |
+| PROC-03 | Phase 12 | Pending |
+| PROC-04 | Phase 12 | Pending |
+| NAV-01 | Phase 13 | Pending |
+| NAV-02 | Phase 13 | Pending |
 
 **Coverage:**
 - v1 requirements: 52 total (all complete)
-- v1.1 requirements: 13 total
-- Mapped to phases: 52 (v1.1 pending roadmap)
-- Unmapped: 13 (v1.1 — awaiting roadmap)
+- v1.1 requirements: 13 total (all mapped to phases 12-14)
+- Mapped to phases: 65/65
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-25*
-*Last updated: 2026-01-28 after v1.1 requirements defined*
+*Last updated: 2026-01-28 after v1.1 roadmap created*
