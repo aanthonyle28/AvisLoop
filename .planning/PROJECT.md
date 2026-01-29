@@ -58,7 +58,7 @@ Make requesting reviews so simple that business owners actually do it — one co
 
 - SMS channel — email first, SMS later
 - Automations / follow-up sequences — adds complexity
-- Campaign scheduling — not needed for MVP
+- ~~Campaign scheduling — not needed for MVP~~ → Now in v1.1 (simple scheduling, not campaigns)
 - Analytics dashboards beyond message history — keep simple
 - AI reply generation — future feature
 - Integrations (Zapier, CRM, Google Business API) — future feature
@@ -95,17 +95,17 @@ Make requesting reviews so simple that business owners actually do it — one co
 - **Mobile-friendly**: App must work well on phones (business owners use mobile)
 - **UX**: Minimal UI, zero clutter, 1 primary action per screen, no jargon
 
-## Current Milestone: v8.1 Code Review Fixes
+## Current Milestone: v1.1 Scheduled Sending
 
-**Goal:** Fix 12 issues identified in code review of phases 6, 7, and 8
+**Goal:** Let users schedule review request emails for future delivery with preset and custom timing options.
 
-**Target fixes:**
-- Security: Webhook rate limiting, service client scope, env validation, localStorage sanitization
-- Maintainability: Centralize constants, extract shared types, fix comments
-- UX: Fix broken footer links, auth page layout consistency
-- SEO: Dynamic copyright year
-- Performance: Parallelize DB queries
-- Accessibility: ARIA attributes on progress indicator
+**Target features:**
+- Schedule presets (Send now, In 1 hour, Next morning, In 24 hours, Custom date/time)
+- New `scheduled_sends` table with pending/completed/failed/cancelled lifecycle
+- Vercel Cron endpoint (every minute) to process due sends using existing email logic
+- ScheduleSelector component integrated into existing send form
+- Scheduled sends management page with cancel functionality
+- Navigation updates for scheduled sends page
 
 ## Key Decisions
 
@@ -117,5 +117,9 @@ Make requesting reviews so simple that business owners actually do it — one co
 | Two tiers ($49/$99) | Basic for small shops, Pro for multi-location businesses | — Pending |
 | Multi-location for Pro | Pro users get multiple business locations | — Pending |
 
+| Separate scheduled_sends table | Different lifecycle than send_logs, supports cancellation | — Pending |
+| Vercel Cron for processing | Serverless, no infrastructure to manage, runs every minute | — Pending |
+| Service role for cron | No user session in cron context, needs direct DB access | — Pending |
+
 ---
-*Last updated: 2026-01-27 after milestone v8.1 started*
+*Last updated: 2026-01-28 after milestone v1.1 started*
