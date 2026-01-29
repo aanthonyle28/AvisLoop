@@ -80,6 +80,57 @@ export async function updateBusiness(
   }
 
   revalidatePath('/dashboard/settings')
+  revalidatePath('/dashboard')
+  return { success: true }
+}
+
+/**
+ * Save just the Google review link for the current user's business.
+ * Used by the review link modal on the dashboard.
+ */
+export async function saveReviewLink(
+  link: string
+): Promise<BusinessActionState> {
+  const supabase = await createClient()
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return { error: 'You must be logged in' }
+  }
+
+  // Validate URL if provided
+  if (link.trim()) {
+    try {
+      new URL(link)
+    } catch {
+      return { error: 'Please enter a valid URL' }
+    }
+    if (!link.includes('google.com')) {
+      return { error: 'Must be a Google URL' }
+    }
+  }
+
+  const { data: business } = await supabase
+    .from('businesses')
+    .select('id')
+    .eq('user_id', user.id)
+    .single()
+
+  if (!business) {
+    return { error: 'Please create a business profile first' }
+  }
+
+  const { error } = await supabase
+    .from('businesses')
+    .update({ google_review_link: link.trim() || null })
+    .eq('id', business.id)
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  revalidatePath('/dashboard')
+  revalidatePath('/dashboard/settings')
   return { success: true }
 }
 

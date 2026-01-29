@@ -1,12 +1,17 @@
+'use client'
+
+import { useState } from 'react'
 import { ArrowRight, Settings, Users, Send, History } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { ReviewLinkModal } from '@/components/dashboard/review-link-modal'
 import type { OnboardingStatus } from '@/lib/data/onboarding'
 
 type NextAction = {
   title: string
   description: string
-  href: string
+  href?: string
+  action?: 'review-link-modal'
   icon: React.ReactNode
   variant: 'default' | 'secondary'
 }
@@ -21,7 +26,7 @@ function determineNextAction(status: OnboardingStatus): NextAction {
       title: 'Add your review link',
       description:
         'Connect your Google Business Profile to start collecting reviews.',
-      href: '/dashboard/settings',
+      action: 'review-link-modal',
       icon: <Settings className="h-5 w-5 text-primary" />,
       variant: 'default',
     }
@@ -62,27 +67,39 @@ function determineNextAction(status: OnboardingStatus): NextAction {
  * Displays context-aware suggestion based on onboarding completion state.
  */
 export function NextActionCard({ status }: { status: OnboardingStatus }) {
+  const [modalOpen, setModalOpen] = useState(false)
   const action = determineNextAction(status)
 
   return (
-    <div className="rounded-lg border bg-card p-6">
-      <div className="flex items-start gap-4">
-        <div className="p-3 rounded-lg bg-primary/10 flex-shrink-0">
-          {action.icon}
-        </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="font-semibold mb-1">{action.title}</h3>
-          <p className="text-sm text-muted-foreground mb-4">
-            {action.description}
-          </p>
-          <Button asChild variant={action.variant}>
-            <Link href={action.href}>
-              {action.title}
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
+    <>
+      <div className="rounded-lg border bg-card p-6">
+        <div className="flex items-start gap-4">
+          <div className="p-3 rounded-lg bg-primary/10 flex-shrink-0">
+            {action.icon}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold mb-1">{action.title}</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              {action.description}
+            </p>
+            {action.action === 'review-link-modal' ? (
+              <Button variant={action.variant} onClick={() => setModalOpen(true)}>
+                {action.title}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            ) : (
+              <Button asChild variant={action.variant}>
+                <Link href={action.href!}>
+                  {action.title}
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+
+      <ReviewLinkModal open={modalOpen} onOpenChange={setModalOpen} />
+    </>
   )
 }
