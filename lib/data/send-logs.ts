@@ -178,6 +178,53 @@ export async function getContactSendStats(contactId: string): Promise<{
 }
 
 /**
+ * Get response rate for the current user's business.
+ * Returns the percentage of delivered review requests that received a response.
+ */
+export async function getResponseRate(): Promise<{
+  total: number
+  responded: number
+  rate: number
+}> {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return { total: 0, responded: 0, rate: 0 }
+  }
+
+  const { data: business } = await supabase
+    .from('businesses')
+    .select('id')
+    .eq('user_id', user.id)
+    .single()
+
+  if (!business) {
+    return { total: 0, responded: 0, rate: 0 }
+  }
+
+  // Count total sends that actually reached the contact
+  const { count: totalCount } = await supabase
+    .from('send_logs')
+    .select('*', { count: 'exact', head: true })
+    .eq('business_id', business.id)
+    .in('status', ['sent', 'delivered', 'opened'])
+
+  // Count sends where the contact responded (reviewed_at is set)
+  const { count: respondedCount } = await supabase
+    .from('send_logs')
+    .select('*', { count: 'exact', head: true })
+    .eq('business_id', business.id)
+    .not('reviewed_at', 'is', null)
+
+  const total = totalCount || 0
+  const responded = respondedCount || 0
+  const rate = total > 0 ? Math.round((responded / total) * 100) : 0
+
+  return { total, responded, rate }
+}
+
+/**
  * Get contacts whose cooldown has expired and are ready to re-send.
  * Returns contacts that:
  * - Belong to the specified business
