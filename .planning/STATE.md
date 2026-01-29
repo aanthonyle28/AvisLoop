@@ -1,15 +1,15 @@
 # Project State
 
-**Last updated:** 2026-01-28T19:44:36Z
+**Last updated:** 2026-01-29T01:52:59Z
 
 ## Current Position
 
 **Phase:** 11 of 12 (Bulk Send & Resend Integrations)
-**Plan:** 2 of 5 (In progress)
+**Plan:** 3 of 5 (In progress)
 **Status:** In progress
-**Last activity:** 2026-01-28 - Completed 11-02-PLAN.md (Webhook API & Authentication)
+**Last activity:** 2026-01-29 - Completed 11-03-PLAN.md (Batch Send UI)
 
-**Progress:** [██████████░] ~98% (47/51 plans complete)
+**Progress:** [██████████░] ~98% (48/51 plans complete)
 
 ```
 Phase 01: ██████ Foundation & Auth (6/6 complete)
@@ -25,7 +25,7 @@ Phase 08: ██ Public Pages (2/2 complete)
 Phase 8.1: ██ Code Review Fixes (2/2 complete)
 Phase 09: ████ Polish & UX (4/4 complete)
 Phase 10: █████ Landing Page Redesign (5/5 complete)
-Phase 11: ██░░░ Bulk Send & Resend (2/5 complete) <- IN PROGRESS
+Phase 11: ███░░ Bulk Send & Resend (3/5 complete) <- IN PROGRESS
 ```
 
 ## What's Been Built
@@ -61,6 +61,7 @@ Phase 11: ██░░░ Bulk Send & Resend (2/5 complete) <- IN PROGRESS
 ### Phase 11 - Bulk Send & Resend Integrations (In Progress)
 - **11-01:** Batch send backend, validation schema, re-send ready query (Complete)
 - **11-02:** Webhook API with API key auth, rate limiting, Settings UI (Complete)
+- **11-03:** Multi-select contact UI, batch results display, re-send filter (Complete)
 
 ## Tech Stack
 
@@ -98,6 +99,9 @@ Phase 11: ██░░░ Bulk Send & Resend (2/5 complete) <- IN PROGRESS
 - **API key authentication with scrypt hashing** <- NEW (11-02)
 - **Webhook rate limiting (60/min per key)** <- NEW (11-02)
 - **Contact deduplication via upsert** <- NEW (11-02)
+- **Set<string> for multi-select state management** <- NEW (11-03)
+- **Filter mode toggle pattern for categorization** <- NEW (11-03)
+- **Expandable details panel pattern** <- NEW (11-03)
 
 ## Decisions Made
 
@@ -138,6 +142,10 @@ Phase 11: ██░░░ Bulk Send & Resend (2/5 complete) <- IN PROGRESS
 | API-002 | Linear scan for API key verification | 11-02 | Acceptable for MVP with small number of businesses |
 | WEBHOOK-001 | 60 requests/minute rate limit | 11-02 | Allows batch operations while preventing abuse |
 | WEBHOOK-002 | Upsert contacts by business_id + email | 11-02 | Automatic deduplication prevents duplicates from repeated webhook calls |
+| UI-001 | Set<string> for multi-select state | 11-03 | Efficient membership checks, natural deduplication, clean state management |
+| UI-002 | Filter mode toggle pattern | 11-03 | Clear categorical filtering with count badges, intuitive UX |
+| UI-003 | Batch action for all sends | 11-03 | Single code path simplifies maintenance, even for 1-contact sends |
+| UI-004 | Expandable details in results | 11-03 | At-a-glance success metrics first, debugging details on demand |
 
 ## Key Files
 
@@ -191,6 +199,9 @@ Phase 11: ██░░░ Bulk Send & Resend (2/5 complete) <- IN PROGRESS
 - `lib/validations/webhook.ts` - Webhook contact schema
 - `app/api/webhooks/contacts/route.ts` - Webhook endpoint
 - `components/settings/integrations-section.tsx` - API key management UI
+- `components/send/contact-selector.tsx` - Multi-select with checkboxes, filter modes, 25-cap
+- `components/send/batch-results.tsx` - Summary cards and expandable details for batch outcomes
+- `components/send/send-form.tsx` - Batch-aware send form with preview and results
 
 ### Billing
 - `lib/constants/billing.ts` - Tier definitions
@@ -203,18 +214,34 @@ Phase 11: ██░░░ Bulk Send & Resend (2/5 complete) <- IN PROGRESS
 
 ## Next Steps
 
-1. **Plan 11-03** - Batch send UI components (contact selector, results display)
-2. **Plan 11-04** - Re-send ready UI integration
-3. **Plan 11-05** - Resend webhook enhancements or email template improvements
+1. **Plan 11-04** - Next plan in Bulk Send & Resend phase
+2. **Plan 11-05** - Continue Bulk Send & Resend phase
+3. Future phases as planned
 
 ## Session Continuity
 
-**Last session:** 2026-01-28T19:44:36Z
-**Stopped at:** Completed 11-02-PLAN.md (Webhook API & Authentication)
+**Last session:** 2026-01-29T01:52:59Z
+**Stopped at:** Completed 11-03-PLAN.md (Batch Send UI)
 **Resume file:** None
-**Next action:** Execute plan 11-03
+**Next action:** Continue Phase 11 with plan 11-04
 
 ## Notes
+
+### Phase 11-03 Execution
+- Very fast execution, ~4 minutes
+- Refactored ContactSelector to multi-select with Set<string> state
+- Added filter mode toggle: "All Contacts" vs "Ready to Re-send"
+- Checkbox-based selection with 25-cap enforcement
+- Select-all with indeterminate state for partial selection
+- Created BatchResults component with summary cards (sent/skipped/failed)
+- Expandable details panel showing per-contact status
+- Updated SendForm to use batchSendReviewRequest for all sends
+- Pre-send summary shows count and template
+- Results display with "Send More" reset button
+- Updated send page to fetch resend-ready contacts
+- Badge hierarchy: ready-to-resend > cooldown > never-sent > send-count
+- No deviations - plan executed exactly as written
+- All verification passing (lint, typecheck)
 
 ### Phase 11-02 Execution
 - Fast execution, ~3 minutes
