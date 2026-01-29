@@ -49,12 +49,13 @@ export function ForgotPasswordForm({
             <form action={formAction}>
               <div className="flex flex-col gap-6">
                 <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="forgot-email">Email</Label>
                   <Input
-                    id="email"
+                    id="forgot-email"
                     name="email"
                     type="email"
                     placeholder="m@example.com"
+                    aria-label="Email address"
                     required
                   />
                   {state?.fieldErrors?.email && (

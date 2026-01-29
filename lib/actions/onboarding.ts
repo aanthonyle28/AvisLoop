@@ -33,8 +33,9 @@ export async function markOnboardingComplete(): Promise<{
     return { success: false, error: error.message }
   }
 
-  // Revalidate dashboard to refresh onboarding status
+  // Revalidate dashboard and onboarding to refresh status
   revalidatePath('/dashboard')
+  revalidatePath('/onboarding')
 
   return { success: true }
 }

@@ -73,7 +73,7 @@ export function AddContactSheet({ open, onOpenChange }: AddContactSheetProps) {
           )}
 
           {/* Add Contact Form */}
-          <form ref={formRef} action={formAction} className="space-y-4">
+          <form ref={formRef} action={formAction} noValidate className="space-y-4">
             <div className="grid gap-2">
               <Label htmlFor="add-name">Name</Label>
               <Input

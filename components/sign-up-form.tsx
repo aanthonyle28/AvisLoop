@@ -32,9 +32,9 @@ export function SignUpForm({
           <form action={formAction}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
-                <Label htmlFor="fullName">Full Name (optional)</Label>
+                <Label htmlFor="signup-fullName">Full Name (optional)</Label>
                 <Input
-                  id="fullName"
+                  id="signup-fullName"
                   name="fullName"
                   type="text"
                   placeholder="John Doe"
@@ -44,12 +44,13 @@ export function SignUpForm({
                 )}
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="signup-email">Email</Label>
                 <Input
-                  id="email"
+                  id="signup-email"
                   name="email"
                   type="email"
                   placeholder="m@example.com"
+                  aria-label="Email address"
                   required
                 />
                 {state?.fieldErrors?.email && (
@@ -57,9 +58,9 @@ export function SignUpForm({
                 )}
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="signup-password">Password</Label>
                 <Input
-                  id="password"
+                  id="signup-password"
                   name="password"
                   type="password"
                   required

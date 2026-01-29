@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState, useEffect } from "react";
 import { signIn, type AuthActionState } from "@/lib/actions/auth";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,14 @@ export function LoginForm({
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   const [state, formAction, pending] = useActionState<AuthActionState | null, FormData>(signIn, null);
+  const [dismissed, setDismissed] = useState(false);
+
+  // Reset dismissed state when a new error arrives
+  useEffect(() => {
+    setDismissed(false);
+  }, [state]);
+
+  const showError = state?.error && !dismissed;
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -34,12 +42,13 @@ export function LoginForm({
           <form action={formAction}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="login-email">Email</Label>
                 <Input
-                  id="email"
+                  id="login-email"
                   name="email"
                   type="email"
                   placeholder="m@example.com"
+                  aria-label="Email address"
                   required
                 />
                 {state?.fieldErrors?.email && (
@@ -48,7 +57,7 @@ export function LoginForm({
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="login-password">Password</Label>
                   <Link
                     href="/auth/forgot-password"
                     className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
@@ -57,7 +66,7 @@ export function LoginForm({
                   </Link>
                 </div>
                 <Input
-                  id="password"
+                  id="login-password"
                   name="password"
                   type="password"
                   required
@@ -66,7 +75,16 @@ export function LoginForm({
                   <p className="text-sm text-red-500">{state.fieldErrors.password[0]}</p>
                 )}
               </div>
-              {state?.error && <p className="text-sm text-red-500">{state.error}</p>}
+              {showError && (
+                <button
+                  type="button"
+                  className="text-sm text-red-500 hover:text-red-700 text-left"
+                  onClick={() => setDismissed(true)}
+                  aria-label="Dismiss error"
+                >
+                  {state.error}
+                </button>
+              )}
               <Button type="submit" className="w-full" disabled={pending}>
                 {pending ? "Logging in..." : "Login"}
               </Button>

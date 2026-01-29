@@ -35,15 +35,22 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Redirect unauthenticated users trying to access protected routes
-  if (!user && request.nextUrl.pathname.startsWith("/dashboard")) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    return NextResponse.redirect(url);
-  }
+  // Protected routes that require authentication
+  const protectedPaths = [
+    "/dashboard",
+    "/protected",
+    "/contacts",
+    "/send",
+    "/history",
+    "/billing",
+    "/onboarding",
+  ];
 
-  // Also protect /protected routes (from template)
-  if (!user && request.nextUrl.pathname.startsWith("/protected")) {
+  // Redirect unauthenticated users trying to access protected routes
+  if (
+    !user &&
+    protectedPaths.some((path) => request.nextUrl.pathname.startsWith(path))
+  ) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);

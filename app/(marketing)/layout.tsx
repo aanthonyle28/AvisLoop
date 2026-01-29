@@ -1,15 +1,13 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { UserMenu } from "@/components/marketing/user-menu";
+import { MobileNav } from "@/components/marketing/mobile-nav";
 import { createClient } from "@/lib/supabase/server";
 import { Star } from "lucide-react";
 
-export default async function MarketingLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+async function AuthButtons() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -22,6 +20,25 @@ export default async function MarketingLayout({
       }
     : null;
 
+  return userMenuData ? (
+    <UserMenu user={userMenuData} />
+  ) : (
+    <>
+      <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex">
+        <Link href="/auth/login">Log in</Link>
+      </Button>
+      <Button size="sm" asChild>
+        <Link href="/auth/sign-up">Start Free</Link>
+      </Button>
+    </>
+  );
+}
+
+export default function MarketingLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navbar */}
@@ -48,21 +65,17 @@ export default async function MarketingLayout({
             </div>
           </div>
 
-          {/* Right side: theme switcher and auth/user menu */}
+          {/* Right side: theme switcher, mobile nav, and auth/user menu */}
           <div className="flex items-center gap-3">
             <ThemeSwitcher />
-            {userMenuData ? (
-              <UserMenu user={userMenuData} />
-            ) : (
-              <>
-                <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex">
-                  <Link href="/auth/login">Log in</Link>
-                </Button>
-                <Button size="sm" asChild>
-                  <Link href="/auth/sign-up">Start Free</Link>
-                </Button>
-              </>
-            )}
+            <Suspense fallback={
+              <Button size="sm" asChild>
+                <Link href="/auth/sign-up">Start Free</Link>
+              </Button>
+            }>
+              <AuthButtons />
+            </Suspense>
+            <MobileNav />
           </div>
         </div>
       </nav>
