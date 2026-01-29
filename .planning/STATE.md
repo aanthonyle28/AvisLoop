@@ -1,15 +1,15 @@
 # Project State
 
-**Last updated:** 2026-01-28T08:52:30Z
+**Last updated:** 2026-01-28T19:43:58Z
 
 ## Current Position
 
-**Phase:** 10 of 12 (Landing Page Redesign)
-**Plan:** 5 of 5 (Complete)
-**Status:** Phase complete
-**Last activity:** 2026-01-28 - Completed 10-05-PLAN.md (Testimonials & CTA Simplification)
+**Phase:** 11 of 12 (Bulk Send & Resend Integrations)
+**Plan:** 1 of 5 (In progress)
+**Status:** In progress
+**Last activity:** 2026-01-28 - Completed 11-01-PLAN.md (Batch Send Backend)
 
-**Progress:** [██████████░] ~98% (45/46 plans complete)
+**Progress:** [██████████░] ~98% (46/51 plans complete)
 
 ```
 Phase 01: ██████ Foundation & Auth (6/6 complete)
@@ -24,7 +24,8 @@ Phase 07: ████ Onboarding Flow (4/4 complete)
 Phase 08: ██ Public Pages (2/2 complete)
 Phase 8.1: ██ Code Review Fixes (2/2 complete)
 Phase 09: ████ Polish & UX (4/4 complete)
-Phase 10: █████ Landing Page Redesign (5/5 complete) <- COMPLETE
+Phase 10: █████ Landing Page Redesign (5/5 complete)
+Phase 11: █░░░░ Bulk Send & Resend (1/5 complete) <- IN PROGRESS
 ```
 
 ## What's Been Built
@@ -57,6 +58,9 @@ Phase 10: █████ Landing Page Redesign (5/5 complete) <- COMPLETE
 - **10-04:** Feature sections (alternating layouts, 3 core features)
 - **10-05:** Testimonials (minimal quote format), CTA (clean), FAQ (6 items)
 
+### Phase 11 - Bulk Send & Resend Integrations (In Progress)
+- **11-01:** Batch send backend, validation schema, re-send ready query (Complete)
+
 ## Tech Stack
 
 ### Core
@@ -86,8 +90,10 @@ Phase 10: █████ Landing Page Redesign (5/5 complete) <- COMPLETE
 - motion-safe prefix for animations
 - InteractiveCard vs static Card distinction
 - 200ms transition timing for consistency
-- **Minimal testimonial format (quote + author only)** <- NEW
-- **Anchor navigation with scroll-mt-20** <- NEW
+- Minimal testimonial format (quote + author only)
+- Anchor navigation with scroll-mt-20
+- **Batch processing: single query + memory categorization** <- NEW
+- **Structured action responses with details arrays** <- NEW
 
 ## Decisions Made
 
@@ -121,6 +127,9 @@ Phase 10: █████ Landing Page Redesign (5/5 complete) <- COMPLETE
 | SEND-001 | Resend for email delivery | 04 | Developer experience, reliability |
 | RATE-001 | Upstash Redis for rate limiting | 04 | Serverless, global edge caching |
 | TIER-001 | Three-tier pricing (Free/Pro/Enterprise) | 06 | Standard SaaS model |
+| BATCH-001 | 25 contact batch limit | 11-01 | Balance bulk efficiency with quota management |
+| BATCH-002 | No rate limit on batch sends | 11-01 | Batch has its own 25-cap control, rate limit unnecessary |
+| BATCH-003 | Quota check before starting batch | 11-01 | Fail fast if entire batch won't fit in remaining quota |
 
 ## Key Files
 
@@ -164,6 +173,9 @@ Phase 10: █████ Landing Page Redesign (5/5 complete) <- COMPLETE
 - `app/dashboard/send/*` - Send page
 - `app/api/resend/webhook/*` - Delivery webhooks
 - `lib/resend.ts` - Email service
+- `lib/actions/send.ts` - Single and batch send actions
+- `lib/data/send-logs.ts` - Send history queries, re-send ready contacts
+- `lib/validations/send.ts` - Send request validation schemas
 
 ### Billing
 - `lib/constants/billing.ts` - Tier definitions
@@ -172,30 +184,36 @@ Phase 10: █████ Landing Page Redesign (5/5 complete) <- COMPLETE
 
 ## Blockers & Concerns
 
-**None** - Phase 10 complete.
+**None**
 
 ## Next Steps
 
-1. **Phase 10 complete** - Landing page redesign finished
-2. Move to Phase 11 (Analytics Dashboard or Review Integrations)
-3. Then Phase 12 (Production Ready)
+1. **Plan 11-02** - Batch send UI components (contact selector, results display)
+2. **Plan 11-03** - Re-send ready UI integration
+3. **Plan 11-04** - Resend webhook enhancements
+4. **Plan 11-05** - Email templates with dynamic merge fields
 
 ## Session Continuity
 
-**Last session:** 2026-01-28T08:52:30Z
-**Stopped at:** Completed 10-05-PLAN.md (Phase 10 complete)
+**Last session:** 2026-01-28T19:43:58Z
+**Stopped at:** Completed 11-01-PLAN.md
 **Resume file:** None
-**Next action:** Start next phase planning
+**Next action:** Execute plan 11-02 (Batch Send UI)
 
 ## Notes
 
-### Phase 10-05 Execution
-- Fast execution, ~4 minutes
-- Simplified testimonials: removed cards, stars, quote icons, avatars
-- Simplified CTA: removed gradient, decorative circles, benefit list
-- Updated FAQ: reduced from 8 to 6 items, lighter borders
-- Reordered page sections: Features now before Stats
-- Added anchor IDs: #features, #testimonials (already has #faq)
+### Phase 11-01 Execution
+- Fast execution, ~3 minutes
+- Updated batchSendSchema: max 25 contacts (down from 50)
+- Added customSubject field to batch schema
+- Created getResendReadyContacts query (returns contacts past 14-day cooldown)
+- Implemented batchSendReviewRequest server action:
+  - Quota check before starting (full batch must fit)
+  - Single query fetches all contacts
+  - Memory categorization: eligible vs skipped
+  - Individual error handling per contact
+  - Structured response with sent/skipped/failed counts + details
+- No rate limit on batch sends (intentional - batch has 25-cap control)
 - No deviations - plan executed exactly as written
 - All verification passing (lint, typecheck)
 
@@ -211,5 +229,3 @@ Landing page redesign finished. Marketing pages now have:
 - Streamlined FAQ (6 items)
 - Clean CTA section
 - Anchor navigation for all major sections
-
-Ready for production review and screenshot integration.
