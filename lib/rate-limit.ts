@@ -48,3 +48,41 @@ export async function checkSendRateLimit(userId: string): Promise<{
     remaining: result.remaining,
   }
 }
+
+/**
+ * Per-API-key rate limit for webhook endpoints.
+ * Allows 60 requests per minute to prevent abuse.
+ * Returns { success: true } if not configured (dev mode bypass).
+ */
+export const webhookRatelimit = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(60, '1 m'),
+      prefix: 'ratelimit:webhook',
+    })
+  : null
+
+/**
+ * Check rate limit for webhook API key.
+ * Returns rate limit details including remaining count, limit, and reset time.
+ * Bypasses in development if Upstash not configured.
+ */
+export async function checkWebhookRateLimit(identifier: string): Promise<{
+  success: boolean
+  remaining: number
+  limit: number
+  reset: number
+}> {
+  if (!webhookRatelimit) {
+    // No rate limiting configured - allow all requests (dev mode)
+    return { success: true, remaining: 999, limit: 60, reset: 0 }
+  }
+
+  const result = await webhookRatelimit.limit(identifier)
+  return {
+    success: result.success,
+    remaining: result.remaining,
+    limit: result.limit,
+    reset: result.reset,
+  }
+}
