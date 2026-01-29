@@ -4,10 +4,11 @@ import { getOnboardingStatus } from '@/lib/data/onboarding'
 import { OnboardingChecklist } from '@/components/dashboard/onboarding-checklist'
 import { NextActionCard } from '@/components/dashboard/next-action-card'
 import { getBusiness } from '@/lib/actions/business'
-import { getMonthlyUsage } from '@/lib/data/send-logs'
+import { getMonthlyUsage, getResponseRate } from '@/lib/data/send-logs'
 import { getContacts } from '@/lib/actions/contact'
 import Link from 'next/link'
 import { CheckCircle2, Users, Send } from 'lucide-react'
+import { ResponseRateCard } from '@/components/dashboard/response-rate-card'
 
 /**
  * Dashboard page - main hub for authenticated users.
@@ -29,11 +30,12 @@ export default async function DashboardPage({
   }
 
   // Fetch data in parallel
-  const [status, business, usage, contactsData] = await Promise.all([
+  const [status, business, usage, contactsData, responseRate] = await Promise.all([
     getOnboardingStatus(),
     getBusiness(),
     getMonthlyUsage(),
     getContacts({ limit: 1 }), // Just need the count
+    getResponseRate(),
   ])
 
   const params = await searchParams
@@ -119,6 +121,9 @@ export default async function DashboardPage({
                 Manage contacts
               </Link>
             </div>
+
+            {/* Response Rate */}
+            <ResponseRateCard {...responseRate} />
           </div>
 
           {/* No business prompt */}
