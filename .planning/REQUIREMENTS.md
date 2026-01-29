@@ -80,6 +80,35 @@
 - [x] **PAGE-03**: Login page for returning users
 - [x] **PAGE-04**: Signup page for new users
 
+## v1.1 Requirements
+
+Requirements for Scheduled Sending milestone. Each maps to roadmap phases.
+
+### Scheduling
+
+- [ ] **SCHED-01**: User can schedule a review request for future delivery using presets (In 1 hour, Next morning, In 24 hours)
+- [ ] **SCHED-02**: User can schedule a review request for a custom date and time
+- [ ] **SCHED-03**: User sees confirmation with scheduled time after scheduling
+
+### Management
+
+- [ ] **MGMT-01**: User can view a list of all scheduled sends with status and send time
+- [ ] **MGMT-02**: User can cancel a pending scheduled send
+- [ ] **MGMT-03**: User can see partial send results (sent/skipped/failed counts) after processing
+- [ ] **MGMT-04**: User can reschedule multiple pending sends to a different time
+
+### Processing
+
+- [ ] **PROC-01**: Cron endpoint processes due scheduled sends every minute
+- [ ] **PROC-02**: System re-validates business rules (opt-out, cooldown, quota) at send time
+- [ ] **PROC-03**: Service role client bypasses RLS for cron operations
+- [ ] **PROC-04**: Cron endpoint logs structured output for each run
+
+### Navigation
+
+- [ ] **NAV-01**: Sidebar and mobile nav include Scheduled sends link
+- [ ] **NAV-02**: Dashboard shows count of pending scheduled sends
+
 ## v2 Requirements
 
 Deferred to future release. Tracked but not in current roadmap.
@@ -128,6 +157,11 @@ Explicitly excluded. Documented to prevent scope creep.
 | QR codes/NFC cards | Physical channel not in scope |
 | Review widgets | Website embedding not in scope |
 | SMS channel | Email first for v1, SMS in v2 |
+| Recipient timezone detection | Send at contact's local 9am; requires timezone field + DST handling, very complex |
+| Recurring scheduled sends | Review requests are one-time; recurring adds complexity |
+| Priority queue | Review requests don't have urgency tiers; FIFO sufficient |
+| Randomized send times | Nice-to-have but adds complexity; defer to future |
+| Health check endpoint | Structured logging sufficient for v1.1; add if monitoring gaps emerge |
 
 ## Traceability
 
@@ -195,11 +229,26 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INTG-02 | Phase 11 | Complete |
 | INTG-03 | Phase 11 | Complete |
 
+| SCHED-01 | Phase TBD | Pending |
+| SCHED-02 | Phase TBD | Pending |
+| SCHED-03 | Phase TBD | Pending |
+| MGMT-01 | Phase TBD | Pending |
+| MGMT-02 | Phase TBD | Pending |
+| MGMT-03 | Phase TBD | Pending |
+| MGMT-04 | Phase TBD | Pending |
+| PROC-01 | Phase TBD | Pending |
+| PROC-02 | Phase TBD | Pending |
+| PROC-03 | Phase TBD | Pending |
+| PROC-04 | Phase TBD | Pending |
+| NAV-01 | Phase TBD | Pending |
+| NAV-02 | Phase TBD | Pending |
+
 **Coverage:**
-- v1 requirements: 52 total
-- Mapped to phases: 52
-- Unmapped: 0
+- v1 requirements: 52 total (all complete)
+- v1.1 requirements: 13 total
+- Mapped to phases: 52 (v1.1 pending roadmap)
+- Unmapped: 13 (v1.1 — awaiting roadmap)
 
 ---
 *Requirements defined: 2026-01-25*
-*Last updated: 2026-01-25 after roadmap creation*
+*Last updated: 2026-01-28 after v1.1 requirements defined*
