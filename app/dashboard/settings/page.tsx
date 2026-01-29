@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { BusinessSettingsForm } from '@/components/business-settings-form'
 import { EmailTemplateForm } from '@/components/email-template-form'
 import { TemplateList } from '@/components/template-list'
+import { IntegrationsSection } from '@/components/settings/integrations-section'
 import type { EmailTemplate } from '@/lib/types/database'
 
 // Loading skeleton for settings content
@@ -105,6 +106,15 @@ async function SettingsContent() {
             Save your business profile above before creating custom templates.
           </p>
         )}
+      </section>
+
+      {/* Section 3: Integrations */}
+      <section className="border rounded-lg p-6 bg-white shadow-sm">
+        <h2 className="text-xl font-semibold mb-4">Integrations</h2>
+        <p className="text-gray-600 mb-4">
+          Connect external tools like Zapier or Make to automatically add contacts.
+        </p>
+        <IntegrationsSection hasExistingKey={!!business?.api_key_hash} />
       </section>
     </div>
   )
