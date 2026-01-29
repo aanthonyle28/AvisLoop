@@ -186,10 +186,18 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PAGE-02 | Phase 8 | Complete |
 | PAGE-03 | Phase 8 | Complete |
 | PAGE-04 | Phase 8 | Complete |
+| BULK-01 | Phase 11 | Complete |
+| BULK-02 | Phase 11 | Complete |
+| BULK-03 | Phase 11 | Complete |
+| RESEND-01 | Phase 11 | Complete |
+| RESEND-02 | Phase 11 | Complete |
+| INTG-01 | Phase 11 | Complete |
+| INTG-02 | Phase 11 | Complete |
+| INTG-03 | Phase 11 | Complete |
 
 **Coverage:**
-- v1 requirements: 44 total
-- Mapped to phases: 44
+- v1 requirements: 52 total
+- Mapped to phases: 52
 - Unmapped: 0
 
 ---
