@@ -176,3 +176,44 @@ export async function getContactSendStats(contactId: string): Promise<{
     cooldownEnds,
   }
 }
+
+/**
+ * Get contacts whose cooldown has expired and are ready to re-send.
+ * Returns contacts that:
+ * - Belong to the specified business
+ * - Are active (not archived)
+ * - Have not opted out
+ * - Have been sent to before (last_sent_at is not null)
+ * - Cooldown period has expired (last_sent_at < now - COOLDOWN_DAYS)
+ */
+export async function getResendReadyContacts(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  businessId: string
+): Promise<Array<{
+  id: string
+  name: string
+  email: string
+  last_sent_at: string
+  send_count: number
+}>> {
+  // Calculate cooldown cutoff date
+  const cooldownDate = new Date()
+  cooldownDate.setDate(cooldownDate.getDate() - COOLDOWN_DAYS)
+
+  const { data, error } = await supabase
+    .from('contacts')
+    .select('id, name, email, last_sent_at, send_count')
+    .eq('business_id', businessId)
+    .eq('status', 'active')
+    .eq('opted_out', false)
+    .not('last_sent_at', 'is', null)
+    .lt('last_sent_at', cooldownDate.toISOString())
+    .order('last_sent_at', { ascending: true })
+
+  if (error) {
+    console.error('Error fetching resend ready contacts:', error)
+    return []
+  }
+
+  return data || []
+}

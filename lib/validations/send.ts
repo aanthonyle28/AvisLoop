@@ -16,8 +16,9 @@ export const sendRequestSchema = z.object({
  * Schema for batch send (future use).
  */
 export const batchSendSchema = z.object({
-  contactIds: z.array(z.string().uuid()).min(1, 'Select at least one contact').max(50, 'Maximum 50 contacts per batch'),
+  contactIds: z.array(z.string().uuid()).min(1, 'Select at least one contact').max(25, 'Maximum 25 contacts per batch'),
   templateId: z.string().uuid('Invalid template ID').optional(),
+  customSubject: z.string().min(1, 'Subject is required').max(200, 'Subject too long').optional(),
 })
 
 export type SendRequest = z.infer<typeof sendRequestSchema>
