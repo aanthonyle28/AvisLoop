@@ -63,11 +63,11 @@ export function NeedsAttentionCard({ total, pending, failed }: NeedsAttentionCar
 
       <div className="flex items-center gap-3">
         <div className="inline-flex items-center gap-1.5 text-xs">
-          <div className="w-2 h-2 rounded-full bg-status-warning" />
+          <div className="w-2 h-2 rounded-full bg-status-clicked-text" />
           <span>{pending.toLocaleString()} Pending</span>
         </div>
         <div className="inline-flex items-center gap-1.5 text-xs">
-          <div className="w-2 h-2 rounded-full bg-status-error" />
+          <div className="w-2 h-2 rounded-full bg-status-failed-text" />
           <span>{failed.toLocaleString()} Failed</span>
         </div>
       </div>

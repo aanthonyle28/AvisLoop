@@ -1,6 +1,15 @@
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { AvatarInitials } from './avatar-initials'
+import {
+  ClockCountdown,
+  CheckCircle,
+  Sparkle,
+  XCircle,
+  Star,
+  ArrowRight,
+  ListBullets,
+} from '@phosphor-icons/react/dist/ssr'
 
 interface RecentActivityProps {
   activities: Array<{
@@ -14,24 +23,80 @@ interface RecentActivityProps {
 }
 
 const STATUS_CONFIG = {
-  pending: { color: 'bg-status-warning', label: 'Pending' },
-  sent: { color: 'bg-status-info', label: 'Sent' },
-  delivered: { color: 'bg-status-success', label: 'Delivered' },
-  opened: { color: 'bg-status-info', label: 'Clicked' },
-  failed: { color: 'bg-status-error', label: 'Failed' },
-  bounced: { color: 'bg-status-error', label: 'Failed' },
-  complained: { color: 'bg-status-error', label: 'Failed' },
-  reviewed: { color: 'bg-status-reviewed', label: 'Reviewed' },
+  pending: {
+    bgColor: 'bg-status-pending-bg',
+    textColor: 'text-status-pending-text',
+    icon: ClockCountdown,
+    label: 'Pending',
+  },
+  sent: {
+    bgColor: 'bg-status-delivered-bg',
+    textColor: 'text-status-delivered-text',
+    icon: CheckCircle,
+    label: 'Sent',
+  },
+  delivered: {
+    bgColor: 'bg-status-delivered-bg',
+    textColor: 'text-status-delivered-text',
+    icon: CheckCircle,
+    label: 'Delivered',
+  },
+  opened: {
+    bgColor: 'bg-status-clicked-bg',
+    textColor: 'text-status-clicked-text',
+    icon: Sparkle,
+    label: 'Clicked',
+  },
+  failed: {
+    bgColor: 'bg-status-failed-bg',
+    textColor: 'text-status-failed-text',
+    icon: XCircle,
+    label: 'Failed',
+  },
+  bounced: {
+    bgColor: 'bg-status-failed-bg',
+    textColor: 'text-status-failed-text',
+    icon: XCircle,
+    label: 'Failed',
+  },
+  complained: {
+    bgColor: 'bg-status-failed-bg',
+    textColor: 'text-status-failed-text',
+    icon: XCircle,
+    label: 'Failed',
+  },
+  reviewed: {
+    bgColor: 'bg-status-reviewed-bg',
+    textColor: 'text-status-reviewed-text',
+    icon: Star,
+    label: 'Reviewed',
+  },
 } as const
+
+function StatusBadge({ status }: { status: string }) {
+  const config = STATUS_CONFIG[status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG.pending
+  const Icon = config.icon
+
+  return (
+    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${config.bgColor} ${config.textColor}`}>
+      <Icon size={12} weight="bold" />
+      {config.label}
+    </span>
+  )
+}
 
 export function RecentActivityTable({ activities }: RecentActivityProps) {
   if (activities.length === 0) {
     return (
       <div className="bg-white border border-[#E3E3E3] rounded-lg overflow-hidden">
         <div className="flex items-center justify-between px-5 pt-5 pb-3">
-          <h3 className="font-semibold text-base">Recent activity</h3>
-          <Link href="/history" className="text-sm text-primary hover:underline">
+          <div className="flex items-center gap-2">
+            <ListBullets size={18} weight="bold" className="text-foreground" />
+            <h3 className="font-semibold text-base">Recent Activity</h3>
+          </div>
+          <Link href="/history" className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
             View All
+            <ArrowRight size={14} weight="bold" />
           </Link>
         </div>
         <div className="px-5 py-12 text-center text-muted-foreground">
@@ -47,9 +112,13 @@ export function RecentActivityTable({ activities }: RecentActivityProps) {
   return (
     <div className="bg-white border border-[#E3E3E3] rounded-lg overflow-hidden">
       <div className="flex items-center justify-between px-5 pt-5 pb-3">
-        <h3 className="font-semibold text-base">Recent activity</h3>
-        <Link href="/history" className="text-sm text-primary hover:underline">
+        <div className="flex items-center gap-2">
+          <ListBullets size={18} weight="bold" className="text-foreground" />
+          <h3 className="font-semibold text-base">Recent Activity</h3>
+        </div>
+        <Link href="/history" className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
           View All
+          <ArrowRight size={14} weight="bold" />
         </Link>
       </div>
 
@@ -73,7 +142,6 @@ export function RecentActivityTable({ activities }: RecentActivityProps) {
           </thead>
           <tbody>
             {activities.map((activity, index) => {
-              const statusConfig = STATUS_CONFIG[activity.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG.pending
               const isLast = index === activities.length - 1
 
               return (
@@ -96,10 +164,7 @@ export function RecentActivityTable({ activities }: RecentActivityProps) {
                     </div>
                   </td>
                   <td className="px-5 py-4">
-                    <div className="flex items-center gap-1.5">
-                      <div className={`w-2 h-2 rounded-full ${statusConfig.color}`} />
-                      <span className="text-sm">{statusConfig.label}</span>
-                    </div>
+                    <StatusBadge status={activity.status} />
                   </td>
                   <td className="px-5 py-4">
                     <div className="text-sm text-muted-foreground">

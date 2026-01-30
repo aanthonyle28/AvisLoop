@@ -30,11 +30,16 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --status-success: 142 71% 45%;
-    --status-warning: 38 92% 50%;
-    --status-error: 0 84% 60%;
-    --status-info: 217 91% 60%;
-    --status-reviewed: 270 50% 55%;
+    --status-pending-bg: 220 14% 96%;
+    --status-pending-text: 220 43% 11%;
+    --status-delivered-bg: 194 33% 94%;
+    --status-delivered-text: 189 57% 40%;
+    --status-clicked-bg: 54 96% 88%;
+    --status-clicked-text: 30 100% 27%;
+    --status-failed-bg: 0 100% 94%;
+    --status-failed-text: 358 100% 38%;
+    --status-reviewed-bg: 138 68% 92%;
+    --status-reviewed-text: 149 100% 25%;
     --radius: 0.5rem;
   }
   .dark {
@@ -64,11 +69,16 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --status-success: 142 71% 55%;
-    --status-warning: 38 92% 55%;
-    --status-error: 0 84% 65%;
-    --status-info: 217 91% 65%;
-    --status-reviewed: 270 50% 65%;
+    --status-pending-bg: 220 14% 20%;
+    --status-pending-text: 220 14% 80%;
+    --status-delivered-bg: 189 30% 20%;
+    --status-delivered-text: 189 57% 55%;
+    --status-clicked-bg: 40 40% 20%;
+    --status-clicked-text: 30 80% 50%;
+    --status-failed-bg: 0 40% 20%;
+    --status-failed-text: 358 80% 55%;
+    --status-reviewed-bg: 149 30% 20%;
+    --status-reviewed-text: 149 80% 45%;
   }
 }
 

@@ -23,12 +23,12 @@ Figma: `https://www.figma.com/design/IkwnYfZavbZVo1DRdwiyZG/Untitled`
 - Sidebar: white background, 1px #E2E2E2 right border, #F2F2F2 background for active nav item, blue icon for active
 - Shadows: **none** — border-only design, no box-shadows anywhere
 - Theme: light mode default, preserve dark mode toggle for users who prefer it
-- Semantic status palette (Claude defines exact hex values):
-  - Success/Delivered: green
-  - Warning/Pending: orange/yellow
-  - Error/Failed: red
-  - Info/Clicked: blue
-  - Reviewed: purple
+- Semantic status palette (updated to match Figma badges):
+  - Pending: gray (neutral bg, gray text)
+  - Delivered/Sent: blue (light blue bg, blue text)
+  - Clicked: yellow (light yellow bg, yellow text)
+  - Failed: red (light red bg, red text)
+  - Reviewed: green (light green bg, green text)
 
 ### Visual Language — Typography
 - Font family: **Kumbh Sans** (Regular 400, Medium 500, Semibold 600 only)
@@ -75,8 +75,15 @@ Figma: `https://www.figma.com/design/IkwnYfZavbZVo1DRdwiyZG/Untitled`
 - Secondary/ghost buttons get distinct treatment (Claude designs variants)
 
 ### Component Style — Status Badges
-- Colored dot + text label for each status
-- Colors match semantic palette defined above
+- Pill-shaped badges with icon + text label, color-coded background/text (no border)
+- Colors extracted from Figma SVG (`Group 735.svg`):
+  - Pending: bg `#F3F4F6`, text `#101828`, ClockCountdown icon
+  - Delivered/Sent: bg `#EAF3F6`, text `#2C879F`, CheckCircle icon
+  - Clicked: bg `#FEF9C2`, text `#894B00`, Sparkle icon
+  - Failed: bg `#FFE2E2`, text `#C10007`, XCircle icon
+  - Reviewed: bg `#DCFCE7`, text `#008236`, Star icon
+- CSS variables: `--status-{status}-bg` and `--status-{status}-text` for each status
+- Tailwind classes: `bg-status-{status}-bg text-status-{status}-text`
 
 ### Component Style — Tables
 - Clean rows with **subtle bottom borders** between rows (not borderless, not zebra-striped)

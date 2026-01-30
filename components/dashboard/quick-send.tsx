@@ -270,7 +270,7 @@ export function QuickSend({ contacts, templates, recentContacts }: QuickSendProp
       <div className="md:hidden h-px bg-[#E3E3E3]" />
 
       {/* Right panel - When to Send */}
-      <div className="w-full md:w-72 md:shrink-0 bg-[#F9F9FB] p-5">
+      <div className="w-full md:w-1/3 md:shrink-0 bg-[#F9F9FB] p-5">
         <h3 className="font-semibold text-sm mb-4">When to Send</h3>
 
         <div className="space-y-2 mb-4">

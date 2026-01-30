@@ -2,21 +2,24 @@
 
 ## Now
 - All 10 phases complete (MVP milestone done)
-- 8 post-MVP bugs fixed (middleware, onboarding, marketing layout, titles, a11y, login error, mobile nav, contact form)
+- 8 post-MVP bugs fixed
 - Landing page redesigned with new aesthetic
-- Ready for Figma redesign integration
+- Dashboard design tweaks applied (Figma alignment)
 
 ## Last session summary
-- Fixed 8 bugs from code review audit:
-  - **Bug #1 (High)**: Middleware now protects /contacts, /send, /history, /billing, /onboarding routes
-  - **Bug #2 (Medium)**: Onboarding page uses force-dynamic, revalidates path on completion
-  - **Bug #3 (Medium)**: Marketing layout auth check wrapped in Suspense boundary (fixes cookies() warning)
-  - **Bug #4 (Low)**: Root layout title changed from starter kit default to "AvisLoop" with template
-  - **Bug #5 (Low)**: Auth form input IDs made unique per form, added aria-labels to email inputs
-  - **Bug #6 (Low)**: Login error is now dismissable and login page uses force-dynamic
-  - **Bug #7 (Low)**: Added MobileNav hamburger menu component to marketing layout
-  - **Bug #8 (Info)**: Add Contact form uses noValidate so Zod server errors display in Sheet portal
-- Typecheck passes, lint clean (pre-existing warnings in dashboard/page.tsx and send-form.tsx)
+- Dashboard design tweaks to match Figma reference:
+  - **Full-width layout**: Removed max-w-6xl constraint, responsive padding (p-4/p-6/p-8)
+  - **Quick Send form**: Recently added contacts always visible (no layout shift), active/selected state on chips, "Add Contact" button next to search bar
+  - **When to Send panel**: Connected to Quick Send in same container (no gap), #F9F9FB background, divider line instead of separate card
+  - **Status badges**: Replaced dot+text with pill badges with Phosphor icons, exact Figma colors:
+    - Pending: `#F3F4F6` bg / `#101828` text (ClockCountdown icon)
+    - Delivered/Sent: `#EAF3F6` bg / `#2C879F` text (CheckCircle icon)
+    - Clicked: `#FEF9C2` bg / `#894B00` text (Sparkle icon)
+    - Failed: `#FFE2E2` bg / `#C10007` text (XCircle icon)
+    - Reviewed: `#DCFCE7` bg / `#008236` text (Star icon)
+  - **Recent Activity**: Added ListBullets icon next to heading, ArrowRight after "View All"
+  - **Design tokens**: Replaced old semantic status vars with per-status bg/text pairs (`--status-{name}-bg`, `--status-{name}-text`)
+- Typecheck passes, lint clean
 
 ## What's been built
 - **Auth**: Sign up, sign in, sign out, password reset, session persistence

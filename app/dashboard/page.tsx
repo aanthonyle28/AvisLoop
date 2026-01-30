@@ -54,7 +54,7 @@ export default async function DashboardPage() {
   const firstName = business?.name?.split(' ')[0] || user.email?.split('@')[0] || 'there'
 
   return (
-    <div className="p-6 space-y-6 max-w-6xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
       {/* 1. Welcome Header */}
       <div>
         <h1 className="text-2xl font-bold">Welcome, {firstName}!</h1>
