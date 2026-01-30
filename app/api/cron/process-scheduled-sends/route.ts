@@ -43,6 +43,12 @@ export async function GET(request: Request) {
   try {
     const supabase = createServiceRoleClient()
 
+    // === 1b. Recover stuck "processing" records (stale > 10 min) ===
+    const { data: recovered } = await supabase.rpc('recover_stuck_scheduled_sends', { stale_minutes: 10 })
+    if (recovered && (recovered as unknown[]).length > 0) {
+      console.warn(`Recovered ${(recovered as unknown[]).length} stuck scheduled sends`)
+    }
+
     // === 2. Atomically claim due scheduled sends via RPC ===
     const { data: claimedSends, error: claimError } = await supabase
       .rpc('claim_due_scheduled_sends', { limit_count: 50 })
@@ -52,7 +58,6 @@ export async function GET(request: Request) {
       return NextResponse.json({
         ok: false,
         error: 'Failed to claim scheduled sends',
-        details: claimError.message
       }, { status: 500 })
     }
 
@@ -191,10 +196,11 @@ export async function GET(request: Request) {
         let sentCount = 0
         let failedCount = 0
 
+        let runningMonthlyCount = monthlyCount || 0
+
         for (const contact of eligibleContacts) {
           // Check if we've hit quota (in case batch spans quota boundary)
-          const currentMonthly = await getMonthlyCount(supabase, business.id)
-          if ((currentMonthly.count || 0) >= monthlyLimit) {
+          if (runningMonthlyCount >= monthlyLimit) {
             skippedReasons[contact.id] = 'quota_exceeded_during_batch'
             totalSkipped++
             continue
@@ -272,6 +278,7 @@ export async function GET(request: Request) {
 
               sentCount++
               totalSent++
+              runningMonthlyCount++
             }
           } catch (err) {
             console.error(`Failed to send to contact ${contact.id}:`, err)
@@ -328,7 +335,7 @@ export async function GET(request: Request) {
     console.error('Cron handler error:', err)
     return NextResponse.json({
       ok: false,
-      error: err instanceof Error ? err.message : 'Unknown error'
+      error: 'Internal server error'
     }, { status: 500 })
   }
 }

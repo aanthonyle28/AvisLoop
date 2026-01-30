@@ -44,6 +44,7 @@ export async function middleware(request: NextRequest) {
     "/history",
     "/billing",
     "/onboarding",
+    "/scheduled",
   ];
 
   // Redirect unauthenticated users trying to access protected routes

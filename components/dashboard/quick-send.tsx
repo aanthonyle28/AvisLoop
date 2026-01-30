@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition, useMemo } from 'react'
+import { useState, useTransition, useMemo, useEffect, useRef } from 'react'
 import { PaperPlaneTilt, MagnifyingGlass, UserPlus } from '@phosphor-icons/react'
 import { batchSendReviewRequest } from '@/lib/actions/send'
 import { scheduleReviewRequest } from '@/lib/actions/schedule'
@@ -24,6 +24,20 @@ export function QuickSend({ contacts, templates, recentContacts }: QuickSendProp
   const [customDateTime, setCustomDateTime] = useState('')
   const [showDropdown, setShowDropdown] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  const formRef = useRef<HTMLFormElement>(null)
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    if (!showDropdown) return
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowDropdown(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showDropdown])
 
   // Filter contacts based on search query
   const filteredContacts = useMemo(() => {
@@ -63,11 +77,13 @@ export function QuickSend({ contacts, templates, recentContacts }: QuickSendProp
       case '1hour':
         return new Date(now + 60 * 60 * 1000).toISOString()
       case 'morning': {
-        // Next 9AM local time
-        const tomorrow = new Date()
-        tomorrow.setDate(tomorrow.getDate() + 1)
-        tomorrow.setHours(9, 0, 0, 0)
-        return tomorrow.toISOString()
+        // Next 9AM local time (today if before 9AM, tomorrow if after)
+        const target = new Date()
+        target.setHours(9, 0, 0, 0)
+        if (target.getTime() <= Date.now()) {
+          target.setDate(target.getDate() + 1)
+        }
+        return target.toISOString()
       }
       case '24hours':
         return new Date(now + 24 * 60 * 60 * 1000).toISOString()
@@ -151,7 +167,7 @@ export function QuickSend({ contacts, templates, recentContacts }: QuickSendProp
           <h3 className="font-semibold">Quick Send</h3>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
           {/* Contact search */}
           <div className="relative">
             <label htmlFor="contact-search" className="block text-sm font-medium mb-2">
@@ -205,7 +221,7 @@ export function QuickSend({ contacts, templates, recentContacts }: QuickSendProp
 
             {/* Search dropdown */}
             {showDropdown && filteredContacts.length > 0 && !selectedContact && (
-              <div className="absolute z-10 mt-1 w-full bg-white border border-[#E3E3E3] rounded-lg shadow-lg max-h-48 overflow-y-auto">
+              <div ref={dropdownRef} className="absolute z-10 mt-1 w-full bg-white border border-[#E3E3E3] rounded-lg shadow-lg max-h-48 overflow-y-auto">
                 {filteredContacts.map(contact => (
                   <button
                     key={contact.id}
@@ -313,8 +329,8 @@ export function QuickSend({ contacts, templates, recentContacts }: QuickSendProp
 
         {/* Send button */}
         <button
-          type="submit"
-          onClick={handleSubmit}
+          type="button"
+          onClick={() => formRef.current?.requestSubmit()}
           disabled={!selectedContactId || isPending}
           className="w-full bg-primary text-white rounded-lg py-3 font-medium text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors"
         >

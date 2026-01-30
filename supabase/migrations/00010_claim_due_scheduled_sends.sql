@@ -14,3 +14,14 @@ RETURNS SETOF scheduled_sends AS $$
   )
   RETURNING *;
 $$ LANGUAGE sql;
+
+-- Recover stuck "processing" records that have been claimed for more than
+-- 10 minutes without completing. This handles cron crashes / timeouts.
+CREATE OR REPLACE FUNCTION recover_stuck_scheduled_sends(stale_minutes INT DEFAULT 10)
+RETURNS SETOF scheduled_sends AS $$
+  UPDATE scheduled_sends
+  SET status = 'pending'
+  WHERE status = 'processing'
+    AND updated_at < now() - (stale_minutes || ' minutes')::interval
+  RETURNING *;
+$$ LANGUAGE sql;

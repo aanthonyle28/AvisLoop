@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { ScheduledSendWithDetails } from '@/lib/types/database'
 import { formatScheduleDate } from '@/lib/utils/schedule'
@@ -250,9 +250,8 @@ export function ScheduledTable({ sends }: ScheduledTableProps) {
                   </thead>
                   <tbody>
                     {pending.map((send) => (
-                      <>
+                      <Fragment key={send.id}>
                         <tr
-                          key={send.id}
                           className="border-b last:border-0 hover:bg-muted/30 cursor-pointer"
                           onClick={() => toggleExpanded(send.id)}
                         >
@@ -299,7 +298,7 @@ export function ScheduledTable({ sends }: ScheduledTableProps) {
                             </td>
                           </tr>
                         )}
-                      </>
+                      </Fragment>
                     ))}
                   </tbody>
                 </table>
@@ -380,9 +379,8 @@ export function ScheduledTable({ sends }: ScheduledTableProps) {
                   </thead>
                   <tbody>
                     {past.map((send) => (
-                      <>
+                      <Fragment key={send.id}>
                         <tr
-                          key={send.id}
                           className="border-b last:border-0 hover:bg-muted/30 cursor-pointer"
                           onClick={() => toggleExpanded(send.id)}
                         >
@@ -419,7 +417,7 @@ export function ScheduledTable({ sends }: ScheduledTableProps) {
                             </td>
                           </tr>
                         )}
-                      </>
+                      </Fragment>
                     ))}
                   </tbody>
                 </table>

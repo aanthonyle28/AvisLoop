@@ -3,11 +3,14 @@
 import { useActionState, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { batchSendReviewRequest } from '@/lib/actions/send'
+import { scheduleReviewRequest } from '@/lib/actions/schedule'
 import { ContactSelector } from './contact-selector'
 import { MessagePreview } from './message-preview'
 import { BatchResults } from './batch-results'
-import type { Contact, Business, EmailTemplate } from '@/lib/types/database'
-import { Loader2, AlertCircle } from 'lucide-react'
+import { ScheduleSelector } from './schedule-selector'
+import type { Contact, Business, EmailTemplate, ScheduleActionState } from '@/lib/types/database'
+import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { formatScheduleDate } from '@/lib/utils/schedule'
 
 interface SendFormProps {
   contacts: Contact[]
@@ -34,8 +37,11 @@ export function SendForm({
   )
   const [customSubject, setCustomSubject] = useState('')
   const [showResults, setShowResults] = useState(false)
+  const [scheduledFor, setScheduledFor] = useState<string | null>(null)
+  const [scheduleSuccess, setScheduleSuccess] = useState<ScheduleActionState | null>(null)
 
   const [batchState, batchFormAction, isBatchPending] = useActionState(batchSendReviewRequest, null)
+  const [scheduleState, scheduleFormAction, isSchedulePending] = useActionState(scheduleReviewRequest, null)
 
   // Convert resendReadyContactIds array to Set for efficient lookup
   const resendReadyIds = new Set(resendReadyContactIds)
@@ -51,11 +57,20 @@ export function SendForm({
     }
   }, [batchState?.success, batchState?.data])
 
+  // Handle successful schedule
+  useEffect(() => {
+    if (scheduleState?.success && scheduleState.data) {
+      setScheduleSuccess(scheduleState)
+    }
+  }, [scheduleState])
+
   // Reset form and hide results
   const handleSendMore = () => {
     setSelectedContacts(new Set())
     setCustomSubject('')
     setShowResults(false)
+    setScheduleSuccess(null)
+    setScheduledFor(null)
   }
 
   // Limit checks
@@ -77,15 +92,58 @@ export function SendForm({
     )
   }
 
+  // Show schedule success
+  if (scheduleSuccess?.success && scheduleSuccess.data) {
+    return (
+      <div className="rounded-lg border border-primary/20 bg-primary/5 p-8 text-center space-y-4">
+        <CheckCircle2 className="h-12 w-12 text-primary mx-auto" />
+        <h2 className="text-xl font-semibold">Sends Scheduled</h2>
+        <p className="text-muted-foreground">
+          {selectedContacts.size} contact{selectedContacts.size !== 1 ? 's' : ''} scheduled for{' '}
+          <strong>{formatScheduleDate(scheduleSuccess.data.scheduledFor)}</strong>
+        </p>
+        <div className="flex gap-3 justify-center pt-2">
+          <a
+            href="/scheduled"
+            className="inline-flex items-center px-4 py-2 rounded-md border text-sm font-medium hover:bg-muted"
+          >
+            View Scheduled
+          </a>
+          <button
+            type="button"
+            onClick={handleSendMore}
+            className="inline-flex items-center px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90"
+          >
+            Send More
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  const isScheduled = scheduledFor !== null
+
+  const handleSubmit = (formData: FormData) => {
+    // Inject contact IDs
+    formData.set('contactIds', JSON.stringify(Array.from(selectedContacts)))
+
+    if (isScheduled) {
+      formData.set('scheduledFor', scheduledFor)
+      scheduleFormAction(formData)
+    } else {
+      batchFormAction(formData)
+    }
+  }
+
   return (
-    <form action={batchFormAction} className="space-y-6">
+    <form action={handleSubmit} className="space-y-6">
       {/* Error display */}
-      {batchState?.error && (
+      {(batchState?.error || scheduleState?.error) && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-4 flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
           <div>
             <p className="font-medium text-red-800">Unable to send</p>
-            <p className="text-sm text-red-700">{batchState.error}</p>
+            <p className="text-sm text-red-700">{batchState?.error || scheduleState?.error}</p>
           </div>
         </div>
       )}
@@ -123,16 +181,27 @@ export function SendForm({
             </div>
           )}
 
+          {/* Schedule selector */}
+          <ScheduleSelector onScheduleChange={setScheduledFor} />
+
           {/* Pre-send summary */}
           {selectedContacts.size > 0 && (
             <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
-              <h3 className="font-medium text-sm mb-2">Ready to Send</h3>
+              <h3 className="font-medium text-sm mb-2">
+                {isScheduled ? 'Ready to Schedule' : 'Ready to Send'}
+              </h3>
               <p className="text-sm text-muted-foreground">
-                Sending to <strong>{selectedContacts.size}</strong> contact{selectedContacts.size !== 1 ? 's' : ''}
+                {isScheduled ? 'Scheduling' : 'Sending to'}{' '}
+                <strong>{selectedContacts.size}</strong> contact{selectedContacts.size !== 1 ? 's' : ''}
               </p>
               {selectedTemplate && (
                 <p className="text-sm text-muted-foreground mt-1">
                   Using template: <strong>{selectedTemplate.name}</strong>
+                </p>
+              )}
+              {isScheduled && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  Scheduled for: <strong>{formatScheduleDate(scheduledFor)}</strong>
                 </p>
               )}
             </div>
@@ -188,13 +257,17 @@ export function SendForm({
         ) : (
           <button
             type="submit"
-            disabled={selectedContacts.size === 0 || isBatchPending}
+            disabled={selectedContacts.size === 0 || isBatchPending || isSchedulePending || (isScheduled && !scheduledFor)}
             className="inline-flex items-center px-6 py-3 rounded-md bg-primary text-primary-foreground font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {isBatchPending ? (
+            {isBatchPending || isSchedulePending ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Sending...
+                {isScheduled ? 'Scheduling...' : 'Sending...'}
+              </>
+            ) : isScheduled ? (
+              <>
+                Schedule {selectedContacts.size} Contact{selectedContacts.size !== 1 ? 's' : ''}
               </>
             ) : (
               <>
