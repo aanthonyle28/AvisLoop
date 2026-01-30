@@ -1,25 +1,19 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { getOnboardingStatus } from '@/lib/data/onboarding'
-import { OnboardingChecklist } from '@/components/dashboard/onboarding-checklist'
-import { NextActionCard } from '@/components/dashboard/next-action-card'
 import { getBusiness } from '@/lib/actions/business'
-import { getMonthlyUsage, getResponseRate } from '@/lib/data/send-logs'
-import { getPendingScheduledCount } from '@/lib/data/scheduled'
+import { getMonthlyUsage, getResponseRate, getNeedsAttentionCount, getRecentActivity } from '@/lib/data/send-logs'
 import { getContacts } from '@/lib/actions/contact'
-import Link from 'next/link'
-import { CheckCircle2, Users, Send, Calendar } from 'lucide-react'
-import { ResponseRateCard } from '@/components/dashboard/response-rate-card'
+import { MonthlyUsageCard, NeedsAttentionCard, ReviewRateCard } from '@/components/dashboard/stat-cards'
+import { RecentActivityTable } from '@/components/dashboard/recent-activity'
+import { QuickSend } from '@/components/dashboard/quick-send'
+import type { EmailTemplate } from '@/lib/types/database'
 
 /**
- * Dashboard page - main hub for authenticated users.
- * Shows onboarding progress, next action, and quick stats.
+ * Dashboard page - redesigned to match Figma reference.
+ * Shows welcome header, stat cards, Quick Send + When to Send, and Recent Activity.
  */
-export default async function DashboardPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ onboarding?: string }>
-}) {
+export default async function DashboardPage() {
   // Auth check
   const supabase = await createClient()
   const {
@@ -30,185 +24,65 @@ export default async function DashboardPage({
     redirect('/login')
   }
 
+  // Check onboarding status
+  const status = await getOnboardingStatus()
+
+  // Redirect to onboarding if not complete
+  if (status && !status.completed) {
+    redirect('/onboarding')
+  }
+
   // Fetch data in parallel
-  const [status, business, usage, contactsData, responseRate, scheduledCount] = await Promise.all([
-    getOnboardingStatus(),
+  const [business, usage, contactsData, responseRate, needsAttention, recentActivity] = await Promise.all([
     getBusiness(),
     getMonthlyUsage(),
-    getContacts({ limit: 1 }), // Just need the count
+    getContacts({ limit: 50 }),
     getResponseRate(),
-    getPendingScheduledCount(),
+    getNeedsAttentionCount(),
+    getRecentActivity(5),
   ])
 
-  const params = await searchParams
-  const showOnboardingComplete = params.onboarding === 'complete'
+  // Get templates for Quick Send
+  const templates: EmailTemplate[] = business?.email_templates || []
 
-  // Business name for welcome message
-  const businessName = business?.name
+  // Get recent contacts (by created_at DESC) for Quick Send chips
+  const recentContacts = contactsData.contacts
+    .filter(c => c.status === 'active')
+    .slice(0, 5)
+
+  // Extract first name from business name or email
+  const firstName = business?.name?.split(' ')[0] || user.email?.split('@')[0] || 'there'
 
   return (
-    <div className="container mx-auto py-6 px-4">
-      {/* Success banner after onboarding completion */}
-      {showOnboardingComplete && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3 dark:bg-green-950 dark:border-green-900">
-          <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
-          <div>
-            <p className="font-medium text-green-800 dark:text-green-200">
-              Setup complete!
-            </p>
-            <p className="text-sm text-green-700 dark:text-green-300">
-              You&apos;re all set to start collecting reviews.
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Welcome header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold">
-          {businessName ? `Welcome, ${businessName}` : 'Welcome to AvisLoop'}
-        </h1>
+    <div className="p-6 space-y-6 max-w-6xl mx-auto">
+      {/* 1. Welcome Header */}
+      <div>
+        <h1 className="text-2xl font-bold">Welcome, {firstName}!</h1>
         <p className="text-muted-foreground mt-1">
-          {status?.completed
-            ? 'Manage your review requests and track results.'
-            : 'Complete your setup to start collecting reviews.'}
+          Here&apos;s what&apos;s happening with your review requests today.
         </p>
       </div>
 
-      {/* Main content grid */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Left column - main content */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Next action recommendation */}
-          {status && <NextActionCard status={status} />}
-
-          {/* Quick stats cards */}
-          <div className="grid gap-4 sm:grid-cols-2">
-            {/* Sends this month */}
-            <div className="rounded-lg border bg-card p-6">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <Send className="h-4 w-4 text-primary" />
-                </div>
-                <h3 className="font-medium">Sends This Month</h3>
-              </div>
-              <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-bold">{usage.count}</span>
-                <span className="text-muted-foreground">/ {usage.limit}</span>
-              </div>
-              <Link
-                href="/history"
-                className="text-sm text-primary hover:underline mt-2 inline-block"
-              >
-                View history
-              </Link>
-            </div>
-
-            {/* Contacts */}
-            <div className="rounded-lg border bg-card p-6">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <Users className="h-4 w-4 text-primary" />
-                </div>
-                <h3 className="font-medium">Contacts</h3>
-              </div>
-              <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-bold">{contactsData.total}</span>
-                <span className="text-muted-foreground">total</span>
-              </div>
-              <Link
-                href="/contacts"
-                className="text-sm text-primary hover:underline mt-2 inline-block"
-              >
-                Manage contacts
-              </Link>
-            </div>
-
-            {/* Scheduled */}
-            <div className="rounded-lg border bg-card p-6">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <Calendar className="h-4 w-4 text-primary" />
-                </div>
-                <h3 className="font-medium">Scheduled</h3>
-              </div>
-              <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-bold">{scheduledCount}</span>
-                <span className="text-muted-foreground">pending</span>
-              </div>
-              <Link
-                href="/scheduled"
-                className="text-sm text-primary hover:underline mt-2 inline-block"
-              >
-                View scheduled
-              </Link>
-            </div>
-
-            {/* Response Rate */}
-            <ResponseRateCard {...responseRate} />
-          </div>
-
-          {/* No business prompt */}
-          {!business && (
-            <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-6 dark:border-yellow-900 dark:bg-yellow-950">
-              <h3 className="font-semibold text-yellow-800 dark:text-yellow-200 mb-2">
-                Complete your setup
-              </h3>
-              <p className="text-yellow-700 dark:text-yellow-300 mb-4">
-                Create your business profile to start sending review requests.
-              </p>
-              <Link
-                href="/onboarding?step=1"
-                className="inline-flex items-center px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors"
-              >
-                Get Started
-              </Link>
-            </div>
-          )}
-        </div>
-
-        {/* Right column - sidebar */}
-        <div className="space-y-6">
-          {/* Onboarding checklist (auto-hides when complete) */}
-          {status && <OnboardingChecklist status={status} />}
-
-          {/* Usage summary for completed users */}
-          {status?.completed && (
-            <div className="rounded-lg border bg-card p-6">
-              <h3 className="font-semibold mb-4">Quick Links</h3>
-              <nav className="space-y-2">
-                <Link
-                  href="/send"
-                  className="block p-3 rounded-lg hover:bg-muted transition-colors"
-                >
-                  <p className="font-medium">Send Request</p>
-                  <p className="text-sm text-muted-foreground">
-                    Send a new review request
-                  </p>
-                </Link>
-                <Link
-                  href="/contacts"
-                  className="block p-3 rounded-lg hover:bg-muted transition-colors"
-                >
-                  <p className="font-medium">Contacts</p>
-                  <p className="text-sm text-muted-foreground">
-                    Manage your contact list
-                  </p>
-                </Link>
-                <Link
-                  href="/dashboard/settings"
-                  className="block p-3 rounded-lg hover:bg-muted transition-colors"
-                >
-                  <p className="font-medium">Settings</p>
-                  <p className="text-sm text-muted-foreground">
-                    Business profile and templates
-                  </p>
-                </Link>
-              </nav>
-            </div>
-          )}
-        </div>
+      {/* 2. Stat Cards Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <MonthlyUsageCard count={usage.count} limit={usage.limit} tier={usage.tier} />
+        <NeedsAttentionCard total={needsAttention.total} pending={needsAttention.pending} failed={needsAttention.failed} />
+        <ReviewRateCard rate={responseRate.rate} total={responseRate.total} responded={responseRate.responded} />
       </div>
+
+      {/* 3. Quick Send + When to Send */}
+      {contactsData.contacts.length > 0 && templates.length > 0 && (
+        <QuickSend
+          contacts={contactsData.contacts
+            .filter(c => c.status === 'active')
+            .map(c => ({ id: c.id, name: c.name, email: c.email }))}
+          templates={templates.map((t) => ({ id: t.id, name: t.name, is_default: t.is_default }))}
+          recentContacts={recentContacts.map(c => ({ id: c.id, name: c.name }))}
+        />
+      )}
+
+      {/* 4. Recent Activity Table */}
+      <RecentActivityTable activities={recentActivity} />
     </div>
   )
 }
