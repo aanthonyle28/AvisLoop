@@ -63,6 +63,7 @@ export interface SendLog {
   provider_id: string | null
   error_message: string | null
   subject: string
+  reviewed_at: string | null
   created_at: string
   updated_at: string
 }
@@ -91,6 +92,30 @@ export interface Subscription {
 
 export type SubscriptionInsert = Omit<Subscription, 'created_at' | 'updated_at'>
 export type SubscriptionUpdate = Partial<Omit<Subscription, 'id' | 'business_id' | 'created_at' | 'updated_at'>>
+
+// Scheduled send types
+export interface ScheduledSend {
+  id: string
+  business_id: string
+  contact_ids: string[]
+  template_id: string | null
+  custom_subject: string | null
+  scheduled_for: string
+  status: 'pending' | 'completed' | 'failed' | 'cancelled'
+  executed_at: string | null
+  send_log_ids: string[] | null
+  error_message: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type ScheduledSendInsert = Omit<ScheduledSend, 'id' | 'created_at' | 'updated_at' | 'executed_at' | 'send_log_ids' | 'error_message'>
+
+export type ScheduleActionState = {
+  error?: string
+  success?: boolean
+  data?: { scheduledSendId: string; scheduledFor: string }
+}
 
 // Batch send action state for server actions
 export type BatchSendActionState = {

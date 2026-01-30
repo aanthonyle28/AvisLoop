@@ -264,3 +264,106 @@ export async function getResendReadyContacts(
 
   return data || []
 }
+
+/**
+ * Get count of sends needing attention (pending + failed).
+ * For dashboard "Needs Attention" card.
+ */
+export async function getNeedsAttentionCount(): Promise<{
+  total: number
+  pending: number
+  failed: number
+}> {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return { total: 0, pending: 0, failed: 0 }
+  }
+
+  const { data: business } = await supabase
+    .from('businesses')
+    .select('id')
+    .eq('user_id', user.id)
+    .single()
+
+  if (!business) {
+    return { total: 0, pending: 0, failed: 0 }
+  }
+
+  // Count pending
+  const { count: pendingCount } = await supabase
+    .from('send_logs')
+    .select('*', { count: 'exact', head: true })
+    .eq('business_id', business.id)
+    .eq('status', 'pending')
+
+  // Count failed (failed + bounced)
+  const { count: failedCount } = await supabase
+    .from('send_logs')
+    .select('*', { count: 'exact', head: true })
+    .eq('business_id', business.id)
+    .in('status', ['failed', 'bounced'])
+
+  const pending = pendingCount || 0
+  const failed = failedCount || 0
+
+  return {
+    total: pending + failed,
+    pending,
+    failed,
+  }
+}
+
+/**
+ * Get recent send activity with contact info.
+ * For dashboard "Recent Activity" table.
+ */
+export async function getRecentActivity(limit: number = 5): Promise<Array<{
+  id: string
+  contact_name: string
+  contact_email: string
+  subject: string
+  status: string
+  created_at: string
+}>> {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return []
+  }
+
+  const { data: business } = await supabase
+    .from('businesses')
+    .select('id')
+    .eq('user_id', user.id)
+    .single()
+
+  if (!business) {
+    return []
+  }
+
+  const { data, error } = await supabase
+    .from('send_logs')
+    .select('id, subject, status, created_at, contacts(name, email)')
+    .eq('business_id', business.id)
+    .order('created_at', { ascending: false })
+    .limit(limit)
+
+  if (error) {
+    console.error('Error fetching recent activity:', error)
+    return []
+  }
+
+  // Flatten the nested contacts structure
+  return (data || []).map((row) => ({
+    id: row.id,
+    contact_name: (row.contacts as any)?.name || '',
+    contact_email: (row.contacts as any)?.email || '',
+    subject: row.subject,
+    status: row.status,
+    created_at: row.created_at,
+  }))
+  .filter(item => item.contact_name && item.contact_email)
+}
