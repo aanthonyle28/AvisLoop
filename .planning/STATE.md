@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 **Phase:** 17 of 18 (Deployment & Critical Fixes)
-**Plan:** Not yet planned
-**Status:** Pending — gap closure phases created from v1.2 audit
-**Last activity:** 2026-01-30 -- Created gap closure phases 17-18 from audit
+**Plan:** 1 of 3 complete
+**Status:** In progress — fixing deployment blockers from v1.2 audit
+**Last activity:** 2026-01-30 -- Completed 17-01-PLAN.md (scheduled_sends migration)
 
-**Progress:** [█████████████████████] 53/59 total plans complete (Phases 17-18 pending)
+**Progress:** [█████████████████████] 54/59 total plans complete (Phase 17: 1/3, Phase 18 pending)
 
 ```
 v1.0 MVP: ████████████████████████████████████████████████ 48/48 COMPLETE
@@ -23,6 +23,7 @@ Phase 13: ██ Scheduling & Navigation (2/2) COMPLETE
 Phase 14: ██ Scheduled Send Management (2/2) COMPLETE
 Phase 15: ████ Design System & Dashboard Redesign (4/4) COMPLETE
 Phase 16: █████ Onboarding Redesign (5/5) COMPLETE
+Phase 17: █ Deployment & Critical Fixes (1/3) IN PROGRESS
 ```
 
 ## What's Been Built
@@ -57,6 +58,9 @@ Phase 16: █████ Onboarding Redesign (5/5) COMPLETE
 - **16-03 Complete:** Auth page redesign with split layout (form left, visual right), Google OAuth button integration via OR divider, removed Card wrappers from forms
 - **16-04 Complete:** Dashboard onboarding cards (3 numbered cards with auto-detection), test send flagging (isTest param wired into send actions), quota exclusion (is_test=false filter)
 - **16-05 Complete:** Test send wiring gap closure (query param → form prop → hidden input → database), Phosphor icon TypeScript fixes (IconWeight type)
+
+### Phase 17: Deployment & Critical Fixes (In Progress)
+- **17-01 Complete:** Created missing scheduled_sends table migration (00009b) that slots between 00009 and 00010, fixing deployment blocker where fresh database deploy failed at migration 00010 which references SETOF scheduled_sends
 
 ## Tech Stack
 
@@ -112,6 +116,9 @@ Next.js 15 (App Router), TypeScript, Supabase, Tailwind CSS, Resend, Stripe, Ups
 | D16-04-04 | 16-04 | Deprecate onboarding checklist instead of deleting | Safe incremental migration, avoid breaking references | Low | 2026-01-30 |
 | D16-05-01 | 16-05 | Display test mode indicator banner | Users need clear visual feedback when in test mode; blue banner shows quota exclusion | Low | 2026-01-30 |
 | D16-05-02 | 16-05 | Use hidden input for isTest flag | FormData is standard mechanism for server actions; cleaner than URL state preservation | Low | 2026-01-30 |
+| D17-01-01 | 17-01 | Include 'processing' status in CHECK constraint | Migration 00010 claim function sets status to 'processing' | Low | 2026-01-30 |
+| D17-01-02 | 17-01 | Partial index on (status, scheduled_for) WHERE status='pending' | Optimizes cron claim query that only selects pending records | Medium | 2026-01-30 |
+| D17-01-03 | 17-01 | No DELETE policy, use status changes instead | Audit trail preservation, consistent with send_logs pattern | Low | 2026-01-30 |
 
 Recent architectural decisions:
 - Separate scheduled_sends table (different lifecycle than send_logs)
@@ -123,10 +130,10 @@ Recent architectural decisions:
 
 ## Blockers & Concerns
 
+- Fresh database deploy must apply all migrations in sequence to validate 00009b fix
 - Vercel Cron only runs in production -- local testing requires curl to route handler
 - CRON_SECRET env var must be set before first deployment
 - Supabase Google OAuth provider must be configured in dashboard before OAuth flow works
-- Migration 00011 must be applied to database before is_test flag is usable
 
 ## Quick Tasks
 
@@ -138,6 +145,6 @@ Recent architectural decisions:
 ## Session Continuity
 
 **Last session:** 2026-01-30
-**Stopped at:** Created gap closure phases 17-18 from v1.2 milestone audit
+**Stopped at:** Completed 17-01-PLAN.md (scheduled_sends migration)
 **Resume file:** None
-**Next action:** `/gsd:plan-phase 17` to plan the deployment & critical fixes phase
+**Next action:** Continue Phase 17 - execute plans 17-02 and 17-03 to complete deployment fixes
