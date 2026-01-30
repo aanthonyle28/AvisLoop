@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 **Phase:** 16 of 19 (Onboarding Redesign)
-**Plan:** 16-03 of 3 (Auth Page Redesign)
+**Plan:** 16-04 of 4 (Dashboard Onboarding Cards)
 **Status:** Phase complete
-**Last activity:** 2026-01-30 -- Completed 16-03-PLAN.md (Auth Page Redesign)
+**Last activity:** 2026-01-30 -- Completed 16-04-PLAN.md (Dashboard Onboarding Cards)
 
-**Progress:** [█████████████████████] 51/57 total plans complete, 3/3 Phase 16 complete
+**Progress:** [█████████████████████] 52/58 total plans complete, 4/4 Phase 16 complete
 
 ```
 v1.0 MVP: ████████████████████████████████████████████████ 48/48 COMPLETE
@@ -22,7 +22,7 @@ Phase 12: █ Cron Processing (1/1) COMPLETE
 Phase 13: ██ Scheduling & Navigation (2/2) COMPLETE
 Phase 14: ██ Scheduled Send Management (2/2) COMPLETE
 Phase 15: ████ Design System & Dashboard Redesign (4/4) COMPLETE
-Phase 16: ███ Onboarding Redesign (3/3) COMPLETE
+Phase 16: ████ Onboarding Redesign (4/4) COMPLETE
 ```
 
 ## What's Been Built
@@ -55,6 +55,7 @@ Phase 16: ███ Onboarding Redesign (3/3) COMPLETE
 - **16-01 Complete:** Database migration (is_test flag on send_logs, onboarding_steps_completed object format), Google OAuth infrastructure (callback route, signInWithGoogle action, GoogleOAuthButton component)
 - **16-02 Complete:** Wizard redesign to 2 steps (business name, Google review link), horizontal progress bar at bottom, simplified inline step components
 - **16-03 Complete:** Auth page redesign with split layout (form left, visual right), Google OAuth button integration via OR divider, removed Card wrappers from forms
+- **16-04 Complete:** Dashboard onboarding cards (3 numbered cards with auto-detection), test send flagging (isTest param wired into send actions), quota exclusion (is_test=false filter)
 
 ## Tech Stack
 
@@ -104,6 +105,10 @@ Next.js 15 (App Router), TypeScript, Supabase, Tailwind CSS, Resend, Stripe, Ups
 | D16-03-02 | 16-03 | Remove Card wrapper from auth forms | Split layout already provides visual structure; Card wrapper was redundant and cluttered the design | Low | 2026-01-30 |
 | D16-03-03 | 16-03 | Place Google OAuth below email/password form with OR divider | Email/password remains primary auth method with OAuth as convenient alternative; OR divider clearly separates the two options | Low | 2026-01-30 |
 | D16-03-04 | 16-03 | Hide right panel on mobile (lg:hidden) | Mobile screens need all space for form; visual panel is decorative and not essential to task completion | Low | 2026-01-30 |
+| D16-04-01 | 16-04 | Auto-detect card completion from database state | Avoids manual tracking, cards update automatically when user completes actions | Medium | 2026-01-30 |
+| D16-04-02 | 16-04 | Card 3 links to /send?test=true | Query param signals send form to set isTest=true, flagging test sends | Low | 2026-01-30 |
+| D16-04-03 | 16-04 | Exclude test sends from quota counting | Test sends shouldn't count against monthly limits | High | 2026-01-30 |
+| D16-04-04 | 16-04 | Deprecate onboarding checklist instead of deleting | Safe incremental migration, avoid breaking references | Low | 2026-01-30 |
 
 Recent architectural decisions:
 - Separate scheduled_sends table (different lifecycle than send_logs)
@@ -129,6 +134,6 @@ Recent architectural decisions:
 ## Session Continuity
 
 **Last session:** 2026-01-30
-**Stopped at:** Completed 16-03-PLAN.md (Auth Page Redesign) - Phase 16 complete
+**Stopped at:** Completed 16-04-PLAN.md (Dashboard Onboarding Cards) - Phase 16 complete
 **Resume file:** None
 **Next action:** Phase 16 complete - ready for next phase or milestone completion
