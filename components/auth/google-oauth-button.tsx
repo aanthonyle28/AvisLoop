@@ -11,7 +11,14 @@ export function GoogleOAuthButton() {
   const handleClick = async () => {
     setIsLoading(true)
     try {
-      await signInWithGoogle()
+      const result = await signInWithGoogle()
+      if (result.url) {
+        window.location.href = result.url
+        return // Don't reset loading — we're navigating away
+      }
+      if (result.error) {
+        toast.error(result.error)
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to sign in with Google')
     } finally {

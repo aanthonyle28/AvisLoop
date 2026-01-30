@@ -179,7 +179,7 @@ export async function deleteAccount(): Promise<AuthActionState> {
   redirect('/')
 }
 
-export async function signInWithGoogle() {
+export async function signInWithGoogle(): Promise<{ url?: string; error?: string }> {
   const supabase = await createClient()
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
@@ -188,9 +188,10 @@ export async function signInWithGoogle() {
     },
   })
   if (error) {
-    throw error
+    return { error: error.message }
   }
   if (data.url) {
-    redirect(data.url)
+    return { url: data.url }
   }
+  return { error: 'Failed to get OAuth URL from provider' }
 }
