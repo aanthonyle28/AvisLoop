@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useRef, useEffect } from 'react'
+import { useRef, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -29,6 +29,8 @@ interface ContactStepProps {
  */
 export function ContactStep({ onComplete, onSkip }: ContactStepProps) {
   const formRef = useRef<HTMLFormElement>(null)
+  const [serverError, setServerError] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
 
   const {
     register,
@@ -44,32 +46,26 @@ export function ContactStep({ onComplete, onSkip }: ContactStepProps) {
     },
   })
 
-  const [state, formAction, isPending] = useActionState<ContactActionState | null, FormData>(
-    async (prevState, formData) => {
-      const result = await createContact(prevState, formData)
+  const onSubmit = handleSubmit(() => {
+    const formData = new FormData(formRef.current!)
+    startTransition(async () => {
+      const result: ContactActionState = await createContact(null, formData)
       if (result.success) {
         onComplete()
+        return
       }
-      return result
-    },
-    null
-  )
-
-  // Map server field errors to form errors
-  useEffect(() => {
-    if (state?.fieldErrors) {
-      Object.entries(state.fieldErrors).forEach(([field, messages]) => {
-        if (messages && messages.length > 0) {
-          setError(field as keyof ContactStepData, { message: messages[0] })
-        }
-      })
-    }
-  }, [state?.fieldErrors, setError])
-
-  const onSubmit = () => {
-    // Form will be submitted via formAction
-    formRef.current?.requestSubmit()
-  }
+      if (result.fieldErrors) {
+        Object.entries(result.fieldErrors).forEach(([field, messages]) => {
+          if (messages && messages.length > 0) {
+            setError(field as keyof ContactStepData, { message: messages[0] })
+          }
+        })
+      }
+      if (result.error) {
+        setServerError(result.error)
+      }
+    })
+  })
 
   return (
     <div className="space-y-6">
@@ -80,7 +76,7 @@ export function ContactStep({ onComplete, onSkip }: ContactStepProps) {
         </p>
       </div>
 
-      <form ref={formRef} action={formAction} onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form ref={formRef} onSubmit={onSubmit} className="space-y-4">
         <div className="grid gap-2">
           <Label htmlFor="contact-name">
             Name <span className="text-red-500">*</span>
@@ -128,8 +124,8 @@ export function ContactStep({ onComplete, onSkip }: ContactStepProps) {
           )}
         </div>
 
-        {state?.error && (
-          <p className="text-sm text-red-600">{state.error}</p>
+        {serverError && (
+          <p className="text-sm text-red-600">{serverError}</p>
         )}
 
         <div className="flex flex-col gap-3 pt-2">
