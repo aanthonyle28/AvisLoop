@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-28)
 
 **Core value:** Make requesting reviews so simple that business owners actually do it -- one contact, one click, done.
-**Current focus:** Phase 17 - Deployment & Critical Fixes (tech debt closure)
+**Current focus:** Phase 18 - Code Cleanup (tech debt closure)
 
 ## Current Position
 
-**Phase:** 17 of 18 (Deployment & Critical Fixes)
-**Plan:** 2 of 3 complete
-**Status:** In progress — fixing deployment blockers from v1.2 audit
-**Last activity:** 2026-01-30 -- Completed 17-02-PLAN.md (Phase 4 verification)
+**Phase:** 18 of 18 (Code Cleanup)
+**Plan:** Not yet planned
+**Status:** Pending — Phase 17 complete, Phase 18 next
+**Last activity:** 2026-01-30 -- Completed Phase 17 execution (2/2 plans, verified 4/4)
 
-**Progress:** [█████████████████████] 55/59 total plans complete (Phase 17: 2/3, Phase 18 pending)
+**Progress:** [██████████████████████] 55/57 total plans complete (Phase 18 pending)
 
 ```
 v1.0 MVP: ████████████████████████████████████████████████ 48/48 COMPLETE
@@ -23,7 +23,7 @@ Phase 13: ██ Scheduling & Navigation (2/2) COMPLETE
 Phase 14: ██ Scheduled Send Management (2/2) COMPLETE
 Phase 15: ████ Design System & Dashboard Redesign (4/4) COMPLETE
 Phase 16: █████ Onboarding Redesign (5/5) COMPLETE
-Phase 17: ██ Deployment & Critical Fixes (2/3) IN PROGRESS
+Phase 17: ██ Deployment & Critical Fixes (2/2) COMPLETE
 ```
 
 ## What's Been Built
@@ -59,9 +59,10 @@ Phase 17: ██ Deployment & Critical Fixes (2/3) IN PROGRESS
 - **16-04 Complete:** Dashboard onboarding cards (3 numbered cards with auto-detection), test send flagging (isTest param wired into send actions), quota exclusion (is_test=false filter)
 - **16-05 Complete:** Test send wiring gap closure (query param → form prop → hidden input → database), Phosphor icon TypeScript fixes (IconWeight type)
 
-### Phase 17: Deployment & Critical Fixes (In Progress)
+### Phase 17: Deployment & Critical Fixes (Complete)
 - **17-01 Complete:** Created missing scheduled_sends table migration (00009b) that slots between 00009 and 00010, fixing deployment blocker where fresh database deploy failed at migration 00010 which references SETOF scheduled_sends
 - **17-02 Complete:** Formal verification of Phase 4 Core Sending with all 9 success criteria confirmed passed (contact selection, message preview, send confirmation, logging, cooldown, rate limiting, opt-out, quotas, webhooks), password reset path audit item confirmed resolved
+- **Verified:** 4/4 success criteria passed — migration exists with RLS/indexes, sequence correct, Phase 4 VERIFICATION.md created, password reset confirmed
 
 ## Tech Stack
 
@@ -148,6 +149,6 @@ Recent architectural decisions:
 ## Session Continuity
 
 **Last session:** 2026-01-30
-**Stopped at:** Completed quick-003 (Fix Onboarding Issues)
+**Stopped at:** Completed Phase 17 execution and verification (2/2 plans, 4/4 criteria)
 **Resume file:** None
-**Next action:** Continue Phase 17 - execute plan 17-03 to complete deployment fixes
+**Next action:** `/gsd:plan-phase 18` to plan the code cleanup phase
