@@ -133,3 +133,17 @@ export type BatchSendActionState = {
     }>
   }
 }
+
+// Send log detail for scheduled sends with contact info
+export interface SendLogDetail {
+  id: string
+  contact_id: string
+  status: string
+  error_message: string | null
+  contacts: { name: string; email: string }
+}
+
+// Scheduled send with per-contact send_log details
+export interface ScheduledSendWithDetails extends ScheduledSend {
+  sendLogs: SendLogDetail[]
+}
