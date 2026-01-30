@@ -356,14 +356,28 @@ export async function getRecentActivity(limit: number = 5): Promise<Array<{
     return []
   }
 
+  if (!data) {
+    return []
+  }
+
   // Flatten the nested contacts structure
-  return (data || []).map((row) => ({
-    id: row.id,
-    contact_name: (row.contacts as any)?.name || '',
-    contact_email: (row.contacts as any)?.email || '',
-    subject: row.subject,
-    status: row.status,
-    created_at: row.created_at,
-  }))
-  .filter(item => item.contact_name && item.contact_email)
+  // Note: contacts is an object in the response, not an array
+  type ContactData = { name: string; email: string }
+
+  return data
+    .map((row) => {
+      const contact = row.contacts as ContactData | ContactData[] | null
+      // Handle both single object and array cases
+      const contactObj = Array.isArray(contact) ? contact[0] : contact
+
+      return {
+        id: row.id,
+        contact_name: contactObj?.name || '',
+        contact_email: contactObj?.email || '',
+        subject: row.subject,
+        status: row.status,
+        created_at: row.created_at,
+      }
+    })
+    .filter(item => item.contact_name && item.contact_email)
 }
