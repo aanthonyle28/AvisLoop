@@ -416,7 +416,11 @@ Plans:
   2. Migration sequence (00009b or 00012) runs before 00010 (claim function) on a fresh database
   3. Phase 4 has a VERIFICATION.md confirming all 9 success criteria
   4. Password reset path audit item confirmed resolved (already fixed in code)
-**Plans**: TBD
+**Plans**: 2 plans in 1 wave
+
+Plans:
+- [ ] 17-01-PLAN.md — Create missing scheduled_sends table migration (00009b)
+- [ ] 17-02-PLAN.md — Phase 4 formal verification + password reset path confirmation
 
 ### Phase 18: Code Cleanup
 **Goal**: Clean up orphaned files, inline constant duplication, and stale verification docs
@@ -456,5 +460,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -
 | 14. Scheduled Send Management | v1.1 | 2/2 | Complete | 2026-01-30 |
 | 15. Design System & Dashboard Redesign | v1.2 | 4/4 | Complete | 2026-01-29 |
 | 16. Onboarding Redesign + Google Auth | v1.2 | 5/5 | Complete | 2026-01-30 |
-| 17. Deployment & Critical Fixes | v1.2.1 | 0/TBD | Pending | — |
+| 17. Deployment & Critical Fixes | v1.2.1 | 0/2 | Planned | — |
 | 18. Code Cleanup | v1.2.1 | 0/TBD | Pending | — |
