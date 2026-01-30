@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 **Phase:** 16 of 19 (Onboarding Redesign)
-**Plan:** 16-02 of 3 (Wizard Redesign)
-**Status:** In progress
-**Last activity:** 2026-01-30 -- Completed 16-02-PLAN.md (Wizard Redesign)
+**Plan:** 16-03 of 3 (Auth Page Redesign)
+**Status:** Phase complete
+**Last activity:** 2026-01-30 -- Completed 16-03-PLAN.md (Auth Page Redesign)
 
-**Progress:** [█████████████████████] 50/57 total plans complete, 2/3 Phase 16 complete
+**Progress:** [█████████████████████] 51/57 total plans complete, 3/3 Phase 16 complete
 
 ```
 v1.0 MVP: ████████████████████████████████████████████████ 48/48 COMPLETE
@@ -22,7 +22,7 @@ Phase 12: █ Cron Processing (1/1) COMPLETE
 Phase 13: ██ Scheduling & Navigation (2/2) COMPLETE
 Phase 14: ██ Scheduled Send Management (2/2) COMPLETE
 Phase 15: ████ Design System & Dashboard Redesign (4/4) COMPLETE
-Phase 16: ██░ Onboarding Redesign (2/3) IN PROGRESS
+Phase 16: ███ Onboarding Redesign (3/3) COMPLETE
 ```
 
 ## What's Been Built
@@ -51,9 +51,10 @@ Phase 16: ██░ Onboarding Redesign (2/3) IN PROGRESS
 - **15-03 Complete:** Dashboard components (stat cards, activity table, avatar) and data layer functions (getNeedsAttentionCount, getRecentActivity)
 - **15-04 Complete:** Dashboard page integration with QuickSend component, redesigned layout matching Figma reference (welcome header, stat cards, quick send + schedule presets, recent activity)
 
-### Phase 16: Onboarding Redesign (In Progress)
+### Phase 16: Onboarding Redesign (Complete)
 - **16-01 Complete:** Database migration (is_test flag on send_logs, onboarding_steps_completed object format), Google OAuth infrastructure (callback route, signInWithGoogle action, GoogleOAuthButton component)
 - **16-02 Complete:** Wizard redesign to 2 steps (business name, Google review link), horizontal progress bar at bottom, simplified inline step components
+- **16-03 Complete:** Auth page redesign with split layout (form left, visual right), Google OAuth button integration via OR divider, removed Card wrappers from forms
 
 ## Tech Stack
 
@@ -99,6 +100,10 @@ Next.js 15 (App Router), TypeScript, Supabase, Tailwind CSS, Resend, Stripe, Ups
 | D16-02-01 | 16-02 | 2-step wizard (business name, Google review link) | Faster onboarding, less intimidating for new users | Medium | 2026-01-30 |
 | D16-02-02 | 16-02 | Inline step components instead of separate files | Simple single-input forms don't need complex form libraries or separate files | Low | 2026-01-30 |
 | D16-02-03 | 16-02 | Horizontal progress bar at bottom with counter | Cleaner UI matching modern onboarding patterns | Low | 2026-01-30 |
+| D16-03-01 | 16-03 | Use split layout (grid-cols-1 lg:grid-cols-2) for auth pages | Modern design pattern that provides visual interest on desktop while remaining clean and focused on mobile | Medium | 2026-01-30 |
+| D16-03-02 | 16-03 | Remove Card wrapper from auth forms | Split layout already provides visual structure; Card wrapper was redundant and cluttered the design | Low | 2026-01-30 |
+| D16-03-03 | 16-03 | Place Google OAuth below email/password form with OR divider | Email/password remains primary auth method with OAuth as convenient alternative; OR divider clearly separates the two options | Low | 2026-01-30 |
+| D16-03-04 | 16-03 | Hide right panel on mobile (lg:hidden) | Mobile screens need all space for form; visual panel is decorative and not essential to task completion | Low | 2026-01-30 |
 
 Recent architectural decisions:
 - Separate scheduled_sends table (different lifecycle than send_logs)
@@ -124,6 +129,6 @@ Recent architectural decisions:
 ## Session Continuity
 
 **Last session:** 2026-01-30
-**Stopped at:** Completed 16-02-PLAN.md (Wizard Redesign)
+**Stopped at:** Completed 16-03-PLAN.md (Auth Page Redesign) - Phase 16 complete
 **Resume file:** None
-**Next action:** Continue with 16-03 (Dashboard Onboarding Cards)
+**Next action:** Phase 16 complete - ready for next phase or milestone completion
