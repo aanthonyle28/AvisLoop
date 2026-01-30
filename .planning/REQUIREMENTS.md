@@ -86,9 +86,9 @@ Requirements for Scheduled Sending milestone. Each maps to roadmap phases.
 
 ### Scheduling
 
-- [ ] **SCHED-01**: User can schedule a review request for future delivery using presets (In 1 hour, Next morning, In 24 hours)
-- [ ] **SCHED-02**: User can schedule a review request for a custom date and time
-- [ ] **SCHED-03**: User sees confirmation with scheduled time after scheduling
+- [x] **SCHED-01**: User can schedule a review request for future delivery using presets (In 1 hour, Next morning, In 24 hours)
+- [x] **SCHED-02**: User can schedule a review request for a custom date and time
+- [x] **SCHED-03**: User sees confirmation with scheduled time after scheduling
 
 ### Management
 
@@ -106,8 +106,8 @@ Requirements for Scheduled Sending milestone. Each maps to roadmap phases.
 
 ### Navigation
 
-- [ ] **NAV-01**: Sidebar and mobile nav include Scheduled sends link
-- [ ] **NAV-02**: Dashboard shows count of pending scheduled sends
+- [x] **NAV-01**: Sidebar and mobile nav include Scheduled sends link
+- [x] **NAV-02**: Dashboard shows count of pending scheduled sends
 
 ## v2 Requirements
 
@@ -228,9 +228,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INTG-01 | Phase 11 | Complete |
 | INTG-02 | Phase 11 | Complete |
 | INTG-03 | Phase 11 | Complete |
-| SCHED-01 | Phase 13 | Pending |
-| SCHED-02 | Phase 13 | Pending |
-| SCHED-03 | Phase 13 | Pending |
+| SCHED-01 | Phase 13 | Complete |
+| SCHED-02 | Phase 13 | Complete |
+| SCHED-03 | Phase 13 | Complete |
 | MGMT-01 | Phase 14 | Pending |
 | MGMT-02 | Phase 14 | Pending |
 | MGMT-03 | Phase 14 | Pending |
@@ -239,8 +239,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PROC-02 | Phase 12 | Complete |
 | PROC-03 | Phase 12 | Complete |
 | PROC-04 | Phase 12 | Complete |
-| NAV-01 | Phase 13 | Pending |
-| NAV-02 | Phase 13 | Pending |
+| NAV-01 | Phase 13 | Complete |
+| NAV-02 | Phase 13 | Complete |
 
 **Coverage:**
 - v1 requirements: 52 total (all complete)
