@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Kumbh_Sans } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
@@ -17,10 +17,11 @@ export const metadata: Metadata = {
   description: "Simple review requests for busy businesses. Get more reviews without the hassle.",
 };
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  display: "swap",
+const kumbhSans = Kumbh_Sans({
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-kumbh-sans",
+  display: "swap",
 });
 
 export default function RootLayout({
@@ -30,7 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.className} antialiased`}>
+      <body className={`${kumbhSans.className} antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
