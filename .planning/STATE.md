@@ -145,10 +145,11 @@ Recent architectural decisions:
 | 001 | Response Rate Dashboard Widget | Complete | reviewed_at column + widget card |
 | 002 | Delete Account Button Settings | Complete | Service-role cascading delete + Radix Dialog confirmation |
 | 003 | Fix Onboarding Issues          | Complete | 6 new-user-flow fixes: OAuth redirect, fullName validation, standalone onboarding, QuickSend visibility, conditional stats, graceful sends |
+| 004 | Fix Test Send Onboarding       | Complete | Card #3 calls markOnboardingCardStep directly instead of navigating to /send; removed send_logs dependency |
 
 ## Session Continuity
 
 **Last session:** 2026-01-30
-**Stopped at:** Completed Phase 17 execution and verification (2/2 plans, 4/4 criteria)
+**Stopped at:** Completed quick-004 (fix test send onboarding)
 **Resume file:** None
 **Next action:** `/gsd:plan-phase 18` to plan the code cleanup phase
