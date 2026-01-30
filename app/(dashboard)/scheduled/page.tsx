@@ -1,8 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { getScheduledSends } from '@/lib/actions/schedule'
+import { getScheduledSendsWithDetails } from '@/lib/data/scheduled'
 import { ScheduledTable } from '@/components/scheduled/scheduled-table'
-import { Calendar, Send } from 'lucide-react'
+import { CalendarBlank, PaperPlaneTilt } from '@phosphor-icons/react/dist/ssr'
 import Link from 'next/link'
 
 export const metadata = {
@@ -23,8 +23,8 @@ export default async function ScheduledPage() {
     redirect('/login')
   }
 
-  // Fetch scheduled sends
-  const scheduledSends = await getScheduledSends()
+  // Fetch scheduled sends with details
+  const scheduledSends = await getScheduledSendsWithDetails()
 
   return (
     <div className="container mx-auto py-6 px-4">
@@ -37,16 +37,16 @@ export default async function ScheduledPage() {
 
       {scheduledSends.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted p-12 text-center">
-          <Calendar className="h-12 w-12 text-muted-foreground mb-4" />
+          <CalendarBlank className="h-12 w-12 text-muted-foreground mb-4" weight="duotone" />
           <h2 className="text-xl font-semibold mb-2">No scheduled sends</h2>
           <p className="text-muted-foreground mb-6 max-w-md">
             Schedule review requests from the Send page to see them here. You can schedule sends for later and manage them in one place.
           </p>
           <Link
             href="/send"
-            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 transition-colors"
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground border border-primary hover:bg-primary/90 transition-colors"
           >
-            <Send className="h-4 w-4" />
+            <PaperPlaneTilt className="h-4 w-4" weight="fill" />
             Schedule a Send
           </Link>
         </div>
