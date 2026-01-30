@@ -1,3 +1,5 @@
+'use client'
+
 import { AddressBook, NotePencil, PaperPlaneTilt, ArrowRight, CheckCircle, Circle } from '@phosphor-icons/react'
 import type { IconWeight } from '@phosphor-icons/react'
 import Link from 'next/link'
