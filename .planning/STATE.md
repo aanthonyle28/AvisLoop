@@ -37,7 +37,7 @@ Phase 15: █░░░ Design System & Dashboard Redesign (1/4) <- IN PROGRESS
 - **Race-safe processing:** Multiple cron invocations can't double-process
 
 ### Phase 13: Scheduling & Navigation (Complete)
-- **13-01:** Nav link badge showing pending scheduled count, added /scheduled to nav
+- **13-01:** Nav link badge showing pending scheduled count in sidebar and mobile nav, dashboard stat card for pending sends
 - **13-02:** /scheduled page with list view, status badges, cancel action for pending sends
 
 ### Phase 15: Design System & Dashboard Redesign (In Progress)
@@ -60,6 +60,9 @@ Next.js 15 (App Router), TypeScript, Supabase, Tailwind CSS, Resend, Stripe, Ups
 | D15-01-03 | 15-01 | Border-only design (no shadows) | Reference design aesthetic, removes all box-shadows from components | Medium | 2026-01-29 |
 | D15-01-04 | 15-01 | 8px border-radius standard | Changed from 12px for tighter corners matching reference | Low | 2026-01-29 |
 | D15-01-05 | 15-01 | Semantic status color palette | 5 status colors (success, warning, error, info, reviewed) with light/dark variants | Medium | 2026-01-29 |
+| D13-01-01 | 13-01 | Pass scheduled count as prop from Server Component layout | Client components cannot call server functions; count must be fetched server-side | Medium | 2026-01-30 |
+| D13-01-02 | 13-01 | Show badge on both desktop sidebar and mobile bottom nav | Users need visibility of pending scheduled sends from all navigation contexts | Low | 2026-01-30 |
+| D13-01-03 | 13-01 | Add Scheduled stat card to dashboard | Provides quick visibility of pending sends and reinforces feature discoverability | Low | 2026-01-30 |
 | D13-02-01 | 13-02 | Separate pending and past sends in UI | Users care most about pending sends; past sends are reference only | Medium | 2026-01-29 |
 | D13-02-02 | 13-02 | Native confirm() dialog for cancel confirmation | Simple, accessible, no additional UI dependencies | Low | 2026-01-29 |
 | D13-02-03 | 13-02 | Responsive table/card pattern | Tables don't work well on mobile; cards provide better UX | Medium | 2026-01-29 |
@@ -84,7 +87,7 @@ Recent architectural decisions:
 
 ## Session Continuity
 
-**Last session:** 2026-01-29
-**Stopped at:** Completed 13-02-PLAN.md (Scheduled Sends Page) - Phase 13 complete
+**Last session:** 2026-01-30
+**Stopped at:** Completed 13-01-PLAN.md (Navigation Updates) - Added dashboard stat card
 **Resume file:** None
 **Next action:** Phase 13 complete. Continue with Phase 14 or Phase 15 work.
