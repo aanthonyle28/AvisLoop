@@ -28,8 +28,8 @@ const STORAGE_KEY = 'onboarding-draft'
 interface OnboardingWizardProps {
   initialStep: number
   business: OnboardingBusiness
-  firstContact?: any // Future use
-  defaultTemplate?: any // Future use
+  firstContact?: unknown // Future use
+  defaultTemplate?: unknown // Future use
 }
 
 /**

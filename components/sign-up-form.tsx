@@ -4,15 +4,9 @@ import { useActionState } from "react";
 import { signUp, type AuthActionState } from "@/lib/actions/auth";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { GoogleOAuthButton } from "@/components/auth/google-oauth-button";
 import Link from "next/link";
 
 export function SignUpForm({
@@ -23,66 +17,84 @@ export function SignUpForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Sign up</CardTitle>
-          <CardDescription>Create a new account</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form action={formAction}>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="signup-fullName">Full Name (optional)</Label>
-                <Input
-                  id="signup-fullName"
-                  name="fullName"
-                  type="text"
-                  placeholder="John Doe"
-                />
-                {state?.fieldErrors?.fullName && (
-                  <p className="text-sm text-red-500">{state.fieldErrors.fullName[0]}</p>
-                )}
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="signup-email">Email</Label>
-                <Input
-                  id="signup-email"
-                  name="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  aria-label="Email address"
-                  required
-                />
-                {state?.fieldErrors?.email && (
-                  <p className="text-sm text-red-500">{state.fieldErrors.email[0]}</p>
-                )}
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="signup-password">Password</Label>
-                <Input
-                  id="signup-password"
-                  name="password"
-                  type="password"
-                  required
-                />
-                {state?.fieldErrors?.password && (
-                  <p className="text-sm text-red-500">{state.fieldErrors.password[0]}</p>
-                )}
-              </div>
-              {state?.error && <p className="text-sm text-red-500">{state.error}</p>}
-              <Button type="submit" className="w-full" disabled={pending}>
-                {pending ? "Creating an account..." : "Sign up"}
-              </Button>
-            </div>
-            <div className="mt-4 text-center text-sm">
-              Already have an account?{" "}
-              <Link href="/auth/login" className="underline underline-offset-4">
-                Login
-              </Link>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+      {/* Heading */}
+      <div className="space-y-2">
+        <h1 className="text-2xl font-bold">Create an account</h1>
+        <p className="text-muted-foreground">
+          Start collecting reviews in minutes
+        </p>
+      </div>
+
+      {/* Email/Password Form */}
+      <form action={formAction} className="space-y-4">
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="signup-fullName">Full Name (optional)</Label>
+            <Input
+              id="signup-fullName"
+              name="fullName"
+              type="text"
+              placeholder="John Doe"
+            />
+            {state?.fieldErrors?.fullName && (
+              <p className="text-sm text-red-500">{state.fieldErrors.fullName[0]}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="signup-email">Email</Label>
+            <Input
+              id="signup-email"
+              name="email"
+              type="email"
+              placeholder="m@example.com"
+              aria-label="Email address"
+              required
+            />
+            {state?.fieldErrors?.email && (
+              <p className="text-sm text-red-500">{state.fieldErrors.email[0]}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="signup-password">Password</Label>
+            <Input
+              id="signup-password"
+              name="password"
+              type="password"
+              required
+            />
+            {state?.fieldErrors?.password && (
+              <p className="text-sm text-red-500">{state.fieldErrors.password[0]}</p>
+            )}
+          </div>
+          {state?.error && <p className="text-sm text-red-500">{state.error}</p>}
+        </div>
+        <Button type="submit" className="w-full" disabled={pending}>
+          {pending ? "Creating an account..." : "Sign up"}
+        </Button>
+      </form>
+
+      {/* OR Divider */}
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-background px-2 text-muted-foreground">
+            Or continue with
+          </span>
+        </div>
+      </div>
+
+      {/* Google OAuth */}
+      <GoogleOAuthButton />
+
+      {/* Account Toggle */}
+      <div className="text-center text-sm">
+        Already have an account?{" "}
+        <Link href="/auth/login" className="underline underline-offset-4">
+          Login
+        </Link>
+      </div>
     </div>
   );
 }
