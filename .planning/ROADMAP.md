@@ -298,7 +298,7 @@ Plans:
 
 </details>
 
-### v1.1 Scheduled Sending (In Progress)
+### v1.1 Scheduled Sending (Complete)
 
 **Milestone Goal:** Let users schedule review request emails for future delivery with preset and custom timing options, manage pending sends, and rely on background processing to deliver them on time.
 
@@ -308,6 +308,10 @@ Plans:
 - [x] **Phase 13: Scheduling & Navigation** - Users can schedule sends and find the scheduling feature in navigation
 - [x] **Phase 14: Scheduled Send Management** - Users can view, cancel, and reschedule their pending sends
 - [x] **Phase 15: Design System & Dashboard Redesign** - Dashboard matches Figma reference with updated design tokens, typography, and layout
+
+### v1.2 Onboarding Redesign + Google Auth (In Progress)
+
+- [ ] **Phase 16: Onboarding Redesign + Google Auth** - Auth pages redesigned with split layout and Google OAuth, onboarding wizard simplified to 2 steps, dashboard shows 3 guided test step cards
 
 ## Phase Details
 
@@ -377,10 +381,28 @@ Plans:
 - [x] 15-03-PLAN.md — Dashboard data layer additions and new components (stat cards, recent activity, avatar)
 - [x] 15-04-PLAN.md — Dashboard page assembly with Quick Send, skeleton update
 
+### Phase 16: Onboarding Redesign + Google Auth
+**Goal**: Redesign auth pages with split layout and Google OAuth, simplify onboarding wizard to 2 steps, replace dashboard checklist with 3 guided test step cards
+**Depends on**: Phase 15 (design system)
+**Success Criteria** (what must be TRUE):
+  1. Login and signup pages use split layout (form left, image right) with Google OAuth button
+  2. Google OAuth works end-to-end (redirect, callback, session creation)
+  3. Onboarding wizard has 2 steps only (business name, Google review link)
+  4. Dashboard shows 3 numbered test step cards after onboarding (create contact, create template, send test)
+  5. Cards track completion automatically and disappear when all 3 done
+  6. Test sends are flagged in database and excluded from quota counting
+**Plans**: 4 plans in 2 waves
+
+Plans:
+- [ ] 16-01-PLAN.md — DB migration (is_test, onboarding JSONB) + Google OAuth infrastructure (callback, action, button)
+- [ ] 16-02-PLAN.md — Onboarding wizard redesign (2 steps: business name, Google review link)
+- [ ] 16-03-PLAN.md — Auth pages split layout redesign (login + signup with Google OAuth button)
+- [ ] 16-04-PLAN.md — Dashboard onboarding cards + test send quota exclusion
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -> 8 -> 8.1 -> 9 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15
+Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -> 8 -> 8.1 -> 9 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -402,3 +424,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -
 | 13. Scheduling & Navigation | v1.1 | 2/2 | Complete | 2026-01-29 |
 | 14. Scheduled Send Management | v1.1 | 2/2 | Complete | 2026-01-30 |
 | 15. Design System & Dashboard Redesign | v1.2 | 4/4 | Complete | 2026-01-29 |
+| 16. Onboarding Redesign + Google Auth | v1.2 | 0/4 | In Progress | — |
