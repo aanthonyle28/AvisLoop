@@ -5,9 +5,10 @@ import { OnboardingChecklist } from '@/components/dashboard/onboarding-checklist
 import { NextActionCard } from '@/components/dashboard/next-action-card'
 import { getBusiness } from '@/lib/actions/business'
 import { getMonthlyUsage, getResponseRate } from '@/lib/data/send-logs'
+import { getPendingScheduledCount } from '@/lib/data/scheduled'
 import { getContacts } from '@/lib/actions/contact'
 import Link from 'next/link'
-import { CheckCircle2, Users, Send } from 'lucide-react'
+import { CheckCircle2, Users, Send, Calendar } from 'lucide-react'
 import { ResponseRateCard } from '@/components/dashboard/response-rate-card'
 
 /**
@@ -30,12 +31,13 @@ export default async function DashboardPage({
   }
 
   // Fetch data in parallel
-  const [status, business, usage, contactsData, responseRate] = await Promise.all([
+  const [status, business, usage, contactsData, responseRate, scheduledCount] = await Promise.all([
     getOnboardingStatus(),
     getBusiness(),
     getMonthlyUsage(),
     getContacts({ limit: 1 }), // Just need the count
     getResponseRate(),
+    getPendingScheduledCount(),
   ])
 
   const params = await searchParams
@@ -119,6 +121,26 @@ export default async function DashboardPage({
                 className="text-sm text-primary hover:underline mt-2 inline-block"
               >
                 Manage contacts
+              </Link>
+            </div>
+
+            {/* Scheduled */}
+            <div className="rounded-lg border bg-card p-6">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Calendar className="h-4 w-4 text-primary" />
+                </div>
+                <h3 className="font-medium">Scheduled</h3>
+              </div>
+              <div className="flex items-baseline gap-1">
+                <span className="text-3xl font-bold">{scheduledCount}</span>
+                <span className="text-muted-foreground">pending</span>
+              </div>
+              <Link
+                href="/scheduled"
+                className="text-sm text-primary hover:underline mt-2 inline-block"
+              >
+                View scheduled
               </Link>
             </div>
 
