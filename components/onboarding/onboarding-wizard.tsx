@@ -6,12 +6,7 @@ import { z } from 'zod'
 import { OnboardingProgress } from './onboarding-progress'
 import { OnboardingSteps } from './onboarding-steps'
 import { markOnboardingComplete } from '@/lib/actions/onboarding'
-import { Button } from '@/components/ui/button'
-import type {
-  OnboardingBusiness,
-  OnboardingContact,
-  OnboardingTemplate,
-} from '@/lib/types/onboarding'
+import type { OnboardingBusiness } from '@/lib/types/onboarding'
 
 // Schema for localStorage draft data validation (SEC-04)
 // Using safeParse instead of catch for Zod 4 compatibility
@@ -24,9 +19,8 @@ type StepConfig = {
 }
 
 const STEPS: StepConfig[] = [
-  { id: 1, title: 'Business Info', skippable: false },
-  { id: 2, title: 'Add Contact', skippable: true },
-  { id: 3, title: 'Send Request', skippable: false },
+  { id: 1, title: 'Business Name', skippable: false },
+  { id: 2, title: 'Google Review Link', skippable: true },
 ]
 
 const STORAGE_KEY = 'onboarding-draft'
@@ -34,8 +28,8 @@ const STORAGE_KEY = 'onboarding-draft'
 interface OnboardingWizardProps {
   initialStep: number
   business: OnboardingBusiness
-  firstContact: OnboardingContact
-  defaultTemplate: OnboardingTemplate
+  firstContact?: any // Optional for future use
+  defaultTemplate?: any // Optional for future use
 }
 
 /**
@@ -104,6 +98,12 @@ export function OnboardingWizard({
     }
   }, [currentStep, goToStep])
 
+  const goBack = useCallback(() => {
+    if (currentStep > 1) {
+      goToStep(currentStep - 1)
+    }
+  }, [currentStep, goToStep])
+
   // Completion handler
   const handleComplete = useCallback(async () => {
     if (isSubmitting) return
@@ -123,48 +123,26 @@ export function OnboardingWizard({
     }
   }, [isSubmitting, router])
 
-  const currentStepConfig = STEPS[currentStep - 1]
-  const stepTitles = STEPS.map(s => s.title)
-
   return (
-    <div className="space-y-8">
-      {/* Progress indicator */}
-      <OnboardingProgress
-        currentStep={currentStep}
-        totalSteps={STEPS.length}
-        stepTitles={stepTitles}
-      />
-
-      {/* Step content */}
-      <div className="bg-card rounded-lg border p-6 shadow-sm">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 pb-20">
+      <div className="w-full max-w-lg space-y-8">
+        {/* Step content */}
         <OnboardingSteps
           currentStep={currentStep}
           business={business}
-          firstContact={firstContact}
-          defaultTemplate={defaultTemplate}
           onGoToNext={goToNext}
-          onGoToStep={goToStep}
+          onGoBack={goBack}
           onComplete={handleComplete}
+          isSubmitting={isSubmitting}
         />
       </div>
 
-      {/* Skip button for skippable steps */}
-      {currentStepConfig?.skippable && currentStep < STEPS.length && (
-        <div className="text-center">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={goToNext}
-            disabled={isSubmitting}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            Skip this step
-          </Button>
-          <p className="text-xs text-muted-foreground mt-1">
-            You can add contacts later from the Contacts page
-          </p>
-        </div>
-      )}
+      {/* Progress bar fixed at bottom */}
+      <OnboardingProgress
+        currentStep={currentStep}
+        totalSteps={STEPS.length}
+        stepTitles={STEPS.map(s => s.title)}
+      />
     </div>
   )
 }
