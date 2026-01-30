@@ -52,6 +52,8 @@ export async function sendReviewRequest(
   }
 
   // === Parse and validate input ===
+  const isTest = formData.get('isTest') === 'true'
+
   const parsed = sendRequestSchema.safeParse({
     contactId: formData.get('contactId'),
     templateId: formData.get('templateId') || undefined,
@@ -149,6 +151,7 @@ export async function sendReviewRequest(
       template_id: templateId || null,
       status: 'pending',
       subject,
+      is_test: isTest,
     })
     .select('id')
     .single()
@@ -228,6 +231,7 @@ async function getMonthlyCount(
     .from('send_logs')
     .select('*', { count: 'exact', head: true })
     .eq('business_id', businessId)
+    .eq('is_test', false) // Exclude test sends from quota
     .gte('created_at', startOfMonth.toISOString())
     .in('status', ['sent', 'delivered', 'opened']) // Only count successful sends
 
@@ -268,6 +272,7 @@ export async function batchSendReviewRequest(
   }
 
   // === 2. Parse and validate input ===
+  const isTest = formData.get('isTest') === 'true'
   const contactIdsRaw = formData.get('contactIds')
   let contactIds: string[] = []
 
@@ -414,6 +419,7 @@ export async function batchSendReviewRequest(
           template_id: templateId || null,
           status: 'pending',
           subject: defaultSubject,
+          is_test: isTest,
         })
         .select('id')
         .single()

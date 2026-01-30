@@ -16,6 +16,16 @@ export type OnboardingStatus = {
 }
 
 /**
+ * Dashboard onboarding card completion status.
+ * Tracks the 3 post-wizard onboarding cards (create contact, create template, send test).
+ */
+export type OnboardingCardStatus = {
+  contact_created: boolean
+  template_created: boolean
+  test_sent: boolean
+}
+
+/**
  * Fetch onboarding status for current user's business.
  * Returns null if user is not authenticated.
  *
@@ -77,4 +87,72 @@ export async function getOnboardingStatus(): Promise<OnboardingStatus | null> {
       hasSentMessage: (sendCount ?? 0) > 0,
     }
   }
+}
+
+/**
+ * Get onboarding card completion status for the current user's business.
+ * Auto-detects completion from database state and persists to JSONB column.
+ *
+ * Checks:
+ * - contact_created: At least one active contact exists
+ * - template_created: At least one email template exists
+ * - test_sent: At least one send_log entry exists
+ */
+export async function getOnboardingCardStatus(): Promise<OnboardingCardStatus> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return { contact_created: false, template_created: false, test_sent: false }
+  }
+
+  const { data: business } = await supabase
+    .from('businesses')
+    .select('id, onboarding_steps_completed')
+    .eq('user_id', user.id)
+    .single()
+
+  if (!business) {
+    return { contact_created: false, template_created: false, test_sent: false }
+  }
+
+  // Read stored status from JSONB column
+  const stored = (business.onboarding_steps_completed || {}) as Partial<OnboardingCardStatus>
+
+  // If all stored as true, return immediately (no need to re-query)
+  if (stored.contact_created && stored.template_created && stored.test_sent) {
+    return stored as OnboardingCardStatus
+  }
+
+  // Auto-detect completion from actual database state
+  const [contactResult, templateResult, testSendResult] = await Promise.all([
+    supabase.from('contacts').select('id', { count: 'exact', head: true }).eq('business_id', business.id).eq('status', 'active'),
+    supabase.from('email_templates').select('id', { count: 'exact', head: true }).eq('business_id', business.id),
+    supabase.from('send_logs').select('id', { count: 'exact', head: true }).eq('business_id', business.id),
+  ])
+
+  const detected: OnboardingCardStatus = {
+    contact_created: (contactResult.count ?? 0) > 0,
+    template_created: (templateResult.count ?? 0) > 0,
+    test_sent: (testSendResult.count ?? 0) > 0,
+  }
+
+  // If any newly detected, persist to JSONB column for faster future reads
+  const needsUpdate = Object.entries(detected).some(
+    ([key, val]) => val && !stored[key as keyof OnboardingCardStatus]
+  )
+  if (needsUpdate) {
+    await supabase
+      .from('businesses')
+      .update({ onboarding_steps_completed: detected })
+      .eq('id', business.id)
+  }
+
+  return detected
+}
+
+/**
+ * Helper to check if all onboarding cards are complete.
+ */
+export function areAllCardsComplete(status: OnboardingCardStatus): boolean {
+  return status.contact_created && status.template_created && status.test_sent
 }

@@ -120,6 +120,7 @@ export async function getMonthlyUsage(): Promise<{
     .from('send_logs')
     .select('*', { count: 'exact', head: true })
     .eq('business_id', business.id)
+    .eq('is_test', false) // Exclude test sends from quota
     .gte('created_at', startOfMonth.toISOString())
     .in('status', ['sent', 'delivered', 'opened'])
 
