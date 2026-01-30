@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createServiceRoleClient } from '@/lib/supabase/service-role'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import {
@@ -141,6 +142,41 @@ export async function updatePassword(
 
   revalidatePath('/', 'layout')
   redirect('/dashboard')
+}
+
+export async function deleteAccount(): Promise<AuthActionState> {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return { error: 'Not authenticated' }
+  }
+
+  const admin = createServiceRoleClient()
+
+  // Delete business (cascades to email_templates, contacts, send_logs, subscriptions, scheduled_sends)
+  const { error: deleteBusinessError } = await admin
+    .from('businesses')
+    .delete()
+    .eq('user_id', user.id)
+
+  if (deleteBusinessError) {
+    return { error: 'Failed to delete account data. Please try again.' }
+  }
+
+  // Delete profile row if it exists
+  await admin.from('profiles').delete().eq('id', user.id)
+
+  // Delete the auth user via admin API
+  const { error: deleteUserError } = await admin.auth.admin.deleteUser(user.id)
+  if (deleteUserError) {
+    return { error: 'Failed to delete account. Please try again.' }
+  }
+
+  // Sign out current session
+  await supabase.auth.signOut()
+
+  redirect('/')
 }
 
 export async function signInWithGoogle() {
