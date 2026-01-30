@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useTransition, useMemo } from 'react'
-import { PaperPlaneTilt, MagnifyingGlass } from '@phosphor-icons/react/dist/ssr'
+import { PaperPlaneTilt, MagnifyingGlass, UserPlus } from '@phosphor-icons/react'
 import { batchSendReviewRequest } from '@/lib/actions/send'
 import { scheduleReviewRequest } from '@/lib/actions/schedule'
 import { toast } from 'sonner'
@@ -143,9 +143,9 @@ export function QuickSend({ contacts, templates, recentContacts }: QuickSendProp
   }
 
   return (
-    <div className="flex flex-col md:flex-row gap-4">
+    <div className="flex flex-col md:flex-row border border-[#E3E3E3] rounded-lg overflow-hidden">
       {/* Left panel - Quick Send */}
-      <div className="flex-1 bg-white border border-[#E3E3E3] rounded-lg p-5">
+      <div className="flex-1 bg-white p-5">
         <div className="flex items-center gap-2 mb-4">
           <PaperPlaneTilt size={20} weight="regular" />
           <h3 className="font-semibold">Quick Send</h3>
@@ -155,42 +155,52 @@ export function QuickSend({ contacts, templates, recentContacts }: QuickSendProp
           {/* Contact search */}
           <div className="relative">
             <label htmlFor="contact-search" className="block text-sm font-medium mb-2">
-              Select Contact
+              Contact
             </label>
-            <div className="relative">
-              <MagnifyingGlass
-                size={16}
-                weight="regular"
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-              />
-              <input
-                id="contact-search"
-                type="text"
-                placeholder="Search by name or email..."
-                value={selectedContact ? selectedContact.name : searchQuery}
-                onChange={(e) => {
-                  if (!selectedContact) {
-                    setSearchQuery(e.target.value)
-                    setShowDropdown(true)
-                  }
-                }}
-                onFocus={() => {
-                  if (!selectedContact && searchQuery) {
-                    setShowDropdown(true)
-                  }
-                }}
-                readOnly={!!selectedContact}
-                className="w-full pl-9 pr-3 py-2 border border-[#E3E3E3] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-              />
-              {selectedContact && (
-                <button
-                  type="button"
-                  onClick={handleDeselectContact}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  ×
-                </button>
-              )}
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <MagnifyingGlass
+                  size={16}
+                  weight="regular"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                />
+                <input
+                  id="contact-search"
+                  type="text"
+                  placeholder="Search Through Comments..."
+                  value={selectedContact ? selectedContact.name : searchQuery}
+                  onChange={(e) => {
+                    if (!selectedContact) {
+                      setSearchQuery(e.target.value)
+                      setShowDropdown(true)
+                    }
+                  }}
+                  onFocus={() => {
+                    if (!selectedContact && searchQuery) {
+                      setShowDropdown(true)
+                    }
+                  }}
+                  readOnly={!!selectedContact}
+                  className="w-full pl-9 pr-8 py-2 border border-[#E3E3E3] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                />
+                {selectedContact && (
+                  <button
+                    type="button"
+                    onClick={handleDeselectContact}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+              {/* Add Contact button */}
+              <a
+                href="/contacts"
+                className="shrink-0 w-10 h-10 flex items-center justify-center rounded-lg bg-foreground text-background hover:bg-foreground/90 transition-colors"
+                title="Add Contact"
+              >
+                <UserPlus size={18} weight="bold" />
+              </a>
             </div>
 
             {/* Search dropdown */}
@@ -211,17 +221,21 @@ export function QuickSend({ contacts, templates, recentContacts }: QuickSendProp
             )}
           </div>
 
-          {/* Recently added contacts */}
-          {!selectedContact && recentContacts.length > 0 && (
+          {/* Recently added contacts - always visible */}
+          {recentContacts.length > 0 && (
             <div>
-              <label className="block text-sm font-medium mb-2">Recently Added</label>
+              <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Recently Added</label>
               <div className="flex flex-wrap gap-2">
                 {recentContacts.slice(0, 5).map(contact => (
                   <button
                     key={contact.id}
                     type="button"
                     onClick={() => handleSelectContact(contact.id)}
-                    className="rounded-full border border-[#E3E3E3] px-3 py-1 text-xs font-medium hover:border-primary/50 hover:bg-primary/5 transition-colors"
+                    className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                      selectedContactId === contact.id
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'border-[#E3E3E3] hover:border-primary/50 hover:bg-primary/5'
+                    }`}
                   >
                     {contact.name}
                   </button>
@@ -239,7 +253,7 @@ export function QuickSend({ contacts, templates, recentContacts }: QuickSendProp
               id="template-select"
               value={selectedTemplateId}
               onChange={(e) => setSelectedTemplateId(e.target.value)}
-              className="w-full px-3 py-2 border border-[#E3E3E3] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              className="w-full px-3 py-2 border border-[#E3E3E3] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none bg-white"
             >
               {templates.map(template => (
                 <option key={template.id} value={template.id}>
@@ -251,75 +265,38 @@ export function QuickSend({ contacts, templates, recentContacts }: QuickSendProp
         </form>
       </div>
 
+      {/* Divider */}
+      <div className="hidden md:block w-px bg-[#E3E3E3]" />
+      <div className="md:hidden h-px bg-[#E3E3E3]" />
+
       {/* Right panel - When to Send */}
-      <div className="w-full md:w-64 md:shrink-0 bg-white border border-[#E3E3E3] rounded-lg p-5">
+      <div className="w-full md:w-72 md:shrink-0 bg-[#F9F9FB] p-5">
         <h3 className="font-semibold text-sm mb-4">When to Send</h3>
 
         <div className="space-y-2 mb-4">
-          {/* Immediately */}
-          <button
-            type="button"
-            onClick={() => setSchedulePreset('immediately')}
-            className={`w-full rounded-full border px-3 py-1.5 text-xs font-medium cursor-pointer transition-colors ${
-              schedulePreset === 'immediately'
-                ? 'bg-primary/10 border-primary text-primary'
-                : 'border-[#E3E3E3] text-foreground/70 hover:border-primary/50'
-            }`}
-          >
-            Immediately
-          </button>
-
-          {/* In 1 hour */}
-          <button
-            type="button"
-            onClick={() => setSchedulePreset('1hour')}
-            className={`w-full rounded-full border px-3 py-1.5 text-xs font-medium cursor-pointer transition-colors ${
-              schedulePreset === '1hour'
-                ? 'bg-primary/10 border-primary text-primary'
-                : 'border-[#E3E3E3] text-foreground/70 hover:border-primary/50'
-            }`}
-          >
-            In 1 hour
-          </button>
-
-          {/* In the morning (9AM) */}
-          <button
-            type="button"
-            onClick={() => setSchedulePreset('morning')}
-            className={`w-full rounded-full border px-3 py-1.5 text-xs font-medium cursor-pointer transition-colors ${
-              schedulePreset === 'morning'
-                ? 'bg-primary/10 border-primary text-primary'
-                : 'border-[#E3E3E3] text-foreground/70 hover:border-primary/50'
-            }`}
-          >
-            In the morning (9AM)
-          </button>
-
-          {/* In 24 hours */}
-          <button
-            type="button"
-            onClick={() => setSchedulePreset('24hours')}
-            className={`w-full rounded-full border px-3 py-1.5 text-xs font-medium cursor-pointer transition-colors ${
-              schedulePreset === '24hours'
-                ? 'bg-primary/10 border-primary text-primary'
-                : 'border-[#E3E3E3] text-foreground/70 hover:border-primary/50'
-            }`}
-          >
-            In 24 hours
-          </button>
-
-          {/* Different date */}
-          <button
-            type="button"
-            onClick={() => setSchedulePreset('custom')}
-            className={`w-full rounded-full border px-3 py-1.5 text-xs font-medium cursor-pointer transition-colors ${
-              schedulePreset === 'custom'
-                ? 'bg-primary/10 border-primary text-primary'
-                : 'border-[#E3E3E3] text-foreground/70 hover:border-primary/50'
-            }`}
-          >
-            Different date
-          </button>
+          {(['immediately', '1hour', 'morning', '24hours', 'custom'] as SchedulePreset[]).map((preset) => {
+            const labels: Record<SchedulePreset, string> = {
+              immediately: 'Immediately',
+              '1hour': 'In 1 hour',
+              morning: 'In the morning (9AM)',
+              '24hours': 'In 24 hours',
+              custom: 'Different date',
+            }
+            return (
+              <button
+                key={preset}
+                type="button"
+                onClick={() => setSchedulePreset(preset)}
+                className={`w-full rounded-full border px-3 py-2 text-xs font-medium cursor-pointer transition-colors ${
+                  schedulePreset === preset
+                    ? 'bg-primary/10 border-primary text-primary'
+                    : 'border-[#E3E3E3] bg-white text-foreground/70 hover:border-primary/50'
+                }`}
+              >
+                {labels[preset]}
+              </button>
+            )
+          })}
         </div>
 
         {/* Custom date/time input */}
@@ -329,7 +306,7 @@ export function QuickSend({ contacts, templates, recentContacts }: QuickSendProp
               type="datetime-local"
               value={customDateTime}
               onChange={(e) => setCustomDateTime(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-[#E3E3E3] rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              className="w-full px-3 py-2 text-sm border border-[#E3E3E3] rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
             />
           </div>
         )}
