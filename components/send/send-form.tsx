@@ -1,9 +1,11 @@
 'use client'
 
-import { useActionState, useEffect, useState } from 'react'
+import { useActionState, useEffect, useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { batchSendReviewRequest } from '@/lib/actions/send'
 import { scheduleReviewRequest } from '@/lib/actions/schedule'
+import { markOnboardingCardStep } from '@/lib/actions/onboarding'
 import { ContactSelector } from './contact-selector'
 import { MessagePreview } from './message-preview'
 import { BatchResults } from './batch-results'
@@ -33,6 +35,7 @@ export function SendForm({
   resendReadyContactIds,
   isTest = false,
 }: SendFormProps) {
+  const router = useRouter()
   const [selectedContacts, setSelectedContacts] = useState<Set<string>>(new Set())
   const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(
     templates.find(t => t.is_default) || templates[0] || null
@@ -41,6 +44,8 @@ export function SendForm({
   const [showResults, setShowResults] = useState(false)
   const [scheduledFor, setScheduledFor] = useState<string | null>(null)
   const [scheduleSuccess, setScheduleSuccess] = useState<ScheduleActionState | null>(null)
+  const [isTestPending, startTestTransition] = useTransition()
+  const [testComplete, setTestComplete] = useState(false)
 
   const [batchState, batchFormAction, isBatchPending] = useActionState(batchSendReviewRequest, null)
   const [scheduleState, scheduleFormAction, isSchedulePending] = useActionState(scheduleReviewRequest, null)
@@ -83,6 +88,27 @@ export function SendForm({
     contactLimit !== undefined && contactCount > contactLimit
 
   const limitReached = sendLimitReached || contactsOverLimit
+
+  // Test mode: show success and redirect to dashboard
+  if (testComplete) {
+    return (
+      <div className="rounded-lg border border-green-200 bg-green-50 p-8 text-center space-y-4">
+        <CheckCircle2 className="h-12 w-12 text-green-600 mx-auto" />
+        <h2 className="text-xl font-semibold">Test Send Complete!</h2>
+        <p className="text-muted-foreground">
+          No email was sent — this was a walkthrough of the send flow.
+          You&apos;re all set to start sending real review requests!
+        </p>
+        <button
+          type="button"
+          onClick={() => router.push('/dashboard')}
+          className="inline-flex items-center px-6 py-3 rounded-md bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors"
+        >
+          Back to Dashboard
+        </button>
+      </div>
+    )
+  }
 
   // Show results if batch completed
   if (showResults && batchState?.success && batchState.data) {
@@ -129,6 +155,15 @@ export function SendForm({
     // Inject contact IDs
     formData.set('contactIds', JSON.stringify(Array.from(selectedContacts)))
 
+    // Test mode: simulate the send, mark onboarding complete, redirect to dashboard
+    if (isTest) {
+      startTestTransition(async () => {
+        await markOnboardingCardStep('test_sent')
+        setTestComplete(true)
+      })
+      return
+    }
+
     if (isScheduled) {
       formData.set('scheduledFor', scheduledFor)
       scheduleFormAction(formData)
@@ -142,7 +177,7 @@ export function SendForm({
       {/* Test mode indicator */}
       {isTest && (
         <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm text-blue-700">
-          Test mode - this send will not count against your monthly quota
+          Walkthrough mode — select a contact, preview your message, and hit send. No email will actually be sent.
         </div>
       )}
 
@@ -239,12 +274,9 @@ export function SendForm({
       {/* Custom subject input */}
       <input type="hidden" name="customSubject" value={customSubject} />
 
-      {/* Test mode flag */}
-      {isTest && <input type="hidden" name="isTest" value="true" />}
-
       {/* Submit button or upgrade prompt */}
       <div className="flex justify-end pt-4 border-t">
-        {limitReached ? (
+        {limitReached && !isTest ? (
           <div className="w-full rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-center">
             <p className="text-sm text-destructive mb-3">
               {contactsOverLimit
@@ -269,13 +301,17 @@ export function SendForm({
         ) : (
           <button
             type="submit"
-            disabled={selectedContacts.size === 0 || isBatchPending || isSchedulePending || (isScheduled && !scheduledFor)}
+            disabled={selectedContacts.size === 0 || isBatchPending || isSchedulePending || isTestPending || (isScheduled && !scheduledFor)}
             className="inline-flex items-center px-6 py-3 rounded-md bg-primary text-primary-foreground font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {isBatchPending || isSchedulePending ? (
+            {isBatchPending || isSchedulePending || isTestPending ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                {isScheduled ? 'Scheduling...' : 'Sending...'}
+                {isTest ? 'Completing...' : isScheduled ? 'Scheduling...' : 'Sending...'}
+              </>
+            ) : isTest ? (
+              <>
+                Send Test to {selectedContacts.size} Contact{selectedContacts.size !== 1 ? 's' : ''}
               </>
             ) : isScheduled ? (
               <>

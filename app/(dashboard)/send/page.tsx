@@ -17,7 +17,7 @@ export default async function SendPage({ searchParams }: { searchParams: Promise
     redirect('/dashboard/settings')
   }
 
-  if (!business.google_review_link) {
+  if (!business.google_review_link && !isTest) {
     return (
       <div className="container mx-auto py-6 px-4">
         <h1 className="text-2xl font-bold mb-6">Send Review Request</h1>
@@ -69,22 +69,28 @@ export default async function SendPage({ searchParams }: { searchParams: Promise
   return (
     <div className="container mx-auto py-6 px-4">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Send Review Request</h1>
-        <Link
-          href="/billing"
-          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          {usage.count} / {usage.limit} sends this month
-        </Link>
+        <h1 className="text-2xl font-bold">
+          {isTest ? 'Test Send Walkthrough' : 'Send Review Request'}
+        </h1>
+        {!isTest && (
+          <Link
+            href="/billing"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {usage.count} / {usage.limit} sends this month
+          </Link>
+        )}
       </div>
 
-      <UsageWarningBanner
-        count={usage.count}
-        limit={usage.limit}
-        tier={usage.tier}
-        contactCount={contactCount ?? undefined}
-        contactLimit={contactLimit}
-      />
+      {!isTest && (
+        <UsageWarningBanner
+          count={usage.count}
+          limit={usage.limit}
+          tier={usage.tier}
+          contactCount={contactCount ?? undefined}
+          contactLimit={contactLimit}
+        />
+      )}
 
       {sendableContacts.length === 0 ? (
         <div className="rounded-lg border border-muted p-6 text-center">

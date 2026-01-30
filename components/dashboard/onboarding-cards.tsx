@@ -1,12 +1,7 @@
-'use client'
-
-import { useTransition } from 'react'
-import { AddressBook, NotePencil, PaperPlaneTilt, ArrowRight, CheckCircle, Circle, SpinnerGap } from '@phosphor-icons/react'
+import { AddressBook, NotePencil, PaperPlaneTilt, ArrowRight, CheckCircle, Circle } from '@phosphor-icons/react'
 import type { IconWeight } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
-import { toast } from 'sonner'
-import { markOnboardingCardStep } from '@/lib/actions/onboarding'
 import type { OnboardingCardStatus } from '@/lib/data/onboarding'
 
 type CardConfig = {
@@ -15,8 +10,7 @@ type CardConfig = {
   title: string
   description: string
   icon: React.ComponentType<{ className?: string; weight?: IconWeight }>
-  href?: string
-  action?: 'test_sent'
+  href: string
   prerequisite?: keyof OnboardingCardStatus
   prerequisiteLabel?: string
 }
@@ -42,33 +36,21 @@ const CARDS: CardConfig[] = [
     id: 'test_sent',
     number: '03',
     title: 'Send a test review request',
-    description: 'Try sending your first review request',
+    description: 'Walk through the send flow — no email is sent',
     icon: PaperPlaneTilt,
-    action: 'test_sent',
+    href: '/send?test=true',
     prerequisite: 'contact_created',
     prerequisiteLabel: 'Create a contact first',
   },
 ]
 
 export function OnboardingCards({ status }: { status: OnboardingCardStatus }) {
-  const [isPending, startTransition] = useTransition()
   const completedCount = Object.values(status).filter(Boolean).length
   const totalCount = CARDS.length
 
   // Hide if all cards complete
   if (completedCount === totalCount) {
     return null
-  }
-
-  function handleTestSend() {
-    startTransition(async () => {
-      const result = await markOnboardingCardStep('test_sent')
-      if (result.success) {
-        toast.success('Test send complete! You are all set.')
-      } else {
-        toast.error(result.error || 'Something went wrong')
-      }
-    })
   }
 
   return (
@@ -97,8 +79,6 @@ export function OnboardingCards({ status }: { status: OnboardingCardStatus }) {
                 </span>
                 {isComplete ? (
                   <CheckCircle weight="fill" className="h-5 w-5 text-green-600" />
-                ) : card.action && isPending ? (
-                  <SpinnerGap weight="regular" className="h-5 w-5 text-muted-foreground animate-spin" />
                 ) : (
                   <Circle weight="regular" className="h-5 w-5 text-muted-foreground" />
                 )}
@@ -132,29 +112,16 @@ export function OnboardingCards({ status }: { status: OnboardingCardStatus }) {
           const sharedClasses = cn(
             'group relative block rounded-lg border p-6 transition-all hover:border-primary text-left w-full',
             isComplete && 'border-green-200 bg-green-50/50',
-            card.action && isPending && 'opacity-50 pointer-events-none'
+            hasPrerequisite && 'opacity-50 pointer-events-none'
           )
-
-          // Card #3 (test_sent) renders as a button, not a Link
-          if (card.action) {
-            return (
-              <button
-                key={card.id}
-                type="button"
-                className={sharedClasses}
-                disabled={isPending || isComplete || !!hasPrerequisite}
-                onClick={handleTestSend}
-              >
-                {cardContent}
-              </button>
-            )
-          }
 
           return (
             <Link
               key={card.id}
-              href={card.href!}
+              href={card.href}
               className={sharedClasses}
+              aria-disabled={!!hasPrerequisite}
+              tabIndex={hasPrerequisite ? -1 : undefined}
             >
               {cardContent}
             </Link>
