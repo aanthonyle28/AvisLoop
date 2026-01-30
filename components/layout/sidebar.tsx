@@ -166,7 +166,7 @@ export function Sidebar({ scheduledCount = 0 }: SidebarProps) {
         <div className="my-6" />
 
         {secondaryNav.map((item) => (
-          <NavLink key={item.href} item={item} />
+          <NavLink key={item.label} item={item} />
         ))}
       </nav>
 

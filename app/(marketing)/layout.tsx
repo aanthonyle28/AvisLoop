@@ -170,7 +170,7 @@ export default function MarketingLayout({
 
           <div className="mt-12 pt-8 border-t border-border/40 flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} AvisLoop. All rights reserved.
+              &copy; 2026 AvisLoop. All rights reserved.
             </p>
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <span>Made for local businesses</span>
