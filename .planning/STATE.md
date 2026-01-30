@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 **Phase:** 15 of 15 (Design System & Dashboard Redesign)
-**Plan:** 15-01 of 4 (Design System Foundation)
-**Status:** Plan 15-01 complete
-**Last activity:** 2026-01-29 -- Completed 15-01-PLAN.md (Design System Foundation)
+**Plan:** 15-02 of 4 (Sidebar and Bottom Nav Redesign)
+**Status:** Plan 15-02 complete
+**Last activity:** 2026-01-30 -- Completed 15-02-PLAN.md (Sidebar and Bottom Nav Redesign)
 
-**Progress:** [###########---------] 48/48 v1.0 plans complete, 1/1 Phase 12 complete, 2/2 Phase 13 complete, 1/4 Phase 15 complete
+**Progress:** [###########---------] 48/48 v1.0 plans complete, 1/1 Phase 12 complete, 2/2 Phase 13 complete, 2/4 Phase 15 complete
 
 ```
 v1.0 MVP: ████████████████████████████████████████████████ 48/48 COMPLETE
 Phase 12: █ Cron Processing (1/1) COMPLETE
 Phase 13: ██ Scheduling & Navigation (2/2) COMPLETE
 Phase 14: ░░░ Scheduled Send Management (0/TBD)
-Phase 15: █░░░ Design System & Dashboard Redesign (1/4) <- IN PROGRESS
+Phase 15: ██░░ Design System & Dashboard Redesign (2/4) <- IN PROGRESS
 ```
 
 ## What's Been Built
@@ -42,6 +42,7 @@ Phase 15: █░░░ Design System & Dashboard Redesign (1/4) <- IN PROGRESS
 
 ### Phase 15: Design System & Dashboard Redesign (In Progress)
 - **15-01 Complete:** Design system foundation with #1B44BF primary color, Kumbh Sans font, Phosphor icons, semantic status palette, border-only design (no shadows)
+- **15-02 Complete:** Sidebar and bottom nav with Phosphor icons, white sidebar bg with #E2E2E2 border, #F2F2F2 active state, #F9F9F9 content bg
 
 ## Tech Stack
 
@@ -66,6 +67,8 @@ Next.js 15 (App Router), TypeScript, Supabase, Tailwind CSS, Resend, Stripe, Ups
 | D13-02-01 | 13-02 | Separate pending and past sends in UI | Users care most about pending sends; past sends are reference only | Medium | 2026-01-29 |
 | D13-02-02 | 13-02 | Native confirm() dialog for cancel confirmation | Simple, accessible, no additional UI dependencies | Low | 2026-01-29 |
 | D13-02-03 | 13-02 | Responsive table/card pattern | Tables don't work well on mobile; cards provide better UX | Medium | 2026-01-29 |
+| D15-02-01 | 15-02 | Bottom nav reduced to 4 items | Scheduled removed from mobile nav to match reference design | Low | 2026-01-30 |
+| D15-02-02 | 15-02 | App content bg #F9F9F9 | Light gray background for content area matching Figma reference | Low | 2026-01-30 |
 
 Recent architectural decisions:
 - Separate scheduled_sends table (different lifecycle than send_logs)
@@ -88,6 +91,6 @@ Recent architectural decisions:
 ## Session Continuity
 
 **Last session:** 2026-01-30
-**Stopped at:** Completed 13-01-PLAN.md (Navigation Updates) - Added dashboard stat card
+**Stopped at:** Completed 15-02-PLAN.md (Sidebar and Bottom Nav Redesign)
 **Resume file:** None
-**Next action:** Phase 13 complete. Continue with Phase 14 or Phase 15 work.
+**Next action:** Continue with Phase 15-03 (Quick Send Form) or Phase 15-04 (Dashboard Integration)
