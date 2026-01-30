@@ -336,7 +336,11 @@ Plans:
   3. User sees confirmation toast with the scheduled date/time after scheduling
   4. Sidebar and mobile bottom nav include a "Scheduled" link with pending count badge
   5. Dashboard shows count of pending scheduled sends
-**Plans**: TBD
+**Plans**: 2 plans in 1 wave
+
+Plans:
+- [ ] 13-01-PLAN.md — Navigation updates with pending count badge (data function, sidebar, bottom nav, dashboard)
+- [ ] 13-02-PLAN.md — /scheduled page with table, empty state, and cancel action
 
 ### Phase 14: Scheduled Send Management
 **Goal**: Users can view, cancel, and reschedule their pending sends
@@ -391,6 +395,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -
 | 10. Landing Page Redesign | v1.0 | 5/5 | Complete | 2026-01-28 |
 | 11. Bulk Send & Integrations | v1.0 | 3/3 | Complete | 2026-01-28 |
 | 12. Cron Processing | v1.1 | 1/1 | Complete | 2026-01-29 |
-| 13. Scheduling & Navigation | v1.1 | 0/TBD | Not started | - |
+| 13. Scheduling & Navigation | v1.1 | 0/2 | Not started | - |
 | 14. Scheduled Send Management | v1.1 | 0/TBD | Not started | - |
 | 15. Design System & Dashboard Redesign | v1.2 | 0/4 | Not started | - |
