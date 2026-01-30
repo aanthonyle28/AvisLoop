@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 **Phase:** 17 of 18 (Deployment & Critical Fixes)
-**Plan:** 1 of 3 complete
+**Plan:** 2 of 3 complete
 **Status:** In progress — fixing deployment blockers from v1.2 audit
-**Last activity:** 2026-01-30 -- Completed 17-01-PLAN.md (scheduled_sends migration)
+**Last activity:** 2026-01-30 -- Completed 17-02-PLAN.md (Phase 4 verification)
 
-**Progress:** [█████████████████████] 54/59 total plans complete (Phase 17: 1/3, Phase 18 pending)
+**Progress:** [█████████████████████] 55/59 total plans complete (Phase 17: 2/3, Phase 18 pending)
 
 ```
 v1.0 MVP: ████████████████████████████████████████████████ 48/48 COMPLETE
@@ -23,7 +23,7 @@ Phase 13: ██ Scheduling & Navigation (2/2) COMPLETE
 Phase 14: ██ Scheduled Send Management (2/2) COMPLETE
 Phase 15: ████ Design System & Dashboard Redesign (4/4) COMPLETE
 Phase 16: █████ Onboarding Redesign (5/5) COMPLETE
-Phase 17: █ Deployment & Critical Fixes (1/3) IN PROGRESS
+Phase 17: ██ Deployment & Critical Fixes (2/3) IN PROGRESS
 ```
 
 ## What's Been Built
@@ -61,6 +61,7 @@ Phase 17: █ Deployment & Critical Fixes (1/3) IN PROGRESS
 
 ### Phase 17: Deployment & Critical Fixes (In Progress)
 - **17-01 Complete:** Created missing scheduled_sends table migration (00009b) that slots between 00009 and 00010, fixing deployment blocker where fresh database deploy failed at migration 00010 which references SETOF scheduled_sends
+- **17-02 Complete:** Formal verification of Phase 4 Core Sending with all 9 success criteria confirmed passed (contact selection, message preview, send confirmation, logging, cooldown, rate limiting, opt-out, quotas, webhooks), password reset path audit item confirmed resolved
 
 ## Tech Stack
 
@@ -119,6 +120,7 @@ Next.js 15 (App Router), TypeScript, Supabase, Tailwind CSS, Resend, Stripe, Ups
 | D17-01-01 | 17-01 | Include 'processing' status in CHECK constraint | Migration 00010 claim function sets status to 'processing' | Low | 2026-01-30 |
 | D17-01-02 | 17-01 | Partial index on (status, scheduled_for) WHERE status='pending' | Optimizes cron claim query that only selects pending records | Medium | 2026-01-30 |
 | D17-01-03 | 17-01 | No DELETE policy, use status changes instead | Audit trail preservation, consistent with send_logs pattern | Low | 2026-01-30 |
+| D17-02-01 | 17-02 | Verification based on code evidence rather than re-testing | Phase 4 functionally complete and in production; verification confirms existing implementation | Low | 2026-01-30 |
 
 Recent architectural decisions:
 - Separate scheduled_sends table (different lifecycle than send_logs)
@@ -145,6 +147,6 @@ Recent architectural decisions:
 ## Session Continuity
 
 **Last session:** 2026-01-30
-**Stopped at:** Completed 17-01-PLAN.md (scheduled_sends migration)
+**Stopped at:** Completed 17-02-PLAN.md (Phase 4 verification)
 **Resume file:** None
-**Next action:** Continue Phase 17 - execute plans 17-02 and 17-03 to complete deployment fixes
+**Next action:** Continue Phase 17 - execute plan 17-03 to complete deployment fixes
