@@ -133,10 +133,11 @@ Recent architectural decisions:
 | ID  | Name                           | Status   | Summary                          |
 | --- | ------------------------------ | -------- | -------------------------------- |
 | 001 | Response Rate Dashboard Widget | Complete | reviewed_at column + widget card |
+| 002 | Delete Account Button Settings | Complete | Service-role cascading delete + Radix Dialog confirmation |
 
 ## Session Continuity
 
 **Last session:** 2026-01-30
-**Stopped at:** Completed 16-05-PLAN.md (Test Send Wiring - Gap Closure) - Phase 16 complete
+**Stopped at:** Completed quick task 002 (Delete Account Button in Settings)
 **Resume file:** None
-**Next action:** Phase 16 complete (all 6 verification truths confirmed) - ready for next phase or milestone completion
+**Next action:** Ready for next task or phase
