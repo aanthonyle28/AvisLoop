@@ -351,7 +351,11 @@ Plans:
   2. User can cancel a pending scheduled send before it processes
   3. User can see partial send results (sent/skipped/failed counts) for completed scheduled sends
   4. User can select multiple pending sends and reschedule them to a different time
-**Plans**: TBD
+**Plans**: 2 plans in 2 waves
+
+Plans:
+- [ ] 14-01-PLAN.md — Backend infrastructure (bulk server actions, data layer with send_log details, Tabs UI component)
+- [ ] 14-02-PLAN.md — Scheduled table rewrite (tabs, expandable rows, bulk selection, floating action bar, styled dialogs)
 
 ### Phase 15: Design System & Dashboard Redesign
 **Goal**: Dashboard matches Figma reference design with updated design tokens, typography, icons, and layout
@@ -396,5 +400,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -
 | 11. Bulk Send & Integrations | v1.0 | 3/3 | Complete | 2026-01-28 |
 | 12. Cron Processing | v1.1 | 1/1 | Complete | 2026-01-29 |
 | 13. Scheduling & Navigation | v1.1 | 2/2 | Complete | 2026-01-29 |
-| 14. Scheduled Send Management | v1.1 | 0/TBD | Not started | - |
+| 14. Scheduled Send Management | v1.1 | 0/2 | Not started | - |
 | 15. Design System & Dashboard Redesign | v1.2 | 4/4 | Complete | 2026-01-29 |
