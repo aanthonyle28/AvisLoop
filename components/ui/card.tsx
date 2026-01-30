@@ -10,7 +10,7 @@ const Card = React.forwardRef<
     ref={ref}
     data-slot="card"
     className={cn(
-      "rounded-xl border bg-card text-card-foreground shadow",
+      "rounded-lg border bg-card text-card-foreground",
       className,
     )}
     {...props}
@@ -26,9 +26,9 @@ const InteractiveCard = React.forwardRef<
     ref={ref}
     data-slot="interactive-card"
     className={cn(
-      "rounded-xl border bg-card text-card-foreground shadow",
+      "rounded-lg border bg-card text-card-foreground",
       "transition-all duration-200 cursor-pointer",
-      "motion-safe:hover:shadow-lg motion-safe:hover:-translate-y-1",
+      "motion-safe:hover:-translate-y-1",
       className,
     )}
     {...props}

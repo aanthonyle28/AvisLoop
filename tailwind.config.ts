@@ -60,6 +60,13 @@ export default {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
+        status: {
+          success: "hsl(var(--status-success))",
+          warning: "hsl(var(--status-warning))",
+          error: "hsl(var(--status-error))",
+          info: "hsl(var(--status-info))",
+          reviewed: "hsl(var(--status-reviewed))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
