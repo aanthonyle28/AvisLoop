@@ -143,10 +143,11 @@ Recent architectural decisions:
 | --- | ------------------------------ | -------- | -------------------------------- |
 | 001 | Response Rate Dashboard Widget | Complete | reviewed_at column + widget card |
 | 002 | Delete Account Button Settings | Complete | Service-role cascading delete + Radix Dialog confirmation |
+| 003 | Fix Onboarding Issues          | Complete | 6 new-user-flow fixes: OAuth redirect, fullName validation, standalone onboarding, QuickSend visibility, conditional stats, graceful sends |
 
 ## Session Continuity
 
 **Last session:** 2026-01-30
-**Stopped at:** Completed 17-02-PLAN.md (Phase 4 verification)
+**Stopped at:** Completed quick-003 (Fix Onboarding Issues)
 **Resume file:** None
 **Next action:** Continue Phase 17 - execute plan 17-03 to complete deployment fixes
