@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-28)
 
 **Core value:** Make requesting reviews so simple that business owners actually do it -- one contact, one click, done.
-**Current focus:** Phase 16 - Onboarding Redesign
+**Current focus:** Phase 17 - Deployment & Critical Fixes (tech debt closure)
 
 ## Current Position
 
-**Phase:** 16 of 19 (Onboarding Redesign)
-**Plan:** 16-05 of 5 (Test Send Wiring - Gap Closure)
-**Status:** Phase complete
-**Last activity:** 2026-01-30 -- Completed 16-05-PLAN.md (Test Send Wiring)
+**Phase:** 17 of 18 (Deployment & Critical Fixes)
+**Plan:** Not yet planned
+**Status:** Pending — gap closure phases created from v1.2 audit
+**Last activity:** 2026-01-30 -- Created gap closure phases 17-18 from audit
 
-**Progress:** [█████████████████████] 53/59 total plans complete, 5/5 Phase 16 complete
+**Progress:** [█████████████████████] 53/59 total plans complete (Phases 17-18 pending)
 
 ```
 v1.0 MVP: ████████████████████████████████████████████████ 48/48 COMPLETE
@@ -138,6 +138,6 @@ Recent architectural decisions:
 ## Session Continuity
 
 **Last session:** 2026-01-30
-**Stopped at:** Completed quick task 002 (Delete Account Button in Settings)
+**Stopped at:** Created gap closure phases 17-18 from v1.2 milestone audit
 **Resume file:** None
-**Next action:** Ready for next task or phase
+**Next action:** `/gsd:plan-phase 17` to plan the deployment & critical fixes phase

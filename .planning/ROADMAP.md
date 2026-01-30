@@ -8,6 +8,7 @@ AvisLoop progresses from foundational authentication and data security through t
 
 - ✅ **v1.0 MVP** - Phases 1-11 (shipped 2026-01-28)
 - ✅ **v1.1 Scheduled Sending** - Phases 12-14 (shipped 2026-01-30)
+- 🔧 **v1.2.1 Tech Debt Closure** - Phases 17-18 (audit-driven fixes)
 
 ## Phases
 
@@ -313,6 +314,11 @@ Plans:
 
 - [x] **Phase 16: Onboarding Redesign + Google Auth** - Auth pages redesigned with split layout and Google OAuth, onboarding wizard simplified to 2 steps, dashboard shows 3 guided test step cards
 
+### v1.2.1 Tech Debt Closure
+
+- [ ] **Phase 17: Deployment & Critical Fixes** - Missing scheduled_sends migration, Phase 4 formal verification
+- [ ] **Phase 18: Code Cleanup** - Orphaned files, inline constant duplication, stale verification docs
+
 ## Phase Details
 
 ### Phase 12: Cron Processing
@@ -400,10 +406,34 @@ Plans:
 - [x] 16-04-PLAN.md — Dashboard onboarding cards + test send quota exclusion
 - [x] 16-05-PLAN.md — Wire test send query param to form + fix icon type [GAP CLOSURE]
 
+### Phase 17: Deployment & Critical Fixes
+**Goal**: Fix deployment blocker (missing migration) and complete Phase 4 verification
+**Depends on**: Phase 16
+**Requirements**: None (tech debt closure)
+**Gap Closure**: Closes audit items #1 (HIGH) and #3 (MEDIUM)
+**Success Criteria** (what must be TRUE):
+  1. Migration file exists that creates `scheduled_sends` table with all columns, RLS policies, and indexes
+  2. Migration sequence (00009b or 00012) runs before 00010 (claim function) on a fresh database
+  3. Phase 4 has a VERIFICATION.md confirming all 9 success criteria
+  4. Password reset path audit item confirmed resolved (already fixed in code)
+**Plans**: TBD
+
+### Phase 18: Code Cleanup
+**Goal**: Clean up orphaned files, inline constant duplication, and stale verification docs
+**Depends on**: Phase 17
+**Requirements**: None (tech debt closure)
+**Gap Closure**: Closes audit low-priority items
+**Success Criteria** (what must be TRUE):
+  1. `components/marketing/how-it-works.tsx` deleted (orphaned, unused)
+  2. `send/page.tsx` imports `CONTACT_LIMITS` from `lib/constants/billing.ts` instead of inline definition
+  3. Phase 13 VERIFICATION.md updated to reflect resolved gaps
+  4. History page pagination UI present (load more or infinite scroll for >50 messages)
+**Plans**: TBD
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -> 8 -> 8.1 -> 9 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16
+Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -> 8 -> 8.1 -> 9 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 -> 18
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -426,3 +456,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -
 | 14. Scheduled Send Management | v1.1 | 2/2 | Complete | 2026-01-30 |
 | 15. Design System & Dashboard Redesign | v1.2 | 4/4 | Complete | 2026-01-29 |
 | 16. Onboarding Redesign + Google Auth | v1.2 | 5/5 | Complete | 2026-01-30 |
+| 17. Deployment & Critical Fixes | v1.2.1 | 0/TBD | Pending | — |
+| 18. Code Cleanup | v1.2.1 | 0/TBD | Pending | — |
