@@ -368,10 +368,10 @@ Plans:
 **Plans**: 4 plans in 3 waves
 
 Plans:
-- [ ] 15-01-PLAN.md — Design tokens, Kumbh Sans font, Phosphor icons install, Card/Button shadow removal
-- [ ] 15-02-PLAN.md — Sidebar and bottom nav restyle with Phosphor icons and new visual language
-- [ ] 15-03-PLAN.md — Dashboard data layer additions and new components (stat cards, recent activity, avatar)
-- [ ] 15-04-PLAN.md — Dashboard page assembly with Quick Send, skeleton update
+- [x] 15-01-PLAN.md — Design tokens, Kumbh Sans font, Phosphor icons install, Card/Button shadow removal
+- [x] 15-02-PLAN.md — Sidebar and bottom nav restyle with Phosphor icons and new visual language
+- [x] 15-03-PLAN.md — Dashboard data layer additions and new components (stat cards, recent activity, avatar)
+- [x] 15-04-PLAN.md — Dashboard page assembly with Quick Send, skeleton update
 
 ## Progress
 
@@ -397,4 +397,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -
 | 12. Cron Processing | v1.1 | 1/1 | Complete | 2026-01-29 |
 | 13. Scheduling & Navigation | v1.1 | 2/2 | Complete | 2026-01-29 |
 | 14. Scheduled Send Management | v1.1 | 0/TBD | Not started | - |
-| 15. Design System & Dashboard Redesign | v1.2 | 0/4 | Not started | - |
+| 15. Design System & Dashboard Redesign | v1.2 | 4/4 | Complete | 2026-01-29 |
