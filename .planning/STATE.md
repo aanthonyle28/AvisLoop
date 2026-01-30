@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 **Phase:** 14 of 15 (Scheduled Send Management)
-**Plan:** 14-01 of 2 (Backend Infrastructure)
-**Status:** In progress
-**Last activity:** 2026-01-30 -- Completed 14-01-PLAN.md (Backend Infrastructure)
+**Plan:** 14-02 of 2 (Scheduled Table Rewrite)
+**Status:** Phase complete
+**Last activity:** 2026-01-30 -- Completed 14-02-PLAN.md (Scheduled Table Rewrite)
 
-**Progress:** [████████████████████] 48/48 v1.0 plans complete, 1/1 Phase 12 complete, 2/2 Phase 13 complete, 1/2 Phase 14 complete, 4/4 Phase 15 complete
+**Progress:** [████████████████████] 48/48 v1.0 plans complete, 1/1 Phase 12 complete, 2/2 Phase 13 complete, 2/2 Phase 14 complete, 4/4 Phase 15 complete
 
 ```
 v1.0 MVP: ████████████████████████████████████████████████ 48/48 COMPLETE
 Phase 12: █ Cron Processing (1/1) COMPLETE
 Phase 13: ██ Scheduling & Navigation (2/2) COMPLETE
-Phase 14: █░░ Scheduled Send Management (1/2) IN PROGRESS
+Phase 14: ██ Scheduled Send Management (2/2) COMPLETE
 Phase 15: ████ Design System & Dashboard Redesign (4/4) COMPLETE
 ```
 
@@ -40,8 +40,9 @@ Phase 15: ████ Design System & Dashboard Redesign (4/4) COMPLETE
 - **13-01:** Nav link badge showing pending scheduled count in sidebar and mobile nav, dashboard stat card for pending sends
 - **13-02:** /scheduled page with list view, status badges, cancel action for pending sends
 
-### Phase 14: Scheduled Send Management (In Progress)
+### Phase 14: Scheduled Send Management (Complete)
 - **14-01 Complete:** Backend infrastructure with bulk cancel/reschedule server actions (max 50 IDs), enhanced data layer with send_log details for completed sends, Radix Tabs UI component
+- **14-02 Complete:** Tabbed scheduled table with expandable per-contact results, checkbox selection with shift-click range support, Gmail-style floating action bar, styled confirmation dialogs (CancelDialog, RescheduleDialog), responsive desktop/mobile layouts, Phase 15 design system integration
 
 ### Phase 15: Design System & Dashboard Redesign (Complete)
 - **15-01 Complete:** Design system foundation with #1B44BF primary color, Kumbh Sans font, Phosphor icons, semantic status palette, border-only design (no shadows)
@@ -83,6 +84,10 @@ Next.js 15 (App Router), TypeScript, Supabase, Tailwind CSS, Resend, Stripe, Ups
 | D14-01-01 | 14-01 | Bulk operations limited to 50 items | Prevent database performance issues and timeouts | Medium | 2026-01-30 |
 | D14-01-02 | 14-01 | Parallel send_log fetching with Promise.all | Optimize performance for multiple completed scheduled sends | Medium | 2026-01-30 |
 | D14-01-03 | 14-01 | Handle Supabase join returning arrays with graceful mapping | Supabase foreign key joins return arrays; need to extract first element | Low | 2026-01-30 |
+| D14-02-01 | 14-02 | Checkboxes only on Pending tab, not Past tab | Past sends cannot be rescheduled/cancelled, so selection not needed | Low | 2026-01-30 |
+| D14-02-02 | 14-02 | Reset expanded state and selection on tab change | Prevent confusion when switching between Pending and Past tabs | Low | 2026-01-30 |
+| D14-02-03 | 14-02 | Filter out 'Send now' preset from reschedule dialog | Rescheduling to 'now' doesn't make semantic sense | Low | 2026-01-30 |
+| D14-02-04 | 14-02 | Show inline results summary in Past tab table rows | Users can see sent/skipped/failed counts at a glance | Low | 2026-01-30 |
 
 Recent architectural decisions:
 - Separate scheduled_sends table (different lifecycle than send_logs)
@@ -106,6 +111,6 @@ Recent architectural decisions:
 ## Session Continuity
 
 **Last session:** 2026-01-30
-**Stopped at:** Completed 14-01-PLAN.md (Backend Infrastructure)
+**Stopped at:** Completed 14-02-PLAN.md (Scheduled Table Rewrite)
 **Resume file:** None
-**Next action:** Execute 14-02-PLAN.md (Scheduled Table Rewrite with tabs, expandable rows, bulk actions)
+**Next action:** Phase 14 complete -- ready for production verification or /gsd:audit-milestone
