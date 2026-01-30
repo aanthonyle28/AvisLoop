@@ -8,7 +8,7 @@ interface AppShellProps {
 
 export function AppShell({ children, scheduledCount }: AppShellProps) {
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-[#F9F9F9] dark:bg-background">
       {/* Desktop sidebar */}
       <Sidebar scheduledCount={scheduledCount} />
 
@@ -21,7 +21,7 @@ export function AppShell({ children, scheduledCount }: AppShellProps) {
       </main>
 
       {/* Mobile bottom nav */}
-      <BottomNav scheduledCount={scheduledCount} />
+      <BottomNav />
     </div>
   )
 }

@@ -3,23 +3,18 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { LayoutDashboard, Users, Send, Calendar, History } from 'lucide-react'
+import { SquaresFour, AddressBook, PaperPlaneTilt, ClockCounterClockwise } from '@phosphor-icons/react'
 
 const NAV_HEIGHT = 72 // 4.5rem in pixels
 
 const items = [
-  { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
-  { icon: Users, label: 'Contacts', href: '/contacts' },
-  { icon: Send, label: 'Send', href: '/send' },
-  { icon: Calendar, label: 'Scheduled', href: '/scheduled' },
-  { icon: History, label: 'History', href: '/history' },
+  { icon: SquaresFour, label: 'Dashboard', href: '/dashboard' },
+  { icon: AddressBook, label: 'Contacts', href: '/contacts' },
+  { icon: PaperPlaneTilt, label: 'Send', href: '/send' },
+  { icon: ClockCounterClockwise, label: 'History', href: '/history' },
 ]
 
-interface BottomNavProps {
-  scheduledCount?: number
-}
-
-export function BottomNav({ scheduledCount = 0 }: BottomNavProps) {
+export function BottomNav() {
   const pathname = usePathname()
 
   return (
@@ -28,11 +23,10 @@ export function BottomNav({ scheduledCount = 0 }: BottomNavProps) {
       style={{ height: `${NAV_HEIGHT}px` }}
       aria-label="Mobile navigation"
     >
-      <div className="grid grid-cols-5 h-full">
+      <div className="grid grid-cols-4 h-full">
         {items.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
           const Icon = item.icon
-          const showBadge = item.label === 'Scheduled' && scheduledCount > 0
 
           return (
             <Link
@@ -45,15 +39,7 @@ export function BottomNav({ scheduledCount = 0 }: BottomNavProps) {
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <div className="relative">
-                <Icon className="h-5 w-5" />
-                {/* Badge indicator for scheduled items */}
-                {showBadge && (
-                  <div className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
-                    {scheduledCount > 9 ? '9+' : scheduledCount}
-                  </div>
-                )}
-              </div>
+              <Icon size={20} weight="regular" />
               <span>{item.label}</span>
             </Link>
           )
