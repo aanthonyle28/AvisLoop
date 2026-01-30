@@ -298,7 +298,7 @@ Plans:
 
 </details>
 
-### 🚧 v1.1 Scheduled Sending (In Progress)
+### v1.1 Scheduled Sending (In Progress)
 
 **Milestone Goal:** Let users schedule review request emails for future delivery with preset and custom timing options, manage pending sends, and rely on background processing to deliver them on time.
 
@@ -320,7 +320,10 @@ Plans:
   3. Service role client bypasses RLS so cron can operate without a user session
   4. Each cron run produces structured JSON log output with counts (processed, sent, failed, skipped)
   5. Concurrent cron invocations cannot process the same scheduled send (FOR UPDATE SKIP LOCKED)
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [ ] 12-01-PLAN.md — Cron route handler + vercel.json (claim, validate, send, log)
 
 ### Phase 13: Scheduling & Navigation
 **Goal**: Users can schedule sends and find the scheduling feature throughout the app
@@ -366,6 +369,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -
 | 9. Polish & UX | v1.0 | 4/4 | Complete | 2026-01-28 |
 | 10. Landing Page Redesign | v1.0 | 5/5 | Complete | 2026-01-28 |
 | 11. Bulk Send & Integrations | v1.0 | 3/3 | Complete | 2026-01-28 |
-| 12. Cron Processing | v1.1 | 0/TBD | Not started | - |
+| 12. Cron Processing | v1.1 | 0/1 | Not started | - |
 | 13. Scheduling & Navigation | v1.1 | 0/TBD | Not started | - |
 | 14. Scheduled Send Management | v1.1 | 0/TBD | Not started | - |
