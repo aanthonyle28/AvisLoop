@@ -70,23 +70,23 @@ export default async function DashboardPage() {
         <OnboardingCards status={cardStatus} />
       )}
 
-      {/* 3. Stat Cards Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <MonthlyUsageCard count={usage.count} limit={usage.limit} tier={usage.tier} />
-        <NeedsAttentionCard total={needsAttention.total} pending={needsAttention.pending} failed={needsAttention.failed} />
-        <ReviewRateCard rate={responseRate.rate} total={responseRate.total} responded={responseRate.responded} />
-      </div>
-
-      {/* 4. Quick Send + When to Send */}
-      {contactsData.contacts.length > 0 && templates.length > 0 && (
-        <QuickSend
-          contacts={contactsData.contacts
-            .filter(c => c.status === 'active')
-            .map(c => ({ id: c.id, name: c.name, email: c.email }))}
-          templates={templates.map((t) => ({ id: t.id, name: t.name, is_default: t.is_default }))}
-          recentContacts={recentContacts.map(c => ({ id: c.id, name: c.name }))}
-        />
+      {/* 3. Stat Cards Row (hidden until user has sent at least one request) */}
+      {cardStatus.test_sent && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <MonthlyUsageCard count={usage.count} limit={usage.limit} tier={usage.tier} />
+          <NeedsAttentionCard total={needsAttention.total} pending={needsAttention.pending} failed={needsAttention.failed} />
+          <ReviewRateCard rate={responseRate.rate} total={responseRate.total} responded={responseRate.responded} />
+        </div>
       )}
+
+      {/* 4. Quick Send + When to Send (always visible) */}
+      <QuickSend
+        contacts={contactsData.contacts
+          .filter(c => c.status === 'active')
+          .map(c => ({ id: c.id, name: c.name, email: c.email }))}
+        templates={templates.map((t) => ({ id: t.id, name: t.name, is_default: t.is_default }))}
+        recentContacts={recentContacts.map(c => ({ id: c.id, name: c.name }))}
+      />
 
       {/* 5. Recent Activity Table */}
       <RecentActivityTable activities={recentActivity} />
