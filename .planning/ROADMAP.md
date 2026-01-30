@@ -391,13 +391,14 @@ Plans:
   4. Dashboard shows 3 numbered test step cards after onboarding (create contact, create template, send test)
   5. Cards track completion automatically and disappear when all 3 done
   6. Test sends are flagged in database and excluded from quota counting
-**Plans**: 4 plans in 2 waves
+**Plans**: 5 plans (4 initial + 1 gap closure)
 
 Plans:
-- [ ] 16-01-PLAN.md — DB migration (is_test, onboarding JSONB) + Google OAuth infrastructure (callback, action, button)
-- [ ] 16-02-PLAN.md — Onboarding wizard redesign (2 steps: business name, Google review link)
-- [ ] 16-03-PLAN.md — Auth pages split layout redesign (login + signup with Google OAuth button)
-- [ ] 16-04-PLAN.md — Dashboard onboarding cards + test send quota exclusion
+- [x] 16-01-PLAN.md — DB migration (is_test, onboarding JSONB) + Google OAuth infrastructure (callback, action, button)
+- [x] 16-02-PLAN.md — Onboarding wizard redesign (2 steps: business name, Google review link)
+- [x] 16-03-PLAN.md — Auth pages split layout redesign (login + signup with Google OAuth button)
+- [x] 16-04-PLAN.md — Dashboard onboarding cards + test send quota exclusion
+- [ ] 16-05-PLAN.md — Wire test send query param to form + fix icon type [GAP CLOSURE]
 
 ## Progress
 
@@ -424,4 +425,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -
 | 13. Scheduling & Navigation | v1.1 | 2/2 | Complete | 2026-01-29 |
 | 14. Scheduled Send Management | v1.1 | 2/2 | Complete | 2026-01-30 |
 | 15. Design System & Dashboard Redesign | v1.2 | 4/4 | Complete | 2026-01-29 |
-| 16. Onboarding Redesign + Google Auth | v1.2 | 0/4 | In Progress | — |
+| 16. Onboarding Redesign + Google Auth | v1.2 | 4/5 | In Progress | — |
