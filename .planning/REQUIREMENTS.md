@@ -92,10 +92,10 @@ Requirements for Scheduled Sending milestone. Each maps to roadmap phases.
 
 ### Management
 
-- [ ] **MGMT-01**: User can view a list of all scheduled sends with status and send time
-- [ ] **MGMT-02**: User can cancel a pending scheduled send
-- [ ] **MGMT-03**: User can see partial send results (sent/skipped/failed counts) after processing
-- [ ] **MGMT-04**: User can reschedule multiple pending sends to a different time
+- [x] **MGMT-01**: User can view a list of all scheduled sends with status and send time
+- [x] **MGMT-02**: User can cancel a pending scheduled send
+- [x] **MGMT-03**: User can see partial send results (sent/skipped/failed counts) after processing
+- [x] **MGMT-04**: User can reschedule multiple pending sends to a different time
 
 ### Processing
 
@@ -231,10 +231,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SCHED-01 | Phase 13 | Complete |
 | SCHED-02 | Phase 13 | Complete |
 | SCHED-03 | Phase 13 | Complete |
-| MGMT-01 | Phase 14 | Pending |
-| MGMT-02 | Phase 14 | Pending |
-| MGMT-03 | Phase 14 | Pending |
-| MGMT-04 | Phase 14 | Pending |
+| MGMT-01 | Phase 14 | Complete |
+| MGMT-02 | Phase 14 | Complete |
+| MGMT-03 | Phase 14 | Complete |
+| MGMT-04 | Phase 14 | Complete |
 | PROC-01 | Phase 12 | Complete |
 | PROC-02 | Phase 12 | Complete |
 | PROC-03 | Phase 12 | Complete |

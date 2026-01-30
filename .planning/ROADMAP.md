@@ -7,7 +7,7 @@ AvisLoop progresses from foundational authentication and data security through t
 ## Milestones
 
 - ✅ **v1.0 MVP** - Phases 1-11 (shipped 2026-01-28)
-- 🚧 **v1.1 Scheduled Sending** - Phases 12-14 (in progress)
+- ✅ **v1.1 Scheduled Sending** - Phases 12-14 (shipped 2026-01-30)
 
 ## Phases
 
@@ -306,8 +306,8 @@ Plans:
 
 - [x] **Phase 12: Cron Processing** - System reliably processes scheduled sends in the background every minute
 - [x] **Phase 13: Scheduling & Navigation** - Users can schedule sends and find the scheduling feature in navigation
-- [ ] **Phase 14: Scheduled Send Management** - Users can view, cancel, and reschedule their pending sends
-- [ ] **Phase 15: Design System & Dashboard Redesign** - Dashboard matches Figma reference with updated design tokens, typography, and layout
+- [x] **Phase 14: Scheduled Send Management** - Users can view, cancel, and reschedule their pending sends
+- [x] **Phase 15: Design System & Dashboard Redesign** - Dashboard matches Figma reference with updated design tokens, typography, and layout
 
 ## Phase Details
 
@@ -354,8 +354,8 @@ Plans:
 **Plans**: 2 plans in 2 waves
 
 Plans:
-- [ ] 14-01-PLAN.md — Backend infrastructure (bulk server actions, data layer with send_log details, Tabs UI component)
-- [ ] 14-02-PLAN.md — Scheduled table rewrite (tabs, expandable rows, bulk selection, floating action bar, styled dialogs)
+- [x] 14-01-PLAN.md — Backend infrastructure (bulk server actions, data layer with send_log details, Tabs UI component)
+- [x] 14-02-PLAN.md — Scheduled table rewrite (tabs, expandable rows, bulk selection, floating action bar, styled dialogs)
 
 ### Phase 15: Design System & Dashboard Redesign
 **Goal**: Dashboard matches Figma reference design with updated design tokens, typography, icons, and layout
@@ -400,5 +400,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -
 | 11. Bulk Send & Integrations | v1.0 | 3/3 | Complete | 2026-01-28 |
 | 12. Cron Processing | v1.1 | 1/1 | Complete | 2026-01-29 |
 | 13. Scheduling & Navigation | v1.1 | 2/2 | Complete | 2026-01-29 |
-| 14. Scheduled Send Management | v1.1 | 0/2 | Not started | - |
+| 14. Scheduled Send Management | v1.1 | 2/2 | Complete | 2026-01-30 |
 | 15. Design System & Dashboard Redesign | v1.2 | 4/4 | Complete | 2026-01-29 |
