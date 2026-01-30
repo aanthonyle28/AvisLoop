@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-28)
 
 **Core value:** Make requesting reviews so simple that business owners actually do it -- one contact, one click, done.
-**Current focus:** Phase 14 - Scheduled Send Management
+**Current focus:** Phase 16 - Onboarding Redesign
 
 ## Current Position
 
-**Phase:** 14 of 15 (Scheduled Send Management)
-**Plan:** 14-02 of 2 (Scheduled Table Rewrite)
-**Status:** Phase complete
-**Last activity:** 2026-01-30 -- Completed 14-02-PLAN.md (Scheduled Table Rewrite)
+**Phase:** 16 of 19 (Onboarding Redesign)
+**Plan:** 16-01 of 3 (Database Migration and Google OAuth Infrastructure)
+**Status:** In progress
+**Last activity:** 2026-01-30 -- Completed 16-01-PLAN.md (Database Migration and Google OAuth Infrastructure)
 
-**Progress:** [████████████████████] 48/48 v1.0 plans complete, 1/1 Phase 12 complete, 2/2 Phase 13 complete, 2/2 Phase 14 complete, 4/4 Phase 15 complete
+**Progress:** [█████████████████████] 49/57 total plans complete, 1/3 Phase 16 complete
 
 ```
 v1.0 MVP: ████████████████████████████████████████████████ 48/48 COMPLETE
@@ -22,6 +22,7 @@ Phase 12: █ Cron Processing (1/1) COMPLETE
 Phase 13: ██ Scheduling & Navigation (2/2) COMPLETE
 Phase 14: ██ Scheduled Send Management (2/2) COMPLETE
 Phase 15: ████ Design System & Dashboard Redesign (4/4) COMPLETE
+Phase 16: █░░ Onboarding Redesign (1/3) IN PROGRESS
 ```
 
 ## What's Been Built
@@ -49,6 +50,9 @@ Phase 15: ████ Design System & Dashboard Redesign (4/4) COMPLETE
 - **15-02 Complete:** Sidebar and bottom nav with Phosphor icons, white sidebar bg with #E2E2E2 border, #F2F2F2 active state, #F9F9F9 content bg
 - **15-03 Complete:** Dashboard components (stat cards, activity table, avatar) and data layer functions (getNeedsAttentionCount, getRecentActivity)
 - **15-04 Complete:** Dashboard page integration with QuickSend component, redesigned layout matching Figma reference (welcome header, stat cards, quick send + schedule presets, recent activity)
+
+### Phase 16: Onboarding Redesign (In Progress)
+- **16-01 Complete:** Database migration (is_test flag on send_logs, onboarding_steps_completed object format), Google OAuth infrastructure (callback route, signInWithGoogle action, GoogleOAuthButton component)
 
 ## Tech Stack
 
@@ -88,6 +92,9 @@ Next.js 15 (App Router), TypeScript, Supabase, Tailwind CSS, Resend, Stripe, Ups
 | D14-02-02 | 14-02 | Reset expanded state and selection on tab change | Prevent confusion when switching between Pending and Past tabs | Low | 2026-01-30 |
 | D14-02-03 | 14-02 | Filter out 'Send now' preset from reschedule dialog | Rescheduling to 'now' doesn't make semantic sense | Low | 2026-01-30 |
 | D14-02-04 | 14-02 | Show inline results summary in Past tab table rows | Users can see sent/skipped/failed counts at a glance | Low | 2026-01-30 |
+| D16-01-01 | 16-01 | Use PKCE flow for Google OAuth | Supabase built-in OAuth provider support with secure PKCE flow | Medium | 2026-01-30 |
+| D16-01-02 | 16-01 | Partial index on send_logs WHERE is_test = false | Optimizes quota enforcement queries by excluding test sends at index level | Medium | 2026-01-30 |
+| D16-01-03 | 16-01 | Change onboarding_steps_completed from array to object | Object format better supports key-value tracking for dashboard cards | Low | 2026-01-30 |
 
 Recent architectural decisions:
 - Separate scheduled_sends table (different lifecycle than send_logs)
@@ -101,6 +108,8 @@ Recent architectural decisions:
 
 - Vercel Cron only runs in production -- local testing requires curl to route handler
 - CRON_SECRET env var must be set before first deployment
+- Supabase Google OAuth provider must be configured in dashboard before OAuth flow works
+- Migration 00011 must be applied to database before is_test flag is usable
 
 ## Quick Tasks
 
@@ -111,6 +120,6 @@ Recent architectural decisions:
 ## Session Continuity
 
 **Last session:** 2026-01-30
-**Stopped at:** Completed 14-02-PLAN.md (Scheduled Table Rewrite)
+**Stopped at:** Completed 16-01-PLAN.md (Database Migration and Google OAuth Infrastructure)
 **Resume file:** None
-**Next action:** Phase 14 complete -- ready for production verification or /gsd:audit-milestone
+**Next action:** Continue with 16-02 (Auth Page Redesign) or 16-03 (Dashboard Onboarding Cards)
