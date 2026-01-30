@@ -1,5 +1,5 @@
 ---
-status: diagnosed
+status: complete
 phase: 15-design-system-dashboard-redesign
 source: [15-01-SUMMARY.md, 15-02-SUMMARY.md, 15-03-SUMMARY.md, 15-04-SUMMARY.md]
 started: 2026-01-30T04:00:00Z
@@ -29,10 +29,8 @@ expected: Sidebar has white background, #E2E2E2 border on right edge, Phosphor i
 result: pass
 
 ### 5. Bottom Nav (Mobile)
-expected: Mobile bottom nav shows 4 items (Dashboard, Contacts, Send, History) with Phosphor icons. No "Scheduled" item.
-result: issue
-reported: "Mobile bottom nav shows 5 items including Scheduled. Expected 4 items per design spec."
-severity: minor
+expected: Mobile bottom nav shows Phosphor icons with new visual styling. (Scheduled kept per Phase 13 feature requirement, overriding initial 4-item design spec.)
+result: pass
 
 ### 6. Content Background Color
 expected: Main content area has light gray #F9F9F9 background color.
@@ -74,26 +72,11 @@ reason: Cannot reliably test loading skeleton in Playwright without network inte
 ## Summary
 
 total: 14
-passed: 12
-issues: 1
+passed: 13
+issues: 0
 pending: 0
 skipped: 1
 
 ## Gaps
 
-- truth: "Mobile bottom nav shows 4 items (Dashboard, Contacts, Send, History) with no Scheduled item"
-  status: failed
-  reason: "User reported: Mobile bottom nav shows 5 items including Scheduled. Expected 4 items per design spec."
-  severity: minor
-  test: 5
-  root_cause: "Phase 15-02 commit ce766c0 correctly removed Scheduled from bottom nav, but commit a3d68a4 (Phase 13 fix, 6 minutes later) re-added it with all 5 items, grid-cols-5, and scheduledCount prop"
-  artifacts:
-    - path: "components/layout/bottom-nav.tsx"
-      issue: "Contains Scheduled nav item at line 14, uses grid-cols-5 at line 31"
-    - path: "components/layout/app-shell.tsx"
-      issue: "Passes scheduledCount prop to BottomNav"
-  missing:
-    - "Remove Scheduled entry from bottom-nav.tsx nav items array"
-    - "Change grid-cols-5 to grid-cols-4 in bottom-nav.tsx"
-    - "Remove scheduledCount prop from BottomNav and AppShell"
-  debug_session: ".planning/debug/scheduled-nav-item-showing.md"
+[none — Scheduled kept in mobile nav per user decision; already uses Phosphor icons and new styling]
