@@ -7,7 +7,10 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 
-export default async function SendPage() {
+export default async function SendPage({ searchParams }: { searchParams: Promise<{ test?: string }> }) {
+  const params = await searchParams
+  const isTest = params.test === 'true'
+
   const business = await getBusiness()
 
   if (!business) {
@@ -104,6 +107,7 @@ export default async function SendPage() {
           contactCount={contactCount ?? 0}
           contactLimit={contactLimit}
           resendReadyContactIds={resendReadyContactIds}
+          isTest={isTest}
         />
       )}
     </div>

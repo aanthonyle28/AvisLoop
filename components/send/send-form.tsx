@@ -20,6 +20,7 @@ interface SendFormProps {
   contactCount: number
   contactLimit?: number
   resendReadyContactIds: string[]
+  isTest?: boolean
 }
 
 export function SendForm({
@@ -30,6 +31,7 @@ export function SendForm({
   contactCount,
   contactLimit,
   resendReadyContactIds,
+  isTest = false,
 }: SendFormProps) {
   const [selectedContacts, setSelectedContacts] = useState<Set<string>>(new Set())
   const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(
@@ -137,6 +139,13 @@ export function SendForm({
 
   return (
     <form action={handleSubmit} className="space-y-6">
+      {/* Test mode indicator */}
+      {isTest && (
+        <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm text-blue-700">
+          Test mode - this send will not count against your monthly quota
+        </div>
+      )}
+
       {/* Error display */}
       {(batchState?.error || scheduleState?.error) && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-4 flex items-start gap-3">
@@ -229,6 +238,9 @@ export function SendForm({
 
       {/* Custom subject input */}
       <input type="hidden" name="customSubject" value={customSubject} />
+
+      {/* Test mode flag */}
+      {isTest && <input type="hidden" name="isTest" value="true" />}
 
       {/* Submit button or upgrade prompt */}
       <div className="flex justify-end pt-4 border-t">
