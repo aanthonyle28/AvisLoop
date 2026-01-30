@@ -9,6 +9,7 @@ import {
   SquaresFour,
   AddressBook,
   PaperPlaneTilt,
+  CalendarBlank,
   ClockCounterClockwise,
   AppWindow,
   CreditCard,
@@ -33,6 +34,7 @@ const mainNav: NavItem[] = [
   { icon: SquaresFour, label: 'Dashboard', href: '/dashboard' },
   { icon: AddressBook, label: 'Contacts', href: '/contacts' },
   { icon: PaperPlaneTilt, label: 'Send', href: '/send' },
+  { icon: CalendarBlank, label: 'Scheduled', href: '/scheduled' },
   { icon: ClockCounterClockwise, label: 'History', href: '/history' },
 ]
 

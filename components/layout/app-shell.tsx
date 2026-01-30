@@ -21,7 +21,7 @@ export function AppShell({ children, scheduledCount }: AppShellProps) {
       </main>
 
       {/* Mobile bottom nav */}
-      <BottomNav />
+      <BottomNav scheduledCount={scheduledCount} />
     </div>
   )
 }
