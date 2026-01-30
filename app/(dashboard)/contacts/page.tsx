@@ -3,7 +3,7 @@ import { getContacts } from '@/lib/actions/contact'
 import { ContactsClient } from '@/components/contacts/contacts-client'
 
 export const metadata = {
-  title: 'Contacts | AvisLoop',
+  title: 'Contacts',
   description: 'Manage your customer contacts',
 }
 

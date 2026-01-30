@@ -3,7 +3,7 @@ import { getSendLogs } from '@/lib/data/send-logs'
 import { HistoryClient } from '@/components/history/history-client'
 
 export const metadata = {
-  title: 'Message History | AvisLoop',
+  title: 'Message History',
   description: 'View and track all your sent review requests',
 }
 

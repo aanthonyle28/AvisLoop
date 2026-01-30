@@ -6,7 +6,7 @@ import { CalendarBlank, PaperPlaneTilt } from '@phosphor-icons/react/dist/ssr'
 import Link from 'next/link'
 
 export const metadata = {
-  title: 'Scheduled Sends | AvisLoop',
+  title: 'Scheduled Sends',
   description: 'Manage your scheduled review requests',
 }
 
