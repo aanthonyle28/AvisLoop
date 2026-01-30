@@ -91,12 +91,13 @@ export async function getOnboardingStatus(): Promise<OnboardingStatus | null> {
 
 /**
  * Get onboarding card completion status for the current user's business.
- * Auto-detects completion from database state and persists to JSONB column.
+ * Auto-detects contact_created and template_created from database state.
+ * test_sent is manual-only: set exclusively via markOnboardingCardStep('test_sent').
  *
  * Checks:
- * - contact_created: At least one active contact exists
- * - template_created: At least one email template exists
- * - test_sent: At least one send_log entry exists
+ * - contact_created: At least one active contact exists (auto-detected)
+ * - template_created: At least one email template exists (auto-detected)
+ * - test_sent: Read from onboarding_steps_completed JSONB column only (manual)
  */
 export async function getOnboardingCardStatus(): Promise<OnboardingCardStatus> {
   const supabase = await createClient()
@@ -123,17 +124,17 @@ export async function getOnboardingCardStatus(): Promise<OnboardingCardStatus> {
     return stored as OnboardingCardStatus
   }
 
-  // Auto-detect completion from actual database state
-  const [contactResult, templateResult, testSendResult] = await Promise.all([
+  // Auto-detect contact_created and template_created from database state
+  // test_sent is manual-only (set via markOnboardingCardStep)
+  const [contactResult, templateResult] = await Promise.all([
     supabase.from('contacts').select('id', { count: 'exact', head: true }).eq('business_id', business.id).eq('status', 'active'),
     supabase.from('email_templates').select('id', { count: 'exact', head: true }).eq('business_id', business.id),
-    supabase.from('send_logs').select('id', { count: 'exact', head: true }).eq('business_id', business.id),
   ])
 
   const detected: OnboardingCardStatus = {
     contact_created: (contactResult.count ?? 0) > 0,
     template_created: (templateResult.count ?? 0) > 0,
-    test_sent: (testSendResult.count ?? 0) > 0,
+    test_sent: stored.test_sent || false,
   }
 
   // If any newly detected, persist to JSONB column for faster future reads
