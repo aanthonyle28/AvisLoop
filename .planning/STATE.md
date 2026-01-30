@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 **Phase:** 15 of 15 (Design System & Dashboard Redesign)
-**Plan:** 15-03 of 4 (Dashboard Components & Data Layer)
-**Status:** Plan 15-03 complete
-**Last activity:** 2026-01-29 -- Completed 15-03-PLAN.md (Dashboard Components & Data Layer)
+**Plan:** 15-04 of 4 (Dashboard Page Integration)
+**Status:** Phase 15 complete
+**Last activity:** 2026-01-30 -- Completed 15-04-PLAN.md (Dashboard Page Integration)
 
-**Progress:** [###########---------] 48/48 v1.0 plans complete, 1/1 Phase 12 complete, 2/2 Phase 13 complete, 3/4 Phase 15 complete
+**Progress:** [████████████████████] 48/48 v1.0 plans complete, 1/1 Phase 12 complete, 2/2 Phase 13 complete, 4/4 Phase 15 complete
 
 ```
 v1.0 MVP: ████████████████████████████████████████████████ 48/48 COMPLETE
 Phase 12: █ Cron Processing (1/1) COMPLETE
 Phase 13: ██ Scheduling & Navigation (2/2) COMPLETE
 Phase 14: ░░░ Scheduled Send Management (0/TBD)
-Phase 15: ███░ Design System & Dashboard Redesign (3/4) <- IN PROGRESS
+Phase 15: ████ Design System & Dashboard Redesign (4/4) COMPLETE
 ```
 
 ## What's Been Built
@@ -40,10 +40,11 @@ Phase 15: ███░ Design System & Dashboard Redesign (3/4) <- IN PROGRESS
 - **13-01:** Nav link badge showing pending scheduled count in sidebar and mobile nav, dashboard stat card for pending sends
 - **13-02:** /scheduled page with list view, status badges, cancel action for pending sends
 
-### Phase 15: Design System & Dashboard Redesign (In Progress)
+### Phase 15: Design System & Dashboard Redesign (Complete)
 - **15-01 Complete:** Design system foundation with #1B44BF primary color, Kumbh Sans font, Phosphor icons, semantic status palette, border-only design (no shadows)
 - **15-02 Complete:** Sidebar and bottom nav with Phosphor icons, white sidebar bg with #E2E2E2 border, #F2F2F2 active state, #F9F9F9 content bg
 - **15-03 Complete:** Dashboard components (stat cards, activity table, avatar) and data layer functions (getNeedsAttentionCount, getRecentActivity)
+- **15-04 Complete:** Dashboard page integration with QuickSend component, redesigned layout matching Figma reference (welcome header, stat cards, quick send + schedule presets, recent activity)
 
 ## Tech Stack
 
@@ -72,6 +73,10 @@ Next.js 15 (App Router), TypeScript, Supabase, Tailwind CSS, Resend, Stripe, Ups
 | D15-02-02 | 15-02 | App content bg #F9F9F9 | Light gray background for content area matching Figma reference | Low | 2026-01-30 |
 | D15-03-01 | 15-03 | Deterministic avatar colors based on name hash | Hash the name string (sum of char codes mod 8) to select from 8 pastel colors for consistent avatar appearance | Low | 2026-01-29 |
 | D15-03-02 | 15-03 | Map 'opened' status to 'Clicked' label in UI | Display email 'opened' status as 'Clicked' for better user understanding in Recent Activity table | Low | 2026-01-29 |
+| D15-04-01 | 15-04 | Contact search max 5 matches in dropdown | Prevent dropdown UI overflow, encourage specific queries | Low | 2026-01-30 |
+| D15-04-02 | 15-04 | Recently added contact chips (max 5) | Quick selection for common use case, avoid UI clutter | Low | 2026-01-30 |
+| D15-04-03 | 15-04 | Schedule presets as toggle chips | Matches Figma aesthetic (rounded-full border), clear visual state | Low | 2026-01-30 |
+| D15-04-04 | 15-04 | Extract first name from business name or email | Personalized welcome message with graceful fallbacks | Low | 2026-01-30 |
 
 Recent architectural decisions:
 - Separate scheduled_sends table (different lifecycle than send_logs)
@@ -79,6 +84,7 @@ Recent architectural decisions:
 - Service role for cron (no user session in cron context)
 - FOR UPDATE SKIP LOCKED for race condition prevention
 - UTC storage, local timezone display
+- Inline Quick Send pattern with schedule presets for dashboard
 
 ## Blockers & Concerns
 
@@ -93,7 +99,7 @@ Recent architectural decisions:
 
 ## Session Continuity
 
-**Last session:** 2026-01-29
-**Stopped at:** Completed 15-03-PLAN.md (Dashboard Components & Data Layer)
+**Last session:** 2026-01-30
+**Stopped at:** Completed 15-04-PLAN.md (Dashboard Page Integration)
 **Resume file:** None
-**Next action:** Continue with Phase 15-04 (Dashboard Page Integration)
+**Next action:** Phase 15 complete. Ready for additional design system application or new feature development.
