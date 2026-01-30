@@ -36,15 +36,9 @@ Phase 15: █░░░ Design System & Dashboard Redesign (1/4) <- IN PROGRESS
 - **Re-validation at send time:** Cooldown, opt-out, archived, quota checks
 - **Race-safe processing:** Multiple cron invocations can't double-process
 
-### v1.1 Partial Work (Exists from Manual Work)
-- `lib/types/database.ts` -- ScheduledSend, ScheduledSendInsert, ScheduleActionState types
-- `lib/actions/schedule.ts` -- scheduleReviewRequest, cancelScheduledSend, getScheduledSends actions
-- `lib/utils/schedule.ts` -- SCHEDULE_PRESETS, formatForDateTimeInput, isValidScheduleDate, formatScheduleDate
-- `lib/validations/schedule.ts` -- scheduleSendSchema Zod validation
-- `lib/supabase/service-role.ts` -- createServiceRoleClient
-- `components/send/schedule-selector.tsx` -- ScheduleSelector (presets + custom picker)
-- `components/send/send-form.tsx` -- Already supports scheduled send flow
-- Database migration for scheduled_sends table applied
+### Phase 13: Scheduling & Navigation (Complete)
+- **13-01:** Nav link badge showing pending scheduled count, added /scheduled to nav
+- **13-02:** /scheduled page with list view, status badges, cancel action for pending sends
 
 ### Phase 15: Design System & Dashboard Redesign (In Progress)
 - **15-01 Complete:** Design system foundation with #1B44BF primary color, Kumbh Sans font, Phosphor icons, semantic status palette, border-only design (no shadows)
@@ -66,6 +60,9 @@ Next.js 15 (App Router), TypeScript, Supabase, Tailwind CSS, Resend, Stripe, Ups
 | D15-01-03 | 15-01 | Border-only design (no shadows) | Reference design aesthetic, removes all box-shadows from components | Medium | 2026-01-29 |
 | D15-01-04 | 15-01 | 8px border-radius standard | Changed from 12px for tighter corners matching reference | Low | 2026-01-29 |
 | D15-01-05 | 15-01 | Semantic status color palette | 5 status colors (success, warning, error, info, reviewed) with light/dark variants | Medium | 2026-01-29 |
+| D13-02-01 | 13-02 | Separate pending and past sends in UI | Users care most about pending sends; past sends are reference only | Medium | 2026-01-29 |
+| D13-02-02 | 13-02 | Native confirm() dialog for cancel confirmation | Simple, accessible, no additional UI dependencies | Low | 2026-01-29 |
+| D13-02-03 | 13-02 | Responsive table/card pattern | Tables don't work well on mobile; cards provide better UX | Medium | 2026-01-29 |
 
 Recent architectural decisions:
 - Separate scheduled_sends table (different lifecycle than send_logs)
@@ -88,6 +85,6 @@ Recent architectural decisions:
 ## Session Continuity
 
 **Last session:** 2026-01-29
-**Stopped at:** Completed 15-01-PLAN.md (Design System Foundation)
+**Stopped at:** Completed 13-02-PLAN.md (Scheduled Sends Page) - Phase 13 complete
 **Resume file:** None
-**Next action:** `/gsd:execute-phase 15-02` (Dashboard Stat Cards) or manual work on remaining Phase 15 plans
+**Next action:** Phase 13 complete. Continue with Phase 14 or Phase 15 work.
