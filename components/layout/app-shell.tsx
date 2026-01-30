@@ -3,13 +3,14 @@ import { BottomNav } from './bottom-nav'
 
 interface AppShellProps {
   children: React.ReactNode
+  scheduledCount?: number
 }
 
-export function AppShell({ children }: AppShellProps) {
+export function AppShell({ children, scheduledCount }: AppShellProps) {
   return (
     <div className="flex min-h-screen bg-background">
       {/* Desktop sidebar */}
-      <Sidebar />
+      <Sidebar scheduledCount={scheduledCount} />
 
       {/* Main content area */}
       <main className="flex-1 overflow-auto">
@@ -20,7 +21,7 @@ export function AppShell({ children }: AppShellProps) {
       </main>
 
       {/* Mobile bottom nav */}
-      <BottomNav />
+      <BottomNav scheduledCount={scheduledCount} />
     </div>
   )
 }

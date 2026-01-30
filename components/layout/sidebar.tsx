@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   Users,
   Send,
+  Calendar,
   History,
   Settings,
   CreditCard,
@@ -17,6 +18,7 @@ import {
   LogOut,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { signOut } from '@/lib/actions/auth'
 
@@ -30,6 +32,7 @@ const mainNav: NavItem[] = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
   { icon: Users, label: 'Contacts', href: '/contacts' },
   { icon: Send, label: 'Send', href: '/send' },
+  { icon: Calendar, label: 'Scheduled', href: '/scheduled' },
   { icon: History, label: 'History', href: '/history' },
 ]
 
@@ -38,7 +41,11 @@ const secondaryNav: NavItem[] = [
   { icon: Settings, label: 'Settings', href: '/dashboard/settings' },
 ]
 
-export function Sidebar() {
+interface SidebarProps {
+  scheduledCount?: number
+}
+
+export function Sidebar({ scheduledCount = 0 }: SidebarProps) {
   const pathname = usePathname()
   const [isCollapsed, setIsCollapsed] = useLocalStorage('sidebarCollapsed', false)
 
@@ -64,7 +71,7 @@ export function Sidebar() {
 
   const collapsed = autoCollapsed || isCollapsed
 
-  const NavLink = ({ item }: { item: NavItem }) => {
+  const NavLink = ({ item, count }: { item: NavItem; count?: number }) => {
     const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
     const Icon = item.icon
 
@@ -81,8 +88,24 @@ export function Sidebar() {
         )}
         title={collapsed ? item.label : undefined}
       >
-        <Icon className="h-5 w-5 shrink-0" />
-        {!collapsed && <span>{item.label}</span>}
+        <div className="relative">
+          <Icon className="h-5 w-5 shrink-0" />
+          {/* Collapsed badge indicator - small dot */}
+          {collapsed && count !== undefined && count > 0 && (
+            <div className="absolute -top-1 -right-1 h-2 w-2 bg-primary rounded-full" />
+          )}
+        </div>
+        {!collapsed && (
+          <>
+            <span className="flex-1">{item.label}</span>
+            {/* Expanded badge with count */}
+            {count !== undefined && count > 0 && (
+              <Badge variant="secondary" className="ml-auto text-xs px-1.5 py-0">
+                {count > 99 ? '99+' : count}
+              </Badge>
+            )}
+          </>
+        )}
       </Link>
     )
   }
@@ -127,7 +150,11 @@ export function Sidebar() {
           </p>
         )}
         {mainNav.map((item) => (
-          <NavLink key={item.href} item={item} />
+          <NavLink
+            key={item.href}
+            item={item}
+            count={item.label === 'Scheduled' ? scheduledCount : undefined}
+          />
         ))}
 
         <Separator className="my-4" />
