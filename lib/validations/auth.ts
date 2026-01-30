@@ -11,7 +11,6 @@ export const signUpSchema = z.object({
     .max(72, 'Password must be less than 72 characters'),
   fullName: z
     .string()
-    .min(1, 'Full name is required')
     .max(100, 'Full name must be less than 100 characters')
     .optional(),
 })
