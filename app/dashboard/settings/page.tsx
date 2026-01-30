@@ -5,6 +5,7 @@ import { BusinessSettingsForm } from '@/components/business-settings-form'
 import { EmailTemplateForm } from '@/components/email-template-form'
 import { TemplateList } from '@/components/template-list'
 import { IntegrationsSection } from '@/components/settings/integrations-section'
+import { DeleteAccountDialog } from '@/components/settings/delete-account-dialog'
 import type { EmailTemplate } from '@/lib/types/database'
 
 // Loading skeleton for settings content
@@ -115,6 +116,15 @@ async function SettingsContent() {
           Connect external tools like Zapier or Make to automatically add contacts.
         </p>
         <IntegrationsSection hasExistingKey={!!business?.api_key_hash} />
+      </section>
+
+      {/* Section 4: Danger Zone */}
+      <section className="border border-red-200 rounded-lg p-6 bg-white shadow-sm">
+        <h2 className="text-xl font-semibold mb-2 text-red-600">Danger Zone</h2>
+        <p className="text-gray-600 mb-4">
+          Permanently delete your account and all associated data. This action cannot be undone.
+        </p>
+        <DeleteAccountDialog />
       </section>
     </div>
   )
