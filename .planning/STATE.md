@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 **Phase:** 15 of 15 (Design System & Dashboard Redesign)
-**Plan:** 15-02 of 4 (Sidebar and Bottom Nav Redesign)
-**Status:** Plan 15-02 complete
-**Last activity:** 2026-01-30 -- Completed 15-02-PLAN.md (Sidebar and Bottom Nav Redesign)
+**Plan:** 15-03 of 4 (Dashboard Components & Data Layer)
+**Status:** Plan 15-03 complete
+**Last activity:** 2026-01-29 -- Completed 15-03-PLAN.md (Dashboard Components & Data Layer)
 
-**Progress:** [###########---------] 48/48 v1.0 plans complete, 1/1 Phase 12 complete, 2/2 Phase 13 complete, 2/4 Phase 15 complete
+**Progress:** [###########---------] 48/48 v1.0 plans complete, 1/1 Phase 12 complete, 2/2 Phase 13 complete, 3/4 Phase 15 complete
 
 ```
 v1.0 MVP: ████████████████████████████████████████████████ 48/48 COMPLETE
 Phase 12: █ Cron Processing (1/1) COMPLETE
 Phase 13: ██ Scheduling & Navigation (2/2) COMPLETE
 Phase 14: ░░░ Scheduled Send Management (0/TBD)
-Phase 15: ██░░ Design System & Dashboard Redesign (2/4) <- IN PROGRESS
+Phase 15: ███░ Design System & Dashboard Redesign (3/4) <- IN PROGRESS
 ```
 
 ## What's Been Built
@@ -43,6 +43,7 @@ Phase 15: ██░░ Design System & Dashboard Redesign (2/4) <- IN PROGRESS
 ### Phase 15: Design System & Dashboard Redesign (In Progress)
 - **15-01 Complete:** Design system foundation with #1B44BF primary color, Kumbh Sans font, Phosphor icons, semantic status palette, border-only design (no shadows)
 - **15-02 Complete:** Sidebar and bottom nav with Phosphor icons, white sidebar bg with #E2E2E2 border, #F2F2F2 active state, #F9F9F9 content bg
+- **15-03 Complete:** Dashboard components (stat cards, activity table, avatar) and data layer functions (getNeedsAttentionCount, getRecentActivity)
 
 ## Tech Stack
 
@@ -69,6 +70,8 @@ Next.js 15 (App Router), TypeScript, Supabase, Tailwind CSS, Resend, Stripe, Ups
 | D13-02-03 | 13-02 | Responsive table/card pattern | Tables don't work well on mobile; cards provide better UX | Medium | 2026-01-29 |
 | D15-02-01 | 15-02 | Bottom nav reduced to 4 items | Scheduled removed from mobile nav to match reference design | Low | 2026-01-30 |
 | D15-02-02 | 15-02 | App content bg #F9F9F9 | Light gray background for content area matching Figma reference | Low | 2026-01-30 |
+| D15-03-01 | 15-03 | Deterministic avatar colors based on name hash | Hash the name string (sum of char codes mod 8) to select from 8 pastel colors for consistent avatar appearance | Low | 2026-01-29 |
+| D15-03-02 | 15-03 | Map 'opened' status to 'Clicked' label in UI | Display email 'opened' status as 'Clicked' for better user understanding in Recent Activity table | Low | 2026-01-29 |
 
 Recent architectural decisions:
 - Separate scheduled_sends table (different lifecycle than send_logs)
@@ -90,7 +93,7 @@ Recent architectural decisions:
 
 ## Session Continuity
 
-**Last session:** 2026-01-30
-**Stopped at:** Completed 15-02-PLAN.md (Sidebar and Bottom Nav Redesign)
+**Last session:** 2026-01-29
+**Stopped at:** Completed 15-03-PLAN.md (Dashboard Components & Data Layer)
 **Resume file:** None
-**Next action:** Continue with Phase 15-03 (Quick Send Form) or Phase 15-04 (Dashboard Integration)
+**Next action:** Continue with Phase 15-04 (Dashboard Page Integration)
