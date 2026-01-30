@@ -5,7 +5,7 @@ import { getBusiness } from '@/lib/actions/business'
 import { OnboardingWizard } from '@/components/onboarding/onboarding-wizard'
 
 /**
- * Onboarding page - guides new users through 2-step setup.
+ * Onboarding page - standalone full-screen experience (no dashboard shell).
  *
  * Server component that:
  * - Redirects to /login if not authenticated
