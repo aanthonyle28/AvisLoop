@@ -309,9 +309,9 @@ Plans:
 - [x] **Phase 14: Scheduled Send Management** - Users can view, cancel, and reschedule their pending sends
 - [x] **Phase 15: Design System & Dashboard Redesign** - Dashboard matches Figma reference with updated design tokens, typography, and layout
 
-### v1.2 Onboarding Redesign + Google Auth (In Progress)
+### v1.2 Onboarding Redesign + Google Auth (Complete)
 
-- [ ] **Phase 16: Onboarding Redesign + Google Auth** - Auth pages redesigned with split layout and Google OAuth, onboarding wizard simplified to 2 steps, dashboard shows 3 guided test step cards
+- [x] **Phase 16: Onboarding Redesign + Google Auth** - Auth pages redesigned with split layout and Google OAuth, onboarding wizard simplified to 2 steps, dashboard shows 3 guided test step cards
 
 ## Phase Details
 
@@ -398,7 +398,7 @@ Plans:
 - [x] 16-02-PLAN.md — Onboarding wizard redesign (2 steps: business name, Google review link)
 - [x] 16-03-PLAN.md — Auth pages split layout redesign (login + signup with Google OAuth button)
 - [x] 16-04-PLAN.md — Dashboard onboarding cards + test send quota exclusion
-- [ ] 16-05-PLAN.md — Wire test send query param to form + fix icon type [GAP CLOSURE]
+- [x] 16-05-PLAN.md — Wire test send query param to form + fix icon type [GAP CLOSURE]
 
 ## Progress
 
@@ -425,4 +425,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -
 | 13. Scheduling & Navigation | v1.1 | 2/2 | Complete | 2026-01-29 |
 | 14. Scheduled Send Management | v1.1 | 2/2 | Complete | 2026-01-30 |
 | 15. Design System & Dashboard Redesign | v1.2 | 4/4 | Complete | 2026-01-29 |
-| 16. Onboarding Redesign + Google Auth | v1.2 | 4/5 | In Progress | — |
+| 16. Onboarding Redesign + Google Auth | v1.2 | 5/5 | Complete | 2026-01-30 |
