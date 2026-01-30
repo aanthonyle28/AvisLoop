@@ -304,7 +304,7 @@ Plans:
 
 **Existing code:** ScheduleSelector component, schedule server actions, Zod validation, database types, service role client, and scheduled_sends table migration already exist from earlier manual work. Phases complete what is missing.
 
-- [ ] **Phase 12: Cron Processing** - System reliably processes scheduled sends in the background every minute
+- [x] **Phase 12: Cron Processing** - System reliably processes scheduled sends in the background every minute
 - [ ] **Phase 13: Scheduling & Navigation** - Users can schedule sends and find the scheduling feature in navigation
 - [ ] **Phase 14: Scheduled Send Management** - Users can view, cancel, and reschedule their pending sends
 
@@ -323,7 +323,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 12-01-PLAN.md — Cron route handler + vercel.json (claim, validate, send, log)
+- [x] 12-01-PLAN.md — Cron route handler + vercel.json (claim, validate, send, log)
 
 ### Phase 13: Scheduling & Navigation
 **Goal**: Users can schedule sends and find the scheduling feature throughout the app
@@ -369,6 +369,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -
 | 9. Polish & UX | v1.0 | 4/4 | Complete | 2026-01-28 |
 | 10. Landing Page Redesign | v1.0 | 5/5 | Complete | 2026-01-28 |
 | 11. Bulk Send & Integrations | v1.0 | 3/3 | Complete | 2026-01-28 |
-| 12. Cron Processing | v1.1 | 0/1 | Not started | - |
+| 12. Cron Processing | v1.1 | 1/1 | Complete | 2026-01-29 |
 | 13. Scheduling & Navigation | v1.1 | 0/TBD | Not started | - |
 | 14. Scheduled Send Management | v1.1 | 0/TBD | Not started | - |

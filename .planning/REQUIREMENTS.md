@@ -99,10 +99,10 @@ Requirements for Scheduled Sending milestone. Each maps to roadmap phases.
 
 ### Processing
 
-- [ ] **PROC-01**: Cron endpoint processes due scheduled sends every minute
-- [ ] **PROC-02**: System re-validates business rules (opt-out, cooldown, quota) at send time
-- [ ] **PROC-03**: Service role client bypasses RLS for cron operations
-- [ ] **PROC-04**: Cron endpoint logs structured output for each run
+- [x] **PROC-01**: Cron endpoint processes due scheduled sends every minute
+- [x] **PROC-02**: System re-validates business rules (opt-out, cooldown, quota) at send time
+- [x] **PROC-03**: Service role client bypasses RLS for cron operations
+- [x] **PROC-04**: Cron endpoint logs structured output for each run
 
 ### Navigation
 
@@ -235,10 +235,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MGMT-02 | Phase 14 | Pending |
 | MGMT-03 | Phase 14 | Pending |
 | MGMT-04 | Phase 14 | Pending |
-| PROC-01 | Phase 12 | Pending |
-| PROC-02 | Phase 12 | Pending |
-| PROC-03 | Phase 12 | Pending |
-| PROC-04 | Phase 12 | Pending |
+| PROC-01 | Phase 12 | Complete |
+| PROC-02 | Phase 12 | Complete |
+| PROC-03 | Phase 12 | Complete |
+| PROC-04 | Phase 12 | Complete |
 | NAV-01 | Phase 13 | Pending |
 | NAV-02 | Phase 13 | Pending |
 
