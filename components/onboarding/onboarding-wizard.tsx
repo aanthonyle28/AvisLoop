@@ -28,8 +28,6 @@ const STORAGE_KEY = 'onboarding-draft'
 interface OnboardingWizardProps {
   initialStep: number
   business: OnboardingBusiness
-  firstContact?: any // Optional for future use
-  defaultTemplate?: any // Optional for future use
 }
 
 /**
@@ -45,8 +43,6 @@ interface OnboardingWizardProps {
 export function OnboardingWizard({
   initialStep,
   business,
-  firstContact,
-  defaultTemplate,
 }: OnboardingWizardProps) {
   const router = useRouter()
   const [currentStep, setCurrentStep] = useState(initialStep)
@@ -138,11 +134,7 @@ export function OnboardingWizard({
       </div>
 
       {/* Progress bar fixed at bottom */}
-      <OnboardingProgress
-        currentStep={currentStep}
-        totalSteps={STEPS.length}
-        stepTitles={STEPS.map(s => s.title)}
-      />
+      <OnboardingProgress currentStep={currentStep} totalSteps={STEPS.length} />
     </div>
   )
 }

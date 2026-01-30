@@ -1,18 +1,20 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getOnboardingStatus } from '@/lib/data/onboarding'
-import { getBusiness, getEmailTemplates } from '@/lib/actions/business'
-import { getContacts } from '@/lib/actions/contact'
+import { getBusiness } from '@/lib/actions/business'
 import { OnboardingWizard } from '@/components/onboarding/onboarding-wizard'
 
 /**
- * Onboarding page - guides new users through initial setup.
+ * Onboarding page - guides new users through 2-step setup.
  *
  * Server component that:
  * - Redirects to /login if not authenticated
  * - Redirects to /dashboard if onboarding already complete
- * - Fetches data needed for all step components
- * - Renders wizard shell with step components
+ * - Fetches business data for step components
+ * - Renders wizard shell with 2-step flow
+ *
+ * Step 1: Business Name (required)
+ * Step 2: Google Review Link (optional/skippable)
  */
 export default async function OnboardingPage({
   searchParams,
@@ -41,39 +43,11 @@ export default async function OnboardingPage({
   const params = await searchParams
   const stepParam = parseInt(params.step || '1', 10)
 
-  // Validate step range (1-3), clamp if out of range
-  // Note: Wizard has 3 steps (Business, Contact, Send). Review Link is part of Business step.
-  const currentStep = Math.min(Math.max(1, stepParam), 3)
+  // Validate step range (1-2), clamp if out of range
+  const currentStep = Math.min(Math.max(1, stepParam), 2)
 
-  // Fetch data needed for step components in parallel
-  const [business, contactsData, templates] = await Promise.all([
-    getBusiness(),
-    getContacts({ limit: 1 }), // Get first contact for SendStep
-    getEmailTemplates(),
-  ])
+  // Fetch business data for step components
+  const business = await getBusiness()
 
-  // First contact for SendStep (if any exist)
-  const firstContact = contactsData.contacts[0] || null
-
-  // Default template for SendStep
-  const defaultTemplate =
-    templates.find((t) => t.is_default) || templates[0] || null
-
-  return (
-    <div className="container mx-auto py-8 px-4 max-w-2xl">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-center">Welcome to AvisLoop</h1>
-        <p className="text-muted-foreground text-center mt-2">
-          Let&apos;s get your business set up to collect reviews
-        </p>
-      </div>
-
-      <OnboardingWizard
-        initialStep={currentStep}
-        business={business}
-        firstContact={firstContact}
-        defaultTemplate={defaultTemplate}
-      />
-    </div>
-  )
+  return <OnboardingWizard initialStep={currentStep} business={business} />
 }
