@@ -5,22 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-28)
 
 **Core value:** Make requesting reviews so simple that business owners actually do it -- one contact, one click, done.
-**Current focus:** Phase 12 - Cron Processing (v1.1 Scheduled Sending)
+**Current focus:** Phase 15 - Design System & Dashboard Redesign
 
 ## Current Position
 
-**Phase:** 12 of 14 (Cron Processing)
-**Plan:** 12-01 of 1 (Cron Processing Engine)
-**Status:** Plan 12-01 complete
-**Last activity:** 2026-01-29 -- Completed 12-01-PLAN.md (Cron Processing Engine)
+**Phase:** 15 of 15 (Design System & Dashboard Redesign)
+**Plan:** 15-01 of 4 (Design System Foundation)
+**Status:** Plan 15-01 complete
+**Last activity:** 2026-01-29 -- Completed 15-01-PLAN.md (Design System Foundation)
 
-**Progress:** [###########---------] 48/48 v1.0 plans complete, 1/1 Phase 12 plan complete
+**Progress:** [###########---------] 48/48 v1.0 plans complete, 1/1 Phase 12 complete, 2/2 Phase 13 complete, 1/4 Phase 15 complete
 
 ```
 v1.0 MVP: ████████████████████████████████████████████████ 48/48 COMPLETE
 Phase 12: █ Cron Processing (1/1) COMPLETE
-Phase 13: ░░░ Scheduling & Navigation (0/TBD) <- NEXT
+Phase 13: ██ Scheduling & Navigation (2/2) COMPLETE
 Phase 14: ░░░ Scheduled Send Management (0/TBD)
+Phase 15: █░░░ Design System & Dashboard Redesign (1/4) <- IN PROGRESS
 ```
 
 ## What's Been Built
@@ -45,9 +46,12 @@ Phase 14: ░░░ Scheduled Send Management (0/TBD)
 - `components/send/send-form.tsx` -- Already supports scheduled send flow
 - Database migration for scheduled_sends table applied
 
+### Phase 15: Design System & Dashboard Redesign (In Progress)
+- **15-01 Complete:** Design system foundation with #1B44BF primary color, Kumbh Sans font, Phosphor icons, semantic status palette, border-only design (no shadows)
+
 ## Tech Stack
 
-Next.js 15 (App Router), TypeScript, Supabase, Tailwind CSS, Resend, Stripe, Upstash Redis
+Next.js 15 (App Router), TypeScript, Supabase, Tailwind CSS, Resend, Stripe, Upstash Redis, Phosphor Icons, Kumbh Sans (Google Fonts)
 
 ## Decisions Made
 
@@ -57,6 +61,11 @@ Next.js 15 (App Router), TypeScript, Supabase, Tailwind CSS, Resend, Stripe, Ups
 | D12-01-02 | 12-01 | Service role client for cron context | Cron runs without user session, needs RLS bypass | High | 2026-01-29 |
 | D12-01-03 | 12-01 | Re-validate all rules at send time | Contact status may change between schedule and execution | Medium | 2026-01-29 |
 | D12-01-04 | 12-01 | Return 200 for partial failures | Vercel Cron expects 200 for success; individual failures logged in scheduled_send records | Low | 2026-01-29 |
+| D15-01-01 | 15-01 | Primary color #1B44BF app-wide | Matches Figma design reference for dashboard redesign | High | 2026-01-29 |
+| D15-01-02 | 15-01 | Kumbh Sans font family | Design system requirement, replaces Geist | Medium | 2026-01-29 |
+| D15-01-03 | 15-01 | Border-only design (no shadows) | Reference design aesthetic, removes all box-shadows from components | Medium | 2026-01-29 |
+| D15-01-04 | 15-01 | 8px border-radius standard | Changed from 12px for tighter corners matching reference | Low | 2026-01-29 |
+| D15-01-05 | 15-01 | Semantic status color palette | 5 status colors (success, warning, error, info, reviewed) with light/dark variants | Medium | 2026-01-29 |
 
 Recent architectural decisions:
 - Separate scheduled_sends table (different lifecycle than send_logs)
@@ -79,6 +88,6 @@ Recent architectural decisions:
 ## Session Continuity
 
 **Last session:** 2026-01-29
-**Stopped at:** Completed 12-01-PLAN.md (Cron Processing Engine)
+**Stopped at:** Completed 15-01-PLAN.md (Design System Foundation)
 **Resume file:** None
-**Next action:** `/gsd:plan-phase 13` or manual work on Phase 13 (Scheduling & Navigation)
+**Next action:** `/gsd:execute-phase 15-02` (Dashboard Stat Cards) or manual work on remaining Phase 15 plans
