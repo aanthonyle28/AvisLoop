@@ -307,6 +307,7 @@ Plans:
 - [x] **Phase 12: Cron Processing** - System reliably processes scheduled sends in the background every minute
 - [ ] **Phase 13: Scheduling & Navigation** - Users can schedule sends and find the scheduling feature in navigation
 - [ ] **Phase 14: Scheduled Send Management** - Users can view, cancel, and reschedule their pending sends
+- [ ] **Phase 15: Design System & Dashboard Redesign** - Dashboard matches Figma reference with updated design tokens, typography, and layout
 
 ## Phase Details
 
@@ -348,10 +349,30 @@ Plans:
   4. User can select multiple pending sends and reschedule them to a different time
 **Plans**: TBD
 
+### Phase 15: Design System & Dashboard Redesign
+**Goal**: Dashboard matches Figma reference design with updated design tokens, typography, icons, and layout
+**Depends on**: Phase 9 (existing design system and dashboard)
+**Requirements**: None (visual redesign, not new functionality)
+**Success Criteria** (what must be TRUE):
+  1. Design tokens updated: primary #1B44BF, Kumbh Sans font, 4px spacing grid, border-only (no shadows)
+  2. Sidebar uses white background, #E2E2E2 border, #F2F2F2 active state with blue icon
+  3. Dashboard shows welcome header, 3 stat cards (Monthly Usage, Needs Attention, Review Rate), Quick Send + When to Send, Recent Activity table
+  4. Stat cards display real data (send count/limit, pending+failed count, review rate percentage)
+  5. Quick Send has contact search, template dropdown, schedule presets, and functional Send button
+  6. Recent Activity shows 5 most recent send_logs with status badges using semantic color palette
+  7. Icons switched from Lucide to Phosphor (outline style)
+**Plans**: 4 plans in 3 waves
+
+Plans:
+- [ ] 15-01-PLAN.md — Design tokens, Kumbh Sans font, Phosphor icons install, Card/Button shadow removal
+- [ ] 15-02-PLAN.md — Sidebar and bottom nav restyle with Phosphor icons and new visual language
+- [ ] 15-03-PLAN.md — Dashboard data layer additions and new components (stat cards, recent activity, avatar)
+- [ ] 15-04-PLAN.md — Dashboard page assembly with Quick Send, skeleton update
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -> 8 -> 8.1 -> 9 -> 10 -> 11 -> 12 -> 13 -> 14
+Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -> 8 -> 8.1 -> 9 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -372,3 +393,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -
 | 12. Cron Processing | v1.1 | 1/1 | Complete | 2026-01-29 |
 | 13. Scheduling & Navigation | v1.1 | 0/TBD | Not started | - |
 | 14. Scheduled Send Management | v1.1 | 0/TBD | Not started | - |
+| 15. Design System & Dashboard Redesign | v1.2 | 0/4 | Not started | - |
