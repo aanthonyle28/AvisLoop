@@ -78,10 +78,6 @@ export async function sendReviewRequest(
     return { error: 'Please create a business profile first' }
   }
 
-  if (!business.google_review_link) {
-    return { error: 'Please add your Google review link in settings before sending' }
-  }
-
   // === Get contact ===
   const { data: contact, error: contactError } = await supabase
     .from('contacts')
@@ -167,7 +163,7 @@ export async function sendReviewRequest(
     ReviewRequestEmail({
       customerName: contact.name,
       businessName: business.name,
-      reviewLink: business.google_review_link,
+      reviewLink: business.google_review_link || '',
       senderName,
     })
   )
@@ -209,6 +205,7 @@ export async function sendReviewRequest(
     })
     .eq('id', contactId)
 
+  revalidatePath('/dashboard')
   revalidatePath('/dashboard/contacts')
   revalidatePath('/dashboard/send')
 
@@ -306,12 +303,7 @@ export async function batchSendReviewRequest(
     return { error: 'Please create a business profile first' }
   }
 
-  // === 4. Check google_review_link ===
-  if (!business.google_review_link) {
-    return { error: 'Please add your Google review link in settings before sending' }
-  }
-
-  // === 5. Check monthly quota (full batch must fit) ===
+  // === 4. Check monthly quota (full batch must fit) ===
   const monthlyLimit = MONTHLY_SEND_LIMITS[business.tier] || MONTHLY_SEND_LIMITS.basic
   const { count: monthlyCount } = await getMonthlyCount(supabase, business.id)
   const remainingQuota = monthlyLimit - monthlyCount
@@ -439,7 +431,7 @@ export async function batchSendReviewRequest(
         ReviewRequestEmail({
           customerName: contact.name,
           businessName: business.name,
-          reviewLink: business.google_review_link,
+          reviewLink: business.google_review_link || '',
           senderName,
         })
       )
@@ -522,6 +514,7 @@ export async function batchSendReviewRequest(
     }))
   ]
 
+  revalidatePath('/dashboard')
   revalidatePath('/dashboard/contacts')
   revalidatePath('/dashboard/send')
 

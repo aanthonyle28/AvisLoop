@@ -36,9 +36,15 @@ export function ReviewRequestEmail({
             you could take a moment to share your experience.
           </Text>
 
-          <Button href={reviewLink} style={button}>
-            Leave a Review
-          </Button>
+          {reviewLink ? (
+            <Button href={reviewLink} style={button}>
+              Leave a Review
+            </Button>
+          ) : (
+            <Text style={text}>
+              We&apos;d love to hear your thoughts! Please share your experience with us.
+            </Text>
+          )}
 
           <Hr style={divider} />
 
