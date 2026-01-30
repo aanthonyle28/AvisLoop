@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 **Phase:** 16 of 19 (Onboarding Redesign)
-**Plan:** 16-01 of 3 (Database Migration and Google OAuth Infrastructure)
+**Plan:** 16-02 of 3 (Wizard Redesign)
 **Status:** In progress
-**Last activity:** 2026-01-30 -- Completed 16-01-PLAN.md (Database Migration and Google OAuth Infrastructure)
+**Last activity:** 2026-01-30 -- Completed 16-02-PLAN.md (Wizard Redesign)
 
-**Progress:** [█████████████████████] 49/57 total plans complete, 1/3 Phase 16 complete
+**Progress:** [█████████████████████] 50/57 total plans complete, 2/3 Phase 16 complete
 
 ```
 v1.0 MVP: ████████████████████████████████████████████████ 48/48 COMPLETE
@@ -22,7 +22,7 @@ Phase 12: █ Cron Processing (1/1) COMPLETE
 Phase 13: ██ Scheduling & Navigation (2/2) COMPLETE
 Phase 14: ██ Scheduled Send Management (2/2) COMPLETE
 Phase 15: ████ Design System & Dashboard Redesign (4/4) COMPLETE
-Phase 16: █░░ Onboarding Redesign (1/3) IN PROGRESS
+Phase 16: ██░ Onboarding Redesign (2/3) IN PROGRESS
 ```
 
 ## What's Been Built
@@ -53,6 +53,7 @@ Phase 16: █░░ Onboarding Redesign (1/3) IN PROGRESS
 
 ### Phase 16: Onboarding Redesign (In Progress)
 - **16-01 Complete:** Database migration (is_test flag on send_logs, onboarding_steps_completed object format), Google OAuth infrastructure (callback route, signInWithGoogle action, GoogleOAuthButton component)
+- **16-02 Complete:** Wizard redesign to 2 steps (business name, Google review link), horizontal progress bar at bottom, simplified inline step components
 
 ## Tech Stack
 
@@ -95,6 +96,9 @@ Next.js 15 (App Router), TypeScript, Supabase, Tailwind CSS, Resend, Stripe, Ups
 | D16-01-01 | 16-01 | Use PKCE flow for Google OAuth | Supabase built-in OAuth provider support with secure PKCE flow | Medium | 2026-01-30 |
 | D16-01-02 | 16-01 | Partial index on send_logs WHERE is_test = false | Optimizes quota enforcement queries by excluding test sends at index level | Medium | 2026-01-30 |
 | D16-01-03 | 16-01 | Change onboarding_steps_completed from array to object | Object format better supports key-value tracking for dashboard cards | Low | 2026-01-30 |
+| D16-02-01 | 16-02 | 2-step wizard (business name, Google review link) | Faster onboarding, less intimidating for new users | Medium | 2026-01-30 |
+| D16-02-02 | 16-02 | Inline step components instead of separate files | Simple single-input forms don't need complex form libraries or separate files | Low | 2026-01-30 |
+| D16-02-03 | 16-02 | Horizontal progress bar at bottom with counter | Cleaner UI matching modern onboarding patterns | Low | 2026-01-30 |
 
 Recent architectural decisions:
 - Separate scheduled_sends table (different lifecycle than send_logs)
@@ -120,6 +124,6 @@ Recent architectural decisions:
 ## Session Continuity
 
 **Last session:** 2026-01-30
-**Stopped at:** Completed 16-01-PLAN.md (Database Migration and Google OAuth Infrastructure)
+**Stopped at:** Completed 16-02-PLAN.md (Wizard Redesign)
 **Resume file:** None
-**Next action:** Continue with 16-02 (Auth Page Redesign) or 16-03 (Dashboard Onboarding Cards)
+**Next action:** Continue with 16-03 (Dashboard Onboarding Cards)

@@ -1,3 +1,5 @@
+// DEPRECATED: Replaced by OnboardingCards in Phase 16. Safe to delete.
+
 'use client'
 
 import { useState } from 'react'

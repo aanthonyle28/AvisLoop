@@ -1,12 +1,13 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { getOnboardingStatus } from '@/lib/data/onboarding'
+import { getOnboardingStatus, getOnboardingCardStatus, areAllCardsComplete } from '@/lib/data/onboarding'
 import { getBusiness } from '@/lib/actions/business'
 import { getMonthlyUsage, getResponseRate, getNeedsAttentionCount, getRecentActivity } from '@/lib/data/send-logs'
 import { getContacts } from '@/lib/actions/contact'
 import { MonthlyUsageCard, NeedsAttentionCard, ReviewRateCard } from '@/components/dashboard/stat-cards'
 import { RecentActivityTable } from '@/components/dashboard/recent-activity'
 import { QuickSend } from '@/components/dashboard/quick-send'
+import { OnboardingCards } from '@/components/dashboard/onboarding-cards'
 import type { EmailTemplate } from '@/lib/types/database'
 
 /**
@@ -33,13 +34,14 @@ export default async function DashboardPage() {
   }
 
   // Fetch data in parallel
-  const [business, usage, contactsData, responseRate, needsAttention, recentActivity] = await Promise.all([
+  const [business, usage, contactsData, responseRate, needsAttention, recentActivity, cardStatus] = await Promise.all([
     getBusiness(),
     getMonthlyUsage(),
     getContacts({ limit: 50 }),
     getResponseRate(),
     getNeedsAttentionCount(),
     getRecentActivity(5),
+    getOnboardingCardStatus(),
   ])
 
   // Get templates for Quick Send
@@ -63,14 +65,19 @@ export default async function DashboardPage() {
         </p>
       </div>
 
-      {/* 2. Stat Cards Row */}
+      {/* 2. Onboarding Cards (if not all complete) */}
+      {!areAllCardsComplete(cardStatus) && (
+        <OnboardingCards status={cardStatus} />
+      )}
+
+      {/* 3. Stat Cards Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <MonthlyUsageCard count={usage.count} limit={usage.limit} tier={usage.tier} />
         <NeedsAttentionCard total={needsAttention.total} pending={needsAttention.pending} failed={needsAttention.failed} />
         <ReviewRateCard rate={responseRate.rate} total={responseRate.total} responded={responseRate.responded} />
       </div>
 
-      {/* 3. Quick Send + When to Send */}
+      {/* 4. Quick Send + When to Send */}
       {contactsData.contacts.length > 0 && templates.length > 0 && (
         <QuickSend
           contacts={contactsData.contacts
@@ -81,7 +88,7 @@ export default async function DashboardPage() {
         />
       )}
 
-      {/* 4. Recent Activity Table */}
+      {/* 5. Recent Activity Table */}
       <RecentActivityTable activities={recentActivity} />
     </div>
   )
