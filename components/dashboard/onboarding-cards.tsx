@@ -1,6 +1,7 @@
 'use client'
 
 import { AddressBook, NotePencil, PaperPlaneTilt, ArrowRight, CheckCircle, Circle } from '@phosphor-icons/react'
+import type { IconWeight } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import type { OnboardingCardStatus } from '@/lib/data/onboarding'
@@ -10,7 +11,7 @@ type CardConfig = {
   number: string
   title: string
   description: string
-  icon: React.ComponentType<{ className?: string; weight?: string }>
+  icon: React.ComponentType<{ className?: string; weight?: IconWeight }>
   href: string
   prerequisite?: keyof OnboardingCardStatus
   prerequisiteLabel?: string
