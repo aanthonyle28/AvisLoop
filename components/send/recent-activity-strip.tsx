@@ -5,6 +5,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { ArrowRight } from '@phosphor-icons/react'
 import { StatusBadge } from '@/components/history/status-badge'
 import type { SendStatus } from '@/components/history/status-badge'
+import { cn } from '@/lib/utils'
 
 export interface RecentActivity {
   id: string
@@ -58,13 +59,19 @@ export function RecentActivityStrip({ activities, mode, onItemClick }: RecentAct
             const timeAgo = formatDistanceToNow(new Date(item.created_at), { addSuffix: false })
 
             return (
-              <div key={item.id} className="flex items-center gap-1 min-w-0">
+              <div
+                key={item.id}
+                className={cn(
+                  "flex items-center gap-1 min-w-0",
+                  index < displayItems.length - 1 ? "shrink-0" : ""
+                )}
+              >
                 {index > 0 && (
                   <span className="text-muted-foreground mx-2 shrink-0">|</span>
                 )}
                 <button
                   onClick={() => onItemClick?.(item.id)}
-                  className="flex items-center gap-2 hover:bg-muted/50 rounded px-1.5 py-0.5 transition-colors min-w-0"
+                  className="flex items-center gap-2 hover:bg-muted/50 rounded px-1.5 py-0.5 transition-colors min-w-0 max-w-full"
                 >
                   <span className="text-sm font-medium truncate">{label}</span>
                   <StatusBadge status={item.status as SendStatus} />
