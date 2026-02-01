@@ -1,4 +1,4 @@
-# Requirements: AvisLoop v1.3
+# Requirements: AvisLoop
 
 **Defined:** 2026-02-01
 **Core Value:** Make requesting reviews so simple that business owners actually do it -- one contact, one click, done.
@@ -40,6 +40,39 @@ Requirements for Dashboard UX Overhaul & Onboarding Polish. Each maps to roadmap
 
 - [ ] **TMPL-01**: Template dropdown on send page shows default templates AND a "Create Template" option that navigates to settings template creation page
 
+## v1.4 Requirements
+
+Requirements for Landing Page Redesign. Creative, unique, high-converting marketing pages.
+
+### Hero Section
+
+- [ ] **HERO-01**: User sees an outcome-focused headline that communicates value within 5 seconds (benefit-driven, not feature-listing, under 8 words)
+- [ ] **HERO-02**: User sees an animated product demo in the hero showing the 2-minute send flow (contact → message → send) using CSS/scroll animations
+- [ ] **HERO-03**: User sees a redesigned hero layout with floating UI mockups, gradient effects, and above-the-fold primary CTA
+- [ ] **HERO-04**: User sees a social proof strip immediately below hero ("Trusted by X+ businesses" with visual logos or industry mentions)
+
+### Content & Storytelling
+
+- [ ] **CONT-01**: User sees a problem/solution empathy section addressing review pain points (forgetting, awkwardness, complex tools) with emotional copy
+- [ ] **CONT-02**: User sees a "How It Works" 3-step visual walkthrough (Add contact → Write message → Send) with inline product screenshots/placeholders
+- [ ] **CONT-03**: User sees benefit-focused outcome cards (not feature lists) — "Get more reviews", "Save time", "No awkward asks" — with icons and supporting copy
+
+### Trust & Social Proof
+
+- [ ] **TRUST-01**: User sees industry-specific testimonials with specific outcome numbers ("Got 30 reviews in 2 weeks") from different business types (dentist, salon, contractor)
+- [ ] **TRUST-02**: User sees animated count-up statistics (reviews collected, businesses using, time saved) that trigger on scroll into viewport
+- [ ] **TRUST-03**: User sees a visual social proof bar with business/industry logos replacing text-only brand names
+
+### Technical & Polish
+
+- [ ] **TECH-01**: All new sections use CSS scroll-triggered animations (fade-in, slide-in, stagger) that respect prefers-reduced-motion and work in dark mode
+- [ ] **TECH-02**: Pricing page is redesigned with persuasive comparison layout, "Most Popular" highlight, transparent pricing, and risk-reversal copy
+- [ ] **TECH-03**: Navbar and footer are updated to match the new creative direction with consistent brand design system
+- [ ] **TECH-04**: All new components use semantic color tokens (bg-card, text-foreground, border-border) for dark mode support
+- [ ] **TECH-05**: FAQ section is redesigned with conversion-optimized placement and updated questions addressing setup time, email compatibility, response rates, and privacy
+- [ ] **TECH-06**: Final CTA section is redesigned with repeated primary CTA, social proof count, and risk-reversal messaging ("No credit card required")
+- [ ] **TECH-07**: All new components are mobile-first responsive (single-column stacking, 44px touch targets, optimized images)
+
 ## v2 Requirements
 
 Deferred to future release. Not in current roadmap.
@@ -52,6 +85,14 @@ Deferred to future release. Not in current roadmap.
 - **CHNL-01**: SMS review requests via Twilio
 - **CHNL-02**: Multi-channel send (email + SMS)
 
+### Landing Page v2
+- **LP-01**: Interactive product walkthrough (embedded preview)
+- **LP-02**: Industry-specific landing pages (dentists vs salons vs contractors)
+- **LP-03**: Video testimonials
+- **LP-04**: Advanced animations (particle effects, 3D elements, WebGL)
+- **LP-05**: A/B testing infrastructure with feature flags
+- **LP-06**: GA4 analytics event tracking (scroll depth, CTA clicks, FAQ expansion)
+
 ## Out of Scope
 
 | Feature | Reason |
@@ -61,6 +102,9 @@ Deferred to future release. Not in current roadmap.
 | Team roles / permissions | 1 user = 1 account for simplicity |
 | Multi-location for Pro | Deferred to v2 |
 | Widgets, QR codes, NFC | Future feature set |
+| Auto-play video with sound | Increases bounce rate |
+| Multiple competing CTAs per section | Creates decision paralysis |
+| Blog/content marketing pages | Not in scope for this milestone |
 
 ## Traceability
 
@@ -81,12 +125,29 @@ Deferred to future release. Not in current roadmap.
 | LAYO-02 | Phase 20 | Pending |
 | TMPL-01 | Phase 21 | Pending |
 | BDGE-01 | Phase 20 | Pending |
+| HERO-01 | TBD | Pending |
+| HERO-02 | TBD | Pending |
+| HERO-03 | TBD | Pending |
+| HERO-04 | TBD | Pending |
+| CONT-01 | TBD | Pending |
+| CONT-02 | TBD | Pending |
+| CONT-03 | TBD | Pending |
+| TRUST-01 | TBD | Pending |
+| TRUST-02 | TBD | Pending |
+| TRUST-03 | TBD | Pending |
+| TECH-01 | TBD | Pending |
+| TECH-02 | TBD | Pending |
+| TECH-03 | TBD | Pending |
+| TECH-04 | TBD | Pending |
+| TECH-05 | TBD | Pending |
+| TECH-06 | TBD | Pending |
+| TECH-07 | TBD | Pending |
 
 **Coverage:**
-- v1.3 requirements: 15 total
-- Mapped to phases: 15
-- Unmapped: 0
+- v1.3 requirements: 15 total (mapped to phases 20-23)
+- v1.4 requirements: 17 total (TBD — awaiting roadmap)
+- Unmapped: 17
 
 ---
 *Requirements defined: 2026-02-01*
-*Last updated: 2026-02-01 after v1.3 roadmap creation*
+*Last updated: 2026-02-01 after v1.4 requirements added*
