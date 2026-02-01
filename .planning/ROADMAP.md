@@ -317,7 +317,7 @@ Plans:
 ### v1.2.1 Tech Debt Closure
 
 - [ ] **Phase 17: Deployment & Critical Fixes** - Missing scheduled_sends migration, Phase 4 formal verification
-- [ ] **Phase 18: Code Cleanup** - Orphaned files, inline constant duplication, stale verification docs
+- [x] **Phase 18: Code Cleanup** - Orphaned files, inline constant duplication, stale verification docs
 
 ## Phase Details
 
@@ -435,8 +435,8 @@ Plans:
 **Plans**: 2 plans in 1 wave
 
 Plans:
-- [ ] 18-01-PLAN.md — Delete orphaned file, fix inline constant, update Phase 13 verification
-- [ ] 18-02-PLAN.md — History page pagination UI (prev/next controls)
+- [x] 18-01-PLAN.md — Delete orphaned file, fix inline constant, update Phase 13 verification
+- [x] 18-02-PLAN.md — History page pagination UI (prev/next controls)
 
 ## Progress
 
@@ -465,4 +465,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -
 | 15. Design System & Dashboard Redesign | v1.2 | 4/4 | Complete | 2026-01-29 |
 | 16. Onboarding Redesign + Google Auth | v1.2 | 5/5 | Complete | 2026-01-30 |
 | 17. Deployment & Critical Fixes | v1.2.1 | 2/2 | Complete | 2026-01-30 |
-| 18. Code Cleanup | v1.2.1 | 0/2 | Planned | — |
+| 18. Code Cleanup | v1.2.1 | 2/2 | Complete | 2026-02-01 |
