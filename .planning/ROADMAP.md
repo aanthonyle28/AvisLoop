@@ -11,7 +11,7 @@ AvisLoop is a review request SaaS for local service businesses. All planned mile
 - **v1.2 Onboarding Redesign + Google Auth** - Phases 15-16 (shipped 2026-01-30) — [Archive](milestones/v1.2-ROADMAP.md)
 - **v1.2.1 Tech Debt Closure** - Phases 17-18 (shipped 2026-02-01) — [Archive](milestones/v1.2.1-ROADMAP.md)
 - **Phase 19 UX/UI Redesign** - Phase 19 (shipped 2026-02-01)
-- **v1.3 Dashboard UX Overhaul & Onboarding Polish** - Phases 20-23 (not started)
+- **v1.3 Dashboard UX Overhaul & Onboarding Polish** - Phases 20-23 (in progress)
 - **v1.4 Landing Page Redesign** - Phases 24-27 (ready to plan)
 
 ## Phases
@@ -79,7 +79,7 @@ AvisLoop is a review request SaaS for local service businesses. All planned mile
 
 **Milestone Goal:** Unify visual consistency (status badges), add detail drawers for contacts and inline request viewing, polish the email preview and template selection experience, and complete the onboarding setup flow.
 
-- [ ] **Phase 20: Status Badges & Layout Fixes** - Unified badge component + sticky settings nav + activity strip layout
+- [x] **Phase 20: Status Badges & Layout Fixes** - Unified badge component + sticky settings nav + activity strip layout (complete 2026-02-01)
 - [ ] **Phase 21: Email Preview & Template Selection** - Compact preview snippet, full preview modal, template dropdown with create option
 - [ ] **Phase 22: Detail Drawers** - Request drawer on send page, contact drawer on contacts page, resend with template selector, contact notes
 - [ ] **Phase 23: Onboarding & Setup Polish** - Bonus credit, simplified checklist, completion banner, help & support menu
@@ -96,8 +96,8 @@ AvisLoop is a review request SaaS for local service businesses. All planned mile
   3. Recent activity chips fill all available horizontal space before the View All button, with the last chip truncating gracefully when space runs out
 **Plans**: 2 plans
 Plans:
-- [ ] 20-01-PLAN.md -- Rebuild StatusBadge with Figma-spec colors/icons + migrate scheduled-table
-- [ ] 20-02-PLAN.md -- Sticky settings header + activity strip horizontal fill/truncation
+- [x] 20-01-PLAN.md -- Rebuild StatusBadge with Figma-spec colors/icons + migrate scheduled-table
+- [x] 20-02-PLAN.md -- Sticky settings header + activity strip horizontal fill/truncation
 
 ### Phase 21: Email Preview & Template Selection
 **Goal**: Users see a compact email confidence snippet before sending and can open a full rendered preview, and the template dropdown includes a shortcut to create new templates.
@@ -195,7 +195,7 @@ Plans:
 | 15-16 | v1.2 | 9/9 | Complete | 2026-01-30 |
 | 17-18 | v1.2.1 | 4/4 | Complete | 2026-02-01 |
 | 19 | UX/UI Redesign | 8/8 | Complete | 2026-02-01 |
-| 20 | v1.3 | 0/TBD | Not started | - |
+| 20 | v1.3 | 2/2 | Complete | 2026-02-01 |
 | 21 | v1.3 | 0/TBD | Not started | - |
 | 22 | v1.3 | 0/TBD | Not started | - |
 | 23 | v1.3 | 0/TBD | Not started | - |
@@ -204,7 +204,7 @@ Plans:
 | 26 | v1.4 | 0/TBD | Not started | - |
 | 27 | v1.4 | 0/TBD | Not started | - |
 
-**Total:** 27 phases, 74 plans complete (+ v1.3 and v1.4 plans TBD).
+**Total:** 27 phases, 76 plans complete (+ remaining v1.3 and v1.4 plans TBD).
 
 ## What's Next
 
@@ -215,4 +215,4 @@ After v1.4:
 - **Production deployment** — Configure Resend, Google OAuth, Stripe for production
 
 ---
-*Last updated: 2026-02-01 after v1.4 roadmap creation*
+*Last updated: 2026-02-01 after Phase 20 completion*

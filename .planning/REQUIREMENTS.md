@@ -29,12 +29,12 @@ Requirements for Dashboard UX Overhaul & Onboarding Polish. Each maps to roadmap
 
 ### Layout & Navigation
 
-- [ ] **LAYO-01**: Settings page navbar is sticky/fixed on scroll
-- [ ] **LAYO-02**: Recent activity strip fills available horizontal space until View All button, with truncation at the end
+- [x] **LAYO-01**: Settings page navbar is sticky/fixed on scroll
+- [x] **LAYO-02**: Recent activity strip fills available horizontal space until View All button, with truncation at the end
 
 ### Status Badges
 
-- [ ] **BDGE-01**: Unified status badge component used consistently across all pages (send, history, contacts, drawers, recent activity) with exact Figma spec: Pending (#F3F4F6 bg, #101828 text, spinner icon), Delivered (#EAF3F6 bg, #2C879F text, check-circle icon), Clicked (#FEF9C2 bg, #894B00 text, cursor icon), Failed (#FFE2E2 bg, #C10007 text, warning-circle icon), Reviewed (#DCFCE7 bg, #008236 text, star icon), Scheduled (rgba(#9F2C86,0.1) bg, #9F2C86 text, check-circle icon)
+- [x] **BDGE-01**: Unified status badge component used consistently across all pages (send, history, contacts, drawers, recent activity) with exact Figma spec: Pending (#F3F4F6 bg, #101828 text, spinner icon), Delivered (#EAF3F6 bg, #2C879F text, check-circle icon), Clicked (#FEF9C2 bg, #894B00 text, cursor icon), Failed (#FFE2E2 bg, #C10007 text, warning-circle icon), Reviewed (#DCFCE7 bg, #008236 text, star icon), Scheduled (rgba(#9F2C86,0.1) bg, #9F2C86 text, check-circle icon)
 
 ### Template Selection
 
@@ -121,10 +121,10 @@ Deferred to future release. Not in current roadmap.
 | DRWR-02 | Phase 22 | Pending |
 | DRWR-03 | Phase 22 | Pending |
 | DRWR-04 | Phase 22 | Pending |
-| LAYO-01 | Phase 20 | Pending |
-| LAYO-02 | Phase 20 | Pending |
+| LAYO-01 | Phase 20 | Complete |
+| LAYO-02 | Phase 20 | Complete |
 | TMPL-01 | Phase 21 | Pending |
-| BDGE-01 | Phase 20 | Pending |
+| BDGE-01 | Phase 20 | Complete |
 | HERO-01 | Phase 24 | Pending |
 | HERO-02 | Phase 24 | Pending |
 | HERO-03 | Phase 24 | Pending |
