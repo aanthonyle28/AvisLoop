@@ -36,7 +36,7 @@ async function HistoryContent({ searchParams }: HistoryPageProps) {
     offset: (page - 1) * limit,
   })
 
-  return <HistoryClient initialLogs={logs} total={total} />
+  return <HistoryClient initialLogs={logs} total={total} currentPage={page} pageSize={limit} />
 }
 
 export default async function HistoryPage(props: HistoryPageProps) {
