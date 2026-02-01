@@ -1,6 +1,7 @@
 import { Sidebar } from './sidebar'
 import { BottomNav } from './bottom-nav'
 import { PageHeader } from './page-header'
+import { NavigationProgressBar } from '@/components/ui/progress-bar'
 
 interface AppShellProps {
   children: React.ReactNode
@@ -10,6 +11,9 @@ interface AppShellProps {
 export function AppShell({ children, pageTitle }: AppShellProps) {
   return (
     <div className="flex min-h-screen bg-[#F9F9F9] dark:bg-background">
+      {/* Navigation progress bar */}
+      <NavigationProgressBar />
+
       {/* Desktop sidebar */}
       <Sidebar />
 
