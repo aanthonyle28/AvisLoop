@@ -22,10 +22,13 @@ import type { SendLogWithContact } from '@/lib/types/database'
 
 interface HistoryTableProps {
   data: SendLogWithContact[]
+  onRowClick?: (request: SendLogWithContact) => void
+  onResend?: (request: SendLogWithContact) => void
+  onCancel?: (request: SendLogWithContact) => void
 }
 
-export function HistoryTable({ data }: HistoryTableProps) {
-  const columns = useMemo(() => createColumns(), [])
+export function HistoryTable({ data, onRowClick, onResend, onCancel }: HistoryTableProps) {
+  const columns = useMemo(() => createColumns({ onResend, onCancel }), [onResend, onCancel])
   const [sorting, setSorting] = useState<SortingState>([])
 
   const table = useReactTable({
@@ -58,7 +61,11 @@ export function HistoryTable({ data }: HistoryTableProps) {
         <TableBody>
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
+              <TableRow
+                key={row.id}
+                className="group cursor-pointer hover:bg-muted/50"
+                onClick={() => onRowClick?.(row.original)}
+              >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

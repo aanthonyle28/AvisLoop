@@ -1,10 +1,12 @@
 import { Suspense } from 'react'
 import { getSendLogs } from '@/lib/data/send-logs'
+import { getBusiness } from '@/lib/data/business'
 import { HistoryClient } from '@/components/history/history-client'
+import { redirect } from 'next/navigation'
 
 export const metadata = {
-  title: 'Message History',
-  description: 'View and track all your sent review requests',
+  title: 'Requests',
+  description: 'View and manage all your review requests',
 }
 
 interface HistoryPageProps {
@@ -27,6 +29,12 @@ async function HistoryContent({ searchParams }: HistoryPageProps) {
   const page = Number(params.page) || 1
   const limit = 50
 
+  // Fetch business and templates for drawer
+  const businessWithTemplates = await getBusiness()
+  if (!businessWithTemplates) {
+    redirect('/onboarding')
+  }
+
   const { logs, total } = await getSendLogs({
     query: query || undefined,
     status: status && status !== 'all' ? status : undefined,
@@ -36,7 +44,16 @@ async function HistoryContent({ searchParams }: HistoryPageProps) {
     offset: (page - 1) * limit,
   })
 
-  return <HistoryClient initialLogs={logs} total={total} currentPage={page} pageSize={limit} />
+  return (
+    <HistoryClient
+      initialLogs={logs}
+      total={total}
+      currentPage={page}
+      pageSize={limit}
+      business={businessWithTemplates}
+      templates={businessWithTemplates.email_templates || []}
+    />
+  )
 }
 
 export default async function HistoryPage(props: HistoryPageProps) {
