@@ -3,23 +3,17 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { SquaresFour, AddressBook, PaperPlaneTilt, CalendarBlank, ClockCounterClockwise } from '@phosphor-icons/react'
+import { AddressBook, PaperPlaneTilt, ClockCounterClockwise } from '@phosphor-icons/react'
 
 const NAV_HEIGHT = 72 // 4.5rem in pixels
 
 const items = [
-  { icon: SquaresFour, label: 'Dashboard', href: '/dashboard' },
-  { icon: AddressBook, label: 'Contacts', href: '/contacts' },
   { icon: PaperPlaneTilt, label: 'Send', href: '/send' },
-  { icon: CalendarBlank, label: 'Scheduled', href: '/scheduled' },
-  { icon: ClockCounterClockwise, label: 'History', href: '/history' },
+  { icon: AddressBook, label: 'Contacts', href: '/contacts' },
+  { icon: ClockCounterClockwise, label: 'Requests', href: '/history' },
 ]
 
-interface BottomNavProps {
-  scheduledCount?: number
-}
-
-export function BottomNav({ scheduledCount = 0 }: BottomNavProps) {
+export function BottomNav() {
   const pathname = usePathname()
 
   return (
@@ -28,11 +22,10 @@ export function BottomNav({ scheduledCount = 0 }: BottomNavProps) {
       style={{ height: `${NAV_HEIGHT}px` }}
       aria-label="Mobile navigation"
     >
-      <div className="grid grid-cols-5 h-full">
+      <div className="grid grid-cols-3 h-full">
         {items.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
           const Icon = item.icon
-          const count = item.label === 'Scheduled' ? scheduledCount : 0
 
           return (
             <Link
@@ -45,14 +38,7 @@ export function BottomNav({ scheduledCount = 0 }: BottomNavProps) {
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <div className="relative">
-                <Icon size={20} weight="regular" />
-                {count > 0 && (
-                  <span className="absolute -top-1.5 -right-2.5 flex items-center justify-center min-w-[16px] h-4 px-1 text-[10px] font-bold text-primary-foreground bg-primary rounded-full">
-                    {count > 9 ? '9+' : count}
-                  </span>
-                )}
-              </div>
+              <Icon size={20} weight="regular" />
               <span>{item.label}</span>
             </Link>
           )

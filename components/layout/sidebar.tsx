@@ -6,10 +6,8 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { useLocalStorage } from '@/lib/hooks/use-local-storage'
 import {
-  SquaresFour,
   AddressBook,
   PaperPlaneTilt,
-  CalendarBlank,
   ClockCounterClockwise,
   AppWindow,
   CreditCard,
@@ -19,9 +17,16 @@ import {
   CaretRight,
   SignOut,
   ArrowsClockwise,
+  GearSix,
 } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { signOut } from '@/lib/actions/auth'
 
 interface NavItem {
@@ -31,25 +36,12 @@ interface NavItem {
 }
 
 const mainNav: NavItem[] = [
-  { icon: SquaresFour, label: 'Dashboard', href: '/dashboard' },
-  { icon: AddressBook, label: 'Contacts', href: '/contacts' },
   { icon: PaperPlaneTilt, label: 'Send', href: '/send' },
-  { icon: CalendarBlank, label: 'Scheduled', href: '/scheduled' },
-  { icon: ClockCounterClockwise, label: 'History', href: '/history' },
+  { icon: AddressBook, label: 'Contacts', href: '/contacts' },
+  { icon: ClockCounterClockwise, label: 'Requests', href: '/history' },
 ]
 
-const secondaryNav: NavItem[] = [
-  { icon: AppWindow, label: 'Apps', href: '/dashboard/settings' },
-  { icon: CreditCard, label: 'Billing', href: '/billing' },
-  { icon: Headset, label: 'Help & Support', href: '#' },
-  { icon: UserCircle, label: 'Account', href: '/dashboard/settings' },
-]
-
-interface SidebarProps {
-  scheduledCount?: number
-}
-
-export function Sidebar({ scheduledCount = 0 }: SidebarProps) {
+export function Sidebar() {
   const pathname = usePathname()
   const [isCollapsed, setIsCollapsed] = useLocalStorage('sidebarCollapsed', false)
 
@@ -75,7 +67,7 @@ export function Sidebar({ scheduledCount = 0 }: SidebarProps) {
 
   const collapsed = autoCollapsed || isCollapsed
 
-  const NavLink = ({ item, count }: { item: NavItem; count?: number }) => {
+  const NavLink = ({ item }: { item: NavItem }) => {
     const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
     const Icon = item.icon
 
@@ -91,31 +83,15 @@ export function Sidebar({ scheduledCount = 0 }: SidebarProps) {
         )}
         title={collapsed ? item.label : undefined}
       >
-        <div className="relative">
-          <Icon
-            size={20}
-            weight="regular"
-            className={cn(
-              "shrink-0",
-              isActive ? "text-primary" : ""
-            )}
-          />
-          {/* Collapsed badge indicator - small dot */}
-          {collapsed && count !== undefined && count > 0 && (
-            <div className="absolute -top-1 -right-1 h-2 w-2 bg-primary rounded-full" />
+        <Icon
+          size={20}
+          weight="regular"
+          className={cn(
+            "shrink-0",
+            isActive ? "text-primary" : ""
           )}
-        </div>
-        {!collapsed && (
-          <>
-            <span className="flex-1">{item.label}</span>
-            {/* Expanded badge with count */}
-            {count !== undefined && count > 0 && (
-              <Badge variant="secondary" className="ml-auto text-xs px-1.5 py-0">
-                {count > 99 ? '99+' : count}
-              </Badge>
-            )}
-          </>
-        )}
+        />
+        {!collapsed && <span className="flex-1">{item.label}</span>}
       </Link>
     )
   }
@@ -133,7 +109,7 @@ export function Sidebar({ scheduledCount = 0 }: SidebarProps) {
         collapsed ? "justify-center" : "justify-between"
       )}>
         {!collapsed && (
-          <Link href="/dashboard" className="flex items-center gap-2">
+          <Link href="/send" className="flex items-center gap-2">
             <ArrowsClockwise size={24} weight="regular" className="text-primary" />
             <span className="font-bold text-lg">AvisLoop</span>
           </Link>
@@ -156,35 +132,59 @@ export function Sidebar({ scheduledCount = 0 }: SidebarProps) {
       {/* Main navigation */}
       <nav className="flex-1 p-3 space-y-1">
         {mainNav.map((item) => (
-          <NavLink
-            key={item.href}
-            item={item}
-            count={item.label === 'Scheduled' ? scheduledCount : undefined}
-          />
-        ))}
-
-        <div className="my-6" />
-
-        {secondaryNav.map((item) => (
-          <NavLink key={item.label} item={item} />
+          <NavLink key={item.href} item={item} />
         ))}
       </nav>
 
-      {/* Footer with logout */}
+      {/* Footer with account dropdown */}
       <div className="p-3 border-t border-[#E2E2E2] dark:border-border">
-        <form action={signOut}>
-          <Button
-            type="submit"
-            variant="ghost"
-            className={cn(
-              "w-full justify-start gap-3 text-foreground/70 dark:text-muted-foreground hover:text-foreground hover:bg-[#F2F2F2]/70 dark:hover:bg-muted/70",
-              collapsed && "justify-center px-2"
-            )}
-          >
-            <SignOut size={20} weight="regular" className="shrink-0" />
-            {!collapsed && <span>Sign out</span>}
-          </Button>
-        </form>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className={cn(
+                "w-full justify-start gap-3 text-foreground/70 dark:text-muted-foreground hover:text-foreground hover:bg-[#F2F2F2]/70 dark:hover:bg-muted/70",
+                collapsed && "justify-center px-2"
+              )}
+            >
+              <UserCircle size={20} weight="regular" className="shrink-0" />
+              {!collapsed && <span>Account</span>}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="top" align="start" className="w-56">
+            <DropdownMenuItem asChild>
+              <Link href="/dashboard/settings" className="flex items-center gap-2 cursor-pointer">
+                <AppWindow size={16} weight="regular" />
+                <span>Apps / Integrations</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/dashboard/settings" className="flex items-center gap-2 cursor-pointer">
+                <GearSix size={16} weight="regular" />
+                <span>Settings</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/billing" className="flex items-center gap-2 cursor-pointer">
+                <CreditCard size={16} weight="regular" />
+                <span>Billing</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem disabled className="flex items-center gap-2">
+              <Headset size={16} weight="regular" />
+              <span>Help & Support</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <form action={signOut} className="w-full">
+                <button type="submit" className="flex items-center gap-2 w-full cursor-pointer">
+                  <SignOut size={16} weight="regular" />
+                  <span>Logout</span>
+                </button>
+              </form>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </aside>
   )
