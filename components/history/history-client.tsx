@@ -93,7 +93,8 @@ export function HistoryClient({ initialLogs, total, currentPage, pageSize, busin
   }
 
   // Handle cancel (for pending/scheduled requests)
-  const handleCancel = async () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleCancel = async (requestId: string) => {
     // For now, we'll show a toast - full cancel logic would need a server action
     toast.info('Cancel pending', {
       description: 'Cancellation for pending requests is not yet implemented.',
