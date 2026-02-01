@@ -1,405 +1,367 @@
-# Features Research: Scheduled Email Sending
+# Feature Landscape: Creative Landing Page Redesign
 
-**Domain:** Scheduled/Deferred Email Sending for Review SaaS
-**Researched:** 2026-01-28
+**Domain:** B2B SaaS Landing Pages (Review Management for Local Businesses)
+**Researched:** 2026-02-01
 **Confidence:** HIGH
 
 ## Executive Summary
 
-Scheduled email sending is a table-stakes feature in modern email tools, expected by users who need flexibility in timing review requests. The research reveals clear UX patterns (preset times + custom picker), technical constraints (30-day Resend API limit), and critical edge cases (timezone handling, DST, cancellation flows).
+Based on extensive research of 2025-2026 SaaS landing page trends, creative examples from companies like Linear, Notion, Stripe, Raycast, Cal.com, and Lemon Squeezy, and analysis of review management competitors (Podium, Birdeye, NiceJob, GatherUp), this document outlines what makes EXCEPTIONAL landing pages that convert for B2B SaaS targeting small local businesses.
+
+**Key insight:** The shift from 2024-2025 to 2026 standards involves moving from feature-heavy templates to outcome-driven storytelling. Pages that demonstrate transformation rather than listing capabilities consistently outperform traditional approaches. For AvisLoop specifically, positioning around simplicity (vs complex tools like Podium/Birdeye at $300-600/mo) and emotional relief (vs awkwardness/forgetting) will resonate with small business owners.
+
+---
+
+## Table Stakes
+
+Features users expect. Missing = page feels incomplete or untrustworthy.
+
+| Feature | Why Expected | Complexity | Source/Notes |
+|---------|--------------|------------|--------------|
+| **Clear, benefit-driven headline** | Within first 3-5 seconds, visitors must grasp what product does and why it matters. Benefit-focused headlines outperform feature-focused by 250-300% | Low | Testing shows "Track Bugs in Half the Time" beats "XYZ Software v3.0 Released". Keep under 8 words (44 chars max). |
+| **Above-the-fold CTA** | CTAs above fold outperform below by 304%. Mobile users scroll less, need immediate action path | Low | Primary CTA should be visible without scrolling. Transparency copy like "See plans and pricing" increased Highrise trials 200%. |
+| **Social proof (client logos)** | 92% of consumers trust reviews/recommendations. Businesses with reviews have 67% higher conversion than those without | Low | Place immediately after hero section. Developer tools study shows majority include clients section right after hero for credibility. |
+| **Trust signals** | Small businesses need reassurance (data security, legitimate company, no hidden costs). Websites with trust badges see 270% conversion increase | Low | Include: secure payment badges, "No credit card required" copy, money-back guarantee if applicable |
+| **Customer testimonials/reviews** | 69% of consumers buy from business with positive written reviews. Shows real transformation, not just claims | Medium | Use specific, outcome-focused quotes. "Saved 10 hours weekly" > "Great tool!" |
+| **Mobile-first responsive design** | 62%+ of traffic is mobile. Google mobile-first indexing penalizes non-optimized sites. 53% abandon if load >3 seconds | High | Single-column layout, large tap targets, fast loading (<3s), readable text without zoom |
+| **FAQ section** | Addresses objections, builds trust. Placing FAQs near conversion points can increase conversion ~80% | Low | Preemptively answer: pricing questions, data privacy, setup time, integration concerns |
+| **Free trial CTA** | SaaS average trial conversion: 2-5%. Trials reduce friction vs demos for low-touch products | Low | Avoid credit card at signup (leaves sour taste). Use action words: "Start Free Trial" not "Submit" |
+| **Pricing transparency** | Hiding pricing behind forms adds friction, reduces lead quality. Transparent pricing builds trust in 2026 | Low | Show pricing upfront. Research shows explicit honesty about pricing increases conversion 15-25%. |
+| **Clear value proposition** | Visitors need to understand unique benefit within seconds. Must address pain point directly | Low | AvisLoop angle: "Get more Google reviews without the awkward ask" or "Turn happy customers into 5-star reviews in 2 minutes" |
+
+---
+
+## Differentiators
+
+Features that set creative, high-converting pages apart. Not expected, but highly valued and memorable.
+
+| Feature | Value Proposition | Complexity | Source/Notes |
+|---------|-------------------|------------|--------------|
+| **Animated product demo in hero** | Shows transformation, not just description. "Use animation to illustrate product workflow rather than describing it" (2026 trend) | High | Examples: Arcade (interactive demo), Apollo (looping workflow), Partful (video+animation blend). Demonstrates value in 3-5 seconds. |
+| **Scrollytelling / narrative scroll experience** | Creates immersive journey. Scrollytelling compels visitors to engage until the end, increasing time-on-page and understanding | High | Techniques: parallax scrolling, scroll-triggered animations, cinematic footage. See: NYT "Snow Fall", Apple AirPods Pro, Lemon Squeezy parallax. |
+| **Micro-interactions that add meaning** | Purposeful animations that enhance understanding, not decorative. Hover states preview functionality, progress indicators show system status | Medium | 2026 micro-interactions prioritize functionality over ornamentation. Each animation fulfills user need or business goal. CTA hover/pulse effects increase engagement. |
+| **Interactive product walkthrough** | Embedded preview lets visitors "try before signup". Reduces uncertainty, builds confidence | High | Builds trust by showing real interface. Alternative: Embedded video walkthrough (lower complexity). |
+| **Outcome-focused copy (not feature lists)** | Feature-Benefit Transformation: "Save 10 hours weekly on review requests" vs "Automated email sending". Shows ROI immediately | Low | Finance SaaS example: changing "Automated invoice reconciliation" → "Save 10 hours weekly on accounting" increased conversions 27%. |
+| **Pain-point storytelling** | Emotional triggers resonate with small business owners: relief (easier workflow), control (more time), gratitude (time for other tasks) | Medium | AvisLoop opportunity: Address forgetting to ask, awkwardness of in-person asks, manual follow-up headaches. 95% of purchase decisions are subconscious/emotional. |
+| **Minimal motion that adds meaning** | Not static, not overwhelming. Subtle animations guide eye, show state changes, communicate progress | Medium | Examples: Linear (minimal precise animations), Notion (micro-animations in hero). Strongest trend for 2026 per SaaSFrame research. |
+| **Developer-quality polish with human copy** | Technical excellence + conversational tone. Linear's copy "reads like a Slack message—human and fast" | Medium | Supabase example: "Build in a weekend. Scale to millions" combines casual tone with bold transformation promise. Balance professionalism with approachability. |
+| **Asymmetrical/unique layouts** | Breaks "boring template" pattern. Centered hero with unique visual treatment stands out | Medium | Not just alternating text/image blocks. Examples: Raycast (dark + illustrations), Lemon Squeezy (parallax side graphics). But maintain usability. |
+| **Social proof beyond logos** | Real metrics: "10,000+ dentists", case studies with numbers, before/after comparisons, UGC (user-generated content generates 6.9x more engagement) | Medium | Podium/Birdeye show industry-specific proof. For AvisLoop: segment by industry (dentists, salons, contractors) for relatability. |
+| **Clear positioning against alternatives** | Explicitly state "simpler than Podium" or "more affordable than Birdeye" to help decision-making | Low | Compare: Enterprise tools (too complex/expensive), manual process (time-consuming/inconsistent), doing nothing (lost revenue). |
+| **One-click Google review link preview** | Show exactly how easy it is. Inline preview of what customer sees (email → link → Google review form) | Medium | Reduces "how does it work?" objection. Visual proof of simplicity claim. |
+
+---
+
+## Anti-Features
+
+Features to explicitly NOT build. Common mistakes that hurt conversion.
+
+| Anti-Feature | Why Avoid | What to Do Instead |
+|--------------|-----------|-------------------|
+| **Slow loading animations (>3s load time)** | 53% of mobile users abandon pages taking >3 seconds. Fancy animations that delay interactivity kill conversion | Use minimal, optimized animations. Prioritize perceived performance. Lazy-load below-fold content. |
+| **Multiple competing CTAs** | Creates confusion and decision paralysis. SaaS pages with 5-7 CTAs confuse; 1-3 clear CTAs convert better | One primary CTA (Start Free Trial), optional secondary (See Pricing). Repeat primary CTA down page, not multiple different actions. |
+| **Feature-heavy copy / jargon** | Text at 5th-8th grade reading level converts at 11.1%; complex copy converts at 5.3%. Small business owners want clarity, not tech specs | Lead with benefits and outcomes. "Get more Google reviews" not "Multi-channel review request automation platform". |
+| **Hidden pricing / gated demos** | Adds friction, reduces lead quality, builds distrust. 2026 standard is transparency | Show pricing upfront. Offer self-serve trial. Demos are for high-touch enterprise sales, not SMB SaaS. |
+| **Generic stock photos** | Feels template-like, reduces trust, doesn't communicate product value | Use real product screenshots, custom illustrations, or real customer photos (with permission). Show the actual interface. |
+| **Complex multi-column mobile layouts** | Single-column is almost always correct for mobile. Multi-column causes cramped, awkward UX | Design mobile-first with single column. Stack elements vertically. Large tap targets (min 44x44px). |
+| **Auto-play video with sound** | Annoys visitors, especially mobile users. Increases bounce rate | Use silent looping video or click-to-play. Always include captions/subtitles. |
+| **Long, mandatory forms** | Each additional form field reduces conversion. Small businesses are busy, won't fill 10-field forms for a trial | Minimal signup: Email + password. Collect additional info after signup during onboarding. |
+| **Vague, template headlines** | "The Future of Review Management" or "Transform Your Business" say nothing. Visitors bounce in <5 seconds | Specific, pain-focused: "Get 3x More Google Reviews in Half the Time" or "Stop Losing Customers Because You Forgot to Ask for a Review" |
+| **Desktop-first shrink approach** | Cramped mobile experience. Harder to maintain. Performance issues | Build mobile-first, enhance for desktop. Separate designs for different breakpoints. |
+| **Navigation menus on conversion-focused pages** | Menus leak attention. Each link is an exit path. Studies show 16-28% conversion increase by removing top nav | Remove navigation from trial signup flow. Keep footer with minimal essential links only. |
+| **Overcomplication (trying to be everything)** | Small business owners respond to simplicity. Complexity positioning can backfire when things go wrong (users get "really angry") | AvisLoop differentiator IS simplicity. Lean into "stupid simple" positioning vs Podium/Birdeye complexity. |
+| **Forcing credit card for free trial** | Leaves "sour taste", creates friction, reduces trial signups | True free trial, no card required. Easier to convert during trial than convince someone to give card upfront. |
+
+---
+
+## AvisLoop-Specific Content Strategy
+
+### Emotional Triggers for Small Business Owners
+
+Based on research into local business psychology and review management pain points:
+
+| Emotion | Trigger | AvisLoop Application |
+|---------|---------|---------------------|
+| **Relief** | "No more awkward in-person asks" | Headline: "Send review requests from your computer. Skip the awkward ask." |
+| **Control** | "Get reviews consistently, not when you remember" | Copy: "Set it and forget it. AvisLoop reminds you to send requests after every appointment." |
+| **Gratitude** | "More time to run your business" | Testimonial angle: "I used to spend an hour a week manually following up. Now it takes 2 minutes." |
+| **Fear (FOMO)** | "Every day without reviews = lost customers" | Stat: "87% won't even consider a business with low star ratings" |
+| **Frustration** | "Complex tools like Podium are overkill" | Positioning: "No training needed. No 30-minute demos. Just add a contact and hit send." |
+
+### Value Proposition Options
+
+Tested messaging frameworks for AvisLoop:
+
+1. **Pain → Solution:** "Forgetting to ask for reviews? AvisLoop asks for you."
+2. **Outcome-focused:** "Get 3x more Google reviews without awkward in-person requests"
+3. **Time-based:** "From happy customer to 5-star review in 2 minutes"
+4. **Simplicity angle:** "Review requests, made stupid simple"
+5. **Comparison:** "All the reviews, none of the complexity (or cost) of Podium"
+
+**Recommendation:** Lead with outcome + time ("Get 3x more Google reviews in 2 minutes"), support with simplicity positioning ("No training. No complexity. Just results."), and differentiate against both manual process AND expensive enterprise tools.
+
+### Section Ordering for Maximum Conversion
+
+Based on 2026 conversion funnel research:
+
+1. **Hero** (3-5 seconds to communicate value)
+   - Outcome-focused headline
+   - Supporting subhead addressing pain point
+   - Primary CTA (Start Free Trial)
+   - Animated product preview (2-min send flow)
+
+2. **Social Proof Strip** (immediate credibility)
+   - Industry-specific logos: "Trusted by 1,000+ dentists, salons, and contractors"
+   - Or review count: "Helped collect 50,000+ Google reviews"
+
+3. **Problem/Solution** (emotional connection)
+   - 3-panel visual: Manual/Forgetting/Tools are complex → AvisLoop → Results
+   - Addresses all three alternatives (doing nothing, manual, complex tools)
+
+4. **How It Works** (reduce "is this really that simple?" objection)
+   - 3-step visual: Add contact → Write message (or use template) → Send
+   - Inline product screenshots showing actual interface
+   - "Takes 2 minutes" reinforcement
+
+5. **Benefits (not features)** (outcome-focused)
+   - "Get more reviews" (main benefit)
+   - "Save time" (efficiency)
+   - "No awkward asks" (emotional relief)
+   - Each with icon, headline, supporting copy
+
+6. **Social Proof Deep Dive** (trust + transformation)
+   - 3-4 testimonials from different industries
+   - Include: Before state, specific results, after state
+   - "I went from 12 reviews to 89 in 3 months" (actual numbers)
 
-**Key insight:** Simple preset-based scheduling with graceful cancellation is table stakes. Advanced features like recurring sends, timezone detection, or batch rescheduling are differentiators but add significant complexity.
+7. **Pricing** (transparency, reduce friction)
+   - 3-tier comparison
+   - Highlight middle tier ("Most Popular")
+   - No hidden costs messaging
+   - "Start free, upgrade anytime"
+
+8. **FAQ** (handle final objections)
+   - Setup time? ("2 minutes")
+   - Works with my email? ("Yes, any email or Gmail/Outlook")
+   - What if customers don't respond? ("Industry average: 20-30% response rate")
+   - HIPAA/Privacy concerns (for dentists)
+
+9. **Final CTA** (last chance conversion)
+   - Repeat free trial CTA
+   - Social proof count ("Join 1,000+ businesses")
+   - Risk-reversal ("No credit card required")
 
-## Table Stakes (Must Have)
+---
+
+## Mobile Conversion Optimization
+
+Specific considerations for small business owners (often browsing on mobile between appointments):
+
+| Element | Mobile Best Practice | Why |
+|---------|---------------------|-----|
+| **Hero CTA** | Large button (min 44x44px), high contrast, sticky on scroll | 32.5% conversion increase when optimized for mobile |
+| **Form fields** | Max 3 fields for trial signup (email, password, business name), use autofill, large input fields | Each additional field reduces conversion |
+| **Product demo** | Autoplay silent looping video OR static preview with play button | Auto-play with sound increases bounce rate |
+| **Copy length** | Shorter paragraphs (2-3 sentences max), bullet points, skimmable | Mobile users scan, don't read |
+| **CTA copy** | Center CTAs (680% more clicks than left-aligned) | Mobile users expect centered buttons |
+| **Load speed** | Target <2s (optimize images, lazy load, minimize scripts) | 53% abandon if >3s load time |
+| **Vertical layout** | Single column, stack all elements | Multi-column creates cramped experience |
+
+---
+
+## Competitor Positioning Analysis
+
+How review management competitors position themselves (gaps = opportunities):
+
+| Competitor | Positioning | Pricing | AvisLoop Differentiator |
+|------------|-------------|---------|------------------------|
+| **Podium** | SMS-first, text-based communication platform | $300-600+/mo/location | "All the review results without the SMS complexity or enterprise pricing" |
+| **Birdeye** | All-in-one enterprise solution, multi-location CX platform | $300-600+/mo/location | "Built for single-location businesses, not enterprise chains" |
+| **NiceJob** | All-in-one reputation marketing for busy/budget-conscious owners | Mid-tier pricing | "Even simpler. Just review requests, no feature bloat" |
+| **GatherUp** | Multi-channel (email/SMS/kiosk), enterprise-level | Premium pricing | "Email-focused simplicity at 70-85% cost savings" |
+| **Manual process** | Free but time-consuming, inconsistent | Free | "Automate what you're doing manually. Save 10 hours/month." |
+| **Doing nothing** | Businesses forget or find it awkward | Free | "87% won't consider you with low ratings. Every day costs customers." |
 
-Features users expect from scheduled sending. Missing these = feels broken or incomplete.
+**AvisLoop's positioning sweet spot:** Simpler than NiceJob, way cheaper than Podium/Birdeye, more consistent than manual, more effective than doing nothing.
 
-| Feature | Complexity | Dependencies | Notes |
-|---------|------------|--------------|-------|
-| **Schedule with presets** | Low | Resend API | "Send now", "In 1 hour", "Tomorrow 9am", etc. Standard pattern across Gmail, Mailchimp, HubSpot. |
-| **Custom date/time picker** | Low | UI component | When presets don't match need. Must validate future-only dates. |
-| **Cancel scheduled email** | Medium | Database + queue | Before send time. Critical for fixing mistakes. "Rescue" feature. |
-| **View scheduled emails** | Medium | Database schema | List of pending sends with send time and recipient. Needed for confidence. |
-| **Status tracking** | Medium | Database schema | "Scheduled" → "Sent" → "Delivered/Failed". Users need to know state. |
-| **Immediate send option** | Low | Existing flow | "Send now" must remain default/easy path. Don't force scheduling. |
+---
 
-### Why These Are Table Stakes
+## Creative Landing Page Examples (Inspiration)
 
-**Evidence from research:**
-- Gmail offers [4 preset times](https://www.getmailtracker.com/blog/how-to-schedule-email-in-gmail): "Tomorrow morning 8am", "Tomorrow afternoon 1pm", "Monday morning", "Pick date & time"
-- Outlook provides [similar presets](https://support.microsoft.com/en-us/office/delay-or-schedule-sending-email-messages-in-outlook-026af69f-c287-490a-a72f-6c65793744ba) with custom scheduling
-- [Resend API supports](https://resend.com/docs/dashboard/emails/schedule-email) both natural language ("in 1 hour") and ISO 8601 dates
-- [Email scheduling tools](https://woodpecker.co/blog/how-to-schedule-an-email/) show cancellation is a must-have: "To edit or reschedule, cancel first (moves to drafts)"
+Real SaaS landing pages that exemplify creative, non-template approaches:
 
-**User expectation:** If you offer scheduling, you must offer cancellation. Scheduled emails without cancel = anxiety.
+| Company | What Makes It Stand Out | Application for AvisLoop |
+|---------|-------------------------|-------------------------|
+| **Linear** | Minimal motion, precise animations, conversational copy ("designed to last pixel"), dark aesthetic | Use minimal animations in hero to show send flow. Conversational headline: "Stop forgetting to ask for reviews" |
+| **Notion** | Story-driven hero with micro-animations showing product value in 3-5s | Animate the 2-minute flow: select contact → preview message → send → customer receives |
+| **Stripe** | Developer-quality polish, clear hierarchy, interactive code examples | Show actual email preview customers receive. Polish = trust for small business owners |
+| **Raycast** | Dark + captivating illustrations, "fast, ergonomic, reliable" messaging | Dark mode option? Illustrations showing relief/happiness (emotional angle) |
+| **Supabase** | Bold transformation promise: "Build in a weekend. Scale to millions." OSS trust badge | "Get 5-star reviews this week. Build your reputation forever." |
+| **Lemon Squeezy** | Parallax scroll effects, playful brand personality | Parallax could work for showing customer journey: appointment → email → review |
+| **Cal.com** | Open-source positioning, clear differentiation vs Calendly | Open pricing, transparent approach vs competitors hiding pricing |
+| **Arcade** | Interactive demo in hero section showing product in action | PERFECT for AvisLoop. Show dragging a contact, previewing email, hitting send |
 
-## Differentiators (Competitive Advantage)
+---
 
-Features that set AvisLoop apart. Nice-to-have, but not expected.
+## Visual Storytelling Opportunities
 
-| Feature | Complexity | Value Proposition | Notes |
-|---------|------------|-------------------|-------|
-| **Smart timezone handling** | High | Respects recipient timezone (9am their time) | Requires contact timezone field + complex logic. [DST edge cases are tricky](https://dev.to/tomjstone/international-saas-nightmare-timezone-edge-cases-and-how-to-solve-them-once-and-for-all-57hn). |
-| **Randomized send times** | Low | "Tomorrow 8-9am" feels more natural than "8:00am" | [Gmail extension does this](https://chromewebstore.google.com/detail/gmail-schedule-send-enhan/nggpchkngejemkdngpapoeiedenleopg): "8:23am" vs "8:00am" looks less automated. |
-| **Batch reschedule** | Medium | Move all scheduled emails forward/back | Useful if user goes on vacation. Not common in tools. |
-| **Preview before schedule** | Low | Same as current immediate send | Already built. Just show before scheduling. |
-| **Schedule confirmation toast** | Low | "Scheduled for Jan 28, 9am" | Immediate feedback. Reduces anxiety. |
-| **Undo scheduling (5 sec window)** | Medium | Like Gmail's "undo send" | Quick fix for accidental schedules. |
+Based on scrollytelling research and narrative scroll techniques:
 
-### Why These Matter for AvisLoop
+1. **Customer Journey Narrative**
+   - Scroll-triggered: Appointment happens → Time passes → Email sent → Customer clicks → Review posted → Business grows
+   - Visual: Timeline animation or parallax showing progression
+   - Emotional: Relief → gratitude → success
 
-**Randomized send times:** Small differentiation, low complexity. Aligns with AvisLoop's "simple but thoughtful" positioning.
+2. **Before/After Transformation**
+   - Scroll reveals split screen
+   - Before: Business owner manually tracking, forgetting, awkward asks (chaotic visual)
+   - After: Automated, consistent, professional (calm, organized visual)
 
-**Timezone handling:** High value for multi-location businesses (Pro tier feature), but [extremely complex](https://dev.to/tomjstone/international-saas-nightmare-timezone-edge-cases-and-how-to-solve-them-once-and-for-all-57hn) due to DST transitions, missing hours (spring forward), and repeated hours (fall back).
+3. **The 2-Minute Flow**
+   - Interactive walkthrough that plays as visitor scrolls
+   - Actually shows interface: contact list → message editor → send confirmation
+   - Builds confidence ("oh, it really IS that simple")
 
-**Batch reschedule:** Unique feature not seen in competitors. Could be Pro tier differentiator.
+4. **Review Impact Visualization**
+   - Animated counter showing review growth over time
+   - Graph of business visibility/calls increasing
+   - Makes abstract benefit (more reviews) concrete and visual
 
-## Anti-Features (Do NOT Build)
+---
 
-Features to deliberately avoid. Either violate constraints, add complexity without value, or conflict with AvisLoop's simplicity.
+## Conversion Research Benchmarks
 
-| Anti-Feature | Reason to Avoid | What to Do Instead |
-|--------------|-----------------|-------------------|
-| **Recurring scheduled sends** | Out of scope for review requests. Review requests are one-time per service. | N/A - Explicitly not needed. |
-| **Schedule past 30 days** | [Resend API limit: 30 days max](https://resend.com/docs/dashboard/emails/schedule-email). Technical constraint. | Enforce 30-day max in UI. Show error if exceeded. |
-| **Schedule in the past** | Invalid state. Leads to confusion and edge cases. | Validate date >= now. Reject past dates with clear error. |
-| **Edit scheduled email** | [Resend: "Once canceled, cannot reschedule"](https://resend.com/docs/dashboard/emails/schedule-email). Must cancel + recreate. | Cancel → re-create flow. Don't pretend you can edit in-place. |
-| **Priority scheduling queue** | Adds complexity. Review requests don't have urgency tiers. | FIFO queue. Simple. |
-| **Scheduled sends without cancellation** | Users need escape hatch for mistakes. | Always allow cancel before send time. |
-| **Complex schedule builder UI** | Goes against AvisLoop's "2-minute simplicity" value prop. | Stick to presets + simple custom picker. |
+Industry data to inform design decisions:
 
-### Why These Are Anti-Features
+| Metric | Benchmark | Source | Application |
+|--------|-----------|--------|-------------|
+| Free trial conversion | 2-5% average, 30% (Slack) | Multiple studies | Set realistic expectations. Optimize trial experience, not just signup. |
+| Above-fold CTA lift | 304% vs below fold | Multiple studies | Primary CTA must be visible without scroll |
+| Benefits vs features | 250-300% improvement | Testing data | Never lead with "features". Always outcomes. |
+| Mobile abandonment | 53% if >3s load | Google research | Speed is critical. Optimize images, lazy load. |
+| Review impact on purchase | 92% check reviews, 87% won't buy with low ratings | Consumer surveys | Lead with this FOMO stat in hero or problem section |
+| Simplified copy | 11.1% conversion (simple) vs 5.3% (complex) | Readability studies | Write at 5th-8th grade level. Short sentences. |
+| FAQ impact | ~80% conversion increase | Landing page studies | Include FAQ, place near conversion point |
+| Trust badges | 270% conversion increase | E-commerce research | Show "secure", "no CC required", "free trial" trust signals |
 
-**Recurring sends:** Review tools don't need this. [MailerLite recurring emails](https://emailanalytics.com/recurring-emails/) are for newsletters, not transactional review requests.
+---
 
-**Edit in-place:** [Resend doesn't support it](https://resend.com/docs/dashboard/emails/schedule-email). Cancel + reschedule is the pattern. Don't hide this.
+## Technical Specifications
 
-**Complex UI:** [Mailchimp requires paid plan for scheduling](https://www.emailtooltester.com/en/blog/hubspot-vs-mailchimp/). AvisLoop differentiates on simplicity, not power features.
+For implementation phase:
 
-## UX Patterns (Common Implementations)
+**Performance:**
+- Target: <2s load time on mobile
+- Optimize images: WebP format, lazy loading
+- Minimize JavaScript: Only for critical interactions
+- Use Next.js built-in optimizations (already in stack)
 
-Standard patterns observed across Gmail, Outlook, Mailchimp, HubSpot.
+**Accessibility:**
+- WCAG 2.1 AA compliance
+- Keyboard navigation for all interactive elements
+- Alt text for all images
+- Color contrast ratios meet standards
+- Screen reader-friendly animations (prefers-reduced-motion)
 
-### Scheduling UI Flow
+**Analytics Tracking:**
+- Hero CTA clicks
+- Scroll depth (how far visitors get)
+- Time on page
+- Pricing section views
+- FAQ expansion (which questions)
+- Trial signup funnel drop-off points
 
-**Standard pattern (Gmail, Outlook):**
-1. User composes email
-2. Click "Send" dropdown → "Schedule send"
-3. See 3-4 preset options + "Custom date/time"
-4. Select preset or open custom picker
-5. Confirm → Email moves to "Scheduled" folder
+---
 
-**Applied to AvisLoop:**
-1. User selects contacts + template (existing flow)
-2. Instead of "Send to X contacts", show "Send" dropdown:
-   - "Send now" (default, current behavior)
-   - "Schedule send" (new)
-3. If "Schedule send", show modal with:
-   - Preset buttons: "In 1 hour", "Tomorrow 9am", "In 24 hours", "Custom"
-   - Custom: date picker + time picker
-   - Timezone indicator (user's local time)
-4. Confirm → Toast: "Scheduled for [date, time]"
-5. Return to send page (cleared state) or redirect to "Scheduled" tab
+## Open Questions / Research Flags
 
-### Viewing Scheduled Emails
+Areas needing validation during build:
 
-**Standard pattern (Gmail, Mailchimp):**
-- Separate "Scheduled" folder/tab
-- Shows: recipient, subject, scheduled time, option to cancel
-- Clicking email shows full preview
+1. **Animation complexity:** How much motion is "too much" for small business owner audience? (May be more conservative than dev tool audience)
 
-**Applied to AvisLoop:**
-- Add "Scheduled" tab to History page
-- Table columns: Contact(s), Template, Scheduled For, Actions (Cancel)
-- Cancel button → confirmation modal → moves to canceled state (don't delete)
+2. **Industry-specific messaging:** Should we create separate landing pages for dentists vs salons vs contractors? Or generic with togglable social proof?
 
-### Cancellation Flow
+3. **Video vs animation:** Is a 30-second explainer video more effective than animated UI walkthrough for this audience?
 
-**Standard pattern (across tools):**
-1. User clicks "Cancel" on scheduled email
-2. Confirmation modal: "Cancel scheduled send?"
-3. Confirm → Email moves to Drafts/Canceled
-4. Toast: "Scheduled send canceled"
+4. **Pricing page placement:** Separate page vs on landing page? Research says transparency, but does full pricing table belong on home vs dedicated /pricing?
 
-**Applied to AvisLoop:**
-1. "Scheduled" tab shows "Cancel" button
-2. Modal: "Cancel scheduled send to [contact]?"
-3. Confirm → Update send_logs.status = 'canceled'
-4. Toast: "Send canceled"
-5. Optionally show "Undo" for 5 seconds
+5. **Testimonial format:** Video testimonials vs written? Review management competitors use both, unclear which converts better for SMB SaaS.
 
-### Status Lifecycle
-
-**Standard states (observed across tools):**
-
-```
-draft → scheduled → sending → sent → delivered
-                  ↓
-                canceled
-```
-
-**For AvisLoop (with existing states):**
-
-```
-[compose] → scheduled → queued → sent → delivered/bounced/failed
-              ↓
-            canceled
-```
-
-- **scheduled:** Future send time set, not yet queued
-- **queued:** Send time reached, in background job queue
-- **canceled:** User canceled before send time
-- **sent/delivered/failed:** Existing states (no change)
-
-## Edge Cases & Gotchas
-
-Critical edge cases identified from research. Must handle gracefully.
-
-### Timezone Handling
-
-**Problem:** User in PST schedules "Tomorrow 9am". What if contact is in EST?
-
-**Solutions (pick one):**
-
-| Approach | Complexity | Notes |
-|----------|------------|-------|
-| **User timezone only** | Low | Store scheduled time in UTC, display in user's TZ. Simple. |
-| **Recipient timezone** | High | Requires contact.timezone field + [DST logic](https://dev.to/tomjstone/international-saas-nightmare-timezone-edge-cases-and-how-to-solve-them-once-and-for-all-57hn). Complex. |
-
-**Recommendation for MVP:** User timezone only. Display: "Scheduled for Jan 28, 9:00 AM PST" (user's TZ). Store in DB as UTC.
-
-**Evidence:** [Gmail schedules in user's timezone](https://www.getmailtracker.com/blog/how-to-schedule-email-in-gmail): "Emails will be sent based on the timezone you schedule them in."
-
-### Daylight Saving Time (DST)
-
-**Problem:** User schedules email for "March 10, 2:30am PST". [DST starts at 2am → 3am](https://dev.to/tomjstone/international-saas-nightmare-timezone-edge-cases-and-how-to-solve-them-once-and-for-all-57hn). That time doesn't exist.
-
-**Solution:** Store scheduled time as UTC timestamp. Convert to user TZ only for display. Background job runs on UTC time.
-
-**Implementation:**
-- User picks "Tomorrow 9am" in PST
-- Convert to UTC: `2026-01-29T17:00:00Z`
-- Store: `send_logs.scheduled_for = '2026-01-29T17:00:00Z'`
-- Background job triggers at UTC time (immune to DST)
-
-**Evidence:** [Salesforce Marketing Cloud doesn't observe DST](https://www.salesforceben.com/your-guide-to-daylight-saving-and-time-zones-in-marketing-cloud-engagement/): "stays at -0600 from GMT at all times". AvisLoop should use UTC internally.
-
-### Past Date Validation
-
-**Problem:** User opens "Schedule send" modal, goes to lunch, comes back, selects preset "In 1 hour" (now in the past).
-
-**Solution:** Validate on submit. If `scheduledTime < now`, show error: "Selected time is in the past. Please choose a future time."
-
-**Implementation:** Client-side validation + server-side validation (user's clock may be wrong).
-
-### Resend API Limits
-
-**Problem:** Resend [schedules up to 30 days](https://resend.com/docs/dashboard/emails/schedule-email). User tries to schedule 60 days out.
-
-**Solution:** Enforce 30-day max in UI. Disable dates > 30 days in date picker. Show error if exceeded.
-
-**Problem:** [Resend: "Once canceled, cannot reschedule"](https://resend.com/docs/dashboard/emails/schedule-email). User wants to edit scheduled time.
-
-**Solution:** Cancel + re-create flow. UI: "To change send time, cancel and schedule again."
-
-### Account Issues During Scheduling
-
-**Problem:** [Resend: "API may fail if key becomes inactive or account under review"](https://resend.com/docs/dashboard/emails/schedule-email). Scheduled email silently fails.
-
-**Solution:**
-1. When scheduled time arrives, attempt send
-2. If API returns error, mark as `failed` with error message
-3. Show in History tab: "Failed: API key inactive"
-4. User can retry or investigate
-
-### Quota Enforcement at Schedule Time
-
-**Problem:** User has 5 sends left this month. Schedules 10 emails for next week. Monthly limit resets before send time. Should quota check at schedule time or send time?
-
-**Options:**
-
-| Approach | Pros | Cons |
-|----------|------|------|
-| **Check at schedule time** | Users can't over-schedule | May block legitimate scheduling across month boundary |
-| **Check at send time** | Flexible | Scheduled sends may fail silently if quota exceeded |
-| **Reserve quota** | Guarantees delivery | Complex accounting (what if user cancels?) |
-
-**Recommendation:** Check at send time. If quota exceeded when send time arrives, mark as `failed` with reason: "Monthly quota exceeded". User sees in History tab.
-
-**Rationale:** [Email tools queue and retry](https://betterstack.com/community/guides/scaling-nodejs/best-nodejs-schedulers/), handling failures gracefully. AvisLoop should do same.
-
-## Dependencies on Existing Features
-
-Scheduled sending builds on existing AvisLoop features:
-
-| Existing Feature | How Scheduling Uses It | Changes Needed |
-|------------------|------------------------|----------------|
-| **Contact selector** | Same multi-select | None. Reuse existing. |
-| **Template system** | Same template selection | None. Reuse existing. |
-| **Message preview** | Preview before scheduling | None. Works as-is. |
-| **send_logs table** | Add `scheduled_for` column | Schema migration: `ALTER TABLE send_logs ADD scheduled_for timestamptz` |
-| **batchSendReviewRequest action** | Split into schedule + send | New `scheduleReviewRequest` action. Keep existing for immediate sends. |
-| **History page** | Add "Scheduled" tab | UI changes. Filter `status = 'scheduled'`. |
-| **Monthly quota** | Check at send time | Logic change: check when job runs, not when scheduled. |
-| **Resend integration** | Use `scheduledAt` param | Pass `scheduledAt` to Resend API. |
-
-## Technical Implementation Notes
-
-Based on research of [Node.js queue systems](https://betterstack.com/community/guides/scaling-nodejs/best-nodejs-schedulers/) and [Resend scheduling API](https://resend.com/docs/dashboard/emails/schedule-email).
-
-### Option 1: Resend Native Scheduling (Recommended)
-
-**How it works:**
-- Resend API accepts `scheduledAt` parameter: `{ scheduledAt: "in 1 hour" }` or ISO 8601
-- Resend handles queuing, retry, delivery
-- No background job infrastructure needed
-
-**Pros:**
-- Zero infrastructure (no cron, no queue)
-- Resend handles retry logic
-- Simpler architecture
-
-**Cons:**
-- [30-day limit](https://resend.com/docs/dashboard/emails/schedule-email) (enforced by Resend)
-- [Cannot reschedule once scheduled](https://resend.com/docs/dashboard/emails/schedule-email) (must cancel + recreate)
-- Less control over send time (Resend decides exact moment within window)
-
-**Database schema:**
-```sql
-ALTER TABLE send_logs ADD COLUMN scheduled_for timestamptz;
-ALTER TABLE send_logs ADD COLUMN resend_scheduled_id text; -- for cancellation
-```
-
-**Cancel flow:**
-1. User clicks "Cancel"
-2. Call Resend cancel API with `resend_scheduled_id`
-3. Update `send_logs.status = 'canceled'`
-
-### Option 2: Self-Hosted Queue (BullMQ + Redis)
-
-**How it works:**
-- Use [BullMQ](https://bullmq.io/) for job scheduling
-- Store scheduled jobs in Redis
-- Background worker processes jobs at scheduled time
-- Call Resend immediately when job runs
-
-**Pros:**
-- Full control over scheduling logic
-- Can reschedule without cancel + recreate
-- Can implement custom features (batch reschedule, timezone magic)
-
-**Cons:**
-- Requires Redis infrastructure (cost, complexity)
-- Need background worker process (Vercel cron or separate server)
-- Must handle job retries, failures, monitoring
-- More code to maintain
-
-**Recommendation:** Start with Option 1 (Resend native). Migrate to Option 2 only if advanced features needed (unlikely for review SaaS).
-
-**Evidence:** [Resend scheduling API announcement](https://resend.com/blog/introducing-the-schedule-email-api) shows native scheduling is production-ready. Many SaaS tools rely on email provider scheduling.
-
-## UX Recommendations
-
-Based on research of [Gmail](https://www.getmailtracker.com/blog/how-to-schedule-email-in-gmail), [Mailchimp](https://www.emailtooltester.com/en/blog/hubspot-vs-mailchimp/), and [email scheduling best practices](https://woodpecker.co/blog/how-to-schedule-an-email/).
-
-### Preset Times for AvisLoop
-
-**Recommended presets (match user mental model):**
-
-1. **"Send now"** — Immediate (existing behavior, keep as default)
-2. **"In 1 hour"** — Common for "send soon but not now"
-3. **"Next morning (9 AM)"** — If before 9am today → today 9am. Else → tomorrow 9am.
-4. **"In 24 hours"** — Exactly 24 hours from now
-5. **"Custom date & time"** — Full picker for specific needs
-
-**Why these presets:**
-- **"Next morning 9am"** matches [optimal send time](https://blog.superhuman.com/best-time-to-send-sales-emails/): "Tuesday/Wednesday 9-11am highest engagement for B2B"
-- **"In 24 hours"** aligns with [review request timing](https://orderry.com/blog/how-to-automate-google-reviews/): "Send within 24-48 hours of service"
-- **Simple choices** match AvisLoop's simplicity value prop
-
-### Visual Design
-
-**Modal layout:**
-```
-┌─────────────────────────────────────┐
-│ Schedule Send                    [×]│
-├─────────────────────────────────────┤
-│                                     │
-│ When would you like to send this?   │
-│                                     │
-│ [Send now]  [In 1 hour]            │
-│ [Tomorrow 9 AM]  [In 24 hours]     │
-│ [Custom date & time...]             │
-│                                     │
-│ Timezone: Pacific Time (PST)        │
-│                                     │
-│         [Cancel]  [Schedule Send]   │
-└─────────────────────────────────────┘
-```
-
-**Scheduled tab (History page):**
-```
-┌──────────────────────────────────────────────────────┐
-│ [All] [Sent] [Scheduled] [Failed]                    │
-├──────────────────────────────────────────────────────┤
-│ Contact        │ Template  │ Scheduled For   │Actions│
-├──────────────────────────────────────────────────────┤
-│ john@ex.com    │ Default   │ Jan 28, 9:00 AM │[Cancel]│
-│ jane@ex.com    │ Default   │ Jan 28, 9:00 AM │[Cancel]│
-└──────────────────────────────────────────────────────┘
-```
-
-## Complexity Assessment
-
-| Feature Component | Complexity | Rationale |
-|-------------------|------------|-----------|
-| Schedule UI (presets) | Low | Simple modal + button handlers |
-| Schedule UI (custom picker) | Low | Standard date/time input components |
-| Database schema | Low | Single column addition: `scheduled_for` |
-| Resend integration | Low | Pass `scheduledAt` parameter |
-| Cancel flow | Medium | Resend cancel API + status updates |
-| Scheduled tab (History) | Medium | New tab + filtered query |
-| Timezone validation | Medium | Convert user TZ → UTC, validate future-only |
-| Status lifecycle | Medium | Add "scheduled" and "canceled" states |
-| Error handling | Medium | Handle Resend API failures gracefully |
-| **Total MVP effort** | **Medium** | ~3-5 days for complete feature |
+---
 
 ## Sources
 
-**Email Scheduling Best Practices:**
-- [Email Marketing for SaaS 2026](https://mailtrap.io/blog/email-marketing-for-saas/)
-- [Best Time to Send Emails 2026](https://blog.superhuman.com/best-time-to-send-sales-emails/)
-- [How to Schedule an Email in Gmail](https://www.getmailtracker.com/blog/how-to-schedule-email-in-gmail)
-- [Schedule Emails to Send - Gmail Help](https://support.google.com/mail/answer/9214606)
-- [How to Schedule an Email? Common Mistakes](https://woodpecker.co/blog/how-to-schedule-an-email/)
+### Creative SaaS Landing Pages & Design Trends
+- [SaaSFrame: 10 SaaS Landing Page Trends for 2026](https://www.saasframe.io/blog/10-saas-landing-page-trends-for-2026-with-real-examples)
+- [Bookmarkify: Best SaaS Websites for Design Inspiration (2026)](https://www.bookmarkify.io/blog/best-saas-websites-of-2025-end-of-year-showcase)
+- [Landingfolio: 341 Best SaaS Landing Page Examples](https://www.landingfolio.com/inspiration/landing-page/saas)
+- [KlientBoost: 51 High-Converting SaaS Landing Pages](https://www.klientboost.com/landing-pages/saas-landing-page/)
+- [SVGator: Top 20 Animated Landing Page Examples](https://www.svgator.com/blog/animated-landing-pages-examples/)
+- [Indie Hackers: 90+ SaaS Hero Section Examples](https://www.indiehackers.com/product/glance/launched-90-saas-hero-section-examples--N0gbO0y8FtiA6l3tAQh)
+- [Saaspo: 135 Hero Section Examples](https://saaspo.com/section-type/saas-hero-section-examples)
+- [Evil Martians: We Studied 100 Dev Tool Landing Pages](https://evilmartians.com/chronicles/we-studied-100-devtool-landing-pages-here-is-what-actually-works-in-2025)
 
-**UX Patterns:**
-- [Zoho Email Scheduling](https://www.zoho.com/mail/help/schedule-send.html)
-- [HubSpot Email Scheduling](https://www.hubspot.com/products/sales/email-scheduling)
-- [Resend Schedule Email API](https://resend.com/blog/introducing-the-schedule-email-api)
-- [Gmail Schedule Send Enhancer](https://chromewebstore.google.com/detail/gmail-schedule-send-enhan/nggpchkngejemkdngpapoeiedenleopg)
+### Conversion Optimization & Best Practices
+- [Unbounce: 26 SaaS Landing Pages - Examples, Trends and Best Practices](https://unbounce.com/conversion-rate-optimization/the-state-of-saas-landing-pages/)
+- [Webstacks: How to Skyrocket Your SaaS Website Conversions in 2026](https://www.webstacks.com/blog/website-conversions-for-saas-businesses)
+- [Userpilot: 15 SaaS Landing Page Best Practices](https://userpilot.com/blog/saas-landing-page-best-practices/)
+- [Fibr.ai: 20 Best SaaS Landing Pages + 2026 Best Practices](https://fibr.ai/landing-page/saas-landing-pages)
+- [LandingPageFlow: Best CTA Placement Strategies for 2026](https://www.landingpageflow.com/post/best-cta-placement-strategies-for-landing-pages)
+- [Hyperspeed: Above the Fold Optimization](https://hyperspeed.me/blog/above-the-fold-optimization/)
+- [Sixth City Marketing: 30+ Call-to-Action Statistics for 2026](https://www.sixthcitymarketing.com/call-to-action-stats/)
 
-**Technical Implementation:**
-- [Resend Schedule Email Docs](https://resend.com/docs/dashboard/emails/schedule-email)
-- [Resend Extended Scheduling](https://resend.com/changelog/extended-email-scheduling)
-- [BullMQ - Background Jobs for NodeJS](https://bullmq.io/)
-- [Node.js Job Queue with BullMQ and Redis](https://oneuptime.com/blog/post/2026-01-06-nodejs-job-queue-bullmq-redis/view)
-- [Sending Emails with Queues in Node.js](https://dev.to/muhammadabir/sending-emails-with-queues-in-nodejs-improve-your-apps-email-deliverys-2gog)
+### Mobile Optimization
+- [OptinMonster: 15 Mobile Landing Page Best Practices](https://optinmonster.com/mobile-landing-page-best-practices/)
+- [Reform: Mobile Landing Page Design Ultimate Guide](https://www.reform.app/blog/mobile-landing-page-design-ultimate-guide)
+- [Neil Patel: Mobile Landing Page Optimization](https://neilpatel.com/blog/mobile-landing-page-optimization/)
+- [Leadpages: Master Mobile Landing Page Design](https://www.leadpages.com/blog/mobile-landing-page-design-responsive-editing)
 
-**Edge Cases & Timezone Handling:**
-- [International SaaS Timezone Edge Cases](https://dev.to/tomjstone/international-saas-nightmare-timezone-edge-cases-and-how-to-solve-them-once-and-for-all-57hn)
-- [Salesforce DST and Timezones](https://www.salesforceben.com/your-guide-to-daylight-saving-and-time-zones-in-marketing-cloud-engagement/)
-- [Handling Timezone and DST with Python](https://www.hacksoft.io/blog/handling-timezone-and-dst-changes-with-python)
+### Social Proof & Trust Signals
+- [BC Associates: The Ultimate Guide to Social Proof](https://bcassociatesmarketing.com/the-ultimate-guide-to-social-proof-building-trust-and-boosting-conversions/)
+- [Crazy Egg: 5 Trust Signals That Instantly Boost Conversion Rates](https://www.crazyegg.com/blog/trust-signals/)
+- [Flowlu: 8 Ways to Use Social Proof to Boost Sales](https://www.flowlu.com/blog/crm/social-proof-to-boost-sales/)
 
-**Platform Comparisons:**
-- [HubSpot vs Mailchimp 2026](https://www.emailtooltester.com/en/blog/hubspot-vs-mailchimp/)
-- [Mailchimp vs HubSpot Comparison](https://moosend.com/blog/hubspot-vs-mailchimp/)
+### Pricing Page Design
+- [Design Studio UIUX: 12 SaaS Pricing Page Best Practices with Examples in 2026](https://www.designstudiouiux.com/blog/saas-pricing-page-design-best-practices/)
+- [Orbix Studio: SaaS Pricing Page Psychology](https://www.orbix.studio/blogs/saas-pricing-page-psychology-convert)
+- [Cieden: How to Optimize SaaS Pricing Page in 2026](https://cieden.com/how-to-optimize-your-saas-pricing-page)
 
-**Anti-Patterns:**
-- [Email Scheduling Mistakes to Avoid](https://woodpecker.co/blog/how-to-schedule-an-email/)
-- [Email Warm-up Mistakes 2026](https://www.trulyinbox.com/blog/email-warm-up-mistakes/)
-- [2026 Will Punish Lazy Email Marketing](https://www.inc.com/liviu-tanase/2026-will-punish-lazy-email-marketing/91281472)
+### Copy & Messaging
+- [Pipedrive: The Essential Emotional Marketing Guide for SMBs](https://www.pipedrive.com/en/blog/emotional-marketing)
+- [Vendelux: Why SaaS Marketing Needs Emotional Storytelling Now](https://vendelux.com/news/emotional-storytelling-saas-marketing/)
+- [Kalungi: SaaS Messaging Template + 10 Actionable Tips](https://www.kalungi.com/blog/how-to-make-your-first-b2b-saas-messaging-framework-template-included)
+- [Data Dab: The Simplicity-Complexity Paradox](https://www.datadab.com/blog/the-simplicity-complexity-paradox-crafting-a-dual-marketing-strategy-for-project-management-tools-2/)
+- [Harmony Group: The Effectiveness of Simplicity in Marketing](https://harmongrp.com/the-effectiveness-of-simplicity-in-marketing/)
 
-**Status Tracking:**
-- [Zoho Track Email Delivery Status](https://www.zoho.com/mail/help/email-status.html)
-- [What is Pending-Sending Status](https://docs.easysendy.com/email-campaigns/kb/what-is-pending-sending-status-of-email-campaign/)
+### Visual Storytelling & Scrollytelling
+- [Webflow: 10 Visual Storytelling Website Examples](https://webflow.com/blog/storytelling-websites)
+- [Shorthand: 12 Engaging Scrollytelling Examples](https://shorthand.com/the-craft/engaging-scrollytelling-examples-to-inspire-your-content/index.html)
+- [Wix Studio: What is Scrollytelling? 6 Best Examples](https://www.wix.com/studio/blog/scrollytelling)
+- [Vev Design: 11 Scrollytelling Examples](https://www.vev.design/blog/scrollytelling-examples/)
+
+### Review Management Competitors
+- [Crazy Egg: Podium Review - The Good and The Bad for 2025](https://www.crazyegg.com/blog/podium-review/)
+- [Crazy Egg: Podium vs Birdeye Comparison](https://www.crazyegg.com/blog/podium-vs-birdeye/)
+- [Review Dingo: Birdeye vs Podium vs Reputation Ultimate Showdown](https://reviewdingo.com/birdeye-vs-podium-vs-reputation-best/)
+- [NiceJob: Top-Rated Reputation Marketing Software](https://get.nicejob.com/)
+- [GatherUp vs NiceJob Comparison](https://reviewgrower.com/gatherup-vs-nicejob/)
+
+### Local Business Review Pain Points
+- [Social Pilot: How to Get More Google Reviews (15 Proven Tactics for 2026)](https://www.socialpilot.co/reviews/blogs/how-to-get-google-reviews)
+- [Podium: How to Get Google Reviews (4-Step Guide)](https://www.podium.com/article/google-reviews)
+- [Cut Throat Marketing: How to Get More Google Reviews with Less Work](https://cutthroatmarketing.com/how-to-get-more-google-reviews-with-less-work/)
+- [Emitrr: Top 10 Dental Office Reputation Management Software](https://emitrr.com/blog/review-and-reputation-management-software-for-dental-office/)
+
+### Landing Page Anti-Patterns
+- [Abmatic AI: Top 10 SaaS Landing Page Mistakes to Avoid](https://abmatic.ai/blog/top-saas-landing-page-mistakes-to-avoid)
+- [Moosend: 10 Landing Page Mistakes You Should Absolutely Avoid in 2025](https://moosend.com/blog/landing-page-mistakes/)
+
+### FAQ & Objection Handling
+- [Site123: The Role of FAQ Sections in Landing Page Design](https://www.site123.com/learn/the-role-of-faq-sections-in-landing-page-design)
+- [Branded Agency: High-Converting Landing Pages: 2026 Essential Elements](https://brandedagency.com/blog/the-anatomy-of-a-high-converting-landing-page-14-powerful-elements-you-must-use-in-2026)
+
+### Free Trial & CTA Best Practices
+- [OptinMonster: How to Improve Free Trial Conversions (17 Proven Strategies)](https://optinmonster.com/how-to-increase-trial-signups/)
+- [Custify: How to Improve Your Free Trial Conversion Rate](https://www.custify.com/blog/free-trial-conversion-rate/)
+- [Userpilot: Free Trial Landing Page - Top Examples and Best Practices](https://userpilot.com/blog/free-trial-landing-page/)
+- [First Page Sage: CTA Conversion Rates – 2026 Report](https://firstpagesage.com/reports/cta-conversion-rates-report/)

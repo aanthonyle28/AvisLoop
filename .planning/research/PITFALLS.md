@@ -1,1043 +1,1557 @@
-# Pitfalls Research: Scheduled Email Sending
+# Domain Pitfalls: SaaS Landing Page Redesign
 
-**Domain:** Adding scheduled/deferred sending to existing Review SaaS
-**Researched:** 2026-01-28
-**Confidence:** HIGH (based on official docs, community patterns, and existing codebase analysis)
+**Domain:** Landing page redesign from generic to creative/unique
+**Target audience:** Local service businesses (dentists, salons, contractors, gyms)
+**Researched:** 2026-02-01
+**Confidence:** MEDIUM-HIGH (based on 2026 WebSearch results, performance benchmarks, UX research)
 
 ---
 
 ## Critical Pitfalls
 
-These mistakes will break the system or create security vulnerabilities if not handled.
+These mistakes cause conversion rate drops, technical failures, or major user experience issues.
 
-### Pitfall 1: Duplicate Sends Due to Race Conditions
-
-**What goes wrong:**
-When a cron job runs every minute, the same scheduled email can be processed multiple times if:
-- Previous cron execution hasn't finished when next one starts
-- Database transaction isolation is insufficient
-- Status updates aren't atomic
-
-With Vercel Cron running every minute and batch sends potentially taking >60 seconds to complete, this creates a race condition window where the same scheduled send could be picked up twice.
-
-**Why it happens:**
-- Cron doesn't wait for previous execution to complete
-- Query like `WHERE scheduled_for <= NOW() AND status = 'pending'` will return same rows if status isn't updated before next cron tick
-- Network delays between read and status update create race window
-
-**Consequences:**
-- Contacts receive duplicate emails (violates CAN-SPAM, burns quota, damages reputation)
-- Monthly quota counted incorrectly (double/triple counting)
-- Cooldown period calculations become incorrect
-- Provider rate limits hit faster than expected
-
-**Prevention:**
-```sql
--- ATOMIC: Use UPDATE...RETURNING to claim and fetch in one query
-UPDATE scheduled_sends
-SET status = 'processing',
-    processing_started_at = NOW()
-WHERE id IN (
-  SELECT id FROM scheduled_sends
-  WHERE scheduled_for <= NOW()
-    AND status = 'pending'
-  ORDER BY scheduled_for ASC
-  LIMIT 25  -- Batch size
-  FOR UPDATE SKIP LOCKED  -- PostgreSQL row-level locking
-)
-RETURNING *;
-```
-
-**Detection:**
-- Monitor for `provider_id` duplicates with same `contact_id` + `template_id` within short time windows
-- Track cron execution overlaps (start time of job N+1 < end time of job N)
-- Alert if same `scheduled_send.id` appears in logs from multiple cron executions
-
-**Phase to address:** Phase 1 (Database Schema & Core Processing Logic)
-
----
-
-### Pitfall 2: Service Role Key Exposure in Vercel Cron
+### Pitfall 1: Multiple CTAs Creating Decision Paralysis
 
 **What goes wrong:**
-Vercel Cron endpoints are publicly accessible URLs. Using service role key without validation means:
-- Anyone who discovers the cron endpoint URL can trigger it with forged requests
-- Service role key bypasses RLS, granting full database access
-- Malicious actor could exhaust quota, send spam, or access all business data
+Creative designs often try to showcase everything at once, leading to multiple competing calls-to-action on the same page. Studies show landing pages with multiple offers can see conversion rates drop by up to 266% compared to pages with a single, dedicated offer.
 
 **Why it happens:**
-- Cron jobs have no user session (need service role for RLS bypass)
-- Developers expose service role key in route handler without secondary authentication
-- Vercel Cron doesn't provide built-in authentication beyond optional cron secret
+- Designers want to give users "options"
+- Stakeholders insist on including secondary CTAs ("What if they want to read docs instead?")
+- Creative layouts provide space for multiple CTAs, so they get filled
+- Marketing team wants to track different conversion paths
 
 **Consequences:**
-- Unauthorized email sends → quota exhaustion, spam complaints, account suspension
-- Data breach if endpoint allows arbitrary queries
-- Compliance violations (GDPR, CAN-SPAM)
+- Visitor confusion: "What should I do first?"
+- Reduced conversion on primary goal (e.g., sign-up)
+- Diluted messaging clarity
+- Lower ROI on traffic acquisition
 
 **Prevention:**
 ```typescript
-// app/api/cron/process-scheduled-sends/route.ts
-import { headers } from 'next/headers'
+// Landing page component structure
+<HeroSection>
+  <Headline>Transform Your Reviews into Revenue</Headline>
+  <Subheadline>One-line value proposition for local businesses</Subheadline>
 
-export async function GET(request: Request) {
-  // 1. Verify Vercel Cron Secret
-  const authHeader = (await headers()).get('authorization')
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response('Unauthorized', { status: 401 })
-  }
+  {/* PRIMARY CTA - Only One */}
+  <Button size="lg" variant="primary">Start Free Trial</Button>
 
-  // 2. Use service role ONLY after validation
-  const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  {/* Secondary action - Make it clearly secondary */}
+  <Link className="text-muted-foreground text-sm">Watch Demo (2 min)</Link>
+</HeroSection>
 
-  // ... process scheduled sends
-}
+{/* Repeat primary CTA at natural decision points */}
+<FeaturesSection>
+  {/* Feature cards */}
+  <Button>Start Free Trial</Button> {/* Same CTA, same copy */}
+</FeaturesSection>
+
+<PricingSection>
+  {/* Pricing tiers */}
+  <Button>Start Free Trial</Button> {/* Consistent throughout */}
+</PricingSection>
 ```
 
-**Additional layers:**
-- Set `CRON_SECRET` in Vercel environment variables
-- Configure Vercel Cron with `headers: { "Authorization": "Bearer ${CRON_SECRET}" }`
-- Rotate `CRON_SECRET` periodically
-- Log all cron invocations with timestamp and result
+**Design rules:**
+- One primary CTA per section (can be same CTA repeated)
+- Secondary actions should be text links, not buttons
+- Use color hierarchy: Primary = brand color, Secondary = muted/ghost
+- Test CTA copy: "Start Free Trial" vs "Get Started" vs "Try AvisLoop Free"
 
 **Detection:**
-- Monitor for unexpected cron endpoint hits (frequency > 1/minute)
-- Alert on 401 responses to cron endpoint
-- Track cron invocations without matching Vercel deployment IDs
+- A/B test: Single CTA page vs Multi-CTA page
+- Heatmaps: Are users clicking secondary CTAs and not converting?
+- Analytics: Compare scroll depth to CTA clicks (if users scroll past primary CTA without clicking, something is wrong)
 
-**Source:** [Supabase RLS service role cron job security pitfalls](https://github.com/orgs/supabase/discussions/23136), [Secure Supabase Service Role Key](https://chat2db.ai/resources/blog/secure-supabase-role-key)
+**Source:** [How to Skyrocket Your SaaS Website Conversions in 2026](https://www.webstacks.com/blog/website-conversions-for-saas-businesses), [27 best SaaS landing page examples](https://unbounce.com/conversion-rate-optimization/the-state-of-saas-landing-pages/)
 
-**Phase to address:** Phase 1 (Database Schema & Core Processing Logic)
+**Phase to address:** Phase 1 (Hero & Core Layout)
 
 ---
 
-### Pitfall 3: Timezone Confusion Between Storage and Display
+### Pitfall 2: Animation-Driven Performance Degradation (LCP/CLS)
 
 **What goes wrong:**
-Vercel Cron runs in UTC. Users expect to schedule in their local time. Common mistakes:
-- Storing `scheduled_for` in user's local time → cron misses or executes at wrong time
-- Displaying UTC times to users → "I scheduled for 9am but it shows 2pm"
-- Not accounting for DST transitions → emails send 1 hour early/late twice a year
+Creative landing pages often use heavy animations (hero image transitions, scroll-triggered effects, particle backgrounds) that:
+- Delay Largest Contentful Paint (LCP > 2.5s)
+- Cause Cumulative Layout Shift (CLS) when elements load/animate in
+- Block interaction responsiveness (INP > 200ms)
+- Drain battery on mobile devices
+- Break on low-end devices
+
+In 2026, Google emphasizes INP (Interaction to Next Paint) ≤ 200ms. Pages that load in 1 second have 3× higher conversion rates than pages that take 5 seconds, and even a 1-second delay can cause a ~7% drop in conversions.
+
+**Why it happens:**
+- JavaScript animation libraries (GSAP, Framer Motion) add 100-300KB to bundle
+- Scroll-triggered animations require constant event listeners
+- Hero section animations delay above-the-fold content
+- Developers prioritize aesthetics over performance
+- Animations tested on high-end dev machines, not representative devices
+
+**Consequences:**
+- Poor Core Web Vitals → Lower Google rankings
+- Mobile users bounce before page loads
+- Local business owners on slower connections can't access site
+- Conversion rate drops 7% per second of delay
+- Accessibility issues (motion sickness, screen readers)
+
+**Prevention:**
+
+**1. Use CSS animations only for critical path:**
+```css
+/* GOOD: Hardware-accelerated, no layout shift */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px); /* transform, not top/margin */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-content {
+  animation: fadeInUp 0.6s ease-out;
+  /* Reserve space to prevent CLS */
+  min-height: 400px;
+}
+
+/* BAD: Triggers layout recalculation */
+@keyframes slideIn {
+  from {
+    width: 0; /* Causes reflow */
+    margin-left: 100px; /* Causes reflow */
+  }
+}
+```
+
+**2. Next.js Image optimization:**
+```typescript
+import Image from 'next/image'
+
+<Image
+  src="/hero-image.webp"
+  alt="Review management dashboard"
+  width={1200}
+  height={800}
+  priority // Preload LCP image
+  placeholder="blur"
+  blurDataURL="data:image/..." // Prevent CLS
+/>
+```
+
+**3. Lazy-load animations below fold:**
+```typescript
+'use client'
+import { useEffect, useState } from 'react'
+
+export function AnimatedSection({ children }) {
+  const [isVisible, setIsVisible] = useState(false)
+
+  useEffect(() => {
+    // Only load animation library after page interactive
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        setIsVisible(true)
+      }
+    })
+
+    observer.observe(ref.current)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <div className={isVisible ? 'animate-fade-in' : ''}>
+      {children}
+    </div>
+  )
+}
+```
+
+**4. Use `prefers-reduced-motion`:**
+```css
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+```
+
+**Performance budget:**
+- LCP: < 2.5s (good), < 4s (needs improvement)
+- CLS: < 0.1 (good), < 0.25 (needs improvement)
+- INP: < 200ms (good), < 500ms (needs improvement)
+- JS bundle: < 300KB (hero section should be < 50KB)
+- Animation library: Consider zero-JS CSS animations first
+
+**Testing:**
+- Test on real devices: iPhone SE, low-end Android (Moto G Power)
+- Lighthouse CI in GitHub Actions (block merge if LCP > 3s)
+- WebPageTest with 3G connection throttling
+- Check Vercel Analytics Real Experience Score
+
+**Detection:**
+- Monitor Core Web Vitals via Vercel Analytics
+- Alert if LCP > 3s or CLS > 0.1 on production
+- Track bounce rate by device (iOS vs Android vs Desktop)
+- User session recordings (Hotjar/FullStory) to see animation jank
+
+**Source:** [Core Web Vitals 2026: INP ≤200ms or Else](https://www.neoseo.co.uk/core-web-vitals-2026/), [CSS for Web Vitals](https://web.dev/articles/css-web-vitals), [Next.js landing page CLS LCP best practices](https://medium.com/@iamsandeshjain/stop-the-wait-a-developers-guide-to-smashing-lcp-in-next-js-634e2963f4c7)
+
+**Phase to address:** Phase 1 (Hero & Core Layout) + Phase 4 (Performance Optimization)
+
+---
+
+### Pitfall 3: Dark Mode Breaking Visual Effects
+
+**What goes wrong:**
+Creative landing pages use gradients, shadows, overlays, and low-contrast decorative elements that look great in light mode but break in dark mode:
+- Shadows become invisible on dark backgrounds
+- Gradients that worked in light mode create harsh contrasts in dark mode
+- Low-contrast gray text (#6B7280) on dark gray background (#1F2937) becomes unreadable
+- Pure black (#000000) backgrounds cause eye strain
+- Decorative elements (geometric shapes, patterns) clash with dark theme
+
+**Why it happens:**
+- Designers design in light mode only (most common)
+- Shadows are designed for light surfaces (don't work on dark)
+- CSS gradients use absolute colors instead of semantic tokens
+- Tailwind utility classes hardcoded (`bg-white`, `text-gray-600`) instead of theme-aware tokens
+- Complex overlays and blend modes don't translate to dark mode
+
+**Consequences:**
+- 94.8% of homepages show WCAG 2 failures, with low-contrast text being the top issue (79.1%)
+- Users with dark mode preference see broken, unreadable design
+- Accessibility violations (WCAG AA requires 4.5:1 contrast for normal text)
+- Brand looks unprofessional ("Did they even test this?")
+- User switches to light mode or leaves site
+
+**Prevention:**
+
+**1. Use semantic color tokens (not absolute colors):**
+```css
+/* BAD: Hardcoded colors */
+.card {
+  background: #ffffff;
+  color: #1a1a1a;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* GOOD: CSS variables that adapt to theme */
+.card {
+  background: var(--color-card);
+  color: var(--color-foreground);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Tailwind version */
+.card {
+  @apply bg-card text-foreground border-border shadow-sm;
+}
+```
+
+**2. Replace shadows with borders/tonal layers in dark mode:**
+```css
+/* Light mode: Use shadows */
+.card {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode: Replace shadows with borders and tonal layering */
+.dark .card {
+  box-shadow: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05); /* Slightly lighter than background */
+}
+```
+
+**3. Design gradients for both modes:**
+```css
+/* BAD: Absolute gradient (breaks in dark mode) */
+.hero {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* GOOD: Theme-aware gradient */
+.hero {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary)) 0%,
+    hsl(var(--primary-dark)) 100%
+  );
+}
+
+/* Or conditional gradients */
+.hero {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.dark .hero {
+  background: linear-gradient(135deg, #4c5fd5 0%, #5a3a7c 100%); /* Darker version */
+}
+```
+
+**4. Avoid pure black, use dark gray:**
+```css
+/* BAD: Pure black causes eye strain with bright elements */
+.dark {
+  --background: 0 0% 0%; /* #000000 */
+}
+
+/* GOOD: Dark gray (Material Design standard) */
+.dark {
+  --background: 222 47% 11%; /* #121212 or similar */
+  --foreground: 0 0% 88%; /* #E0E0E0 (not pure white) */
+}
+```
+
+**5. Test contrast ratios:**
+- Use [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/)
+- WCAG AA: 4.5:1 for normal text, 3:1 for large text (18px bold or 24px)
+- WCAG AAA: 7:1 for normal text, 4.5:1 for large text
+- Test all text/background combinations in both themes
+
+**6. Decorative elements need explicit dark mode variants:**
+```typescript
+// Geometric marker component
+export function GeometricMarker({ variant = 'circle' }) {
+  return (
+    <div className={cn(
+      // Light mode
+      'bg-blue-100 border-blue-500',
+      // Dark mode explicit overrides
+      'dark:bg-blue-950/30 dark:border-blue-400',
+      variant === 'circle' && 'rounded-full'
+    )} />
+  )
+}
+```
+
+**Testing checklist:**
+- [ ] Toggle dark mode on every page
+- [ ] Check all text for contrast (use browser DevTools contrast checker)
+- [ ] Verify gradients don't create harsh edges
+- [ ] Ensure shadows are replaced or adapted
+- [ ] Test on OLED screens (pure black shows differently)
+- [ ] Check with accessibility audit tool (axe DevTools, Lighthouse)
+
+**Detection:**
+- Automated: Lighthouse accessibility audit (catches contrast issues)
+- Manual: QA checklist for dark mode on all pages
+- User feedback: "I can't read this in dark mode"
+- Analytics: Track dark mode usage and bounce rate correlation
+
+**Source:** [Dark Mode Design Best Practices in 2026](https://www.tech-rz.com/blog/dark-mode-design-best-practices-in-2026/), [Why dark mode causes more accessibility issues than it solves](https://medium.com/@h_locke/why-dark-mode-causes-more-accessibility-issues-than-it-solves-54cddf6466f5), [10 Dark Mode UI Best Practices](https://www.designstudiouiux.com/blog/dark-mode-ui-design-best-practices/)
+
+**Phase to address:** Phase 1 (Hero & Core Layout) + Phase 3 (Polish & Accessibility)
+
+---
+
+### Pitfall 4: Being Clever at the Expense of Clarity
+
+**What goes wrong:**
+Creative redesigns often prioritize clever copywriting, abstract metaphors, and artistic visuals over clear value propositions. For local business owners (dentists, plumbers, contractors), this creates confusion:
+- Headline uses clever wordplay but doesn't communicate what the product does
+- Features described with jargon ("Leverage omnichannel reputation management")
+- Abstract imagery (e.g., mountains, abstract shapes) instead of product screenshots
+- Value proposition hidden below the fold
+- Copy uses "we" instead of "you" (only 27% of SaaS landing pages use "you" in H1 headlines)
 
 **Example failure:**
 ```
-User (PST): Schedules for "2026-03-10 09:00 PST" (day DST starts)
-Developer: Stores "2026-03-10 09:00:00-08:00"
-Cron (UTC): Converts to "2026-03-10 17:00:00Z"
-DST happens: PST → PDT, offset changes -08:00 → -07:00
-User expectation: Email at 9am PDT (17:00 UTC)
-Actual send: 17:00 UTC = 10am PDT (1 hour late!)
+BAD: "Elevate Your Brand's Voice"
+→ What does this mean? Voice? Branding? Audio?
+
+GOOD: "Get More 5-Star Reviews from Your Customers"
+→ Clear outcome, specific to reviews, no jargon
 ```
 
 **Why it happens:**
-- Mixing timezone-aware and timezone-naive timestamps
-- Storing local times instead of UTC
-- Not using user's timezone for display conversions
-- DST edge cases not tested
+- Designers/marketers try to be unique and stand out
+- Agency pitches "creative concepts" that look good in portfolio
+- Copy written by people who don't talk to target customers
+- Emulating tech-savvy SaaS companies (Stripe, Vercel) when targeting non-tech users
+- No user testing with actual local business owners
 
 **Consequences:**
-- Emails sent at wrong times (damages UX, missed opportunities)
-- User confusion ("I scheduled it wrong?")
-- Compliance issues if time-sensitive (e.g., "send review request 1 day after service")
+- Visitor leaves within 3 seconds ("What does this do?")
+- Bounce rate increases (site looks nice but doesn't communicate value)
+- Pages that use overly advanced vocabulary see a 24% drop in conversion rates
+- Wrong audience self-selects in (or right audience self-selects out)
+- Support tickets: "Is this for me?"
 
 **Prevention:**
-```typescript
-// STORAGE: Always UTC
-scheduled_for TIMESTAMPTZ  -- PostgreSQL handles UTC storage
 
-// CONVERSION: Client → Server (scheduling)
-const scheduledForUTC = new Date(userSelectedDateTime).toISOString()
+**1. Value proposition checklist (5-second test):**
+- Can a dentist who's never heard of AvisLoop understand what it does in 5 seconds?
+- Does the headline include the outcome, not the process?
+- Is the subheadline specific to the target audience?
+- Are benefits written as "You get X" not "We provide Y"?
 
-// CONVERSION: Server → Client (display)
-const userTimezone = 'America/Los_Angeles'  // from user profile
-const displayTime = new Date(scheduledForUTC).toLocaleString('en-US', {
-  timeZone: userTimezone,
-  dateStyle: 'medium',
-  timeStyle: 'short'
-})
+**2. Copy formula for local businesses:**
+```
+Headline: [Outcome they want] for [their industry]
+Subheadline: [How it works in 10 words or less]
+CTA: [Action verb] [What they get]
+
+Example:
+Headline: Get More 5-Star Reviews for Your Dental Practice
+Subheadline: Send review requests via email in 2 clicks—no technical skills needed
+CTA: Start Getting Reviews Free
 ```
 
-**UX best practices:**
-- Show user's timezone in scheduling UI: "Schedule for [date] [time] PST"
-- Display confirmation: "Scheduled for Jan 28, 2026 at 9:00 AM PST (in 3 hours)"
-- Add timezone selector if business serves multiple timezones
+**3. Use customer language (not marketing speak):**
+- Interview 5-10 target customers: "How would you describe this to a colleague?"
+- Mine reviews/support tickets for phrases customers use
+- Avoid jargon: "omnichannel", "synergy", "leverage", "ecosystem"
+- Use concrete words: "email" not "communication channels", "reviews" not "social proof"
+
+**4. Show the product, not abstract concepts:**
+```typescript
+<HeroSection>
+  {/* BAD: Abstract image */}
+  <Image src="/mountains-sunset.jpg" alt="Success" />
+
+  {/* GOOD: Product screenshot with context */}
+  <Image
+    src="/dashboard-reviews.png"
+    alt="AvisLoop dashboard showing 47 new 5-star reviews this month"
+  />
+</HeroSection>
+```
+
+**5. Trust signals for local businesses (not tech companies):**
+```typescript
+// Local businesses care about:
+<TrustSignals>
+  <Stat>2,847 local businesses use AvisLoop</Stat>
+  <Testimonial>
+    "I got 30 new reviews in 2 weeks. So easy even I could do it!"
+    — Dr. Sarah Chen, Oak Street Dental
+  </Testimonial>
+  <Badge>No credit card required</Badge>
+  <Badge>Cancel anytime</Badge>
+</TrustSignals>
+
+// NOT what tech companies show:
+❌ "SOC 2 Type II Compliant"
+❌ "99.99% uptime SLA"
+❌ "GraphQL API with webhooks"
+```
+
+**6. Clarity testing:**
+- 5-second test: Show page for 5 seconds, hide it, ask "What does this product do?"
+- Mom test: Can your mom (or a plumber friend) explain what AvisLoop does after seeing the landing page?
+- Analytics: Measure scroll depth—if users scroll past hero without clicking CTA, headline failed
 
 **Detection:**
-- User reports: "Email sent at wrong time"
-- Analytics: Scheduled vs actual send time delta > 60 minutes (excluding processing delays)
-- Test DST boundary dates explicitly
+- User testing: Record sessions with target audience (local business owners)
+- Analytics: Track time-to-CTA-click (if >30 seconds, users are confused)
+- Support: Track "What does AvisLoop do?" questions
+- A/B test: Clear headline vs clever headline
 
-**Source:** [Handling Timezones within Enterprise-Level Applications](https://medium.com/@20011002nimeth/handling-timezones-within-enterprise-level-applications-utc-vs-local-time-309cbe438eaf), [Time Zone Selection UX](https://smart-interface-design-patterns.com/articles/time-zone-selection-ux/)
+**Source:** [27 best SaaS landing page examples](https://unbounce.com/conversion-rate-optimization/the-state-of-saas-landing-pages/), [Boring, unsexy, incredibly effective landing pages](https://www.poweredbysearch.com/blog/landing-page-conversion-rate/)
 
-**Phase to address:** Phase 2 (Scheduling UI & User Timezone Handling)
+**Phase to address:** Phase 1 (Hero & Core Layout)
 
 ---
 
-### Pitfall 4: Forgetting to Re-validate Business Rules at Send Time
+### Pitfall 5: SEO Regression During Redesign
 
 **What goes wrong:**
-Scheduled sends are created with validation snapshot at schedule time, but conditions change before send time:
-- Contact opts out after scheduling → email still sends (CAN-SPAM violation)
-- Business hits monthly quota between schedule and send → send fails or quota exceeded
-- Contact archived/deleted → email sends to invalid contact
-- Cooldown period still active at schedule time but expires by send time → duplicate validation error
-
-**Example:**
-```
-Monday 9am: User schedules send to 50 contacts for Friday 9am
-Monday 10am: Contact #23 opts out
-Friday 9am: Cron processes scheduled sends → Contact #23 receives email
-Result: CAN-SPAM violation, complaint, potential legal action
-```
+Creative redesigns often unintentionally break SEO:
+- Changed URLs (e.g., `/features` → `/product`) without 301 redirects
+- Removed or changed page titles and meta descriptions
+- Hero content moved to client-rendered components (Next.js hydration issues)
+- Removed structured data (Schema.org markup)
+- Navigation structure changed, breaking internal links
+- Image alt text removed for "cleaner code"
+- H1 changed from keyword-rich to creative/vague
+- Content removed to make design "cleaner"
 
 **Why it happens:**
-- Developers validate eligibility only at schedule creation
-- Cron processing assumes scheduled sends are "pre-validated"
-- No re-check before actual send
+- Designers don't think about SEO implications
+- Developers rebuild pages from scratch without preserving SEO elements
+- Client-side rendering used for hero section (Google indexes empty shell)
+- Broken links not caught in testing
+- No SEO audit before/after redesign
 
 **Consequences:**
-- Legal violations (CAN-SPAM, GDPR)
-- Wasted quota on failed sends
-- User confusion ("Why did it skip this contact?")
-- Contact complaints → sender reputation damage
+- Organic traffic drops 20-50% post-launch
+- Rankings for key terms drop (e.g., "review management software")
+- Backlinks to old URLs return 404s
+- Google Search Console floods with errors
+- Recovery takes 3-6 months
 
 **Prevention:**
+
+**1. SEO audit BEFORE redesign:**
+```bash
+# Document current state
+- Current URLs and traffic (Google Analytics)
+- Current rankings for key terms (Google Search Console)
+- Existing backlinks (Ahrefs, SEMrush)
+- Structured data (Schema.org markup)
+- Page titles, meta descriptions, H1s
+- Internal linking structure
+```
+
+**2. Preserve URL structure (or redirect):**
 ```typescript
-// In cron processor
-for (const scheduledSend of scheduledSends) {
-  // CRITICAL: Re-fetch contact with current status
-  const contact = await getContact(scheduledSend.contact_id)
-
-  // Re-validate ALL business rules
-  if (contact.opted_out) {
-    await updateScheduledSend(scheduledSend.id, {
-      status: 'cancelled',
-      cancel_reason: 'contact_opted_out'
-    })
-    continue
-  }
-
-  if (contact.status === 'archived') {
-    await updateScheduledSend(scheduledSend.id, {
-      status: 'cancelled',
-      cancel_reason: 'contact_archived'
-    })
-    continue
-  }
-
-  // Check cooldown (may have changed since scheduling)
-  const cooldownCheck = checkCooldown(contact.last_sent_at)
-  if (!cooldownCheck.canSend) {
-    await updateScheduledSend(scheduledSend.id, {
-      status: 'cancelled',
-      cancel_reason: 'cooldown_active'
-    })
-    continue
-  }
-
-  // Check monthly quota (current count, not count at schedule time)
-  const quotaCheck = await checkMonthlyQuota(business.id)
-  if (!quotaCheck.hasQuota) {
-    await updateScheduledSend(scheduledSend.id, {
-      status: 'cancelled',
-      cancel_reason: 'quota_exceeded'
-    })
-    continue
-  }
-
-  // All checks pass → proceed with send
-  await processSend(scheduledSend)
+// next.config.js
+module.exports = {
+  async redirects() {
+    return [
+      {
+        source: '/features',
+        destination: '/product',
+        permanent: true, // 301 redirect
+      },
+      {
+        source: '/pricing-old',
+        destination: '/pricing',
+        permanent: true,
+      },
+    ]
+  },
 }
 ```
 
+**3. Ensure hero content is server-rendered:**
+```typescript
+// BAD: Client-rendered hero (Google sees empty div)
+'use client'
+export function Hero() {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+  if (!mounted) return null
+  return <h1>Get More Reviews</h1>
+}
+
+// GOOD: Server-rendered hero (Google indexes immediately)
+export function Hero() {
+  return (
+    <section>
+      <h1>Get More 5-Star Reviews for Your Business</h1>
+      <p>Send review requests in 2 clicks. Trusted by 2,847 local businesses.</p>
+    </section>
+  )
+}
+```
+
+**4. Structured data for SaaS:**
+```typescript
+// app/page.tsx
+export default function LandingPage() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "AvisLoop",
+    "applicationCategory": "BusinessApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "247"
+    }
+  }
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      {/* Page content */}
+    </>
+  )
+}
+```
+
+**5. Meta tags for every page:**
+```typescript
+// app/page.tsx (landing page)
+export const metadata: Metadata = {
+  title: 'AvisLoop - Review Management for Local Businesses',
+  description: 'Get more 5-star reviews with automated review requests. Simple review management software for dentists, salons, and local service businesses.',
+  openGraph: {
+    title: 'AvisLoop - Review Management for Local Businesses',
+    description: 'Get more 5-star reviews with automated review requests.',
+    images: ['/og-image.png'],
+  },
+}
+```
+
+**6. Internal linking audit:**
+```typescript
+// Use Next.js <Link> for all internal navigation (SPA routing + SEO)
+import Link from 'next/link'
+
+<nav>
+  <Link href="/features">Features</Link>
+  <Link href="/pricing">Pricing</Link>
+  <Link href="/blog">Blog</Link>
+</nav>
+```
+
+**7. Monitor during rollout:**
+```bash
+# Week 1 after launch:
+- Google Search Console: Check for crawl errors, index coverage
+- Google Analytics: Compare organic traffic week-over-week
+- Lighthouse: Run SEO audit (should be 90+)
+- Broken link checker: screaming-frog.co.uk
+
+# Week 2-4:
+- Monitor rankings for key terms (Google Search Console)
+- Check backlinks (Ahrefs: any 404s?)
+- Track organic conversion rate (did redesign hurt conversion?)
+```
+
+**Testing:**
+- Run Lighthouse SEO audit (target score: 95+)
+- Screaming Frog crawl to find broken links
+- Compare sitemap before/after (did any URLs disappear?)
+- Test all pages render with JavaScript disabled (curl test)
+
 **Detection:**
-- Track cancellation reasons in `scheduled_sends` table
-- Alert if cancellation rate > 5% (indicates schedule-time vs send-time drift)
-- Monthly audit: opted-out contacts who received emails
+- Google Search Console: Index coverage errors
+- Analytics: Organic traffic drop >10% week-over-week
+- Manual: Search for key terms, see if site still ranks
+- Ahrefs: Backlinks returning 404
 
-**Source:** [Common Email Scheduling Mistakes](https://woodpecker.co/blog/how-to-schedule-an-email/), existing codebase analysis
+**Source:** [Website Redesign For SEO Guide 2026](https://moswebdesign.com/articles/website-redesign-for-seo/), [Website Redesign SEO: Minimize Negative Impact](https://intigress.com/blog/seo/website-redesign-seo)
 
-**Phase to address:** Phase 1 (Database Schema & Core Processing Logic)
+**Phase to address:** Phase 1 (Hero & Core Layout) + Phase 4 (Performance Optimization)
+
+---
+
+### Pitfall 6: Hydration Mismatch with Scroll/Animation Effects
+
+**What goes wrong:**
+Next.js Server Components render HTML on the server, then React "hydrates" it on the client. Creative landing pages often use scroll-triggered animations that cause hydration mismatches:
+- Scroll position differs between server (always top) and client (preserved from navigation)
+- Animations use dynamic calculations (window.innerHeight) that differ server vs client
+- Theme detection (dark mode) causes different HTML server vs client
+- Browser-specific features (IntersectionObserver) used during SSR
+
+**Example error:**
+```
+Error: Hydration failed because the initial UI does not match what was rendered on the server.
+Warning: Expected server HTML to contain a matching <div> in <section>.
+```
+
+**Why it happens:**
+- Using browser APIs (window, document) in Server Components
+- Scroll animations calculated with CSS that embeds dynamic values (translateX(-${width}px))
+- Theme state checked during SSR without proper suppression
+- Animation libraries that run during SSR
+
+**Consequences:**
+- Console errors flood production logs
+- React forces client-side re-render (performance hit)
+- Flash of unstyled content (FOUC)
+- Animations broken on first load
+- User sees layout shift as React "fixes" the mismatch
+
+**Prevention:**
+
+**1. Use `'use client'` for animation components:**
+```typescript
+// BAD: Scroll animation in Server Component
+export default function Hero() {
+  const [scrollY, setScrollY] = useState(0) // ❌ Can't use useState in Server Component
+
+  useEffect(() => {
+    window.addEventListener('scroll', ...) // ❌ window not available in SSR
+  }, [])
+}
+
+// GOOD: Separate client component
+'use client'
+export function ScrollAnimation({ children }) {
+  const [scrollY, setScrollY] = useState(0)
+
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY)
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  return <div style={{ transform: `translateY(${scrollY * 0.5}px)` }}>{children}</div>
+}
+
+// Use in Server Component
+export default function Hero() {
+  return (
+    <ScrollAnimation>
+      <h1>Server-rendered content, client-animated wrapper</h1>
+    </ScrollAnimation>
+  )
+}
+```
+
+**2. Use percentages, not dynamic pixel values in CSS:**
+```typescript
+// BAD: Dynamic pixel calculation causes hydration mismatch
+<style jsx global>{`
+  @keyframes scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-${imageWidth * images.length}px); }
+  }
+`}</style>
+
+// GOOD: Percentage-based animation (consistent server/client)
+<style jsx global>{`
+  @keyframes scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+  }
+`}</style>
+```
+
+**3. Suppress hydration warnings for theme/date:**
+```typescript
+// Theme toggle (server doesn't know user preference)
+export function ThemeToggle() {
+  const { theme } = useTheme()
+
+  return (
+    <button suppressHydrationWarning>
+      {theme === 'dark' ? '🌙' : '☀️'}
+    </button>
+  )
+}
+```
+
+**4. Defer non-critical animations:**
+```typescript
+'use client'
+export function AnimatedHero() {
+  const [mounted, setMounted] = useState(false)
+
+  // Wait for client-side mount before rendering animation
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  return (
+    <div className={mounted ? 'animate-fade-in' : 'opacity-0'}>
+      {/* Content */}
+    </div>
+  )
+}
+```
+
+**5. Use dynamic imports for animation libraries:**
+```typescript
+// Only load Framer Motion on client
+import dynamic from 'next/dynamic'
+
+const MotionDiv = dynamic(
+  () => import('framer-motion').then(mod => mod.motion.div),
+  { ssr: false } // Don't render on server
+)
+
+export function AnimatedSection() {
+  return (
+    <MotionDiv
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+    >
+      Content
+    </MotionDiv>
+  )
+}
+```
+
+**Testing:**
+- Check browser console for hydration errors
+- Test with "Disable JavaScript" in DevTools (should still render)
+- Test navigation from different pages (scroll position might be preserved)
+- Test in dark mode (theme hydration is common pitfall)
+
+**Detection:**
+- Monitor Sentry/error tracking for hydration errors
+- Console error count in production (should be 0)
+- Visual regression testing (Percy, Chromatic)
+
+**Source:** [Fixing Hydration Errors in Next.js](https://dev.to/georgemeka/hydration-error-4n0k), [Fixing Scroll Animation and Hydration Mismatch in Next.js](https://dev.to/ri_ki_251ca3db361b527f552/umemura-farm-website-devlog-34-fixing-scroll-animation-and-hydration-mismatch-in-nextjs-mla)
+
+**Phase to address:** Phase 2 (Features & Interactive Elements)
 
 ---
 
 ## Integration Pitfalls
 
-Mistakes when connecting scheduled sending to existing immediate send flow.
+Mistakes when integrating redesigned landing page with existing app.
 
-### Pitfall 5: Inconsistent Business Rule Application Between Immediate and Scheduled Sends
+### Pitfall 7: Inconsistent Design Language Between Marketing and App
 
 **What goes wrong:**
-Scheduled sends bypass or apply different validation than immediate sends:
-- Immediate send checks rate limit per user, scheduled send has no rate limit
-- Immediate send enforces cooldown, scheduled send uses stale cooldown check
-- Immediate send uses idempotency keys, scheduled send doesn't
-- Monthly quota counted differently (scheduled counted at schedule time vs send time)
+Redesigned landing page uses new creative aesthetic (bold colors, geometric shapes, modern typography) but:
+- Dashboard uses old design system
+- Buttons/forms styled differently between landing page and sign-up flow
+- Color palette changes mid-experience (blue on landing page, green in app)
+- Typography inconsistent (landing page uses fancy font, app uses system font)
+- User signs up expecting one experience, gets a different product
 
 **Why it happens:**
-- Two separate code paths for immediate vs scheduled
-- Copy-paste with drift over time
-- Different developers implement each feature
-- Scheduled send processor reimplements rules instead of reusing existing functions
+- Marketing team owns landing page, product team owns app
+- Landing page designed by external agency, app designed by internal team
+- Landing page prioritizes "wow factor", app prioritizes usability
+- No shared design system or component library
+- Redesign is Phase 1, app redesign is "Phase 2 someday"
 
 **Consequences:**
-- Users discover loopholes ("I can bypass cooldown by scheduling")
-- Quota accounting becomes inaccurate
-- Support burden: "Why did this work but that didn't?"
-- Future rule changes need to be updated in multiple places
+- User confusion: "Is this the same product?"
+- Trust erosion: "This looks like a bait-and-switch"
+- Churn: Users sign up for creative landing page, disappointed by generic app
+- Support tickets: "The app doesn't look like the website"
 
 **Prevention:**
+
+**1. Establish shared design tokens:**
 ```typescript
-// SHARED validation functions (DRY principle)
-// lib/validations/send-eligibility.ts
-export async function checkContactEligibility(contact, business) {
-  // Single source of truth for eligibility rules
-  if (contact.opted_out) return { canSend: false, reason: 'opted_out' }
-  if (contact.status === 'archived') return { canSend: false, reason: 'archived' }
+// tailwind.config.ts (used by both landing page AND app)
+export default {
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          DEFAULT: '#3B82F6', // Blue
+          dark: '#2563EB',
+        },
+        accent: {
+          lime: '#84CC16',
+          coral: '#F97316',
+        },
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Space Grotesk', 'sans-serif'], // Landing page only
+      },
+    },
+  },
+}
+```
 
-  const cooldown = checkCooldown(contact.last_sent_at)
-  if (!cooldown.canSend) return { canSend: false, reason: 'cooldown' }
-
-  return { canSend: true }
+**2. Shared component library:**
+```typescript
+// components/ui/button.tsx (used by both contexts)
+export function Button({ variant = 'primary', ...props }) {
+  return (
+    <button
+      className={cn(
+        'px-6 py-3 rounded-lg font-semibold',
+        variant === 'primary' && 'bg-primary text-white hover:bg-primary-dark'
+      )}
+      {...props}
+    />
+  )
 }
 
-export async function checkBusinessQuota(business) {
-  const usage = await getMonthlyCount(business.id)
-  const limit = MONTHLY_SEND_LIMITS[business.tier]
-  if (usage >= limit) return { hasQuota: false, reason: 'quota_exceeded' }
-  return { hasQuota: true }
-}
+// Landing page uses it
+<Button>Start Free Trial</Button>
 
-// REUSE in both flows
-// lib/actions/send.ts (immediate send)
-const eligibility = await checkContactEligibility(contact, business)
-if (!eligibility.canSend) return { error: eligibility.reason }
+// Sign-up page uses same component
+<Button>Create Account</Button>
+```
 
-// app/api/cron/process-scheduled-sends/route.ts (scheduled send)
-const eligibility = await checkContactEligibility(contact, business)
-if (!eligibility.canSend) {
-  await cancelScheduledSend(id, eligibility.reason)
-  continue
-}
+**3. Progressive enhancement of app design:**
+```
+Phase 1: Redesign landing page + public pages (pricing, etc.)
+Phase 2: Update sign-up flow and onboarding to match
+Phase 3: Incrementally update app dashboard components
+Phase 4: Full app redesign
+
+// DON'T: Launch new landing page, leave app untouched for 6 months
+```
+
+**4. User journey continuity:**
+```
+Landing page → Sign-up page → Onboarding → Dashboard
+     ↓              ↓              ↓             ↓
+  New style     New style     New style    Transition
+                                           (gradually update)
+```
+
+**5. Visual regression testing:**
+```bash
+# Use Percy/Chromatic to catch inconsistencies
+- Screenshot landing page components
+- Screenshot sign-up flow components
+- Compare side-by-side (same button should look identical)
 ```
 
 **Testing:**
-- Integration test suite covering both immediate and scheduled sends
-- Property-based testing: same contact + business should have same eligibility result
-- Regression tests when business rules change
+- User testing: Have users go from landing page → sign up → dashboard. Ask "Did anything feel inconsistent?"
+- Design QA: Side-by-side comparison of landing page and first-login experience
+- Analytics: Track drop-off rate between sign-up and first login (inconsistency causes abandonment)
 
 **Detection:**
-- Code review checklist: "Did you update both send flows?"
-- Static analysis: detect duplicate validation logic
-- Monthly audit: compare immediate vs scheduled send failure reasons (should have similar distribution)
+- User feedback: "The app doesn't match the website"
+- Support tickets asking about features shown on landing page
+- Churn analysis: Do users from new landing page have higher churn?
 
-**Source:** Existing codebase analysis (lib/actions/send.ts has comprehensive validation)
+**Source:** [SaaS Website Redesign Guide](https://www.ideapeel.com/blogs/saas-website-redesign), [Best SaaS websites 2026](https://www.stan.vision/journal/saas-website-design)
 
-**Phase to address:** Phase 1 (Database Schema & Core Processing Logic)
+**Phase to address:** Phase 1 (Hero & Core Layout) + Phase 5 (Sign-up Flow Alignment)
 
 ---
 
-### Pitfall 6: Idempotency Key Conflicts Between Immediate and Scheduled Sends
+### Pitfall 8: Analytics Tracking Breaks During Redesign
 
 **What goes wrong:**
-Current code uses `idempotencyKey: 'send-${sendLog.id}'` for Resend. If scheduled sends reuse the same pattern:
-- Immediate send creates `send_logs.id = abc123`, uses idempotency key `send-abc123`
-- Scheduled send creates `scheduled_sends.id = def456`, references same contact/template
-- Both map to different tables but Resend sees them as potentially duplicate if keys collide
-
-Worse: If scheduled send creates a `send_log` BEFORE sending (like immediate flow does), and cron crashes between log creation and send, retry will fail because idempotency key prevents re-send but email was never sent.
+Creative redesigns rebuild pages from scratch, often breaking existing analytics tracking:
+- Google Analytics events no longer fire (button IDs changed)
+- Conversion goals reset (URLs changed, no 301 redirects in GA4)
+- Heatmaps (Hotjar) broken (element selectors changed)
+- A/B tests (Google Optimize) break (variant selectors no longer exist)
+- Attribution tracking lost (UTM parameters not preserved in new routing)
 
 **Why it happens:**
-- Two different ID spaces (send_logs.id vs scheduled_sends.id) both used for idempotency
-- 24-hour Resend idempotency window overlaps with scheduling window
-- Retry logic doesn't account for idempotency key reuse
+- Developers rebuild pages without checking existing tracking code
+- Button IDs and class names changed without updating analytics
+- Old Google Tag Manager (GTM) triggers reference old DOM structure
+- No analytics QA checklist during redesign
+- Tracking code lives in old component, not ported to new component
 
 **Consequences:**
-- Emails silently not sent (Resend returns cached response from previous send)
-- Duplicate emails if keys are different but should be deduplicated
-- Debugging nightmare: "Why didn't this scheduled send actually send?"
+- 2-4 weeks of missing conversion data (can't calculate ROI of redesign)
+- Can't measure if redesign improved or hurt conversion
+- Marketing attribution broken (can't tell which ads drove sign-ups)
+- A/B testing broken (can't validate design decisions)
+- Executive panic: "Why did conversions drop to zero?!"
 
 **Prevention:**
-```typescript
-// IMMEDIATE SEND: Use send_logs.id
-{ idempotencyKey: `immediate-${sendLog.id}` }
 
-// SCHEDULED SEND: Use scheduled_sends.id
-{ idempotencyKey: `scheduled-${scheduledSend.id}` }
+**1. Audit existing tracking BEFORE redesign:**
+```bash
+# Document all GA4 events currently tracked
+- page_view (automatic)
+- click_cta (button clicks)
+- start_trial (sign-up conversion)
+- view_pricing (pricing page visits)
 
-// ALTERNATIVE: Include timestamp for absolute uniqueness
-{ idempotencyKey: `${scheduledSend.id}-${Date.now()}` }
+# Document all GTM triggers and their selectors
+- CTA button: #hero-cta-button
+- Pricing card: .pricing-card
+- Navigation links: nav a[href]
 
-// BEST: Include business context for clarity
-{ idempotencyKey: `business-${businessId}-scheduled-${scheduledSend.id}` }
+# Document conversion goals
+- Goal 1: /signup/complete (sign-up conversion)
+- Goal 2: /onboarding/complete (onboarding completion)
 ```
 
-**Additional considerations:**
-- Resend's 24-hour TTL: Don't rely on idempotency beyond 24 hours
-- Document idempotency key format in code comments
-- Test retry scenarios explicitly
+**2. Use data attributes (not IDs/classes):**
+```typescript
+// BAD: Tracking depends on fragile selectors
+<button id="hero-cta-button" className="btn-primary">
+  Start Free Trial
+</button>
+
+// GOOD: Explicit data attributes for tracking
+<button
+  data-track="cta-click"
+  data-location="hero"
+  data-label="start-trial"
+  onClick={() => {
+    // Track event
+    gtag('event', 'click_cta', {
+      location: 'hero',
+      label: 'start-trial',
+    })
+  }}
+>
+  Start Free Trial
+</button>
+```
+
+**3. Centralized tracking abstraction:**
+```typescript
+// lib/analytics.ts
+export function trackEvent(eventName: string, properties?: Record<string, any>) {
+  // Send to Google Analytics
+  if (typeof gtag !== 'undefined') {
+    gtag('event', eventName, properties)
+  }
+
+  // Send to other analytics tools (Mixpanel, etc.)
+  if (typeof mixpanel !== 'undefined') {
+    mixpanel.track(eventName, properties)
+  }
+
+  console.log('[Analytics]', eventName, properties)
+}
+
+// Use in components
+<Button onClick={() => trackEvent('cta_click', { location: 'hero' })}>
+  Start Free Trial
+</Button>
+```
+
+**4. Test tracking in staging:**
+```bash
+# Before launch:
+1. Open staging site
+2. Open GA4 DebugView (or browser extension)
+3. Click through entire user journey
+4. Verify every event fires correctly
+5. Check conversion funnels work end-to-end
+```
+
+**5. Preserve URL structure (or update goals):**
+```typescript
+// If URLs change, update GA4 conversion goals
+Old goal: /signup/complete
+New URL: /onboarding/complete
+
+→ Update GA4 conversion goal to match new URL
+→ OR: Add 301 redirect from /signup/complete to /onboarding/complete
+```
+
+**6. Deploy tracking first, design second:**
+```bash
+# Migration strategy:
+1. Add new tracking code to old design (test it works)
+2. Deploy redesign with same tracking code
+3. Verify tracking still works post-launch
+4. Compare metrics before/after
+```
+
+**Testing:**
+- Use Google Tag Assistant to verify all tags fire
+- Check GA4 Realtime view while clicking through new pages
+- Compare event counts week-before vs week-after launch (should be similar)
+- Test conversion funnels (sign-up flow should track end-to-end)
 
 **Detection:**
-- Log idempotency keys with every send attempt
-- Monitor Resend API responses for "idempotent request" indicators
-- Alert if scheduled send status = 'processing' for > 5 minutes
+- GA4 shows 0 events after launch (broken tracking)
+- Conversion rate drops to 0 (tracking broken, not actual conversions)
+- UTM parameters not showing up in campaign reports
+- Heatmaps show no data
 
-**Source:** [Resend Idempotency Keys](https://resend.com/docs/dashboard/emails/idempotency-keys), [Preventing duplicate emails with Idempotency Keys](https://www.linkedin.com/posts/zenorocha_how-do-you-prevent-duplicate-emails-the-activity-7331716190966362112-EGgm)
+**Source:** [Landing Page Optimization Best Practices 2026](https://prismic.io/blog/landing-page-optimization-best-practices), [A/B testing best practices](https://unbounce.com/conversion-rate-optimization/cro-case-studies/)
 
-**Phase to address:** Phase 1 (Database Schema & Core Processing Logic)
-
----
-
-### Pitfall 7: Monthly Quota Counting Confusion (Schedule Time vs Send Time)
-
-**What goes wrong:**
-When should a scheduled send count toward monthly quota?
-- Option A: At schedule time → user can't schedule more after hitting quota, but quota resets before send time (send fails or credits negative balance)
-- Option B: At send time → user can schedule unlimited sends, quota explodes when they all process
-- Option C: Decrement at schedule, refund on cancel → complex accounting, race conditions on quota checks
-
-**Example failure (Option B):**
-```
-User tier: basic (100 sends/month)
-Current usage: 95 sends
-User schedules: 50 sends for tomorrow
-Quota check at schedule time: 95 < 100 ✓ (allows scheduling)
-Tomorrow: Cron processes 50 scheduled sends
-Result: 145 total sends (45 over quota)
-```
-
-**Why it happens:**
-- No clear decision on quota reservation semantics
-- Immediate sends count at send time, scheduled sends follow same pattern blindly
-- Cancellation flow doesn't refund reserved quota
-
-**Consequences:**
-- Quota overruns → financial loss if provider charges overage
-- User frustration: "Why did it let me schedule if I don't have quota?"
-- Billing disputes
-
-**Prevention (Recommended: Reserve at schedule time):**
-```typescript
-// SCHEDULE TIME: Reserve quota
-const currentUsage = await getMonthlyCount(businessId)
-const scheduledPending = await getScheduledCount(businessId) // NEW
-const totalCommitted = currentUsage + scheduledPending
-
-if (totalCommitted + contactIds.length > monthlyLimit) {
-  return { error: 'Insufficient quota (includes pending scheduled sends)' }
-}
-
-// Create scheduled sends (counted in scheduledPending)
-await createScheduledSends(...)
-
-// SEND TIME: Convert reservation to actual usage
-await processSend(scheduledSend)
-// (send_log with status=sent now counted in currentUsage)
-
-// CANCELLATION: Free up reservation
-await cancelScheduledSend(id)
-// (no longer counted in scheduledPending)
-```
-
-**Alternative (Simpler: Count at send time with hard limit):**
-```typescript
-// Prevent over-scheduling with buffer
-const scheduledCount = await getScheduledCount(businessId)
-if (scheduledCount >= monthlyLimit * 0.5) {
-  return { error: 'Too many pending scheduled sends. Wait for some to process.' }
-}
-
-// At send time, fail gracefully if quota exceeded
-if (currentUsage >= monthlyLimit) {
-  await cancelScheduledSend(id, 'quota_exceeded_at_send_time')
-  continue
-}
-```
-
-**UX communication:**
-- Show "Available quota: 50 (includes 20 scheduled)" in UI
-- Warn user if scheduling will use >80% of remaining quota
-- Monthly summary email: "You have 10 scheduled sends pending"
-
-**Detection:**
-- Daily report: sum(sent) + sum(scheduled pending) per business
-- Alert if any business exceeds quota by >10%
-- Audit trail for quota adjustments
-
-**Source:** [Resend Rate Limits](https://resend.com/docs/api-reference/rate-limit), existing codebase analysis (lib/actions/send.ts lines 310-318)
-
-**Phase to address:** Phase 2 (Scheduling UI & User Timezone Handling)
+**Phase to address:** Phase 1 (Hero & Core Layout) + Phase 4 (Performance Optimization)
 
 ---
 
 ## UX Pitfalls
 
-Common user experience mistakes with scheduling features.
+User experience mistakes specific to creative landing page designs.
 
-### Pitfall 8: No Confirmation or Visibility After Scheduling
+### Pitfall 9: Mobile Experience as Afterthought
 
 **What goes wrong:**
-User schedules a send, sees success toast, then:
-- Can't find list of pending scheduled sends
-- Can't edit or cancel scheduled send
-- No reminder before send happens
-- No notification when send completes
-- Forgets they scheduled it, schedules again (duplicate)
+Creative landing pages designed desktop-first, then "made responsive" by:
+- Stacking desktop layout vertically (creates 10-screen-high mobile page)
+- Animations too complex for mobile (janky scrolling, battery drain)
+- Touch targets too small (buttons < 44px, hard to tap)
+- Hero images optimized for desktop (2MB image on 3G connection)
+- Horizontal scrolling sections that don't work well on mobile
+- Text too small or overlapping on small screens
 
 **Why it happens:**
-- Developers focus on backend processing, neglect UX
-- No "scheduled sends" dashboard or list view
-- No email confirmation of scheduling action
-- No pre-send reminder
+- Designers work on 27" monitors, test on iPhone 14 Pro (not representative)
+- "Mobile-first" lip service, desktop-first execution
+- Animations tested on M1 MacBook, not tested on Moto G Power
+- Desktop is "more impressive" for stakeholder demos
 
 **Consequences:**
-- User anxiety: "Did it work? When will it send?"
-- Support tickets: "How do I cancel a scheduled send?"
-- Duplicate sends (user forgets and re-schedules)
-- Lost trust in feature
+- 63% of Google search traffic is mobile—if mobile UX is bad, most traffic bounces
+- Local business owners search on mobile during lunch break ("I need review software NOW")
+- Poor mobile experience = lower Google rankings (mobile-first indexing)
+- Conversion rate on mobile 50-70% lower than desktop (should be 80-90%)
 
 **Prevention:**
-```typescript
-// 1. Immediate confirmation
-toast.success(`Scheduled ${count} emails for ${formatDate(scheduledFor)}`)
 
-// 2. Redirect to scheduled sends view
-router.push('/dashboard/scheduled-sends')
+**1. Design mobile-first (literally):**
+```
+Process:
+1. Design mobile layout first (320px-428px width)
+2. Validate it works well
+3. Then adapt to tablet (768px)
+4. Then adapt to desktop (1024px+)
 
-// 3. Show pending scheduled sends on dashboard
-<ScheduledSendsWidget>
-  <p>You have {pendingCount} emails scheduled</p>
-  <Link href="/dashboard/scheduled-sends">View & manage →</Link>
-</ScheduledSendsWidget>
-
-// 4. Email confirmation (optional but recommended)
-await sendConfirmationEmail({
-  to: user.email,
-  subject: 'Review request scheduled',
-  body: `You scheduled ${count} review requests for ${formatDate(scheduledFor)}.
-         View details: ${appUrl}/dashboard/scheduled-sends`
-})
-
-// 5. Pre-send reminder (optional, for high-value sends)
-// 1 hour before scheduled_for, send reminder email
+Don't:
+1. Design desktop
+2. "Make it responsive" by stacking everything
 ```
 
-**UI must-haves:**
-- `/dashboard/scheduled-sends` page with table of pending sends
-- Columns: scheduled_for, contact count, template, status, actions (cancel, edit)
-- Filter by date range, search by contact
-- Cancel button with confirmation dialog
-- Badge on sidebar navigation: "Scheduled (3)"
+**2. Mobile performance budget:**
+```
+- LCP: < 2.5s on 3G
+- JS bundle: < 150KB (mobile devices have slower CPUs)
+- Images: < 500KB total above fold
+- No horizontal scroll (ever)
+- No modals that cover entire screen (hard to dismiss)
+```
 
-**Source:** [Email Scheduling Not Working in Gmail](https://www.getinboxzero.com/blog/post/email-scheduling-not-working-gmail), [Cancel scheduled email implementation](https://help.salesforce.com/s/articleView?id=000384224&language=en_US&type=1)
+**3. Touch-friendly UI:**
+```typescript
+// Minimum touch target: 44x44px (Apple HIG)
+<Button className="min-h-[44px] min-w-[44px] px-6 py-3">
+  Start Free Trial
+</Button>
 
-**Phase to address:** Phase 3 (Scheduled Sends Management UI)
+// Spacing between tappable elements: 8px minimum
+<div className="flex flex-col gap-4">
+  <Button>Primary Action</Button>
+  <Link>Secondary Action</Link>
+</div>
+
+// Avoid hover-only interactions
+// BAD: Dropdown menu on hover (doesn't work on mobile)
+<nav>
+  <div className="group">
+    <button>Features</button>
+    <div className="hidden group-hover:block">
+      Submenu
+    </div>
+  </div>
+</nav>
+
+// GOOD: Click/tap to open
+<nav>
+  <button onClick={() => setMenuOpen(!menuOpen)}>
+    Features
+  </button>
+  {menuOpen && <div>Submenu</div>}
+</nav>
+```
+
+**4. Image optimization for mobile:**
+```typescript
+import Image from 'next/image'
+
+<Image
+  src="/hero-desktop.jpg"
+  alt="Dashboard"
+  width={1200}
+  height={800}
+  priority
+  // Serve smaller image on mobile
+  sizes="(max-width: 768px) 100vw, 1200px"
+/>
+
+// Or separate images
+<picture>
+  <source media="(max-width: 768px)" srcSet="/hero-mobile.webp" />
+  <source media="(min-width: 769px)" srcSet="/hero-desktop.webp" />
+  <img src="/hero-desktop.jpg" alt="Dashboard" />
+</picture>
+```
+
+**5. Test on real devices (not just Chrome DevTools):**
+```
+Required test devices:
+- iPhone SE (small screen, representative of budget iOS)
+- iPhone 14/15 (common iOS)
+- Moto G Power or Samsung Galaxy A series (budget Android, slow CPU)
+- iPad (tablet experience different from desktop AND mobile)
+
+Test conditions:
+- 3G throttling (not just "Fast 3G" in DevTools)
+- Low power mode (animations disabled)
+- Landscape orientation (especially for tablets)
+```
+
+**6. Mobile-specific UX patterns:**
+```typescript
+// Sticky CTA on mobile (always accessible)
+<div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t md:hidden">
+  <Button className="w-full">Start Free Trial</Button>
+</div>
+
+// Simplified navigation on mobile (hamburger menu)
+<nav className="md:flex hidden">
+  <Link href="/features">Features</Link>
+  <Link href="/pricing">Pricing</Link>
+</nav>
+<button className="md:hidden" onClick={() => setMenuOpen(true)}>
+  <MenuIcon />
+</button>
+
+// Shorter copy on mobile
+<h1 className="text-4xl md:text-6xl">
+  <span className="md:hidden">Get More Reviews</span>
+  <span className="hidden md:inline">Get More 5-Star Reviews for Your Business</span>
+</h1>
+```
+
+**Testing:**
+- BrowserStack or LambdaTest for real device testing
+- Lighthouse mobile audit (target 90+ performance)
+- Google Search Console: Mobile usability issues (should be 0)
+- Analytics: Compare mobile vs desktop conversion rate (should be 80-100% of desktop)
+
+**Detection:**
+- Google Search Console: Mobile usability errors
+- Analytics: High mobile bounce rate (>60% on mobile, <40% on desktop = mobile problem)
+- Session recordings: Users pinch-zooming (text too small)
+
+**Source:** [How to Create a Mobile Landing Page 2026](https://www.involve.me/blog/how-to-create-a-mobile-landing-page), [Best Practices for Using Animation in Mobile Web Design](https://blog.pixelfreestudio.com/best-practices-for-using-animation-in-mobile-web-design/)
+
+**Phase to address:** Phase 1 (Hero & Core Layout) + Phase 3 (Polish & Accessibility)
 
 ---
 
-### Pitfall 9: Confusing Timezone Display (See Pitfall 3 for technical details)
-
-**What goes wrong (UX angle):**
-User sees "Scheduled for 2026-01-28 17:00:00Z" and has to mentally convert to their timezone. Common UX mistakes:
-- Showing UTC times in UI ("What timezone is this?")
-- Showing relative times without absolute time ("in 3 hours" → user closes app → comes back → "in 2 hours" → "wait, when exactly?")
-- No timezone indicator next to time
-- No conversion tool or explanation
-
-**Why it happens:**
-- Developers comfortable with UTC forget users aren't
-- ISO 8601 timestamps displayed directly from database
-- No design spec for timezone UX
-
-**Consequences:**
-- User schedules for wrong time ("I thought 9am was in 9am UTC")
-- Support burden: "When will my email send?"
-- Negative reviews: "Confusing interface"
-
-**Prevention:**
-```typescript
-// GOOD: Show user's local time with timezone
-Scheduled for: Jan 28, 2026 at 9:00 AM PST
-
-// BETTER: Show relative + absolute
-Scheduled for: Tomorrow at 9:00 AM PST (in 18 hours)
-
-// BEST: Interactive, clear about timezone
-┌─────────────────────────────────────┐
-│ Schedule for                        │
-│ [Date picker: Jan 28, 2026]         │
-│ [Time picker: 09:00 AM]             │
-│ Timezone: [PST ▼] (GMT-8)          │
-│                                     │
-│ ⏰ Email will send in 18 hours     │
-│ (Jan 28, 2026 at 5:00 PM UTC)      │
-└─────────────────────────────────────┘
-```
-
-**Best practices:**
-- Always show timezone abbreviation (PST, PDT, EST) next to time
-- Detect user's timezone automatically (browser API)
-- Allow timezone override in user settings
-- Show "Scheduled for [local time] ([relative time])" in confirmation
-- Display UTC in dev tools / logs only, not user UI
-
-**Source:** [Time Picker UX Best Practices](https://www.eleken.co/blog-posts/time-picker-ux), [Designing A Time Zone Selection UX](https://smart-interface-design-patterns.com/articles/time-zone-selection-ux/)
-
-**Phase to address:** Phase 2 (Scheduling UI & User Timezone Handling)
-
----
-
-### Pitfall 10: Allowing Cancel Without Clear Expectations
+### Pitfall 10: Wrong Aesthetic for Target Audience
 
 **What goes wrong:**
-User cancels a scheduled send but:
-- Doesn't realize some emails already sent (batch started processing)
-- Expects refund of quota reservation (if quota is reserved at schedule time)
-- Cancels accidentally (no confirmation dialog)
-- Can't re-schedule same send after cancellation
+Creative landing page optimized for design awards, not for local business owners:
+- Trendy, edgy design (gradient meshes, brutalism, glassmorphism) when target audience wants trust/professionalism
+- Minimal design hiding critical information ("less is more" taken too far)
+- Tech-savvy language (API, webhooks, integrations) for non-tech audience
+- Abstract imagery instead of relatable business scenarios
+- B2B SaaS aesthetic (Stripe, Linear, Vercel) when targeting B2C service businesses
 
-**Why it happens:**
-- Cancel button is too easy to click
-- No explanation of what "cancel" means
-- Partial sends not communicated
-- Status transitions not clear
-
-**Consequences:**
-- User frustration: "I cancelled but it still sent!"
-- Support tickets
-- Quota accounting confusion
-
-**Prevention:**
-```typescript
-// UI: Cancel confirmation dialog
-<AlertDialog>
-  <AlertDialogTitle>Cancel scheduled send?</AlertDialogTitle>
-  <AlertDialogDescription>
-    This will cancel {remainingCount} pending emails.
-    {alreadySentCount > 0 && (
-      <p className="text-yellow-600">
-        Note: {alreadySentCount} emails have already been sent and cannot be cancelled.
-      </p>
-    )}
-    This action cannot be undone.
-  </AlertDialogDescription>
-  <AlertDialogAction onClick={handleCancel}>Cancel send</AlertDialogAction>
-</AlertDialog>
-
-// Backend: Handle partial sends
-if (scheduledSend.status === 'processing') {
-  return {
-    error: 'This send is currently processing. Some emails may have already been sent. Please wait for processing to complete.'
-  }
-}
-
-// Allow cancel only for 'pending' status
-if (scheduledSend.status === 'pending') {
-  await updateScheduledSend(id, {
-    status: 'cancelled',
-    cancelled_at: new Date().toISOString(),
-    cancelled_by: user.id
-  })
-}
+**Example mismatch:**
+```
+Target audience: 55-year-old dentist who's been practicing for 20 years
+Landing page aesthetic: Cyberpunk gradients, animated 3D shapes, "Web3-ready"
+Result: Dentist thinks "This isn't for me" and leaves
 ```
 
-**Status flow for cancellation:**
-- `pending` → `cancelled` (user action)
-- `processing` → cannot cancel (in progress)
-- `sent` / `failed` → cannot cancel (already completed)
+**Why it happens:**
+- Designers design for their peers (other designers), not customers
+- Agency portfolio priorities ("We need something that looks cool")
+- Copying trendy SaaS companies without understanding target market
+- No user research or customer interviews
+- Stakeholders approve based on "I like it" not "our customers will like it"
 
-**Source:** [Cancel a scheduled email implementation](https://help.salesforce.com/s/articleView?id=000384224&language=en_US&type=1), [Cancel a scheduled user-initiated Send](https://knowledge.hubspot.com/marketing-email/can-i-cancel-a-sent-or-scheduled-email-send-in-hubspot)
+**Consequences:**
+- Wrong audience self-selects in (tech enthusiasts) instead of target market (local business owners)
+- Target audience bounces ("This looks complicated")
+- Low conversion despite high traffic
+- Brand perception mismatch ("Are they serious? This looks like a toy")
 
-**Phase to address:** Phase 3 (Scheduled Sends Management UI)
+**Prevention:**
+
+**1. Research target audience design preferences:**
+```bash
+# Interview 10 local business owners:
+- Show them 5 different landing page styles (minimal, bold, traditional, modern, playful)
+- Ask: "Which of these would you trust with your business?"
+- Ask: "Which looks easiest to use?"
+- Ask: "Which looks professional?"
+
+# Common findings for local business owners:
+✅ Clear, straightforward design
+✅ Friendly but professional tone
+✅ Real photos of people (not stock photos or illustrations)
+✅ Trust signals (testimonials, ratings, "No credit card required")
+❌ Too minimal (looks incomplete)
+❌ Too flashy (looks like a scam)
+❌ Abstract concepts (looks confusing)
+```
+
+**2. Local business design principles:**
+```typescript
+// GOOD for local businesses:
+<Hero>
+  {/* Clear headline with outcome */}
+  <h1>Get More 5-Star Reviews for Your Dental Practice</h1>
+
+  {/* Relatable image: real business owner or product screenshot */}
+  <img src="/dentist-using-app.jpg" alt="Dr. Chen using AvisLoop on tablet" />
+
+  {/* Trust signals prominently displayed */}
+  <TrustBar>
+    <Star rating={4.8} reviews={247} />
+    <Badge>No credit card required</Badge>
+    <Badge>Cancel anytime</Badge>
+  </TrustBar>
+
+  {/* Simple, clear CTA */}
+  <Button size="lg">Start Getting Reviews Free</Button>
+</Hero>
+
+// BAD for local businesses:
+<Hero>
+  {/* Vague headline */}
+  <h1>Transform Your Digital Presence</h1>
+
+  {/* Abstract 3D animation */}
+  <Canvas3D />
+
+  {/* Technical jargon */}
+  <p>Leverage our omnichannel reputation management API</p>
+
+  {/* Clever but unclear CTA */}
+  <Button>Enter the Loop</Button>
+</Hero>
+```
+
+**3. Trust signals local businesses care about:**
+```typescript
+// Show these prominently:
+<TrustSignals>
+  {/* Specific number builds credibility */}
+  <Stat>2,847 local businesses trust AvisLoop</Stat>
+
+  {/* Real testimonial from relatable business */}
+  <Testimonial>
+    "I'm not tech-savvy, but AvisLoop was so easy to set up. Got 30 reviews in 2 weeks!"
+    — Dr. Sarah Chen, Oak Street Dental
+    <Image src="/sarah-headshot.jpg" /> {/* Real photo, not stock */}
+  </Testimonial>
+
+  {/* Reduce risk */}
+  <Badge>Free 14-day trial</Badge>
+  <Badge>No credit card required</Badge>
+  <Badge>Cancel anytime</Badge>
+  <Badge>Setup takes 5 minutes</Badge>
+
+  {/* Social proof */}
+  <Stars rating={4.8} count={247} />
+  <Logos>
+    <img src="/google-partner.png" alt="Google Partner" />
+  </Logos>
+</TrustSignals>
+
+// NOT relevant for local businesses:
+❌ SOC 2 Type II Compliance badge
+❌ Y Combinator logo
+❌ "Used by 500+ enterprise companies"
+❌ "99.99% uptime SLA"
+```
+
+**4. Language and tone:**
+```
+Target: Local business owner (busy, not tech-savvy, skeptical of "too good to be true")
+
+GOOD tone:
+- Conversational but professional
+- "You" language (not "we" or "our platform")
+- Concrete benefits (not abstract value propositions)
+- Simple words (not jargon)
+
+Examples:
+✅ "Send review requests to your customers in 2 clicks"
+❌ "Leverage our omnichannel customer engagement platform"
+
+✅ "Get more 5-star reviews on Google"
+❌ "Amplify your online reputation with social proof optimization"
+
+✅ "No tech skills needed—if you can send an email, you can use AvisLoop"
+❌ "Intuitive UI/UX with low-code/no-code customization"
+```
+
+**5. Visual style guide for local businesses:**
+```css
+/* Colors: Professional but approachable */
+Primary: Blue (trust, reliability)
+Accent: Lime (energy, growth) or Coral (friendly, approachable)
+Avoid: Purple/pink (too playful), black/red (too aggressive)
+
+/* Typography: Readable, not trendy */
+Headings: Sans-serif, 600 weight (not 900 black or 200 thin)
+Body: 16px minimum (not 14px), line-height 1.6
+Avoid: Condensed fonts, script fonts, all-caps paragraphs
+
+/* Imagery: Real, not abstract */
+✅ Real business owners using the product
+✅ Product screenshots with real data
+✅ Simple icons for features
+❌ Abstract 3D shapes
+❌ Generic stock photos (diverse-team-high-fiving)
+❌ Illustrations (unless very simple and clear)
+
+/* Layout: Clear hierarchy */
+✅ Clear sections with headings
+✅ Whitespace (but not excessive)
+✅ Linear flow (hero → features → pricing → CTA)
+❌ Overlapping sections
+❌ Horizontal scroll carousels
+❌ Hidden content behind interactions
+```
+
+**Testing:**
+- User testing with 5-10 target audience members (not designers or developers)
+- Ask: "Who is this product for?" (should say "local businesses like mine")
+- Ask: "Do you trust this company?" (should say yes or maybe, not no)
+- Ask: "Does this look easy to use?" (should say yes)
+- Track conversion rate by audience segment (are local business owners converting at target rate?)
+
+**Detection:**
+- Analytics: Low conversion despite high traffic (aesthetic problem)
+- User feedback: "This looks complicated" or "Is this for me?"
+- Wrong audience converting (enterprise companies, not local businesses)
+
+**Source:** [Local service websites that convert](https://www.housecallpro.com/resources/best-plumbing-websites/), [30 Best General Contractor Websites](https://comradeweb.com/blog/top-best-contractor-websites/), [A dark landing page won our A/B test](https://searchengineland.com/landing-page-best-practices-wrong-465988)
+
+**Phase to address:** Phase 1 (Hero & Core Layout)
 
 ---
 
 ## Operational Pitfalls
 
-Deployment, monitoring, and reliability issues specific to cron-based scheduling.
+Deployment and migration issues specific to landing page redesigns.
 
-### Pitfall 11: Vercel Cron Silently Failing Without Monitoring
+### Pitfall 11: No Rollback Plan or A/B Test Strategy
 
 **What goes wrong:**
-Vercel Cron runs every minute but:
-- Cron endpoint returns 500 error → Vercel retries, but scheduled sends don't process
-- Database connection timeout → cron exits early, partial batch processed
-- Deployment during cron execution → cron terminates mid-batch
-- Vercel Cron disabled accidentally (plan downgrade, billing issue) → no sends
+Redesign deployed as a full replacement of old landing page with no way to:
+- Roll back if conversion rate drops
+- A/B test new vs old design
+- Gradually roll out to percentage of traffic
+- Compare metrics side-by-side
+
+Result: Redesign hurts conversion, but you're locked in (can't roll back) and can't prove it (no A/B test data).
 
 **Why it happens:**
-- Cron failures are silent (no user to report error)
-- Developers don't set up monitoring for cron jobs
-- Vercel Cron has no built-in alerting
-- Logs buried in Vercel dashboard
+- "Big bang" deployment ("Let's just launch it")
+- No feature flags or A/B testing infrastructure
+- Stakeholder pressure to "ship the redesign" ASAP
+- Overconfidence ("The new design is obviously better")
+- No baseline metrics captured before launch
 
 **Consequences:**
-- Scheduled sends stuck in `pending` forever
-- Users think emails sent but they didn't
-- SLA violations (if promised "send within 5 minutes of scheduled time")
-- Reputation damage
+- Conversion rate drops 20-30%, can't roll back quickly
+- Weeks of panic trying to figure out what's wrong
+- No data to justify reverting or keeping new design
+- Lost revenue during the uncertainty period
+- Team morale damage ("Was the redesign a mistake?")
 
 **Prevention:**
+
+**1. A/B test deployment strategy:**
 ```typescript
-// 1. Cron endpoint returns structured logs
-export async function GET(request: Request) {
-  const startTime = Date.now()
-  let processedCount = 0
-  let errorCount = 0
+// Use feature flags (Vercel Edge Config, LaunchDarkly, Unleash)
+import { getEdgeConfig } from '@vercel/edge-config'
 
-  try {
-    const result = await processScheduledSends()
-    processedCount = result.processedCount
-    errorCount = result.errorCount
+export default async function LandingPage() {
+  const edgeConfig = await getEdgeConfig()
+  const newDesignEnabled = edgeConfig.get('new_landing_page_enabled')
 
-    // Log success metrics
-    console.log(JSON.stringify({
-      type: 'cron_success',
-      duration_ms: Date.now() - startTime,
-      processed: processedCount,
-      errors: errorCount,
-      timestamp: new Date().toISOString()
-    }))
+  // Roll out to 10% of traffic first
+  const userBucket = Math.random()
+  const showNewDesign = newDesignEnabled && userBucket < 0.1
 
-    return NextResponse.json({ success: true, processedCount, errorCount })
-  } catch (error) {
-    // Log failure
-    console.error(JSON.stringify({
-      type: 'cron_failure',
-      duration_ms: Date.now() - startTime,
-      error: error.message,
-      timestamp: new Date().toISOString()
-    }))
-
-    // Alert external service (e.g., Sentry, Axiom, BetterStack)
-    await sendAlert({
-      severity: 'critical',
-      message: `Cron failed: ${error.message}`,
-      context: { processedCount, errorCount }
-    })
-
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+  if (showNewDesign) {
+    return <NewLandingPage />
   }
-}
 
-// 2. Dead letter queue for stuck sends
-// Every hour, check for scheduled sends older than 10 minutes past scheduled_for
-const stuckSends = await db
-  .select()
-  .from(scheduled_sends)
-  .where(
-    and(
-      eq(scheduled_sends.status, 'pending'),
-      lt(scheduled_sends.scheduled_for, new Date(Date.now() - 10 * 60 * 1000))
-    )
-  )
-
-if (stuckSends.length > 0) {
-  await sendAlert({
-    severity: 'high',
-    message: `${stuckSends.length} scheduled sends are stuck (overdue by >10 min)`,
-  })
-}
-
-// 3. Health check endpoint
-// GET /api/health/scheduled-sends
-// Returns: oldest pending send, queue depth, last cron run time
-export async function GET() {
-  const lastCronRun = await getLastCronRunTime() // from logs or dedicated table
-  const pendingCount = await getScheduledSendsCount({ status: 'pending' })
-  const oldestPending = await getOldestScheduledSend({ status: 'pending' })
-
-  const isHealthy = (
-    lastCronRun && Date.now() - lastCronRun.getTime() < 2 * 60 * 1000 && // Ran in last 2 min
-    (!oldestPending || oldestPending.scheduled_for > new Date(Date.now() - 10 * 60 * 1000)) // No sends overdue >10min
-  )
-
-  return NextResponse.json({
-    healthy: isHealthy,
-    lastCronRun,
-    pendingCount,
-    oldestPendingScheduledFor: oldestPending?.scheduled_for
-  })
+  return <OldLandingPage />
 }
 ```
 
-**External monitoring:**
-- Vercel Cron logs → Axiom/Datadog/Logtail
-- BetterStack cron monitoring (ping endpoint after successful run)
-- Sentry for error tracking
-- Uptime monitoring on health check endpoint (alert if unhealthy)
+**2. Gradual rollout plan:**
+```bash
+# Week 1: 10% of traffic (monitor closely)
+- Check conversion rate hourly
+- Compare to baseline (same day last week)
+- Watch for errors, performance issues
 
-**Detection:**
-- Alert if cron doesn't run for >5 minutes
-- Alert if >10 scheduled sends are overdue
-- Alert if cron error rate >5%
-- Daily summary: cron executions, avg duration, error count
+# Week 2: If metrics good, 50% of traffic
+- Let it run for full week
+- Compare weekly conversion rate
 
-**Source:** [How to Monitor Cron Jobs in 2026](https://dev.to/cronmonitor/how-to-monitor-cron-jobs-in-2026-a-complete-guide-28g9), [Our complete cron job guide for 2026](https://uptimerobot.com/knowledge-hub/cron-monitoring/cron-job-guide/)
+# Week 3: If still good, 100% of traffic
+- Monitor for another week
+- Keep old design code for 2 more weeks (easy rollback)
 
-**Phase to address:** Phase 4 (Monitoring & Reliability)
-
----
-
-### Pitfall 12: Resend Rate Limit Exhaustion During Batch Processing
-
-**What goes wrong:**
-Resend API has default limit of 2 requests/second. Cron processes 25 scheduled sends in a loop:
-```typescript
-for (const send of scheduledSends) {
-  await resend.emails.send(...) // 25 API calls in rapid succession
-}
+# Only delete old design after 1 month of validated improvement
 ```
-After 2nd send, rate limit kicks in → 429 errors → sends fail
 
-**Why it happens:**
-- Batch processing doesn't respect provider rate limits
-- No delay between API calls
-- Resend's 2/second limit not documented prominently
-- Works fine in dev (low volume) but breaks in production
+**3. Baseline metrics capture BEFORE launch:**
+```bash
+# Document current performance (2 weeks before launch):
+- Landing page conversion rate: 3.2%
+- Bounce rate: 42%
+- Avg time on page: 1:45
+- Mobile conversion rate: 2.8%
+- Core Web Vitals: LCP 2.1s, CLS 0.08, INP 150ms
+- Organic traffic: 1,200 visits/day
+- Sign-ups: 38/day
 
-**Consequences:**
-- Scheduled sends fail with 429 errors
-- Quota wasted (counted at schedule time but send fails)
-- User frustration: "Why didn't my scheduled send work?"
-- Need manual retry
+# Set success criteria:
+- Conversion rate: > 3.2% (maintain or improve)
+- Core Web Vitals: LCP < 2.5s, CLS < 0.1
+- Bounce rate: < 45%
+- If any metric degrades >10%, investigate immediately
+```
 
-**Prevention:**
+**4. Instant rollback mechanism:**
 ```typescript
-// Option 1: Simple delay between sends
-for (const send of scheduledSends) {
-  await processSend(send)
-  await new Promise(resolve => setTimeout(resolve, 500)) // 500ms = 2/sec max
-}
+// Vercel Environment Variable toggle (instant rollback)
+const USE_NEW_DESIGN = process.env.NEXT_PUBLIC_NEW_LANDING_PAGE === 'true'
 
-// Option 2: Rate-limited queue (better for production)
-import pLimit from 'p-limit'
-
-const limit = pLimit(2) // 2 concurrent requests max
-
-const promises = scheduledSends.map(send =>
-  limit(() => processSend(send))
-)
-
-await Promise.all(promises)
-
-// Option 3: Exponential backoff on 429
-async function processSendWithRetry(send, retries = 3) {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const result = await resend.emails.send(...)
-      return result
-    } catch (error) {
-      if (error.status === 429 && i < retries - 1) {
-        const delay = Math.pow(2, i) * 1000 // 1s, 2s, 4s
-        await new Promise(resolve => setTimeout(resolve, delay))
-        continue
-      }
-      throw error
-    }
+export default function Home() {
+  if (USE_NEW_DESIGN) {
+    return <NewLandingPage />
   }
-}
-```
-
-**Configuration:**
-- Monitor Resend rate limit headers: `X-RateLimit-Remaining`, `X-RateLimit-Reset`
-- Contact Resend support to increase rate limits (available on paid plans)
-- Adjust cron batch size based on rate limit (2/sec * 60sec = 120 max per minute)
-
-**Detection:**
-- Log all 429 errors with context (send_id, timestamp)
-- Alert if 429 error rate >1% of sends
-- Track Resend rate limit headers in logs
-
-**Source:** [Resend Rate Limits](https://resend.com/docs/api-reference/rate-limit), [Mastering Email Rate Limits with Resend API](https://dalenguyen.medium.com/mastering-email-rate-limits-a-deep-dive-into-resend-api-and-cloud-run-debugging-f1b97c995904)
-
-**Phase to address:** Phase 1 (Database Schema & Core Processing Logic)
-
----
-
-### Pitfall 13: No Graceful Degradation for Partial Batch Failures
-
-**What goes wrong:**
-Cron processes batch of 25 scheduled sends:
-- Sends 1-10: success
-- Send 11: Resend API timeout
-- Sends 12-25: never processed (loop breaks)
-
-Users 12-25 never get their scheduled sends, but system shows status = `processing` forever.
-
-**Why it happens:**
-- Batch processing loop exits on first error
-- No try-catch around individual send
-- All-or-nothing transaction logic
-
-**Consequences:**
-- Partial sends lost
-- Status inconsistency (some `sent`, some stuck in `processing`)
-- Manual intervention required
-
-**Prevention:**
-```typescript
-// Process each send independently with error handling
-const results = await Promise.allSettled(
-  scheduledSends.map(async (send) => {
-    try {
-      // Update status to 'processing' with row-level lock
-      await updateScheduledSend(send.id, { status: 'processing' })
-
-      // Re-validate business rules
-      const validation = await validateSendEligibility(send)
-      if (!validation.canSend) {
-        await updateScheduledSend(send.id, {
-          status: 'cancelled',
-          cancel_reason: validation.reason
-        })
-        return { success: false, reason: validation.reason }
-      }
-
-      // Process send
-      const result = await processSend(send)
-
-      // Update status based on result
-      await updateScheduledSend(send.id, {
-        status: result.success ? 'sent' : 'failed',
-        error_message: result.error || null,
-        sent_at: result.success ? new Date().toISOString() : null
-      })
-
-      return { success: result.success }
-    } catch (error) {
-      // Mark as failed, don't block other sends
-      await updateScheduledSend(send.id, {
-        status: 'failed',
-        error_message: error.message
-      })
-
-      console.error(`Failed to process scheduled send ${send.id}:`, error)
-      return { success: false, error: error.message }
-    }
-  })
-)
-
-// Log summary
-const successful = results.filter(r => r.status === 'fulfilled' && r.value.success).length
-const failed = results.filter(r => r.status === 'rejected' || !r.value.success).length
-
-console.log(JSON.stringify({
-  type: 'batch_complete',
-  total: scheduledSends.length,
-  successful,
-  failed,
-  timestamp: new Date().toISOString()
-}))
-```
-
-**Retry logic for failed sends:**
-```sql
--- Track retry attempts
-ALTER TABLE scheduled_sends
-ADD COLUMN retry_count INTEGER DEFAULT 0,
-ADD COLUMN last_retry_at TIMESTAMPTZ;
-
--- Exponential backoff for retries
--- Retry failed sends: immediately, +5min, +30min, then give up
-```
-
-**Detection:**
-- Alert if failure rate >10% in a batch
-- Daily report: scheduled sends by status (pending, processing, sent, failed, cancelled)
-- Audit sends stuck in `processing` for >5 minutes
-
-**Source:** [Cron Jobs vs Real Task Schedulers](https://dev.to/elvissautet/cron-jobs-vs-real-task-schedulers-a-love-story-1fka), [Managing Distributed Cron Jobs in NestJS](https://medium.com/geekfarmer/managing-distributed-cron-jobs-in-nestjs-from-basic-to-production-ready-solutions-7caed0cc14cf)
-
-**Phase to address:** Phase 1 (Database Schema & Core Processing Logic)
-
----
-
-### Pitfall 14: No Visibility Into Processing State During Cron Execution
-
-**What goes wrong:**
-User schedules 50 emails. Cron starts processing. User opens dashboard and sees:
-- Status: "pending" (hasn't updated yet)
-- Or status: "processing" (but no progress indicator)
-- Or status: "sent" (but which ones? how many? when?)
-
-No way to tell:
-- How many have been sent so far
-- Which contacts succeeded/failed
-- When processing will complete
-
-**Why it happens:**
-- Status is binary (pending/processing/sent)
-- No progress tracking
-- No detailed results stored
-
-**Consequences:**
-- User anxiety: "Is it working?"
-- Support tickets: "What happened to my scheduled send?"
-- No debugging data when things go wrong
-
-**Prevention:**
-```sql
--- Add progress tracking to scheduled_sends
-ALTER TABLE scheduled_sends
-ADD COLUMN total_contacts INTEGER NOT NULL DEFAULT 0,
-ADD COLUMN sent_count INTEGER NOT NULL DEFAULT 0,
-ADD COLUMN failed_count INTEGER NOT NULL DEFAULT 0,
-ADD COLUMN cancelled_count INTEGER NOT NULL DEFAULT 0,
-ADD COLUMN processing_started_at TIMESTAMPTZ,
-ADD COLUMN processing_completed_at TIMESTAMPTZ;
-
--- Link individual sends to scheduled_send
-ALTER TABLE send_logs
-ADD COLUMN scheduled_send_id UUID REFERENCES scheduled_sends(id) ON DELETE SET NULL;
-```
-
-```typescript
-// Update progress after each send
-async function processSend(scheduledSend, contact) {
-  const result = await sendEmail(contact)
-
-  // Create send_log
-  await createSendLog({
-    ...emailData,
-    scheduled_send_id: scheduledSend.id,
-    status: result.success ? 'sent' : 'failed'
-  })
-
-  // Increment counter
-  await db
-    .update(scheduled_sends)
-    .set({
-      sent_count: sql`sent_count + 1`,
-      failed_count: result.success ? sql`failed_count` : sql`failed_count + 1`
-    })
-    .where(eq(scheduled_sends.id, scheduledSend.id))
+  return <OldLandingPage />
 }
 
-// UI: Show progress
-<ScheduledSendRow>
-  <span>Scheduled for {formatDate(send.scheduled_for)}</span>
-  <Progress
-    value={(send.sent_count + send.failed_count) / send.total_contacts * 100}
-  />
-  <span>{send.sent_count} / {send.total_contacts} sent</span>
-  {send.failed_count > 0 && (
-    <Badge variant="destructive">{send.failed_count} failed</Badge>
-  )}
-</ScheduledSendRow>
+// Rollback: Change env var in Vercel dashboard, redeploy takes 30 seconds
 ```
 
-**Real-time updates (optional):**
-- Polling: Refetch scheduled sends every 5 seconds while status = 'processing'
-- Supabase Realtime: Subscribe to scheduled_sends updates
-- WebSockets: Push progress updates from cron to frontend
+**5. Statistical significance calculator:**
+```bash
+# Don't make decisions on 1 day of data
+# Need statistical significance (usually 1-2 weeks, 100+ conversions per variant)
 
-**Source:** UX best practices, existing codebase pattern (batch send results in lib/actions/send.ts lines 500-530)
+Tool: https://abtestguide.com/calc/
+Input:
+- Variant A (old): 1000 visitors, 32 conversions (3.2%)
+- Variant B (new): 1000 visitors, 38 conversions (3.8%)
+Output: 85% confidence (not significant yet, need more data)
 
-**Phase to address:** Phase 3 (Scheduled Sends Management UI)
+Wait until 95%+ confidence before making decision
+```
+
+**6. Document decision criteria:**
+```markdown
+# Launch Decision Criteria
+
+GO decision (keep new design):
+- Conversion rate ≥ 3.2% (maintain or improve)
+- Core Web Vitals pass (LCP < 2.5s, CLS < 0.1, INP < 200ms)
+- No increase in error rate
+- Mobile conversion rate ≥ 2.8%
+- Qualitative feedback neutral or positive
+
+NO-GO decision (rollback):
+- Conversion rate < 2.9% (>10% drop)
+- Any Core Web Vital fails by >20%
+- Error rate increases >5%
+- Mobile conversion rate < 2.5%
+- Significant negative user feedback
+
+INVESTIGATE decision (need more data):
+- Any metric in between GO and NO-GO ranges
+```
+
+**Testing:**
+- Dry-run: Practice rollback procedure in staging before launch
+- Feature flag test: Toggle new design on/off, ensure seamless switch
+- Monitoring: Set up Vercel Analytics dashboard to compare variants
+
+**Detection:**
+- Real-time monitoring on launch day (Vercel Analytics, Google Analytics)
+- Slack alerts if conversion rate drops >10% from baseline
+- Daily summary email comparing new vs old design metrics
+
+**Source:** [How Landing Page Optimization Affects Conversion Rates](https://www.workshopdigital.com/blog/how-landing-page-optimization-affects-conversion-rates/), [12 real CRO case studies](https://unbounce.com/conversion-rate-optimization/cro-case-studies/)
+
+**Phase to address:** Phase 4 (Performance Optimization) + Phase 5 (Launch & Monitoring)
 
 ---
 
@@ -1045,106 +1559,151 @@ async function processSend(scheduledSend, contact) {
 
 | Pitfall | Severity | Phase to Address | Detection Method |
 |---------|----------|------------------|------------------|
-| 1. Duplicate sends (race conditions) | CRITICAL | Phase 1 | Monitor provider_id duplicates |
-| 2. Service role key exposure | CRITICAL | Phase 1 | Track 401s on cron endpoint |
-| 3. Timezone confusion | CRITICAL | Phase 2 | User reports, DST testing |
-| 4. Business rule re-validation | CRITICAL | Phase 1 | Opt-out audit, cancellation tracking |
-| 5. Inconsistent validation (immediate vs scheduled) | HIGH | Phase 1 | Integration tests, code review |
-| 6. Idempotency key conflicts | HIGH | Phase 1 | Log key usage, monitor Resend responses |
-| 7. Quota counting confusion | HIGH | Phase 2 | Daily quota audit |
-| 8. No confirmation/visibility | MEDIUM | Phase 3 | User feedback, support tickets |
-| 9. Confusing timezone display | MEDIUM | Phase 2 | User feedback |
-| 10. Cancel expectations unclear | MEDIUM | Phase 3 | Support tickets |
-| 11. Silent cron failures | CRITICAL | Phase 4 | External monitoring, health checks |
-| 12. Resend rate limit exhaustion | HIGH | Phase 1 | Track 429 errors |
-| 13. No graceful degradation | HIGH | Phase 1 | Track batch failure rates |
-| 14. No processing visibility | MEDIUM | Phase 3 | User feedback |
+| 1. Multiple CTAs creating confusion | HIGH | Phase 1 | A/B test, heatmaps |
+| 2. Animation-driven performance degradation | CRITICAL | Phase 1, 4 | Lighthouse, Vercel Analytics |
+| 3. Dark mode breaking visual effects | HIGH | Phase 1, 3 | Manual QA, contrast checker |
+| 4. Being clever at expense of clarity | CRITICAL | Phase 1 | User testing, bounce rate |
+| 5. SEO regression during redesign | CRITICAL | Phase 1, 4 | Search Console, rankings |
+| 6. Hydration mismatch with animations | MEDIUM | Phase 2 | Console errors, Sentry |
+| 7. Inconsistent design language | MEDIUM | Phase 1, 5 | User feedback, visual QA |
+| 8. Analytics tracking breaks | HIGH | Phase 1, 4 | GA4 DebugView, event counts |
+| 9. Mobile experience as afterthought | CRITICAL | Phase 1, 3 | Real device testing, bounce rate |
+| 10. Wrong aesthetic for target audience | HIGH | Phase 1 | User testing, conversion rate |
+| 11. No rollback plan or A/B test | HIGH | Phase 4, 5 | Conversion rate tracking |
 
 ---
 
 ## Phase-Specific Warnings
 
-### Phase 1: Database Schema & Core Processing Logic
+### Phase 1: Hero & Core Layout
 **High-risk areas:**
-- Race conditions in cron processor (Pitfall 1)
-- Service role authentication (Pitfall 2)
-- Business rule re-validation (Pitfall 4)
-- Idempotency key design (Pitfall 6)
-- Rate limit handling (Pitfall 12)
-- Error handling in batch processing (Pitfall 13)
+- CTA placement and hierarchy (Pitfall 1)
+- Hero animation performance (Pitfall 2)
+- Dark mode implementation (Pitfall 3)
+- Copy clarity and value proposition (Pitfall 4)
+- SEO-critical elements (H1, meta, structured data) (Pitfall 5)
+- Target audience aesthetic fit (Pitfall 10)
+- Mobile-first design (Pitfall 9)
 
 **Mitigation:**
-- Use `FOR UPDATE SKIP LOCKED` in SQL
-- Implement cron secret validation before any processing
-- Extract shared validation functions
-- Document idempotency key format
-- Implement rate limiting with delays or queues
-- Use `Promise.allSettled` for batch processing
+- Single primary CTA per section, repeated consistently
+- CSS-only animations with transform/opacity, reserve space to prevent CLS
+- Design in dark mode simultaneously, use semantic color tokens
+- User-test headline with 5 target customers before building
+- Preserve SEO elements from old design, use Server Components
+- Interview target audience about design preferences
+- Design mobile layout first, then scale up
 
-### Phase 2: Scheduling UI & User Timezone Handling
+### Phase 2: Features & Interactive Elements
 **High-risk areas:**
-- Timezone storage vs display (Pitfall 3)
-- Quota reservation logic (Pitfall 7)
-- Confusing timezone UX (Pitfall 9)
+- Scroll-triggered animations causing hydration mismatch (Pitfall 6)
+- Additional sections maintaining mobile UX (Pitfall 9)
 
 **Mitigation:**
-- Store UTC, display local with timezone abbreviation
-- Decide on quota reservation strategy upfront
-- Show relative + absolute times in UI
-- Test DST boundary dates
+- Use 'use client' for animation components, avoid dynamic CSS values
+- Test all interactive elements on real mobile devices
+- Implement IntersectionObserver for lazy-loading animations
 
-### Phase 3: Scheduled Sends Management UI
+### Phase 3: Polish & Accessibility
 **High-risk areas:**
-- No visibility after scheduling (Pitfall 8)
-- Cancel expectations (Pitfall 10)
-- Processing state visibility (Pitfall 14)
+- Dark mode edge cases (Pitfall 3)
+- Mobile touch targets and typography (Pitfall 9)
+- Accessibility violations (contrast, keyboard nav)
 
 **Mitigation:**
-- Build dedicated /dashboard/scheduled-sends page
-- Show progress bars for processing sends
-- Require confirmation for cancellation
-- Link to send_logs for detailed results
+- Run axe DevTools audit for both light and dark modes
+- Test with screen reader (VoiceOver/NVDA)
+- Ensure all touch targets ≥ 44px
+- Implement prefers-reduced-motion
 
-### Phase 4: Monitoring & Reliability
+### Phase 4: Performance Optimization
 **High-risk areas:**
-- Silent cron failures (Pitfall 11)
+- Core Web Vitals degradation (Pitfall 2)
+- SEO crawling and indexing (Pitfall 5)
+- Analytics tracking verification (Pitfall 8)
+- A/B testing infrastructure (Pitfall 11)
 
 **Mitigation:**
-- Implement structured logging in cron endpoint
-- Set up external monitoring (BetterStack, Sentry)
-- Create health check endpoint
-- Alert on stuck sends (overdue >10 min)
-- Daily summary reports
+- Run Lighthouse CI, block merge if LCP > 2.5s or CLS > 0.1
+- Test with JavaScript disabled (curl), verify SSR works
+- Test all analytics events in staging before launch
+- Set up feature flags for gradual rollout
+
+### Phase 5: Sign-up Flow Alignment + Launch
+**High-risk areas:**
+- Design inconsistency at conversion point (Pitfall 7)
+- Rollback plan and monitoring (Pitfall 11)
+
+**Mitigation:**
+- Update sign-up page to match new landing page aesthetic
+- Deploy with feature flag (10% → 50% → 100%)
+- Monitor conversion rate hourly on launch day
+- Have instant rollback procedure documented and tested
 
 ---
 
 ## Open Questions for Roadmap Planning
 
-1. **Quota reservation strategy:** Count at schedule time or send time? (Recommend: schedule time with reservation)
-2. **Retry policy:** How many retries for failed sends? (Recommend: 3 retries with exponential backoff)
-3. **Batch size:** How many scheduled sends to process per cron tick? (Recommend: 25, limited by Resend rate limit)
-4. **User timezone:** Store in user profile or auto-detect? (Recommend: auto-detect with override option)
-5. **Monitoring:** Which external service for cron monitoring? (Options: BetterStack, Axiom, Sentry)
+1. **A/B testing infrastructure:** Do we have feature flags set up? (Recommend: Vercel Edge Config)
+2. **Performance budget:** What's acceptable LCP/CLS? (Recommend: LCP < 2.5s, CLS < 0.1)
+3. **Mobile test devices:** What devices should we test on? (Recommend: iPhone SE, Moto G Power)
+4. **Rollout strategy:** Big bang or gradual? (Recommend: 10% → 50% → 100% over 3 weeks)
+5. **User testing:** Can we interview 5-10 local business owners for feedback? (Recommend: Yes, before Phase 1)
+6. **Design system:** Will we update app design to match, or keep landing page separate? (Recommend: Update sign-up flow + onboarding, gradually update app)
 
 ---
 
 ## Sources
 
-- [Braze Race Conditions](https://www.braze.com/docs/user_guide/engagement_tools/testing/race_conditions)
-- [Supabase RLS service role cron job security](https://github.com/orgs/supabase/discussions/23136)
-- [Secure Supabase Service Role Key](https://chat2db.ai/resources/blog/secure-supabase-role-key)
-- [Resend Idempotency Keys](https://resend.com/docs/dashboard/emails/idempotency-keys)
-- [Preventing duplicate emails with Idempotency Keys](https://www.linkedin.com/posts/zenorocha_how-do-you-prevent-duplicate-emails-the-activity-7331716190966362112-EGgm)
-- [Resend Rate Limits](https://resend.com/docs/api-reference/rate-limit)
-- [Mastering Email Rate Limits with Resend API](https://dalenguyen.medium.com/mastering-email-rate-limits-a-deep-dive-into-resend-api-and-cloud-run-debugging-f1b97c995904)
-- [Handling Timezones within Enterprise-Level Applications](https://medium.com/@20011002nimeth/handling-timezones-within-enterprise-level-applications-utc-vs-local-time-309cbe438eaf)
-- [Time Picker UX Best Practices](https://www.eleken.co/blog-posts/time-picker-ux)
-- [Designing A Time Zone Selection UX](https://smart-interface-design-patterns.com/articles/time-zone-selection-ux/)
-- [How to Monitor Cron Jobs in 2026](https://dev.to/cronmonitor/how-to-monitor-cron-jobs-in-2026-a-complete-guide-28g9)
-- [Our complete cron job guide for 2026](https://uptimerobot.com/knowledge-hub/cron-monitoring/cron-job-guide/)
-- [Cron Jobs vs Real Task Schedulers](https://dev.to/elvissautet/cron-jobs-vs-real-task-schedulers-a-love-story-1fka)
-- [Managing Distributed Cron Jobs in NestJS](https://medium.com/geekfarmer/managing-distributed-cron-jobs-in-nestjs-from-basic-to-production-ready-solutions-7caed0cc14cf)
-- [Cancel a scheduled email implementation](https://help.salesforce.com/s/articleView?id=000384224&language=en_US&type=1)
-- [Cancel a scheduled user-initiated Send](https://knowledge.hubspot.com/marketing-email/can-i-cancel-a-sent-or-scheduled-email-send-in-hubspot)
-- [Common Email Scheduling Mistakes](https://woodpecker.co/blog/how-to-schedule-an-email/)
-- [Email Scheduling Not Working in Gmail](https://www.getinboxzero.com/blog/post/email-scheduling-not-working-gmail)
+### Conversion & Marketing
+- [How to Skyrocket Your SaaS Website Conversions in 2026](https://www.webstacks.com/blog/website-conversions-for-saas-businesses)
+- [27 best SaaS landing page examples](https://unbounce.com/conversion-rate-optimization/the-state-of-saas-landing-pages/)
+- [Average SaaS Conversion Rates: 2026 Report](https://firstpagesage.com/seo-blog/average-saas-conversion-rates/)
+- [Boring, unsexy, incredibly effective landing pages](https://www.poweredbysearch.com/blog/landing-page-conversion-rate/)
+- [100+ Landing Page Statistics 2026](https://www.involve.me/blog/landing-page-statistics)
+- [A dark landing page won our A/B test](https://searchengineland.com/landing-page-best-practices-wrong-465988)
+- [12 real CRO case studies & examples](https://unbounce.com/conversion-rate-optimization/cro-case-studies/)
+
+### Performance & Core Web Vitals
+- [Core Web Vitals 2026: INP ≤200ms or Else](https://www.neoseo.co.uk/core-web-vitals-2026/)
+- [CSS for Web Vitals](https://web.dev/articles/css-web-vitals)
+- [Mastering Core Web Vitals - CLS](https://www.rumvision.com/blog/mastering-core-web-vitals-cumulative-layout-shift-cls/)
+- [7 Best Practices for Improving Landing Page Performance](https://www.debugbear.com/blog/improving-landing-page-performance)
+- [Stop the Wait: Developer's Guide to Smashing LCP in Next.js](https://medium.com/@iamsandeshjain/stop-the-wait-a-developers-guide-to-smashing-lcp-in-next-js-634e2963f4c7)
+- [Optimizing Core Web Vitals in 2024](https://vercel.com/kb/guide/optimizing-core-web-vitals-in-2024)
+- [How to Improve Core Web Vitals in Next.js](https://www.jigz.dev/blogs/how-to-improve-core-web-vitals-lcp-inp-cls-in-next-js-for-top-performance)
+
+### Local Business & Trust Signals
+- [The Best Small Business Website Design Options In 2026](https://www.thesmallbusinessexpo.com/blog/small-business-website-design-2026/)
+- [Local Landing Page Templates & High Converting Service Pages](https://www.getpassionfruit.com/blog/local-service-pages-that-convert)
+- [Trust Signals: A Key to Consistent Page Conversions](https://lineardesign.com/blog/trust-signals/)
+- [15 Amazing Plumbing Websites in 2026](https://www.plumbingwebmasters.com/plumbing-websites/)
+- [30 Best General Contractor Websites](https://comradeweb.com/blog/top-best-contractor-websites/)
+- [Local SEO for Dentists 2026](https://www.novaadvertising.com/local-seo-for-dentists/)
+
+### Dark Mode & Accessibility
+- [Dark Mode Design Best Practices in 2026](https://www.tech-rz.com/blog/dark-mode-design-best-practices-in-2026/)
+- [Why dark mode causes more accessibility issues than it solves](https://medium.com/@h_locke/why-dark-mode-causes-more-accessibility-issues-than-it-solves-54cddf6466f5)
+- [10 Dark Mode UI Best Practices](https://www.designstudiouiux.com/blog/dark-mode-ui-design-best-practices/)
+- [How to Design Accessible Dark Mode Interfaces](https://medium.com/@tundehercules/designing-effective-dark-mode-interfaces-17f38ecea2e9)
+
+### Mobile & Animation
+- [How to Create a Mobile Landing Page 2026](https://www.involve.me/blog/how-to-create-a-mobile-landing-page)
+- [Best Practices for Using Animation in Mobile Web Design](https://blog.pixelfreestudio.com/best-practices-for-using-animation-in-mobile-web-design/)
+- [How to Optimize Motion Design for Mobile Performance](https://blog.pixelfreestudio.com/how-to-optimize-motion-design-for-mobile-performance/)
+
+### SEO & Technical
+- [Website Redesign For SEO Guide 2026](https://moswebdesign.com/articles/website-redesign-for-seo/)
+- [Website Redesign SEO: Minimize Negative Impact](https://intigress.com/blog/seo/website-redesign-seo)
+- [Top SEO Mistakes That Hurt Rankings in 2026](https://webdesignerindia.medium.com/seo-mistakes-that-kill-rankings-2026-6f4fd03b2a6f)
+
+### Next.js & Hydration
+- [Fixing Hydration Errors in Next.js](https://dev.to/georgemeka/hydration-error-4n0k)
+- [Fixing Scroll Animation and Hydration Mismatch in Next.js](https://dev.to/ri_ki_251ca3db361b527f552/umemura-farm-website-devlog-34-fixing-scroll-animation-and-hydration-mismatch-in-nextjs-mla)
+- [The Ultimate Guide to Hydration Errors in Next.js](https://medium.com/@skarka90/the-ultimate-guide-to-hydration-and-hydration-errors-in-next-js-ae9b4bc74ee2)
+
+### CTA & Design Strategy
+- [The Best CTA Placement Strategies For 2026](https://www.landingpageflow.com/post/best-cta-placement-strategies-for-landing-pages)
+- [10 CTA Button Best Practices for Landing Pages](https://bitly.com/blog/cta-button-best-practices-for-landing-pages/)
+- [SaaS Website Redesign Guide](https://www.ideapeel.com/blogs/saas-website-redesign)
+- [Top B2B SaaS Website Examples 2026](https://www.vezadigital.com/post/best-b2b-saas-websites-2026)

@@ -1,906 +1,876 @@
-# Architecture Research: Scheduled Sending
+# Architecture Patterns for Creative Landing Page
 
-**Project:** AvisLoop Review SaaS
-**Domain:** Scheduled email sending via Vercel Cron
-**Researched:** 2026-01-28
-**Overall confidence:** HIGH
+**Domain:** Marketing landing page redesign for SaaS review request platform
+**Researched:** 2026-02-01
+**Confidence:** HIGH
 
 ## Executive Summary
 
-Scheduled sending integrates cleanly with the existing Next.js + Supabase + Resend architecture through:
-1. A `scheduled_sends` table (already exists in codebase) for storing future send jobs
-2. A Vercel Cron route handler (`/api/cron/process-scheduled-sends`) that runs every minute
-3. A service role Supabase client that bypasses RLS for cron processing
-4. Reuse of existing `batchSendReviewRequest` logic with extracted core send function
-5. Row-level locking (`SELECT FOR UPDATE SKIP LOCKED`) for safe concurrent execution
+The new creative landing page should integrate into the existing Next.js App Router architecture using a **progressive enhancement strategy** with clear Server/Client Component boundaries. The recommended approach is a **hybrid architecture** that preserves existing infrastructure (layout, navbar, footer) while replacing page.tsx and its section components with new, animation-rich versions.
 
-The architecture is straightforward because most infrastructure already exists: email sending, rate limiting, quota checks, and send logging are all implemented. Scheduled sending adds a queue layer (scheduled_sends table) and a background processor (cron job).
+**Key architectural decision:** Replace, don't refactor. The existing components are simple enough that creating new versions alongside the old ones minimizes risk and allows for easy rollback.
 
-## System Design
+## Existing Architecture Analysis
 
-### High-Level Flow
+### Current State (Working Well)
 
 ```
-User schedules send → scheduled_sends row (status: pending)
-                          ↓
-Cron runs every minute → SELECT pending sends due now (with row lock)
-                          ↓
-For each scheduled send → Extract contacts, check eligibility
-                          ↓
-Call core send logic → Create send_logs, send via Resend
-                          ↓
-Update scheduled_sends → status: completed/failed/partial
+app/(marketing)/
+├── layout.tsx              # Sticky nav + footer (KEEP)
+├── page.tsx                # Section composition (REPLACE)
+└── pricing/
+    └── page.tsx            # Pricing table (KEEP for now)
+
+components/
+├── marketing/              # Section components (REPLACE most)
+│   ├── hero.tsx
+│   ├── social-proof.tsx
+│   ├── features.tsx
+│   ├── stats-section.tsx
+│   ├── testimonials.tsx
+│   ├── faq-section.tsx
+│   ├── cta-section.tsx
+│   ├── user-menu.tsx       # (KEEP - shared with app)
+│   ├── mobile-nav.tsx      # (KEEP - shared with app)
+│   └── pricing-table.tsx   # (KEEP - used on /pricing)
+└── ui/                     # Design system (KEEP + EXTEND)
+    ├── button.tsx
+    ├── card.tsx
+    ├── badge.tsx
+    ├── geometric-marker.tsx
+    └── ...
+
+Design tokens:
+├── app/globals.css         # CSS variables (EXTEND)
+└── tailwind.config.ts      # Theme config (EXTEND)
 ```
 
-### Integration Points with Existing Architecture
+### What Works Well
 
-| Existing Component | How Scheduled Sending Uses It |
-|-------------------|-------------------------------|
-| **lib/actions/send.ts** | Extract core email sending logic (render template, call Resend, update send_log, update contact) into reusable function |
-| **lib/data/send-logs.ts** | Reuse `getMonthlyCount`, `getResendReadyContacts` for quota checks |
-| **lib/email/resend.ts** | Same Resend client and templates |
-| **lib/supabase/server.ts** | Create separate service role client for cron (bypasses RLS) |
-| **send_logs table** | Same logging mechanism, same status tracking |
-| **contacts table** | Same cooldown logic, same eligibility checks |
-| **businesses table** | Same tier/quota enforcement |
+1. **Clean route group structure** - `(marketing)` isolates marketing from app
+2. **Server Component default** - Fast initial load, good SEO
+3. **Shared layout** - Navbar/footer consistent across pages
+4. **Design system in place** - UI components, theme tokens, dark mode ready
+5. **Metadata API usage** - Proper SEO setup with OpenGraph
+6. **Progressive enhancement** - `prefers-reduced-motion` respected
 
-### Database Schema
+### Integration Points to Preserve
 
-The `scheduled_sends` table structure (from existing lib/actions/schedule.ts):
+| Component | Why Keep | Used By |
+|-----------|----------|---------|
+| `layout.tsx` | Auth state, nav, footer | All marketing pages |
+| `user-menu.tsx` | Server Component with auth | Navbar |
+| `mobile-nav.tsx` | Client Component, works | Navbar |
+| `pricing-table.tsx` | Used on `/pricing` page | Pricing page |
+| `ui/*` components | Design system foundation | Entire app |
+| Theme system | CSS variables, dark mode | Entire app |
 
-```sql
-CREATE TABLE scheduled_sends (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
-  contact_ids UUID[] NOT NULL,  -- Array of contact UUIDs
-  template_id UUID REFERENCES email_templates(id) ON DELETE SET NULL,
-  custom_subject TEXT,
-  scheduled_for TIMESTAMPTZ NOT NULL,
-  status TEXT NOT NULL DEFAULT 'pending',
-  processed_at TIMESTAMPTZ,
-  sent_count INT DEFAULT 0,
-  failed_count INT DEFAULT 0,
-  skipped_count INT DEFAULT 0,
-  error_message TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  CONSTRAINT scheduled_sends_status_valid CHECK (
-    status IN ('pending', 'processing', 'completed', 'failed', 'cancelled', 'partial')
+## Recommended Architecture for Creative Landing Page
+
+### Strategy: Side-by-Side Replacement
+
+Create new landing page in parallel, then swap atomically.
+
+```
+app/(marketing)/
+├── layout.tsx                    # UNCHANGED
+├── page.tsx                      # REPLACE with new composition
+├── _page-v1.tsx.backup          # Backup of old version
+└── pricing/page.tsx              # UNCHANGED (for now)
+
+components/marketing/
+├── v2/                           # NEW directory for redesign
+│   ├── hero-v2.tsx              # Creative hero with animations
+│   ├── problem-section.tsx      # New storytelling section
+│   ├── solution-section.tsx     # Animated solution showcase
+│   ├── features-grid.tsx        # Interactive feature grid
+│   ├── social-proof-v2.tsx      # Enhanced social proof
+│   ├── testimonials-v2.tsx      # Animated testimonials
+│   ├── faq-v2.tsx               # Improved FAQ
+│   └── cta-v2.tsx               # Final conversion section
+├── [old components]              # KEEP until migration complete
+└── user-menu.tsx                 # UNCHANGED
+
+components/ui/
+├── [existing]                    # UNCHANGED
+└── animated/                     # NEW - animation primitives
+    ├── fade-in.tsx              # Scroll-triggered fade
+    ├── slide-in.tsx             # Directional slide
+    ├── stagger-children.tsx     # Stagger container
+    └── parallax-section.tsx     # Parallax wrapper
+```
+
+### Component Architecture Pattern
+
+#### Pattern 1: Server Component Wrapper + Client Animation Child
+
+**For sections with simple interactivity:**
+
+```tsx
+// components/marketing/v2/hero-v2.tsx (Server Component)
+import { HeroContent } from './hero-content'
+import { getLatestStats } from '@/lib/data' // Server-side data fetch
+
+export async function HeroV2() {
+  const stats = await getLatestStats() // Server fetch
+
+  return (
+    <section className="relative overflow-hidden py-20">
+      <HeroContent stats={stats} /> {/* Client Component */}
+    </section>
   )
-);
-
--- Index for cron query (critical for performance)
-CREATE INDEX idx_scheduled_sends_due
-  ON scheduled_sends (scheduled_for, status)
-  WHERE status = 'pending';
-```
-
-**Why this schema works:**
-- `contact_ids` as array avoids join complexity during cron processing
-- `status` field prevents duplicate processing
-- `scheduled_for` + `status` index makes "find due sends" query fast
-- Counts (`sent_count`, `failed_count`, `skipped_count`) provide detailed results
-- `processed_at` tracks actual execution time vs scheduled time
-
-## New Components
-
-### 1. Service Role Supabase Client
-
-**File:** `lib/supabase/service-role.ts` (new)
-
-**Purpose:** Bypass RLS for cron job processing
-
-**Implementation:**
-```typescript
-import { createClient } from '@supabase/supabase-js'
-
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-  throw new Error('NEXT_PUBLIC_SUPABASE_URL is required')
-}
-if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-  throw new Error('SUPABASE_SERVICE_ROLE_KEY is required')
 }
 
-/**
- * Service role client - bypasses RLS.
- * Use ONLY in server-side code (cron jobs, admin operations).
- * NEVER expose this client to the browser.
- */
-export function createServiceRoleClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY,
-    {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-        detectSessionInUrl: false,
-      },
-    }
+// components/marketing/v2/hero-content.tsx (Client Component)
+'use client'
+import { motion } from 'framer-motion'
+
+export function HeroContent({ stats }: { stats: Stats }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+    >
+      {/* Animated content */}
+    </motion.div>
   )
 }
 ```
-
-**Source confidence:** HIGH - [Supabase official docs](https://github.com/orgs/supabase/discussions/30739), [Adrian Murage guide](https://adrianmurage.com/posts/supabase-service-role-secret-key/)
-
-**Critical notes:**
-- Service role key **completely bypasses all RLS policies**
-- Must use `@supabase/supabase-js` directly, NOT `@supabase/ssr` (SSR package requires cookies)
-- Disable session persistence (not needed for service operations)
-- Authorization header determines role, not the API key parameter
-
-### 2. Vercel Cron Route Handler
-
-**File:** `app/api/cron/process-scheduled-sends/route.ts` (new)
-
-**Purpose:** Background job that processes due scheduled sends
-
-**Implementation:**
-```typescript
-import { NextRequest, NextResponse } from 'next/server'
-import { createServiceRoleClient } from '@/lib/supabase/service-role'
-import { processDueScheduledSends } from '@/lib/scheduled-sends/processor'
-
-/**
- * Vercel Cron handler - processes scheduled sends that are due.
- * Runs every minute (configured in vercel.json).
- *
- * Security: Protected by CRON_SECRET environment variable.
- */
-export async function GET(request: NextRequest) {
-  // 1. Verify cron secret (security)
-  const authHeader = request.headers.get('authorization')
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  // 2. Process due sends
-  const supabase = createServiceRoleClient()
-  const results = await processDueScheduledSends(supabase)
-
-  // 3. Return results
-  return NextResponse.json(results)
-}
-```
-
-**Configuration:** `vercel.json` (root)
-```json
-{
-  "crons": [
-    {
-      "path": "/api/cron/process-scheduled-sends",
-      "schedule": "* * * * *"
-    }
-  ]
-}
-```
-
-**Source confidence:** HIGH - [Vercel official docs](https://vercel.com/docs/cron-jobs), [CodingCat.dev security guide](https://codingcat.dev/post/how-to-secure-vercel-cron-job-routes-in-next-js-14-app-router)
-
-**Critical notes:**
-- Cron schedule syntax: `* * * * *` = every minute (minute, hour, day of month, month, day of week)
-- `CRON_SECRET` must be set in Vercel environment variables
-- Vercel automatically sends `Authorization: Bearer ${CRON_SECRET}` header
-- Cron jobs **only run on production** (not preview or local)
-- Standard serverless timeout applies (10s hobby, 60s pro)
-
-### 3. Scheduled Send Processor
-
-**File:** `lib/scheduled-sends/processor.ts` (new)
-
-**Purpose:** Core logic for fetching due sends, processing them, updating status
-
-**Implementation pattern:**
-```typescript
-export async function processDueScheduledSends(
-  supabase: ReturnType<typeof createServiceRoleClient>
-) {
-  // 1. Find due sends with row locking
-  const dueSends = await fetchDueSendsWithLock(supabase)
-
-  // 2. Process each send
-  const results = []
-  for (const scheduledSend of dueSends) {
-    const result = await processScheduledSend(supabase, scheduledSend)
-    results.push(result)
-  }
-
-  return { processed: results.length, results }
-}
-
-async function fetchDueSendsWithLock(supabase) {
-  // CRITICAL: Use SELECT FOR UPDATE SKIP LOCKED for concurrency safety
-  const { data, error } = await supabase
-    .rpc('fetch_due_scheduled_sends_with_lock', { batch_size: 10 })
-
-  return data || []
-}
-```
-
-**Database function for row locking:**
-```sql
-CREATE OR REPLACE FUNCTION fetch_due_scheduled_sends_with_lock(batch_size INT)
-RETURNS SETOF scheduled_sends
-LANGUAGE plpgsql
-AS $$
-BEGIN
-  RETURN QUERY
-  UPDATE scheduled_sends
-  SET status = 'processing'
-  WHERE id IN (
-    SELECT id
-    FROM scheduled_sends
-    WHERE status = 'pending'
-      AND scheduled_for <= NOW()
-    ORDER BY scheduled_for ASC
-    LIMIT batch_size
-    FOR UPDATE SKIP LOCKED
-  )
-  RETURNING *;
-END;
-$$;
-```
-
-**Source confidence:** HIGH - [The Unreasonable Effectiveness of SKIP LOCKED](https://www.inferable.ai/blog/posts/postgres-skip-locked), [Netdata SKIP LOCKED guide](https://www.netdata.cloud/academy/update-skip-locked/)
 
 **Why this pattern:**
-- `SELECT FOR UPDATE SKIP LOCKED` prevents multiple cron invocations from processing the same send
-- Atomic `UPDATE` + `RETURNING` pattern ensures we lock and claim sends in one query
-- `SKIP LOCKED` means if another cron instance is processing a row, we skip it (no waiting, no deadlocks)
-- Setting status to 'processing' immediately prevents duplicate work
-
-### 4. Core Send Function (extracted)
-
-**File:** `lib/scheduled-sends/core-send.ts` (new, extracted from existing send.ts)
-
-**Purpose:** Reusable send logic for both immediate and scheduled sends
-
-**What to extract from `batchSendReviewRequest`:**
-- Contact eligibility checks (cooldown, opt-out, archived)
-- Template fetching and subject resolution
-- Email rendering (ReviewRequestEmail component)
-- Resend API call with idempotency key
-- send_log creation and status updates
-- Contact tracking field updates (last_sent_at, send_count)
-
-**Signature:**
-```typescript
-export async function sendToContact(params: {
-  supabase: SupabaseClient
-  business: { id: string; name: string; google_review_link: string; default_sender_name: string }
-  contact: { id: string; name: string; email: string }
-  template?: { subject: string; body: string }
-  customSubject?: string
-}): Promise<{
-  status: 'sent' | 'failed' | 'skipped'
-  reason?: string
-  sendLogId?: string
-}>
-```
-
-**Why extract:**
-- Avoid duplicating 200+ lines of send logic
-- Single source of truth for email sending rules
-- Easier to test and maintain
-- Same behavior for immediate and scheduled sends
-
-## Modified Components
-
-### 1. lib/actions/send.ts
-
-**Changes:**
-- Extract core send logic into `lib/scheduled-sends/core-send.ts`
-- Refactor `sendReviewRequest` and `batchSendReviewRequest` to use extracted function
-- Keep all existing validation, rate limiting, and auth logic
-- No breaking changes to existing API
-
-**Affected functions:**
-- `sendReviewRequest`: Call `sendToContact` for single send
-- `batchSendReviewRequest`: Call `sendToContact` in loop
-
-### 2. lib/actions/schedule.ts
-
-**Changes:**
-- Already exists with basic CRUD operations
-- Add helper function to check if scheduled send can be cancelled
-- Add function to get scheduled send details for UI
-
-**Current implementation review:**
-- `scheduleReviewRequest`: Creates scheduled_sends row ✓
-- `cancelScheduledSend`: Updates status to cancelled ✓
-- `getScheduledSends`: Fetches user's scheduled sends ✓
-- Missing: Get single scheduled send with contact details (needed for edit UI)
-
-### 3. Database Migrations
-
-**New migration file:** `supabase/migrations/0000X_add_scheduled_sends.sql`
-
-**What to add:**
-- `scheduled_sends` table (schema above)
-- RLS policies for scheduled_sends (user can only see/modify their business's scheduled sends)
-- `fetch_due_scheduled_sends_with_lock` function
-- Index on `(scheduled_for, status)` for cron query performance
-- Trigger for `updated_at` timestamp
-
-**RLS policies needed:**
-```sql
--- Users can view their business's scheduled sends
-CREATE POLICY "Users view own scheduled_sends"
-  ON scheduled_sends FOR SELECT
-  TO authenticated
-  USING (business_id IN (
-    SELECT id FROM businesses WHERE user_id = auth.uid()
-  ));
-
--- Users can insert for their business
-CREATE POLICY "Users insert own scheduled_sends"
-  ON scheduled_sends FOR INSERT
-  TO authenticated
-  WITH CHECK (business_id IN (
-    SELECT id FROM businesses WHERE user_id = auth.uid()
-  ));
-
--- Users can update their business's sends (for cancellation)
-CREATE POLICY "Users update own scheduled_sends"
-  ON scheduled_sends FOR UPDATE
-  TO authenticated
-  USING (business_id IN (
-    SELECT id FROM businesses WHERE user_id = auth.uid()
-  ));
-```
-
-**Note:** Service role client bypasses all these policies, which is needed for cron processing.
-
-## Data Flow
-
-### User Schedules Send (UI Flow)
-
-```
-1. User: Select contacts + template + date/time
-   ↓
-2. Client: POST to scheduleReviewRequest server action
-   ↓
-3. Server: Validate inputs
-   - Check auth (user session)
-   - Validate contact IDs (belong to user's business)
-   - Validate scheduled_for (must be future)
-   - Validate template (belongs to user's business)
-   ↓
-4. Server: Insert scheduled_sends row
-   - business_id (from user's business)
-   - contact_ids (array of UUIDs)
-   - template_id / custom_subject
-   - scheduled_for (timestamptz)
-   - status: 'pending'
-   ↓
-5. Server: Return success + scheduled_send_id
-   ↓
-6. Client: Redirect to /scheduled, show confirmation
-```
-
-### Cron Processes Send (Background Flow)
-
-```
-1. Vercel: Trigger cron every minute
-   ↓
-2. Cron Route: Verify CRON_SECRET
-   ↓
-3. Cron Route: Call processDueScheduledSends(serviceRoleClient)
-   ↓
-4. Processor: Find due sends with row lock
-   - SELECT ... WHERE status='pending' AND scheduled_for <= NOW()
-   - FOR UPDATE SKIP LOCKED (prevents duplicate processing)
-   - UPDATE status='processing' immediately
-   - LIMIT 10 (batch size to stay under serverless timeout)
-   ↓
-5. For each scheduled send:
-   a. Fetch business details (name, google_review_link, tier)
-   b. Check monthly quota (same logic as immediate send)
-   c. Fetch all contacts in contact_ids array
-   d. Categorize: eligible vs skipped (cooldown, opt-out, archived)
-   e. For each eligible contact:
-      - Call sendToContact(supabase, business, contact, template)
-      - Creates send_log (status: pending -> sent/failed)
-      - Sends email via Resend with idempotency key
-      - Updates contact tracking (last_sent_at, send_count)
-   f. Update scheduled_sends row:
-      - status: 'completed' (all succeeded) / 'failed' (all failed) / 'partial' (mixed)
-      - sent_count, failed_count, skipped_count
-      - processed_at: NOW()
-      - error_message (if any)
-   ↓
-6. Processor: Return results summary
-   ↓
-7. Cron Route: Return 200 OK with results JSON
-```
-
-### User Views Send History
-
-```
-1. User: Navigate to /dashboard/send/history or /scheduled
-   ↓
-2. Server Component: Fetch data
-   - send_logs (for immediate sends)
-   - scheduled_sends (for scheduled sends)
-   - Join with contacts for display names
-   ↓
-3. Client: Render unified timeline
-   - "Sent to John Doe on 2026-01-28" (immediate)
-   - "Scheduled: Send to 5 contacts on 2026-02-01 at 10:00 AM" (scheduled, pending)
-   - "Completed: Sent to 4 of 5 contacts on 2026-02-01" (scheduled, completed)
-```
-
-## Concurrency & Safety
-
-### Problem: Multiple Cron Invocations
-
-**Scenario:** Cron runs every minute. If processing takes >60s, two cron jobs could run simultaneously.
-
-**Risk:** Without locking, both could:
-- Select the same scheduled send
-- Process the same contacts
-- Send duplicate emails
-
-### Solution 1: Row-Level Locking (Recommended)
-
-**Pattern:** `SELECT FOR UPDATE SKIP LOCKED`
-
-**How it works:**
-1. Cron A starts, runs query with `FOR UPDATE SKIP LOCKED`
-2. Postgres locks selected rows for Cron A
-3. Cron B starts 60s later, runs same query
-4. Postgres sees rows are locked by Cron A
-5. `SKIP LOCKED` makes Cron B skip those rows, select different ones
-6. Both crons process different sends, no duplicates
-
-**Implementation:**
-```sql
--- Inside processor function
-SELECT * FROM scheduled_sends
-WHERE status = 'pending'
-  AND scheduled_for <= NOW()
-ORDER BY scheduled_for ASC
-LIMIT 10
-FOR UPDATE SKIP LOCKED;
-
--- Immediately update status to claim them
-UPDATE scheduled_sends
-SET status = 'processing'
-WHERE id IN (selected_ids);
-```
-
-**Performance notes:**
-- Index on `(status, scheduled_for)` is critical for query speed
-- `SKIP LOCKED` adds negligible overhead
-- Composite index allows Postgres to use index-only scan
-
-**Source confidence:** HIGH - [The Unreasonable Effectiveness of SKIP LOCKED](https://www.inferable.ai/blog/posts/postgres-skip-locked), [Solid Queue analysis](https://www.bigbinary.com/blog/solid-queue)
-
-### Solution 2: Batch Size Limiting
-
-**Pattern:** Process max 10 sends per cron invocation
-
-**Why:**
-- Vercel serverless timeout: 10s (hobby) / 60s (pro)
-- Each send takes ~200ms (render + Resend API)
-- 10 sends * 10 contacts each * 200ms = ~20s (safe margin)
-
-**Implementation:**
-```typescript
-const BATCH_SIZE = 10
-
-const dueSends = await supabase
-  .from('scheduled_sends')
-  .select('*')
-  .eq('status', 'pending')
-  .lte('scheduled_for', new Date().toISOString())
-  .order('scheduled_for', { ascending: true })
-  .limit(BATCH_SIZE)
-```
-
-**Why this helps concurrency:**
-- If 100 sends are due, each cron processes 10
-- Multiple crons can run concurrently on different batches
-- No single cron monopolizes all work
-
-### Solution 3: Idempotency Keys (Defense in Depth)
-
-**Pattern:** Resend idempotency keys already implemented
-
-**Existing code (from send.ts line 183):**
-```typescript
-const { data: emailData, error: emailError } = await resend.emails.send(
-  { /* ... */ },
-  { idempotencyKey: `send-${sendLog.id}` }
-)
-```
-
-**Why this matters:**
-- If cron runs twice on same send (bug in locking logic)
-- Resend deduplicates based on idempotency key
-- No duplicate emails sent (Resend's API guarantee)
-
-**Current idempotency key format:** `send-${sendLog.id}`
-
-**Works because:**
-- Each send_log has unique ID
-- If we try to resend, Resend recognizes the key
-- Returns cached response, doesn't send duplicate
-
-**Source confidence:** HIGH - Resend's API documentation guarantees idempotency
-
-### Solution 4: Status Transitions
-
-**Pattern:** State machine for scheduled_sends.status
-
-**Valid transitions:**
-```
-pending -> processing -> completed
-pending -> processing -> failed
-pending -> processing -> partial
-pending -> cancelled (user action only)
-```
-
-**Why this matters:**
-- Once status changes from 'pending', cron query won't select it
-- Even if row locking fails, status check prevents reprocessing
-- Status acts as second line of defense
-
-**Implementation:**
-```sql
--- Cron query only selects 'pending'
-WHERE status = 'pending'
-
--- Processing immediately updates status
-UPDATE scheduled_sends
-SET status = 'processing'
-WHERE id = ?
-```
-
-### Combined Safety Architecture
-
-**Defense in depth:**
-1. Row locking prevents concurrent selection (primary defense)
-2. Status field prevents reprocessing (secondary defense)
-3. Batch size limits timeout risk (operational safety)
-4. Idempotency keys prevent duplicate emails (tertiary defense)
-
-**Failure modes:**
-- Row locking fails → Status check catches it
-- Status update fails → Idempotency keys catch duplicate sends
-- Timeout occurs → Batch size keeps it manageable, next cron picks up remaining
-
-## Build Order
-
-Suggested implementation sequence based on dependencies:
-
-### Phase 1: Core Infrastructure (3-4 tasks)
-
-1. **Database migration** (`supabase/migrations/`)
-   - Create `scheduled_sends` table
-   - Add RLS policies
-   - Create `fetch_due_scheduled_sends_with_lock` function
-   - Add indexes
-   - Run migration locally and test schema
-
-2. **Service role client** (`lib/supabase/service-role.ts`)
-   - Create service role Supabase client
-   - Add environment variable validation
-   - Test bypass of RLS (create test script)
-
-3. **Extract core send logic** (`lib/scheduled-sends/core-send.ts`)
-   - Extract contact eligibility checks from `batchSendReviewRequest`
-   - Extract email rendering logic
-   - Extract Resend API call logic
-   - Extract send_log CRUD
-   - Add comprehensive JSDoc
-   - Create unit tests (optional but recommended)
-
-4. **Refactor existing send actions** (`lib/actions/send.ts`)
-   - Update `sendReviewRequest` to use `sendToContact`
-   - Update `batchSendReviewRequest` to use `sendToContact`
-   - Verify no breaking changes (existing tests should pass)
-
-### Phase 2: Scheduled Send Processing (2-3 tasks)
-
-5. **Processor implementation** (`lib/scheduled-sends/processor.ts`)
-   - Implement `fetchDueSendsWithLock`
-   - Implement `processScheduledSend`
-   - Implement `processDueScheduledSends` (orchestrator)
-   - Add error handling and logging
-   - Test locally with mock Supabase data
-
-6. **Cron route handler** (`app/api/cron/process-scheduled-sends/route.ts`)
-   - Create GET handler with CRON_SECRET validation
-   - Call processor with service role client
-   - Return results JSON
-   - Add error handling and structured logging
-
-7. **Vercel cron configuration** (`vercel.json`)
-   - Add cron job configuration
-   - Set schedule to `* * * * *` (every minute)
-   - Deploy to Vercel (staging first)
-   - Verify cron runs in Vercel logs
-
-### Phase 3: User Interface (2-3 tasks)
-
-8. **Schedule action enhancement** (`lib/actions/schedule.ts`)
-   - Already exists, minimal changes needed
-   - Add function to get single scheduled send with details
-   - Add validation helpers
-
-9. **Scheduled sends UI** (`app/dashboard/scheduled/`)
-   - Create page component (Server Component)
-   - Display scheduled sends with status badges
-   - Add cancel button with confirmation
-   - Show contact count and scheduled time
-   - Add empty state
-
-10. **Integration with send flow** (`app/dashboard/send/`)
-    - Add "Schedule for later" option to contact selector
-    - Add date/time picker component
-    - Update preview to show schedule info
-    - Submit to `scheduleReviewRequest` instead of `batchSendReviewRequest`
-
-### Phase 4: Polish & Testing (1-2 tasks)
-
-11. **Send history unified view** (optional)
-    - Combine immediate and scheduled sends in timeline
-    - Add filter tabs: All / Immediate / Scheduled
-    - Show detailed results for completed scheduled sends
-
-12. **Testing & monitoring**
-    - Test full flow: schedule → cron processes → verify send_logs
-    - Test concurrency: schedule multiple sends for same time
-    - Test edge cases: cancelled send, expired send, quota exceeded
-    - Monitor Vercel cron logs for errors
-    - Set up alerts for failed cron runs (optional)
-
-### Critical Path
-
-**Minimum viable implementation:**
-- Phase 1 tasks 1-4 (core infrastructure)
-- Phase 2 tasks 5-7 (cron processing)
-- Phase 3 task 8 only (schedule action)
-
-**This enables:**
-- Scheduling sends programmatically (via server action)
-- Background processing via cron
-- No UI needed initially (can schedule via API/testing)
-
-**Full feature:**
-- All phases (1-4)
-- User-facing scheduling interface
-- Cancellation and history views
-
-### Estimated Effort
-
-Based on existing codebase maturity and component reuse:
-
-| Phase | Tasks | Complexity | Estimated Hours |
-|-------|-------|------------|-----------------|
-| Phase 1 | 4 | Medium | 4-6 hours |
-| Phase 2 | 3 | Medium-High | 4-6 hours |
-| Phase 3 | 3 | Low-Medium | 3-4 hours |
-| Phase 4 | 2 | Low | 2-3 hours |
-| **Total** | **12** | - | **13-19 hours** |
-
-**Why relatively fast:**
-- Email sending logic already exists (80% reusable)
-- Database patterns established (RLS, migrations)
-- UI components exist (can reuse contact selector, templates)
-- Resend integration working (just call same functions)
-
-**Key risks:**
-- Vercel cron testing requires production deploy (can't test locally)
-- Row locking function needs careful SQL testing
-- Service role client setup could have env var issues
-
-### Testing Strategy
-
-**Per phase:**
-
-1. **Phase 1:**
-   - Run migration locally: `supabase db reset`
-   - Test RLS policies: Create scheduled send via anon client, verify via service role
-   - Test core send function: Mock Supabase, verify send_log created
-
-2. **Phase 2:**
-   - Test processor locally: Seed scheduled_sends table, run processor, verify status updates
-   - Test cron route: Use curl with Bearer token, verify 401 without, 200 with
-   - Test in Vercel staging: Deploy, schedule send for 2 minutes ahead, watch logs
-
-3. **Phase 3:**
-   - Test schedule action: Use form, verify scheduled_sends row created
-   - Test UI rendering: Verify scheduled sends display correctly
-   - Test cancellation: Cancel pending send, verify status update
-
-4. **Phase 4:**
-   - Test end-to-end: Schedule → Wait for cron → Verify send_logs created
-   - Test concurrency: Schedule 20 sends for same time, verify no duplicates
-   - Test edge cases: Cancel mid-processing, quota exceeded, invalid contacts
-
-## Performance Considerations
-
-### Database Query Optimization
-
-**Critical index for cron query:**
-```sql
-CREATE INDEX idx_scheduled_sends_due
-  ON scheduled_sends (scheduled_for, status)
-  WHERE status = 'pending';
-```
-
-**Why:**
-- Cron query: `WHERE status='pending' AND scheduled_for <= NOW()`
-- This exact index allows index-only scan
-- Partial index (`WHERE status='pending'`) reduces index size
-- Without this, query becomes slow with 10K+ scheduled sends
-
-**Expected performance:**
-- With index: <10ms to find 100 due sends
-- Without index: 500ms+ sequential scan
-
-### Serverless Timeout Management
-
-**Vercel limits:**
-- Hobby: 10s max
-- Pro: 60s max
-
-**Mitigation:**
-- Batch size: 10 sends per cron (configurable constant)
-- Each send: ~200ms (render + Resend API)
-- 10 sends * 10 contacts * 200ms = 20s total
-- Safe margin on Pro tier, would need lower batch on Hobby
-
-**If timeout occurs:**
-- Scheduled send status remains 'processing'
-- Need cleanup cron (optional): Reset 'processing' > 5 min back to 'pending'
-- Or: Accept that it retries next minute (idempotency prevents duplicates)
-
-### RLS Policy Performance
-
-**Problem:** RLS policies with subqueries can be slow
-
-**Current policy:**
-```sql
-USING (business_id IN (
-  SELECT id FROM businesses WHERE user_id = auth.uid()
-))
-```
-
-**Performance:**
-- Postgres caches auth.uid() per transaction
-- Subquery executes once per query (not per row)
-- With index on `businesses.user_id`, subquery is <1ms
-
-**Note:** Service role client bypasses RLS entirely, so cron doesn't pay this cost.
-
-## Open Questions & Recommendations
-
-### Recommended Approach
-
-**Primary:** Vercel Cron + Row Locking + Service Role Client
-
-**Why:**
-- Simplest integration (no new services)
-- Leverages existing Vercel infrastructure
-- Row locking is battle-tested pattern (used by Solid Queue, many SaaS)
-- Service role client is Supabase's official approach
-
-**Alternative considered:** Supabase Functions (pg_cron)
-- More complex: Requires Supabase Edge Functions
-- Less visibility: Harder to debug than Vercel logs
-- Same pattern: Would still need row locking
-- Skip for now: Can migrate later if needed
-
-### Configuration Recommendations
-
-**Environment variables to add:**
-```bash
-# Required
-SUPABASE_SERVICE_ROLE_KEY=<from Supabase dashboard>
-CRON_SECRET=<generate random 32-char string>
-
-# Optional (for monitoring)
-SENTRY_DSN=<for error tracking>
-```
-
-**Vercel cron schedule:**
-- Start with: `* * * * *` (every minute)
-- Can adjust later: `*/5 * * * *` (every 5 minutes) if load is low
-
-**Batch size tuning:**
-```typescript
-// lib/scheduled-sends/config.ts
-export const SCHEDULED_SEND_CONFIG = {
-  BATCH_SIZE: 10,           // Sends per cron invocation
-  MAX_CONTACTS_PER_SEND: 25 // Already enforced in batchSendSchema
+- Server Component handles data fetching (if needed)
+- Client Component isolated to smallest interactive scope
+- SEO-friendly - content rendered on server
+- Fast initial load - minimal client JS for non-interactive sections
+
+**Source:** [How to Use Framer Motion with Next.js Server Components](https://www.hemantasundaray.com/blog/use-framer-motion-with-nextjs-server-components)
+
+#### Pattern 2: Scroll-Triggered Animations
+
+**For sections that animate on scroll:**
+
+```tsx
+// components/ui/animated/fade-in.tsx
+'use client'
+import { motion, useInView } from 'framer-motion'
+import { useRef } from 'react'
+
+export function FadeIn({ children, direction = 'up' }: Props) {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: '-100px' })
+
+  const variants = {
+    hidden: { opacity: 0, y: direction === 'up' ? 40 : -40 },
+    visible: { opacity: 1, y: 0 }
+  }
+
+  return (
+    <motion.div
+      ref={ref}
+      initial="hidden"
+      animate={isInView ? 'visible' : 'hidden'}
+      variants={variants}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+    >
+      {children}
+    </motion.div>
+  )
+}
+
+// Usage in Server Component
+import { FadeIn } from '@/components/ui/animated/fade-in'
+
+export function FeatureSection() {
+  return (
+    <section>
+      <FadeIn>
+        <h2>Feature Title</h2>
+      </FadeIn>
+      <FadeIn direction="up">
+        <p>Feature description</p>
+      </FadeIn>
+    </section>
+  )
 }
 ```
 
-### Edge Cases to Handle
+**Why this pattern:**
+- Server Components can use Client animation wrappers
+- Animations only run when in viewport (performance)
+- Progressive enhancement - content visible without JS
+- Reusable across all sections
 
-1. **Scheduled time in the past** (user's clock was wrong)
-   - Solution: Process immediately on next cron run
-   - Status: Treat same as "due now"
+**Source:** [Next.js 15 Scroll Behavior Guide](https://dev.to/hijazi313/nextjs-15-scroll-behavior-a-comprehensive-guide-387j)
 
-2. **User cancels during processing**
-   - Solution: Status check before each contact send
-   - If cancelled, skip remaining contacts, update counts
+#### Pattern 3: Heavy Animation Dynamic Import
 
-3. **Contact deleted before scheduled send**
-   - Solution: Skip missing contacts, log in skipped_count
-   - Don't fail entire send
+**For complex animations that aren't critical:**
 
-4. **Monthly quota exhausted before scheduled time**
-   - Solution: Mark as 'failed', error_message explains quota issue
-   - Don't retry (user must upgrade plan)
+```tsx
+// components/marketing/v2/interactive-demo.tsx (Server Component)
+import dynamic from 'next/dynamic'
 
-5. **Business deleted before scheduled send**
-   - Solution: CASCADE delete on scheduled_sends table handles this
-   - Scheduled send removed automatically
+const AnimatedDemo = dynamic(
+  () => import('./animated-demo-content'),
+  {
+    ssr: false, // Skip server rendering
+    loading: () => <DemoSkeleton /> // Show placeholder
+  }
+)
 
-6. **Template deleted before scheduled send**
-   - Solution: SET NULL on template_id (already in schema)
-   - Fall back to default template (same as immediate send)
-
-### Monitoring & Observability
-
-**What to log:**
-```typescript
-// In cron route handler
-console.log({
-  timestamp: new Date().toISOString(),
-  action: 'cron-start',
-  runId: crypto.randomUUID()
-})
-
-// In processor
-console.log({
-  action: 'processing-scheduled-send',
-  scheduledSendId,
-  businessId,
-  contactCount,
-  sentCount,
-  failedCount,
-  skippedCount,
-  durationMs
-})
+export function InteractiveDemo() {
+  return (
+    <section>
+      <h2>Try It Yourself</h2>
+      <AnimatedDemo /> {/* Loaded after hydration */}
+    </section>
+  )
+}
 ```
 
-**Vercel cron logs location:**
-- Dashboard: Project → Deployments → Production → Functions
-- Real-time: `vercel logs --follow`
+**Why this pattern:**
+- Heavy animation libraries (GSAP, Lottie) only loaded when needed
+- Doesn't block initial page render
+- Improves Lighthouse scores (First Contentful Paint)
+- User sees content immediately, animation enhances after
 
-**Alerts to set up (optional but recommended):**
-- Cron fails 3 times in a row → Slack/email notification
-- Average processing time > 30s → Warning (approaching timeout)
-- Skipped sends > 50% → Review contact data quality
+**Source:** [How to Keep Rich Animations Snappy in Next.js 15](https://medium.com/@thomasaugot/how-to-keep-rich-animations-snappy-in-next-js-15-46d90f503b15)
+
+### Data Flow
+
+```
+User Request
+     ↓
+app/(marketing)/page.tsx (Server Component)
+     ↓
+Fetch any server data (stats, testimonials from DB)
+     ↓
+Render HTML with sections
+     ↓
+     ├─→ Static sections (Server Components)
+     ├─→ Animation wrappers (Client Components - small JS)
+     └─→ Interactive sections (Dynamic imports - loaded after)
+     ↓
+Browser receives HTML
+     ↓
+Hydration (only for Client Components)
+     ↓
+Scroll animations activate on viewport enter
+```
+
+**Key flow characteristics:**
+- Initial HTML includes all content (SEO-friendly)
+- Client JS minimal for first paint
+- Animations progressively enhance experience
+- Heavy features lazy-loaded
+
+## Animation Strategy
+
+### CSS vs JavaScript Decision Matrix
+
+| Use Case | Solution | Reason |
+|----------|----------|--------|
+| Fade in on scroll | Framer Motion | useInView hook, clean API |
+| Slide transitions | Framer Motion | Layout animations built-in |
+| Stagger effects | Framer Motion | Variants system ideal |
+| Complex timelines | CSS + Tailwind | Simple, no extra JS |
+| Parallax effects | Framer Motion | useScroll hook + transforms |
+| Micro-interactions | CSS + Tailwind | Hover states, GPU-accelerated |
+| Custom curves | CSS Modules | Complex keyframes, full control |
+
+### Recommended Approach: Hybrid
+
+**Framer Motion for:**
+- Scroll-triggered entrance animations
+- Stagger effects (feature grids, testimonials)
+- Page/section transitions
+- Interactive animations (hover states with complex choreography)
+
+**Tailwind + CSS for:**
+- Simple hover effects (`group-hover:`, `transition-*`)
+- Loading states (`animate-pulse`, `animate-spin`)
+- Micro-interactions (button states, card lifts)
+- Geometric markers, decorative elements
+
+**Why hybrid:**
+- Framer Motion: 58KB gzipped (acceptable for landing page impact)
+- CSS: 0KB runtime cost, GPU-accelerated
+- Use right tool for each job - performance + DX
+
+**Source:** [CSS Modules vs Tailwind CSS: A Comprehensive Comparison](https://medium.com/@ignatovich.dm/css-modules-vs-css-in-js-vs-tailwind-css-a-comprehensive-comparison-24e7cb6f48e9)
+
+### Animation Performance Architecture
+
+```tsx
+// app/globals.css - ADD
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  /* Override Framer Motion */
+  .motion-reduce {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+// tailwind.config.ts - ADD
+module.exports = {
+  theme: {
+    extend: {
+      animation: {
+        'fade-in': 'fadeIn 0.5s ease-out',
+        'slide-up': 'slideUp 0.6s ease-out',
+        'scale-in': 'scaleIn 0.4s ease-out',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        slideUp: {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        scaleIn: {
+          '0%': { opacity: '0', transform: 'scale(0.95)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+      },
+    },
+  },
+}
+```
+
+**Progressive enhancement:**
+1. Content visible without JS (Server Components)
+2. Basic CSS animations for minimal motion
+3. Framer Motion enhances with scroll triggers
+4. `prefers-reduced-motion` disables all (accessibility)
+
+**Source:** [The Impact of Page Load Animations on Landing Page Performance](https://www.site123.com/learn/the-impact-of-page-load-animations-on-landing-page-performance)
+
+## Image & Asset Optimization
+
+### Strategy: Next.js Image Component + Priority Flags
+
+```tsx
+// Hero section - CRITICAL
+import Image from 'next/image'
+
+export function HeroV2() {
+  return (
+    <section>
+      <Image
+        src="/hero-screenshot.webp"
+        alt="AvisLoop dashboard"
+        width={1200}
+        height={900}
+        priority // Preload above fold
+        quality={90} // High quality for hero
+        placeholder="blur"
+        blurDataURL="data:image/..." // Low-res placeholder
+      />
+    </section>
+  )
+}
+
+// Below-fold sections - LAZY
+export function FeatureGrid() {
+  return (
+    <section>
+      <Image
+        src="/feature-contacts.webp"
+        alt="Contact management"
+        width={800}
+        height={600}
+        loading="lazy" // Lazy load (default)
+        quality={85} // Slightly lower
+      />
+    </section>
+  )
+}
+```
+
+**Source:** [Next.js Image Component: How to use next/image for performance](https://prismic.io/blog/nextjs-image-component-optimization)
+
+### Asset Architecture
+
+```
+public/
+├── hero/
+│   ├── dashboard-light.webp    # Hero image - light mode
+│   ├── dashboard-dark.webp     # Hero image - dark mode
+│   └── hero-blur-data.txt      # Blur data URLs
+├── features/
+│   ├── send-interface.webp     # Feature screenshots
+│   ├── contacts-view.webp
+│   └── analytics-view.webp
+├── social-proof/
+│   ├── company-logo-1.svg      # Client logos (SVG preferred)
+│   └── company-logo-2.svg
+└── decorative/
+    ├── gradient-orb.svg        # CSS-animated shapes
+    └── geometric-pattern.svg
+```
+
+**Optimization checklist:**
+- [ ] Use WebP format (smaller than PNG/JPG)
+- [ ] Provide AVIF fallback (even smaller, Next.js handles automatically)
+- [ ] Generate blur placeholders (prevents layout shift)
+- [ ] Mark hero images with `priority`
+- [ ] Lazy load below-fold images
+- [ ] Use SVG for logos/icons (scalable, small)
+- [ ] Set explicit width/height (prevents CLS)
+
+**Source:** [Next.js Image Optimization Guide](https://nextjs.org/docs/app/api-reference/components/image)
+
+### Performance Budget
+
+| Resource | Budget | Actual | Status |
+|----------|--------|--------|--------|
+| Hero image | 150KB | TBD | Pending |
+| Feature screenshots (3×) | 100KB each | TBD | Pending |
+| Framer Motion bundle | 60KB gzip | 58KB | ✅ |
+| Total images | 500KB | TBD | Pending |
+| Total JS | 150KB | TBD | Pending |
+| First Contentful Paint | <1.5s | TBD | Pending |
+| Largest Contentful Paint | <2.5s | TBD | Pending |
+
+## SEO Architecture
+
+### Metadata Strategy (App Router)
+
+```tsx
+// app/(marketing)/page.tsx
+import type { Metadata } from 'next'
+
+const baseUrl = process.env.VERCEL_URL
+  ? `https://${process.env.VERCEL_URL}`
+  : 'http://localhost:3000'
+
+export const metadata: Metadata = {
+  title: 'AvisLoop - Get 3× More Reviews Without Chasing Customers',
+  description:
+    'Send review requests in under 30 seconds. No complex campaigns, no forgotten follow-ups. Just simple requests that actually get sent. Start free today.',
+  openGraph: {
+    title: 'AvisLoop - Get 3× More Reviews Without Chasing Customers',
+    description:
+      'Send review requests in under 30 seconds. No complex campaigns, no forgotten follow-ups.',
+    url: baseUrl,
+    siteName: 'AvisLoop',
+    type: 'website',
+    images: [
+      {
+        url: `${baseUrl}/og-image.png`, // 1200×630 social share image
+        width: 1200,
+        height: 630,
+        alt: 'AvisLoop - Review request platform',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AvisLoop - Get 3× More Reviews Without Chasing Customers',
+    description:
+      'Send review requests in under 30 seconds. No complex campaigns, no forgotten follow-ups.',
+    images: [`${baseUrl}/og-image.png`],
+  },
+  alternates: {
+    canonical: baseUrl,
+  },
+}
+
+export default function LandingPage() {
+  return (
+    <>
+      {/* JSON-LD structured data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'SoftwareApplication',
+            name: 'AvisLoop',
+            applicationCategory: 'BusinessApplication',
+            operatingSystem: 'Web',
+            offers: {
+              '@type': 'Offer',
+              price: '0',
+              priceCurrency: 'USD',
+            },
+            aggregateRating: {
+              '@type': 'AggregateRating',
+              ratingValue: '4.8',
+              ratingCount: '127',
+            },
+          }),
+        }}
+      />
+
+      {/* Page sections */}
+      <HeroV2 />
+      <SocialProofV2 />
+      {/* ... */}
+    </>
+  )
+}
+```
+
+**Structured data benefits:**
+- Rich snippets in Google search results
+- Better AI search visibility (ChatGPT Search, Perplexity, Gemini)
+- Schema.org vocabulary for SaaS apps
+- Aggregate ratings display (social proof in SERPs)
+
+**Source:** [Maximizing SEO with Meta Data in Next.js 15](https://dev.to/joodi/maximizing-seo-with-meta-data-in-nextjs-15-a-comprehensive-guide-4pa7)
+
+## Component Breakdown for Creative Landing Page
+
+### Suggested Component Structure
+
+Based on common SaaS landing page patterns and your existing features, here's the recommended section breakdown:
+
+```tsx
+// app/(marketing)/page.tsx - NEW VERSION
+
+import { HeroV2 } from '@/components/marketing/v2/hero-v2'
+import { SocialProofV2 } from '@/components/marketing/v2/social-proof-v2'
+import { ProblemSection } from '@/components/marketing/v2/problem-section'
+import { SolutionSection } from '@/components/marketing/v2/solution-section'
+import { FeaturesGrid } from '@/components/marketing/v2/features-grid'
+import { HowItWorks } from '@/components/marketing/v2/how-it-works'
+import { TestimonialsV2 } from '@/components/marketing/v2/testimonials-v2'
+import { StatsShowcase } from '@/components/marketing/v2/stats-showcase'
+import { FAQV2 } from '@/components/marketing/v2/faq-v2'
+import { CTAV2 } from '@/components/marketing/v2/cta-v2'
+
+export default function LandingPage() {
+  return (
+    <>
+      <HeroV2 />              {/* Above fold, priority load */}
+      <SocialProofV2 />       {/* Logo bar or testimonial highlights */}
+      <ProblemSection />      {/* "Review requests are a pain" */}
+      <SolutionSection />     {/* "We make it simple" with demo */}
+      <FeaturesGrid />        {/* 3-6 features, interactive cards */}
+      <HowItWorks />          {/* 3-step process, animated */}
+      <StatsShowcase />       {/* Results-driven metrics */}
+      <TestimonialsV2 />      {/* Animated testimonial carousel */}
+      <FAQV2 />               {/* Accordion, keep existing FAQs */}
+      <CTAV2 />               {/* Final conversion push */}
+    </>
+  )
+}
+```
+
+**Source:** [Landing Page Structure: Anatomy & Best Practices](https://www.involve.me/blog/landing-page-structure)
+
+### New Components Needed
+
+| Component | Purpose | Complexity | Animation Level |
+|-----------|---------|------------|-----------------|
+| `hero-v2.tsx` | Headline + CTA + visual | Medium | High (entrance, parallax) |
+| `social-proof-v2.tsx` | Trust indicators | Low | Low (fade in) |
+| `problem-section.tsx` | Empathy hook | Low | Medium (scroll reveal) |
+| `solution-section.tsx` | Product demo | High | High (interactive demo) |
+| `features-grid.tsx` | Feature cards | Medium | Medium (stagger, hover) |
+| `how-it-works.tsx` | 3-step process | Medium | High (step progression) |
+| `stats-showcase.tsx` | Animated counters | Low | Medium (count-up animation) |
+| `testimonials-v2.tsx` | Customer quotes | Medium | Medium (carousel/slider) |
+| `faq-v2.tsx` | Questions accordion | Low | Low (reuse existing) |
+| `cta-v2.tsx` | Final CTA | Low | Low (simple entrance) |
+
+### Reusable Animation Primitives Needed
+
+```
+components/ui/animated/
+├── fade-in.tsx              # Opacity 0→1 on scroll
+├── slide-in.tsx             # Directional slide on scroll
+├── stagger-children.tsx     # Delay between child animations
+├── count-up.tsx             # Animated number counter
+├── parallax-wrapper.tsx     # Y-transform based on scroll
+├── scale-on-hover.tsx       # Grow on hover (cards)
+└── reveal-on-scroll.tsx     # Clip-path reveal effect
+```
+
+**Build order suggestion:**
+1. Create animation primitives first (reusable across sections)
+2. Build Hero (highest impact, sets tone)
+3. Build simple sections (Social Proof, Problem, CTA) to test primitives
+4. Build complex sections (Solution, Features, How It Works)
+5. Polish micro-interactions last
+
+## Migration Path
+
+### Phase 1: Parallel Development
+```bash
+# Create new component directory
+mkdir -p components/marketing/v2
+mkdir -p components/ui/animated
+
+# Build new components alongside old
+# Old site continues running on old components
+```
+
+### Phase 2: Testing
+```bash
+# Create feature flag route for testing
+app/(marketing)/v2/page.tsx → uses new components
+app/(marketing)/page.tsx → uses old components (production)
+
+# Test v2 route with real users (beta link)
+```
+
+### Phase 3: Atomic Swap
+```bash
+# When ready, swap in one commit
+mv app/(marketing)/page.tsx app/(marketing)/_page-v1.backup.tsx
+mv app/(marketing)/v2/page.tsx app/(marketing)/page.tsx
+
+# Easy rollback if needed
+git revert [commit-hash]
+```
+
+### Phase 4: Cleanup
+```bash
+# After v2 stable for 1 week, remove old components
+rm -rf components/marketing/hero.tsx
+rm -rf components/marketing/features.tsx
+# ... (keep shared components like user-menu, mobile-nav, pricing-table)
+```
+
+**Why this approach:**
+- Zero downtime migration
+- Easy rollback (just swap files back)
+- Test new version without affecting production
+- Clean separation (v2 directory clear signal)
+
+**Source:** [Refactoring landing page with React, NextJS & TailwindCSS](https://dev.to/dkapanidis/refactoring-landing-page-with-react-nextjs-tailwindcss-2hk8)
+
+## Performance Monitoring
+
+### Core Web Vitals Targets
+
+| Metric | Target | Measurement Point |
+|--------|--------|-------------------|
+| FCP (First Contentful Paint) | <1.5s | Hero appears |
+| LCP (Largest Contentful Paint) | <2.5s | Hero image loaded |
+| CLS (Cumulative Layout Shift) | <0.1 | No layout jumps |
+| FID (First Input Delay) | <100ms | Button clicks responsive |
+| TTI (Time to Interactive) | <3.5s | Animations start |
+
+**Why these targets:**
+- Google's "Good" thresholds for Core Web Vitals
+- Above targets = better SEO ranking
+- Below targets = poor user experience, higher bounce rate
+
+## Anti-Patterns to Avoid
+
+### Anti-Pattern 1: Animation Everything
+**What:** Adding entrance animations to every element on the page
+**Why bad:** Overwhelming, slow perceived performance, seizure risk
+**Instead:** Animate only key sections (hero, features). Keep body copy static.
+
+### Anti-Pattern 2: Client Component Creep
+**What:** Making entire sections 'use client' for one small animation
+**Why bad:** Loses Server Component benefits (streaming, smaller JS bundle)
+**Instead:** Wrap only the interactive part in a Client Component
+
+```tsx
+// BAD
+'use client'
+export function FeatureSection() {
+  return (
+    <section>
+      <h2>Static heading</h2>
+      <p>Static paragraph</p>
+      <motion.div>Animated card</motion.div> {/* Only this needs client */}
+    </section>
+  )
+}
+
+// GOOD
+export function FeatureSection() {
+  return (
+    <section>
+      <h2>Static heading</h2>
+      <p>Static paragraph</p>
+      <AnimatedCard /> {/* Client Component wrapper */}
+    </section>
+  )
+}
+```
+
+**Source:** [Solving Framer Motion Page Transitions in Next.js App Router](https://www.imcorfitz.com/posts/adding-framer-motion-page-transitions-to-next-js-app-router)
+
+### Anti-Pattern 3: Inline Animation Definitions
+**What:** Defining animation variants inside render functions
+**Why bad:** Re-creates objects on every render, causes jank
+**Instead:** Define variants outside component or use useMemo
+
+```tsx
+// BAD
+export function Hero() {
+  const variants = { hidden: {}, visible: {} } // Re-created every render
+  return <motion.div variants={variants}>...</motion.div>
+}
+
+// GOOD
+const variants = { hidden: {}, visible: {} } // Created once
+
+export function Hero() {
+  return <motion.div variants={variants}>...</motion.div>
+}
+```
+
+### Anti-Pattern 4: No Accessibility Fallbacks
+**What:** Animations with no `prefers-reduced-motion` support
+**Why bad:** Inaccessible to users with vestibular disorders
+**Instead:** Always respect `prefers-reduced-motion` media query
+
+```tsx
+// BAD
+<motion.div
+  initial={{ opacity: 0, y: 50 }}
+  animate={{ opacity: 1, y: 0 }}
+>
+  Content
+</motion.div>
+
+// GOOD
+<motion.div
+  initial={{ opacity: 0, y: 50 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.5 }}
+  className="motion-reduce:transform-none motion-reduce:opacity-100"
+>
+  Content
+</motion.div>
+```
+
+### Anti-Pattern 5: Blocking Animations
+**What:** Heavy animations that prevent content from rendering
+**Why bad:** Users see blank screen, high bounce rate
+**Instead:** Use Server Components for content, enhance with animations after
+
+## Integration with Existing System
+
+### Preserving Design Tokens
+
+```tsx
+// components/marketing/v2/hero-v2.tsx
+import { GeometricMarker } from '@/components/ui/geometric-marker' // REUSE
+
+export function HeroV2() {
+  return (
+    <section className="py-20 bg-background"> {/* CSS variables */}
+      <motion.h1 className="text-foreground"> {/* Theme-aware */}
+        Get More Reviews
+      </motion.h1>
+      <GeometricMarker variant="triangle" color="lime" /> {/* Existing component */}
+    </section>
+  )
+}
+```
+
+**Key integrations:**
+- Use existing CSS variables (`--background`, `--foreground`, etc.)
+- Reuse `geometric-marker.tsx` for brand consistency
+- Reuse `button.tsx`, `card.tsx` from UI library
+- Maintain dark mode support (all new components must support)
+
+### Dark Mode Considerations
+
+```tsx
+// All animations must work in both themes
+<motion.div className="bg-card border-border"> {/* Not bg-white */}
+  <h2 className="text-foreground"> {/* Not text-gray-900 */}
+    Feature Title
+  </h2>
+  <p className="text-muted-foreground"> {/* Not text-gray-600 */}
+    Feature description
+  </p>
+</motion.div>
+```
+
+**Testing checklist:**
+- [ ] All sections visible in light mode
+- [ ] All sections visible in dark mode
+- [ ] Animations smooth in both modes
+- [ ] No hardcoded colors (use CSS variables)
+
+## Build Order Recommendation
+
+Based on dependencies and impact:
+
+### Week 1: Foundation
+1. Set up animation primitive components (`components/ui/animated/`)
+2. Create v2 directory structure
+3. Build `hero-v2.tsx` (highest impact)
+4. Test hero in isolation
+
+### Week 2: Core Sections
+5. Build `social-proof-v2.tsx`
+6. Build `problem-section.tsx`
+7. Build `solution-section.tsx`
+8. Compose into test route (`app/(marketing)/v2/page.tsx`)
+
+### Week 3: Feature Showcase
+9. Build `features-grid.tsx`
+10. Build `how-it-works.tsx`
+11. Build `stats-showcase.tsx`
+12. Test interactive animations
+
+### Week 4: Social Proof & Conversion
+13. Build `testimonials-v2.tsx`
+14. Refactor `faq-v2.tsx` (or reuse existing with new styling)
+15. Build `cta-v2.tsx`
+16. Full page testing
+
+### Week 5: Polish & Performance
+17. Optimize images (WebP conversion, blur placeholders)
+18. Add structured data (JSON-LD)
+19. Lighthouse CI setup
+20. Accessibility audit (`prefers-reduced-motion`, keyboard nav)
+
+### Week 6: Launch
+21. Beta testing with real users
+22. Performance monitoring
+23. Atomic swap (replace old page.tsx)
+24. Monitor analytics for bounce rate, conversion rate
+
+**Total estimated effort:** 6 weeks (1 developer)
 
 ## Sources
 
-### High Confidence (Official Documentation)
+### Architecture Patterns
+- [Next.js 15 Scroll Behavior Guide](https://dev.to/hijazi313/nextjs-15-scroll-behavior-a-comprehensive-guide-387j)
+- [Smooth Scroll with Next.js, GSAP, Locomotive](https://blog.olivierlarose.com/tutorials/smooth-scroll)
+- [How to Use Framer Motion with Next.js Server Components](https://www.hemantasundaray.com/blog/use-framer-motion-with-nextjs-server-components)
+- [Solving Framer Motion Page Transitions in Next.js App Router](https://www.imcorfitz.com/posts/adding-framer-motion-page-transitions-to-next-js-app-router)
 
-- [Vercel Cron Jobs](https://vercel.com/docs/cron-jobs)
-- [Getting started with cron jobs](https://vercel.com/docs/cron-jobs/quickstart)
-- [Managing Cron Jobs](https://vercel.com/docs/cron-jobs/manage-cron-jobs)
-- [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security)
-- [Supabase Service Role Key](https://supabase.com/docs/guides/troubleshooting/why-is-my-service-role-key-client-getting-rls-errors-or-not-returning-data-7_1K9z)
-- [PostgreSQL Explicit Locking](https://www.postgresql.org/docs/current/explicit-locking.html)
-- [PostgreSQL SELECT](https://www.postgresql.org/docs/current/sql-select.html)
+### Performance & Optimization
+- [How to Keep Rich Animations Snappy in Next.js 15](https://medium.com/@thomasaugot/how-to-keep-rich-animations-snappy-in-next-js-15-46d90f503b15)
+- [Optimizing Performance in Next.js Using Dynamic Imports](https://dev.to/bolajibolajoko51/optimizing-performance-in-nextjs-using-dynamic-imports-5b3)
+- [Next.js Image Optimization Guide](https://nextjs.org/docs/app/api-reference/components/image)
+- [Next.js Image Component: How to use next/image for performance](https://prismic.io/blog/nextjs-image-component-optimization)
 
-### High Confidence (Technical Guides)
+### SEO & Metadata
+- [Maximizing SEO with Meta Data in Next.js 15](https://dev.to/joodi/maximizing-seo-with-meta-data-in-nextjs-15-a-comprehensive-guide-4pa7)
+- [Next.js Metadata API Documentation](https://nextjs.org/learn/seo/metadata)
 
-- [How to Secure Vercel Cron Job routes in Next.js 14](https://codingcat.dev/post/how-to-secure-vercel-cron-job-routes-in-next-js-14-app-router)
-- [Using Service Role with Supabase in Next.js Backend](https://github.com/orgs/supabase/discussions/30739)
-- [Adrian Murage: Supabase Service Role Secret Key](https://adrianmurage.com/posts/supabase-service-role-secret-key/)
-- [The Unreasonable Effectiveness of SKIP LOCKED](https://www.inferable.ai/blog/posts/postgres-skip-locked)
-- [Using FOR UPDATE SKIP LOCKED for Queue-Based Workflows](https://www.netdata.cloud/academy/update-skip-locked/)
-- [Solid Queue & understanding UPDATE SKIP LOCKED](https://www.bigbinary.com/blog/solid-queue)
+### Landing Page Best Practices
+- [Landing Page Structure: Anatomy & Best Practices](https://www.involve.me/blog/landing-page-structure)
+- [10 SaaS Landing Page Trends for 2026](https://www.saasframe.io/blog/10-saas-landing-page-trends-for-2026-with-real-examples)
+- [The Impact of Page Load Animations on Landing Page Performance](https://www.site123.com/learn/the-impact-of-page-load-animations-on-landing-page-performance)
 
-### Medium Confidence (Community Resources)
-
-- [Automate Your NextJS API Routes With Vercel Cron Jobs](https://medium.com/@mertenercan/automate-your-nextjs-api-routes-with-vercel-cron-jobs-64e8e86cbee9)
-- [Testing Next.js Cron Jobs Locally](https://medium.com/@quentinmousset/testing-next-js-cron-jobs-locally-my-journey-from-frustration-to-solution-6ffb2e774d7a)
-- [Queue System using SKIP LOCKED in Neon Postgres](https://neon.com/guides/queue-system)
+### CSS & Styling Strategy
+- [CSS Modules vs Tailwind CSS: A Comprehensive Comparison](https://medium.com/@ignatovich.dm/css-modules-vs-css-in-js-vs-tailwind-css-a-comprehensive-comparison-24e7cb6f48e9)
+- [Page UI - Landing page components for React & Next.js](https://github.com/danmindru/page-ui)
+- [Refactoring landing page with React, NextJS & TailwindCSS](https://dev.to/dkapanidis/refactoring-landing-page-with-react-nextjs-tailwindcss-2hk8)

@@ -1,507 +1,383 @@
-# Stack Research: Scheduled Email Sending
+# Technology Stack for Landing Page Redesign
 
-**Project:** AvisLoop Review SaaS
-**Milestone:** Scheduled Sending Feature
-**Researched:** 2026-01-28
-**Overall Confidence:** HIGH
+**Project:** AvisLoop Landing Page Redesign
+**Researched:** 2026-02-01
+**Existing Stack:** Next.js 15/16 (App Router), React 19, Tailwind CSS 3.4, tailwindcss-animate
 
 ## Executive Summary
 
-No new npm packages required. The existing stack (Next.js 15 + Supabase + Resend + date-fns 4.1.0) already contains all necessary dependencies for scheduled email sending with Vercel Cron. Implementation requires only configuration (vercel.json) and patterns (service role client, datetime-local inputs).
+**Recommendation:** Use CSS-first approach with selective JavaScript animation for maximum creative impact with minimal performance cost. Avoid heavy animation libraries. Leverage native browser APIs and extend existing Tailwind setup.
 
-## New Dependencies
+**Core principle:** The best landing page animations are those that feel premium but load instantly. CSS provides 80% of creative needs at 5% of the JavaScript cost.
 
-**NONE REQUIRED**
+## Animation Stack Recommendations
 
-All capabilities exist in the current stack:
+### Tier 1: CSS-Only Animations (Use for 80% of effects)
 
-| Capability | Provided By | Already Installed |
-|------------|-------------|-------------------|
-| Cron jobs | Vercel platform | N/A (platform feature) |
-| Service role DB access | @supabase/supabase-js | Yes (latest) |
-| Date comparison | date-fns | Yes (^4.1.0) |
-| Date formatting | date-fns | Yes (^4.1.0) |
-| Email sending | resend | Yes (^6.9.1) |
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| **CSS Scroll-driven Animations** | Native | Scroll-triggered reveals, parallax | Zero JS, compositor-thread optimized, Safari 26+ support, Chrome 115+, polyfill available |
+| **tailwindcss-animate** | 1.0.7 (installed) | Basic transitions, fades, slides | Already in stack, JIT-optimized, no additional dependencies |
+| **@midudev/tailwind-animations** | ^1.1.0 | Extended animation library | Community-powered, includes scroll-based animations, fade/slide/zoom/rotate/flip/bounce/shake, lightweight |
+| **CSS View Transitions API** | Native | Page/section transitions | Next.js 15.2+ experimental support, native browser API, no library needed |
 
-**Rationale:** Scheduled sending reuses existing email logic (Resend) and existing DB client (@supabase/supabase-js). Vercel Cron is a platform feature, not a package. date-fns v4 includes all needed date comparison functions (isBefore, isAfter, isPast).
+**Rationale:** CSS animations run on compositor thread (60fps even on main thread blocking), have zero bundle cost, and browser support is excellent in 2026. Scroll-driven animations finally have Safari 26 support, making them production-ready.
 
-## Vercel Cron
+### Tier 2: Selective JavaScript Animation (Use for 10-15% of effects)
 
-### How It Works
+| Technology | Version | Purpose | When to Use |
+|------------|---------|---------|-------------|
+| **Framer Motion** | ^12.27.0 | Complex gesture interactions, orchestrated sequences | React 19 compatible (v12+), use ONLY for hero section complex interactions or features requiring spring physics |
+| **Intersection Observer API** | Native | Lazy-load animations, scroll triggers | CSS scroll-driven animations' fallback, excellent performance, universal support |
+| **CSS custom properties + JS** | Native | Dynamic color transitions, cursor effects | Minimal JS that manipulates CSS vars, maintains hardware acceleration |
 
-Vercel Cron makes HTTP GET requests to your production deployment at scheduled intervals. The cron job triggers a Next.js Route Handler, which runs server-side code.
+**Rationale:** Framer Motion now officially supports React 19 (v12.27.0, published Feb 2026). However, it adds 82kb to bundle. Use sparingly and wrap in client components with 'use client' directive. Intersection Observer is the most performant JS approach for scroll animations when CSS scroll-driven animations need polyfill.
 
-**Key characteristics:**
-- Always runs in production (not local dev)
-- Always uses UTC timezone for schedules
-- Includes `vercel-cron/1.0` user agent in requests
-- Serverless function with same limits as Route Handlers
+### Tier 3: Media & Visual Effects (Use for 5% of hero/feature sections)
 
-**Source:** [Vercel Cron Jobs Documentation](https://vercel.com/docs/cron-jobs)
+| Technology | Version | Purpose | When to Use |
+|------------|---------|---------|-------------|
+| **HTML5 `<video>` with autoplay** | Native | Hero background videos | Use 720p max, <10MB, <10sec loop, with poster image for LCP, preload="auto" for above-fold only |
+| **@dotlottie/react-player** | ^0.3.0 | Icon/micro animations | Use .lottie format (80% smaller than JSON), lazy-load, avoid for hero section due to WASM LCP impact |
+| **SVG + CSS animations** | Native | Logo animations, decorative shapes | Inline SVG with CSS animations, not SMIL (better mobile performance) |
 
-### Configuration
+**Rationale:** Video must be heavily optimized (720p, <10MB, muted, loop, playsinline attributes). Lottie's WASM decoder impacts LCP, so use only for below-fold decorative elements. SVG with CSS animations performs better on mobile than SMIL.
 
-Create `vercel.json` in project root:
+## Visual Effects & Styling
 
-```json
-{
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "crons": [
-    {
-      "path": "/api/cron/process-scheduled-sends",
-      "schedule": "* * * * *"
-    }
-  ]
+### Recommended Techniques
+
+| Effect | Implementation | Performance Impact |
+|--------|---------------|-------------------|
+| **Glassmorphism** | `backdrop-blur-md` + `bg-opacity-*` | Low (hardware accelerated) |
+| **Mesh gradients** | CSS `conic-gradient()` + `radial-gradient()` | Zero JS, pure CSS |
+| **Aurora/glow effects** | Animated CSS gradients with `background-clip: text` | Low (GPU-accelerated) |
+| **Parallax scrolling** | CSS `animation-timeline: scroll(root)` or Intersection Observer + transform | Low (compositor thread) |
+| **Cursor effects** | CSS `:hover` with `transform` + `opacity` | Low (avoid `box-shadow` animation) |
+| **Scroll reveals** | CSS scroll-driven animations or Intersection Observer | Low (batch calculations) |
+
+### CSS Variable Strategy
+
+Extend existing `globals.css` with animation-specific variables:
+
+```css
+:root {
+  --animation-duration-fast: 200ms;
+  --animation-duration-normal: 400ms;
+  --animation-duration-slow: 600ms;
+  --animation-easing-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --animation-easing-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --blur-sm: 4px;
+  --blur-md: 12px;
+  --blur-lg: 24px;
 }
 ```
 
-**Schedule format:** Standard cron expressions (5 fields: minute, hour, day-of-month, month, day-of-week)
-
-Example: `* * * * *` = every minute (recommended for scheduled sending to minimize delay)
-
-**Alternative schedules:**
-- `*/5 * * * *` = every 5 minutes (reduces function invocations)
-- `0 * * * *` = every hour (not recommended - max 60min delay)
-
-**Validation:** Use [crontab.guru](https://crontab.guru/) or Vercel's validator
-
-**Sources:**
-- [Vercel Cron Jobs Quickstart](https://vercel.com/docs/cron-jobs/quickstart)
-- [How to Secure Vercel Cron Job Routes](https://codingcat.dev/post/how-to-secure-vercel-cron-job-routes-in-next-js-14-app-router)
-
-### Security (CRITICAL)
-
-**MUST implement CRON_SECRET authentication:**
-
-```typescript
-// app/api/cron/process-scheduled-sends/route.ts
-import type { NextRequest } from 'next/server';
-
-export async function GET(request: NextRequest) {
-  const authHeader = request.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response('Unauthorized', { status: 401 });
-  }
-
-  // Process scheduled sends...
-}
-```
-
-**Why:** Without authentication, anyone can trigger your cron endpoint by visiting the URL, causing:
-- Quota exhaustion
-- Duplicate sends
-- Potential abuse
-
-**Setup:**
-1. Generate random secret: `openssl rand -base64 32`
-2. Add to Vercel environment variables: `CRON_SECRET=<value>`
-3. Vercel automatically includes as `Authorization: Bearer <secret>` header
-
-**Source:** [Vercel Cron Security Best Practices](https://codingcat.dev/post/how-to-secure-vercel-cron-job-routes-in-next-js-14-app-router)
-
-### Limitations
-
-| Limit | Hobby Plan | Pro Plan |
-|-------|------------|----------|
-| Max cron jobs | 2 | 40 |
-| Function timeout | 10s | 300s (5min) |
-| Timezone | UTC only | UTC only |
-| Concurrency | 1 (sequential) | Configurable |
-
-**Implications for scheduled sending:**
-- Cron runs every minute → max 1 job/min on Hobby (sufficient for MVP)
-- Must process batch of pending sends within timeout (batch size matters)
-- All scheduled_for times stored as UTC in DB
-- Cannot configure "send at 9am user's timezone" - must calculate UTC time
-
-**Sources:**
-- [Vercel Cron Usage and Pricing](https://vercel.com/docs/cron-jobs/usage-and-pricing)
-- [Managing Cron Jobs](https://vercel.com/docs/cron-jobs/manage-cron-jobs)
-
-### Local Testing
-
-**Problem:** Vercel Cron only runs in production.
-
-**Solution:** Direct HTTP calls to route during development.
-
-```bash
-# Test cron route locally
-curl http://localhost:3000/api/cron/process-scheduled-sends \
-  -H "Authorization: Bearer ${CRON_SECRET}"
-```
-
-**Advanced option:** [nextjs-crons](https://medium.com/@quentinmousset/testing-next-js-cron-jobs-locally-my-journey-from-frustration-to-solution-6ffb2e774d7a) tool (January 2026) simulates Vercel Cron locally, but adds dev dependency. Not recommended - direct curl testing is simpler.
-
-**Confidence:** HIGH (official Vercel docs)
-
-## Service Role Client
-
-### Purpose
-
-Cron jobs run without user authentication. Standard Supabase SSR client expects cookies/sessions. Service role client bypasses RLS for admin operations.
-
-**When to use:**
-- Cron jobs (no user context)
-- System-level operations (cleanup, aggregation)
-- Admin actions not tied to specific user
-
-**When NOT to use:**
-- User-facing requests (use SSR client with cookies)
-- Client Components (NEVER - security risk)
-
-### Implementation
-
-**Create separate client for service role operations:**
-
-```typescript
-// lib/supabase/service-role-client.ts (server-only)
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-export const supabaseServiceRole = createClient(supabaseUrl, serviceRoleKey, {
-  auth: {
-    persistSession: false,      // No session needed
-    autoRefreshToken: false,     // No token refresh
-    detectSessionInUrl: false,   // Not in browser
-  },
-});
-```
-
-**Use in cron route:**
-
-```typescript
-// app/api/cron/process-scheduled-sends/route.ts
-import { supabaseServiceRole } from '@/lib/supabase/service-role-client';
-
-export async function GET(request: NextRequest) {
-  // Auth check...
-
-  const { data: pendingSends } = await supabaseServiceRole
-    .from('scheduled_sends')
-    .select('*')
-    .lte('scheduled_for', new Date().toISOString())
-    .eq('status', 'pending')
-    .limit(50); // Batch size
-
-  // Process sends...
-}
-```
-
-**Sources:**
-- [Using Service Role with Supabase in Next.js Backend](https://github.com/orgs/supabase/discussions/30739)
-- [How to Use the Supabase Service Role Secret Key](https://adrianmurage.com/posts/supabase-service-role-secret-key/)
-
-### Security Considerations (CRITICAL)
-
-**NEVER expose service role key:**
-- DO NOT prefix with `NEXT_PUBLIC_` (exposes to browser)
-- DO NOT import service role client in Client Components
-- DO NOT log service role key or queries (may contain PII)
-
-**Service role bypasses RLS:**
-- Can read/write ANY row in ANY table
-- Equivalent to database superuser
-- Use only when RLS bypass is intentional
-
-**Best practices:**
-1. Create `lib/supabase/service-role-client.ts` as server-only module
-2. Import only in Route Handlers, Server Actions, Server Components
-3. Validate all inputs before queries (no user input directly in queries)
-4. Log operations for audit trail (without sensitive data)
-
-**Confidence:** HIGH (official Supabase guidance + community best practices)
-
-## Date/Time Handling
-
-### Libraries Already Installed
-
-**date-fns:** v4.1.0 (already in package.json)
-
-date-fns v4 includes first-class timezone support but scheduled sending for AvisLoop only needs basic date comparison - no additional timezone package required.
-
-**Source:** [date-fns v4.0 Release Announcement](https://blog.date-fns.org/v40-with-time-zone-support/)
-
-### Core Functions Needed
-
-All available in base `date-fns` package:
-
-| Function | Purpose | Example |
-|----------|---------|---------|
-| `isBefore(date1, date2)` | Check if scheduled_for is before now | `isBefore(scheduledFor, new Date())` |
-| `isAfter(date1, date2)` | Validate scheduled_for is in future | `isAfter(scheduledFor, new Date())` |
-| `isPast(date)` | Check if scheduled time has passed | `isPast(scheduledFor)` |
-| `isFuture(date)` | Validate user input is future date | `isFuture(scheduledFor)` |
-| `parseISO(string)` | Parse datetime-local input value | `parseISO("2026-01-28T14:30")` |
-| `formatISO(date)` | Format date for DB storage | `formatISO(new Date())` |
-
-**Sources:**
-- [date-fns isBefore](https://date-fns.org/docs/isBefore)
-- [You Might Not Need date-fns](https://youmightnotneed.com/date-fns) (confirms functions exist)
-
-### Timezone Strategy
-
-**Storage:** Always store as UTC in Postgres `timestamptz` columns.
-
-```typescript
-// When creating scheduled send
-const scheduledForUTC = new Date(formData.scheduled_for); // Browser sends local time
-await supabase.from('scheduled_sends').insert({
-  scheduled_for: scheduledForUTC.toISOString(), // Converts to UTC
-});
-```
-
-**Comparison:** Always compare against `new Date()` (server time = UTC on Vercel).
-
-```typescript
-// In cron job (runs on server in UTC)
-const now = new Date(); // Already UTC
-const { data } = await supabaseServiceRole
-  .from('scheduled_sends')
-  .lte('scheduled_for', now.toISOString());
-```
-
-**Display:** Browser automatically converts UTC to user's local timezone when rendering.
-
-```typescript
-// Client-side display
-<time dateTime={send.scheduled_for}>
-  {format(parseISO(send.scheduled_for), 'PPpp')} {/* Shows in user's timezone */}
-</time>
-```
-
-**Why NOT add @date-fns/tz:**
-- AvisLoop doesn't need explicit timezone conversion (user picks local time, we store UTC)
-- Browser handles local→UTC conversion automatically via `new Date()`
-- Adds 761+ bytes for unused functionality
-- Postgres `timestamptz` handles UTC storage automatically
-
-**Confidence:** HIGH (standard UTC storage pattern + date-fns v4 docs)
-
-### HTML datetime-local Input
-
-**Value format:** ISO 8601 local datetime string (no timezone)
-
-**Format:** `YYYY-MM-DDTHH:mm` (e.g., `2026-01-28T14:30`)
-
-**Characteristics:**
-- No timezone info in string (browser assumes local time)
-- Normalizes to format with `T` separator
-- Browser converts to UTC when submitting via JavaScript
-
-**Example:**
-
-```tsx
-// Form input
-<input
-  type="datetime-local"
-  name="scheduled_for"
-  min={new Date().toISOString().slice(0, 16)} // Prevent past dates
-/>
-
-// Server Action
-const formData = new FormData();
-const scheduledForLocal = formData.get('scheduled_for'); // "2026-01-28T14:30"
-const scheduledForUTC = new Date(scheduledForLocal); // Browser converted to UTC
-```
-
-**Source:** [MDN: datetime-local Input](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/datetime-local)
-
-**Confidence:** HIGH (MDN + W3C HTML5 spec)
+**Rationale:** CSS variables maintain existing theming system, enable dark mode compatibility, and allow dynamic JS manipulation without re-parsing styles.
 
 ## What NOT to Add
 
-### Do NOT Install These Packages
+| Library | Why Avoid |
+|---------|-----------|
+| **GSAP** | 40-50kb bundle size, overkill for marketing pages, requires `'use client'` everywhere, better suited for complex web apps |
+| **React Spring** | Experimental SSR support, App Router compatibility unclear, Framer Motion is better supported |
+| **Anime.js** | Redundant with Framer Motion, not React-optimized |
+| **lottie-web** | 82kb + JSON files (1.3MB+), use @dotlottie/react-player with .lottie format instead |
+| **Three.js** | 3D overkill for SaaS landing, massive bundle impact, not aligned with geometric brand |
+| **next-view-transitions** | Experimental Next.js API (v15.2+), use native CSS View Transitions instead |
 
-| Package | Why NOT | Use Instead |
-|---------|---------|-------------|
-| `@date-fns/tz` | Only needed for explicit timezone conversion; UTC storage + browser rendering handles timezones | Base `date-fns` functions |
-| `date-fns-tz` | Third-party package for date-fns v3; AvisLoop uses v4 | Base `date-fns` (has built-in TZ support if needed) |
-| `node-cron` | Server-always-on cron scheduler; Vercel is serverless | Vercel Cron (platform feature) |
-| `cron` | Same as node-cron; assumes persistent process | Vercel Cron |
-| `bull` / `bullmq` | Job queue systems requiring Redis; overkill for simple scheduling | Vercel Cron + Postgres |
-| `agenda` | Requires MongoDB; AvisLoop uses Postgres | Vercel Cron + Postgres |
-| `luxon` | Alternative to date-fns; redundant dependency | Existing `date-fns` |
-| `moment` | Legacy library (maintenance mode since 2020) | Existing `date-fns` |
-| `dayjs` | Smaller than date-fns but less comprehensive; would replace existing dep | Existing `date-fns` |
+**Rationale:** Each avoided library saves 40-80kb bundle size. Landing pages must prioritize First Contentful Paint (FCP) and Largest Contentful Paint (LCP) over feature richness.
 
-### Do NOT Use Native Cron
+## Installation
 
-**Avoid:** Server-based cron (crontab, systemd timers, etc.)
+### Recommended Additions
 
-**Why:** Vercel is serverless. No persistent server to run cron daemon. Functions spin up on request, then shut down.
-
-**Source:** [Vercel Serverless Functions](https://vercel.com/docs/functions)
-
-### Do NOT Over-Engineer Timezone Handling
-
-**Temptation:** "Users in different timezones need different send times!"
-
-**Reality for MVP:** Store UTC, display local. Users pick a datetime in their browser, which is their local time. Browser converts to UTC automatically. Postgres stores UTC. Display converts back to local.
-
-**Advanced feature (post-MVP):** Explicit timezone selection ("Send at 9am Pacific") requires @date-fns/tz + timezone dropdown, but NOT needed for initial scheduled sending.
-
-**Confidence:** HIGH (standard web app pattern)
-
-## Integration Points
-
-### How New Elements Connect to Existing Stack
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│ User Browser (Client Component)                             │
-│                                                              │
-│  ┌────────────────────────────────────────────────────┐    │
-│  │ <input type="datetime-local" />                    │    │
-│  │ User picks: 2026-01-28 14:30 (local time)          │    │
-│  └────────────────┬───────────────────────────────────┘    │
-│                   │ Form submission                         │
-│                   ▼                                          │
-│  ┌────────────────────────────────────────────────────┐    │
-│  │ Browser converts to UTC: 2026-01-28T22:30:00Z      │    │
-│  └────────────────┬───────────────────────────────────┘    │
-└───────────────────┼──────────────────────────────────────────┘
-                    │
-                    ▼
-┌─────────────────────────────────────────────────────────────┐
-│ Server Action / Route Handler                               │
-│                                                              │
-│  ┌────────────────────────────────────────────────────┐    │
-│  │ import { supabaseSSR } from '@/lib/supabase/ssr'   │    │
-│  │                                                     │    │
-│  │ await supabaseSSR.from('scheduled_sends').insert({ │    │
-│  │   org_id: user.org_id,                             │    │
-│  │   contact_id: formData.contact_id,                 │    │
-│  │   scheduled_for: scheduledForUTC.toISOString(),    │    │
-│  │   status: 'pending',                               │    │
-│  │   ...                                              │    │
-│  │ })                                                 │    │
-│  └────────────────┬───────────────────────────────────┘    │
-└───────────────────┼──────────────────────────────────────────┘
-                    │
-                    ▼
-┌─────────────────────────────────────────────────────────────┐
-│ Supabase Postgres (existing)                                │
-│                                                              │
-│  scheduled_sends table:                                     │
-│  ┌──────────────────────────────────────────────────┐      │
-│  │ id | org_id | scheduled_for (timestamptz) | ...  │      │
-│  │ 1  | abc    | 2026-01-28 22:30:00+00       | ...  │      │
-│  └──────────────────────────────────────────────────┘      │
-└─────────────────────────────────────────────────────────────┘
-                    │
-                    │ Every minute (Vercel Cron)
-                    ▼
-┌─────────────────────────────────────────────────────────────┐
-│ Vercel Cron (NEW)                                           │
-│                                                              │
-│  vercel.json:                                               │
-│  ┌────────────────────────────────────────────────────┐    │
-│  │ "crons": [{                                        │    │
-│  │   "path": "/api/cron/process-scheduled-sends",     │    │
-│  │   "schedule": "* * * * *"  // every minute         │    │
-│  │ }]                                                 │    │
-│  └────────────────┬───────────────────────────────────┘    │
-└───────────────────┼──────────────────────────────────────────┘
-                    │ HTTP GET with CRON_SECRET
-                    ▼
-┌─────────────────────────────────────────────────────────────┐
-│ app/api/cron/process-scheduled-sends/route.ts (NEW)         │
-│                                                              │
-│  ┌────────────────────────────────────────────────────┐    │
-│  │ 1. Check CRON_SECRET authorization                 │    │
-│  │ 2. Import service role client (NEW pattern)        │    │
-│  │    import { supabaseServiceRole }                  │    │
-│  │ 3. Query pending sends (NEW query)                 │    │
-│  │    .lte('scheduled_for', new Date().toISOString()) │    │
-│  │    .eq('status', 'pending')                        │    │
-│  │ 4. Use date-fns for comparison (EXISTING lib)      │    │
-│  │    if (isPast(send.scheduled_for)) { ... }         │    │
-│  │ 5. Call EXISTING email sending logic               │    │
-│  │    await sendReviewRequest(send)                   │    │
-│  │ 6. Update status to 'sent' or 'failed'             │    │
-│  └────────────────┬───────────────────────────────────┘    │
-└───────────────────┼──────────────────────────────────────────┘
-                    │
-                    ▼
-┌─────────────────────────────────────────────────────────────┐
-│ Resend API (existing)                                       │
-│                                                              │
-│  ┌────────────────────────────────────────────────────┐    │
-│  │ Email sent to contact                              │    │
-│  └────────────────────────────────────────────────────┘    │
-└─────────────────────────────────────────────────────────────┘
+```bash
+# Extended animation utilities (lightweight)
+npm install @midudev/tailwind-animations
 ```
 
-### Key Integration Considerations
+### Optional (only if hero section requires complex interactions)
 
-**1. Existing email sending logic reuse:**
-   - DO NOT duplicate send logic in cron job
-   - Extract to shared function: `lib/email/send-review-request.ts`
-   - Call from both immediate send and scheduled send
+```bash
+# Framer Motion (use sparingly)
+npm install framer-motion@^12.27.0
 
-**2. Supabase service role client isolation:**
-   - Create separate file: `lib/supabase/service-role-client.ts`
-   - Server-only module (never import in Client Components)
-   - Use ONLY in cron routes and admin Server Actions
+# Lottie (only for below-fold decorative elements)
+npm install @dotlottie/react-player@^0.3.0
+```
 
-**3. Schema additions minimal:**
-   - Add `scheduled_sends` table (mirrors existing send structure)
-   - Add RLS policies (org_id scoping like existing tables)
-   - Service role client bypasses RLS (intentional for cron job)
+### Tailwind Config Extension
 
-**4. No UI library changes:**
-   - Native `<input type="datetime-local">` sufficient
-   - Existing shadcn/ui components for form layout
-   - No calendar picker library needed (datetime-local has built-in picker)
+Add to `tailwind.config.ts`:
 
-**5. Monitoring/logging hooks:**
-   - Log cron execution to existing logging setup (if present)
-   - Track send attempts in `send_history` table (existing pattern)
-   - Error handling follows existing Resend error patterns
+```typescript
+import tailwindAnimations from '@midudev/tailwind-animations';
 
-**Confidence:** HIGH (architectural analysis of existing codebase patterns)
+export default {
+  // ...existing config
+  plugins: [
+    tailwindcssAnimate,
+    tailwindAnimations, // Add this
+  ],
+} satisfies Config;
+```
 
-## Implementation Checklist
+## Integration with Existing Stack
 
-Downstream roadmap should ensure:
+### Next.js App Router Considerations
 
-- [ ] `vercel.json` created with cron configuration
-- [ ] `CRON_SECRET` added to Vercel environment variables
-- [ ] `lib/supabase/service-role-client.ts` created (server-only)
-- [ ] Cron route implements CRON_SECRET check
-- [ ] Service role client limited to cron route (not exposed elsewhere)
-- [ ] Existing send logic extracted to shared function
-- [ ] datetime-local inputs include `min` attribute (prevent past dates)
-- [ ] All scheduled_for values stored as ISO 8601 UTC strings
-- [ ] date-fns functions imported as needed (no new package install)
-- [ ] Schema migration includes RLS policies for scheduled_sends table
+**Server Components (default):**
+- Use CSS animations exclusively
+- Inline SVG with CSS keyframes
+- No animation library imports
 
-**Confidence:** HIGH (comprehensive coverage of all integration points)
+**Client Components ('use client'):**
+- Limit to interactive sections (hero CTA, contact forms)
+- Framer Motion for complex interactions only
+- Intersection Observer for scroll triggers
 
----
+**Performance Budget:**
+- First Contentful Paint (FCP): <1.8s
+- Largest Contentful Paint (LCP): <2.5s
+- Total Blocking Time (TBT): <200ms
+- Animation library budget: <15kb (prefer CSS)
+
+### Dark Mode Integration
+
+All animations must respect existing dark mode system:
+
+```typescript
+// Use CSS variables from globals.css
+<div className="bg-card/80 backdrop-blur-md border-border">
+  {/* Animation respects theme automatically */}
+</div>
+```
+
+**Rationale:** Existing CSS variable system in `globals.css` already handles light/dark themes. New animations must use `bg-card`, `text-foreground`, `border-border` tokens, not hardcoded colors.
+
+### React 19 Compatibility
+
+**Verified compatible:**
+- Framer Motion 12.27.0+ (official React 19 support)
+- Native browser APIs (Intersection Observer, View Transitions, Scroll-driven animations)
+- All Tailwind plugins (CSS-only)
+
+**Requires testing:**
+- @dotlottie/react-player (verify with React 19, may need peer dependency override)
+
+## Performance Optimization Patterns
+
+### 1. Lazy-Load Animations
+
+```typescript
+// Good: Lazy load heavy animation library
+const AnimatedHero = lazy(() => import('./animated-hero'));
+
+// Better: Use CSS scroll-driven animations (zero JS)
+<div className="animate-fade-in animation-timeline-scroll">
+```
+
+### 2. Video Optimization
+
+```html
+<!-- Required attributes for performance -->
+<video
+  autoplay
+  muted
+  loop
+  playsinline
+  preload="auto"
+  poster="/hero-poster.jpg"
+  src="/hero-720p.mp4"
+>
+```
+
+**Specs:**
+- Resolution: 720p max (4K kills mobile)
+- Duration: <10 seconds (loop seamlessly)
+- Size: <10MB (gzip/brotli compression)
+- Format: MP4 with H.264 (universal support)
+- Poster: Optimized WebP/AVIF for LCP
+
+### 3. Intersection Observer Pattern
+
+```typescript
+// Minimal, reusable hook
+const useScrollAnimation = (threshold = 0.1) => {
+  const ref = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(entry.target); // Cleanup after animation
+        }
+      },
+      { threshold }
+    );
+
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [threshold]);
+
+  return { ref, isVisible };
+};
+```
+
+**Rationale:** Unobserve after animation prevents memory leaks. Keep callbacks lean (no DOM manipulation in loop).
+
+### 4. Respect Motion Preferences
+
+Existing `globals.css` already includes `prefers-reduced-motion` handling. New animations must respect this:
+
+```typescript
+// Framer Motion respects reduced motion automatically
+<motion.div
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.4 }}
+>
+```
+
+CSS animations already respect via `globals.css` media query.
+
+## Core Web Vitals Impact Analysis
+
+| Approach | FCP Impact | LCP Impact | CLS Impact | TBT Impact |
+|----------|------------|------------|------------|------------|
+| **CSS-only animations** | +0ms | +0ms | None (if GPU-accelerated) | +0ms |
+| **Framer Motion (hero only)** | +150-200ms | +100ms | None | +50ms |
+| **Video hero (optimized)** | +200-300ms | +400-600ms | None (with poster) | +0ms |
+| **Lottie (below-fold, lazy)** | +0ms | +0ms | None | +100ms (WASM) |
+| **GSAP (NOT RECOMMENDED)** | +300-400ms | +200ms | Varies | +150ms |
+
+**Performance target:** Keep animation additions under 200ms FCP impact, 100ms LCP impact.
+
+## Tailwind Animation Utilities Reference
+
+### Already Available (tailwindcss-animate)
+
+```typescript
+animate-in          // Fade in
+animate-out         // Fade out
+fade-in-0 to fade-in-100
+zoom-in-0 to zoom-in-100
+slide-in-from-top-0 to slide-in-from-top-100
+duration-0 to duration-1000
+```
+
+### Adding @midudev/tailwind-animations
+
+```typescript
+animate-fade-in
+animate-fade-out
+animate-fade-in-down
+animate-fade-in-up
+animate-fade-in-left
+animate-fade-in-right
+animate-slide-in-down
+animate-slide-in-up
+animate-zoom-in
+animate-zoom-out
+animate-rotate
+animate-flip-up
+animate-flip-down
+animate-bounce
+animate-shake
+animate-pulse
+```
+
+All include `motion-safe:` variants and responsive variants (`md:animate-fade-in`).
+
+## Browser Support Matrix
+
+| Feature | Chrome | Safari | Firefox | Edge |
+|---------|--------|--------|---------|------|
+| CSS Scroll-driven Animations | 115+ ✅ | 26+ ✅ | Via polyfill | 115+ ✅ |
+| View Transitions API | 111+ ✅ | 26 beta ✅ | In development | 111+ ✅ |
+| Framer Motion 12 | ✅ | ✅ | ✅ | ✅ |
+| Intersection Observer | ✅ | ✅ | ✅ | ✅ |
+| backdrop-filter | ✅ | ✅ | ✅ | ✅ |
+
+**Polyfill strategy:** Use `@supports` for CSS scroll-driven animations, fall back to Intersection Observer:
+
+```css
+@supports (animation-timeline: scroll()) {
+  .scroll-animate {
+    animation-timeline: scroll(root);
+  }
+}
+```
+
+## Final Recommendations
+
+### Phase 1: Foundation (Zero additional dependencies)
+
+1. Extend Tailwind config with animation utilities from @midudev/tailwind-animations
+2. Add CSS scroll-driven animations for scroll reveals
+3. Use existing tailwindcss-animate for transitions
+4. Add CSS variables for animation timing/easing
+5. Implement glassmorphism with backdrop-blur
+
+**Bundle impact:** +2kb (Tailwind plugin is JIT, only includes used classes)
+
+### Phase 2: Hero Section (Selective JavaScript)
+
+1. Add Framer Motion ONLY if hero requires complex orchestration
+2. Use HTML5 video for hero background (optimized 720p <10MB)
+3. Implement cursor effects with CSS :hover + transform
+4. Add Intersection Observer for above-fold scroll triggers
+
+**Bundle impact:** +82kb if Framer Motion added (use conditionally)
+
+### Phase 3: Polish (Below-fold only)
+
+1. Add @dotlottie/react-player for icon animations (lazy-loaded)
+2. Implement parallax with CSS animation-timeline or Intersection Observer
+3. Add SVG animations with CSS keyframes for decorative elements
+
+**Bundle impact:** +15-20kb (lazy-loaded, doesn't impact FCP/LCP)
+
+### Total Bundle Impact Estimate
+
+- **Minimal path** (CSS-only): +2kb
+- **Recommended path** (CSS + selective JS): +15-25kb
+- **Maximum path** (includes Framer Motion): +100kb
+
+**Target:** Stay under 25kb for animation additions to maintain FCP <1.8s.
 
 ## Sources
 
-**Vercel Cron:**
-- [Vercel Cron Jobs Documentation](https://vercel.com/docs/cron-jobs)
-- [Vercel Cron Jobs Quickstart](https://vercel.com/docs/cron-jobs/quickstart)
-- [Managing Vercel Cron Jobs](https://vercel.com/docs/cron-jobs/manage-cron-jobs)
-- [How to Secure Vercel Cron Job Routes (App Router)](https://codingcat.dev/post/how-to-secure-vercel-cron-job-routes-in-next-js-14-app-router)
-- [Testing Next.js Cron Jobs Locally (2026)](https://medium.com/@quentinmousset/testing-next-js-cron-jobs-locally-my-journey-from-frustration-to-solution-6ffb2e774d7a)
+### Animation Libraries
+- [Framer Motion React 19 Compatibility](https://github.com/motiondivision/motion/issues/2668) - Verified v12.27.0 support
+- [Motion Changelog](https://motion.dev/changelog) - Latest React 19 fixes
+- [GSAP Next.js Best Practices](https://gsap.com/community/forums/topic/43831-what-are-the-best-practices-for-using-gsap-with-next-15-clientserver-components/)
+- [Tailwind Animations Plugin](https://github.com/midudev/tailwind-animations)
+- [tailwindcss-animate](https://github.com/jamiebuilds/tailwindcss-animate)
 
-**Supabase Service Role:**
-- [Supabase SSR Client Creation](https://supabase.com/docs/guides/auth/server-side/creating-a-client)
-- [Using Service Role with Supabase in Next.js Backend](https://github.com/orgs/supabase/discussions/30739)
-- [How to Use the Supabase Service Role Secret Key](https://adrianmurage.com/posts/supabase-service-role-secret-key/)
+### Browser APIs
+- [CSS Scroll-driven Animations - MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Scroll-driven_animations)
+- [WebKit Scroll-driven Animations Guide](https://webkit.org/blog/17101/a-guide-to-scroll-driven-animations-with-just-css/)
+- [Intersection Observer API 2026 Guide](https://future.forem.com/sherry_walker_bba406fb339/mastering-the-intersection-observer-api-2026-a-complete-guide-561k)
+- [View Transitions API - MDN](https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API)
+- [Next.js View Transitions Config](https://nextjs.org/docs/app/api-reference/config/next-config-js/viewTransition)
 
-**date-fns:**
-- [date-fns v4.0 Release with Time Zone Support](https://blog.date-fns.org/v40-with-time-zone-support/)
-- [date-fns isBefore Function](https://date-fns.org/docs/isBefore)
-- [date-fns Time Zones Documentation](https://date-fns.org/v4.0.0/docs/Time-Zones)
-- [@date-fns/tz Package](https://github.com/date-fns/tz)
+### Performance
+- [Lottie Performance Issues in Next.js](https://forum.lottiefiles.com/t/lottiefile-in-next-js-webcore-vitals-performance-issue/1747)
+- [DotLottie React Performance](https://developers.lottiefiles.com/docs/dotlottie-player/dotlottie-react/)
+- [Video Hero Performance Best Practices](https://www.thegeckoagency.com/best-practices-for-filming-choosing-and-placing-a-hero-video-on-your-website/)
+- [Performant Parallaxing - Chrome Developers](https://developer.chrome.com/blog/performant-parallaxing)
+- [Best Parallax Scrolling 2026](https://www.builder.io/blog/parallax-scrolling-effect)
 
-**HTML datetime-local:**
-- [MDN: datetime-local Input Type](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/datetime-local)
-- [Using Date and Time Formats in HTML](https://developer.mozilla.org/en-US/docs/Web/HTML/Guides/Date_and_time_formats)
+### Visual Effects
+- [Tailwind Glassmorphism Generator](https://gradienty.codes/tailwind-glassmorphism-generator)
+- [CSS Hover Effects Performance](https://prismic.io/blog/css-hover-effects)
+- [SVG Animation Methods Compared](https://xyris.app/blog/svg-animation-methods-compared-css-smil-and-javascript/)
+
+### Next.js Integration
+- [Next.js Performance Optimization 2026](https://medium.com/@shirkeharshal210/next-js-performance-optimization-app-router-a-practical-guide-a24d6b3f5db2)
+- [Framer Motion with Server Components](https://www.hemantasundaray.com/blog/use-framer-motion-with-nextjs-server-components)
+- [Next.js SEO: Core Web Vitals](https://nextjs.org/learn/seo/web-performance)

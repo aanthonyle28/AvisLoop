@@ -1,272 +1,338 @@
 # Project Research Summary
 
-**Project:** AvisLoop Review SaaS - Scheduled Sending Feature
-**Domain:** Scheduled/Deferred Email Sending for Review Requests
-**Researched:** 2026-01-28
+**Project:** AvisLoop Landing Page Redesign (v1.4)
+**Domain:** B2B SaaS Marketing Landing Page (Review Management Platform)
+**Researched:** 2026-02-01
 **Confidence:** HIGH
 
 ## Executive Summary
 
-Scheduled email sending is a well-understood feature with established patterns across Gmail, Outlook, Mailchimp, and modern email tools. The research reveals that AvisLoop's existing architecture (Next.js + Supabase + Resend) already contains everything needed — no new npm packages required. The implementation leverages Vercel Cron (runs every minute in UTC), a service role Supabase client (bypasses RLS for background processing), and row-level locking with `FOR UPDATE SKIP LOCKED` to prevent race conditions.
+The AvisLoop landing page redesign should prioritize **conversion over creativity**. Research shows that landing pages targeting local service businesses (dentists, salons, contractors) require clarity, trust signals, and outcome-focused messaging—not abstract concepts or developer-tool aesthetics. The recommended approach is a **CSS-first animation strategy with selective JavaScript**, maintaining sub-2.5s LCP while adding meaningful motion that enhances rather than obscures the value proposition.
 
-The recommended approach is straightforward: create a `scheduled_sends` table, add a cron route handler protected with `CRON_SECRET`, and extract the existing email sending logic into reusable functions. The architecture minimizes complexity by reusing 80% of existing send infrastructure — template rendering, quota checks, cooldown validation, and Resend integration all remain unchanged. The cron processor becomes a thin orchestration layer that fetches due sends, re-validates business rules at send time, and calls existing send functions.
+The critical insight from studying 100+ SaaS landing pages and competitor analysis (Podium, Birdeye, NiceJob) is that AvisLoop's positioning sweet spot is **simplicity over enterprise complexity**. Where competitors charge $300-600/month for feature-bloated platforms, AvisLoop wins by being "stupid simple"—get reviews in 2 clicks, no training needed. This positioning must be reflected in both design aesthetic (professional but approachable, not cutting-edge trendy) and copy (benefit-driven, jargon-free). The research identified 11 critical pitfalls, with the top three being: (1) animation-driven performance degradation (53% of users abandon if load >3s), (2) clarity sacrificed for cleverness (confused visitors bounce in 3 seconds), and (3) mobile experience as afterthought (63% of traffic is mobile).
 
-The primary risks are race conditions (duplicate sends), timezone confusion (UTC storage vs local display), and silent cron failures. All are mitigated through proven patterns: atomic database operations with row locking, strict UTC storage with local display conversion, and structured logging with external monitoring. The research identifies 14 specific pitfalls across 4 categories, with clear prevention strategies for each. Implementation complexity is medium (13-19 hours estimated) due to high code reuse, but deployment requires production testing since Vercel Cron only runs in production.
+The recommended architecture preserves existing Next.js App Router patterns while introducing new v2 components in parallel for safe migration. Use Server Components by default, wrap animations in minimal Client Components, and leverage the existing design system (CSS variables, dark mode, geometric markers) to maintain brand consistency between landing page and sign-up flow. Deploy with feature flags for gradual rollout (10% → 50% → 100%) with instant rollback capability.
 
 ## Key Findings
 
 ### Recommended Stack
 
-No new dependencies required. The existing stack provides all necessary capabilities. Vercel Cron (platform feature) handles job scheduling, `@supabase/supabase-js` provides service role access for RLS bypass, `date-fns 4.1.0` includes date comparison functions, and `resend 6.9.1` handles email delivery. The only additions are configuration (vercel.json cron setup) and patterns (service role client, datetime-local HTML inputs).
+**Approach:** Extend existing stack with minimal additions. The landing page already has Next.js 15, React 19, Tailwind CSS 3.4, and dark mode support—build on this foundation rather than introducing heavy libraries. Priority is **perceived performance** (animations that feel premium but load instantly) over "feature richness."
 
 **Core technologies:**
-- **Vercel Cron** (platform feature) — HTTP-triggered job scheduling at 1-minute intervals; no persistent process required
-- **Supabase service role client** (`createClient` with `SUPABASE_SERVICE_ROLE_KEY`) — bypasses RLS for cron operations; requires strict security (CRON_SECRET validation)
-- **date-fns 4.1.0** (already installed) — date comparison (`isBefore`, `isAfter`, `isPast`) for due send detection; no timezone package needed
-- **PostgreSQL `FOR UPDATE SKIP LOCKED`** — row-level locking prevents race conditions when multiple cron invocations overlap
-- **HTML datetime-local input** (native browser API) — no calendar picker library needed; browser handles timezone conversion automatically
+- **@midudev/tailwind-animations** (1.0.7) — Lightweight animation utilities — Adds scroll-triggered animations (fade-in, slide-in, zoom) via Tailwind classes with zero runtime cost, compatible with existing tailwindcss-animate
+- **CSS Scroll-driven Animations** (Native browser API) — Parallax and scroll reveals — Zero JavaScript, compositor-thread optimized, Safari 26+ support, polyfill available for older browsers
+- **Framer Motion** (12.27.0+, optional) — Complex hero interactions only — React 19 compatible, but adds 82KB to bundle, use sparingly and only for hero section orchestration if truly needed
+- **Next.js Image Component** (built-in) — Hero/feature images — Priority loading for above-fold, lazy loading below-fold, WebP/AVIF automatic format optimization, blur placeholders to prevent CLS
+
+**What NOT to add:**
+- GSAP (40-50KB, overkill for marketing pages)
+- Three.js (3D is off-brand and massive bundle impact)
+- lottie-web (use @dotlottie/react-player with .lottie format if needed, below-fold only)
+
+**Performance budget:** FCP <1.5s, LCP <2.5s, CLS <0.1, animation library budget <15KB (prefer CSS-only approach to hit this target).
 
 ### Expected Features
 
-Scheduled sending follows established UX patterns from consumer email tools. Table stakes include preset scheduling options ("In 1 hour", "Tomorrow 9am", "Custom"), viewing scheduled sends with cancellation ability, and status tracking through the lifecycle. Differentiators include randomized send times (feels more human), batch reschedule (move all scheduled sends forward/back), and smart timezone handling (send at recipient's 9am).
+Research into 2025-2026 SaaS landing page trends and local business positioning reveals a clear hierarchy.
 
 **Must have (table stakes):**
-- **Schedule with presets** — 3-4 preset buttons plus custom date/time picker; users expect this from Gmail/Outlook
-- **Cancel scheduled send** — before send time; critical "rescue" feature for mistakes
-- **View scheduled sends** — dedicated list/tab showing pending sends with send time and recipient count
-- **Status tracking** — pending → processing → sent/failed/cancelled lifecycle with clear indicators
-- **Timezone display** — show user's local time with abbreviation; store UTC, display local
-- **Re-validate at send time** — check opt-out, cooldown, quota, archive status before sending (not just at schedule time)
+- Clear, benefit-driven headline (5-second test: "Can a dentist understand what this does?")
+- Above-the-fold CTA (304% better conversion than below-fold)
+- Social proof immediately after hero (client logos or "Trusted by 1,000+ dentists")
+- Trust signals ("No credit card required", "Cancel anytime", money-back guarantee)
+- Customer testimonials with specific outcomes ("Got 30 reviews in 2 weeks" > "Great tool!")
+- Mobile-first responsive design (62%+ of traffic, Google mobile-first indexing)
+- FAQ section near conversion points (addresses objections, increases conversion ~80%)
+- Pricing transparency (hiding pricing adds friction, reduces lead quality)
+- Free trial CTA (industry standard for low-touch SaaS, avoid credit card at signup)
 
-**Should have (competitive):**
-- **Randomized send times** — "8:23am" instead of "8:00am" preset; looks less automated
-- **Schedule confirmation** — toast with "Scheduled for Jan 28, 9:00 AM PST" + redirect to scheduled view
-- **Partial send results** — show "Sent to 4 of 5 contacts" with per-contact details
-- **Batch reschedule** — move multiple scheduled sends forward/back (vacation scenario)
+**Should have (differentiators):**
+- Animated product demo in hero (shows transformation in 3-5 seconds, not just description)
+- Scrollytelling / scroll-triggered reveals (increases engagement and time-on-page)
+- Outcome-focused copy ("Save 10 hours weekly" vs "Automated email sending")
+- Pain-point storytelling (address forgetting to ask, awkwardness, manual follow-up headaches)
+- Minimal motion that adds meaning (Linear/Notion style, not overwhelming)
+- One-click Google review link preview (visual proof of simplicity claim)
+- Clear positioning vs alternatives (simpler than Podium, more affordable than Birdeye, more consistent than manual)
+- Industry-specific social proof (segment testimonials by dentists/salons/contractors)
 
 **Defer (v2+):**
-- **Recipient timezone detection** — send at 9am contact's timezone; requires contact.timezone field + DST handling (very complex)
-- **Recurring sends** — not needed for one-time review requests
-- **Priority queue** — review requests don't have urgency tiers; FIFO is sufficient
+- Interactive product walkthrough (embedded preview requires engineering complexity, use video walkthrough initially)
+- Industry-specific landing pages (dentists vs salons, start with generic, A/B test later)
+- Video testimonials (written testimonials are simpler to implement, equal or better conversion)
+- Advanced animations (particle effects, 3D elements, complex WebGL)
+
+**Anti-features (explicitly avoid):**
+- Slow loading animations (>3s load time kills 53% of mobile users)
+- Multiple competing CTAs (creates decision paralysis, reduces conversion)
+- Feature-heavy copy / jargon ("omnichannel reputation management platform" → "Get more reviews")
+- Hidden pricing or gated demos (adds friction, builds distrust)
+- Generic stock photos (use real product screenshots or real customer photos)
+- Auto-play video with sound (increases bounce rate)
+- Vague, template headlines ("The Future of Review Management" → "Get 3× More Google Reviews in 2 Minutes")
 
 ### Architecture Approach
 
-The architecture integrates cleanly as a queue layer (scheduled_sends table) plus background processor (cron route). Most infrastructure exists: email sending, rate limiting, quota checks, and logging are implemented. Scheduled sending extracts core send logic into `lib/scheduled-sends/core-send.ts`, creates a service role client in `lib/supabase/service-role.ts`, and adds a cron route at `app/api/cron/process-scheduled-sends/route.ts` that runs every minute via Vercel Cron configuration in `vercel.json`.
+**Strategy:** Side-by-side replacement using v2 component directory. Create new landing page components in parallel with old versions, then atomic swap when validated. This preserves existing infrastructure (layout, navbar, footer, auth, design system) while minimizing risk.
 
 **Major components:**
-1. **scheduled_sends table** — stores business_id, contact_ids (array), template_id, scheduled_for (timestamptz), status (pending/processing/completed/failed/cancelled), counts (sent/failed/skipped), and error_message; includes RLS policies for user access and service role bypass for cron
-2. **Vercel Cron route handler** — validates `CRON_SECRET` header, creates service role client, calls processor, returns structured JSON; runs every minute in production only
-3. **Scheduled send processor** — fetches due sends with `FOR UPDATE SKIP LOCKED` (atomic claim), re-validates business rules (opt-out, cooldown, quota), calls extracted send function per contact, updates status and counts; handles partial failures gracefully with `Promise.allSettled`
-4. **Extracted send function** — shared between immediate and scheduled sends; includes eligibility checks, template rendering, Resend API call with idempotency key, send_log creation, contact tracking updates; single source of truth for send rules
-5. **Service role client** — separate from SSR client; disables session persistence; used only in cron route and admin operations; never imported in client components
+1. **Server Component wrapper pattern** — Section components are Server Components by default, with minimal Client Component wrappers for animations. This preserves SEO benefits (content indexed by Google) while enabling progressive enhancement with scroll-triggered animations.
+2. **Reusable animation primitives** (`components/ui/animated/`) — Build library of composable animation wrappers (FadeIn, SlideIn, StaggerChildren, CountUp) that work in both light/dark mode, respect prefers-reduced-motion, and use Intersection Observer for viewport-triggered animations.
+3. **Performance-first image strategy** — Use Next.js Image component with priority flag for hero images (preload LCP), lazy loading for below-fold images, WebP format, blur placeholders to prevent CLS, explicit width/height to reserve layout space.
+4. **Progressive enhancement flow** — Content visible without JavaScript (Server Components), basic CSS animations for minimal motion, Framer Motion enhances with scroll triggers, prefers-reduced-motion disables all animations for accessibility.
+5. **Shared design tokens** — Reuse existing CSS variables (--background, --foreground, --primary, etc.) from globals.css to maintain dark mode support and brand consistency. New animations must use semantic color tokens (bg-card, text-foreground, border-border) not hardcoded colors.
+6. **Migration-safe architecture** — Old components remain untouched in `components/marketing/`, new components in `components/marketing/v2/`, feature flag enables gradual rollout, easy rollback by swapping file imports.
+
+**Data flow:** User Request → Server Component (fetch stats/testimonials from DB if needed) → Render HTML with sections → Browser receives full HTML → Hydration only for Client Components → Scroll animations activate on viewport enter.
 
 ### Critical Pitfalls
 
-Research identified 14 pitfalls across technical, UX, and operational categories. The most critical relate to race conditions, security, timezone handling, and business rule re-validation.
+Research identified 11 pitfalls from analyzing failed redesigns, performance case studies, and accessibility audits. Top 5:
 
-1. **Duplicate sends via race conditions** — without `FOR UPDATE SKIP LOCKED`, multiple cron invocations can process the same scheduled send; prevention requires atomic `UPDATE...RETURNING` query that claims sends by immediately setting status='processing'
-2. **Service role key exposure** — Vercel Cron endpoints are public URLs; must validate `Authorization: Bearer ${CRON_SECRET}` header before using service role client; rotate secret periodically
-3. **Timezone confusion** — Vercel Cron runs in UTC; always store scheduled_for as UTC in PostgreSQL timestamptz; display in user's local timezone with abbreviation; test DST boundary dates explicitly
-4. **Stale business rule validation** — contact opts out after scheduling but before send time; must re-check opt-out, cooldown, quota, archived status in cron processor, not just at schedule creation
-5. **Inconsistent validation between immediate and scheduled** — extract shared validation functions (`checkContactEligibility`, `checkBusinessQuota`) to avoid drift; both flows must use same eligibility rules
-6. **Idempotency key conflicts** — use distinct prefixes for immediate (`immediate-${sendLog.id}`) vs scheduled (`scheduled-${scheduledSend.id}`) sends; Resend's 24-hour idempotency window overlaps with scheduling window
-7. **Silent cron failures** — implement structured logging, external monitoring (BetterStack/Sentry), health check endpoint; alert if cron doesn't run for >5 minutes or sends are overdue >10 minutes
-8. **Resend rate limit exhaustion** — default 2 requests/second; add 500ms delay between sends or use rate-limited queue (p-limit); monitor 429 errors and implement exponential backoff
+1. **Animation-driven performance degradation (LCP/CLS)** — Heavy animations delay Largest Contentful Paint (>2.5s) and cause layout shift. Prevention: Use CSS animations with transform/opacity (GPU-accelerated), reserve space with min-height to prevent CLS, lazy-load animations below fold, test on real devices (Moto G Power, not just MacBook). Google emphasizes INP <200ms in 2026; pages that load in 1s have 3× higher conversion than 5s loads.
+
+2. **Being clever at the expense of clarity** — Creative headlines with wordplay don't communicate value to busy local business owners. Prevention: 5-second test with target audience ("Can a dentist understand what this does?"), use customer language from interviews, show product screenshots not abstract concepts, trust signals local businesses care about (not SOC 2 compliance or 99.99% uptime).
+
+3. **Mobile experience as afterthought** — Desktop-first designs stacked vertically create 10-screen-high mobile pages with janky animations. Prevention: Design mobile-first (320px-428px width), touch targets ≥44px, test on real devices with 3G throttling, sticky CTA on mobile, separate optimized images for mobile (not just responsive scaling), no hover-only interactions.
+
+4. **Dark mode breaking visual effects** — Shadows invisible on dark backgrounds, gradients create harsh contrasts, low-contrast text becomes unreadable (79.1% of homepages have WCAG contrast failures). Prevention: Use semantic color tokens (bg-card, text-foreground, not hardcoded colors), replace shadows with borders in dark mode, test contrast ratios (WCAG AA requires 4.5:1), design in both modes simultaneously.
+
+5. **SEO regression during redesign** — Changed URLs without 301 redirects, hero content moved to client-rendered components (Google sees empty shell), removed structured data. Prevention: Preserve URL structure or add redirects, ensure hero is Server Component (content indexed immediately), maintain Schema.org markup (SoftwareApplication type with pricing/ratings), monitor Search Console for crawl errors week 1 after launch.
+
+**Additional critical pitfalls:** Multiple CTAs creating decision paralysis (reduces conversion by up to 266%), hydration mismatch with scroll animations (causes console errors and layout shifts), inconsistent design between landing page and sign-up flow (trust erosion), analytics tracking breaks during redesign (2-4 weeks of missing conversion data), wrong aesthetic for target audience (local business owners want professional/approachable, not trendy/edgy), no rollback plan or A/B test strategy (locked into failing redesign).
 
 ## Implications for Roadmap
 
-Based on research, scheduled sending should be implemented in 4 phases over 13-19 hours total. Phase structure follows dependency order: database and core processing first (enables programmatic scheduling), then cron infrastructure (enables background execution), then user interface (enables user interaction), finally monitoring (ensures reliability).
+Based on research, suggested phase structure prioritizes high-impact sections first, front-loads risk mitigation, and enables incremental validation.
 
-### Phase 1: Core Infrastructure & Processing
-**Rationale:** Database schema and send logic are foundational dependencies. Everything else builds on the scheduled_sends table and extracted send function. Addressing race conditions, service role security, and business rule re-validation upfront prevents technical debt.
+### Phase 1: Foundation & Hero Section
+**Rationale:** Hero section has highest impact on conversion (first 3-5 seconds determine bounce). Building animation primitives first creates reusable patterns for all subsequent phases. Establishing performance budget and dark mode support early prevents rework later.
 
 **Delivers:**
-- Database migration with scheduled_sends table, RLS policies, and `fetch_due_scheduled_sends_with_lock` function
-- Service role client (`lib/supabase/service-role.ts`) with environment variable validation
-- Extracted core send function (`lib/scheduled-sends/core-send.ts`) reusable by immediate and scheduled flows
-- Refactored `sendReviewRequest` and `batchSendReviewRequest` to use extracted function
+- Animation primitive components (FadeIn, SlideIn, StaggerChildren, ParallaxWrapper)
+- Hero v2 with outcome-focused headline, animated product preview, above-fold CTA
+- Social proof strip (client logos or testimonial highlights)
+- Design tokens extended for animations (CSS variables for duration/easing)
+- Performance baseline established (Lighthouse CI configured, LCP <2.5s target)
 
 **Addresses features:**
-- Foundation for all scheduling features (enables storage and processing)
-- Re-validation at send time (table stakes requirement)
+- Clear, benefit-driven headline (table stakes)
+- Above-the-fold CTA (table stakes)
+- Animated product demo in hero (differentiator)
+- Social proof immediately after hero (table stakes)
+- Dark mode support for all new components (technical requirement)
 
 **Avoids pitfalls:**
-- Pitfall 1 (race conditions) — via `FOR UPDATE SKIP LOCKED` in database function
-- Pitfall 2 (service role exposure) — via strict environment variable isolation
-- Pitfall 4 (stale validation) — via re-check pattern in processor
-- Pitfall 5 (inconsistent validation) — via shared functions
-- Pitfall 6 (idempotency conflicts) — via distinct key prefixes
-- Pitfall 12 (rate limits) — via rate limiting design
-- Pitfall 13 (partial failures) — via `Promise.allSettled` pattern
+- Multiple CTAs (single primary CTA repeated consistently)
+- Animation performance degradation (CSS-first approach, performance budget enforced)
+- Being clever at expense of clarity (user-test headline with 5 local business owners before building)
+- Dark mode breaking visual effects (design in both modes simultaneously, use semantic color tokens)
+- Mobile experience as afterthought (design mobile layout first, then scale up)
+- Wrong aesthetic for target audience (validate with local business owner interviews)
 
-**Research flag:** Standard patterns; skip phase-level research
+**Research flags:** Standard patterns (well-documented hero section examples from Linear, Notion, Stripe). No deeper research needed.
 
-### Phase 2: Cron Processing
-**Rationale:** With database and send logic ready, add background processing layer. Vercel Cron requires production deployment for testing, so this phase needs careful validation. CRON_SECRET security must be set up before first deployment.
+---
 
-**Delivers:**
-- Scheduled send processor (`lib/scheduled-sends/processor.ts`) with due send fetching, batch processing, and status updates
-- Vercel Cron route handler (`app/api/cron/process-scheduled-sends/route.ts`) with CRON_SECRET validation
-- vercel.json configuration with `* * * * *` schedule (every minute)
-- Environment variables: CRON_SECRET, SUPABASE_SERVICE_ROLE_KEY
-
-**Uses stack elements:**
-- Vercel Cron platform feature
-- Service role client from Phase 1
-- date-fns for time comparisons
-
-**Implements architecture:**
-- Background processor component with row locking
-- Cron route handler with security validation
-
-**Avoids pitfalls:**
-- Pitfall 2 (service role security) — via CRON_SECRET header validation
-- Pitfall 1 (race conditions) — via row locking in processor
-- Pitfall 13 (partial failures) — via per-send error handling
-
-**Research flag:** Vercel Cron deployment testing required; no additional research needed (well-documented)
-
-### Phase 3: Scheduling UI
-**Rationale:** With backend processing complete, add user-facing scheduling interface. Timezone handling is the main complexity here — must display local time while storing UTC. Preset buttons reduce cognitive load and match user mental models from Gmail/Outlook.
+### Phase 2: Problem/Solution Storytelling
+**Rationale:** After grabbing attention in hero, need emotional connection through pain-point storytelling. This section differentiates AvisLoop (simplicity positioning) and builds trust before feature details.
 
 **Delivers:**
-- Schedule send modal with preset buttons ("In 1 hour", "Tomorrow 9am", "In 24 hours", "Custom")
-- Custom date/time picker using HTML datetime-local input (no library needed)
-- Timezone indicator in UI ("Pacific Time (PST)")
-- Schedule action enhancement (`lib/actions/schedule.ts`) with validation
-- Integration with existing contact selector and template system
+- Problem section (empathy hook: "Review requests are a pain—forgetting, awkwardness, complexity")
+- Solution section (product demo showing 2-minute send flow)
+- How It Works (3-step visual: Add contact → Write message → Send)
+- Stats showcase (animated counters for social proof: "50,000+ reviews collected")
 
 **Addresses features:**
-- Schedule with presets (table stakes)
-- Custom date/time picker (table stakes)
-- Timezone display (table stakes)
-- Schedule confirmation toast (competitive)
+- Pain-point storytelling (differentiator)
+- Outcome-focused copy (differentiator)
+- One-click Google review link preview (differentiator)
+- Trust signals (table stakes)
 
 **Avoids pitfalls:**
-- Pitfall 3 (timezone confusion) — via UTC storage + local display with abbreviation
-- Pitfall 9 (confusing timezone display) — via relative + absolute time display
-- Pitfall 7 (quota counting) — via reservation strategy (count scheduled + sent)
+- Being clever at expense of clarity (show actual product, not metaphors)
+- Hydration mismatch (use 'use client' for animation components, avoid dynamic CSS values)
 
-**Research flag:** Standard UI patterns; skip phase-level research
+**Research flags:** Standard patterns (3-step "how it works" is ubiquitous in SaaS landing pages). No deeper research needed.
 
-### Phase 4: Management UI & Monitoring
-**Rationale:** Users need visibility into scheduled sends and ability to cancel. Monitoring ensures reliability — silent cron failures are a critical operational risk. Health checks and alerts catch issues before users report them.
+---
+
+### Phase 3: Features, Testimonials, FAQ
+**Rationale:** Middle-funnel conversion elements. Features justify the value, testimonials provide social proof with specific outcomes, FAQ handles final objections.
 
 **Delivers:**
-- Scheduled sends list page (`app/dashboard/scheduled-sends/`) with table view
-- Status badges (pending, processing, completed, failed, cancelled)
-- Cancel button with confirmation dialog
-- Progress indicators for processing sends (sent_count / total_contacts)
-- Structured logging in cron endpoint
-- Health check endpoint (`/api/health/scheduled-sends`)
-- External monitoring setup (BetterStack or Sentry)
+- Features grid (3-6 interactive cards with benefits: "Get more reviews", "Save time", "No awkward asks")
+- Testimonials v2 (carousel or stagger animation, outcome-focused quotes with real customer photos)
+- FAQ v2 (accordion, preemptively address: setup time, email compatibility, response rates, HIPAA/privacy)
+- Final CTA (repeat free trial CTA with risk-reversal: "No credit card required")
 
 **Addresses features:**
-- View scheduled sends (table stakes)
-- Cancel scheduled send (table stakes)
-- Status tracking (table stakes)
-- Partial send results (competitive)
+- Customer testimonials with specific outcomes (table stakes)
+- FAQ section (table stakes)
+- Industry-specific social proof (differentiator)
+- Minimal motion that adds meaning (differentiator)
 
 **Avoids pitfalls:**
-- Pitfall 8 (no confirmation/visibility) — via dedicated list page
-- Pitfall 10 (cancel expectations) — via confirmation dialog with partial send warnings
-- Pitfall 11 (silent failures) — via structured logging and monitoring
-- Pitfall 14 (processing visibility) — via progress tracking
+- Mobile experience (test all interactive elements on real devices, ensure touch targets ≥44px)
+- Dark mode edge cases (run axe DevTools audit for both light/dark modes)
 
-**Research flag:** Monitoring tool selection needed; evaluation phase for BetterStack vs Sentry vs Axiom
+**Research flags:** Standard patterns (feature grids and FAQ sections are well-established). No deeper research needed.
+
+---
+
+### Phase 4: Performance Optimization & SEO
+**Rationale:** Before launch, validate Core Web Vitals, ensure SEO elements preserved, set up analytics tracking verification. This phase de-risks launch.
+
+**Delivers:**
+- Image optimization (convert to WebP, generate blur placeholders, set priority flags)
+- Lighthouse CI configured (block merge if LCP >2.5s or CLS >0.1)
+- Structured data added (Schema.org SoftwareApplication type with pricing/ratings)
+- Metadata verified (page titles, meta descriptions, OpenGraph images)
+- Analytics tracking tested (all GA4 events fire correctly, conversion funnels work end-to-end)
+- Accessibility audit (WCAG AA contrast ratios, keyboard navigation, screen reader compatibility)
+- A/B testing infrastructure (feature flags via Vercel Edge Config or environment variable toggle)
+
+**Addresses features:**
+- Pricing transparency (table stakes, verify SEO metadata includes pricing info)
+- Mobile-first responsive design (validate with real device testing)
+
+**Avoids pitfalls:**
+- Animation performance degradation (enforce performance budget with Lighthouse CI)
+- SEO regression (preserve URL structure, ensure Server Components for hero content, maintain structured data)
+- Analytics tracking breaks (test all events in staging, document current tracking before migration)
+- Mobile experience (test on iPhone SE, Moto G Power with 3G throttling)
+
+**Research flags:** Standard patterns (performance optimization is well-documented). No deeper research needed, but requires careful execution and testing.
+
+---
+
+### Phase 5: Sign-up Flow Alignment & Launch
+**Rationale:** Ensure design consistency at conversion point (landing page → sign-up → onboarding). Deploy with gradual rollout for safe validation.
+
+**Delivers:**
+- Sign-up page updated to match landing page aesthetic (shared Button, Card, typography components)
+- Onboarding flow updated with new design tokens
+- Feature flag deployment (10% of traffic week 1, 50% week 2, 100% week 3)
+- Real-time monitoring dashboard (conversion rate, Core Web Vitals, error rate)
+- Rollback procedure documented and tested
+- Success criteria defined (conversion rate ≥3.2%, LCP <2.5s, CLS <0.1, no increase in error rate)
+
+**Addresses features:**
+- Free trial CTA (table stakes, ensure sign-up flow matches landing page promise)
+
+**Avoids pitfalls:**
+- Inconsistent design language between marketing and app (update sign-up flow to match landing page, use shared components)
+- No rollback plan or A/B test strategy (feature flag enables instant rollback, gradual rollout de-risks launch)
+
+**Research flags:** Standard patterns (gradual rollout is industry best practice). No deeper research needed.
+
+---
 
 ### Phase Ordering Rationale
 
-- **Phase 1 before 2:** Database schema must exist before cron processor can query it; extracted send function must exist before scheduled processor can call it
-- **Phase 2 before 3:** Background processing must work before users can schedule sends (otherwise scheduled sends never execute)
-- **Phase 3 before 4:** Users can schedule sends before management UI exists (programmatic scheduling works); but management UI is high priority for confidence and cancellation
-- **Phase 4 last:** Monitoring and management UI enhance existing functionality but aren't blocking; can iterate on alerts and health checks post-launch
-
-**Dependency chains identified:**
-- Database → Processor → Cron route (linear dependency)
-- Extracted send function → Both immediate and scheduled flows (shared dependency)
-- Service role client → Cron route (security dependency)
-- Scheduling UI → Schedule action → Database (user interaction flow)
-
-**Architecture patterns discovered:**
-- Service role pattern for RLS bypass in cron context
-- Row locking pattern for safe concurrent processing
-- Idempotency keys for duplicate prevention
-- Status state machine for clear lifecycle management
-
-**How this avoids pitfalls:**
-- Early phase 1 work prevents race conditions and inconsistent validation (hardest to fix later)
-- Phase 2 security setup prevents service role exposure before production
-- Phase 3 timezone handling prevents UX confusion from day one
-- Phase 4 monitoring catches operational issues before they cascade
+- **Dependencies:** Animation primitives (Phase 1) are reused in all subsequent phases. Performance budget (Phase 1) prevents rework. SEO/analytics verification (Phase 4) must happen before launch (Phase 5).
+- **Risk mitigation:** Front-load highest-risk areas (hero section performance, mobile experience, dark mode support) in Phase 1. Validate with user testing before building remaining sections.
+- **Incremental validation:** Each phase delivers standalone value. Phase 1 hero can be tested in isolation. Phase 2-3 build on validated foundation. Phase 4 de-risks launch. Phase 5 ensures safe deployment.
+- **Avoiding pitfalls:** Research shows most landing page redesigns fail due to performance degradation (Phase 1/4 mitigation), unclear messaging (Phase 1 user testing), mobile UX issues (Phase 1 mobile-first design), or SEO regression (Phase 4 verification). This phase structure addresses these systematically.
 
 ### Research Flags
 
-Phases with standard patterns (skip deep research):
-- **Phase 1:** Database schema and RLS patterns well-documented in Supabase docs; extraction refactoring is code-level work
-- **Phase 2:** Vercel Cron has comprehensive official documentation; row locking is standard PostgreSQL pattern
-- **Phase 3:** HTML datetime-local is W3C standard; preset button UX is well-established pattern
+**Phases with standard patterns (skip deeper research):**
+- **All phases** — Landing page redesign has extensive documentation (100+ examples analyzed, SaaSFrame/Unbounce/Landingfolio case studies). Architecture patterns (Server/Client Component split, animation primitives, performance optimization) are well-established in Next.js community.
 
-Phases needing validation during planning:
-- **Phase 4:** Monitoring tool selection requires evaluation (BetterStack vs Sentry vs Axiom) — not a research blocker, but decision needed during phase planning
+**Phases needing extra validation (not deeper research, but careful execution):**
+- **Phase 1** — User-test headline and hero design with 5-10 local business owners before building. Validate aesthetic fits target audience (professional but approachable, not trendy/edgy).
+- **Phase 4** — Real device testing on budget Android (Moto G Power) and older iOS (iPhone SE) with 3G throttling. Performance budget enforcement is critical.
+- **Phase 5** — Monitor conversion rate hourly on launch day. Have instant rollback procedure ready.
+
+**No phases require /gsd:research-phase during planning.** All patterns are well-documented.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | No new packages needed; all capabilities exist in current stack; Vercel Cron and Supabase service role are official features with comprehensive docs |
-| Features | HIGH | Table stakes and differentiators identified from Gmail, Outlook, Mailchimp UX patterns; anti-features backed by technical constraints (30-day Resend limit) |
-| Architecture | HIGH | Existing codebase analysis reveals 80% code reuse; integration points well-defined; row locking pattern proven in production systems (Solid Queue) |
-| Pitfalls | HIGH | 14 pitfalls identified from official docs, community patterns, and codebase analysis; prevention strategies validated against existing implementation |
+| Stack | HIGH | CSS-first approach with selective JavaScript is proven pattern. Framer Motion React 19 compatibility verified (v12.27.0+). Browser API support (Scroll-driven Animations, Intersection Observer) confirmed for Safari 26+/Chrome 115+. Performance impact of animation libraries benchmarked. |
+| Features | HIGH | Synthesized from 100+ SaaS landing page examples (SaaSFrame, Landingfolio, KlientBoost), competitor analysis (Podium/Birdeye/NiceJob), conversion optimization research (Unbounce case studies), local business positioning research. Table stakes vs differentiators distinction validated across multiple sources. |
+| Architecture | HIGH | Next.js App Router Server/Client Component patterns are established best practices (official Next.js docs, Hemant Sundaray blog, ImCorfitz blog). Side-by-side replacement strategy validated in refactoring case studies (Dev.to examples). Performance optimization patterns verified (Vercel docs, Core Web Vitals guides). |
+| Pitfalls | MEDIUM-HIGH | Based on 2026 WebSearch results, performance benchmarks (Core Web Vitals data, Lighthouse studies), UX research (accessibility audits, mobile optimization studies), and landing page failure case studies. Specific pitfall impact percentages (53% abandon >3s load, 304% CTA lift above-fold, 266% multi-CTA conversion drop) from cited research. Some findings are correlational not causal, but patterns consistent across sources. |
 
 **Overall confidence:** HIGH
 
+Research is comprehensive with convergent findings from multiple high-quality sources. Stack recommendations are conservative (extend existing tools, minimal new dependencies). Architecture patterns are proven in Next.js community. Feature hierarchy validated across 50+ competitive landing pages. Pitfall identification based on real failure case studies and performance data.
+
 ### Gaps to Address
 
-While research confidence is high, a few areas need validation during implementation:
+**Animation complexity threshold:** Research consensus is "minimal motion that adds meaning" (Linear/Notion style), but exact threshold for "too much animation" for local business owner audience is uncertain. **Mitigation:** User-test with 5-10 target customers, measure scroll depth and time-on-page, compare to pre-redesign baseline. If time-on-page decreases or scroll depth drops, animations are overwhelming.
 
-- **Vercel Cron testing strategy** — Cron only runs in production; local testing requires curl to route handler; may need staging environment for cron validation before production rollout
-- **Batch size tuning** — Research suggests 10-25 sends per cron invocation based on Resend rate limits (2/sec) and serverless timeout (10s hobby, 60s pro); actual batch size depends on email template complexity and may need adjustment after production monitoring
-- **Quota reservation vs send-time counting** — Research presents two approaches (reserve at schedule time, or count at send time with buffer); decision impacts UX and requires product judgment (recommend reservation for user clarity)
-- **Monitoring tool selection** — BetterStack, Sentry, and Axiom all viable; needs cost/feature evaluation during Phase 4 planning
-- **DST edge case testing** — Timezone handling strategy is clear (UTC storage + local display), but DST boundary dates (spring forward, fall back) need explicit test cases to verify correctness
+**Industry-specific messaging:** Unclear whether single generic landing page or separate pages for dentists/salons/contractors converts better. Research shows industry-specific social proof increases relatability, but creates maintenance complexity. **Mitigation:** Start with single page using togglable testimonials by industry. A/B test generic vs industry-specific headline after launch (Phase 5+).
+
+**Video vs animated walkthrough:** Some research advocates for 30-second explainer video, other sources show animated UI walkthrough performs better for SaaS. Unclear which is optimal for AvisLoop's local business audience. **Mitigation:** Start with animated walkthrough (lower production cost, easier to update). If conversion doesn't hit target (3.2%+), test video version in A/B test.
+
+**Framer Motion necessity:** Research shows Framer Motion adds 82KB but enables complex hero animations. Unclear if hero section truly needs this complexity or if CSS-only approach is sufficient. **Mitigation:** Build Phase 1 hero with CSS animations first (fade-in, slide-in). If stakeholder feedback demands more complex orchestration, add Framer Motion conditionally with dynamic import (ssr: false).
+
+**Gradual rollout duration:** Research consensus is 10% → 50% → 100% rollout, but duration unclear (1 week per step vs 2 weeks?). **Mitigation:** Week 1 at 10%, monitor hourly. If conversion rate ≥3.2% and no errors, move to 50% week 2. If still stable, 100% week 3. Extend timeline if any metric degrades >10%.
 
 ## Sources
 
-### Primary (HIGH confidence)
-- [Vercel Cron Jobs Documentation](https://vercel.com/docs/cron-jobs)
-- [Vercel Cron Jobs Quickstart](https://vercel.com/docs/cron-jobs/quickstart)
-- [Supabase Service Role Key](https://supabase.com/docs/guides/troubleshooting/why-is-my-service-role-key-client-getting-rls-errors-or-not-returning-data-7_1K9z)
-- [PostgreSQL Explicit Locking](https://www.postgresql.org/docs/current/explicit-locking.html)
-- [PostgreSQL SELECT](https://www.postgresql.org/docs/current/sql-select.html)
-- [MDN: datetime-local Input](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/datetime-local)
-- [date-fns v4.0 Release](https://blog.date-fns.org/v40-with-time-zone-support/)
-- [Resend Schedule Email API](https://resend.com/docs/dashboard/emails/schedule-email)
-- [Resend Idempotency Keys](https://resend.com/docs/dashboard/emails/idempotency-keys)
-- [Resend Rate Limits](https://resend.com/docs/api-reference/rate-limit)
+### Primary Sources (HIGH confidence)
 
-### Secondary (MEDIUM confidence)
-- [How to Secure Vercel Cron Job Routes](https://codingcat.dev/post/how-to-secure-vercel-cron-job-routes-in-next-js-14-app-router)
-- [Using Service Role with Supabase in Next.js](https://github.com/orgs/supabase/discussions/30739)
-- [The Unreasonable Effectiveness of SKIP LOCKED](https://www.inferable.ai/blog/posts/postgres-skip-locked)
-- [Solid Queue analysis](https://www.bigbinary.com/blog/solid-queue)
-- [Gmail Schedule Send](https://www.getmailtracker.com/blog/how-to-schedule-email-in-gmail)
-- [Outlook Delay or Schedule Email](https://support.microsoft.com/en-us/office/delay-or-schedule-sending-email-messages-in-outlook-026af69f-c287-490a-a72f-6c65793744ba)
-- [International SaaS Timezone Edge Cases](https://dev.to/tomjstone/international-saas-nightmare-timezone-edge-cases-and-how-to-solve-them-once-and-for-all-57hn)
-- [Handling Timezones in Enterprise Applications](https://medium.com/@20011002nimeth/handling-timezones-within-enterprise-level-applications-utc-vs-local-time-309cbe438eaf)
-- [How to Monitor Cron Jobs in 2026](https://dev.to/cronmonitor/how-to-monitor-cron-jobs-in-2026-a-complete-guide-28g9)
+**Stack research:**
+- [Framer Motion React 19 Compatibility](https://github.com/motiondivision/motion/issues/2668) — Verified v12.27.0+ official support
+- [Motion Changelog](https://motion.dev/changelog) — Latest React 19 fixes documented
+- [WebKit Scroll-driven Animations Guide](https://webkit.org/blog/17101/a-guide-to-scroll-driven-animations-with-just-css/) — Safari 26+ support confirmed
+- [CSS Scroll-driven Animations - MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Scroll-driven_animations) — Native API reference
+- [Next.js Image Component Docs](https://nextjs.org/docs/app/api-reference/components/image) — Official optimization guide
 
-### Tertiary (LOW confidence, for context)
-- [Email Scheduling Best Practices](https://woodpecker.co/blog/how-to-schedule-an-email/)
-- [Time Picker UX Best Practices](https://www.eleken.co/blog-posts/time-picker-ux)
-- [Designing A Time Zone Selection UX](https://smart-interface-design-patterns.com/articles/time-zone-selection-ux/)
+**Features research:**
+- [SaaSFrame: 10 SaaS Landing Page Trends for 2026](https://www.saasframe.io/blog/10-saas-landing-page-trends-for-2026-with-real-examples) — 100+ examples analyzed
+- [Unbounce: 26 SaaS Landing Pages](https://unbounce.com/conversion-rate-optimization/the-state-of-saas-landing-pages/) — Conversion best practices, 304% above-fold CTA lift, 27% H1 "you" usage
+- [Evil Martians: 100 Dev Tool Landing Pages Study](https://evilmartians.com/chronicles/we-studied-100-devtool-landing-pages-here-is-what-actually-works-in-2025) — What converts for tech audiences
+- [Landingfolio: 341 Best SaaS Landing Page Examples](https://www.landingfolio.com/inspiration/landing-page/saas) — Pattern library
+- [Webstacks: SaaS Website Conversions 2026](https://www.webstacks.com/blog/website-conversions-for-saas-businesses) — Decision paralysis data, multi-CTA conversion drops
 
-### Existing Codebase (analysis performed)
-- `lib/actions/send.ts` — email sending logic, eligibility checks, rate limiting, quota enforcement (lines 80-530)
-- `lib/actions/schedule.ts` — scheduled send CRUD operations (exists with basic functionality)
-- `lib/data/send-logs.ts` — quota tracking (`getMonthlyCount`, `getResendReadyContacts`)
-- Database schema — RLS patterns, multi-tenancy enforcement, existing business rules
+**Architecture research:**
+- [Next.js 15 Scroll Behavior Guide](https://dev.to/hijazi313/nextjs-15-scroll-behavior-a-comprehensive-guide-387j) — App Router scroll patterns
+- [Hemantasundaray: Framer Motion with Server Components](https://www.hemantasundaray.com/blog/use-framer-motion-with-nextjs-server-components) — Server/Client Component wrapper pattern
+- [ImCorfitz: Framer Motion Page Transitions in App Router](https://www.imcorfitz.com/posts/adding-framer-motion-page-transitions-to-next-js-app-router) — Hydration avoidance patterns
+- [Next.js Metadata API Docs](https://nextjs.org/learn/seo/metadata) — Official SEO guide
+- [Prismic: next/image Performance](https://prismic.io/blog/nextjs-image-component-optimization) — Optimization patterns
+
+**Pitfalls research:**
+- [Core Web Vitals 2026: INP ≤200ms](https://www.neoseo.co.uk/core-web-vitals-2026/) — 2026 Google performance requirements
+- [CSS for Web Vitals](https://web.dev/articles/css-web-vitals) — Animation performance best practices
+- [OptinMonster: Mobile Landing Page Best Practices](https://optinmonster.com/mobile-landing-page-best-practices/) — 63% mobile traffic stat, touch target minimums
+- [Dark Mode Design Best Practices 2026](https://www.tech-rz.com/blog/dark-mode-design-best-practices-in-2026/) — Contrast ratio requirements, pure black avoidance
+- [Website Redesign SEO Guide 2026](https://moswebdesign.com/articles/website-redesign-for-seo/) — 301 redirect strategies, structured data preservation
+
+### Secondary Sources (MEDIUM confidence)
+
+**Competitor positioning:**
+- [Crazy Egg: Podium Review](https://www.crazyegg.com/blog/podium-review/) — $300-600/mo pricing, complexity issues
+- [Review Dingo: Birdeye vs Podium](https://reviewdingo.com/birdeye-vs-podium-vs-reputation-best/) — Feature comparison, enterprise focus
+- [GatherUp vs NiceJob Comparison](https://reviewgrower.com/gatherup-vs-nicejob/) — Mid-tier competitor positioning
+
+**Local business audience:**
+- [Social Pilot: How to Get More Google Reviews](https://www.socialpilot.co/reviews/blogs/how-to-get-google-reviews) — Local business pain points (forgetting, awkwardness)
+- [Emitrr: Dental Reputation Management Software](https://emitrr.com/blog/review-and-reputation-management-software-for-dental-office/) — Industry-specific needs
+- [Pipedrive: Emotional Marketing for SMBs](https://www.pipedrive.com/en/blog/emotional-marketing) — Emotional triggers (relief, control, gratitude)
+
+**Conversion optimization:**
+- [First Page Sage: Average SaaS Conversion Rates 2026](https://firstpagesage.com/reports/cta-conversion-rates-report/) — 2-5% trial conversion benchmark
+- [Custify: Free Trial Conversion Rate](https://www.custify.com/blog/free-trial-conversion-rate/) — No credit card best practice
+- [Abmatic: SaaS Landing Page Mistakes](https://abmatic.ai/blog/top-saas-landing-page-mistakes-to-avoid) — Anti-patterns documented
+
+### Tertiary Sources (LOW confidence, needs validation)
+
+**Animation impact:**
+- [Lottie Performance Issues](https://forum.lottiefiles.com/t/lottiefile-in-next-js-webcore-vitals-performance-issue/1747) — Community forum reports (anecdotal)
+- [SVGator: Animated Landing Page Examples](https://www.svgator.com/blog/animated-landing-pages-examples/) — Creative examples (not conversion data)
+
+**A/B testing strategy:**
+- [Workshop Digital: Landing Page Optimization](https://www.workshopdigital.com/blog/how-landing-page-optimization-affects-conversion-rates/) — Case studies (limited sample size)
+- [Unbounce: CRO Case Studies](https://unbounce.com/conversion-rate-optimization/cro-case-studies/) — 12 examples (vary by industry)
 
 ---
-*Research completed: 2026-01-28*
-*Ready for roadmap: yes*
+
+*Research completed: 2026-02-01*
+*Ready for roadmap: Yes*
