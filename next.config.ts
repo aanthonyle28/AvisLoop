@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  cacheComponents: true,
+  // Disable cacheComponents - incompatible with route segment configs like dynamic, revalidate
+  // cacheComponents: true,
 };
 
 export default nextConfig;

@@ -6,8 +6,6 @@ import { render } from '@react-email/render'
 import { COOLDOWN_DAYS, MONTHLY_SEND_LIMITS } from '@/lib/constants/billing'
 import type { ScheduledSend } from '@/lib/types/database'
 
-export const dynamic = 'force-dynamic'
-
 /**
  * Cron endpoint for processing scheduled sends.
  * Invoked by Vercel Cron every minute.

@@ -10,6 +10,8 @@ export const metadata = {
   description: 'Manage your scheduled review requests',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function ScheduledPage() {
   const supabase = await createClient()
 
