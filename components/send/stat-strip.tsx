@@ -1,5 +1,7 @@
+'use client'
+
 import Link from 'next/link'
-import { ArrowSquareOut, WarningCircle, Star } from '@phosphor-icons/react/dist/ssr'
+import { ArrowSquareOut, WarningCircle, Star, ArrowRight } from '@phosphor-icons/react'
 
 interface StatStripProps {
   usage: {
@@ -28,6 +30,9 @@ export function StatStrip({ usage, responseRate, needsAttention }: StatStripProp
   const isNearLimit = percentage >= 80 && percentage < 90
   const isAtLimit = percentage >= 90
 
+  // Only show star avg when there's actual data
+  const starAvg = responseRate.total > 0 ? (responseRate.rate / 20).toFixed(1) : '0.0'
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
       {/* Monthly Usage */}
@@ -45,7 +50,7 @@ export function StatStrip({ usage, responseRate, needsAttention }: StatStripProp
           <div className="text-2xl font-bold">
             {usage.count.toLocaleString()}/{usage.limit.toLocaleString()}
           </div>
-          <div className="text-xs text-muted-foreground">sends</div>
+          <div className="text-xs text-muted-foreground">sends used</div>
         </div>
 
         <div className="mb-2">
@@ -67,7 +72,7 @@ export function StatStrip({ usage, responseRate, needsAttention }: StatStripProp
           </Link>
         ) : (
           <div className="text-xs text-muted-foreground">
-            {remaining.toLocaleString()} remaining
+            {remaining.toLocaleString()} remaining this month
           </div>
         )}
       </div>
@@ -80,21 +85,28 @@ export function StatStrip({ usage, responseRate, needsAttention }: StatStripProp
         </div>
 
         <div className="mb-2">
-          <div className="text-2xl font-bold">{responseRate.rate}%</div>
-          <div className="text-xs text-muted-foreground">
-            {responseRate.responded}/{responseRate.total} responded
+          <div className="flex items-baseline gap-2">
+            <span className="text-2xl font-bold">{responseRate.rate}%</span>
+            {responseRate.total > 0 && responseRate.rate > 0 && (
+              <span className="text-xs text-green-600 font-medium">
+                +{responseRate.rate}% from last month
+              </span>
+            )}
           </div>
         </div>
 
-        <div className="flex items-center gap-1">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Star
-              key={i}
-              size={14}
-              weight={i < filledStars ? 'fill' : 'regular'}
-              className={i < filledStars ? 'text-yellow-400' : 'text-gray-300'}
-            />
-          ))}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-0.5">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Star
+                key={i}
+                size={14}
+                weight={i < filledStars ? 'fill' : 'regular'}
+                className={i < filledStars ? 'text-yellow-400' : 'text-gray-300'}
+              />
+            ))}
+          </div>
+          <span className="text-xs text-muted-foreground">{starAvg}/5 avg</span>
         </div>
       </div>
 
@@ -111,10 +123,19 @@ export function StatStrip({ usage, responseRate, needsAttention }: StatStripProp
         </div>
 
         {needsAttention.total > 0 ? (
-          <Link href="/history?status=failed" className="text-xs text-primary hover:underline">
-            {needsAttention.pending > 0 && `${needsAttention.pending} pending`}
-            {needsAttention.pending > 0 && needsAttention.failed > 0 && ', '}
-            {needsAttention.failed > 0 && `${needsAttention.failed} failed`}
+          <Link href="/history?status=failed" className="flex items-center gap-2">
+            {needsAttention.pending > 0 && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-600 border border-red-200">
+                {needsAttention.pending} Pending
+                <ArrowRight size={10} weight="bold" />
+              </span>
+            )}
+            {needsAttention.failed > 0 && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-600 border border-red-200">
+                {needsAttention.failed} Failed
+                <ArrowRight size={10} weight="bold" />
+              </span>
+            )}
           </Link>
         ) : (
           <div className="text-xs text-muted-foreground">All clear</div>

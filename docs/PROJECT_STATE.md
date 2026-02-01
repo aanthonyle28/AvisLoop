@@ -6,23 +6,17 @@
 - Landing page redesigned with new aesthetic
 - Dashboard design tweaks applied (Figma alignment)
 - Onboarding flow fixed and test send walkthrough added
+- 3 blocking bugs fixed (onboarding redirect, step 2 finish, missing is_test column)
+- Stat cards always visible (no longer gated behind test_sent)
+- Resend integration confirmed working (API key + FROM domain configured)
 
 ## Last session summary
-- **Quick task 003: Fix Onboarding Issues** (6 fixes):
-  - Google Auth: `signInWithGoogle()` returns URL instead of calling `redirect()` (throws in client)
-  - Full Name: removed `.min(1)` from optional field so empty string passes validation
-  - Onboarding screen: moved to `app/onboarding/` (out of dashboard shell) — full-width, centered, no nav
-  - QuickSend: always visible on dashboard after onboarding
-  - Stat cards (Monthly Usage, Needs Attention, Review Rate): hidden until `test_sent` onboarding step complete
-  - Send without review link: graceful handling when `google_review_link` missing
-- **Quick task 004: Fix Test Send Onboarding**:
-  - Test send card no longer tries to call real Resend API
-  - Detection reads from JSONB column instead of querying send_logs
-- **Test Send Walkthrough**:
-  - Card #3 navigates to `/send?test=true`
-  - Full send UI walkthrough (select contact, template, preview, send) — no email sent
-  - On submit: marks onboarding step complete, shows success screen, redirects to dashboard
-  - Bypasses google_review_link gate, quota limits, and usage warnings in test mode
+- **Fix: Onboarding redirect** — `send/page.tsx` now redirects to `/onboarding` instead of `/dashboard/settings` when no business exists
+- **Fix: Step 2 Finish button** — onboarding step 2 (Google review link) now uses `saveReviewLink()` instead of `updateBusiness()`, avoiding silent validation failure from empty name field
+- **Fix: Missing `is_test` column** — `send_logs` table was missing the `is_test` boolean column that the send action inserts; added via migration `add_is_test_to_send_logs`
+- **Fix: Stat cards always visible** — removed `test_sent` gate on stat cards (Monthly Usage, Needs Attention, Review Rate); they now always render on the Send page. Removed unnecessary `getOnboardingCardStatus()` call from Send page.
+- **Send page redesign** — stats, recent activity, and send form now rendered through `SendPageClient` component with updated props
+- **End-to-end tested** full 4-step setup checklist flow via Playwright: add contact → set review link → create template → send request (real Resend email delivered successfully)
 - Lint + typecheck clean
 
 ## What's been built
@@ -33,18 +27,16 @@
 - **Sending**: Contact selector, message preview, Resend integration, cooldown, quotas
 - **History**: Send history with date filtering, search, status badges
 - **Billing**: Stripe integration, tier enforcement, usage tracking
-- **Onboarding**: Setup wizard, dashboard checklist, test send walkthrough, completion redirect
+- **Onboarding**: Setup wizard, dashboard checklist, completion redirect
 - **Marketing**: Landing page, pricing page, responsive design, mobile nav menu
 - **Polish**: Design system, loading states, micro-interactions, accessibility, branded titles
 
 ## Next steps
-1. Configure Resend (API key + verified FROM domain) for real sends
-2. Configure Supabase Google OAuth provider in dashboard
-3. Replace image placeholders with real screenshots
-4. Production deployment prep
-5. Optional: /gsd:audit-milestone or /gsd:complete-milestone
+1. Configure Supabase Google OAuth provider in dashboard
+2. Replace image placeholders with real screenshots
+3. Production deployment prep
+4. Optional: /gsd:audit-milestone or /gsd:complete-milestone
 
 ## Open questions / decisions needed
-- Resend FROM email domain verification
 - Google OAuth provider config in Supabase dashboard
 - Production domain and deployment

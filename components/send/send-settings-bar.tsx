@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import type { EmailTemplate } from '@/lib/types/database'
+import { format } from 'date-fns'
 
 type SchedulePreset = 'immediately' | '1hour' | 'morning' | 'custom'
 
@@ -24,6 +25,8 @@ export function SendSettingsBar({
   customDateTime,
   onCustomDateTimeChange,
 }: SendSettingsBarProps) {
+  const customInputRef = useRef<HTMLInputElement>(null)
+
   // Load from localStorage on mount
   useEffect(() => {
     const savedTemplate = localStorage.getItem('avisloop_lastTemplate')
@@ -38,7 +41,6 @@ export function SendSettingsBar({
     }
   }, [templates, onTemplateChange, onSchedulePresetChange])
 
-  // Save to localStorage on change
   const handleTemplateChange = (templateId: string) => {
     localStorage.setItem('avisloop_lastTemplate', templateId)
     onTemplateChange(templateId)
@@ -47,14 +49,33 @@ export function SendSettingsBar({
   const handleScheduleChange = (preset: SchedulePreset) => {
     localStorage.setItem('avisloop_lastSchedule', preset)
     onSchedulePresetChange(preset)
+    // When custom is selected, focus the hidden date input to open the picker
+    if (preset === 'custom') {
+      setTimeout(() => {
+        customInputRef.current?.showPicker?.()
+        customInputRef.current?.focus()
+      }, 50)
+    }
   }
 
+  // Format custom date for display in the chip
+  const customDateLabel = customDateTime
+    ? `Custom: ${format(new Date(customDateTime), 'MMM d, h:mm a')}`
+    : 'Custom Date'
+
+  const presetButtonClass = (preset: SchedulePreset) =>
+    `px-3 py-2 text-xs font-medium rounded-md border transition-colors whitespace-nowrap ${
+      schedulePreset === preset
+        ? 'bg-primary/10 border-primary text-primary'
+        : 'bg-background border-border hover:bg-muted'
+    }`
+
   return (
-    <div className="flex flex-col sm:flex-row gap-4 p-4 bg-muted/30 rounded-lg border">
+    <div className="flex flex-col sm:flex-row sm:items-end gap-4">
       {/* Template dropdown */}
-      <div className="flex-1">
+      <div className="sm:w-48">
         <label htmlFor="template-select" className="block text-xs font-medium text-muted-foreground mb-1.5">
-          Template
+          Message Template
         </label>
         <select
           id="template-select"
@@ -73,64 +94,35 @@ export function SendSettingsBar({
       {/* Schedule presets */}
       <div className="flex-1">
         <label className="block text-xs font-medium text-muted-foreground mb-1.5">
-          Schedule
+          When to Send
         </label>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => handleScheduleChange('immediately')}
-            className={`flex-1 px-3 py-2 text-xs font-medium rounded-md border transition-colors ${
-              schedulePreset === 'immediately'
-                ? 'bg-primary/10 border-primary text-primary'
-                : 'bg-background border-border hover:bg-muted'
-            }`}
-          >
-            Now
+        <div className="flex gap-2 flex-wrap">
+          <button type="button" onClick={() => handleScheduleChange('immediately')} className={presetButtonClass('immediately')}>
+            Immediately
           </button>
-          <button
-            type="button"
-            onClick={() => handleScheduleChange('1hour')}
-            className={`flex-1 px-3 py-2 text-xs font-medium rounded-md border transition-colors ${
-              schedulePreset === '1hour'
-                ? 'bg-primary/10 border-primary text-primary'
-                : 'bg-background border-border hover:bg-muted'
-            }`}
-          >
-            1hr
+          <button type="button" onClick={() => handleScheduleChange('1hour')} className={presetButtonClass('1hour')}>
+            In 1 hour
           </button>
-          <button
-            type="button"
-            onClick={() => handleScheduleChange('morning')}
-            className={`flex-1 px-3 py-2 text-xs font-medium rounded-md border transition-colors ${
-              schedulePreset === 'morning'
-                ? 'bg-primary/10 border-primary text-primary'
-                : 'bg-background border-border hover:bg-muted'
-            }`}
-          >
-            9AM
+          <button type="button" onClick={() => handleScheduleChange('morning')} className={presetButtonClass('morning')}>
+            Morning (9AM)
           </button>
-          <button
-            type="button"
-            onClick={() => handleScheduleChange('custom')}
-            className={`flex-1 px-3 py-2 text-xs font-medium rounded-md border transition-colors ${
-              schedulePreset === 'custom'
-                ? 'bg-primary/10 border-primary text-primary'
-                : 'bg-background border-border hover:bg-muted'
-            }`}
-          >
-            Custom
-          </button>
-        </div>
 
-        {/* Custom datetime input */}
-        {schedulePreset === 'custom' && (
-          <input
-            type="datetime-local"
-            value={customDateTime}
-            onChange={(e) => onCustomDateTimeChange(e.target.value)}
-            className="w-full mt-2 px-3 py-2 text-sm border rounded-md bg-background"
-          />
-        )}
+          {/* Custom date chip with inline date picker */}
+          <label className={`relative cursor-pointer ${presetButtonClass('custom')}`}>
+            {customDateLabel}
+            <input
+              ref={customInputRef}
+              type="datetime-local"
+              value={customDateTime}
+              onChange={(e) => {
+                onCustomDateTimeChange(e.target.value)
+                handleScheduleChange('custom')
+              }}
+              onFocus={() => handleScheduleChange('custom')}
+              className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+            />
+          </label>
+        </div>
       </div>
     </div>
   )

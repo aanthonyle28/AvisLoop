@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
-import { ArrowRight, ListBullets } from '@phosphor-icons/react/dist/ssr'
+import { ArrowRight } from '@phosphor-icons/react'
 import { StatusBadge } from '@/components/history/status-badge'
 import type { SendStatus } from '@/components/history/status-badge'
 
@@ -26,96 +26,70 @@ interface RecentActivityStripProps {
 export function RecentActivityStrip({ activities, mode, onItemClick }: RecentActivityStripProps) {
   if (activities.length === 0) {
     return (
-      <div className="bg-white border border-[#E3E3E3] rounded-lg p-5 mb-6">
-        <div className="flex items-center justify-between mb-3">
+      <div className="bg-white border border-[#E3E3E3] rounded-lg px-5 py-4 mb-6">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <ListBullets size={18} weight="bold" className="text-foreground" />
-            <h3 className="font-semibold text-base">Recent Activity</h3>
+            <span className="text-sm font-semibold text-foreground">Recent Activity:</span>
+            <span className="text-sm text-muted-foreground">No sends yet</span>
           </div>
-          <Link href="/history" className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
-            View all
+          <Link href="/history" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            View All
             <ArrowRight size={14} weight="bold" />
           </Link>
-        </div>
-        <div className="text-center text-muted-foreground py-6">
-          <p>No sends yet — send your first review request!</p>
         </div>
       </div>
     )
   }
 
-  // Group activities by batch_id if in bulk mode
+  // Group by batch if in bulk mode
   const displayItems = mode === 'bulk' && activities.some(a => a.batch_id)
     ? groupByBatch(activities)
-    : activities.slice(0, 5)
+    : activities.slice(0, 3)
 
   return (
-    <div className="bg-white border border-[#E3E3E3] rounded-lg p-5 mb-6">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <ListBullets size={18} weight="bold" className="text-foreground" />
-          <h3 className="font-semibold text-base">Recent Activity</h3>
+    <div className="bg-white border border-[#E3E3E3] rounded-lg px-5 py-4 mb-6">
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-semibold text-foreground shrink-0">Recent Activity:</span>
+
+        <div className="flex items-center gap-1 overflow-hidden flex-1 min-w-0">
+          {displayItems.map((item, index) => {
+            const isBatch = 'batch_count' in item && item.batch_count && item.batch_count > 1
+            const label = isBatch ? `${item.batch_count} contacts` : (item.contact_name || item.contact_email.split('@')[0])
+            const timeAgo = formatDistanceToNow(new Date(item.created_at), { addSuffix: false })
+
+            return (
+              <div key={item.id} className="flex items-center gap-1 min-w-0">
+                {index > 0 && (
+                  <span className="text-muted-foreground mx-2 shrink-0">|</span>
+                )}
+                <button
+                  onClick={() => onItemClick?.(item.id)}
+                  className="flex items-center gap-2 hover:bg-muted/50 rounded px-1.5 py-0.5 transition-colors min-w-0"
+                >
+                  <span className="text-sm font-medium truncate">{label}</span>
+                  <StatusBadge status={item.status as SendStatus} />
+                  <span className="text-xs text-muted-foreground whitespace-nowrap">{timeAgo}</span>
+                </button>
+              </div>
+            )
+          })}
         </div>
-        <Link href="/history" className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
-          View all
+
+        <Link
+          href="/history"
+          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors shrink-0"
+        >
+          View All
           <ArrowRight size={14} weight="bold" />
         </Link>
-      </div>
-
-      <div className="space-y-3">
-        {displayItems.map((item) => {
-          const isBatch = 'batch_count' in item && item.batch_count && item.batch_count > 1
-
-          return (
-            <button
-              key={item.id}
-              onClick={() => onItemClick?.(item.id)}
-              className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors text-left"
-            >
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                {isBatch ? (
-                  <div className="text-sm">
-                    <div className="font-medium">
-                      {item.batch_count} contacts
-                    </div>
-                    <div className="text-muted-foreground text-xs">
-                      Bulk send
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-sm min-w-0 flex-1">
-                    <div className="font-medium truncate">
-                      {item.contact_name}
-                    </div>
-                    <div className="text-muted-foreground text-xs truncate">
-                      {item.contact_email}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex items-center gap-3 shrink-0">
-                <StatusBadge status={item.status as SendStatus} />
-                <div className="text-xs text-muted-foreground whitespace-nowrap">
-                  {formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
-                </div>
-              </div>
-            </button>
-          )
-        })}
       </div>
     </div>
   )
 }
 
-/**
- * Group activities by batch_id, showing most recent batch with count.
- * Returns max 5 batches.
- */
 function groupByBatch(activities: RecentActivity[]): RecentActivity[] {
   const batches = new Map<string, RecentActivity[]>()
 
-  // Group by batch_id
   for (const activity of activities) {
     const batchId = activity.batch_id || activity.id
     if (!batches.has(batchId)) {
@@ -124,14 +98,11 @@ function groupByBatch(activities: RecentActivity[]): RecentActivity[] {
     batches.get(batchId)!.push(activity)
   }
 
-  // Convert to display items (take first item of each batch, add count)
-  const batchItems = Array.from(batches.values())
+  return Array.from(batches.values())
     .map((items) => ({
       ...items[0],
       batch_count: items.length,
     }))
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    .slice(0, 5)
-
-  return batchItems
+    .slice(0, 3)
 }

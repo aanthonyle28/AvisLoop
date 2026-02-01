@@ -125,7 +125,6 @@ export async function getOnboardingCardStatus(): Promise<OnboardingCardStatus> {
   }
 
   // Auto-detect contact_created and template_created from database state
-  // test_sent is manual-only (set via markOnboardingCardStep)
   const [contactResult, templateResult] = await Promise.all([
     supabase.from('contacts').select('id', { count: 'exact', head: true }).eq('business_id', business.id).eq('status', 'active'),
     supabase.from('email_templates').select('id', { count: 'exact', head: true }).eq('business_id', business.id),

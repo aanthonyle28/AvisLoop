@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useTransition, useMemo } from 'react'
+import { useState, useTransition, useMemo, useRef, useEffect } from 'react'
 import { toast } from 'sonner'
-import { MagnifyingGlass, X } from '@phosphor-icons/react'
+import { MagnifyingGlass, X, PaperPlaneTilt } from '@phosphor-icons/react'
 import { batchSendReviewRequest } from '@/lib/actions/send'
 import { scheduleReviewRequest } from '@/lib/actions/schedule'
 import { findOrCreateContact } from '@/lib/actions/contact'
 import { SendSettingsBar } from './send-settings-bar'
+import { MessagePreview } from './message-preview'
 import type { Contact, Business, EmailTemplate } from '@/lib/types/database'
 import { Loader2 } from 'lucide-react'
 
@@ -35,6 +36,10 @@ export function QuickSendTab({
   const [schedulePreset, setSchedulePreset] = useState<SchedulePreset>('immediately')
   const [customDateTime, setCustomDateTime] = useState('')
   const [isPending, startTransition] = useTransition()
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [highlightedIndex, setHighlightedIndex] = useState(-1)
+  const suggestionsRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   // Email search and matching
   const matchedContact = useMemo(() => {
@@ -43,8 +48,20 @@ export function QuickSendTab({
     return contacts.find(c => c.email.toLowerCase() === normalizedEmail) || null
   }, [email, contacts])
 
-  // Filter contacts by created today
-  const addedTodayContacts = useMemo(() => {
+  // Autocomplete suggestions - search by email AND name
+  const suggestions = useMemo(() => {
+    if (!email.trim() || email.trim().length < 2) return []
+    const query = email.toLowerCase().trim()
+    return contacts
+      .filter(c =>
+        c.email.toLowerCase().includes(query) ||
+        c.name.toLowerCase().includes(query)
+      )
+      .slice(0, 6)
+  }, [email, contacts])
+
+  // Filter contacts added today for quick chips
+  const recentContacts = useMemo(() => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     return contacts.filter(c => {
@@ -53,10 +70,24 @@ export function QuickSendTab({
     })
   }, [contacts])
 
-  // Get scheduled_for ISO string based on preset
+  // Close suggestions on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        suggestionsRef.current &&
+        !suggestionsRef.current.contains(e.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(e.target as Node)
+      ) {
+        setShowSuggestions(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
   const getScheduledFor = (): string | null => {
     const now = Date.now()
-
     switch (schedulePreset) {
       case 'immediately':
         return null
@@ -77,13 +108,35 @@ export function QuickSendTab({
     }
   }
 
-  // Handle chip click to auto-fill email
+  const handleSelectSuggestion = (contact: Contact) => {
+    setEmail(contact.email)
+    setName(contact.name)
+    setShowSuggestions(false)
+    setHighlightedIndex(-1)
+  }
+
   const handleChipClick = (contact: Contact) => {
     setEmail(contact.email)
     setName(contact.name)
   }
 
-  // Handle form submission
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!showSuggestions || suggestions.length === 0) return
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setHighlightedIndex(prev => (prev < suggestions.length - 1 ? prev + 1 : 0))
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setHighlightedIndex(prev => (prev > 0 ? prev - 1 : suggestions.length - 1))
+    } else if (e.key === 'Enter' && highlightedIndex >= 0) {
+      e.preventDefault()
+      handleSelectSuggestion(suggestions[highlightedIndex])
+    } else if (e.key === 'Escape') {
+      setShowSuggestions(false)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -97,7 +150,6 @@ export function QuickSendTab({
       return
     }
 
-    // Check monthly limit
     if (monthlyUsage.count >= monthlyUsage.limit) {
       toast.error(`Monthly send limit reached (${monthlyUsage.limit})`)
       return
@@ -107,7 +159,6 @@ export function QuickSendTab({
       try {
         let contactId = matchedContact?.id
 
-        // If no match, create new contact
         if (!contactId) {
           if (!name.trim()) {
             toast.error('Please enter a name for this new contact')
@@ -139,7 +190,6 @@ export function QuickSendTab({
         formData.append('templateId', selectedTemplateId)
 
         if (scheduledFor) {
-          // Schedule the send
           formData.append('scheduledFor', scheduledFor)
           const result = await scheduleReviewRequest(null, formData)
 
@@ -147,12 +197,10 @@ export function QuickSendTab({
             toast.error(result.error)
           } else {
             toast.success('Review request scheduled successfully')
-            // Clear contact/name fields, keep template + schedule
             setEmail('')
             setName('')
           }
         } else {
-          // Send immediately
           const result = await batchSendReviewRequest(null, formData)
 
           if (result.error) {
@@ -167,7 +215,6 @@ export function QuickSendTab({
             } else {
               toast.error('Failed to send review request')
             }
-            // Clear contact/name fields, keep template + schedule
             setEmail('')
             setName('')
           }
@@ -180,162 +227,200 @@ export function QuickSendTab({
   }
 
   const selectedTemplate = templates.find(t => t.id === selectedTemplateId) || null
-  const previewContact = matchedContact || (email && name ? { id: 'preview', name, email, status: 'active', opted_out: false, send_count: 0, last_sent_at: null, created_at: new Date().toISOString(), business_id: business.id, phone: null } as Contact : null)
+  const previewContact = matchedContact || (email && name ? {
+    id: 'preview', name, email, status: 'active', opted_out: false,
+    send_count: 0, last_sent_at: null, created_at: new Date().toISOString(),
+    business_id: business.id, phone: null,
+  } as Contact : null)
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 mt-4">
-      {/* Settings Bar */}
-      <SendSettingsBar
-        templates={templates}
-        selectedTemplateId={selectedTemplateId}
-        onTemplateChange={setSelectedTemplateId}
-        schedulePreset={schedulePreset}
-        onSchedulePresetChange={setSchedulePreset}
-        customDateTime={customDateTime}
-        onCustomDateTimeChange={setCustomDateTime}
-      />
+    <div className="bg-white border border-[#E3E3E3] rounded-lg p-6">
+      {/* Section header */}
+      <div className="flex items-center gap-2 mb-5">
+        <PaperPlaneTilt size={18} weight="bold" />
+        <h2 className="text-base font-semibold">Single Send</h2>
+      </div>
 
-      {/* Email field with search + contact detection */}
-      <div className="space-y-2">
-        <label htmlFor="email-input" className="block text-sm font-medium">
-          Contact Email
-        </label>
-        <div className="relative">
-          <MagnifyingGlass
-            size={16}
-            weight="regular"
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-          />
-          <input
-            id="email-input"
-            type="email"
-            placeholder="Search by email..."
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full pl-9 pr-10 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-          />
-          {email && (
-            <button
-              type="button"
-              onClick={() => {
-                setEmail('')
-                setName('')
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Settings Bar: Template + Schedule in one row */}
+        <SendSettingsBar
+          templates={templates}
+          selectedTemplateId={selectedTemplateId}
+          onTemplateChange={setSelectedTemplateId}
+          schedulePreset={schedulePreset}
+          onSchedulePresetChange={setSchedulePreset}
+          customDateTime={customDateTime}
+          onCustomDateTimeChange={setCustomDateTime}
+        />
+
+        {/* Contact search with autocomplete */}
+        <div className="space-y-2">
+          <label htmlFor="email-input" className="block text-sm font-medium">
+            Contact
+          </label>
+          <div className="relative">
+            <MagnifyingGlass
+              size={16}
+              weight="regular"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+            />
+            <input
+              ref={inputRef}
+              id="email-input"
+              type="text"
+              placeholder="Search Through Contacts..."
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value)
+                setShowSuggestions(true)
+                setHighlightedIndex(-1)
               }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-            >
-              <X size={16} weight="bold" />
-            </button>
+              onFocus={() => {
+                if (email.trim().length >= 2) setShowSuggestions(true)
+              }}
+              onKeyDown={handleKeyDown}
+              autoComplete="off"
+              className="w-full pl-9 pr-10 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+            />
+            {email && (
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail('')
+                  setName('')
+                  setShowSuggestions(false)
+                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X size={16} weight="bold" />
+              </button>
+            )}
+
+            {/* Autocomplete dropdown */}
+            {showSuggestions && suggestions.length > 0 && !matchedContact && (
+              <div
+                ref={suggestionsRef}
+                className="absolute z-20 top-full left-0 right-0 mt-1 bg-white border border-border rounded-md shadow-lg max-h-48 overflow-y-auto"
+              >
+                {suggestions.map((contact, index) => (
+                  <button
+                    key={contact.id}
+                    type="button"
+                    onClick={() => handleSelectSuggestion(contact)}
+                    className={`w-full flex items-center gap-3 px-3 py-2 text-left text-sm hover:bg-muted/50 transition-colors ${
+                      index === highlightedIndex ? 'bg-muted/50' : ''
+                    }`}
+                  >
+                    <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold shrink-0">
+                      {contact.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium truncate">{contact.name}</div>
+                      <div className="text-xs text-muted-foreground truncate">{contact.email}</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Existing contact chip */}
+          {matchedContact && (
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-muted-foreground">Existing contact:</span>
+              <span className="px-2 py-1 bg-primary/10 text-primary rounded-md font-medium">
+                {matchedContact.name}
+              </span>
+            </div>
+          )}
+
+          {/* Name input for new contact */}
+          {email && !matchedContact && (
+            <div className="space-y-1">
+              <label htmlFor="name-input" className="block text-sm font-medium">
+                Contact Name
+              </label>
+              <input
+                id="name-input"
+                type="text"
+                placeholder="Enter name for new contact"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              />
+            </div>
           )}
         </div>
 
-        {/* Show existing contact chip if match found */}
-        {matchedContact && (
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-muted-foreground">Existing contact:</span>
-            <span className="px-2 py-1 bg-primary/10 text-primary rounded-md font-medium">
-              {matchedContact.name}
-            </span>
-          </div>
-        )}
-
-        {/* Show name input if no match */}
-        {email && !matchedContact && (
-          <div className="space-y-1">
-            <label htmlFor="name-input" className="block text-sm font-medium">
-              Contact Name
+        {/* Recently Added chips */}
+        {recentContacts.length > 0 && (
+          <div className="space-y-2">
+            <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Recently Added
             </label>
-            <input
-              id="name-input"
-              type="text"
-              placeholder="Enter name for new contact"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-            />
-          </div>
-        )}
-      </div>
-
-      {/* Added Today chips */}
-      {addedTodayContacts.length > 0 && (
-        <div className="space-y-2">
-          <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider">
-            Added Today
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {addedTodayContacts.slice(0, 10).map(contact => (
-              <button
-                key={contact.id}
-                type="button"
-                onClick={() => handleChipClick(contact)}
-                className="px-3 py-1.5 text-xs font-medium rounded-full border border-border hover:border-primary/50 hover:bg-primary/5 transition-colors"
-              >
-                {contact.name}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Message Preview */}
-      {previewContact && selectedTemplate && (
-        <div className="rounded-lg border overflow-hidden">
-          <div className="bg-muted/30 px-4 py-3 border-b">
-            <div className="text-sm text-muted-foreground">Preview</div>
-            <div className="font-medium">{selectedTemplate.subject}</div>
-          </div>
-          <div className="p-6 bg-gray-50">
-            <div className="bg-white rounded-lg p-6 shadow-sm max-w-lg mx-auto">
-              <h2 className="text-xl font-semibold mb-4">Hi {previewContact.name},</h2>
-              <p className="text-gray-600 mb-6">{selectedTemplate.body}</p>
-              <div className="text-center mb-6">
-                <span className="inline-block bg-primary text-primary-foreground px-6 py-3 rounded-md font-medium">
-                  Leave a Review
-                </span>
-              </div>
-              <hr className="my-6 border-gray-200" />
-              <p className="text-gray-500 text-sm">
-                Thanks so much,<br />
-                {business.default_sender_name || business.name}
-              </p>
+            <div className="flex flex-wrap gap-2">
+              {recentContacts.slice(0, 10).map(contact => (
+                <button
+                  key={contact.id}
+                  type="button"
+                  onClick={() => handleChipClick(contact)}
+                  className="px-3 py-1.5 text-xs font-medium rounded-full border border-border hover:border-primary/50 hover:bg-primary/5 transition-colors"
+                >
+                  {contact.name}
+                </button>
+              ))}
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Send button area */}
-      <div className="flex justify-end pt-4 border-t">
-        {!hasReviewLink ? (
-          <div className="flex-1 text-center">
-            <p className="text-sm text-muted-foreground mb-3">
-              Add your Google review link in settings before sending
-            </p>
-            <a
-              href="/dashboard/settings"
-              className="inline-flex items-center px-4 py-2 rounded-md border text-sm font-medium hover:bg-muted"
-            >
-              Go to Settings
-            </a>
-          </div>
-        ) : (
-          <button
-            type="submit"
-            disabled={!email || isPending || (!matchedContact && !name)}
-            className="inline-flex items-center px-6 py-3 rounded-md bg-primary text-primary-foreground font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {isPending ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                {schedulePreset === 'immediately' ? 'Sending...' : 'Scheduling...'}
-              </>
-            ) : (
-              <>
-                {schedulePreset === 'immediately' ? 'Send Review Request' : 'Schedule Send'}
-              </>
-            )}
-          </button>
         )}
-      </div>
-    </form>
+
+        {/* Compact Message Preview */}
+        <div className="space-y-2">
+          <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            Preview
+          </label>
+          <MessagePreview
+            contact={previewContact}
+            business={business}
+            template={selectedTemplate}
+            compact={true}
+          />
+        </div>
+
+        {/* Send button */}
+        <div className="pt-2">
+          {!hasReviewLink ? (
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground mb-3">
+                Add your Google review link in settings before sending
+              </p>
+              <a
+                href="/dashboard/settings"
+                className="inline-flex items-center px-4 py-2 rounded-md border text-sm font-medium hover:bg-muted"
+              >
+                Go to Settings
+              </a>
+            </div>
+          ) : (
+            <button
+              type="submit"
+              disabled={!email || isPending || (!matchedContact && !name)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-primary text-primary-foreground font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  {schedulePreset === 'immediately' ? 'Sending...' : 'Scheduling...'}
+                </>
+              ) : (
+                <>
+                  <PaperPlaneTilt size={16} weight="bold" />
+                  Send Request
+                </>
+              )}
+            </button>
+          )}
+        </div>
+      </form>
+    </div>
   )
 }
