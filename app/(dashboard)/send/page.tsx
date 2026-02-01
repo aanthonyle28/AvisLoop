@@ -11,7 +11,7 @@ export default async function SendPage() {
   const business = await getBusiness()
 
   if (!business) {
-    redirect('/dashboard/settings')
+    redirect('/onboarding')
   }
 
   const supabase = await createClient()

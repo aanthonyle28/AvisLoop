@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { updateBusiness } from '@/lib/actions/business'
+import { updateBusiness, saveReviewLink } from '@/lib/actions/business'
 import type { OnboardingBusiness } from '@/lib/types/onboarding'
 
 interface OnboardingStepsProps {
@@ -169,20 +169,11 @@ function GoogleReviewLinkStep({
       }
     }
 
-    const formData = new FormData()
-    formData.append('name', '') // Not updating name in this step
-    formData.append('googleReviewLink', link.trim())
-    formData.append('defaultSenderName', '')
-    formData.append('defaultTemplateId', '')
-
     startTransition(async () => {
-      const result = await updateBusiness(null, formData)
+      const result = await saveReviewLink(link.trim())
       if (result.success) {
         await onComplete()
         return
-      }
-      if (result.fieldErrors?.googleReviewLink) {
-        setError(result.fieldErrors.googleReviewLink[0])
       }
       if (result.error) {
         setError(result.error)
