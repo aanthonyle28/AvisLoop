@@ -107,7 +107,10 @@ Plans:
   1. Below the compose area, a compact preview (80-140px) shows the subject line (1 line), body snippet (2-3 lines clamped), and a "View full email" link -- visible without scrolling or expanding a separate section
   2. Clicking "View full email" opens a read-only modal displaying the subject, resolved body with contact name/variables filled in, a rendered review CTA button, footer text, and From/To header
   3. Template dropdown on the send page lists all saved templates plus a "Create Template" option that navigates to the settings template page
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 21-01-PLAN.md -- Compact preview snippet + full email preview modal
+- [ ] 21-02-PLAN.md -- Template dropdown "Create Template" navigation option
 
 ### Phase 22: Detail Drawers
 **Goal**: Users can inspect request details and contact details inline via drawers without leaving the current page.
@@ -196,7 +199,7 @@ Plans:
 | 17-18 | v1.2.1 | 4/4 | Complete | 2026-02-01 |
 | 19 | UX/UI Redesign | 8/8 | Complete | 2026-02-01 |
 | 20 | v1.3 | 2/2 | Complete | 2026-02-01 |
-| 21 | v1.3 | 0/TBD | Not started | - |
+| 21 | v1.3 | 0/2 | Planned | - |
 | 22 | v1.3 | 0/TBD | Not started | - |
 | 23 | v1.3 | 0/TBD | Not started | - |
 | 24 | v1.4 | 0/TBD | Ready to plan | - |
