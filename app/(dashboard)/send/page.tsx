@@ -6,6 +6,7 @@ import { UsageWarningBanner } from '@/components/billing/usage-warning-banner'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { CONTACT_LIMITS } from '@/lib/constants/billing'
 
 export default async function SendPage({ searchParams }: { searchParams: Promise<{ test?: string }> }) {
   const params = await searchParams
@@ -51,11 +52,6 @@ export default async function SendPage({ searchParams }: { searchParams: Promise
   ])
 
   // Contact limits by tier (BILL-07)
-  const CONTACT_LIMITS: Record<string, number | undefined> = {
-    trial: undefined,
-    basic: 200,
-    pro: undefined,
-  }
   const contactLimit = CONTACT_LIMITS[usage.tier]
 
   // Filter to only sendable contacts (active, not opted out)
