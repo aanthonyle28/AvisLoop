@@ -32,6 +32,10 @@ Requirements for Dashboard UX Overhaul & Onboarding Polish. Each maps to roadmap
 - [ ] **LAYO-01**: Settings page navbar is sticky/fixed on scroll
 - [ ] **LAYO-02**: Recent activity strip fills available horizontal space until View All button, with truncation at the end
 
+### Status Badges
+
+- [ ] **BDGE-01**: Unified status badge component used consistently across all pages (send, history, contacts, drawers, recent activity) with exact Figma spec: Pending (#F3F4F6 bg, #101828 text, spinner icon), Delivered (#EAF3F6 bg, #2C879F text, check-circle icon), Clicked (#FEF9C2 bg, #894B00 text, cursor icon), Failed (#FFE2E2 bg, #C10007 text, warning-circle icon), Reviewed (#DCFCE7 bg, #008236 text, star icon), Scheduled (rgba(#9F2C86,0.1) bg, #9F2C86 text, check-circle icon)
+
 ### Template Selection
 
 - [ ] **TMPL-01**: Template dropdown on send page shows default templates AND a "Create Template" option that navigates to settings template creation page
@@ -76,11 +80,12 @@ Deferred to future release. Not in current roadmap.
 | LAYO-01 | TBD | Pending |
 | LAYO-02 | TBD | Pending |
 | TMPL-01 | TBD | Pending |
+| BDGE-01 | TBD | Pending |
 
 **Coverage:**
-- v1.3 requirements: 14 total
+- v1.3 requirements: 15 total
 - Mapped to phases: 0
-- Unmapped: 14 (pending roadmap creation)
+- Unmapped: 15 (pending roadmap creation)
 
 ---
 *Requirements defined: 2026-02-01*
