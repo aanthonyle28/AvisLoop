@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-01)
 
 ## Current Position
 
-**Phase:** 20 of 27 (Status Badges & Layout Fixes)
-**Plan:** 02 of 02 complete
-**Status:** Phase complete
-**Last activity:** 2026-02-01 — Completed 20-02-PLAN.md (layout fixes)
+**Phase:** 24 of 27 (Foundation & Hero)
+**Plan:** 01 of 04 complete
+**Status:** In progress
+**Last activity:** 2026-02-01 — Completed 24-01-PLAN.md (hero components)
 
-**Progress:** [████████████████████████████░] 76/77+ total plans complete
+**Progress:** [████████████████████████████░] 77/78+ total plans complete
 
 ```
 v1.0 MVP:           ████████████████████████████████████████████████ 48/48 SHIPPED
@@ -23,7 +23,7 @@ v1.2 Onboarding:    █████████ 9/9 SHIPPED
 v1.2.1 Tech Debt:   ████ 4/4 SHIPPED
 Phase 19 UX:        ████████ 8/8 COMPLETE
 Phase 20 Layout:    ██ 2/2 COMPLETE
-v1.4 Landing Page:  ░░░░░░░░ 0/4 NOT STARTED
+Phase 24 Hero:      ██░░░░░░ 1/4 IN PROGRESS
 ```
 
 ## What's Been Built
@@ -36,6 +36,7 @@ See .planning/MILESTONES.md for full history.
 - **v1.2.1 Tech Debt:** Migration fix, Phase 4 verification, code cleanup, history pagination
 - **Phase 19 UX/UI Redesign:** Send-first dashboard, 3-page nav, onboarding drawer, stat/activity strips, request detail drawer
 - **Phase 20 Layout Fixes:** Unified status badges, sticky settings header, optimized activity strip layout
+- **Phase 24 Foundation & Hero:** FadeIn animation wrapper, 3-step animated product demo, outcome-focused hero section ("3× More Reviews in 2 Minutes")
 
 ## Tech Stack
 
@@ -54,6 +55,9 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 
 | ID | Decision | Context | Date |
 |----|----------|---------|------|
+| fade-in-intersection-observer | Use IntersectionObserver API for scroll-triggered animations with trigger-once pattern | Phase 24-01 | 2026-02-01 |
+| motion-safe-prefix-pattern | Prefix ALL animation classes with motion-safe: variant for accessibility | Phase 24-01 | 2026-02-01 |
+| outcome-focused-hero-headline | Hero headline "3× More Reviews in 2 Minutes" (specific metric + time promise) | Phase 24-01 | 2026-02-01 |
 | sticky-header-frosted-glass | Use backdrop-blur with bg-background/95 for modern sticky header UX | Phase 20-02 | 2026-02-01 |
 | shrink-truncation-pattern | Non-last chips shrink-0, last chip truncates for optimal horizontal fill | Phase 20-02 | 2026-02-01 |
 | inline-styles-for-figma-colors | Use inline styles with exact hex values instead of Tailwind classes for status badges | Figma spec requires precise colors not in Tailwind palette | 2026-02-01 |
@@ -70,6 +74,6 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 ## Session Continuity
 
 **Last session:** 2026-02-01
-**Stopped at:** Phase 20 complete, verified ✓
+**Stopped at:** Completed 24-01-PLAN.md
 **Resume file:** None
-**Next action:** `/gsd:plan-phase 21`
+**Next action:** Continue with plan 24-02
