@@ -7,6 +7,9 @@ import {
   CreditCard,
   Headset,
   SignOut,
+  Sun,
+  Moon,
+  Desktop,
 } from '@phosphor-icons/react'
 import {
   DropdownMenu,
@@ -16,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { signOut } from '@/lib/actions/auth'
+import { useTheme } from 'next-themes'
 
 interface AccountMenuProps {
   trigger: React.ReactNode
@@ -24,6 +28,17 @@ interface AccountMenuProps {
 }
 
 export function AccountMenu({ trigger, side = 'top', align = 'start' }: AccountMenuProps) {
+  const { theme, setTheme } = useTheme()
+
+  const cycleTheme = () => {
+    if (theme === 'light') setTheme('dark')
+    else if (theme === 'dark') setTheme('system')
+    else setTheme('light')
+  }
+
+  const ThemeIcon = theme === 'dark' ? Moon : theme === 'light' ? Sun : Desktop
+  const themeLabel = theme === 'dark' ? 'Dark' : theme === 'light' ? 'Light' : 'System'
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -51,6 +66,11 @@ export function AccountMenu({ trigger, side = 'top', align = 'start' }: AccountM
         <DropdownMenuItem disabled className="flex items-center gap-2">
           <Headset size={16} weight="regular" />
           <span>Help & Support</span>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={(e) => { e.preventDefault(); cycleTheme() }} className="flex items-center gap-2 cursor-pointer">
+          <ThemeIcon size={16} weight="regular" />
+          <span>Theme: {themeLabel}</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
