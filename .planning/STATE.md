@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-01)
 ## Current Position
 
 **Phase:** 19 of 19 (UX/UI Redesign)
-**Plan:** 4 of 8
+**Plan:** 5 of 8
 **Status:** In progress
-**Last activity:** 2026-02-01 -- Completed 19-04-PLAN.md (Collapsible Setup Progress)
+**Last activity:** 2026-02-01 -- Completed 19-03-PLAN.md (Send Page Redesign)
 
-**Progress:** [█████████████████████████] 70/74 total plans complete
+**Progress:** [█████████████████████████] 69/74 total plans complete
 
 ```
 v1.0 MVP:           ████████████████████████████████████████████████ 48/48 SHIPPED
 v1.1 Scheduled:     █████ 5/5 SHIPPED
 v1.2 Onboarding:    █████████ 9/9 SHIPPED
 v1.2.1 Tech Debt:   ████ 4/4 SHIPPED
-Phase 19 UX:        ████░░░░ 4/8 IN PROGRESS
+Phase 19 UX:        █████░░░ 5/8 IN PROGRESS
 ```
 
 ## What's Been Built
@@ -32,7 +32,7 @@ See .planning/MILESTONES.md for full history.
 - **v1.1 Scheduled Sending:** Cron processing, scheduling UI, scheduled send management
 - **v1.2 Onboarding Redesign:** Design system overhaul, dashboard redesign, Google OAuth, simplified onboarding
 - **v1.2.1 Tech Debt:** Migration fix, Phase 4 verification, code cleanup, history pagination
-- **Phase 19 (in progress):** Navigation simplified to 3 pages, account dropdown menu, mobile page header, navigation progress bar, actionable toasts, softer skeletons, collapsible setup progress pill and drawer
+- **Phase 19 (in progress):** Navigation simplified to 3 pages, account dropdown menu, mobile page header, navigation progress bar, actionable toasts, softer skeletons, compact message preview, collapsible setup progress pill and drawer
 
 ## Tech Stack
 
@@ -55,13 +55,15 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 | youtube-style-progress | Thin 2px progress bar that animates 0% → 80% → 100% | Phase 19-02: Matches modern SaaS patterns (GitHub, YouTube), immediate feedback | 2026-02-01 |
 | toast-durations | 6s for actionable toasts (with buttons), 5s for errors | Phase 19-02: Gives users time to read and act on toasts with actions | 2026-02-01 |
 | inline-preview | Simplified read-only preview in QuickSendTab | Phase 19-02: Reduces coupling, QuickSendTab doesn't need editing | 2026-02-01 |
+| compact-preview-default | Default to compact mode with expand/collapse toggle | Phase 19-03: Reduces visual clutter, allows users to see more controls without scrolling | 2026-02-01 |
+| remove-inline-editing | Make MessagePreview read-only (no inline subject/body editing) | Phase 19-03: Quick Send flow focuses on template selection, not custom messages | 2026-02-01 |
 | pill-drawer-pattern | Replaced onboarding cards grid with collapsible pill + drawer | Phase 19-04: Reduces dashboard clutter while keeping guidance accessible | 2026-02-01 |
 | bonus-step-threshold | Show 'Try Bulk Send' bonus step only when 3+ contacts exist | Phase 19-04: Progressive disclosure - bulk send only makes sense with multiple contacts | 2026-02-01 |
 | dismiss-persistence | Setup complete chip dismissible via localStorage | Phase 19-04: User preference, instant feedback, no server roundtrip needed | 2026-02-01 |
 
 ## Session Continuity
 
-**Last session:** 2026-02-01 10:54 UTC
-**Stopped at:** Completed 19-04-PLAN.md (Collapsible Setup Progress)
+**Last session:** 2026-02-01 10:59 UTC
+**Stopped at:** Completed 19-03-PLAN.md (Send Page Redesign)
 **Resume file:** None
-**Next action:** Execute 19-05-PLAN.md (Contact List Redesign)
+**Next action:** Execute next incomplete plan in phase 19
