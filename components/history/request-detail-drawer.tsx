@@ -178,7 +178,6 @@ export function RequestDetailDrawer({
               contact={mockContact}
               business={business}
               template={usedTemplate}
-              compact={false}
             />
           </div>
 

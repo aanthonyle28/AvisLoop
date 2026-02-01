@@ -1,26 +1,36 @@
 'use client'
 
-import { useState } from 'react'
 import type { Contact, Business, EmailTemplate } from '@/lib/types/database'
 
 interface MessagePreviewProps {
   contact: Contact | null
   business: Business
   template: EmailTemplate | null
-  compact?: boolean
+  onViewFull?: () => void
+}
+
+function resolveTemplate(
+  text: string,
+  contact: Contact | null,
+  business: Business
+): string {
+  if (!contact) return text
+
+  const senderName = business.default_sender_name || business.name
+  return text
+    .replace(/{{CUSTOMER_NAME}}/g, contact.name)
+    .replace(/{{BUSINESS_NAME}}/g, business.name)
+    .replace(/{{SENDER_NAME}}/g, senderName)
 }
 
 export function MessagePreview({
   contact,
   business,
   template,
-  compact = true,
+  onViewFull,
 }: MessagePreviewProps) {
-  const [isExpanded, setIsExpanded] = useState(false)
-
   const defaultSubject = template?.subject || `${business.name} would love your feedback!`
   const defaultBody = template?.body || `Thank you for choosing ${business.name}! We'd really appreciate it if you could take a moment to share your experience.`
-  const senderName = business.default_sender_name || business.name
 
   if (!contact) {
     return (
@@ -30,59 +40,33 @@ export function MessagePreview({
     )
   }
 
-  const showCompact = compact && !isExpanded
+  const resolvedSubject = resolveTemplate(defaultSubject, contact, business)
+  const resolvedBody = resolveTemplate(defaultBody, contact, business)
 
   return (
-    <div className="rounded-lg border overflow-hidden transition-all duration-300">
-      <div className="bg-muted/30 px-4 py-3 border-b">
-        <div className="text-sm text-muted-foreground mb-1">Preview</div>
-        <div className="font-medium">{defaultSubject}</div>
+    <div className="rounded-lg border bg-card p-4">
+      <div className="text-xs text-muted-foreground mb-2">Email Preview</div>
+
+      {/* Subject - single line */}
+      <div className="font-semibold text-sm mb-2 truncate">
+        {resolvedSubject}
       </div>
 
-      <div className="p-6 bg-muted/50">
-        <div className={`bg-card rounded-lg p-6 shadow-sm max-w-lg mx-auto ${showCompact ? 'line-clamp-container' : ''}`}>
-          <h2 className="text-xl font-semibold mb-4">Hi {contact.name},</h2>
+      {/* Body - 2-3 lines clamped */}
+      <p className="text-sm text-muted-foreground line-clamp-3 mb-3">
+        {resolvedBody}
+      </p>
 
-          <p className={`text-muted-foreground mb-6 ${showCompact ? 'line-clamp-3' : ''}`}>
-            {defaultBody}
-          </p>
-
-          {showCompact && (
-            <button
-              type="button"
-              onClick={() => setIsExpanded(true)}
-              className="text-sm text-primary hover:underline mb-4"
-            >
-              Show full preview
-            </button>
-          )}
-
-          {!showCompact && (
-            <>
-              <div className="text-center mb-6">
-                <span className="inline-block bg-primary text-primary-foreground px-6 py-3 rounded-md font-medium">
-                  Leave a Review
-                </span>
-              </div>
-
-              <hr className="my-6 border-border" />
-
-              <p className="text-muted-foreground text-sm">
-                Thanks so much,<br />
-                {senderName}
-              </p>
-
-              <button
-                type="button"
-                onClick={() => setIsExpanded(false)}
-                className="text-sm text-primary hover:underline mt-4"
-              >
-                Collapse preview
-              </button>
-            </>
-          )}
-        </div>
-      </div>
+      {/* View full link */}
+      {onViewFull && (
+        <button
+          type="button"
+          onClick={onViewFull}
+          className="text-sm text-primary hover:underline"
+        >
+          View full email
+        </button>
+      )}
     </div>
   )
 }
