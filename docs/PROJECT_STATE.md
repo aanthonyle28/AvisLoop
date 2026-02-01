@@ -38,7 +38,6 @@
 - **Polish**: Design system, loading states, micro-interactions, accessibility, branded titles
 
 ## Next steps
-1. Configure Resend (API key + verified FROM domain) for real sends
 2. Configure Supabase Google OAuth provider in dashboard
 3. Replace image placeholders with real screenshots
 4. Production deployment prep

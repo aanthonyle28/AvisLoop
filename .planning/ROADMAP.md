@@ -432,7 +432,11 @@ Plans:
   2. `send/page.tsx` imports `CONTACT_LIMITS` from `lib/constants/billing.ts` instead of inline definition
   3. Phase 13 VERIFICATION.md updated to reflect resolved gaps
   4. History page pagination UI present (load more or infinite scroll for >50 messages)
-**Plans**: TBD
+**Plans**: 2 plans in 1 wave
+
+Plans:
+- [ ] 18-01-PLAN.md — Delete orphaned file, fix inline constant, update Phase 13 verification
+- [ ] 18-02-PLAN.md — History page pagination UI (prev/next controls)
 
 ## Progress
 
@@ -461,4 +465,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 5.1 -> 6 -> 7 -
 | 15. Design System & Dashboard Redesign | v1.2 | 4/4 | Complete | 2026-01-29 |
 | 16. Onboarding Redesign + Google Auth | v1.2 | 5/5 | Complete | 2026-01-30 |
 | 17. Deployment & Critical Fixes | v1.2.1 | 2/2 | Complete | 2026-01-30 |
-| 18. Code Cleanup | v1.2.1 | 0/TBD | Pending | — |
+| 18. Code Cleanup | v1.2.1 | 0/2 | Planned | — |
