@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-01)
 ## Current Position
 
 **Phase:** 19 of 19 (UX/UI Redesign)
-**Plan:** 1 of 8
+**Plan:** 2 of 8
 **Status:** In progress
-**Last activity:** 2026-02-01 -- Completed 19-01-PLAN.md (Navigation & Layout Shell)
+**Last activity:** 2026-02-01 -- Completed 19-02-PLAN.md (Shared UI Foundation)
 
-**Progress:** [████████████████████████░] 67/74 total plans complete
+**Progress:** [████████████████████████░] 68/74 total plans complete
 
 ```
 v1.0 MVP:           ████████████████████████████████████████████████ 48/48 SHIPPED
 v1.1 Scheduled:     █████ 5/5 SHIPPED
 v1.2 Onboarding:    █████████ 9/9 SHIPPED
 v1.2.1 Tech Debt:   ████ 4/4 SHIPPED
-Phase 19 UX:        █░░░░░░░ 1/8 IN PROGRESS
+Phase 19 UX:        ██░░░░░░ 2/8 IN PROGRESS
 ```
 
 ## What's Been Built
@@ -32,7 +32,7 @@ See .planning/MILESTONES.md for full history.
 - **v1.1 Scheduled Sending:** Cron processing, scheduling UI, scheduled send management
 - **v1.2 Onboarding Redesign:** Design system overhaul, dashboard redesign, Google OAuth, simplified onboarding
 - **v1.2.1 Tech Debt:** Migration fix, Phase 4 verification, code cleanup, history pagination
-- **Phase 19 (in progress):** Navigation simplified to 3 pages (Send, Contacts, Requests), account dropdown menu, mobile page header
+- **Phase 19 (in progress):** Navigation simplified to 3 pages, account dropdown menu, mobile page header, navigation progress bar, actionable toasts, softer skeletons
 
 ## Tech Stack
 
@@ -52,10 +52,13 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 | nav-simplification | Reduced navigation from 5+4 items to 3 main + account dropdown | Phase 19-01: Aligns with Send-first IA, improves mobile UX | 2026-02-01 |
 | account-menu-pattern | Shared AccountMenu component for sidebar and mobile | Phase 19-01: DRY principle, consistent behavior across devices | 2026-02-01 |
 | logo-link-change | Logo links to /send instead of /dashboard | Phase 19-01: Send is the new home page | 2026-02-01 |
+| youtube-style-progress | Thin 2px progress bar that animates 0% → 80% → 100% | Phase 19-02: Matches modern SaaS patterns (GitHub, YouTube), immediate feedback | 2026-02-01 |
+| toast-durations | 6s for actionable toasts (with buttons), 5s for errors | Phase 19-02: Gives users time to read and act on toasts with actions | 2026-02-01 |
+| inline-preview | Simplified read-only preview in QuickSendTab | Phase 19-02: Reduces coupling, QuickSendTab doesn't need editing | 2026-02-01 |
 
 ## Session Continuity
 
-**Last session:** 2026-02-01 10:41 UTC
-**Stopped at:** Completed 19-01-PLAN.md (Navigation & Layout Shell)
+**Last session:** 2026-02-01 10:56 UTC
+**Stopped at:** Completed 19-02-PLAN.md (Shared UI Foundation)
 **Resume file:** None
-**Next action:** Execute 19-02-PLAN.md (Send Page Redesign)
+**Next action:** Execute 19-03-PLAN.md (Send Page Redesign)
