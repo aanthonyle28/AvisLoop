@@ -125,29 +125,29 @@ Deferred to future release. Not in current roadmap.
 | LAYO-02 | Phase 20 | Pending |
 | TMPL-01 | Phase 21 | Pending |
 | BDGE-01 | Phase 20 | Pending |
-| HERO-01 | TBD | Pending |
-| HERO-02 | TBD | Pending |
-| HERO-03 | TBD | Pending |
-| HERO-04 | TBD | Pending |
-| CONT-01 | TBD | Pending |
-| CONT-02 | TBD | Pending |
-| CONT-03 | TBD | Pending |
-| TRUST-01 | TBD | Pending |
-| TRUST-02 | TBD | Pending |
-| TRUST-03 | TBD | Pending |
-| TECH-01 | TBD | Pending |
-| TECH-02 | TBD | Pending |
-| TECH-03 | TBD | Pending |
-| TECH-04 | TBD | Pending |
-| TECH-05 | TBD | Pending |
-| TECH-06 | TBD | Pending |
-| TECH-07 | TBD | Pending |
+| HERO-01 | Phase 24 | Pending |
+| HERO-02 | Phase 24 | Pending |
+| HERO-03 | Phase 24 | Pending |
+| HERO-04 | Phase 24 | Pending |
+| CONT-01 | Phase 25 | Pending |
+| CONT-02 | Phase 25 | Pending |
+| CONT-03 | Phase 25 | Pending |
+| TRUST-01 | Phase 26 | Pending |
+| TRUST-02 | Phase 25 | Pending |
+| TRUST-03 | Phase 26 | Pending |
+| TECH-01 | Phase 24 | Pending |
+| TECH-02 | Phase 27 | Pending |
+| TECH-03 | Phase 27 | Pending |
+| TECH-04 | Phase 24 | Pending |
+| TECH-05 | Phase 26 | Pending |
+| TECH-06 | Phase 26 | Pending |
+| TECH-07 | Phase 27 | Pending |
 
 **Coverage:**
 - v1.3 requirements: 15 total (mapped to phases 20-23)
-- v1.4 requirements: 17 total (TBD — awaiting roadmap)
-- Unmapped: 17
+- v1.4 requirements: 17 total (mapped to phases 24-27)
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-01*
-*Last updated: 2026-02-01 after v1.4 requirements added*
+*Last updated: 2026-02-01 after v1.4 roadmap creation*
