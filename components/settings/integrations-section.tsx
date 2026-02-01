@@ -67,11 +67,11 @@ export function IntegrationsSection({ hasExistingKey }: IntegrationsSectionProps
     <div className="space-y-6">
       {/* Webhook URL */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-foreground mb-2">
           Webhook URL
         </label>
         <div className="flex items-center gap-2">
-          <code className="flex-1 px-3 py-2 bg-gray-50 border rounded-md text-sm font-mono">
+          <code className="flex-1 px-3 py-2 bg-muted border rounded-md text-sm font-mono">
             {webhookUrl}
           </code>
           <Button
@@ -91,7 +91,7 @@ export function IntegrationsSection({ hasExistingKey }: IntegrationsSectionProps
 
       {/* API Key Generation */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-foreground mb-2">
           API Key
         </label>
 
@@ -125,12 +125,12 @@ export function IntegrationsSection({ hasExistingKey }: IntegrationsSectionProps
         ) : (
           <div className="space-y-3">
             {/* Show generated key */}
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-              <p className="text-sm font-medium text-amber-800 mb-2">
+            <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+              <p className="text-sm font-medium text-amber-800 dark:text-amber-300 mb-2">
                 Copy this key now. It won&apos;t be shown again.
               </p>
               <div className="flex items-center gap-2">
-                <code className="flex-1 px-3 py-2 bg-white border border-amber-300 rounded-md text-sm font-mono break-all">
+                <code className="flex-1 px-3 py-2 bg-card border border-amber-300 dark:border-amber-700 rounded-md text-sm font-mono break-all">
                   {apiKey}
                 </code>
                 <Button
@@ -165,21 +165,21 @@ export function IntegrationsSection({ hasExistingKey }: IntegrationsSectionProps
 
       {/* Usage Instructions */}
       <div className="border-t pt-6">
-        <h3 className="text-sm font-medium text-gray-700 mb-3">
+        <h3 className="text-sm font-medium text-foreground mb-3">
           Usage Instructions
         </h3>
 
-        <div className="space-y-4 text-sm text-gray-600">
+        <div className="space-y-4 text-sm text-muted-foreground">
           <p>
-            Send a POST request with the <code className="px-1.5 py-0.5 bg-gray-100 rounded text-xs font-mono">x-api-key</code> header to create or update contacts:
+            Send a POST request with the <code className="px-1.5 py-0.5 bg-muted rounded text-xs font-mono">x-api-key</code> header to create or update contacts:
           </p>
 
-          <div className="bg-gray-50 rounded-lg p-4 overflow-x-auto">
+          <div className="bg-muted rounded-lg p-4 overflow-x-auto">
             <pre className="text-xs font-mono whitespace-pre">{curlExample}</pre>
           </div>
 
           <div>
-            <p className="font-medium text-gray-700 mb-2">Compatible with:</p>
+            <p className="font-medium text-foreground mb-2">Compatible with:</p>
             <ul className="list-disc list-inside space-y-1 ml-2">
               <li>Zapier (Webhooks by Zapier action)</li>
               <li>Make (HTTP module)</li>
@@ -189,7 +189,7 @@ export function IntegrationsSection({ hasExistingKey }: IntegrationsSectionProps
           </div>
 
           <div>
-            <p className="font-medium text-gray-700 mb-2">Request body fields:</p>
+            <p className="font-medium text-foreground mb-2">Request body fields:</p>
             <ul className="list-disc list-inside space-y-1 ml-2">
               <li><code className="text-xs">name</code> (required): Contact&apos;s full name</li>
               <li><code className="text-xs">email</code> (required): Contact&apos;s email address</li>
@@ -197,7 +197,7 @@ export function IntegrationsSection({ hasExistingKey }: IntegrationsSectionProps
             </ul>
           </div>
 
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-muted-foreground">
             Rate limit: 60 requests per minute per API key
           </p>
         </div>

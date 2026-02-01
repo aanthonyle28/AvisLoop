@@ -51,7 +51,7 @@ export function BulkSendActionBar({
   return (
     <>
       {/* Sticky bottom bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t shadow-lg transition-transform duration-200 md:left-64">
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-card border-t border-border shadow-lg transition-transform duration-200 md:left-64">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-4">
             {/* Left: selection count */}

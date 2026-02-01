@@ -74,7 +74,7 @@ export function DeleteAccountDialog() {
           <div>
             <label
               htmlFor="delete-confirm"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-foreground mb-1"
             >
               Type DELETE to confirm
             </label>
@@ -84,7 +84,7 @@ export function DeleteAccountDialog() {
               value={confirmText}
               onChange={(e) => setConfirmText(e.target.value)}
               placeholder="Type DELETE here"
-              className="border rounded-md px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              className="border border-border bg-background text-foreground rounded-md px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
               disabled={isDeleting}
               autoComplete="off"
             />
@@ -100,7 +100,7 @@ export function DeleteAccountDialog() {
             type="button"
             onClick={() => handleOpenChange(false)}
             disabled={isDeleting}
-            className="px-4 py-2 rounded-md text-sm font-medium border border-gray-300 hover:bg-gray-50 disabled:opacity-50"
+            className="px-4 py-2 rounded-md text-sm font-medium border border-border hover:bg-muted disabled:opacity-50"
           >
             Cancel
           </button>

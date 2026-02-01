@@ -13,21 +13,21 @@ export function EmailTemplateForm() {
     <form action={formAction} className="space-y-4">
       {/* General error */}
       {state?.error && (
-        <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded">
+        <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-300 px-4 py-3 rounded">
           {state.error}
         </div>
       )}
 
       {/* Success message */}
       {state?.success && (
-        <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded">
+        <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-300 px-4 py-3 rounded">
           Template created successfully!
         </div>
       )}
 
       {/* Template Name */}
       <div>
-        <label htmlFor="template-name" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="template-name" className="block text-sm font-medium text-foreground mb-1">
           Template Name <span className="text-red-500">*</span>
         </label>
         <input
@@ -35,7 +35,7 @@ export function EmailTemplateForm() {
           id="template-name"
           name="name"
           required
-          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full border border-border rounded-md px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
           placeholder="My Custom Template"
         />
         {state?.fieldErrors?.name && (
@@ -45,7 +45,7 @@ export function EmailTemplateForm() {
 
       {/* Email Subject */}
       <div>
-        <label htmlFor="template-subject" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="template-subject" className="block text-sm font-medium text-foreground mb-1">
           Email Subject <span className="text-red-500">*</span>
         </label>
         <input
@@ -53,7 +53,7 @@ export function EmailTemplateForm() {
           id="template-subject"
           name="subject"
           required
-          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full border border-border rounded-md px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
           placeholder="We would love your feedback, {{CUSTOMER_NAME}}!"
         />
         {state?.fieldErrors?.subject && (
@@ -63,7 +63,7 @@ export function EmailTemplateForm() {
 
       {/* Email Body */}
       <div>
-        <label htmlFor="template-body" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="template-body" className="block text-sm font-medium text-foreground mb-1">
           Email Body <span className="text-red-500">*</span>
         </label>
         <textarea
@@ -71,7 +71,7 @@ export function EmailTemplateForm() {
           name="body"
           required
           rows={8}
-          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+          className="w-full border border-border rounded-md px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-mono text-sm"
           placeholder={`Hi {{CUSTOMER_NAME}},
 
 Thank you for choosing {{BUSINESS_NAME}}!

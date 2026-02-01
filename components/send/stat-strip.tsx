@@ -36,7 +36,7 @@ export function StatStrip({ usage, responseRate, needsAttention }: StatStripProp
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
       {/* Monthly Usage */}
-      <div className="bg-white border border-[#E3E3E3] rounded-lg px-4 py-3">
+      <div className="bg-card border border-border rounded-lg px-4 py-3">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-sm font-medium text-muted-foreground">Monthly Usage</h3>
           {isAtLimit ? (
@@ -54,7 +54,7 @@ export function StatStrip({ usage, responseRate, needsAttention }: StatStripProp
         </div>
 
         <div className="mb-2">
-          <div className="bg-[#F3F4F6] rounded-full h-1.5 overflow-hidden">
+          <div className="bg-muted rounded-full h-1.5 overflow-hidden">
             <div
               className={`${isAtLimit ? 'bg-red-600' : 'bg-primary'} rounded-full h-1.5 transition-all duration-300`}
               style={{ width: `${percentage}%` }}
@@ -78,7 +78,7 @@ export function StatStrip({ usage, responseRate, needsAttention }: StatStripProp
       </div>
 
       {/* Review Rate */}
-      <div className="bg-white border border-[#E3E3E3] rounded-lg px-4 py-3">
+      <div className="bg-card border border-border rounded-lg px-4 py-3">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-sm font-medium text-muted-foreground">Review Rate</h3>
           <Star size={16} weight="regular" className="text-muted-foreground" />
@@ -102,7 +102,7 @@ export function StatStrip({ usage, responseRate, needsAttention }: StatStripProp
                 key={i}
                 size={14}
                 weight={i < filledStars ? 'fill' : 'regular'}
-                className={i < filledStars ? 'text-yellow-400' : 'text-gray-300'}
+                className={i < filledStars ? 'text-yellow-400' : 'text-muted-foreground/40'}
               />
             ))}
           </div>
@@ -111,7 +111,7 @@ export function StatStrip({ usage, responseRate, needsAttention }: StatStripProp
       </div>
 
       {/* Needs Attention */}
-      <div className="bg-white border border-[#E3E3E3] rounded-lg px-4 py-3">
+      <div className="bg-card border border-border rounded-lg px-4 py-3">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-sm font-medium text-muted-foreground">Needs Attention</h3>
           <WarningCircle size={16} weight="regular" className="text-muted-foreground" />
@@ -125,13 +125,13 @@ export function StatStrip({ usage, responseRate, needsAttention }: StatStripProp
         {needsAttention.total > 0 ? (
           <Link href="/history?status=failed" className="flex items-center gap-2">
             {needsAttention.pending > 0 && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-600 border border-red-200">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800">
                 {needsAttention.pending} Pending
                 <ArrowRight size={10} weight="bold" />
               </span>
             )}
             {needsAttention.failed > 0 && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-600 border border-red-200">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800">
                 {needsAttention.failed} Failed
                 <ArrowRight size={10} weight="bold" />
               </span>

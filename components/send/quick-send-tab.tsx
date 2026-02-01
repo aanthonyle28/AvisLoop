@@ -234,7 +234,7 @@ export function QuickSendTab({
   } as Contact : null)
 
   return (
-    <div className="bg-white border border-[#E3E3E3] rounded-lg p-6">
+    <div className="bg-card border border-border rounded-lg p-6">
       {/* Section header */}
       <div className="flex items-center gap-2 mb-5">
         <PaperPlaneTilt size={18} weight="bold" />
@@ -280,7 +280,7 @@ export function QuickSendTab({
               }}
               onKeyDown={handleKeyDown}
               autoComplete="off"
-              className="w-full pl-9 pr-10 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              className="w-full pl-9 pr-10 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
             />
             {email && (
               <button
@@ -300,7 +300,7 @@ export function QuickSendTab({
             {showSuggestions && suggestions.length > 0 && !matchedContact && (
               <div
                 ref={suggestionsRef}
-                className="absolute z-20 top-full left-0 right-0 mt-1 bg-white border border-border rounded-md shadow-lg max-h-48 overflow-y-auto"
+                className="absolute z-20 top-full left-0 right-0 mt-1 bg-card border border-border rounded-md shadow-lg max-h-48 overflow-y-auto"
               >
                 {suggestions.map((contact, index) => (
                   <button
@@ -346,7 +346,7 @@ export function QuickSendTab({
                 placeholder="Enter name for new contact"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
               />
             </div>
           )}

@@ -39,11 +39,11 @@ export function MessagePreview({
         <div className="font-medium">{defaultSubject}</div>
       </div>
 
-      <div className="p-6 bg-gray-50">
-        <div className={`bg-white rounded-lg p-6 shadow-sm max-w-lg mx-auto ${showCompact ? 'line-clamp-container' : ''}`}>
+      <div className="p-6 bg-muted/50">
+        <div className={`bg-card rounded-lg p-6 shadow-sm max-w-lg mx-auto ${showCompact ? 'line-clamp-container' : ''}`}>
           <h2 className="text-xl font-semibold mb-4">Hi {contact.name},</h2>
 
-          <p className={`text-gray-600 mb-6 ${showCompact ? 'line-clamp-3' : ''}`}>
+          <p className={`text-muted-foreground mb-6 ${showCompact ? 'line-clamp-3' : ''}`}>
             {defaultBody}
           </p>
 
@@ -65,9 +65,9 @@ export function MessagePreview({
                 </span>
               </div>
 
-              <hr className="my-6 border-gray-200" />
+              <hr className="my-6 border-border" />
 
-              <p className="text-gray-500 text-sm">
+              <p className="text-muted-foreground text-sm">
                 Thanks so much,<br />
                 {senderName}
               </p>
