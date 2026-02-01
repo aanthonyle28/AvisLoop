@@ -2,7 +2,7 @@
 
 ## What This Is
 
-AvisLoop is a SaaS web app that helps local service businesses (dentists, salons, contractors, gyms, restaurants, etc.) request more Google reviews by sending customers a simple email with their review link, and tracking what was sent. The core promise: "In 2 minutes, add a contact, hit send, and start collecting more reviews — no marketing setup, no CRM, no learning curve."
+AvisLoop is a SaaS web app that helps local service businesses (dentists, salons, contractors, gyms, restaurants, etc.) request more Google reviews by sending customers a simple email with their review link, scheduling sends for optimal timing, and tracking what was sent. The core promise: "In 2 minutes, add a contact, hit send, and start collecting more reviews — no marketing setup, no CRM, no learning curve."
 
 ## Core Value
 
@@ -12,58 +12,38 @@ Make requesting reviews so simple that business owners actually do it — one co
 
 ### Validated
 
-(None yet — ship to validate)
+**v1.0 MVP**
+- User can sign up (email/password + Google OAuth), log in, reset password, and log out
+- User can create a business with name and Google review link
+- User can select/customize email templates and set sender name
+- User can add/edit/archive contacts, import via CSV, search and filter
+- User can send review request emails with preview, cooldown, rate limiting, opt-out, and quota enforcement
+- User can view message history with status tracking, date filtering, search, and pagination
+- 25 free trial sends, then Basic ($49/mo: 200 sends, 200 contacts) or Pro ($99/mo: 500 sends, unlimited contacts)
+- Guided onboarding wizard with dashboard test step cards
+- Landing page, pricing page, login/signup with split layout and Google OAuth
+- Bulk send (up to 25 contacts), re-send to cooled-down contacts, webhook API for contact ingestion
+
+**v1.1 Scheduled Sending**
+- User can schedule review requests with presets (1 hour, next morning, 24 hours) or custom date/time
+- User can view, cancel, and reschedule pending scheduled sends
+- Cron processes due sends every minute with re-validation of business rules
+- Navigation badges show pending scheduled count
 
 ### Active
 
-**Authentication & Account**
-- [ ] User can sign up and log in
-- [ ] User has a dashboard after login
-- [ ] User can log out
-
-**Business Profile**
-- [ ] User can create a business with name and Google review link
-- [ ] Pro users can manage multiple business locations
-
-**Contacts**
-- [ ] User can add contacts manually (name + email)
-- [ ] Contacts are stored under the user's business
-- [ ] Basic tier limited to 200 contacts
-- [ ] Pro tier has unlimited contacts
-
-**Send Review Request**
-- [ ] User can select a contact and send a review request email
-- [ ] Email uses a simple, editable message template
-- [ ] Email sent via Resend
-- [ ] Each send creates a Message record with status (sent/failed)
-- [ ] Basic tier limited to 200 sends/month
-- [ ] Pro tier limited to 500 sends/month
-
-**Message History**
-- [ ] User can view list of sent messages
-- [ ] Shows: recipient, channel, date/time, status
-
-**Billing**
-- [ ] 25 free sends before requiring subscription
-- [ ] Basic plan: $49/month (200 sends, 200 contacts, 1 location)
-- [ ] Pro plan: $99/month (500 sends, unlimited contacts, multiple locations)
-- [ ] Stripe integration for subscription management
-- [ ] Sending gated behind active subscription or remaining trial sends
-
-**Onboarding**
-- [ ] Guided wizard: business name → review link → first contact → first send
-- [ ] Dashboard shows "next best action" after onboarding
+(No active requirements — planning next milestone)
 
 ### Out of Scope
 
 - SMS channel — email first, SMS later
 - Automations / follow-up sequences — adds complexity
-- ~~Campaign scheduling — not needed for MVP~~ → Now in v1.1 (simple scheduling, not campaigns)
 - Analytics dashboards beyond message history — keep simple
 - AI reply generation — future feature
 - Integrations (Zapier, CRM, Google Business API) — future feature
 - Widgets, QR codes, NFC cards — future feature
 - Team roles / permissions — 1 user = 1 account for now
+- Multi-location for Pro — deferred to v2
 
 ## Context
 
@@ -73,53 +53,50 @@ Make requesting reviews so simple that business owners actually do it — one co
 - Find existing tools too complex or expensive
 - Don't have a repeatable process
 
-**User flows:**
-1. **Onboarding:** Landing → Sign up → Wizard (business, review link, first contact, first send) → Dashboard
-2. **Daily usage:** Login → Add contact → Send request → See confirmation → Check history later
-3. **Billing:** Hit paywall after 25 sends → Stripe checkout → Unlock sending
+**Current state:** 18,011 LOC (TypeScript/SQL/CSS). 18 phases across 4 milestones (v1.0, v1.1, v1.2, v1.2.1) all shipped. Tech stack: Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, Resend, Stripe, Upstash Redis, Phosphor Icons, Kumbh Sans.
 
-**Pages (MVP):**
+**User flows:**
+1. **Onboarding:** Landing → Sign up (email or Google) → Wizard (business name, review link) → Dashboard test cards (create contact, create template, send test)
+2. **Daily usage:** Login → Add contact → Send/schedule request → See confirmation → Check history
+3. **Scheduling:** Schedule send → View in /scheduled → Cron processes at scheduled time → Results in history
+4. **Billing:** Hit paywall after 25 sends → Stripe checkout → Unlock sending
+
+**Pages:**
 - Public: `/` (landing), `/pricing`, `/login`, `/signup`
-- App: `/app` (dashboard), `/app/onboarding`, `/app/business`, `/app/contacts`, `/app/send`, `/app/history`, `/app/billing`
+- App: `/dashboard`, `/onboarding`, `/contacts`, `/send`, `/scheduled`, `/history`, `/billing`, `/dashboard/settings`
 
 **Data model:**
-- Business: id, user_id, name, review_link, created_at
-- Contact: id, business_id, name, email, created_at
-- Message: id, business_id, contact_id, channel, template_used, status, sent_at, provider_id
+- Business: id, user_id, name, google_review_link, sender_name, created_at
+- Contact: id, business_id, name, email, opted_out, archived, created_at
+- EmailTemplate: id, business_id, name, subject, body, is_default, created_at
+- SendLog: id, business_id, contact_id, template_id, status, is_test, sent_at, provider_id
+- ScheduledSend: id, business_id, contact_ids, template_id, scheduled_for, status, executed_at, send_log_ids
 
 ## Constraints
 
 - **Tech stack**: Next.js + Supabase + Resend + Stripe — chosen for speed to ship
-- **Channel**: Email only for MVP — SMS adds complexity and cost
+- **Channel**: Email only — SMS adds complexity and cost
 - **Simplicity**: 1 user = 1 account, no team permissions
 - **Mobile-friendly**: App must work well on phones (business owners use mobile)
 - **UX**: Minimal UI, zero clutter, 1 primary action per screen, no jargon
-
-## Current Milestone: v1.1 Scheduled Sending
-
-**Goal:** Let users schedule review request emails for future delivery with preset and custom timing options.
-
-**Target features:**
-- Schedule presets (Send now, In 1 hour, Next morning, In 24 hours, Custom date/time)
-- New `scheduled_sends` table with pending/completed/failed/cancelled lifecycle
-- Vercel Cron endpoint (every minute) to process due sends using existing email logic
-- ScheduleSelector component integrated into existing send form
-- Scheduled sends management page with cancel functionality
-- Navigation updates for scheduled sends page
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Email first, not SMS | Lower cost, simpler integration, SMS can come later | — Pending |
-| Next.js + Supabase | Fast to ship, built-in auth, good DX | — Pending |
-| Usage-based trial (25 sends) | Let users see value before paying | — Pending |
-| Two tiers ($49/$99) | Basic for small shops, Pro for multi-location businesses | — Pending |
-| Multi-location for Pro | Pro users get multiple business locations | — Pending |
-
-| Separate scheduled_sends table | Different lifecycle than send_logs, supports cancellation | — Pending |
-| Vercel Cron for processing | Serverless, no infrastructure to manage, runs every minute | — Pending |
-| Service role for cron | No user session in cron context, needs direct DB access | — Pending |
+| Email first, not SMS | Lower cost, simpler integration | Good — email sufficient for core value |
+| Next.js + Supabase | Fast to ship, built-in auth, good DX | Good — shipped MVP in 3 days |
+| Usage-based trial (25 sends) | Let users see value before paying | Pending — needs real user validation |
+| Two tiers ($49/$99) | Basic for small shops, Pro for multi-location | Pending — needs pricing validation |
+| Separate scheduled_sends table | Different lifecycle than send_logs, supports cancellation | Good — clean separation |
+| Vercel Cron for processing | Serverless, no infrastructure to manage | Good — runs every minute reliably |
+| Service role for cron | No user session in cron context | Good — necessary for RLS bypass |
+| FOR UPDATE SKIP LOCKED | Race-safe atomic claiming of scheduled sends | Good — prevents double-processing |
+| Phosphor Icons + Kumbh Sans | Design system aligned to Figma reference | Good — consistent visual language |
+| Google OAuth via PKCE | Supabase built-in, reduces signup friction | Good — standard secure flow |
+| 2-step onboarding wizard | Faster onboarding, less intimidating | Good — business name + review link only |
+| Dashboard test step cards | Guided walkthrough instead of checklist | Good — auto-detection of completion |
+| Test sends excluded from quota | Fair for users learning the product | Good — is_test flag in database |
 
 ---
-*Last updated: 2026-01-28 after milestone v1.1 started*
+*Last updated: 2026-02-01 after v1.2.1 milestone complete*
