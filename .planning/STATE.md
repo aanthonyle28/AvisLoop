@@ -66,6 +66,7 @@ Phase 18: █░ Code Cleanup (1/2) IN PROGRESS
 - **Verified:** 4/4 success criteria passed — migration exists with RLS/indexes, sequence correct, Phase 4 VERIFICATION.md created, password reset confirmed
 
 ### Phase 18: Code Cleanup (In Progress)
+- **18-01 Complete:** Tech debt cleanup (deleted orphaned components/marketing/how-it-works.tsx, replaced inline CONTACT_LIMITS with import from lib/constants/billing.ts, updated Phase 13 VERIFICATION.md to resolved status reflecting Phase 15 navigation fixes)
 - **18-02 Complete:** History pagination with Previous/Next controls, URL-driven page state (?page=N), Phosphor icon integration, conditional rendering when >50 messages
 
 ## Tech Stack
@@ -126,6 +127,8 @@ Next.js 15 (App Router), TypeScript, Supabase, Tailwind CSS, Resend, Stripe, Ups
 | D17-01-02 | 17-01 | Partial index on (status, scheduled_for) WHERE status='pending' | Optimizes cron claim query that only selects pending records | Medium | 2026-01-30 |
 | D17-01-03 | 17-01 | No DELETE policy, use status changes instead | Audit trail preservation, consistent with send_logs pattern | Low | 2026-01-30 |
 | D17-02-01 | 17-02 | Verification based on code evidence rather than re-testing | Phase 4 functionally complete and in production; verification confirms existing implementation | Low | 2026-01-30 |
+| D18-01-01 | 18-01 | Import billing constants from centralized module | Single source of truth prevents drift between definitions | Low | 2026-02-01 |
+| D18-01-02 | 18-01 | Update verification documents retroactively | Phase 13 gaps were fully resolved by Phase 15 sidebar redesign, verification should reflect actual state | Low | 2026-02-01 |
 | D18-02-01 | 18-02 | Hide pagination controls when total messages <= 50 | Avoid UI clutter on small datasets; controls only needed for large message lists | Low | 2026-02-01 |
 | D18-02-02 | 18-02 | Use URL search params (?page=N) for pagination state | Shareable/bookmarkable state, standard pattern for server-side pagination | Low | 2026-02-01 |
 | D18-02-03 | 18-02 | Show page range in message count (X-Y of Z) | Users can see exactly which messages are displayed on current page | Low | 2026-02-01 |
@@ -156,7 +159,7 @@ Recent architectural decisions:
 
 ## Session Continuity
 
-**Last session:** 2026-02-01T08:36:26Z
-**Stopped at:** Completed 18-02-PLAN.md (History pagination)
+**Last session:** 2026-02-01
+**Stopped at:** Completed 18-01-PLAN.md execution (tech debt cleanup)
 **Resume file:** None
-**Next action:** Execute 18-01-PLAN.md (last plan in Phase 18)
+**Next action:** 18-02 already complete, Phase 18 finished
