@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { Hero } from "@/components/marketing/hero";
-import { SocialProof } from "@/components/marketing/social-proof";
+import { HeroV2 } from "@/components/marketing/v2/hero-v2";
+import { SocialProofStrip } from "@/components/marketing/v2/social-proof-strip";
 import { StatsSection } from "@/components/marketing/stats-section";
 import { Features } from "@/components/marketing/features";
 import { Testimonials } from "@/components/marketing/testimonials";
@@ -34,8 +34,8 @@ export const metadata: Metadata = {
 export default function LandingPage() {
   return (
     <>
-      <Hero />
-      <SocialProof />
+      <HeroV2 />
+      <SocialProofStrip />
       <Features />
       <StatsSection />
       <Testimonials />
