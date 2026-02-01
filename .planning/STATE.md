@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-01)
 ## Current Position
 
 **Phase:** 19 of 19 (UX/UI Redesign)
-**Plan:** 7 of 8
-**Status:** In progress
-**Last activity:** 2026-02-01 -- Completed 19-06-PLAN.md (Bulk Send Tab)
+**Plan:** 8 of 8
+**Status:** Phase complete
+**Last activity:** 2026-02-01 -- Completed 19-08-PLAN.md (Dashboard Deprecation and Dead Code Cleanup)
 
-**Progress:** [███████████████████████████] 71/74 total plans complete
+**Progress:** [████████████████████████████] 72/74 total plans complete
 
 ```
 v1.0 MVP:           ████████████████████████████████████████████████ 48/48 SHIPPED
 v1.1 Scheduled:     █████ 5/5 SHIPPED
 v1.2 Onboarding:    █████████ 9/9 SHIPPED
 v1.2.1 Tech Debt:   ████ 4/4 SHIPPED
-Phase 19 UX:        ███████░ 7/8 IN PROGRESS
+Phase 19 UX:        ████████ 8/8 SHIPPED
 ```
 
 ## What's Been Built
@@ -32,7 +32,7 @@ See .planning/MILESTONES.md for full history.
 - **v1.1 Scheduled Sending:** Cron processing, scheduling UI, scheduled send management
 - **v1.2 Onboarding Redesign:** Design system overhaul, dashboard redesign, Google OAuth, simplified onboarding
 - **v1.2.1 Tech Debt:** Migration fix, Phase 4 verification, code cleanup, history pagination
-- **Phase 19 (in progress):** Navigation simplified to 3 pages, account dropdown menu, mobile page header, navigation progress bar, actionable toasts, softer skeletons, compact message preview, collapsible setup progress pill and drawer, stat strip and recent activity feed, bulk send table with filter chips and sticky action bar
+- **Phase 19 (complete):** Navigation simplified to 3 pages, account dropdown menu, mobile page header, navigation progress bar, actionable toasts, softer skeletons, compact message preview, collapsible setup progress pill and drawer, stat strip and recent activity feed, bulk send table with filter chips and sticky action bar, dashboard deprecation and dead code cleanup
 
 ## Tech Stack
 
@@ -66,10 +66,11 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 | filter-chip-or-logic | Multiple active filters use OR logic (not AND) | Phase 19-06: More intuitive - "show me contacts that are EITHER never sent OR added today" | 2026-02-01 |
 | cooldown-categorization | Categorize contacts client-side in confirmation dialog | Phase 19-06: Avoids duplicate logic, uses existing resendReadyIds | 2026-02-01 |
 | sticky-bar-positioning | Fixed bottom with md:left-64 offset for desktop sidebar | Phase 19-06: Gmail-style UX, doesn't block content, accessible on mobile | 2026-02-01 |
+| dashboard-deprecation | /dashboard redirects to /send, old dashboard components deleted | Phase 19-08: Send is canonical home page, removes duplicate functionality and 1,145 lines of dead code | 2026-02-01 |
 
 ## Session Continuity
 
-**Last session:** 2026-02-01 11:14 UTC
-**Stopped at:** Completed 19-06-PLAN.md (Bulk Send Tab)
+**Last session:** 2026-02-01 11:21 UTC
+**Stopped at:** Completed 19-08-PLAN.md (Dashboard Deprecation and Dead Code Cleanup)
 **Resume file:** None
-**Next action:** Execute next incomplete plan in phase 19
+**Next action:** Phase 19 complete - all UX/UI redesign work shipped
