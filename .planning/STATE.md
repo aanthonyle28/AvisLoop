@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-01)
 
 ## Current Position
 
-**Phase:** 24 of 27 (Foundation & Hero)
-**Plan:** Not started
-**Status:** Ready to plan
-**Last activity:** 2026-02-01 — v1.4 roadmap created
+**Phase:** 20 of 27 (Status Badges & Layout Fixes)
+**Plan:** 01 of 03 complete
+**Status:** In progress
+**Last activity:** 2026-02-01 — Completed 20-01-PLAN.md
 
-**Progress:** [████████████████████████████] 74/74 total plans complete (previous milestones)
+**Progress:** [████████████████████████████░] 75/77 total plans complete
 
 ```
 v1.0 MVP:           ████████████████████████████████████████████████ 48/48 SHIPPED
@@ -22,8 +22,8 @@ v1.1 Scheduled:     █████ 5/5 SHIPPED
 v1.2 Onboarding:    █████████ 9/9 SHIPPED
 v1.2.1 Tech Debt:   ████ 4/4 SHIPPED
 Phase 19 UX:        ████████ 8/8 COMPLETE
-v1.3 UX Overhaul:   ░░░░░░░░ 0/? NOT STARTED
-v1.4 Landing Page:  ░░░░░░░░ 0/? READY TO PLAN
+v1.3 UX Overhaul:   █░░ 1/3 IN PROGRESS
+v1.4 Landing Page:  ░░░░░░░░ 0/4 NOT STARTED
 ```
 
 ## What's Been Built
@@ -35,6 +35,7 @@ See .planning/MILESTONES.md for full history.
 - **v1.2 Onboarding Redesign:** Design system overhaul, dashboard redesign, Google OAuth, simplified onboarding
 - **v1.2.1 Tech Debt:** Migration fix, Phase 4 verification, code cleanup, history pagination
 - **Phase 19 UX/UI Redesign:** Send-first dashboard, 3-page nav, onboarding drawer, stat/activity strips, request detail drawer
+- **Phase 20 (1/3):** Unified StatusBadge component with Figma-spec colors and Phosphor icons across all status displays
 
 ## Tech Stack
 
@@ -53,6 +54,8 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 
 | ID | Decision | Context | Date |
 |----|----------|---------|------|
+| inline-styles-for-figma-colors | Use inline styles with exact hex values instead of Tailwind classes for status badges | Figma spec requires precise colors not in Tailwind palette | 2026-02-01 |
+| legacy-status-normalization | Normalize legacy status strings to 6 canonical statuses via normalizeStatus function | Maintains backwards compatibility with database/Resend status values | 2026-02-01 |
 | css-first-animations | Use CSS-first animation strategy with selective JavaScript | v1.4 Phase 24 | 2026-02-01 |
 | v2-component-directory | New landing page components in components/marketing/v2/ for safe migration | v1.4 architecture | 2026-02-01 |
 | mobile-first-design | Design mobile layout first (320-428px), then scale up | v1.4 responsive strategy | 2026-02-01 |
@@ -65,6 +68,6 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 ## Session Continuity
 
 **Last session:** 2026-02-01
-**Stopped at:** v1.4 roadmap created, ready to plan Phase 24
+**Stopped at:** Completed 20-01-PLAN.md (unified StatusBadge component)
 **Resume file:** None
-**Next action:** `/gsd:plan-phase 24`
+**Next action:** Execute phase 20 plan 02 (settings sticky header + activity strip truncation)
