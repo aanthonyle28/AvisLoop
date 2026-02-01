@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import type { EmailTemplate } from '@/lib/types/database'
 import { format } from 'date-fns'
 
@@ -25,6 +26,7 @@ export function SendSettingsBar({
   customDateTime,
   onCustomDateTimeChange,
 }: SendSettingsBarProps) {
+  const router = useRouter()
   const customInputRef = useRef<HTMLInputElement>(null)
 
   // Load from localStorage on mount
@@ -42,6 +44,13 @@ export function SendSettingsBar({
   }, [templates, onTemplateChange, onSchedulePresetChange])
 
   const handleTemplateChange = (templateId: string) => {
+    // Navigate to settings if "Create Template" is selected
+    if (templateId === 'create-new') {
+      router.push('/dashboard/settings#templates')
+      return
+    }
+
+    // Normal template selection
     localStorage.setItem('avisloop_lastTemplate', templateId)
     onTemplateChange(templateId)
   }
@@ -88,6 +97,8 @@ export function SendSettingsBar({
               {template.name} {template.is_default ? '(Default)' : ''}
             </option>
           ))}
+          <option disabled>──────────</option>
+          <option value="create-new">+ Create Template</option>
         </select>
       </div>
 
