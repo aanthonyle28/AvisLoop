@@ -93,7 +93,10 @@ AvisLoop is a review request SaaS for local service businesses. All planned mile
   1. Status badges on send page, history page, contacts page, drawers, and recent activity strip all render with identical colors, icons, and typography matching the Figma spec
   2. Scrolling the settings page keeps the navbar visible and fixed at the top
   3. Recent activity chips fill all available horizontal space before the View All button, with the last chip truncating gracefully when space runs out
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 20-01-PLAN.md -- Rebuild StatusBadge with Figma-spec colors/icons + migrate scheduled-table
+- [ ] 20-02-PLAN.md -- Sticky settings header + activity strip horizontal fill/truncation
 
 ### Phase 21: Email Preview & Template Selection
 **Goal**: Users see a compact email confidence snippet before sending and can open a full rendered preview, and the template dropdown includes a shortcut to create new templates.
