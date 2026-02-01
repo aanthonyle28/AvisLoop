@@ -9,25 +9,13 @@ import {
   AddressBook,
   PaperPlaneTilt,
   ClockCounterClockwise,
-  AppWindow,
-  CreditCard,
-  Headset,
   UserCircle,
   CaretLeft,
   CaretRight,
-  SignOut,
   ArrowsClockwise,
-  GearSix,
 } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { signOut } from '@/lib/actions/auth'
+import { AccountMenu } from './account-menu'
 
 interface NavItem {
   icon: React.ElementType
@@ -138,8 +126,10 @@ export function Sidebar() {
 
       {/* Footer with account dropdown */}
       <div className="p-3 border-t border-[#E2E2E2] dark:border-border">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+        <AccountMenu
+          side="top"
+          align="start"
+          trigger={
             <Button
               variant="ghost"
               className={cn(
@@ -150,41 +140,8 @@ export function Sidebar() {
               <UserCircle size={20} weight="regular" className="shrink-0" />
               {!collapsed && <span>Account</span>}
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent side="top" align="start" className="w-56">
-            <DropdownMenuItem asChild>
-              <Link href="/dashboard/settings" className="flex items-center gap-2 cursor-pointer">
-                <AppWindow size={16} weight="regular" />
-                <span>Apps / Integrations</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/dashboard/settings" className="flex items-center gap-2 cursor-pointer">
-                <GearSix size={16} weight="regular" />
-                <span>Settings</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/billing" className="flex items-center gap-2 cursor-pointer">
-                <CreditCard size={16} weight="regular" />
-                <span>Billing</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem disabled className="flex items-center gap-2">
-              <Headset size={16} weight="regular" />
-              <span>Help & Support</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <form action={signOut} className="w-full">
-                <button type="submit" className="flex items-center gap-2 w-full cursor-pointer">
-                  <SignOut size={16} weight="regular" />
-                  <span>Logout</span>
-                </button>
-              </form>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          }
+        />
       </div>
     </aside>
   )
