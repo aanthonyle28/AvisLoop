@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-01)
 
 ## Current Position
 
-**Phase:** 24 of 27 (Foundation & Hero)
-**Plan:** 01 of 04 complete
-**Status:** In progress
-**Last activity:** 2026-02-01 — Completed 24-01-PLAN.md (hero components)
+**Phase:** 21 of 27 (Email Preview & Template Selection)
+**Plan:** 02 of 02 complete
+**Status:** Phase complete
+**Last activity:** 2026-02-01 — Completed 21-02-PLAN.md (template dropdown enhancement)
 
-**Progress:** [████████████████████████████░] 77/78+ total plans complete
+**Progress:** [████████████████████████████░] 78/78+ total plans complete
 
 ```
 v1.0 MVP:           ████████████████████████████████████████████████ 48/48 SHIPPED
@@ -23,7 +23,7 @@ v1.2 Onboarding:    █████████ 9/9 SHIPPED
 v1.2.1 Tech Debt:   ████ 4/4 SHIPPED
 Phase 19 UX:        ████████ 8/8 COMPLETE
 Phase 20 Layout:    ██ 2/2 COMPLETE
-Phase 24 Hero:      ██░░░░░░ 1/4 IN PROGRESS
+Phase 21 Preview:   ██ 2/2 COMPLETE
 ```
 
 ## What's Been Built
@@ -36,7 +36,7 @@ See .planning/MILESTONES.md for full history.
 - **v1.2.1 Tech Debt:** Migration fix, Phase 4 verification, code cleanup, history pagination
 - **Phase 19 UX/UI Redesign:** Send-first dashboard, 3-page nav, onboarding drawer, stat/activity strips, request detail drawer
 - **Phase 20 Layout Fixes:** Unified status badges, sticky settings header, optimized activity strip layout
-- **Phase 24 Foundation & Hero:** FadeIn animation wrapper, 3-step animated product demo, outcome-focused hero section ("3× More Reviews in 2 Minutes")
+- **Phase 21 Email Preview:** Compact preview snippet with modal, template dropdown with "Create Template" navigation option
 
 ## Tech Stack
 
@@ -55,6 +55,8 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 
 | ID | Decision | Context | Date |
 |----|----------|---------|------|
+| template-dropdown-navigation | Template dropdown includes "+ Create Template" option that routes to settings page with #templates fragment | Phase 21-02 | 2026-02-01 |
+| create-new-special-value | Use 'create-new' as non-UUID dropdown value to safely detect navigation trigger | Phase 21-02 | 2026-02-01 |
 | fade-in-intersection-observer | Use IntersectionObserver API for scroll-triggered animations with trigger-once pattern | Phase 24-01 | 2026-02-01 |
 | motion-safe-prefix-pattern | Prefix ALL animation classes with motion-safe: variant for accessibility | Phase 24-01 | 2026-02-01 |
 | outcome-focused-hero-headline | Hero headline "3× More Reviews in 2 Minutes" (specific metric + time promise) | Phase 24-01 | 2026-02-01 |
@@ -74,6 +76,6 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 ## Session Continuity
 
 **Last session:** 2026-02-01
-**Stopped at:** Completed 24-01-PLAN.md
+**Stopped at:** Completed 21-02-PLAN.md
 **Resume file:** None
-**Next action:** Continue with plan 24-02
+**Next action:** Continue with Phase 22 (Detail Drawers) or Phase 23 (Onboarding Polish)

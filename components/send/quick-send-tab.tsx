@@ -8,6 +8,7 @@ import { scheduleReviewRequest } from '@/lib/actions/schedule'
 import { findOrCreateContact } from '@/lib/actions/contact'
 import { SendSettingsBar } from './send-settings-bar'
 import { MessagePreview } from './message-preview'
+import { EmailPreviewModal } from './email-preview-modal'
 import type { Contact, Business, EmailTemplate } from '@/lib/types/database'
 import { Loader2 } from 'lucide-react'
 
@@ -38,6 +39,7 @@ export function QuickSendTab({
   const [isPending, startTransition] = useTransition()
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [highlightedIndex, setHighlightedIndex] = useState(-1)
+  const [showFullPreview, setShowFullPreview] = useState(false)
   const suggestionsRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -382,7 +384,7 @@ export function QuickSendTab({
             contact={previewContact}
             business={business}
             template={selectedTemplate}
-            compact={true}
+            onViewFull={() => setShowFullPreview(true)}
           />
         </div>
 
@@ -421,6 +423,14 @@ export function QuickSendTab({
           )}
         </div>
       </form>
+
+      <EmailPreviewModal
+        open={showFullPreview}
+        onOpenChange={setShowFullPreview}
+        contact={previewContact}
+        business={business}
+        template={selectedTemplate}
+      />
     </div>
   )
 }
