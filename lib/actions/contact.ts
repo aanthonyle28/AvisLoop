@@ -24,6 +24,64 @@ export type BulkCreateResult = {
 }
 
 /**
+ * Find or create a contact by email.
+ * Used by Quick Send to auto-create contacts on-the-fly.
+ */
+export async function findOrCreateContact({
+  email,
+  name,
+  businessId,
+}: {
+  email: string
+  name: string
+  businessId: string
+}): Promise<ContactActionState> {
+  const supabase = await createClient()
+
+  // Validate user authentication
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return { error: 'You must be logged in' }
+  }
+
+  const normalizedEmail = email.toLowerCase()
+
+  // Check for existing contact
+  const { data: existingContact } = await supabase
+    .from('contacts')
+    .select('id')
+    .eq('business_id', businessId)
+    .eq('email', normalizedEmail)
+    .single()
+
+  if (existingContact) {
+    return { success: true, data: { id: existingContact.id } }
+  }
+
+  // Create new contact
+  const { data: newContact, error } = await supabase
+    .from('contacts')
+    .insert({
+      business_id: businessId,
+      name,
+      email: normalizedEmail,
+      phone: null,
+      status: 'active',
+      send_count: 0,
+    })
+    .select('id')
+    .single()
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  revalidatePath('/dashboard/contacts')
+  revalidatePath('/send')
+  return { success: true, data: { id: newContact.id } }
+}
+
+/**
  * Create a new contact for the user's business.
  * Checks for duplicate emails within the same business.
  */

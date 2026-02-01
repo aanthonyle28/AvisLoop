@@ -157,3 +157,73 @@ export async function getOnboardingCardStatus(): Promise<OnboardingCardStatus> {
 export function areAllCardsComplete(status: OnboardingCardStatus): boolean {
   return status.contact_created && status.template_created && status.test_sent
 }
+
+/**
+ * Get setup progress for the setup pill/drawer UI.
+ * Returns step completion status and counts.
+ */
+export async function getSetupProgress() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return {
+      hasContact: false,
+      hasReviewLink: false,
+      hasTemplate: false,
+      hasSent: false,
+      contactCount: 0,
+      completedCount: 0,
+      totalCount: 4,
+      isAllComplete: false,
+    }
+  }
+
+  const { data: business } = await supabase
+    .from('businesses')
+    .select('id, google_review_link')
+    .eq('user_id', user.id)
+    .single()
+
+  if (!business) {
+    return {
+      hasContact: false,
+      hasReviewLink: false,
+      hasTemplate: false,
+      hasSent: false,
+      contactCount: 0,
+      completedCount: 0,
+      totalCount: 4,
+      isAllComplete: false,
+    }
+  }
+
+  // Check all conditions in parallel
+  const [contactResult, templateResult, sendResult] = await Promise.all([
+    supabase.from('contacts').select('id', { count: 'exact', head: true }).eq('business_id', business.id).eq('status', 'active'),
+    supabase.from('email_templates').select('id', { count: 'exact', head: true }).eq('business_id', business.id),
+    supabase.from('send_logs').select('id', { count: 'exact', head: true }).eq('business_id', business.id),
+  ])
+
+  const hasContact = (contactResult.count ?? 0) > 0
+  const hasReviewLink = !!business.google_review_link
+  const hasTemplate = (templateResult.count ?? 0) > 0
+  const hasSent = (sendResult.count ?? 0) > 0
+  const contactCount = contactResult.count ?? 0
+
+  const steps = [hasContact, hasReviewLink, hasTemplate, hasSent]
+  const completedCount = steps.filter(Boolean).length
+  const totalCount = 4
+  const isAllComplete = completedCount === totalCount
+
+  return {
+    hasContact,
+    hasReviewLink,
+    hasTemplate,
+    hasSent,
+    contactCount,
+    completedCount,
+    totalCount,
+    isAllComplete,
+  }
+}

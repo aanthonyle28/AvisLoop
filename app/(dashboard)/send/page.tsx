@@ -1,117 +1,54 @@
 import { getBusiness } from '@/lib/actions/business'
 import { getContacts } from '@/lib/actions/contact'
-import { getMonthlyUsage, getResendReadyContacts } from '@/lib/data/send-logs'
-import { SendForm } from '@/components/send/send-form'
-import { UsageWarningBanner } from '@/components/billing/usage-warning-banner'
+import { getMonthlyUsage, getResendReadyContacts, getNeedsAttentionCount, getResponseRate, getRecentActivity } from '@/lib/data/send-logs'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
-import { CONTACT_LIMITS } from '@/lib/constants/billing'
+import { SendPageClient } from '@/components/send/send-page-client'
 
-export default async function SendPage({ searchParams }: { searchParams: Promise<{ test?: string }> }) {
-  const params = await searchParams
-  const isTest = params.test === 'true'
-
+export default async function SendPage() {
   const business = await getBusiness()
 
   if (!business) {
     redirect('/dashboard/settings')
   }
 
-  if (!business.google_review_link && !isTest) {
-    return (
-      <div className="container mx-auto py-6 px-4">
-        <h1 className="text-2xl font-bold mb-6">Send Review Request</h1>
-        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-6">
-          <h2 className="font-semibold text-yellow-800 mb-2">Setup Required</h2>
-          <p className="text-yellow-700 mb-4">
-            Please add your Google review link in settings before sending review requests.
-          </p>
-          <a
-            href="/dashboard/settings"
-            className="text-sm font-medium text-yellow-800 underline hover:no-underline"
-          >
-            Go to Settings
-          </a>
-        </div>
-      </div>
-    )
-  }
-
   const supabase = await createClient()
 
-  const [{ contacts }, usage, { count: contactCount }, resendReadyContacts] = await Promise.all([
+  // Fetch all data in parallel
+  const [
+    { contacts },
+    monthlyUsage,
+    resendReadyContacts,
+    needsAttention,
+    responseRate,
+    recentActivity
+  ] = await Promise.all([
     getContacts({ limit: 200 }),
     getMonthlyUsage(),
-    supabase
-      .from('contacts')
-      .select('*', { count: 'exact', head: true })
-      .eq('business_id', business.id)
-      .eq('status', 'active'),
     getResendReadyContacts(supabase, business.id),
+    getNeedsAttentionCount(),
+    getResponseRate(),
+    getRecentActivity(5),
   ])
 
-  // Contact limits by tier (BILL-07)
-  const contactLimit = CONTACT_LIMITS[usage.tier]
-
-  // Filter to only sendable contacts (active, not opted out)
-  const sendableContacts = contacts.filter(
-    c => c.status === 'active' && !c.opted_out
-  )
-
-  // Extract IDs from resend-ready contacts
-  const resendReadyContactIds = resendReadyContacts.map(c => c.id)
+  const hasReviewLink = !!business.google_review_link
+  const templates = business.email_templates || []
 
   return (
     <div className="container mx-auto py-6 px-4">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">
-          {isTest ? 'Test Send Walkthrough' : 'Send Review Request'}
-        </h1>
-        {!isTest && (
-          <Link
-            href="/billing"
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            {usage.count} / {usage.limit} sends this month
-          </Link>
-        )}
-      </div>
+      <h1 className="text-2xl font-bold mb-6">Send</h1>
 
-      {!isTest && (
-        <UsageWarningBanner
-          count={usage.count}
-          limit={usage.limit}
-          tier={usage.tier}
-          contactCount={contactCount ?? undefined}
-          contactLimit={contactLimit}
-        />
-      )}
-
-      {sendableContacts.length === 0 ? (
-        <div className="rounded-lg border border-muted p-6 text-center">
-          <p className="text-muted-foreground mb-4">
-            No contacts available to send to. Add some contacts first!
-          </p>
-          <a
-            href="/dashboard/contacts"
-            className="text-sm font-medium text-primary underline hover:no-underline"
-          >
-            Go to Contacts
-          </a>
-        </div>
-      ) : (
-        <SendForm
-          contacts={sendableContacts}
-          business={business}
-          templates={business.email_templates || []}
-          monthlyUsage={usage}
-          contactCount={contactCount ?? 0}
-          contactLimit={contactLimit}
-          resendReadyContactIds={resendReadyContactIds}
-          isTest={isTest}
-        />
-      )}
+      <SendPageClient
+        contacts={contacts}
+        business={business}
+        templates={templates}
+        monthlyUsage={monthlyUsage}
+        hasReviewLink={hasReviewLink}
+        resendReadyContacts={resendReadyContacts}
+        needsAttention={needsAttention}
+        responseRate={responseRate}
+        recentActivity={recentActivity}
+      />
     </div>
   )
 }

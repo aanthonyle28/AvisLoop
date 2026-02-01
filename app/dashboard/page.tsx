@@ -1,13 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { getOnboardingStatus, getOnboardingCardStatus, areAllCardsComplete } from '@/lib/data/onboarding'
+import { getOnboardingStatus, getOnboardingCardStatus } from '@/lib/data/onboarding'
 import { getBusiness } from '@/lib/actions/business'
 import { getMonthlyUsage, getResponseRate, getNeedsAttentionCount, getRecentActivity } from '@/lib/data/send-logs'
 import { getContacts } from '@/lib/actions/contact'
 import { MonthlyUsageCard, NeedsAttentionCard, ReviewRateCard } from '@/components/dashboard/stat-cards'
 import { RecentActivityTable } from '@/components/dashboard/recent-activity'
 import { QuickSend } from '@/components/dashboard/quick-send'
-import { OnboardingCards } from '@/components/dashboard/onboarding-cards'
 import type { EmailTemplate } from '@/lib/types/database'
 
 /**
@@ -65,12 +64,7 @@ export default async function DashboardPage() {
         </p>
       </div>
 
-      {/* 2. Onboarding Cards (if not all complete) */}
-      {!areAllCardsComplete(cardStatus) && (
-        <OnboardingCards status={cardStatus} />
-      )}
-
-      {/* 3. Stat Cards Row (hidden until user has sent at least one request) */}
+      {/* 2. Stat Cards Row (hidden until user has sent at least one request) */}
       {cardStatus.test_sent && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <MonthlyUsageCard count={usage.count} limit={usage.limit} tier={usage.tier} />
@@ -79,7 +73,7 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* 4. Quick Send + When to Send (always visible) */}
+      {/* 3. Quick Send + When to Send (always visible) */}
       <QuickSend
         contacts={contactsData.contacts
           .filter(c => c.status === 'active')
@@ -88,7 +82,7 @@ export default async function DashboardPage() {
         recentContacts={recentContacts.map(c => ({ id: c.id, name: c.name }))}
       />
 
-      {/* 5. Recent Activity Table */}
+      {/* 4. Recent Activity Table */}
       <RecentActivityTable activities={recentActivity} />
     </div>
   )
