@@ -10,31 +10,6 @@ interface SendPageClientProps {
   templates: EmailTemplate[]
   monthlyUsage: { count: number; limit: number; tier: string }
   hasReviewLink: boolean
-  resendReadyContacts: Array<{
-    id: string
-    name: string
-    email: string
-    last_sent_at: string
-    send_count: number
-  }>
-  needsAttention: {
-    total: number
-    pending: number
-    failed: number
-  }
-  responseRate: {
-    total: number
-    responded: number
-    rate: number
-  }
-  recentActivity: Array<{
-    id: string
-    contact_name: string
-    contact_email: string
-    subject: string
-    status: string
-    created_at: string
-  }>
 }
 
 export function SendPageClient({
@@ -42,7 +17,7 @@ export function SendPageClient({
   business,
   templates,
   monthlyUsage,
-  resendReadyContacts,
+  hasReviewLink,
 }: SendPageClientProps) {
   return (
     <Tabs defaultValue="quick-send" className="w-full">
@@ -57,7 +32,7 @@ export function SendPageClient({
           business={business}
           templates={templates}
           monthlyUsage={monthlyUsage}
-          resendReadyContacts={resendReadyContacts}
+          hasReviewLink={hasReviewLink}
         />
       </TabsContent>
 

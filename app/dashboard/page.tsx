@@ -6,7 +6,7 @@ import { getMonthlyUsage, getResponseRate, getNeedsAttentionCount, getRecentActi
 import { getContacts } from '@/lib/actions/contact'
 import { MonthlyUsageCard, NeedsAttentionCard, ReviewRateCard } from '@/components/dashboard/stat-cards'
 import { RecentActivityTable } from '@/components/dashboard/recent-activity'
-import { QuickSend } from '@/components/dashboard/quick-send'
+import { QuickSendTab } from '@/components/send/quick-send-tab'
 import type { EmailTemplate } from '@/lib/types/database'
 
 /**
@@ -46,11 +46,6 @@ export default async function DashboardPage() {
   // Get templates for Quick Send
   const templates: EmailTemplate[] = business?.email_templates || []
 
-  // Get recent contacts (by created_at DESC) for Quick Send chips
-  const recentContacts = contactsData.contacts
-    .filter(c => c.status === 'active')
-    .slice(0, 5)
-
   // Extract first name from business name or email
   const firstName = business?.name?.split(' ')[0] || user.email?.split('@')[0] || 'there'
 
@@ -73,14 +68,20 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* 3. Quick Send + When to Send (always visible) */}
-      <QuickSend
-        contacts={contactsData.contacts
-          .filter(c => c.status === 'active')
-          .map(c => ({ id: c.id, name: c.name, email: c.email }))}
-        templates={templates.map((t) => ({ id: t.id, name: t.name, is_default: t.is_default }))}
-        recentContacts={recentContacts.map(c => ({ id: c.id, name: c.name }))}
-      />
+      {/* 3. Quick Send (always visible) */}
+      <div className="rounded-lg border bg-card p-6">
+        <h2 className="text-lg font-semibold mb-1">Quick Send</h2>
+        <p className="text-sm text-muted-foreground mb-4">
+          Send a review request to a single contact
+        </p>
+        <QuickSendTab
+          contacts={contactsData.contacts.filter(c => c.status === 'active')}
+          business={business}
+          templates={templates}
+          monthlyUsage={usage}
+          hasReviewLink={!!business?.google_review_link}
+        />
+      </div>
 
       {/* 4. Recent Activity Table */}
       <RecentActivityTable activities={recentActivity} />
