@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-01)
 
 **Core value:** Make requesting reviews so simple that business owners actually do it -- one contact, one click, done.
-**Current focus:** Milestone v1.3 — Dashboard UX Overhaul & Onboarding Polish
+**Current focus:** Milestone v1.4 — Landing Page Redesign
 
 ## Current Position
 
-**Phase:** Not started (defining requirements)
+**Phase:** Not started (researching)
 **Plan:** —
-**Status:** Defining requirements
-**Last activity:** 2026-02-01 — Milestone v1.3 started
+**Status:** Researching landing page best practices and content strategy
+**Last activity:** 2026-02-01 — Milestone v1.4 started
 
 **Progress:** [████████████████████████████] 74/74 total plans complete (previous milestones)
 
@@ -66,6 +66,6 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 ## Session Continuity
 
 **Last session:** 2026-02-01
-**Stopped at:** Milestone v1.3 started — defining requirements
+**Stopped at:** Milestone v1.4 started — researching
 **Resume file:** None
-**Next action:** Define requirements and create roadmap for v1.3
+**Next action:** Complete research, define requirements, create roadmap for v1.4 Landing Page Redesign

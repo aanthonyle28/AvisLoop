@@ -108,19 +108,22 @@ Make requesting reviews so simple that business owners actually do it — one co
 | Dashboard test step cards | Guided walkthrough instead of checklist | Good — auto-detection of completion |
 | Test sends excluded from quota | Fair for users learning the product | Good — is_test flag in database |
 
-## Current Milestone: v1.3 Dashboard UX Overhaul & Onboarding Polish
+## Current Milestone: v1.4 Landing Page Redesign
 
-**Goal:** Refine the send page UX, email previews, detail drawers, onboarding flow, and settings layout for a polished user experience.
+**Goal:** Redesign all marketing pages (homepage, pricing) with creative, unique, high-converting layouts — moving beyond template-like patterns to a distinctive brand experience that drives signups.
 
 **Target features:**
-- Free send credit for onboarding test
-- Recent activity strip improvements
-- Sticky settings nav
-- Compact + full email preview redesign
-- Detail drawers (contacts, requests, recent activity)
-- Simplified setup checklist with completion state
-- Template selector with "Create Template" option
-- Help & Support menu with restart checklist
+- Research-driven landing page redesign with conversion-optimized copy
+- Creative, non-generic hero section with strong visual identity
+- Unique section layouts that stand out from typical SaaS templates
+- Conversion-focused content strategy tailored for local business owners
+- Redesigned pricing page with persuasive comparison
+- Consistent use of brand design system (blue primary, lime/coral accents, Kumbh Sans, geometric markers)
+- Dark mode support across all new marketing components
+- Image/mockup placeholders for future asset replacement
+- Mobile-responsive design throughout
+
+**Queued:** v1.3 Dashboard UX Overhaul & Onboarding Polish (defined, not started)
 
 ---
-*Last updated: 2026-02-01 after v1.3 milestone started*
+*Last updated: 2026-02-01 after v1.4 milestone started*
