@@ -32,7 +32,17 @@ Make requesting reviews so simple that business owners actually do it — one co
 
 ### Active
 
-(No active requirements — planning next milestone)
+**v1.3 Dashboard UX Overhaul & Onboarding Polish**
+- Free test send credit during onboarding (silent extra credit in backend)
+- Recent activity strip fills available space with truncation to View All button
+- Settings page sticky navigation bar on scroll
+- Compact email preview redesign (80-140px, full-width, subject + body snippet + "View full email")
+- Full email preview in read-only modal (resolved variables, CTA button, footer)
+- Recent activity chips open detail drawer instead of routing to history page
+- Contact detail drawer with action items on contacts page
+- Request detail drawer shows resend option
+- Setup checklist removes "create template" step; template selector shows defaults + "Create Template" option
+- Setup complete banner with restart/finish options; "Restart Setup Checklist" in help & support menu
 
 ### Out of Scope
 
@@ -98,5 +108,19 @@ Make requesting reviews so simple that business owners actually do it — one co
 | Dashboard test step cards | Guided walkthrough instead of checklist | Good — auto-detection of completion |
 | Test sends excluded from quota | Fair for users learning the product | Good — is_test flag in database |
 
+## Current Milestone: v1.3 Dashboard UX Overhaul & Onboarding Polish
+
+**Goal:** Refine the send page UX, email previews, detail drawers, onboarding flow, and settings layout for a polished user experience.
+
+**Target features:**
+- Free send credit for onboarding test
+- Recent activity strip improvements
+- Sticky settings nav
+- Compact + full email preview redesign
+- Detail drawers (contacts, requests, recent activity)
+- Simplified setup checklist with completion state
+- Template selector with "Create Template" option
+- Help & Support menu with restart checklist
+
 ---
-*Last updated: 2026-02-01 after v1.2.1 milestone complete*
+*Last updated: 2026-02-01 after v1.3 milestone started*
