@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-01)
 ## Current Position
 
 **Phase:** 19 of 19 (UX/UI Redesign)
-**Plan:** 5 of 8
+**Plan:** 6 of 8
 **Status:** In progress
-**Last activity:** 2026-02-01 -- Completed 19-03-PLAN.md (Send Page Redesign)
+**Last activity:** 2026-02-01 -- Completed 19-05-PLAN.md (Stat Strip and Recent Activity)
 
-**Progress:** [█████████████████████████] 69/74 total plans complete
+**Progress:** [██████████████████████████] 70/74 total plans complete
 
 ```
 v1.0 MVP:           ████████████████████████████████████████████████ 48/48 SHIPPED
 v1.1 Scheduled:     █████ 5/5 SHIPPED
 v1.2 Onboarding:    █████████ 9/9 SHIPPED
 v1.2.1 Tech Debt:   ████ 4/4 SHIPPED
-Phase 19 UX:        █████░░░ 5/8 IN PROGRESS
+Phase 19 UX:        ██████░░ 6/8 IN PROGRESS
 ```
 
 ## What's Been Built
@@ -32,7 +32,7 @@ See .planning/MILESTONES.md for full history.
 - **v1.1 Scheduled Sending:** Cron processing, scheduling UI, scheduled send management
 - **v1.2 Onboarding Redesign:** Design system overhaul, dashboard redesign, Google OAuth, simplified onboarding
 - **v1.2.1 Tech Debt:** Migration fix, Phase 4 verification, code cleanup, history pagination
-- **Phase 19 (in progress):** Navigation simplified to 3 pages, account dropdown menu, mobile page header, navigation progress bar, actionable toasts, softer skeletons, compact message preview, collapsible setup progress pill and drawer
+- **Phase 19 (in progress):** Navigation simplified to 3 pages, account dropdown menu, mobile page header, navigation progress bar, actionable toasts, softer skeletons, compact message preview, collapsible setup progress pill and drawer, stat strip and recent activity feed
 
 ## Tech Stack
 
@@ -44,6 +44,7 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 - Google OAuth provider must be configured in Supabase dashboard
 - CRON_SECRET env var must be set before deployment
 - Production domain and Vercel deployment configuration pending
+- Pre-existing typecheck error in bulk-send-tab.tsx (missing bulk-send-action-bar.tsx) should be fixed
 
 ## Decisions
 
@@ -60,10 +61,13 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 | pill-drawer-pattern | Replaced onboarding cards grid with collapsible pill + drawer | Phase 19-04: Reduces dashboard clutter while keeping guidance accessible | 2026-02-01 |
 | bonus-step-threshold | Show 'Try Bulk Send' bonus step only when 3+ contacts exist | Phase 19-04: Progressive disclosure - bulk send only makes sense with multiple contacts | 2026-02-01 |
 | dismiss-persistence | Setup complete chip dismissible via localStorage | Phase 19-04: User preference, instant feedback, no server roundtrip needed | 2026-02-01 |
+| compact-stat-cards | Compact stat strip with 3 cards in horizontal row | Phase 19-05: Reduces vertical space, keeps stats visible above tabs | 2026-02-01 |
+| smart-usage-cta | Dynamic CTA based on usage (80-90% "Manage plan", >=90% "Upgrade") | Phase 19-05: Proactive nudge before users hit limits | 2026-02-01 |
+| tab-aware-activity | RecentActivityStrip mode changes with active tab | Phase 19-05: Shows relevant activity (individual items on quick, batches on bulk) | 2026-02-01 |
 
 ## Session Continuity
 
-**Last session:** 2026-02-01 10:59 UTC
-**Stopped at:** Completed 19-03-PLAN.md (Send Page Redesign)
+**Last session:** 2026-02-01 11:08 UTC
+**Stopped at:** Completed 19-05-PLAN.md (Stat Strip and Recent Activity)
 **Resume file:** None
 **Next action:** Execute next incomplete plan in phase 19
