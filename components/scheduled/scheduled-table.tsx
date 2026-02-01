@@ -4,7 +4,6 @@ import { Fragment, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { ScheduledSendWithDetails } from '@/lib/types/database'
 import { formatScheduleDate } from '@/lib/utils/schedule'
-import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ExpandedDetails } from './expanded-details'
@@ -14,14 +13,12 @@ import { RescheduleDialog } from './reschedule-dialog'
 import { CancelButton } from './cancel-button'
 import { bulkCancelScheduledSends, bulkRescheduleScheduledSends } from '@/lib/actions/schedule'
 import { toast } from 'sonner'
+import { StatusBadge } from '@/components/history/status-badge'
 import {
   CaretRight,
   CaretDown,
   Users,
-  Clock,
-  CheckCircle,
-  XCircle,
-  Warning
+  Clock
 } from '@phosphor-icons/react'
 
 interface ScheduledTableProps {
@@ -153,40 +150,6 @@ export function ScheduledTable({ sends }: ScheduledTableProps) {
     setLastSelectedId(null)
   }
 
-  // Get status badge
-  const getStatusBadge = (status: ScheduledSendWithDetails['status']) => {
-    switch (status) {
-      case 'pending':
-        return (
-          <Badge variant="default" className="gap-1 bg-blue-600 text-white">
-            <Clock className="h-3 w-3" />
-            Pending
-          </Badge>
-        )
-      case 'completed':
-        return (
-          <Badge variant="outline" className="gap-1 text-green-600 bg-green-50 border-green-200">
-            <CheckCircle className="h-3 w-3" />
-            Completed
-          </Badge>
-        )
-      case 'failed':
-        return (
-          <Badge variant="outline" className="gap-1 text-red-600 bg-red-50 border-red-200">
-            <Warning className="h-3 w-3" />
-            Failed
-          </Badge>
-        )
-      case 'cancelled':
-        return (
-          <Badge variant="outline" className="gap-1">
-            <XCircle className="h-3 w-3" />
-            Cancelled
-          </Badge>
-        )
-    }
-  }
-
   // Get results summary for completed sends
   const getResultsSummary = (send: ScheduledSendWithDetails) => {
     if (send.status !== 'completed') return null
@@ -285,7 +248,7 @@ export function ScheduledTable({ sends }: ScheduledTableProps) {
                             </div>
                           </td>
                           <td className="p-3">
-                            {getStatusBadge(send.status)}
+                            <StatusBadge status={send.status} />
                           </td>
                           <td className="p-3" onClick={(e) => e.stopPropagation()}>
                             <CancelButton scheduledSendId={send.id} />
@@ -337,7 +300,7 @@ export function ScheduledTable({ sends }: ScheduledTableProps) {
                             </span>
                           </div>
                         </div>
-                        {getStatusBadge(send.status)}
+                        <StatusBadge status={send.status} />
                       </div>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <Clock className="h-4 w-4" />
@@ -404,7 +367,7 @@ export function ScheduledTable({ sends }: ScheduledTableProps) {
                             </div>
                           </td>
                           <td className="p-3">
-                            {getStatusBadge(send.status)}
+                            <StatusBadge status={send.status} />
                           </td>
                           <td className="p-3">
                             {getResultsSummary(send)}
@@ -448,7 +411,7 @@ export function ScheduledTable({ sends }: ScheduledTableProps) {
                             </span>
                           </div>
                         </div>
-                        {getStatusBadge(send.status)}
+                        <StatusBadge status={send.status} />
                       </div>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <Clock className="h-4 w-4" />
