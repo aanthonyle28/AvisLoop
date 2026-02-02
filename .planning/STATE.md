@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-01)
 ## Current Position
 
 **Phase:** 22 of 27 (Detail Drawers)
-**Plan:** 01 of 02 complete
-**Status:** In progress
-**Last activity:** 2026-02-01 — Completed 22-01-PLAN.md (contact notes foundation)
+**Plan:** 02 of 02 complete
+**Status:** Phase complete
+**Last activity:** 2026-02-02 — Completed 22-02-PLAN.md (send page request drawer)
 
-**Progress:** [█████████████████████████████░] 79/80+ total plans complete
+**Progress:** [█████████████████████████████░] 80/80+ total plans complete
 
 ```
 v1.0 MVP:           ████████████████████████████████████████████████ 48/48 SHIPPED
@@ -24,7 +24,7 @@ v1.2.1 Tech Debt:   ████ 4/4 SHIPPED
 Phase 19 UX:        ████████ 8/8 COMPLETE
 Phase 20 Layout:    ██ 2/2 COMPLETE
 Phase 21 Preview:   ██ 2/2 COMPLETE
-Phase 22 Drawers:   █░ 1/2 IN PROGRESS
+Phase 22 Drawers:   ██ 2/2 COMPLETE
 ```
 
 ## What's Been Built
@@ -38,7 +38,7 @@ See .planning/MILESTONES.md for full history.
 - **Phase 19 UX/UI Redesign:** Send-first dashboard, 3-page nav, onboarding drawer, stat/activity strips, request detail drawer
 - **Phase 20 Layout Fixes:** Unified status badges, sticky settings header, optimized activity strip layout
 - **Phase 21 Email Preview:** Compact always-visible snippet, full preview modal with resolved variables, "Create Template" dropdown navigation
-- **Phase 22 Detail Drawers (in progress):** Contact notes foundation (DB column, Textarea component, server action)
+- **Phase 22 Detail Drawers:** Contact notes foundation (DB column, Textarea component, server action), send page request drawer with inline resend
 
 ## Tech Stack
 
@@ -57,6 +57,8 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 
 | ID | Decision | Context | Date |
 |----|----------|---------|------|
+| server-side-drawer-prefetch | Pre-fetch full request data server-side instead of client-side fetch | Send page fetches both summary and full SendLogWithContact data in parallel; trades small upfront cost for instant drawer open | 2026-02-02 |
+| reuse-request-drawer | Reuse RequestDetailDrawer component on send page | Avoids duplicate drawer variants, maintains consistent UX across send and history pages | 2026-02-02 |
 | notes-optional-field | Notes field is optional in Contact type | Existing rows won't have notes until migration runs, Supabase returns empty string by default | 2026-02-01 |
 | notes-character-limit | 10,000 character limit on notes | Prevents abuse while allowing substantial contact notes | 2026-02-01 |
 | textarea-follows-input-pattern | Textarea component follows Input component pattern exactly | Maintains design consistency across form components | 2026-02-01 |
@@ -82,7 +84,7 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 
 ## Session Continuity
 
-**Last session:** 2026-02-01
-**Stopped at:** Completed 22-01-PLAN.md (contact notes foundation)
+**Last session:** 2026-02-02
+**Stopped at:** Completed 22-02-PLAN.md (send page request drawer)
 **Resume file:** None
-**Next action:** Execute 22-02-PLAN.md (contact detail drawer)
+**Next action:** Plan next phase or milestone completion
