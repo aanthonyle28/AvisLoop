@@ -382,3 +382,40 @@ export async function getRecentActivity(limit: number = 5): Promise<Array<{
     })
     .filter(item => item.contact_name && item.contact_email)
 }
+
+/**
+ * Get recent send activity with full details for drawer display.
+ * Returns full SendLogWithContact objects for the most recent sends.
+ */
+export async function getRecentActivityFull(limit: number = 5): Promise<SendLogWithContact[]> {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return []
+  }
+
+  const { data: business } = await supabase
+    .from('businesses')
+    .select('id')
+    .eq('user_id', user.id)
+    .single()
+
+  if (!business) {
+    return []
+  }
+
+  const { data, error } = await supabase
+    .from('send_logs')
+    .select('*, contacts(name, email)')
+    .eq('business_id', business.id)
+    .order('created_at', { ascending: false })
+    .limit(limit)
+
+  if (error) {
+    console.error('Error fetching recent activity full:', error)
+    return []
+  }
+
+  return (data || []) as SendLogWithContact[]
+}

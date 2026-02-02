@@ -1,6 +1,6 @@
 import { getBusiness } from '@/lib/actions/business'
 import { getContacts } from '@/lib/actions/contact'
-import { getMonthlyUsage, getResponseRate, getNeedsAttentionCount, getRecentActivity, getResendReadyContacts } from '@/lib/data/send-logs'
+import { getMonthlyUsage, getResponseRate, getNeedsAttentionCount, getRecentActivity, getRecentActivityFull, getResendReadyContacts } from '@/lib/data/send-logs'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { SendPageClient } from '@/components/send/send-page-client'
@@ -21,6 +21,7 @@ export default async function SendPage() {
     responseRate,
     needsAttention,
     recentActivity,
+    recentActivityFull,
     resendReadyContacts,
   ] = await Promise.all([
     getContacts({ limit: 200 }),
@@ -28,12 +29,13 @@ export default async function SendPage() {
     getResponseRate(),
     getNeedsAttentionCount(),
     getRecentActivity(5),
+    getRecentActivityFull(5),
     getResendReadyContacts(supabase, business.id),
   ])
 
   const hasReviewLink = !!business.google_review_link
   const templates = business.email_templates || []
-  const resendReadyContactIds = resendReadyContacts.map(c => c.id)
+  const resendReadyContactIds = resendReadyContacts.map((c: { id: string }) => c.id)
 
   const displayName = business.default_sender_name || business.name || 'there'
 
@@ -46,6 +48,7 @@ export default async function SendPage() {
         monthlyUsage={monthlyUsage}
         hasReviewLink={hasReviewLink}
         recentActivity={recentActivity}
+        recentActivityFull={recentActivityFull}
         resendReadyContactIds={resendReadyContactIds}
         displayName={displayName}
         showStats={true}
