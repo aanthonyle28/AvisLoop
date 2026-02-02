@@ -45,6 +45,7 @@ export interface Contact {
   phone: string | null
   status: 'active' | 'archived'
   opted_out: boolean
+  notes?: string
   last_sent_at: string | null
   send_count: number
   created_at: string
