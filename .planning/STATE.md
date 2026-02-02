@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-01)
 
 **Core value:** Make requesting reviews so simple that business owners actually do it -- one contact, one click, done.
-**Current focus:** Milestone v1.3 — Dashboard UX Overhaul
+**Current focus:** Milestone v1.4 — Landing Page Redesign
 
 ## Current Position
 
-**Phase:** 22 of 27 (Detail Drawers)
-**Plan:** 03 of 03 complete
+**Phase:** 25 of 27 (Problem/Solution Storytelling) — COMPLETE
+**Plan:** 02 of 02 complete
 **Status:** Phase complete
-**Last activity:** 2026-02-02 — Completed 22-03-PLAN.md (contact detail drawer)
+**Last activity:** 2026-02-02 — Completed Phase 25 (problem/solution storytelling)
 
-**Progress:** [██████████████████████████████░] 81/83+ total plans complete
+**Progress:** [██████████████████████████████░] 83/85+ total plans complete
 
 ```
 v1.0 MVP:           ████████████████████████████████████████████████ 48/48 SHIPPED
@@ -25,6 +25,7 @@ Phase 19 UX:        ████████ 8/8 COMPLETE
 Phase 20 Layout:    ██ 2/2 COMPLETE
 Phase 21 Preview:   ██ 2/2 COMPLETE
 Phase 22 Drawers:   ███ 3/3 COMPLETE
+Phase 25 Story:     ██ 2/2 COMPLETE
 ```
 
 ## What's Been Built
@@ -39,10 +40,11 @@ See .planning/MILESTONES.md for full history.
 - **Phase 20 Layout Fixes:** Unified status badges, sticky settings header, optimized activity strip layout
 - **Phase 21 Email Preview:** Compact always-visible snippet, full preview modal with resolved variables, "Create Template" dropdown navigation
 - **Phase 22 Detail Drawers:** Contact notes foundation (DB column, Textarea component, server action), send page request drawer with inline resend, contact detail drawer with auto-saving notes
+- **Phase 25 Problem/Solution Storytelling:** PAS-framework empathy section (3 pain point cards), 3-step How It Works walkthrough, outcome cards with proof points, scroll-triggered animated statistics via react-countup, full landing page integration
 
 ## Tech Stack
 
-Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, Resend, Stripe, Upstash Redis, Phosphor Icons, Kumbh Sans
+Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, Resend, Stripe, Upstash Redis, Phosphor Icons, Kumbh Sans, react-countup
 
 ## Blockers & Concerns
 
@@ -50,13 +52,15 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 - Google OAuth provider must be configured in Supabase dashboard
 - CRON_SECRET env var must be set before deployment
 - Phase 22-01 migration ready: Run `supabase db reset` or `supabase db push` to apply notes column migration before testing drawer
-- v1.4 hero section user testing needed with 5-10 local business owners before build
 - v1.4 performance budget must be enforced (LCP <2.5s, CLS <0.1)
 
 ## Decisions
 
 | ID | Decision | Context | Date |
 |----|----------|---------|------|
+| react-countup-scroll-spy | Use react-countup enableScrollSpy for zero-boilerplate scroll-triggered counting | Built-in scroll spy eliminates manual IntersectionObserver, handles SSR edge cases | 2026-02-02 |
+| storytelling-section-order | Landing page: Hero -> SocialProof -> Problem -> HowItWorks -> Outcomes -> Stats -> Testimonials -> FAQ -> CTA | Follows empathy-to-trust conversion funnel | 2026-02-02 |
+| old-sections-preserved | Keep old features.tsx and stats-section.tsx for rollback | Section replacement preserves old files in case storytelling needs revision | 2026-02-02 |
 | drawer-auto-save-debounce | 500ms debounce for notes auto-save | Balances responsiveness with reducing unnecessary server calls | 2026-02-02 |
 | flush-on-close | Flush pending notes when drawer closes | Prevents data loss if user types and immediately closes drawer | 2026-02-02 |
 | delayed-sheet-opening | 200ms delay when opening edit sheet after closing drawer | Prevents overlapping sheets which creates bad UX | 2026-02-02 |
@@ -92,6 +96,6 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 ## Session Continuity
 
 **Last session:** 2026-02-02
-**Stopped at:** Phase 22 complete — verified 4/4 must-haves
+**Stopped at:** Phase 25 complete — verified 8/8 must-haves
 **Resume file:** None
-**Next action:** Plan phase 23 (Onboarding & Setup Polish)
+**Next action:** Plan Phase 26 (Features, Testimonials & FAQ)

@@ -171,8 +171,8 @@ Plans:
   4. Animated count-up statistics (reviews collected, businesses using, time saved) trigger on scroll into viewport and display real numbers
 **Plans**: 2 plans
 Plans:
-- [ ] 25-01-PLAN.md -- ProblemSolutionSection (PAS empathy) + HowItWorksSection (3-step walkthrough)
-- [ ] 25-02-PLAN.md -- OutcomeCardsSection + AnimatedStatsSection + landing page wiring
+- [x] 25-01-PLAN.md -- ProblemSolutionSection (PAS empathy) + HowItWorksSection (3-step walkthrough)
+- [x] 25-02-PLAN.md -- OutcomeCardsSection + AnimatedStatsSection + landing page wiring
 
 ### Phase 26: Features, Testimonials & FAQ
 **Goal**: Visitors see industry-specific social proof with outcome numbers, get common objections answered, and encounter the primary CTA again with risk-reversal messaging.
@@ -210,11 +210,11 @@ Plans:
 | 22 | v1.3 | 3/3 | Complete | 2026-02-02 |
 | 23 | v1.3 | 0/TBD | Not started | - |
 | 24 | v1.4 | 0/TBD | Ready to plan | - |
-| 25 | v1.4 | 0/TBD | Not started | - |
+| 25 | v1.4 | 2/2 | Complete | 2026-02-02 |
 | 26 | v1.4 | 0/TBD | Not started | - |
 | 27 | v1.4 | 0/TBD | Not started | - |
 
-**Total:** 27 phases, 78 plans complete (+ remaining v1.3 and v1.4 plans TBD).
+**Total:** 27 phases, 82 plans complete (+ remaining v1.3 and v1.4 plans TBD).
 
 ## What's Next
 
@@ -225,4 +225,4 @@ After v1.4:
 - **Production deployment** — Configure Resend, Google OAuth, Stripe for production
 
 ---
-*Last updated: 2026-02-01 after Phase 22 planning*
+*Last updated: 2026-02-02 after Phase 25 execution*
