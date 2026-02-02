@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-01)
 
 ## Current Position
 
-**Phase:** 22 of 27 (Detail Drawers)
-**Plan:** 02 of 02 complete
-**Status:** Phase complete
-**Last activity:** 2026-02-02 — Completed 22-02-PLAN.md (send page request drawer)
+**Phase:** 25 of 27 (Problem/Solution Storytelling)
+**Plan:** 01 of 02 complete
+**Status:** In progress
+**Last activity:** 2026-02-02 — Completed 25-01-PLAN.md (problem/solution sections)
 
-**Progress:** [█████████████████████████████░] 80/80+ total plans complete
+**Progress:** [█████████████████████████████░] 81/80+ total plans complete
 
 ```
 v1.0 MVP:           ████████████████████████████████████████████████ 48/48 SHIPPED
@@ -25,6 +25,7 @@ Phase 19 UX:        ████████ 8/8 COMPLETE
 Phase 20 Layout:    ██ 2/2 COMPLETE
 Phase 21 Preview:   ██ 2/2 COMPLETE
 Phase 22 Drawers:   ██ 2/2 COMPLETE
+Phase 25 Story:     █░ 1/2 IN PROGRESS
 ```
 
 ## What's Been Built
@@ -39,6 +40,7 @@ See .planning/MILESTONES.md for full history.
 - **Phase 20 Layout Fixes:** Unified status badges, sticky settings header, optimized activity strip layout
 - **Phase 21 Email Preview:** Compact always-visible snippet, full preview modal with resolved variables, "Create Template" dropdown navigation
 - **Phase 22 Detail Drawers:** Contact notes foundation (DB column, Textarea component, server action), send page request drawer with inline resend
+- **Phase 25 Problem/Solution Storytelling (in progress):** PAS-framework problem section with 3 emotional pain point cards, 3-step how-it-works section with alternating layout
 
 ## Tech Stack
 
@@ -57,6 +59,9 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 
 | ID | Decision | Context | Date |
 |----|----------|---------|------|
+| pas-framework-empathy | Use PAS framework (Problem-Agitate-Solution) for landing page storytelling | Addresses specific emotional pain points (forgetting, awkwardness, complexity) before presenting solution, builds connection with visitors | 2026-02-02 |
+| alternating-step-layout | Alternate text/image layout in How It Works (steps 1&3 left, step 2 right) | Visual variety prevents monotony, maintains engagement through 3-step sequence | 2026-02-02 |
+| step-description-word-limit | Keep all step descriptions under 15 words | Scannable copy maintains momentum, prevents information overload | 2026-02-02 |
 | server-side-drawer-prefetch | Pre-fetch full request data server-side instead of client-side fetch | Send page fetches both summary and full SendLogWithContact data in parallel; trades small upfront cost for instant drawer open | 2026-02-02 |
 | reuse-request-drawer | Reuse RequestDetailDrawer component on send page | Avoids duplicate drawer variants, maintains consistent UX across send and history pages | 2026-02-02 |
 | notes-optional-field | Notes field is optional in Contact type | Existing rows won't have notes until migration runs, Supabase returns empty string by default | 2026-02-01 |
@@ -85,6 +90,6 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 ## Session Continuity
 
 **Last session:** 2026-02-02
-**Stopped at:** Completed 22-02-PLAN.md (send page request drawer)
+**Stopped at:** Completed 25-01-PLAN.md (problem/solution sections)
 **Resume file:** None
-**Next action:** Plan next phase or milestone completion
+**Next action:** Execute 25-02-PLAN.md (landing page integration)
