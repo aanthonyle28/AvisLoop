@@ -17,8 +17,8 @@ Requirements for Dashboard UX Overhaul & Onboarding Polish. Each maps to roadmap
 
 ### Email Preview
 
-- [ ] **PREV-01**: Compact preview is ~80-140px, full-width, shows subject (1 line), body snippet (2-3 lines clamped), and "View full email" link -- not a separate section, more like a confidence snippet
-- [ ] **PREV-02**: Full preview opens in read-only modal showing subject, resolved body with contact variables, review CTA button rendered as button, footer text, and small From/To header
+- [x] **PREV-01**: Compact preview is ~80-140px, full-width, shows subject (1 line), body snippet (2-3 lines clamped), and "View full email" link -- not a separate section, more like a confidence snippet
+- [x] **PREV-02**: Full preview opens in read-only modal showing subject, resolved body with contact variables, review CTA button rendered as button, footer text, and small From/To header
 
 ### Detail Drawers
 
@@ -38,7 +38,7 @@ Requirements for Dashboard UX Overhaul & Onboarding Polish. Each maps to roadmap
 
 ### Template Selection
 
-- [ ] **TMPL-01**: Template dropdown on send page shows default templates AND a "Create Template" option that navigates to settings template creation page
+- [x] **TMPL-01**: Template dropdown on send page shows default templates AND a "Create Template" option that navigates to settings template creation page
 
 ## v1.4 Requirements
 
@@ -115,15 +115,15 @@ Deferred to future release. Not in current roadmap.
 | ONBD-03 | Phase 23 | Pending |
 | ONBD-04 | Phase 23 | Pending |
 | ONBD-05 | Phase 23 | Pending |
-| PREV-01 | Phase 21 | Pending |
-| PREV-02 | Phase 21 | Pending |
+| PREV-01 | Phase 21 | Complete |
+| PREV-02 | Phase 21 | Complete |
 | DRWR-01 | Phase 22 | Pending |
 | DRWR-02 | Phase 22 | Pending |
 | DRWR-03 | Phase 22 | Pending |
 | DRWR-04 | Phase 22 | Pending |
 | LAYO-01 | Phase 20 | Complete |
 | LAYO-02 | Phase 20 | Complete |
-| TMPL-01 | Phase 21 | Pending |
+| TMPL-01 | Phase 21 | Complete |
 | BDGE-01 | Phase 20 | Complete |
 | HERO-01 | Phase 24 | Pending |
 | HERO-02 | Phase 24 | Pending |
@@ -150,4 +150,4 @@ Deferred to future release. Not in current roadmap.
 
 ---
 *Requirements defined: 2026-02-01*
-*Last updated: 2026-02-01 after v1.4 roadmap creation*
+*Last updated: 2026-02-01 after Phase 21 completion*

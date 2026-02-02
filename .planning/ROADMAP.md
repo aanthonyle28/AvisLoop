@@ -80,7 +80,7 @@ AvisLoop is a review request SaaS for local service businesses. All planned mile
 **Milestone Goal:** Unify visual consistency (status badges), add detail drawers for contacts and inline request viewing, polish the email preview and template selection experience, and complete the onboarding setup flow.
 
 - [x] **Phase 20: Status Badges & Layout Fixes** - Unified badge component + sticky settings nav + activity strip layout (complete 2026-02-01)
-- [ ] **Phase 21: Email Preview & Template Selection** - Compact preview snippet, full preview modal, template dropdown with create option
+- [x] **Phase 21: Email Preview & Template Selection** - Compact preview snippet, full preview modal, template dropdown with create option (complete 2026-02-01)
 - [ ] **Phase 22: Detail Drawers** - Request drawer on send page, contact drawer on contacts page, resend with template selector, contact notes
 - [ ] **Phase 23: Onboarding & Setup Polish** - Bonus credit, simplified checklist, completion banner, help & support menu
 
@@ -109,8 +109,8 @@ Plans:
   3. Template dropdown on the send page lists all saved templates plus a "Create Template" option that navigates to the settings template page
 **Plans**: 2 plans
 Plans:
-- [ ] 21-01-PLAN.md -- Compact preview snippet + full email preview modal
-- [ ] 21-02-PLAN.md -- Template dropdown "Create Template" navigation option
+- [x] 21-01-PLAN.md -- Compact preview snippet + full email preview modal
+- [x] 21-02-PLAN.md -- Template dropdown "Create Template" navigation option
 
 ### Phase 22: Detail Drawers
 **Goal**: Users can inspect request details and contact details inline via drawers without leaving the current page.
@@ -199,7 +199,7 @@ Plans:
 | 17-18 | v1.2.1 | 4/4 | Complete | 2026-02-01 |
 | 19 | UX/UI Redesign | 8/8 | Complete | 2026-02-01 |
 | 20 | v1.3 | 2/2 | Complete | 2026-02-01 |
-| 21 | v1.3 | 0/2 | Planned | - |
+| 21 | v1.3 | 2/2 | Complete | 2026-02-01 |
 | 22 | v1.3 | 0/TBD | Not started | - |
 | 23 | v1.3 | 0/TBD | Not started | - |
 | 24 | v1.4 | 0/TBD | Ready to plan | - |
@@ -207,7 +207,7 @@ Plans:
 | 26 | v1.4 | 0/TBD | Not started | - |
 | 27 | v1.4 | 0/TBD | Not started | - |
 
-**Total:** 27 phases, 76 plans complete (+ remaining v1.3 and v1.4 plans TBD).
+**Total:** 27 phases, 78 plans complete (+ remaining v1.3 and v1.4 plans TBD).
 
 ## What's Next
 
@@ -218,4 +218,4 @@ After v1.4:
 - **Production deployment** — Configure Resend, Google OAuth, Stripe for production
 
 ---
-*Last updated: 2026-02-01 after Phase 20 completion*
+*Last updated: 2026-02-01 after Phase 21 completion*
