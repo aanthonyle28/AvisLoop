@@ -121,7 +121,11 @@ Plans:
   2. Clicking a contact row on the contacts page opens a detail drawer showing contact info, a notes field, and action items (send, edit, archive, view history)
   3. The request detail drawer includes a resend option with a template selector dropdown
   4. The contact detail drawer has an editable notes textbox; typing and saving persists the note to the database and it reappears on next open
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 22-01-PLAN.md -- DB migration (notes column) + Textarea component + updateContactNotes action
+- [ ] 22-02-PLAN.md -- Wire request detail drawer inline on send page
+- [ ] 22-03-PLAN.md -- Contact detail drawer on contacts page with auto-saving notes
 
 ### Phase 23: Onboarding & Setup Polish
 **Goal**: The onboarding setup flow is streamlined -- new users get a silent bonus credit, the checklist is simplified, completion is celebrated, and Help & Support is functional.
@@ -200,7 +204,7 @@ Plans:
 | 19 | UX/UI Redesign | 8/8 | Complete | 2026-02-01 |
 | 20 | v1.3 | 2/2 | Complete | 2026-02-01 |
 | 21 | v1.3 | 2/2 | Complete | 2026-02-01 |
-| 22 | v1.3 | 0/TBD | Not started | - |
+| 22 | v1.3 | 0/3 | Not started | - |
 | 23 | v1.3 | 0/TBD | Not started | - |
 | 24 | v1.4 | 0/TBD | Ready to plan | - |
 | 25 | v1.4 | 0/TBD | Not started | - |
@@ -218,4 +222,4 @@ After v1.4:
 - **Production deployment** — Configure Resend, Google OAuth, Stripe for production
 
 ---
-*Last updated: 2026-02-01 after Phase 21 completion*
+*Last updated: 2026-02-01 after Phase 22 planning*
