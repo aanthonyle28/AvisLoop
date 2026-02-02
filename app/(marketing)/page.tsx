@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { HeroV2 } from "@/components/marketing/v2/hero-v2";
 import { SocialProofStrip } from "@/components/marketing/v2/social-proof-strip";
-import { StatsSection } from "@/components/marketing/stats-section";
-import { Features } from "@/components/marketing/features";
+import { ProblemSolutionSection } from "@/components/marketing/v2/problem-solution";
+import { HowItWorksSection } from "@/components/marketing/v2/how-it-works";
+import { OutcomeCardsSection } from "@/components/marketing/v2/outcome-cards";
+import { AnimatedStatsSection } from "@/components/marketing/v2/animated-stats";
 import { Testimonials } from "@/components/marketing/testimonials";
 import { FAQSection } from "@/components/marketing/faq-section";
 import { CTASection } from "@/components/marketing/cta-section";
@@ -36,8 +38,10 @@ export default function LandingPage() {
     <>
       <HeroV2 />
       <SocialProofStrip />
-      <Features />
-      <StatsSection />
+      <ProblemSolutionSection />
+      <HowItWorksSection />
+      <OutcomeCardsSection />
+      <AnimatedStatsSection />
       <Testimonials />
       <FAQSection />
       <CTASection />
