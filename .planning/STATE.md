@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-01)
 
 ## Current Position
 
-**Phase:** 21 of 27 (Email Preview & Template Selection)
-**Plan:** 02 of 02 complete
-**Status:** Phase complete
-**Last activity:** 2026-02-01 — Phase 21 complete (email preview + template selection)
+**Phase:** 22 of 27 (Detail Drawers)
+**Plan:** 01 of 02 complete
+**Status:** In progress
+**Last activity:** 2026-02-01 — Completed 22-01-PLAN.md (contact notes foundation)
 
-**Progress:** [█████████████████████████████░] 78/80+ total plans complete
+**Progress:** [█████████████████████████████░] 79/80+ total plans complete
 
 ```
 v1.0 MVP:           ████████████████████████████████████████████████ 48/48 SHIPPED
@@ -24,6 +24,7 @@ v1.2.1 Tech Debt:   ████ 4/4 SHIPPED
 Phase 19 UX:        ████████ 8/8 COMPLETE
 Phase 20 Layout:    ██ 2/2 COMPLETE
 Phase 21 Preview:   ██ 2/2 COMPLETE
+Phase 22 Drawers:   █░ 1/2 IN PROGRESS
 ```
 
 ## What's Been Built
@@ -37,6 +38,7 @@ See .planning/MILESTONES.md for full history.
 - **Phase 19 UX/UI Redesign:** Send-first dashboard, 3-page nav, onboarding drawer, stat/activity strips, request detail drawer
 - **Phase 20 Layout Fixes:** Unified status badges, sticky settings header, optimized activity strip layout
 - **Phase 21 Email Preview:** Compact always-visible snippet, full preview modal with resolved variables, "Create Template" dropdown navigation
+- **Phase 22 Detail Drawers (in progress):** Contact notes foundation (DB column, Textarea component, server action)
 
 ## Tech Stack
 
@@ -47,7 +49,7 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 - Resend FROM email domain verification needed for production
 - Google OAuth provider must be configured in Supabase dashboard
 - CRON_SECRET env var must be set before deployment
-- Phase 22 (v1.3) requires DB migration (notes column on contacts table)
+- Phase 22-01 migration ready: Run `supabase db reset` or `supabase db push` to apply notes column migration before testing drawer
 - v1.4 hero section user testing needed with 5-10 local business owners before build
 - v1.4 performance budget must be enforced (LCP <2.5s, CLS <0.1)
 
@@ -55,6 +57,9 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 
 | ID | Decision | Context | Date |
 |----|----------|---------|------|
+| notes-optional-field | Notes field is optional in Contact type | Existing rows won't have notes until migration runs, Supabase returns empty string by default | 2026-02-01 |
+| notes-character-limit | 10,000 character limit on notes | Prevents abuse while allowing substantial contact notes | 2026-02-01 |
+| textarea-follows-input-pattern | Textarea component follows Input component pattern exactly | Maintains design consistency across form components | 2026-02-01 |
 | compact-modal-preview-pattern | Refactored preview into compact always-visible snippet with onViewFull callback triggering full preview modal | Phase 21-01 | 2026-02-01 |
 | shared-variable-resolution | resolveTemplate helper replaces template variables consistently across compact and full preview | Phase 21-01 | 2026-02-01 |
 | template-dropdown-navigation | Template dropdown includes "+ Create Template" option that routes to settings page with #templates fragment | Phase 21-02 | 2026-02-01 |
@@ -78,6 +83,6 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 ## Session Continuity
 
 **Last session:** 2026-02-01
-**Stopped at:** Phase 21 complete
+**Stopped at:** Completed 22-01-PLAN.md (contact notes foundation)
 **Resume file:** None
-**Next action:** Plan phase 22 (Detail Drawers)
+**Next action:** Execute 22-02-PLAN.md (contact detail drawer)
