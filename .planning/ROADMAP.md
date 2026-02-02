@@ -169,7 +169,10 @@ Plans:
   2. A "How It Works" visual walkthrough shows 3 clear steps (Add contact, Write message, Send) with inline product screenshots or high-fidelity placeholders
   3. Benefit-focused outcome cards communicate "Get more reviews," "Save time," and "No awkward asks" with supporting icons and copy (not feature lists)
   4. Animated count-up statistics (reviews collected, businesses using, time saved) trigger on scroll into viewport and display real numbers
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 25-01-PLAN.md -- ProblemSolutionSection (PAS empathy) + HowItWorksSection (3-step walkthrough)
+- [ ] 25-02-PLAN.md -- OutcomeCardsSection + AnimatedStatsSection + landing page wiring
 
 ### Phase 26: Features, Testimonials & FAQ
 **Goal**: Visitors see industry-specific social proof with outcome numbers, get common objections answered, and encounter the primary CTA again with risk-reversal messaging.
