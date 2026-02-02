@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-01)
 
 ## Current Position
 
-**Phase:** 25 of 27 (Problem/Solution Storytelling)
-**Plan:** 01 of 02 complete
-**Status:** In progress
-**Last activity:** 2026-02-02 — Completed 25-01-PLAN.md (problem/solution sections)
+**Phase:** 22 of 27 (Detail Drawers)
+**Plan:** 03 of 03 complete
+**Status:** Phase complete
+**Last activity:** 2026-02-02 — Completed 22-03-PLAN.md (contact detail drawer)
 
-**Progress:** [█████████████████████████████░] 81/80+ total plans complete
+**Progress:** [█████████████████████████████░] 82/80+ total plans complete
 
 ```
 v1.0 MVP:           ████████████████████████████████████████████████ 48/48 SHIPPED
@@ -24,7 +24,7 @@ v1.2.1 Tech Debt:   ████ 4/4 SHIPPED
 Phase 19 UX:        ████████ 8/8 COMPLETE
 Phase 20 Layout:    ██ 2/2 COMPLETE
 Phase 21 Preview:   ██ 2/2 COMPLETE
-Phase 22 Drawers:   ██ 2/2 COMPLETE
+Phase 22 Drawers:   ███ 3/3 COMPLETE
 Phase 25 Story:     █░ 1/2 IN PROGRESS
 ```
 
@@ -39,7 +39,7 @@ See .planning/MILESTONES.md for full history.
 - **Phase 19 UX/UI Redesign:** Send-first dashboard, 3-page nav, onboarding drawer, stat/activity strips, request detail drawer
 - **Phase 20 Layout Fixes:** Unified status badges, sticky settings header, optimized activity strip layout
 - **Phase 21 Email Preview:** Compact always-visible snippet, full preview modal with resolved variables, "Create Template" dropdown navigation
-- **Phase 22 Detail Drawers:** Contact notes foundation (DB column, Textarea component, server action), send page request drawer with inline resend
+- **Phase 22 Detail Drawers:** Contact notes foundation (DB column, Textarea component, server action), send page request drawer with inline resend, contact detail drawer with auto-saving notes
 - **Phase 25 Problem/Solution Storytelling (in progress):** PAS-framework problem section with 3 emotional pain point cards, 3-step how-it-works section with alternating layout
 
 ## Tech Stack
@@ -59,6 +59,10 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 
 | ID | Decision | Context | Date |
 |----|----------|---------|------|
+| drawer-auto-save-debounce | 500ms debounce for notes auto-save | Balances responsiveness with reducing unnecessary server calls | 2026-02-02 |
+| flush-on-close | Flush pending notes when drawer closes | Prevents data loss if user types and immediately closes drawer | 2026-02-02 |
+| delayed-sheet-opening | 200ms delay when opening edit sheet after closing drawer | Prevents overlapping sheets which creates bad UX | 2026-02-02 |
+| stopPropagation-on-actions | stopPropagation on checkbox and action buttons | Prevents row click event from firing when user interacts with controls | 2026-02-02 |
 | pas-framework-empathy | Use PAS framework (Problem-Agitate-Solution) for landing page storytelling | Addresses specific emotional pain points (forgetting, awkwardness, complexity) before presenting solution, builds connection with visitors | 2026-02-02 |
 | alternating-step-layout | Alternate text/image layout in How It Works (steps 1&3 left, step 2 right) | Visual variety prevents monotony, maintains engagement through 3-step sequence | 2026-02-02 |
 | step-description-word-limit | Keep all step descriptions under 15 words | Scannable copy maintains momentum, prevents information overload | 2026-02-02 |
@@ -90,6 +94,6 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 ## Session Continuity
 
 **Last session:** 2026-02-02
-**Stopped at:** Completed 25-01-PLAN.md (problem/solution sections)
+**Stopped at:** Completed 22-03-PLAN.md (contact detail drawer)
 **Resume file:** None
-**Next action:** Execute 25-02-PLAN.md (landing page integration)
+**Next action:** Phase 22 complete — ready for next phase
