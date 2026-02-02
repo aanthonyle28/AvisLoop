@@ -34,6 +34,7 @@ interface ContactTableProps {
   onDelete: (id: string) => void
   onBulkArchive: (ids: string[]) => void
   onBulkDelete: (ids: string[]) => void
+  onRowClick?: (contact: Contact) => void
 }
 
 export function ContactTable({
@@ -44,6 +45,7 @@ export function ContactTable({
   onDelete,
   onBulkArchive,
   onBulkDelete,
+  onRowClick,
 }: ContactTableProps) {
   // Table state
   const [sorting, setSorting] = useState<SortingState>([
@@ -178,7 +180,8 @@ export function ContactTable({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
-                  className="transition-colors duration-150 hover:bg-muted/50"
+                  onClick={() => onRowClick?.(row.original)}
+                  className="cursor-pointer transition-colors duration-150 hover:bg-muted/50"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

@@ -1,10 +1,12 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { ContactTable } from './contact-table'
 import { AddContactSheet } from './add-contact-sheet'
 import { EditContactSheet } from './edit-contact-sheet'
 import { CSVImportDialog } from './csv-import-dialog'
+import { ContactDetailDrawer } from './contact-detail-drawer'
 import { Button } from '@/components/ui/button'
 import { Plus, Users } from 'lucide-react'
 import {
@@ -21,12 +23,18 @@ interface ContactsClientProps {
 }
 
 export function ContactsClient({ initialContacts }: ContactsClientProps) {
+  const router = useRouter()
+
   // State for add contact sheet
   const [addSheetOpen, setAddSheetOpen] = useState(false)
 
   // State for editing contact
   const [editingContact, setEditingContact] = useState<Contact | null>(null)
   const [editSheetOpen, setEditSheetOpen] = useState(false)
+
+  // State for detail drawer
+  const [detailContact, setDetailContact] = useState<Contact | null>(null)
+  const [detailDrawerOpen, setDetailDrawerOpen] = useState(false)
 
   // Transition for action feedback
   const [, startTransition] = useTransition()
@@ -73,6 +81,35 @@ export function ContactsClient({ initialContacts }: ContactsClientProps) {
     }
   }
 
+  // Detail drawer handlers
+  const handleRowClick = (contact: Contact) => {
+    setDetailContact(contact)
+    setDetailDrawerOpen(true)
+  }
+
+  const handleSendFromDrawer = () => {
+    router.push('/send')
+    setDetailDrawerOpen(false)
+  }
+
+  const handleEditFromDrawer = (contact: Contact) => {
+    setDetailDrawerOpen(false)
+    // Small delay to avoid two sheets overlapping
+    setTimeout(() => {
+      handleEdit(contact)
+    }, 200)
+  }
+
+  const handleArchiveFromDrawer = (contactId: string) => {
+    handleArchive(contactId)
+    setDetailDrawerOpen(false)
+  }
+
+  const handleViewHistoryFromDrawer = (contactId: string) => {
+    router.push(`/history?contact=${contactId}`)
+    setDetailDrawerOpen(false)
+  }
+
   const hasContacts = initialContacts.length > 0
 
   return (
@@ -107,6 +144,7 @@ export function ContactsClient({ initialContacts }: ContactsClientProps) {
           onDelete={handleDelete}
           onBulkArchive={handleBulkArchive}
           onBulkDelete={handleBulkDelete}
+          onRowClick={handleRowClick}
         />
       ) : (
         <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
@@ -148,6 +186,22 @@ export function ContactsClient({ initialContacts }: ContactsClientProps) {
             setEditingContact(null)
           }
         }}
+      />
+
+      {/* Contact Detail Drawer */}
+      <ContactDetailDrawer
+        open={detailDrawerOpen}
+        onOpenChange={(open) => {
+          setDetailDrawerOpen(open)
+          if (!open) {
+            setDetailContact(null)
+          }
+        }}
+        contact={detailContact}
+        onSend={handleSendFromDrawer}
+        onEdit={handleEditFromDrawer}
+        onArchive={handleArchiveFromDrawer}
+        onViewHistory={handleViewHistoryFromDrawer}
       />
     </div>
   )

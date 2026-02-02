@@ -36,11 +36,13 @@ export const createColumns = (handlers: ColumnHandlers): ColumnDef<Contact>[] =>
       />
     ),
     cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
+      <div onClick={(e) => e.stopPropagation()}>
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      </div>
     ),
     enableSorting: false,
     enableHiding: false,
@@ -106,38 +108,40 @@ export const createColumns = (handlers: ColumnHandlers): ColumnDef<Contact>[] =>
       const isArchived = contact.status === 'archived'
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <MoreHorizontal />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => handlers.onEdit(contact)}>
-              <Pencil className="mr-2 h-4 w-4" />
-              Edit
-            </DropdownMenuItem>
-            {isArchived ? (
-              <DropdownMenuItem onClick={() => handlers.onRestore(contact.id)}>
-                <RotateCcw className="mr-2 h-4 w-4" />
-                Restore
+        <div onClick={(e) => e.stopPropagation()}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <MoreHorizontal />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handlers.onEdit(contact); }}>
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit
               </DropdownMenuItem>
-            ) : (
-              <DropdownMenuItem onClick={() => handlers.onArchive(contact.id)}>
-                <Archive className="mr-2 h-4 w-4" />
-                Archive
+              {isArchived ? (
+                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handlers.onRestore(contact.id); }}>
+                  <RotateCcw className="mr-2 h-4 w-4" />
+                  Restore
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handlers.onArchive(contact.id); }}>
+                  <Archive className="mr-2 h-4 w-4" />
+                  Archive
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem
+                onClick={(e) => { e.stopPropagation(); handlers.onDelete(contact.id); }}
+                className="text-destructive"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete
               </DropdownMenuItem>
-            )}
-            <DropdownMenuItem
-              onClick={() => handlers.onDelete(contact.id)}
-              className="text-destructive"
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       )
     },
   },
