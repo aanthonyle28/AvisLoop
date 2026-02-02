@@ -541,6 +541,43 @@ export async function getContacts(options?: {
 }
 
 /**
+ * Update contact notes field.
+ */
+export async function updateContactNotes(
+  contactId: string,
+  notes: string
+): Promise<ContactActionState> {
+  const supabase = await createClient()
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return { error: 'You must be logged in' }
+  }
+
+  // Validate inputs
+  if (!contactId || typeof contactId !== 'string') {
+    return { error: 'Invalid contact ID' }
+  }
+  if (typeof notes !== 'string' || notes.length > 10000) {
+    return { error: 'Notes must be under 10,000 characters' }
+  }
+
+  // Update notes (RLS handles ownership check)
+  const { error } = await supabase
+    .from('contacts')
+    .update({ notes })
+    .eq('id', contactId)
+
+  if (error) {
+    console.error('Failed to update contact notes:', error)
+    return { error: 'Failed to save notes' }
+  }
+
+  revalidatePath('/dashboard/contacts')
+  return { success: true }
+}
+
+/**
  * Search contacts by name or email with optional filters.
  */
 export async function searchContacts(

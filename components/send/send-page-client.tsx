@@ -2,12 +2,15 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { QuickSendTab } from './quick-send-tab'
 import { BulkSendTab } from './bulk-send-tab'
 import { RecentActivityStrip } from './recent-activity-strip'
 import { StatStrip } from './stat-strip'
-import type { Contact, Business, EmailTemplate } from '@/lib/types/database'
+import { RequestDetailDrawer } from '@/components/history/request-detail-drawer'
+import { sendReviewRequest } from '@/lib/actions/send'
+import type { Contact, Business, EmailTemplate, SendLogWithContact } from '@/lib/types/database'
 import type { RecentActivity } from './recent-activity-strip'
 
 interface SendPageClientProps {
@@ -17,6 +20,7 @@ interface SendPageClientProps {
   monthlyUsage: { count: number; limit: number; tier: string }
   hasReviewLink: boolean
   recentActivity: RecentActivity[]
+  recentActivityFull: SendLogWithContact[]
   resendReadyContactIds: string[]
   displayName: string
   showStats: boolean
@@ -32,6 +36,7 @@ export function SendPageClient({
   monthlyUsage,
   hasReviewLink,
   recentActivity,
+  recentActivityFull,
   resendReadyContactIds,
   displayName,
   showStats,
@@ -41,10 +46,48 @@ export function SendPageClient({
 }: SendPageClientProps) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<'quick-send' | 'bulk-send'>('quick-send')
+  const [selectedRequest, setSelectedRequest] = useState<SendLogWithContact | null>(null)
+  const [requestDrawerOpen, setRequestDrawerOpen] = useState(false)
 
   const handleActivityClick = (id: string) => {
-    // Navigate to history with request ID to open the drawer
-    router.push(`/history?open=${id}`)
+    const request = recentActivityFull.find(r => r.id === id)
+    if (request) {
+      setSelectedRequest(request)
+      setRequestDrawerOpen(true)
+    }
+  }
+
+  const handleResend = async (contactId: string, templateId: string | null) => {
+    const formData = new FormData()
+    formData.append('contactId', contactId)
+    if (templateId) {
+      formData.append('templateId', templateId)
+    }
+
+    const result = await sendReviewRequest(null, formData)
+
+    if (result.success) {
+      toast.success('Review request sent successfully!', {
+        description: 'The recipient will receive your message shortly.',
+        duration: 6000,
+      })
+      setRequestDrawerOpen(false)
+      router.refresh()
+    } else {
+      toast.error('Failed to send', {
+        description: result.error || 'An error occurred while sending the request.',
+        duration: 5000,
+      })
+    }
+  }
+
+  const handleCancel = async () => {
+    // For now, we'll show a toast - full cancel logic would need a server action
+    toast.info('Cancel pending', {
+      description: 'Cancellation for pending requests is not yet implemented.',
+      duration: 5000,
+    })
+    router.refresh()
   }
 
   return (
@@ -102,6 +145,20 @@ export function SendPageClient({
           resendReadyContactIds={resendReadyContactIds}
         />
       </TabsContent>
+
+      {/* Request Detail Drawer */}
+      <RequestDetailDrawer
+        open={requestDrawerOpen}
+        onOpenChange={(open) => {
+          setRequestDrawerOpen(open)
+          if (!open) setSelectedRequest(null)
+        }}
+        request={selectedRequest}
+        business={business}
+        templates={templates}
+        onResend={handleResend}
+        onCancel={handleCancel}
+      />
     </Tabs>
   )
 }
