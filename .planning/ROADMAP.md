@@ -81,7 +81,7 @@ AvisLoop is a review request SaaS for local service businesses. All planned mile
 
 - [x] **Phase 20: Status Badges & Layout Fixes** - Unified badge component + sticky settings nav + activity strip layout (complete 2026-02-01)
 - [x] **Phase 21: Email Preview & Template Selection** - Compact preview snippet, full preview modal, template dropdown with create option (complete 2026-02-01)
-- [ ] **Phase 22: Detail Drawers** - Request drawer on send page, contact drawer on contacts page, resend with template selector, contact notes
+- [x] **Phase 22: Detail Drawers** - Request drawer on send page, contact drawer on contacts page, resend with template selector, contact notes (complete 2026-02-02)
 - [ ] **Phase 23: Onboarding & Setup Polish** - Bonus credit, simplified checklist, completion banner, help & support menu
 
 ## Phase Details
@@ -123,9 +123,9 @@ Plans:
   4. The contact detail drawer has an editable notes textbox; typing and saving persists the note to the database and it reappears on next open
 **Plans**: 3 plans
 Plans:
-- [ ] 22-01-PLAN.md -- DB migration (notes column) + Textarea component + updateContactNotes action
-- [ ] 22-02-PLAN.md -- Wire request detail drawer inline on send page
-- [ ] 22-03-PLAN.md -- Contact detail drawer on contacts page with auto-saving notes
+- [x] 22-01-PLAN.md -- DB migration (notes column) + Textarea component + updateContactNotes action
+- [x] 22-02-PLAN.md -- Wire request detail drawer inline on send page
+- [x] 22-03-PLAN.md -- Contact detail drawer on contacts page with auto-saving notes
 
 ### Phase 23: Onboarding & Setup Polish
 **Goal**: The onboarding setup flow is streamlined -- new users get a silent bonus credit, the checklist is simplified, completion is celebrated, and Help & Support is functional.
@@ -207,7 +207,7 @@ Plans:
 | 19 | UX/UI Redesign | 8/8 | Complete | 2026-02-01 |
 | 20 | v1.3 | 2/2 | Complete | 2026-02-01 |
 | 21 | v1.3 | 2/2 | Complete | 2026-02-01 |
-| 22 | v1.3 | 0/3 | Not started | - |
+| 22 | v1.3 | 3/3 | Complete | 2026-02-02 |
 | 23 | v1.3 | 0/TBD | Not started | - |
 | 24 | v1.4 | 0/TBD | Ready to plan | - |
 | 25 | v1.4 | 0/TBD | Not started | - |

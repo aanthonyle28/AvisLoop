@@ -14,7 +14,7 @@ See: .planning/PROJECT.md (updated 2026-02-01)
 **Status:** Phase complete
 **Last activity:** 2026-02-02 — Completed 22-03-PLAN.md (contact detail drawer)
 
-**Progress:** [█████████████████████████████░] 82/80+ total plans complete
+**Progress:** [██████████████████████████████░] 81/83+ total plans complete
 
 ```
 v1.0 MVP:           ████████████████████████████████████████████████ 48/48 SHIPPED
@@ -25,7 +25,6 @@ Phase 19 UX:        ████████ 8/8 COMPLETE
 Phase 20 Layout:    ██ 2/2 COMPLETE
 Phase 21 Preview:   ██ 2/2 COMPLETE
 Phase 22 Drawers:   ███ 3/3 COMPLETE
-Phase 25 Story:     █░ 1/2 IN PROGRESS
 ```
 
 ## What's Been Built
@@ -40,7 +39,6 @@ See .planning/MILESTONES.md for full history.
 - **Phase 20 Layout Fixes:** Unified status badges, sticky settings header, optimized activity strip layout
 - **Phase 21 Email Preview:** Compact always-visible snippet, full preview modal with resolved variables, "Create Template" dropdown navigation
 - **Phase 22 Detail Drawers:** Contact notes foundation (DB column, Textarea component, server action), send page request drawer with inline resend, contact detail drawer with auto-saving notes
-- **Phase 25 Problem/Solution Storytelling (in progress):** PAS-framework problem section with 3 emotional pain point cards, 3-step how-it-works section with alternating layout
 
 ## Tech Stack
 
@@ -94,6 +92,6 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 ## Session Continuity
 
 **Last session:** 2026-02-02
-**Stopped at:** Completed 22-03-PLAN.md (contact detail drawer)
+**Stopped at:** Phase 22 complete — verified 4/4 must-haves
 **Resume file:** None
-**Next action:** Phase 22 complete — ready for next phase
+**Next action:** Plan phase 23 (Onboarding & Setup Polish)

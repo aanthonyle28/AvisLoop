@@ -22,10 +22,10 @@ Requirements for Dashboard UX Overhaul & Onboarding Polish. Each maps to roadmap
 
 ### Detail Drawers
 
-- [ ] **DRWR-01**: Recent activity chips open request detail drawer inline on the send page (not route to /history)
-- [ ] **DRWR-02**: Clicking a contact on contacts page opens detail drawer with contact info, notes field, and action items (send, edit, archive, view history)
-- [ ] **DRWR-03**: Request detail drawer includes resend option with template selector
-- [ ] **DRWR-04**: Contact detail drawer includes an editable "Notes" textbox that persists to database (new `notes` text column on contacts table)
+- [x] **DRWR-01**: Recent activity chips open request detail drawer inline on the send page (not route to /history)
+- [x] **DRWR-02**: Clicking a contact on contacts page opens detail drawer with contact info, notes field, and action items (send, edit, archive, view history)
+- [x] **DRWR-03**: Request detail drawer includes resend option with template selector
+- [x] **DRWR-04**: Contact detail drawer includes an editable "Notes" textbox that persists to database (new `notes` text column on contacts table)
 
 ### Layout & Navigation
 
@@ -117,10 +117,10 @@ Deferred to future release. Not in current roadmap.
 | ONBD-05 | Phase 23 | Pending |
 | PREV-01 | Phase 21 | Complete |
 | PREV-02 | Phase 21 | Complete |
-| DRWR-01 | Phase 22 | Pending |
-| DRWR-02 | Phase 22 | Pending |
-| DRWR-03 | Phase 22 | Pending |
-| DRWR-04 | Phase 22 | Pending |
+| DRWR-01 | Phase 22 | Complete |
+| DRWR-02 | Phase 22 | Complete |
+| DRWR-03 | Phase 22 | Complete |
+| DRWR-04 | Phase 22 | Complete |
 | LAYO-01 | Phase 20 | Complete |
 | LAYO-02 | Phase 20 | Complete |
 | TMPL-01 | Phase 21 | Complete |
@@ -150,4 +150,4 @@ Deferred to future release. Not in current roadmap.
 
 ---
 *Requirements defined: 2026-02-01*
-*Last updated: 2026-02-01 after Phase 21 completion*
+*Last updated: 2026-02-02 after Phase 22 completion*
