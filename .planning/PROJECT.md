@@ -2,11 +2,11 @@
 
 ## What This Is
 
-AvisLoop is a SaaS web app that helps local service businesses (dentists, salons, contractors, gyms, restaurants, etc.) request more Google reviews by sending customers a simple email with their review link, scheduling sends for optimal timing, and tracking what was sent. The core promise: "In 2 minutes, add a contact, hit send, and start collecting more reviews — no marketing setup, no CRM, no learning curve."
+AvisLoop is a review follow-up system for home service businesses (HVAC, plumbing, electrical, cleaning, roofing, etc.). After a job is completed, AvisLoop triggers a multi-touch SMS + email sequence that personalizes the ask, sends at the right time, and helps manage reputation outcomes. Optimized for home services first, but works for any local service business. The core promise: "Complete the job, AvisLoop handles the follow-up — the right message, at the right time, on the right channel."
 
 ## Core Value
 
-Make requesting reviews so simple that business owners actually do it — one contact, one click, done.
+Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
 
 ## Requirements
 
@@ -32,63 +32,71 @@ Make requesting reviews so simple that business owners actually do it — one co
 
 ### Active
 
-**v1.3 Dashboard UX Overhaul & Onboarding Polish**
-- Free test send credit during onboarding (silent extra credit in backend)
-- Recent activity strip fills available space with truncation to View All button
-- Settings page sticky navigation bar on scroll
-- Compact email preview redesign (80-140px, full-width, subject + body snippet + "View full email")
-- Full email preview in read-only modal (resolved variables, CTA button, footer)
-- Recent activity chips open detail drawer instead of routing to history page
-- Contact detail drawer with action items on contacts page
-- Request detail drawer shows resend option
-- Setup checklist removes "create template" step; template selector shows defaults + "Create Template" option
-- Setup complete banner with restart/finish options; "Restart Setup Checklist" in help & support menu
+**v2.0 Review Follow-Up System Redesign**
+- Rename Contacts to Customers; add phone number, service history, tags
+- Jobs: basic CRUD with service type, status, tied to customer
+- Campaigns: preset sequences (conservative/standard/aggressive) + duplicate & customize; multi-touch with channel + timing per touch; stop conditions
+- SMS sending via Twilio with quiet hours, STOP compliance, fallback logic (no phone -> email)
+- LLM personalization via Vercel AI SDK (GPT-4o-mini primary, Haiku fallback on constraint violations); personalization slider, QA checks
+- Dashboard redesign: pipeline KPIs, ready-to-send queue, needs attention, quick actions
+- Onboarding redesign: services offered (timing defaults), software used, review destination, default campaign
+- Navigation: Send/Queue, Customers, Jobs, Campaigns, Activity/History
+- Landing page redesign for home services positioning
 
 ### Out of Scope
 
-- SMS channel — email first, SMS later
-- Automations / follow-up sequences — adds complexity
-- Analytics dashboards beyond message history — keep simple
+- Review inbox / ingestion — future feature (show "Coming soon")
+- Integrations (Jobber, HCP, ServiceTitan) — capture software used now, build later
 - AI reply generation — future feature
-- Integrations (Zapier, CRM, Google Business API) — future feature
 - Widgets, QR codes, NFC cards — future feature
 - Team roles / permissions — 1 user = 1 account for now
-- Multi-location for Pro — deferred to v2
+- Multi-location for Pro — deferred
+- Video testimonials on landing page — use written testimonials
+- Industry-specific landing pages — start generic, A/B test later
 
 ## Context
 
-**Target users:** Small local service businesses who know reviews matter but:
-- Forget to ask customers
-- Find asking awkward
-- Find existing tools too complex or expensive
-- Don't have a repeatable process
+**Target users:** Home service business owners (HVAC techs, plumbers, electricians, cleaners, roofers, painters, handymen) who:
+- Complete jobs daily but forget to ask for reviews
+- Find asking awkward or don't have a system
+- Want reviews but won't learn complex software
+- Need something that works from the truck/field (mobile)
 
-**Current state:** 18,011 LOC (TypeScript/SQL/CSS). 18 phases across 4 milestones (v1.0, v1.1, v1.2, v1.2.1) all shipped. Tech stack: Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, Resend, Stripe, Upstash Redis, Phosphor Icons, Kumbh Sans.
+**Current state:** 18,011+ LOC (TypeScript/SQL/CSS). 25 phases across 5 milestones shipped. Tech stack: Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, Resend, Stripe, Upstash Redis, Phosphor Icons, Kumbh Sans, react-countup.
 
-**User flows:**
-1. **Onboarding:** Landing → Sign up (email or Google) → Wizard (business name, review link) → Dashboard test cards (create contact, create template, send test)
-2. **Daily usage:** Login → Add contact → Send/schedule request → See confirmation → Check history
-3. **Scheduling:** Schedule send → View in /scheduled → Cron processes at scheduled time → Results in history
-4. **Billing:** Hit paywall after 25 sends → Stripe checkout → Unlock sending
+**User flows (v2.0 target):**
+1. **Onboarding:** Landing → Sign up → Wizard (business basics, review destination, services offered, software used, default campaign, import customers)
+2. **Daily usage:** Complete job → Add job record → Campaign triggers sequence → SMS/email sent automatically → Track in dashboard
+3. **Dashboard:** View pipeline (jobs ready, queued requests, follow-ups due, delivery issues) → Act on needs-attention items
+4. **Campaign management:** Choose preset or customize sequence → Set touches (SMS/email), timing, stop conditions
+5. **Billing:** Hit paywall → Stripe checkout → Unlock sending
 
-**Pages:**
+**Pages (v2.0 target):**
 - Public: `/` (landing), `/pricing`, `/login`, `/signup`
-- App: `/dashboard`, `/onboarding`, `/contacts`, `/send`, `/scheduled`, `/history`, `/billing`, `/dashboard/settings`
+- App: `/dashboard`, `/onboarding`, `/customers`, `/send`, `/jobs`, `/campaigns`, `/history`, `/billing`, `/settings`
 
-**Data model:**
+**Data model (existing):**
 - Business: id, user_id, name, google_review_link, sender_name, created_at
-- Contact: id, business_id, name, email, opted_out, archived, created_at
+- Contact: id, business_id, name, email, phone, notes, opted_out, archived, created_at
 - EmailTemplate: id, business_id, name, subject, body, is_default, created_at
 - SendLog: id, business_id, contact_id, template_id, status, is_test, sent_at, provider_id
 - ScheduledSend: id, business_id, contact_ids, template_id, scheduled_for, status, executed_at, send_log_ids
 
+**Data model (new for v2.0):**
+- Job: id, business_id, customer_id, service_type, status, completed_at, technician_name, notes, created_at
+- Campaign: id, business_id, name, is_preset, touches (JSONB array of channel/timing/template), stop_conditions, service_rules, active, created_at
+- CampaignEnrollment: id, campaign_id, job_id, customer_id, current_touch, status, enrolled_at, completed_at
+- MessageTemplate: extends EmailTemplate with channel (email/sms), character_limit, personalization_level
+
 ## Constraints
 
-- **Tech stack**: Next.js + Supabase + Resend + Stripe — chosen for speed to ship
-- **Channel**: Email only — SMS adds complexity and cost
+- **Tech stack**: Next.js + Supabase + Resend + Twilio + Stripe + Vercel AI SDK — chosen for speed to ship
+- **Channels**: Email (Resend) + SMS (Twilio) — dual channel with fallback logic
 - **Simplicity**: 1 user = 1 account, no team permissions
-- **Mobile-friendly**: App must work well on phones (business owners use mobile)
+- **Mobile-friendly**: App must work well on phones (techs use mobile in the field)
 - **UX**: Minimal UI, zero clutter, 1 primary action per screen, no jargon
+- **SMS compliance**: A2P 10DLC registration, STOP handling, quiet hours (9am-8pm default)
+- **LLM safety**: Vercel AI SDK abstraction, GPT-4o-mini primary, Haiku fallback, never invent details
 
 ## Key Decisions
 
@@ -108,22 +116,21 @@ Make requesting reviews so simple that business owners actually do it — one co
 | Dashboard test step cards | Guided walkthrough instead of checklist | Good — auto-detection of completion |
 | Test sends excluded from quota | Fair for users learning the product | Good — is_test flag in database |
 
-## Current Milestone: v1.4 Landing Page Redesign
+## Current Milestone: v2.0 Review Follow-Up System
 
-**Goal:** Redesign all marketing pages (homepage, pricing) with creative, unique, high-converting layouts — moving beyond template-like patterns to a distinctive brand experience that drives signups.
+**Goal:** Transform AvisLoop from a single-send review request tool into a multi-touch follow-up system for home service businesses — with SMS, campaigns/sequences, jobs, LLM personalization, and a redesigned dashboard/onboarding/landing page.
 
 **Target features:**
-- Research-driven landing page redesign with conversion-optimized copy
-- Creative, non-generic hero section with strong visual identity
-- Unique section layouts that stand out from typical SaaS templates
-- Conversion-focused content strategy tailored for local business owners
-- Redesigned pricing page with persuasive comparison
-- Consistent use of brand design system (blue primary, lime/coral accents, Kumbh Sans, geometric markers)
-- Dark mode support across all new marketing components
-- Image/mockup placeholders for future asset replacement
-- Mobile-responsive design throughout
-
-**Queued:** v1.3 Dashboard UX Overhaul & Onboarding Polish (defined, not started)
+- Customers (renamed from Contacts) with phone, service history, tags
+- Jobs with basic CRUD, service type, status, customer link
+- Campaigns: preset sequences + duplicate & customize, multi-touch with timing/channel per touch
+- SMS via Twilio with quiet hours, STOP compliance, fallback to email
+- LLM personalization (Vercel AI SDK, GPT-4o-mini + Haiku fallback)
+- Dashboard: pipeline KPIs, ready-to-send queue, needs attention, quick actions
+- Onboarding: services offered, software used, review destination, default campaign
+- Navigation overhaul: Send/Queue, Customers, Jobs, Campaigns, History
+- Landing page redesigned for home services positioning
+- Remove old/unused code as new features replace them; reuse working components (badges, drawers, preview)
 
 ---
-*Last updated: 2026-02-01 after v1.4 milestone started*
+*Last updated: 2026-02-02 after v2.0 milestone started*
