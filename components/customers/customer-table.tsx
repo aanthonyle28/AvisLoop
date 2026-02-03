@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   useReactTable,
   getCoreRowModel,
@@ -58,6 +58,14 @@ export function CustomerTable({
   const [searchQuery, setSearchQuery] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'archived'>('all')
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
+
+  // Compute available tags from customers
+  const availableTags = useMemo(() => {
+    const tagSet = new Set<string>()
+    data.forEach(c => (c.tags || []).forEach(t => tagSet.add(t)))
+    return Array.from(tagSet)
+  }, [data])
 
   // Filter data based on search query and status
   const filteredData = useMemo(() => {
@@ -106,6 +114,17 @@ export function CustomerTable({
     },
   })
 
+  // Effect to sync selectedTags state with table column filter
+  useEffect(() => {
+    // Get the tags column from the table instance
+    const tagsColumn = table.getColumn('tags')
+    if (tagsColumn) {
+      // Set the column's filter value to the selectedTags array
+      // This triggers the filterFn defined in customer-columns.tsx
+      tagsColumn.setFilterValue(selectedTags.length > 0 ? selectedTags : undefined)
+    }
+  }, [selectedTags, table])
+
   // Get selected row IDs
   const selectedRows = table.getFilteredSelectedRowModel().rows
   const selectedIds = selectedRows.map((row) => row.original.id)
@@ -123,6 +142,9 @@ export function CustomerTable({
         }}
         statusFilter={statusFilter}
         onStatusFilterChange={setStatusFilter}
+        onTagFilterChange={setSelectedTags}
+        selectedTags={selectedTags}
+        availableTags={availableTags}
       />
 
       {/* Bulk action bar */}

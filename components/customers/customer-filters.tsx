@@ -3,12 +3,16 @@
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { X, Search } from 'lucide-react'
+import { TagBadge, PRESET_TAGS } from '@/components/ui/tag-badge'
 
 interface CustomerFiltersProps {
   searchQuery: string
   onSearchChange: (query: string) => void
   statusFilter: 'all' | 'active' | 'archived'
   onStatusFilterChange: (status: 'all' | 'active' | 'archived') => void
+  onTagFilterChange?: (tags: string[]) => void
+  selectedTags?: string[]
+  availableTags?: string[]
 }
 
 export function CustomerFilters({
@@ -16,8 +20,21 @@ export function CustomerFilters({
   onSearchChange,
   statusFilter,
   onStatusFilterChange,
+  onTagFilterChange,
+  selectedTags = [],
+  availableTags = [],
 }: CustomerFiltersProps) {
-  const hasActiveFilters = searchQuery !== '' || statusFilter !== 'all'
+  // Combine preset tags with custom tags from business
+  const allTags = [...new Set([...PRESET_TAGS, ...availableTags])]
+
+  const toggleTag = (tag: string) => {
+    const newTags = selectedTags.includes(tag)
+      ? selectedTags.filter(t => t !== tag)
+      : [...selectedTags, tag]
+    onTagFilterChange?.(newTags)
+  }
+
+  const hasActiveFilters = searchQuery !== '' || statusFilter !== 'all' || selectedTags.length > 0
 
   return (
     <div className='space-y-3'>
@@ -65,6 +82,7 @@ export function CustomerFilters({
             onClick={() => {
               onSearchChange('')
               onStatusFilterChange('all')
+              onTagFilterChange?.([])
             }}
             className='ml-auto'
           >
@@ -73,6 +91,29 @@ export function CustomerFilters({
           </Button>
         )}
       </div>
+
+      {/* Tag filter section */}
+      {allTags.length > 0 && (
+        <div className='flex flex-wrap items-center gap-2'>
+          <span className='text-sm text-muted-foreground'>Filter by tag:</span>
+          {allTags.map(tag => (
+            <TagBadge
+              key={tag}
+              tag={tag}
+              onClick={() => toggleTag(tag)}
+              selected={selectedTags.includes(tag)}
+            />
+          ))}
+          {selectedTags.length > 0 && (
+            <button
+              onClick={() => onTagFilterChange?.([])}
+              className='text-xs text-muted-foreground hover:text-foreground underline'
+            >
+              Clear
+            </button>
+          )}
+        </div>
+      )}
     </div>
   )
 }
