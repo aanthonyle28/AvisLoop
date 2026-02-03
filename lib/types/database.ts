@@ -37,28 +37,43 @@ export type BusinessUpdate = Partial<Omit<Business, 'id' | 'user_id' | 'created_
 export type EmailTemplateInsert = Omit<EmailTemplate, 'id' | 'created_at' | 'updated_at'>
 export type EmailTemplateUpdate = Partial<Omit<EmailTemplate, 'id' | 'business_id' | 'created_at' | 'updated_at'>>
 
-export interface Contact {
+export interface Customer {
   id: string
   business_id: string
   name: string
   email: string
   phone: string | null
+  phone_status: 'valid' | 'invalid' | 'missing'
+  tags: string[]
   status: 'active' | 'archived'
   opted_out: boolean
   notes?: string
+  timezone: string | null
+  sms_consent_status: 'opted_in' | 'opted_out' | 'unknown'
+  sms_consent_at: string | null
+  sms_consent_source: string | null
+  sms_consent_method: 'verbal_in_person' | 'phone_call' | 'service_agreement' | 'website_form' | 'other' | null
+  sms_consent_notes: string | null
+  sms_consent_ip: string | null
+  sms_consent_captured_by: string | null
   last_sent_at: string | null
   send_count: number
   created_at: string
   updated_at: string
 }
 
-export type ContactInsert = Omit<Contact, 'id' | 'created_at' | 'updated_at' | 'last_sent_at' | 'send_count'>
-export type ContactUpdate = Partial<Omit<Contact, 'id' | 'business_id' | 'created_at' | 'updated_at'>>
+export type CustomerInsert = Omit<Customer, 'id' | 'created_at' | 'updated_at' | 'last_sent_at' | 'send_count'>
+export type CustomerUpdate = Partial<Omit<Customer, 'id' | 'business_id' | 'created_at' | 'updated_at'>>
+
+/** @deprecated Use Customer instead */
+export type Contact = Customer
+export type ContactInsert = CustomerInsert
+export type ContactUpdate = CustomerUpdate
 
 export interface SendLog {
   id: string
   business_id: string
-  contact_id: string
+  customer_id: string
   template_id: string | null
   status: 'pending' | 'sent' | 'delivered' | 'bounced' | 'complained' | 'failed' | 'opened'
   provider_id: string | null
@@ -72,10 +87,13 @@ export interface SendLog {
 export type SendLogInsert = Omit<SendLog, 'id' | 'created_at' | 'updated_at' | 'provider_id' | 'error_message'>
 export type SendLogUpdate = Partial<Pick<SendLog, 'status' | 'provider_id' | 'error_message'>>
 
-// Combined type for send history display with contact info
-export interface SendLogWithContact extends SendLog {
-  contacts: Pick<Contact, 'name' | 'email'>
+// Combined type for send history display with customer info
+export interface SendLogWithCustomer extends SendLog {
+  customers: Pick<Customer, 'name' | 'email'>
 }
+
+/** @deprecated Use SendLogWithCustomer instead */
+export type SendLogWithContact = SendLogWithCustomer
 
 // Subscription types for Stripe billing
 export interface Subscription {
