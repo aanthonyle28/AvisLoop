@@ -18,6 +18,8 @@ import { bulkCreateCustomers, getCustomers, type BulkCreateResult } from '@/lib/
 import { customerSchema } from '@/lib/validations/customer'
 import type { Customer } from '@/lib/types/database'
 import { cn } from '@/lib/utils'
+import { parseAndValidatePhone } from '@/lib/utils/phone'
+import { PhoneReviewTable } from '@/components/customers/phone-review-table'
 
 // Header mapping from research
 const HEADER_MAPPINGS: Record<string, string> = {
@@ -33,7 +35,9 @@ const HEADER_MAPPINGS: Record<string, string> = {
 interface ParsedRow {
   name: string
   email: string
-  phone?: string
+  phone: string | null        // Raw CSV value
+  phoneE164: string | null    // Parsed E.164 (null if invalid)
+  phoneStatus: 'valid' | 'invalid' | 'missing'
   isValid: boolean
   isDuplicate: boolean
   errors: string[]
@@ -48,6 +52,15 @@ export function CSVImportDialog() {
   const [parsedRows, setParsedRows] = useState<ParsedRow[]>([])
   const [existingEmails, setExistingEmails] = useState<Set<string>>(new Set())
   const [importResult, setImportResult] = useState<BulkCreateResult | null>(null)
+  const [showPhoneReview, setShowPhoneReview] = useState(false)
+  const [phoneIssues, setPhoneIssues] = useState<Array<{
+    id: string
+    name: string
+    email: string
+    rawPhone: string
+    phoneStatus: 'invalid'
+  }>>([])
+
 
   // Reset dialog state
   const resetDialog = useCallback(() => {
@@ -56,6 +69,8 @@ export function CSVImportDialog() {
     setParsedRows([])
     setExistingEmails(new Set())
     setImportResult(null)
+    setShowPhoneReview(false)
+    setPhoneIssues([])
   }, [])
 
   // Handle file drop/selection
@@ -86,10 +101,13 @@ export function CSVImportDialog() {
 
           const name = mappedRow.name || ''
           const email = mappedRow.email || ''
-          const phone = mappedRow.phone || ''
+          const rawPhone = mappedRow.phone || ''
 
-          // Validate with schema
-          const parsed = customerSchema.safeParse({ name, email, phone })
+          // Parse phone with libphonenumber-js
+          const phoneResult = parseAndValidatePhone(rawPhone)
+
+          // Validate with schema (phone optional)
+          const parsed = customerSchema.safeParse({ name, email, phone: rawPhone })
 
           const isValid = parsed.success
           const isDuplicate = isValid && existingEmailsSet.has(email.toLowerCase())
@@ -98,7 +116,9 @@ export function CSVImportDialog() {
           return {
             name,
             email,
-            phone,
+            phone: rawPhone || null,
+            phoneE164: phoneResult.e164 || null,
+            phoneStatus: phoneResult.status,
             isValid,
             isDuplicate,
             errors,
@@ -133,9 +153,17 @@ export function CSVImportDialog() {
         name: row.name,
         email: row.email,
         phone: row.phone,
+        phoneE164: row.phoneE164,
+        phoneStatus: row.phoneStatus,
       }))
 
     const result = await bulkCreateCustomers(customersToImport)
+
+    // Extract phone issues from result
+    if (result.success && result.data?.customersWithPhoneIssues) {
+      setPhoneIssues(result.data.customersWithPhoneIssues)
+    }
+
     setImportResult(result)
     setStep('complete')
   }
@@ -221,16 +249,54 @@ export function CSVImportDialog() {
         {step === 'complete' && (
           <div className='space-y-4'>
             {importResult?.success ? (
-              <div className='flex flex-col items-center justify-center py-8 space-y-4'>
-                <CheckCircle className='h-16 w-16 text-green-600' />
-                <div className='text-center space-y-2'>
-                  <h3 className='text-lg font-semibold'>Import Complete</h3>
-                  <div className='text-sm text-muted-foreground space-y-1'>
-                    <p>Created: <span className='font-medium text-green-600'>{importResult.data?.created || 0}</span></p>
-                    <p>Skipped (duplicates): <span className='font-medium text-yellow-600'>{importResult.data?.skipped || 0}</span></p>
+              <>
+                <div className='flex flex-col items-center justify-center py-8 space-y-4'>
+                  <CheckCircle className='h-16 w-16 text-green-600' />
+                  <div className='text-center space-y-2'>
+                    <h3 className='text-lg font-semibold'>Import Complete</h3>
+                    <div className='text-sm text-muted-foreground space-y-1'>
+                      <p>Created: <span className='font-medium text-green-600'>{importResult.data?.created || 0}</span></p>
+                      <p>Skipped (duplicates): <span className='font-medium text-yellow-600'>{importResult.data?.skipped || 0}</span></p>
+                      {importResult.data?.phoneNeedsReview !== undefined && importResult.data.phoneNeedsReview > 0 && (
+                        <p>Phone needs review: <span className='font-medium text-amber-600'>{importResult.data.phoneNeedsReview}</span></p>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
+
+                {/* Phone review prompt */}
+                {phoneIssues.length > 0 && !showPhoneReview && (
+                  <div className='p-4 bg-amber-50 dark:bg-amber-950 rounded-lg'>
+                    <div className='flex items-center justify-between'>
+                      <div>
+                        <p className='font-medium text-amber-700 dark:text-amber-300'>
+                          {phoneIssues.length} phone number{phoneIssues.length !== 1 ? 's' : ''} need review
+                        </p>
+                        <p className='text-sm text-amber-600 dark:text-amber-400'>
+                          These customers were imported but have invalid phone formats
+                        </p>
+                      </div>
+                      <Button
+                        variant='outline'
+                        onClick={() => setShowPhoneReview(true)}
+                      >
+                        Review phone issues
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Phone review table */}
+                {showPhoneReview && phoneIssues.length > 0 && (
+                  <PhoneReviewTable
+                    issues={phoneIssues}
+                    onComplete={() => {
+                      setShowPhoneReview(false)
+                      setPhoneIssues([])
+                    }}
+                  />
+                )}
+              </>
             ) : (
               <div className='flex flex-col items-center justify-center py-8 space-y-4'>
                 <AlertCircle className='h-16 w-16 text-destructive' />
