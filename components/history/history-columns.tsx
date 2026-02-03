@@ -5,25 +5,25 @@ import { format } from 'date-fns'
 import { StatusBadge } from './status-badge'
 import { Button } from '@/components/ui/button'
 import { ArrowClockwise, X } from '@phosphor-icons/react'
-import type { SendLogWithContact } from '@/lib/types/database'
+import type { SendLogWithCustomer } from '@/lib/types/database'
 import type { SendStatus } from './status-badge'
 
 interface CreateColumnsProps {
-  onResend?: (request: SendLogWithContact) => void
-  onCancel?: (request: SendLogWithContact) => void
+  onResend?: (request: SendLogWithCustomer) => void
+  onCancel?: (request: SendLogWithCustomer) => void
 }
 
-export function createColumns({ onResend, onCancel }: CreateColumnsProps = {}): ColumnDef<SendLogWithContact>[] {
+export function createColumns({ onResend, onCancel }: CreateColumnsProps = {}): ColumnDef<SendLogWithCustomer>[] {
   return [
     {
-      accessorKey: 'contacts',
+      accessorKey: 'customers',
       header: 'Recipient',
       cell: ({ row }) => {
-        const contact = row.original.contacts
+        const customer = row.original.customers
         return (
           <div className="flex flex-col">
-            <span className="font-medium">{contact.name}</span>
-            <span className="text-sm text-muted-foreground">{contact.email}</span>
+            <span className="font-medium">{customer.name}</span>
+            <span className="text-sm text-muted-foreground">{customer.email}</span>
           </div>
         )
       },

@@ -7,27 +7,27 @@ import { z } from 'zod'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { createContact, type ContactActionState } from '@/lib/actions/contact'
+import { createCustomer, type CustomerActionState } from '@/lib/actions/customer'
 
-const contactStepSchema = z.object({
+const customerStepSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100),
   email: z.string().email('Valid email required'),
   phone: z.string().max(20).optional().or(z.literal('')),
 })
 
-type ContactStepData = z.infer<typeof contactStepSchema>
+type CustomerStepData = z.infer<typeof customerStepSchema>
 
-interface ContactStepProps {
+interface CustomerStepProps {
   onComplete: () => void
   onSkip: () => void
 }
 
 /**
- * Contact step for onboarding wizard.
- * Note: businessId is NOT needed as a prop - createContact server action
+ * Customer step for onboarding wizard.
+ * Note: businessId is NOT needed as a prop - createCustomer server action
  * derives the business from the authenticated user's session automatically.
  */
-export function ContactStep({ onComplete, onSkip }: ContactStepProps) {
+export function CustomerStep({ onComplete, onSkip }: CustomerStepProps) {
   const formRef = useRef<HTMLFormElement>(null)
   const [serverError, setServerError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -37,8 +37,8 @@ export function ContactStep({ onComplete, onSkip }: ContactStepProps) {
     handleSubmit,
     formState: { errors },
     setError,
-  } = useForm<ContactStepData>({
-    resolver: zodResolver(contactStepSchema),
+  } = useForm<CustomerStepData>({
+    resolver: zodResolver(customerStepSchema),
     defaultValues: {
       name: '',
       email: '',
@@ -49,7 +49,7 @@ export function ContactStep({ onComplete, onSkip }: ContactStepProps) {
   const onSubmit = handleSubmit(() => {
     const formData = new FormData(formRef.current!)
     startTransition(async () => {
-      const result: ContactActionState = await createContact(null, formData)
+      const result: CustomerActionState = await createCustomer(null, formData)
       if (result.success) {
         onComplete()
         return
@@ -57,7 +57,7 @@ export function ContactStep({ onComplete, onSkip }: ContactStepProps) {
       if (result.fieldErrors) {
         Object.entries(result.fieldErrors).forEach(([field, messages]) => {
           if (messages && messages.length > 0) {
-            setError(field as keyof ContactStepData, { message: messages[0] })
+            setError(field as keyof CustomerStepData, { message: messages[0] })
           }
         })
       }
@@ -70,7 +70,7 @@ export function ContactStep({ onComplete, onSkip }: ContactStepProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold mb-2">Add your first contact</h2>
+        <h2 className="text-xl font-semibold mb-2">Add your first customer</h2>
         <p className="text-muted-foreground">
           Add a customer you&apos;d like to request a review from.
         </p>
@@ -78,11 +78,11 @@ export function ContactStep({ onComplete, onSkip }: ContactStepProps) {
 
       <form ref={formRef} onSubmit={onSubmit} className="space-y-4">
         <div className="grid gap-2">
-          <Label htmlFor="contact-name">
+          <Label htmlFor="customer-name">
             Name <span className="text-red-500">*</span>
           </Label>
           <Input
-            id="contact-name"
+            id="customer-name"
             {...register('name')}
             placeholder="John Smith"
             disabled={isPending}
@@ -93,11 +93,11 @@ export function ContactStep({ onComplete, onSkip }: ContactStepProps) {
         </div>
 
         <div className="grid gap-2">
-          <Label htmlFor="contact-email">
+          <Label htmlFor="customer-email">
             Email <span className="text-red-500">*</span>
           </Label>
           <Input
-            id="contact-email"
+            id="customer-email"
             type="email"
             {...register('email')}
             placeholder="john@example.com"
@@ -109,11 +109,11 @@ export function ContactStep({ onComplete, onSkip }: ContactStepProps) {
         </div>
 
         <div className="grid gap-2">
-          <Label htmlFor="contact-phone">
+          <Label htmlFor="customer-phone">
             Phone (optional)
           </Label>
           <Input
-            id="contact-phone"
+            id="customer-phone"
             type="tel"
             {...register('phone')}
             placeholder="(555) 123-4567"
@@ -130,7 +130,7 @@ export function ContactStep({ onComplete, onSkip }: ContactStepProps) {
 
         <div className="flex flex-col gap-3 pt-2">
           <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? 'Adding...' : 'Add Contact & Continue'}
+            {isPending ? 'Adding...' : 'Add Customer & Continue'}
           </Button>
           <button
             type="button"
@@ -138,7 +138,7 @@ export function ContactStep({ onComplete, onSkip }: ContactStepProps) {
             disabled={isPending}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            Skip for now - I&apos;ll add contacts later
+            Skip for now - I&apos;ll add customers later
           </button>
         </div>
       </form>

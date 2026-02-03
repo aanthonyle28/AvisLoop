@@ -96,7 +96,7 @@ AvisLoop is a review follow-up system for home service businesses. v1.0 through 
 
 **Milestone Goal:** Transform AvisLoop from a single-send review request tool into a multi-touch follow-up system for home service businesses — with SMS, campaigns/sequences, jobs, LLM personalization, and redesigned dashboard/onboarding/landing page.
 
-**Replaces:** Old v1.3/v1.4 phases 20-25 (new v2.0 milestone starts fresh from Phase 20)
+**Replaces:** Old v1.3/v1.4 phases 20-26 (new v2.0 milestone starts fresh from Phase 20)
 
 **Reusable from v1.0-v1.4:**
 - StatusBadge component (Phase 20)
@@ -312,4 +312,4 @@ After v2.0:
 
 ---
 *Last updated: 2026-02-02 after Phase 20 planning*
-*v2.0 phases replace old v1.3/v1.4 phases 20-25 per user request*
+*v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*

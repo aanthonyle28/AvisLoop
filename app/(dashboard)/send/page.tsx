@@ -1,5 +1,5 @@
 import { getBusiness } from '@/lib/actions/business'
-import { getContacts } from '@/lib/actions/contact'
+import { getCustomers } from '@/lib/actions/customer'
 import { getMonthlyUsage, getResponseRate, getNeedsAttentionCount, getRecentActivity, getRecentActivityFull, getResendReadyContacts } from '@/lib/data/send-logs'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
@@ -16,7 +16,7 @@ export default async function SendPage() {
 
   // Fetch required data in parallel
   const [
-    { contacts },
+    { customers },
     monthlyUsage,
     responseRate,
     needsAttention,
@@ -24,7 +24,7 @@ export default async function SendPage() {
     recentActivityFull,
     resendReadyContacts,
   ] = await Promise.all([
-    getContacts({ limit: 200 }),
+    getCustomers({ limit: 200 }),
     getMonthlyUsage(),
     getResponseRate(),
     getNeedsAttentionCount(),
@@ -42,7 +42,7 @@ export default async function SendPage() {
   return (
     <div className="container mx-auto py-6 px-4">
       <SendPageClient
-        contacts={contacts}
+        customers={customers}
         business={business}
         templates={templates}
         monthlyUsage={monthlyUsage}

@@ -5,17 +5,17 @@ import { toast } from 'sonner'
 import { MagnifyingGlass, X, PaperPlaneTilt } from '@phosphor-icons/react'
 import { batchSendReviewRequest } from '@/lib/actions/send'
 import { scheduleReviewRequest } from '@/lib/actions/schedule'
-import { findOrCreateContact } from '@/lib/actions/contact'
+import { findOrCreateCustomer } from '@/lib/actions/customer'
 import { SendSettingsBar } from './send-settings-bar'
 import { MessagePreview } from './message-preview'
 import { EmailPreviewModal } from './email-preview-modal'
-import type { Contact, Business, EmailTemplate } from '@/lib/types/database'
+import type { Customer, Business, EmailTemplate } from '@/lib/types/database'
 import { Loader2 } from 'lucide-react'
 
 type SchedulePreset = 'immediately' | '1hour' | 'morning' | 'custom'
 
 interface QuickSendTabProps {
-  contacts: Contact[]
+  customers: Customer[]
   business: Business & { email_templates?: EmailTemplate[] }
   templates: EmailTemplate[]
   monthlyUsage: { count: number; limit: number; tier: string }
@@ -23,7 +23,7 @@ interface QuickSendTabProps {
 }
 
 export function QuickSendTab({
-  contacts,
+  customers,
   business,
   templates,
   monthlyUsage,
@@ -44,33 +44,33 @@ export function QuickSendTab({
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Email search and matching
-  const matchedContact = useMemo(() => {
+  const matchedCustomer = useMemo(() => {
     if (!email.trim()) return null
     const normalizedEmail = email.toLowerCase().trim()
-    return contacts.find(c => c.email.toLowerCase() === normalizedEmail) || null
-  }, [email, contacts])
+    return customers.find(c => c.email.toLowerCase() === normalizedEmail) || null
+  }, [email, customers])
 
   // Autocomplete suggestions - search by email AND name
   const suggestions = useMemo(() => {
     if (!email.trim() || email.trim().length < 2) return []
     const query = email.toLowerCase().trim()
-    return contacts
+    return customers
       .filter(c =>
         c.email.toLowerCase().includes(query) ||
         c.name.toLowerCase().includes(query)
       )
       .slice(0, 6)
-  }, [email, contacts])
+  }, [email, customers])
 
   // Filter contacts added today for quick chips
-  const recentContacts = useMemo(() => {
+  const recentCustomers = useMemo(() => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
-    return contacts.filter(c => {
+    return customers.filter(c => {
       const created = new Date(c.created_at)
       return created >= today
     })
-  }, [contacts])
+  }, [customers])
 
   // Close suggestions on outside click
   useEffect(() => {
@@ -110,16 +110,16 @@ export function QuickSendTab({
     }
   }
 
-  const handleSelectSuggestion = (contact: Contact) => {
-    setEmail(contact.email)
-    setName(contact.name)
+  const handleSelectSuggestion = (customer: Customer) => {
+    setEmail(customer.email)
+    setName(customer.name)
     setShowSuggestions(false)
     setHighlightedIndex(-1)
   }
 
-  const handleChipClick = (contact: Contact) => {
-    setEmail(contact.email)
-    setName(contact.name)
+  const handleChipClick = (customer: Customer) => {
+    setEmail(customer.email)
+    setName(customer.name)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -159,7 +159,7 @@ export function QuickSendTab({
 
     startTransition(async () => {
       try {
-        let contactId = matchedContact?.id
+        let contactId = matchedCustomer?.id
 
         if (!contactId) {
           if (!name.trim()) {
@@ -167,7 +167,7 @@ export function QuickSendTab({
             return
           }
 
-          const result = await findOrCreateContact({
+          const result = await findOrCreateCustomer({
             email: email.trim(),
             name: name.trim(),
             businessId: business.id,
@@ -229,11 +229,15 @@ export function QuickSendTab({
   }
 
   const selectedTemplate = templates.find(t => t.id === selectedTemplateId) || null
-  const previewContact = matchedContact || (email && name ? {
+  const previewCustomer = matchedCustomer || (email && name ? {
     id: 'preview', name, email, status: 'active', opted_out: false,
     send_count: 0, last_sent_at: null, created_at: new Date().toISOString(),
-    business_id: business.id, phone: null,
-  } as Contact : null)
+    business_id: business.id, phone: null, phone_status: 'missing' as const,
+    tags: [], timezone: null, sms_consent_status: 'unknown' as const,
+    sms_consent_at: null, sms_consent_source: null, sms_consent_method: null,
+    sms_consent_notes: null, sms_consent_ip: null, sms_consent_captured_by: null,
+    updated_at: new Date().toISOString(),
+  } as Customer : null)
 
   return (
     <div className="bg-card border border-border rounded-lg p-6">
@@ -299,26 +303,26 @@ export function QuickSendTab({
             )}
 
             {/* Autocomplete dropdown */}
-            {showSuggestions && suggestions.length > 0 && !matchedContact && (
+            {showSuggestions && suggestions.length > 0 && !matchedCustomer && (
               <div
                 ref={suggestionsRef}
                 className="absolute z-20 top-full left-0 right-0 mt-1 bg-card border border-border rounded-md shadow-lg max-h-48 overflow-y-auto"
               >
-                {suggestions.map((contact, index) => (
+                {suggestions.map((customer, index) => (
                   <button
-                    key={contact.id}
+                    key={customer.id}
                     type="button"
-                    onClick={() => handleSelectSuggestion(contact)}
+                    onClick={() => handleSelectSuggestion(customer)}
                     className={`w-full flex items-center gap-3 px-3 py-2 text-left text-sm hover:bg-muted/50 transition-colors ${
                       index === highlightedIndex ? 'bg-muted/50' : ''
                     }`}
                   >
                     <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold shrink-0">
-                      {contact.name.charAt(0).toUpperCase()}
+                      {customer.name.charAt(0).toUpperCase()}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="font-medium truncate">{contact.name}</div>
-                      <div className="text-xs text-muted-foreground truncate">{contact.email}</div>
+                      <div className="font-medium truncate">{customer.name}</div>
+                      <div className="text-xs text-muted-foreground truncate">{customer.email}</div>
                     </div>
                   </button>
                 ))}
@@ -327,17 +331,17 @@ export function QuickSendTab({
           </div>
 
           {/* Existing contact chip */}
-          {matchedContact && (
+          {matchedCustomer && (
             <div className="flex items-center gap-2 text-sm">
               <span className="text-muted-foreground">Existing contact:</span>
               <span className="px-2 py-1 bg-primary/10 text-primary rounded-md font-medium">
-                {matchedContact.name}
+                {matchedCustomer.name}
               </span>
             </div>
           )}
 
           {/* Name input for new contact */}
-          {email && !matchedContact && (
+          {email && !matchedCustomer && (
             <div className="space-y-1">
               <label htmlFor="name-input" className="block text-sm font-medium">
                 Contact Name
@@ -355,20 +359,20 @@ export function QuickSendTab({
         </div>
 
         {/* Recently Added chips */}
-        {recentContacts.length > 0 && (
+        {recentCustomers.length > 0 && (
           <div className="space-y-2">
             <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider">
               Recently Added
             </label>
             <div className="flex flex-wrap gap-2">
-              {recentContacts.slice(0, 10).map(contact => (
+              {recentCustomers.slice(0, 10).map(customer => (
                 <button
-                  key={contact.id}
+                  key={customer.id}
                   type="button"
-                  onClick={() => handleChipClick(contact)}
+                  onClick={() => handleChipClick(customer)}
                   className="px-3 py-1.5 text-xs font-medium rounded-full border border-border hover:border-primary/50 hover:bg-primary/5 transition-colors"
                 >
-                  {contact.name}
+                  {customer.name}
                 </button>
               ))}
             </div>
@@ -381,7 +385,7 @@ export function QuickSendTab({
             Preview
           </label>
           <MessagePreview
-            contact={previewContact}
+            contact={previewCustomer}
             business={business}
             template={selectedTemplate}
             onViewFull={() => setShowFullPreview(true)}
@@ -405,7 +409,7 @@ export function QuickSendTab({
           ) : (
             <button
               type="submit"
-              disabled={!email || isPending || (!matchedContact && !name)}
+              disabled={!email || isPending || (!matchedCustomer && !name)}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-primary text-primary-foreground font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isPending ? (
@@ -427,7 +431,7 @@ export function QuickSendTab({
       <EmailPreviewModal
         open={showFullPreview}
         onOpenChange={setShowFullPreview}
-        contact={previewContact}
+        contact={previewCustomer}
         business={business}
         template={selectedTemplate}
       />

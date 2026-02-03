@@ -23,14 +23,14 @@ import { Button } from '@/components/ui/button'
 import { SendSettingsBar } from './send-settings-bar'
 import { BulkSendActionBar } from './bulk-send-action-bar'
 import { createBulkSendColumns } from './bulk-send-columns'
-import type { Contact, EmailTemplate } from '@/lib/types/database'
+import type { Customer, EmailTemplate } from '@/lib/types/database'
 
 type SchedulePreset = 'immediately' | '1hour' | 'morning' | 'custom'
 
 type FilterType = 'never-sent' | 'added-today' | 'sent-30-days' | 'issues'
 
 interface BulkSendTabProps {
-  contacts: Contact[]
+  customers: Customer[]
   templates: EmailTemplate[]
   monthlyUsage: { count: number; limit: number; tier: string }
   hasReviewLink: boolean
@@ -38,7 +38,7 @@ interface BulkSendTabProps {
 }
 
 export function BulkSendTab({
-  contacts,
+  customers,
   templates,
   hasReviewLink,
   resendReadyContactIds,
@@ -68,19 +68,19 @@ export function BulkSendTab({
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
     return {
-      'never-sent': contacts.filter(c => !c.last_sent_at).length,
-      'added-today': contacts.filter(c => new Date(c.created_at) >= startOfToday).length,
-      'sent-30-days': contacts.filter(
+      'never-sent': customers.filter(c => !c.last_sent_at).length,
+      'added-today': customers.filter(c => new Date(c.created_at) >= startOfToday).length,
+      'sent-30-days': customers.filter(
         c => c.last_sent_at && new Date(c.last_sent_at) < thirtyDaysAgo
       ).length,
-      'issues': contacts.filter(c => c.opted_out || c.status === 'archived').length,
+      'issues': customers.filter(c => c.opted_out || c.status === 'archived').length,
     }
-  }, [contacts])
+  }, [customers])
 
   // Apply filters to contacts
-  const filteredContacts = useMemo(() => {
+  const filteredCustomers = useMemo(() => {
     if (activeFilters.size === 0) {
-      return contacts
+      return customers
     }
 
     const startOfToday = new Date()
@@ -89,26 +89,26 @@ export function BulkSendTab({
     const thirtyDaysAgo = new Date()
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
-    return contacts.filter(contact => {
+    return customers.filter((customer: Customer) => {
       const checks: boolean[] = []
 
       if (activeFilters.has('never-sent')) {
-        checks.push(!contact.last_sent_at)
+        checks.push(!customer.last_sent_at)
       }
       if (activeFilters.has('added-today')) {
-        checks.push(new Date(contact.created_at) >= startOfToday)
+        checks.push(new Date(customer.created_at) >= startOfToday)
       }
       if (activeFilters.has('sent-30-days')) {
-        checks.push(!!contact.last_sent_at && new Date(contact.last_sent_at) < thirtyDaysAgo)
+        checks.push(!!customer.last_sent_at && new Date(customer.last_sent_at) < thirtyDaysAgo)
       }
       if (activeFilters.has('issues')) {
-        checks.push(contact.opted_out || contact.status === 'archived')
+        checks.push(customer.opted_out || customer.status === 'archived')
       }
 
       // OR logic: contact matches if ANY filter matches
       return checks.some(check => check)
     })
-  }, [contacts, activeFilters])
+  }, [customers, activeFilters])
 
   // Toggle filter chip
   const toggleFilter = (filter: FilterType) => {
@@ -136,7 +136,7 @@ export function BulkSendTab({
 
   // Initialize table
   const table = useReactTable({
-    data: filteredContacts,
+    data: filteredCustomers,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -159,7 +159,7 @@ export function BulkSendTab({
   const selectedRows = table.getFilteredSelectedRowModel().rows
   const selectedContacts = selectedRows.map(row => row.original)
   const selectedCount = selectedContacts.length
-  const filteredCount = filteredContacts.length
+  const filteredCount = filteredCustomers.length
 
   return (
     <div className="space-y-4">
@@ -241,8 +241,8 @@ export function BulkSendTab({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map(row => {
-                const contact = row.original
-                const isOptedOut = contact.opted_out
+                const customer = row.original
+                const isOptedOut = customer.opted_out
 
                 return (
                   <TableRow
@@ -272,7 +272,7 @@ export function BulkSendTab({
       </div>
 
       {/* Pagination controls */}
-      {filteredContacts.length > 50 && (
+      {filteredCustomers.length > 50 && (
         <div className="flex items-center justify-end space-x-2">
           <Button
             variant="outline"
@@ -299,7 +299,7 @@ export function BulkSendTab({
           selectedCount={selectedCount}
           filteredCount={filteredCount}
           selectedContacts={selectedContacts}
-          allFilteredContacts={filteredContacts}
+          allFilteredContacts={filteredCustomers}
           template={templates.find(t => t.id === selectedTemplateId)!}
           schedulePreset={schedulePreset}
           customDateTime={customDateTime}

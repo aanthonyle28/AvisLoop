@@ -50,7 +50,7 @@ export function RequestDetailDrawer({
   if (!request) return null
 
   // Determine if contact is on cooldown
-  const isOnCooldown = request.contacts && (() => {
+  const isOnCooldown = request.customers && (() => {
     // We don't have last_sent_at on SendLogWithContact, so check request created_at
     const lastSent = new Date(request.created_at)
     const cooldownEnd = new Date(lastSent.getTime() + COOLDOWN_DAYS * 24 * 60 * 60 * 1000)
@@ -65,13 +65,24 @@ export function RequestDetailDrawer({
 
   // Mock contact object for MessagePreview
   const mockContact = {
-    id: request.contact_id,
+    id: request.customer_id,
     business_id: request.business_id,
-    name: request.contacts.name,
-    email: request.contacts.email,
+    name: request.customers.name,
+    email: request.customers.email,
     phone: null,
+    phone_status: 'missing' as const,
+    tags: [],
     status: 'active' as const,
     opted_out: false,
+    notes: undefined,
+    timezone: null,
+    sms_consent_status: 'unknown' as const,
+    sms_consent_at: null,
+    sms_consent_source: null,
+    sms_consent_method: null,
+    sms_consent_notes: null,
+    sms_consent_ip: null,
+    sms_consent_captured_by: null,
     last_sent_at: request.created_at,
     send_count: 1,
     created_at: request.created_at,
@@ -84,7 +95,7 @@ export function RequestDetailDrawer({
   const handleResend = async () => {
     setIsResending(true)
     try {
-      await onResend(request.contact_id, selectedTemplateId || request.template_id)
+      await onResend(request.customer_id, selectedTemplateId || request.template_id)
     } finally {
       setIsResending(false)
     }
@@ -107,7 +118,7 @@ export function RequestDetailDrawer({
   }
 
   // Get initials for avatar
-  const initials = request.contacts.name
+  const initials = request.customers.name
     .split(' ')
     .map(n => n[0])
     .join('')
@@ -133,8 +144,8 @@ export function RequestDetailDrawer({
                 <span className="text-sm font-medium text-primary">{initials}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-medium truncate">{request.contacts.name}</p>
-                <p className="text-sm text-muted-foreground truncate">{request.contacts.email}</p>
+                <p className="font-medium truncate">{request.customers.name}</p>
+                <p className="text-sm text-muted-foreground truncate">{request.customers.email}</p>
               </div>
             </div>
           </div>

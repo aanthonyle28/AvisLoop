@@ -40,6 +40,7 @@ export async function middleware(request: NextRequest) {
     "/dashboard",
     "/protected",
     "/contacts",
+    "/customers",
     "/send",
     "/history",
     "/billing",

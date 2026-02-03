@@ -10,17 +10,17 @@ import { RecentActivityStrip } from './recent-activity-strip'
 import { StatStrip } from './stat-strip'
 import { RequestDetailDrawer } from '@/components/history/request-detail-drawer'
 import { sendReviewRequest } from '@/lib/actions/send'
-import type { Contact, Business, EmailTemplate, SendLogWithContact } from '@/lib/types/database'
+import type { Customer, Business, EmailTemplate, SendLogWithCustomer } from '@/lib/types/database'
 import type { RecentActivity } from './recent-activity-strip'
 
 interface SendPageClientProps {
-  contacts: Contact[]
+  customers: Customer[]
   business: Business & { email_templates?: EmailTemplate[] }
   templates: EmailTemplate[]
   monthlyUsage: { count: number; limit: number; tier: string }
   hasReviewLink: boolean
   recentActivity: RecentActivity[]
-  recentActivityFull: SendLogWithContact[]
+  recentActivityFull: SendLogWithCustomer[]
   resendReadyContactIds: string[]
   displayName: string
   showStats: boolean
@@ -30,7 +30,7 @@ interface SendPageClientProps {
 }
 
 export function SendPageClient({
-  contacts,
+  customers,
   business,
   templates,
   monthlyUsage,
@@ -46,7 +46,7 @@ export function SendPageClient({
 }: SendPageClientProps) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<'quick-send' | 'bulk-send'>('quick-send')
-  const [selectedRequest, setSelectedRequest] = useState<SendLogWithContact | null>(null)
+  const [selectedRequest, setSelectedRequest] = useState<SendLogWithCustomer | null>(null)
   const [requestDrawerOpen, setRequestDrawerOpen] = useState(false)
 
   const handleActivityClick = (id: string) => {
@@ -128,7 +128,7 @@ export function SendPageClient({
 
       <TabsContent value="quick-send" className="mt-0">
         <QuickSendTab
-          contacts={contacts}
+          customers={customers}
           business={business}
           templates={templates}
           monthlyUsage={monthlyUsage}
@@ -138,7 +138,7 @@ export function SendPageClient({
 
       <TabsContent value="bulk-send" className="mt-0">
         <BulkSendTab
-          contacts={contacts}
+          customers={customers}
           templates={templates}
           monthlyUsage={monthlyUsage}
           hasReviewLink={hasReviewLink}
