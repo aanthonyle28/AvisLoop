@@ -121,7 +121,16 @@ AvisLoop is a review follow-up system for home service businesses. v1.0 through 
   5. Each customer has sms_opt_in boolean, opt_in_date, opt_in_method, and opt_in_ip fields in database (UI in Phase 21)
   6. Twilio A2P 10DLC brand and campaign registration approved (verified in Twilio Console before Phase 21 starts)
   7. Customer timezone field populated from browser Intl API on creation with business timezone fallback
-**Plans**: TBD
+**Plans**: 8 plans in 4 waves
+Plans:
+- [ ] 20-01-PLAN.md — Database table rename (contacts -> customers) with FK and RLS updates
+- [ ] 20-02-PLAN.md — New schema fields (tags, phone_status, SMS consent, timezone)
+- [ ] 20-03-PLAN.md — Phone validation library and customer validation schemas
+- [ ] 20-04-PLAN.md — Codebase rename (types, actions, components, routes)
+- [ ] 20-05-PLAN.md — Customer UI (tags, phone display, tag filter)
+- [ ] 20-06-PLAN.md — CSV import enhancement with phone review queue
+- [ ] 20-07-PLAN.md — SMS consent UI (checkbox, audit trail, badges)
+- [ ] 20-08-PLAN.md — A2P 10DLC registration checkpoint
 
 ### Phase 21: SMS Foundation & Compliance
 **Goal**: Users can send SMS messages via Twilio with full TCPA compliance (opt-in tracking, STOP handling, quiet hours enforcement, webhook verification).
@@ -277,7 +286,7 @@ See individual phase sections above for requirements, success criteria, and depe
 | 21 (v1.3) | Dashboard UX | 2/2 | Complete | 2026-02-01 |
 | 22 (v1.3) | Dashboard UX | 3/3 | Complete | 2026-02-02 |
 | 25 (v1.4) | Landing Page | 2/2 | Complete | 2026-02-02 |
-| **20 (v2.0)** | **Review Follow-Up** | **0/TBD** | **Not started** | **-** |
+| **20 (v2.0)** | **Review Follow-Up** | **0/8** | **Planned** | **-** |
 | 21 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 | 22 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 | 23 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
@@ -293,7 +302,7 @@ See individual phase sections above for requirements, success criteria, and depe
 ## What's Next
 
 **Current milestone:** v2.0 Review Follow-Up System (Phases 20-29)
-**Next action:** Plan Phase 20 (Database Migration & Customer Enhancement)
+**Next action:** Execute Phase 20 (Database Migration & Customer Enhancement)
 
 After v2.0:
 - **v2.1 Integrations** — ServiceTitan/Jobber/Housecall Pro API integrations for auto job import
@@ -302,5 +311,5 @@ After v2.0:
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 
 ---
-*Last updated: 2026-02-02 after v2.0 roadmap creation*
+*Last updated: 2026-02-02 after Phase 20 planning*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
