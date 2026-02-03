@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 **Phase:** Phase 20 - Database Migration & Customer Enhancement
-**Plan:** 06 of 7
-**Status:** In progress
-**Last activity:** 2026-02-03 -- Completed 20-06-PLAN.md
+**Plan:** 07 of 7
+**Status:** Phase complete
+**Last activity:** 2026-02-03 -- Completed 20-07-PLAN.md
 
-**Progress:** [████████████████████████████████░░░░░░░] 89/93+ total plans complete
+**Progress:** [████████████████████████████████░░░░░░░] 90/93+ total plans complete
 
 ```
 v1.0 MVP:           ████████████████████████████████████████████████ 48/48 SHIPPED
@@ -26,7 +26,7 @@ Phase 20 Layout:    ██ 2/2 COMPLETE (v1.3)
 Phase 21 Preview:   ██ 2/2 COMPLETE (v1.3)
 Phase 22 Drawers:   ███ 3/3 COMPLETE (v1.3)
 Phase 25 Story:     ██ 2/2 COMPLETE (v1.4)
-v2.0 (Ph 20-29):    ███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 6/TBD IN PROGRESS
+v2.0 (Ph 20-29):    ████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 7/TBD IN PROGRESS
 ```
 
 ## What's Been Built
@@ -102,6 +102,8 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 | 10-phase-structure | 76 requirements across 10 phases (20-29) | Balanced depth (standard config), natural delivery boundaries | 2026-02-02 |
 | compatibility-view-pattern | Create view 'contacts' as SELECT * FROM customers during table rename | Allows safe rollback during migration window, zero-downtime migration | 2026-02-03 |
 | csv-phone-best-effort | CSV import uses best-effort phone parsing (invalid phones don't block import) | Better UX - import succeeds, user fixes phone issues after via review workflow | 2026-02-03 |
+| sms-consent-drawer-only | SMS consent status editable only in drawer, read-only in edit form | Prevents accidental audit trail corruption, forces deliberate consent changes | 2026-02-03 |
+| timezone-auto-detect | Auto-detect timezone from browser Intl API on customer creation | Prepares for Phase 21 quiet hours enforcement, defaults to America/New_York | 2026-02-03 |
 
 ## Open Questions
 
@@ -136,6 +138,7 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 - [ ] Design message_templates migration strategy
 
 ### Recent Changes
+- 2026-02-03: Phase 20-07 complete (SMS consent UI with TCPA audit trail and timezone capture)
 - 2026-02-03: Phase 20-06 complete (CSV import phone handling with review workflow)
 - 2026-02-03: Phase 20-05 complete (customer detail drawer with notes and tags)
 - 2026-02-03: Phase 20-04 complete (contacts→customers terminology migration)
@@ -150,9 +153,9 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 ## Session Continuity
 
 **Last session:** 2026-02-03
-**Stopped at:** Completed 20-06-PLAN.md (CSV import phone handling)
-**Resume file:** .planning/phases/20-database-migration-customer-enhancement/20-06-SUMMARY.md
-**Next action:** Execute 20-07-PLAN.md (A2P 10DLC registration) if available
+**Stopped at:** Completed 20-07-PLAN.md (SMS consent UI and timezone capture)
+**Resume file:** .planning/phases/20-database-migration-customer-enhancement/20-07-SUMMARY.md
+**Next action:** Phase 20 complete - ready for Phase 21 (SMS Foundation)
 
 **Key context for next session:**
 - Phase 20 is migration + customer enhancement + A2P registration (7 requirements)
