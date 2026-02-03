@@ -19,8 +19,6 @@ export function TagBadge({
   selected = false,
   className,
 }: TagBadgeProps) {
-  const isPreset = PRESET_TAGS.includes(tag)
-
   return (
     <span
       onClick={onClick}

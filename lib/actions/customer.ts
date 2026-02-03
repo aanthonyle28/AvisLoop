@@ -20,6 +20,14 @@ export type BulkCreateResult = {
     created: number
     skipped: number
     duplicates: string[]  // List of duplicate emails that were skipped
+    phoneNeedsReview?: number  // Count of customers with invalid phone numbers
+    customersWithPhoneIssues?: Array<{
+      id: string
+      name: string
+      email: string
+      rawPhone: string
+      phoneStatus: 'invalid'
+    }>
   }
 }
 
@@ -124,6 +132,17 @@ export async function createCustomer(
   // Lowercase email for duplicate check and storage
   const normalizedEmail = email.toLowerCase()
 
+  // Parse and validate phone number
+  const { parseAndValidatePhone } = await import('@/lib/utils/phone')
+  const phoneResult = parseAndValidatePhone(phone)
+  const phoneE164 = phoneResult.e164 || null
+
+  // Extract timezone and SMS consent data
+  const timezone = (formData.get('timezone') as string) || 'America/New_York'
+  const smsConsented = formData.get('smsConsented') === 'true'
+  const smsConsentMethod = (formData.get('smsConsentMethod') as string) || null
+  const smsConsentNotes = (formData.get('smsConsentNotes') as string) || null
+
   // Check for duplicate email within this business
   const { data: existingCustomer } = await supabase
     .from('customers')
@@ -147,7 +166,16 @@ export async function createCustomer(
       business_id: business.id,
       name,
       email: normalizedEmail,
-      phone: phone || null,
+      phone: phoneE164,
+      phone_status: phoneResult.status,
+      timezone,
+      tags: [],
+      sms_consent_status: smsConsented ? 'opted_in' : 'unknown',
+      sms_consent_at: smsConsented ? new Date().toISOString() : null,
+      sms_consent_source: smsConsented ? 'manual' : null,
+      sms_consent_method: smsConsented ? smsConsentMethod : null,
+      sms_consent_notes: smsConsented ? smsConsentNotes : null,
+      sms_consent_captured_by: smsConsented ? user.id : null,
       status: 'active',
       send_count: 0,
     })
@@ -211,6 +239,11 @@ export async function updateCustomer(
   // Lowercase email for duplicate check and storage
   const normalizedEmail = email.toLowerCase()
 
+  // Parse and validate phone number
+  const { parseAndValidatePhone } = await import('@/lib/utils/phone')
+  const phoneResult = parseAndValidatePhone(phone)
+  const phoneE164 = phoneResult.e164 || null
+
   // Check for duplicate email within this business (excluding current customer)
   const { data: existingCustomer } = await supabase
     .from('customers')
@@ -234,7 +267,8 @@ export async function updateCustomer(
     .update({
       name,
       email: normalizedEmail,
-      phone: phone || null,
+      phone: phoneE164,
+      phone_status: phoneResult.status,
     })
     .eq('id', customerId)
 
@@ -407,7 +441,13 @@ export async function bulkDeleteCustomers(
  * Skips duplicates and returns summary of created/skipped customers.
  */
 export async function bulkCreateCustomers(
-  customers: Array<{ name: string; email: string; phone?: string }>
+  customers: Array<{
+    name: string
+    email: string
+    phone?: string | null
+    phoneE164?: string | null
+    phoneStatus?: 'valid' | 'invalid' | 'missing'
+  }>
 ): Promise<BulkCreateResult> {
   const supabase = await createClient()
 
@@ -417,10 +457,10 @@ export async function bulkCreateCustomers(
     return { error: 'You must be logged in to import customers' }
   }
 
-  // Get user's business
+  // Get user's business (with timezone)
   const { data: business, error: businessError } = await supabase
     .from('businesses')
-    .select('id')
+    .select('id, timezone')
     .eq('user_id', user.id)
     .single()
 
@@ -463,24 +503,51 @@ export async function bulkCreateCustomers(
   })
 
   // Insert remaining customers
+  let insertedCustomers: Array<{
+    id: string
+    name: string
+    email: string
+    phone: string | null
+    phone_status: string
+  }> = []
+
   if (customersToInsert.length > 0) {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('customers')
       .insert(
         customersToInsert.map(c => ({
           business_id: business.id,
           name: c.name,
           email: c.email,
-          phone: c.phone || null,
+          phone: c.phoneE164 || null,
+          phone_status: c.phoneStatus || 'missing',
+          timezone: business.timezone || 'America/New_York',
           status: 'active',
           send_count: 0,
+          tags: [],
+          sms_consent_status: 'unknown',
+          sms_consent_source: 'csv_import',
         }))
       )
+      .select('id, name, email, phone, phone_status')
 
     if (error) {
       return { error: error.message }
     }
+
+    insertedCustomers = data || []
   }
+
+  // Extract customers with phone issues
+  const customersWithPhoneIssues = insertedCustomers
+    .filter(c => c.phone_status === 'invalid')
+    .map(c => ({
+      id: c.id,
+      name: c.name,
+      email: c.email,
+      rawPhone: c.phone || '',
+      phoneStatus: 'invalid' as const
+    }))
 
   revalidatePath('/customers')
   return {
@@ -488,7 +555,9 @@ export async function bulkCreateCustomers(
     data: {
       created: customersToInsert.length,
       skipped: duplicates.length,
-      duplicates
+      duplicates,
+      phoneNeedsReview: customersWithPhoneIssues.length,
+      customersWithPhoneIssues
     }
   }
 }
@@ -710,4 +779,104 @@ export async function updateCustomerTags(
 
   revalidatePath('/customers')
   return { success: true }
+}
+
+/**
+ * Update customer phone number with validation.
+ */
+export async function updateCustomerPhone(
+  customerId: string,
+  phoneE164: string,
+  phoneStatus: 'valid' | 'invalid' | 'missing'
+): Promise<CustomerActionState> {
+  const supabase = await createClient()
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return { error: 'You must be logged in' }
+  }
+
+  const { error } = await supabase
+    .from('customers')
+    .update({
+      phone: phoneE164,
+      phone_status: phoneStatus,
+    })
+    .eq('id', customerId)
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  revalidatePath('/customers')
+  return { success: true }
+}
+
+/**
+ * Mark customer as email-only (no phone).
+ */
+export async function markCustomerEmailOnly(
+  customerId: string
+): Promise<CustomerActionState> {
+  const supabase = await createClient()
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return { error: 'You must be logged in' }
+  }
+
+  const { error } = await supabase
+    .from('customers')
+    .update({
+      phone: null,
+      phone_status: 'missing',
+    })
+    .eq('id', customerId)
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  revalidatePath('/customers')
+  return { success: true }
+}
+
+/**
+ * Get customers with phone issues for review.
+ */
+export async function getCustomersWithPhoneIssues(): Promise<Array<{
+  id: string
+  name: string
+  email: string
+  rawPhone: string
+}>> {
+  const supabase = await createClient()
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return []
+  }
+
+  const { data: business } = await supabase
+    .from('businesses')
+    .select('id')
+    .eq('user_id', user.id)
+    .single()
+
+  if (!business) {
+    return []
+  }
+
+  const { data: customers } = await supabase
+    .from('customers')
+    .select('id, name, email, phone')
+    .eq('business_id', business.id)
+    .eq('phone_status', 'invalid')
+
+  return (customers || []).map(c => ({
+    id: c.id,
+    name: c.name,
+    email: c.email,
+    rawPhone: c.phone || '',
+  }))
 }
