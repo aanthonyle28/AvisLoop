@@ -15,7 +15,9 @@ import { cn } from '@/lib/utils'
 interface CSVPreviewRow {
   name: string
   email: string
-  phone?: string
+  phone: string | null | undefined  // Accept both null and undefined
+  phoneE164?: string | null   // Optional for compatibility
+  phoneStatus?: 'valid' | 'invalid' | 'missing'  // Optional for compatibility
   isValid: boolean
   isDuplicate: boolean
   errors: string[]
