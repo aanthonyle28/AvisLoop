@@ -13,6 +13,10 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { format } from 'date-fns'
 import type { Customer } from '@/lib/types/database'
+import { formatPhoneDisplay } from '@/lib/utils/phone'
+import { TagList } from '@/components/ui/tag-badge'
+import { Copy, Envelope } from '@phosphor-icons/react'
+import { toast } from 'sonner'
 
 interface ColumnHandlers {
   onEdit: (customer: Customer) => void
@@ -60,6 +64,61 @@ export const createColumns = (handlers: ColumnHandlers): ColumnDef<Customer>[] =
     accessorKey: 'email',
     header: 'Email',
     cell: ({ row }) => <div className='text-muted-foreground'>{row.getValue('email')}</div>,
+  },
+
+  // Phone column
+  {
+    accessorKey: 'phone',
+    header: 'Phone',
+    cell: ({ row }) => {
+      const phone = row.original.phone
+      const phoneStatus = row.original.phone_status
+
+      if (!phone || phoneStatus === 'missing') {
+        return (
+          <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+            <Envelope className="h-3 w-3" />
+            Email-only
+          </span>
+        )
+      }
+
+      const formatted = formatPhoneDisplay(phone)
+
+      const handleCopy = async () => {
+        await navigator.clipboard.writeText(phone)
+        toast.success('Phone copied to clipboard')
+      }
+
+      return (
+        <div className="flex items-center gap-1">
+          <span className="font-mono text-sm">{formatted}</span>
+          <button
+            onClick={handleCopy}
+            className="p-1 hover:bg-muted rounded opacity-0 group-hover:opacity-100 transition-opacity"
+            title="Copy phone number"
+          >
+            <Copy className="h-3 w-3 text-muted-foreground" />
+          </button>
+        </div>
+      )
+    },
+  },
+
+  // Tags column
+  {
+    accessorKey: 'tags',
+    header: 'Tags',
+    cell: ({ row }) => {
+      const tags = row.original.tags || []
+      return <TagList tags={tags} className="max-w-[200px]" />
+    },
+    filterFn: (row, _id, filterValue: string[]) => {
+      if (!filterValue || filterValue.length === 0) return true
+      const tags = row.original.tags || []
+      // OR filter: show if customer has ANY selected tag
+      return filterValue.some(tag => tags.includes(tag))
+    },
   },
 
   // Status column with badge
