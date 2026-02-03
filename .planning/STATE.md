@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 **Phase:** Phase 20 - Database Migration & Customer Enhancement
-**Plan:** 01 of 7
+**Plan:** 06 of 7
 **Status:** In progress
-**Last activity:** 2026-02-03 -- Completed 20-01-PLAN.md
+**Last activity:** 2026-02-03 -- Completed 20-06-PLAN.md
 
-**Progress:** [████████████████████████████████░░░░░░░] 84/93+ total plans complete
+**Progress:** [████████████████████████████████░░░░░░░] 89/93+ total plans complete
 
 ```
 v1.0 MVP:           ████████████████████████████████████████████████ 48/48 SHIPPED
@@ -26,7 +26,7 @@ Phase 20 Layout:    ██ 2/2 COMPLETE (v1.3)
 Phase 21 Preview:   ██ 2/2 COMPLETE (v1.3)
 Phase 22 Drawers:   ███ 3/3 COMPLETE (v1.3)
 Phase 25 Story:     ██ 2/2 COMPLETE (v1.4)
-v2.0 (Ph 20-29):    ███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 3/TBD IN PROGRESS
+v2.0 (Ph 20-29):    ███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 6/TBD IN PROGRESS
 ```
 
 ## What's Been Built
@@ -101,6 +101,7 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 | phase-numbering-restart | Start v2.0 phases from 20 (overwrite old v1.3/v1.4 phases 20-26) | Clean slate for new milestone | 2026-02-02 |
 | 10-phase-structure | 76 requirements across 10 phases (20-29) | Balanced depth (standard config), natural delivery boundaries | 2026-02-02 |
 | compatibility-view-pattern | Create view 'contacts' as SELECT * FROM customers during table rename | Allows safe rollback during migration window, zero-downtime migration | 2026-02-03 |
+| csv-phone-best-effort | CSV import uses best-effort phone parsing (invalid phones don't block import) | Better UX - import succeeds, user fixes phone issues after via review workflow | 2026-02-03 |
 
 ## Open Questions
 
@@ -135,10 +136,13 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 - [ ] Design message_templates migration strategy
 
 ### Recent Changes
+- 2026-02-03: Phase 20-06 complete (CSV import phone handling with review workflow)
+- 2026-02-03: Phase 20-05 complete (customer detail drawer with notes and tags)
+- 2026-02-03: Phase 20-04 complete (contacts→customers terminology migration)
+- 2026-02-03: Phase 20-03 complete (libphonenumber-js utilities and schemas)
+- 2026-02-03: Phase 20-02 complete (customer field enhancements)
 - 2026-02-03: Phase 20-01 complete (contacts table renamed to customers)
 - 2026-02-02: v2.0 roadmap created (76 requirements mapped to 10 phases)
-- 2026-02-02: Requirements defined (14 categories, 76 total)
-- 2026-02-02: Research completed (STACK, FEATURES, ARCHITECTURE, PITFALLS synthesized)
 
 ### Known Issues
 - None (v1.0-v1.4 shipped clean)
@@ -146,9 +150,9 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 ## Session Continuity
 
 **Last session:** 2026-02-03
-**Stopped at:** Completed 20-01-PLAN.md (database table rename)
-**Resume file:** .planning/phases/20-database-migration-customer-enhancement/20-01-SUMMARY.md
-**Next action:** Execute 20-02-PLAN.md (customer field enhancements)
+**Stopped at:** Completed 20-06-PLAN.md (CSV import phone handling)
+**Resume file:** .planning/phases/20-database-migration-customer-enhancement/20-06-SUMMARY.md
+**Next action:** Execute 20-07-PLAN.md (A2P 10DLC registration) if available
 
 **Key context for next session:**
 - Phase 20 is migration + customer enhancement + A2P registration (7 requirements)
