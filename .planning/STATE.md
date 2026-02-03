@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 **Phase:** Phase 20 - Database Migration & Customer Enhancement
-**Plan:** 03 of 7
+**Plan:** 01 of 7
 **Status:** In progress
-**Last activity:** 2026-02-03 -- Completed 20-03-PLAN.md
+**Last activity:** 2026-02-03 -- Completed 20-01-PLAN.md
 
-**Progress:** [████████████████████████████████░░░░░░░] 86/93+ total plans complete
+**Progress:** [████████████████████████████████░░░░░░░] 84/93+ total plans complete
 
 ```
 v1.0 MVP:           ████████████████████████████████████████████████ 48/48 SHIPPED
@@ -100,9 +100,7 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 | reuse-what-fits | Keep working components (badges, drawers, preview), replace what changes | Preserve investment in Phase 19-25 work | 2026-02-02 |
 | phase-numbering-restart | Start v2.0 phases from 20 (overwrite old v1.3/v1.4 phases 20-26) | Clean slate for new milestone | 2026-02-02 |
 | 10-phase-structure | 76 requirements across 10 phases (20-29) | Balanced depth (standard config), natural delivery boundaries | 2026-02-02 |
-| libphonenumber-js | Use libphonenumber-js over google-libphonenumber | Smaller bundle (145KB vs 550KB), TypeScript types included | 2026-02-03 |
-| phone-optional | Phone field is optional in customer forms | Empty phone returns valid with 'missing' status, supports optional field UX | 2026-02-03 |
-| csv-relaxed-validation | CSV import uses relaxed phone validation | Invalid phones flagged for review, not rejected - prevents blocking entire CSV | 2026-02-03 |
+| compatibility-view-pattern | Create view 'contacts' as SELECT * FROM customers during table rename | Allows safe rollback during migration window, zero-downtime migration | 2026-02-03 |
 
 ## Open Questions
 
@@ -137,8 +135,6 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 - [ ] Design message_templates migration strategy
 
 ### Recent Changes
-- 2026-02-03: Phase 20-03 complete (phone validation utilities and customer schemas)
-- 2026-02-03: Phase 20-02 complete (customer schema enhancements - phone, tags, SMS)
 - 2026-02-03: Phase 20-01 complete (contacts table renamed to customers)
 - 2026-02-02: v2.0 roadmap created (76 requirements mapped to 10 phases)
 - 2026-02-02: Requirements defined (14 categories, 76 total)
@@ -150,9 +146,9 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 ## Session Continuity
 
 **Last session:** 2026-02-03
-**Stopped at:** Completed 20-03-PLAN.md (phone validation & customer schemas)
-**Resume file:** .planning/phases/20-database-migration-customer-enhancement/20-03-SUMMARY.md
-**Next action:** Execute 20-04-PLAN.md (customer API routes)
+**Stopped at:** Completed 20-01-PLAN.md (database table rename)
+**Resume file:** .planning/phases/20-database-migration-customer-enhancement/20-01-SUMMARY.md
+**Next action:** Execute 20-02-PLAN.md (customer field enhancements)
 
 **Key context for next session:**
 - Phase 20 is migration + customer enhancement + A2P registration (7 requirements)
