@@ -180,90 +180,104 @@ Deferred to later milestones. Captured for traceability.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CUST-01 | TBD | Pending |
-| CUST-02 | TBD | Pending |
-| CUST-03 | TBD | Pending |
-| CUST-04 | TBD | Pending |
-| JOBS-01 | TBD | Pending |
-| JOBS-02 | TBD | Pending |
-| JOBS-03 | TBD | Pending |
-| JOBS-04 | TBD | Pending |
-| JOBS-05 | TBD | Pending |
-| JOBS-06 | TBD | Pending |
-| SMS-01 | TBD | Pending |
-| SMS-02 | TBD | Pending |
-| SMS-03 | TBD | Pending |
-| SMS-04 | TBD | Pending |
-| SMS-05 | TBD | Pending |
-| SMS-06 | TBD | Pending |
-| SMS-07 | TBD | Pending |
-| SMS-08 | TBD | Pending |
-| SMS-09 | TBD | Pending |
-| CAMP-01 | TBD | Pending |
-| CAMP-02 | TBD | Pending |
-| CAMP-03 | TBD | Pending |
-| CAMP-04 | TBD | Pending |
-| CAMP-05 | TBD | Pending |
-| CAMP-06 | TBD | Pending |
-| CAMP-07 | TBD | Pending |
-| CAMP-08 | TBD | Pending |
-| LLM-01 | TBD | Pending |
-| LLM-02 | TBD | Pending |
-| LLM-03 | TBD | Pending |
-| LLM-04 | TBD | Pending |
-| LLM-05 | TBD | Pending |
-| LLM-06 | TBD | Pending |
-| LLM-07 | TBD | Pending |
-| LLM-08 | TBD | Pending |
-| LLM-09 | TBD | Pending |
-| LLM-10 | TBD | Pending |
-| LLM-11 | TBD | Pending |
-| REVW-01 | TBD | Pending |
-| REVW-02 | TBD | Pending |
-| REVW-03 | TBD | Pending |
-| REVW-04 | TBD | Pending |
-| DASH-01 | TBD | Pending |
-| DASH-02 | TBD | Pending |
-| DASH-03 | TBD | Pending |
-| DASH-04 | TBD | Pending |
-| DASH-05 | TBD | Pending |
-| ONBD-01 | TBD | Pending |
-| ONBD-02 | TBD | Pending |
-| ONBD-03 | TBD | Pending |
-| ONBD-04 | TBD | Pending |
-| ONBD-05 | TBD | Pending |
-| ONBD-06 | TBD | Pending |
-| ONBD-07 | TBD | Pending |
-| NAV-01 | TBD | Pending |
-| NAV-02 | TBD | Pending |
-| TMPL-01 | TBD | Pending |
-| TMPL-02 | TBD | Pending |
-| TMPL-03 | TBD | Pending |
-| TMPL-04 | TBD | Pending |
-| SVCT-01 | TBD | Pending |
-| SVCT-02 | TBD | Pending |
-| SVCT-03 | TBD | Pending |
-| SVCT-04 | TBD | Pending |
-| DLVR-01 | TBD | Pending |
-| DLVR-02 | TBD | Pending |
-| DLVR-03 | TBD | Pending |
-| COMP-01 | TBD | Pending |
-| COMP-02 | TBD | Pending |
-| COMP-03 | TBD | Pending |
-| COMP-04 | TBD | Pending |
-| OPS-01 | TBD | Pending |
-| OPS-02 | TBD | Pending |
-| OPS-03 | TBD | Pending |
-| AGCY-01 | TBD | Pending |
-| AGCY-02 | TBD | Pending |
-| AGCY-03 | TBD | Pending |
-| LAND-01 | TBD | Pending |
-| LAND-02 | TBD | Pending |
+| CUST-01 | Phase 20 | Pending |
+| CUST-02 | Phase 20 | Pending |
+| CUST-03 | Phase 20 | Pending |
+| CUST-04 | Phase 20 | Pending |
+| SMS-02 | Phase 20 | Pending |
+| SMS-03 | Phase 20 | Pending |
+| COMP-01 | Phase 20 | Pending |
+| SMS-01 | Phase 21 | Pending |
+| SMS-04 | Phase 21 | Pending |
+| SMS-05 | Phase 21 | Pending |
+| SMS-06 | Phase 21 | Pending |
+| SMS-07 | Phase 21 | Pending |
+| SMS-08 | Phase 21 | Pending |
+| SMS-09 | Phase 21 | Pending |
+| COMP-04 | Phase 21 | Pending |
+| DLVR-02 | Phase 21 | Pending |
+| JOBS-01 | Phase 22 | Pending |
+| JOBS-02 | Phase 22 | Pending |
+| JOBS-03 | Phase 22 | Pending |
+| JOBS-04 | Phase 22 | Pending |
+| JOBS-05 | Phase 22 | Pending |
+| JOBS-06 | Phase 22 | Pending |
+| SVCT-01 | Phase 22 | Pending |
+| SVCT-02 | Phase 22 | Pending |
+| SVCT-03 | Phase 22 | Pending |
+| SVCT-04 | Phase 22 | Pending |
+| TMPL-01 | Phase 23 | Pending |
+| TMPL-02 | Phase 23 | Pending |
+| TMPL-03 | Phase 23 | Pending |
+| TMPL-04 | Phase 23 | Pending |
+| CAMP-01 | Phase 24 | Pending |
+| CAMP-02 | Phase 24 | Pending |
+| CAMP-03 | Phase 24 | Pending |
+| CAMP-04 | Phase 24 | Pending |
+| CAMP-05 | Phase 24 | Pending |
+| CAMP-06 | Phase 24 | Pending |
+| CAMP-07 | Phase 24 | Pending |
+| CAMP-08 | Phase 24 | Pending |
+| OPS-03 | Phase 24 | Pending |
+| COMP-03 | Phase 24 | Pending |
+| LLM-01 | Phase 25 | Pending |
+| LLM-02 | Phase 25 | Pending |
+| LLM-03 | Phase 25 | Pending |
+| LLM-04 | Phase 25 | Pending |
+| LLM-05 | Phase 25 | Pending |
+| LLM-06 | Phase 25 | Pending |
+| LLM-07 | Phase 25 | Pending |
+| LLM-08 | Phase 25 | Pending |
+| LLM-09 | Phase 25 | Pending |
+| LLM-10 | Phase 25 | Pending |
+| LLM-11 | Phase 25 | Pending |
+| REVW-01 | Phase 26 | Pending |
+| REVW-02 | Phase 26 | Pending |
+| REVW-03 | Phase 26 | Pending |
+| REVW-04 | Phase 26 | Pending |
+| COMP-02 | Phase 26 | Pending |
+| DASH-01 | Phase 27 | Pending |
+| DASH-02 | Phase 27 | Pending |
+| DASH-03 | Phase 27 | Pending |
+| DASH-04 | Phase 27 | Pending |
+| DASH-05 | Phase 27 | Pending |
+| NAV-01 | Phase 27 | Pending |
+| NAV-02 | Phase 27 | Pending |
+| OPS-01 | Phase 27 | Pending |
+| OPS-02 | Phase 27 | Pending |
+| ONBD-01 | Phase 28 | Pending |
+| ONBD-02 | Phase 28 | Pending |
+| ONBD-03 | Phase 28 | Pending |
+| ONBD-04 | Phase 28 | Pending |
+| ONBD-05 | Phase 28 | Pending |
+| ONBD-06 | Phase 28 | Pending |
+| ONBD-07 | Phase 28 | Pending |
+| DLVR-01 | Phase 28 | Pending |
+| DLVR-03 | Phase 28 | Pending |
+| AGCY-01 | Phase 29 | Pending |
+| AGCY-02 | Phase 29 | Pending |
+| AGCY-03 | Phase 29 | Pending |
+| LAND-01 | Phase 29 | Pending |
+| LAND-02 | Phase 29 | Pending |
 
 **Coverage:**
 - v2.0 requirements: 76 total across 14 categories
-- Unmapped: 0 (all will be mapped by roadmapper)
+- Mapped: 76/76 (100% coverage)
+- Phases: 20-29 (10 phases)
+
+**Coverage validation:**
+- Phase 20: 7 requirements (CUST-01, CUST-02, CUST-03, CUST-04, SMS-02, SMS-03, COMP-01)
+- Phase 21: 9 requirements (SMS-01, SMS-04, SMS-05, SMS-06, SMS-07, SMS-08, SMS-09, COMP-04, DLVR-02)
+- Phase 22: 10 requirements (JOBS-01 to JOBS-06, SVCT-01 to SVCT-04)
+- Phase 23: 4 requirements (TMPL-01 to TMPL-04)
+- Phase 24: 10 requirements (CAMP-01 to CAMP-08, OPS-03, COMP-03)
+- Phase 25: 11 requirements (LLM-01 to LLM-11)
+- Phase 26: 5 requirements (REVW-01 to REVW-04, COMP-02)
+- Phase 27: 9 requirements (DASH-01 to DASH-05, NAV-01, NAV-02, OPS-01, OPS-02)
+- Phase 28: 9 requirements (ONBD-01 to ONBD-07, DLVR-01, DLVR-03)
+- Phase 29: 5 requirements (AGCY-01 to AGCY-03, LAND-01, LAND-02)
+- Total: 76 requirements (no orphans, no duplicates)
 
 ---
 *Requirements defined: 2026-02-02*
-*Last updated: 2026-02-02*
+*Last updated: 2026-02-02 (traceability mapped to v2.0 phases 20-29)*

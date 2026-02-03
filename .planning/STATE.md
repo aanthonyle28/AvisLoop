@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 
 ## Current Position
 
-**Phase:** Not started (defining requirements)
+**Phase:** Phase 20 - Database Migration & Customer Enhancement
 **Plan:** --
-**Status:** Defining requirements
-**Last activity:** 2026-02-02 -- Milestone v2.0 started
+**Status:** Ready to plan
+**Last activity:** 2026-02-02 -- v2.0 roadmap created
 
-**Progress:** [██████████████████████████████░] 83/85+ total plans complete
+**Progress:** [████████████████████████████████░░░░░░░] 83/93+ total plans complete
 
 ```
 v1.0 MVP:           ████████████████████████████████████████████████ 48/48 SHIPPED
@@ -22,26 +22,24 @@ v1.1 Scheduled:     █████ 5/5 SHIPPED
 v1.2 Onboarding:    █████████ 9/9 SHIPPED
 v1.2.1 Tech Debt:   ████ 4/4 SHIPPED
 Phase 19 UX:        ████████ 8/8 COMPLETE
-Phase 20 Layout:    ██ 2/2 COMPLETE
-Phase 21 Preview:   ██ 2/2 COMPLETE
-Phase 22 Drawers:   ███ 3/3 COMPLETE
-Phase 25 Story:     ██ 2/2 COMPLETE
-v2.0 Redesign:      ░░░░░░░░░░░░░░░░░░░░ 0/TBD NOT STARTED
+Phase 20 Layout:    ██ 2/2 COMPLETE (v1.3)
+Phase 21 Preview:   ██ 2/2 COMPLETE (v1.3)
+Phase 22 Drawers:   ███ 3/3 COMPLETE (v1.3)
+Phase 25 Story:     ██ 2/2 COMPLETE (v1.4)
+v2.0 (Ph 20-29):    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 0/TBD NOT STARTED
 ```
 
 ## What's Been Built
 
-See .planning/MILESTONES.md for full history.
+See .planning/ROADMAP.md for full history.
 
-- **v1.0 MVP:** Auth, business profiles, contacts, sending, history, billing, onboarding, public pages, polish, bulk send
-- **v1.1 Scheduled Sending:** Cron processing, scheduling UI, scheduled send management
-- **v1.2 Onboarding Redesign:** Design system overhaul, dashboard redesign, Google OAuth, simplified onboarding
-- **v1.2.1 Tech Debt:** Migration fix, Phase 4 verification, code cleanup, history pagination
-- **Phase 19 UX/UI Redesign:** Send-first dashboard, 3-page nav, onboarding drawer, stat/activity strips, request detail drawer
-- **Phase 20 Layout Fixes:** Unified status badges, sticky settings header, optimized activity strip layout
-- **Phase 21 Email Preview:** Compact always-visible snippet, full preview modal with resolved variables, "Create Template" dropdown navigation
-- **Phase 22 Detail Drawers:** Contact notes foundation (DB column, Textarea component, server action), send page request drawer with inline resend, contact detail drawer with auto-saving notes
-- **Phase 25 Problem/Solution Storytelling:** PAS-framework empathy section, 3-step How It Works walkthrough, outcome cards with proof points, scroll-triggered animated statistics
+**v1.0 through v1.4 (shipped):**
+- Auth, business profiles, contacts, sending, history, billing, onboarding, public pages
+- Scheduled sending with cron processing
+- Design system overhaul, Google OAuth, simplified onboarding
+- Send-first dashboard with 3-page nav, stat/activity strips, request detail drawer
+- Unified status badges, email preview (compact + full modal), contact detail drawers
+- Landing page problem/solution storytelling sections
 
 **Reusable components for v2.0:**
 - StatusBadge component (Figma-spec colors/icons)
@@ -52,19 +50,41 @@ See .planning/MILESTONES.md for full history.
 - Textarea component
 - Design system (CSS variables, dark mode, Phosphor icons, Kumbh Sans)
 
+**v2.0 Roadmap (Phases 20-29):**
+- Phase 20: Database Migration & Customer Enhancement (customers table, phone, tags, SMS fields, A2P registration, timezone)
+- Phase 21: SMS Foundation & Compliance (Twilio sending, STOP handling, quiet hours, webhook verification)
+- Phase 22: Jobs CRUD & Service Types (jobs table, service taxonomy, completion triggers, timing defaults)
+- Phase 23: Message Templates & Migration (unified email+SMS templates, channel selector, migration)
+- Phase 24: Multi-Touch Campaign Engine (preset sequences, enrollment, cron processing, analytics)
+- Phase 25: LLM Personalization (Vercel AI SDK, GPT-4o-mini, guardrails, fallback)
+- Phase 26: Review Funnel (satisfaction filter, conditional routing, feedback storage)
+- Phase 27: Dashboard Redesign (pipeline KPIs, ready-to-send queue, attention alerts, quick actions, to-do list)
+- Phase 28: Onboarding Redesign (services offered, software used, default campaign, SMS opt-in)
+- Phase 29: Agency-Mode Readiness & Landing Page (multi-location schema, performance reports, playbooks, copy updates)
+
 ## Tech Stack
 
 Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, Resend, Stripe, Upstash Redis, Phosphor Icons, Kumbh Sans, react-countup
 
-**New for v2.0:** Twilio (SMS), Vercel AI SDK (LLM), OpenAI GPT-4o-mini, Anthropic Claude Haiku (fallback)
+**New for v2.0:** Twilio (SMS), Vercel AI SDK (LLM), OpenAI GPT-4o-mini, Anthropic Claude Haiku (fallback), date-fns-tz
 
 ## Blockers & Concerns
 
-- Resend FROM email domain verification needed for production
-- Google OAuth provider must be configured in Supabase dashboard
-- CRON_SECRET env var must be set before deployment
-- Twilio account + A2P 10DLC registration needed for SMS
-- Vercel AI SDK requires OPENAI_API_KEY and ANTHROPIC_API_KEY env vars
+**Pre-Phase 21 blockers:**
+- Twilio account setup required
+- A2P 10DLC brand registration (2-4 weeks approval time) -- CRITICAL PATH
+- A2P 10DLC campaign registration -- must complete before Phase 21 starts
+- TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN env vars
+
+**Pre-Phase 25 blockers:**
+- OPENAI_API_KEY env var (GPT-4o-mini)
+- ANTHROPIC_API_KEY env var (Claude Haiku fallback)
+
+**Production deployment blockers (unchanged):**
+- Resend FROM email domain verification
+- Google OAuth provider configured in Supabase dashboard
+- CRON_SECRET env var
+- Stripe production keys
 
 ## Decisions
 
@@ -78,10 +98,59 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 | preset-plus-customize | Campaign presets (conservative/standard/aggressive) + duplicate & edit | Best of both: quick start + full control | 2026-02-02 |
 | jobs-basic-crud | Jobs with list/add/edit/delete, service type, status, customer link | Minimal but functional job tracking for v2.0 | 2026-02-02 |
 | reuse-what-fits | Keep working components (badges, drawers, preview), replace what changes | Preserve investment in Phase 19-25 work | 2026-02-02 |
+| phase-numbering-restart | Start v2.0 phases from 20 (overwrite old v1.3/v1.4 phases 20-26) | Clean slate for new milestone | 2026-02-02 |
+| 10-phase-structure | 76 requirements across 10 phases (20-29) | Balanced depth (standard config), natural delivery boundaries | 2026-02-02 |
+
+## Open Questions
+
+**Phase 20 (Migration):**
+- Existing customers migration: email opt-in campaign vs. SMS disabled by default?
+- Job status workflow: does "complete" mean technician-complete or office-verified?
+
+**Phase 21 (SMS):**
+- Double opt-in vs. single opt-in for SMS consent?
+- Twilio number provisioning: shared number or per-business numbers?
+
+**Phase 24 (Campaigns):**
+- Campaign timing defaults: validate 24h/72h/168h with customer interviews?
+- Multi-day job handling: project_id field vs. customer_id grouping?
+
+**Phase 25 (LLM):**
+- Model quality: GPT-4o-mini sufficient or need GPT-4o? (A/B test during implementation)
+- Cost budget: $50/month per business acceptable?
+
+**Phase 26 (Review Funnel):**
+- Transparency: should customer know routing is based on rating?
+- Notification: who gets notified on negative feedback (owner, manager, technician)?
+
+## Accumulated Context
+
+### Todos
+- [ ] Plan Phase 20 (Database Migration & Customer Enhancement)
+- [ ] Start Twilio A2P 10DLC registration (2-4 week lead time)
+- [ ] Design customer tags UI/UX
+- [ ] Design jobs table schema and RLS policies
+- [ ] Design campaign_enrollments schema
+- [ ] Design message_templates migration strategy
+
+### Recent Changes
+- 2026-02-02: v2.0 roadmap created (76 requirements mapped to 10 phases)
+- 2026-02-02: Requirements defined (14 categories, 76 total)
+- 2026-02-02: Research completed (STACK, FEATURES, ARCHITECTURE, PITFALLS synthesized)
+- 2026-02-02: Phase 25 (v1.4) storytelling sections shipped
+
+### Known Issues
+- None (v1.0-v1.4 shipped clean)
 
 ## Session Continuity
 
 **Last session:** 2026-02-02
-**Stopped at:** Milestone v2.0 started, defining requirements
-**Resume file:** None
-**Next action:** Research domain ecosystem, then define requirements
+**Stopped at:** v2.0 roadmap created, ready to plan Phase 20
+**Resume file:** .planning/ROADMAP.md
+**Next action:** /gsd:plan-phase 20
+
+**Key context for next session:**
+- Phase 20 is migration + customer enhancement + A2P registration (7 requirements)
+- A2P registration is critical path blocker (must complete before Phase 21)
+- Reuse existing contact patterns, extend with phone/tags/SMS fields
+- Customer timezone needed for quiet hours compliance in Phase 21

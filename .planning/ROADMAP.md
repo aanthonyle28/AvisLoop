@@ -2,7 +2,7 @@
 
 ## Overview
 
-AvisLoop is a review request SaaS for local service businesses. All planned milestones through v1.2.1 and Phase 19 are shipped. Milestone v1.3 focuses on dashboard UX polish: unified status badges, email preview refinements, detail drawers for contacts and requests, and onboarding setup improvements. Milestone v1.4 redesigns marketing pages (homepage, pricing) with creative, unique, high-converting layouts -- moving beyond template-like patterns to a distinctive brand experience that drives signups.
+AvisLoop is a review follow-up system for home service businesses. v1.0 through Phase 25 are shipped. Milestone v2.0 transforms AvisLoop from a single-send review request tool into a multi-touch follow-up system with SMS, campaigns/sequences, jobs, LLM personalization, and redesigned dashboard/onboarding/landing page.
 
 ## Milestones
 
@@ -11,8 +11,9 @@ AvisLoop is a review request SaaS for local service businesses. All planned mile
 - **v1.2 Onboarding Redesign + Google Auth** - Phases 15-16 (shipped 2026-01-30) — [Archive](milestones/v1.2-ROADMAP.md)
 - **v1.2.1 Tech Debt Closure** - Phases 17-18 (shipped 2026-02-01) — [Archive](milestones/v1.2.1-ROADMAP.md)
 - **Phase 19 UX/UI Redesign** - Phase 19 (shipped 2026-02-01)
-- **v1.3 Dashboard UX Overhaul & Onboarding Polish** - Phases 20-23 (in progress)
-- **v1.4 Landing Page Redesign** - Phases 24-27 (ready to plan)
+- **v1.3 Dashboard UX Overhaul** - Phases 20-22 (shipped 2026-02-02)
+- **v1.4 Landing Page Redesign** - Phase 25 (shipped 2026-02-02)
+- **v2.0 Review Follow-Up System** - Phases 20-29 (in progress)
 
 ## Phases
 
@@ -62,9 +63,9 @@ AvisLoop is a review request SaaS for local service businesses. All planned mile
 </details>
 
 <details>
-<summary>Phase 19: UX/UI Redesign — Send-First Dashboard - COMPLETE 2026-02-01</summary>
+<summary>Phase 19: UX/UI Redesign - SHIPPED 2026-02-01</summary>
 
-- [x] 19-01-PLAN.md — Rebuild navigation and layout shell (3-item nav + account dropdown)
+- [x] 19-01-PLAN.md — Rebuild navigation and layout shell
 - [x] 19-02-PLAN.md — Loading states, skeletons, and actionable toast patterns
 - [x] 19-03-PLAN.md — Send page shell + Quick Send tab
 - [x] 19-04-PLAN.md — Onboarding setup progress pill and drawer
@@ -75,126 +76,193 @@ AvisLoop is a review request SaaS for local service businesses. All planned mile
 
 </details>
 
-### v1.3 Dashboard UX Overhaul & Onboarding Polish (Not Started)
+<details>
+<summary>v1.3 Dashboard UX Overhaul (Phases 20-22) - SHIPPED 2026-02-02</summary>
 
-**Milestone Goal:** Unify visual consistency (status badges), add detail drawers for contacts and inline request viewing, polish the email preview and template selection experience, and complete the onboarding setup flow.
+- [x] Phase 20: Status Badges & Layout Fixes (2 plans)
+- [x] Phase 21: Email Preview & Template Selection (2 plans)
+- [x] Phase 22: Detail Drawers (3 plans)
 
-- [x] **Phase 20: Status Badges & Layout Fixes** - Unified badge component + sticky settings nav + activity strip layout (complete 2026-02-01)
-- [x] **Phase 21: Email Preview & Template Selection** - Compact preview snippet, full preview modal, template dropdown with create option (complete 2026-02-01)
-- [x] **Phase 22: Detail Drawers** - Request drawer on send page, contact drawer on contacts page, resend with template selector, contact notes (complete 2026-02-02)
-- [ ] **Phase 23: Onboarding & Setup Polish** - Bonus credit, simplified checklist, completion banner, help & support menu
+</details>
+
+<details>
+<summary>v1.4 Landing Page Redesign (Phase 25) - SHIPPED 2026-02-02</summary>
+
+- [x] Phase 25: Problem/Solution Storytelling (2 plans)
+
+</details>
+
+### v2.0 Review Follow-Up System (Phases 20-29)
+
+**Milestone Goal:** Transform AvisLoop from a single-send review request tool into a multi-touch follow-up system for home service businesses — with SMS, campaigns/sequences, jobs, LLM personalization, and redesigned dashboard/onboarding/landing page.
+
+**Replaces:** Old v1.3/v1.4 phases 20-26 (new v2.0 milestone starts fresh from Phase 20)
+
+**Reusable from v1.0-v1.4:**
+- StatusBadge component (Phase 20)
+- Request/contact detail drawers (Phase 22)
+- Email preview components (Phase 21)
+- Template selector patterns
+- Design system (CSS variables, dark mode, Phosphor icons, Kumbh Sans)
+
+**Coverage:** 76 requirements across 14 categories
+
+---
+
+### Phase 20: Database Migration & Customer Enhancement
+**Goal**: Contacts table renamed to Customers, SMS opt-in fields added, A2P 10DLC registration complete, timezone support enabled.
+**Depends on**: Phase 19 (v1.0 shipped)
+**Requirements**: CUST-01, CUST-02, CUST-03, CUST-04, SMS-02, SMS-03, COMP-01
+**Success Criteria** (what must be TRUE):
+  1. User can view /customers page (renamed from /contacts) with phone number and tags columns visible
+  2. Customer records display phone number with US format validation (xxx-xxx-xxxx)
+  3. Customer records support multiple tags (VIP, repeat, commercial, residential, plus custom) with tag filter UI
+  4. Customer list filters by tag (clicking tag chip shows only tagged customers)
+  5. Each customer has sms_opt_in boolean, opt_in_date, opt_in_method, and opt_in_ip fields in database (UI in Phase 21)
+  6. Twilio A2P 10DLC brand and campaign registration approved (verified in Twilio Console before Phase 21 starts)
+  7. Customer timezone field populated from browser Intl API on creation with business timezone fallback
+**Plans**: TBD
+
+### Phase 21: SMS Foundation & Compliance
+**Goal**: Users can send SMS messages via Twilio with full TCPA compliance (opt-in tracking, STOP handling, quiet hours enforcement, webhook verification).
+**Depends on**: Phase 20 (A2P registration complete, SMS fields exist)
+**Requirements**: SMS-01, SMS-04, SMS-05, SMS-06, SMS-07, SMS-08, SMS-09, COMP-04, DLVR-02
+**Success Criteria** (what must be TRUE):
+  1. User can send manual SMS from /send page with channel selector (email/SMS toggle), message preview shows character count (160 GSM-7 limit)
+  2. SMS sending only enabled for customers with sms_opt_in = true and phone number present (graceful fallback to email if no phone)
+  3. Customer receives SMS from branded sender (business name in FROM field), message includes review link + opt-out footer
+  4. Customer can reply STOP/STOPALL/UNSUBSCRIBE/CANCEL/END/QUIT to opt out; Twilio webhook updates sms_opt_in = false and sends confirmation within 5 minutes
+  5. SMS messages outside 8am-9pm customer local time are queued and sent at next available window (date-fns-tz timezone conversion)
+  6. Twilio webhooks verify signature (twilio.validateRequest) and reject invalid requests with 403
+  7. send_logs table includes channel column (email/sms) and provider-specific IDs (Twilio message_sid or Resend email_id)
+  8. Failed SMS sends (Twilio down, invalid number) queue for retry with exponential backoff (3 attempts max, then mark failed)
+**Plans**: TBD
+
+### Phase 22: Jobs CRUD & Service Types
+**Goal**: Users can create jobs linked to customers with service type and completion status, enabling job-centric workflow and service-specific analytics.
+**Depends on**: Phase 20 (customers table exists)
+**Requirements**: JOBS-01, JOBS-02, JOBS-03, JOBS-04, JOBS-05, JOBS-06, SVCT-01, SVCT-02, SVCT-03, SVCT-04
+**Success Criteria** (what must be TRUE):
+  1. User can view /jobs page with list of all jobs (customer name, service type, status, completion date)
+  2. User can create job with customer selector (dropdown search), service type (HVAC/plumbing/electrical/cleaning/roofing/painting/handyman/other), and status (completed/do-not-send)
+  3. User can edit job details and mark job completed (completion timestamp saved, triggers campaign enrollment in Phase 24)
+  4. Each job links to exactly one customer (foreign key enforced, customer details visible in job view)
+  5. Job completion (status changed to completed) triggers campaign enrollment (when campaign exists for that service type)
+  6. Service taxonomy saved as business setting during onboarding (multi-select: "Which services do you offer?")
+  7. Each service type has default timing rules (HVAC: 24h, plumbing: 48h, electrical: 24h, cleaning: 4h, roofing: 72h) configurable in settings
+  8. Campaign creation for specific service type auto-applies timing defaults (can be overridden)
+  9. Analytics page displays response rate and review rate breakdowns by service type
+**Plans**: TBD
+
+### Phase 23: Message Templates & Migration
+**Goal**: Email and SMS messages use unified message_templates table with channel selector, replacing old email_templates.
+**Depends on**: Phase 21 (SMS sending works), Phase 19 (email sending works)
+**Requirements**: TMPL-01, TMPL-02, TMPL-03, TMPL-04
+**Success Criteria** (what must be TRUE):
+  1. message_templates table supports both email and SMS via channel column (email/sms discriminator)
+  2. User can create template with channel selector (email/SMS radio buttons), template form enforces SMS 160 character limit
+  3. Default templates exist for each service category (HVAC, plumbing, electrical, cleaning, roofing, painting, handyman, other) per channel
+  4. Existing email_templates migrated to message_templates with channel = email (backward compatible, no data loss)
+  5. Template preview shows appropriate rendering (email: subject + body + CTA button, SMS: body only with character count)
+  6. Campaign touch configuration references message_templates by ID (not email_templates)
+**Plans**: TBD
+
+### Phase 24: Multi-Touch Campaign Engine
+**Goal**: Users can create multi-touch campaigns (up to 4 touches) with preset sequences, enroll jobs on completion, and automatically stop on review/opt-out.
+**Depends on**: Phase 22 (jobs trigger enrollment), Phase 23 (templates ready), Phase 21 (SMS sending works)
+**Requirements**: CAMP-01, CAMP-02, CAMP-03, CAMP-04, CAMP-05, CAMP-06, CAMP-07, CAMP-08, OPS-03, COMP-03
+**Success Criteria** (what must be TRUE):
+  1. User can select campaign preset during onboarding or settings (conservative: 2 emails; standard: 2 emails + 1 SMS; aggressive: 2 emails + 2 SMS)
+  2. User can duplicate any campaign and customize touches (edit channel, timing delay, template)
+  3. Each campaign touch specifies channel (email/SMS), timing delay (hours/days after job completion), and template (max 4 touches per campaign)
+  4. Campaign automatically stops when: review completed, customer opted out (email or SMS), or campaign paused by business owner
+  5. campaign_enrollments table tracks job progression through campaign touches (active, paused, completed, stopped) with touch completion timestamps
+  6. Vercel Cron job processes campaign touches via claim_due_campaign_touches() RPC using FOR UPDATE SKIP LOCKED (prevents race conditions)
+  7. Campaign performance dashboard displays open/click/conversion rates per touch and per campaign (aggregated from send_logs)
+  8. Campaign creation allows service-type filtering ("only enroll HVAC jobs" or "all service types")
+  9. Send pacing controls limit sends per hour per business (default 100/hour, configurable in settings) to avoid spam flags
+  10. Campaign sends spread across time windows (throttle 100 sends over 60 minutes, not burst)
+**Plans**: TBD
+
+### Phase 25: LLM Personalization
+**Goal**: Campaign messages optionally personalized via GPT-4o-mini with guardrails, graceful fallback to templates, and cost tracking.
+**Depends on**: Phase 23 (templates exist), Phase 24 (campaigns send messages)
+**Requirements**: LLM-01, LLM-02, LLM-03, LLM-04, LLM-05, LLM-06, LLM-07, LLM-08, LLM-09, LLM-10, LLM-11
+**Success Criteria** (what must be TRUE):
+  1. Vercel AI SDK integrated with GPT-4o-mini primary model and Claude Haiku fallback on constraint violations
+  2. personalizeMessage() function injects customer name, service type, technician name, business name into template with structured prompt
+  3. Personalization level fixed at Medium (rewrite for tone/warmth, no invented details) — no UI slider
+  4. All customer input sanitized before LLM (prevent prompt injection: remove "ignore", "system:", special characters)
+  5. LLM output validated before storage (length under 2x template, no HTML/script tags, no invented URLs, all placeholders present)
+  6. Any LLM failure (timeout, invalid output, API error) falls back to raw template (never blocks sends)
+  7. LLM rewrite contract enforced: preserve all factual content (review link, opt-out language, business name, offer details if present)
+  8. Hard constraint: LLM may only rewrite approved templates using provided fields — cannot introduce new claims, discounts, promises, or invented job details
+  9. Auto-fallback triggers: timeout over 3s, output over 2x template length, missing required placeholders, profanity/inappropriate content
+  10. Campaign launch shows batch preview of 3-5 personalized message samples before confirming send
+  11. Rate limiting per business: 100 LLM calls/hour with cost tracking dashboard (estimated cost per month shown in settings)
+**Plans**: TBD
+
+### Phase 26: Review Funnel
+**Goal**: Review requests route through satisfaction filter (4-5 stars to Google, 1-3 stars to private feedback), preventing negative public reviews.
+**Depends on**: Phase 24 (campaigns send review links)
+**Requirements**: REVW-01, REVW-02, REVW-03, REVW-04, COMP-02
+**Success Criteria** (what must be TRUE):
+  1. Review link opens pre-qualification page with 1-5 star satisfaction rating (not Google directly)
+  2. Selecting 4-5 stars redirects to Google review link (business's actual Google Business Profile URL)
+  3. Selecting 1-3 stars shows private feedback form (not Google)
+  4. Private feedback stored in database with customer reference and business owner receives email notification on submission
+  5. Pre-qualification page frames as "share your experience" (not "leave a review if happy") to avoid review gating language
+  6. Feedback dashboard shows all private feedback with response workflow (mark as resolved, add notes)
+**Plans**: TBD
+
+### Phase 27: Dashboard Redesign
+**Goal**: Dashboard displays pipeline KPIs, ready-to-send queue, needs attention alerts, quick actions, and daily to-do list.
+**Depends on**: Phase 24 (campaign data exists), Phase 22 (jobs data exists)
+**Requirements**: DASH-01, DASH-02, DASH-03, DASH-04, DASH-05, NAV-01, NAV-02, OPS-01, OPS-02
+**Success Criteria** (what must be TRUE):
+  1. Dashboard displays pipeline KPIs widget (jobs ready to send count, active campaigns count, reviews this month count, response rate percentage)
+  2. Ready-to-send queue lists completed jobs not yet enrolled in campaign (with quick enroll action)
+  3. Needs attention alerts display failed sends, STOP requests, campaign issues, budget warnings with badge counts
+  4. Quick actions buttons: "Add Job", "Enroll in Campaign", "Send Manual Request" (no navigation, inline modals)
+  5. Daily to-do list shows prioritized action items (jobs to close out, follow-ups due today, issues to resolve) with completion checkboxes
+  6. Navigation restructured: Send/Queue, Customers, Jobs, Campaigns, Activity/History (5 items, no dashboard link)
+  7. Navigation badges show pending counts (queued sends count, attention items count)
+  8. Exception handling dashboard displays failed sends with retry action, webhook errors with logs, budget warnings with upgrade prompt
+  9. Daily to-do list items persist in database (user can dismiss/complete, reappear next day if not resolved)
+**Plans**: TBD
+
+### Phase 28: Onboarding Redesign
+**Goal**: New users complete setup wizard (business basics, review destination, services offered, software used, default campaign, import customers, SMS opt-in).
+**Depends on**: Phase 24 (campaigns exist), Phase 22 (service taxonomy exists), Phase 20 (customers with SMS fields)
+**Requirements**: ONBD-01, ONBD-02, ONBD-03, ONBD-04, ONBD-05, ONBD-06, ONBD-07, DLVR-01, DLVR-03
+**Success Criteria** (what must be TRUE):
+  1. Step 1 collects business basics (business name, phone number, Google review link)
+  2. Step 2 verifies review destination setup (Google review link validation with preview)
+  3. Step 3 collects services offered (multi-select from service taxonomy: HVAC, plumbing, electrical, etc.) with timing defaults auto-applied
+  4. Step 4 collects software used (ServiceTitan/Jobber/Housecall Pro/none) for future integrations (captured but not integrated yet)
+  5. Step 5 selects default campaign preset (conservative/standard/aggressive) and auto-creates campaign
+  6. Step 6 imports customers via CSV upload or manual add with phone number collection (SMS opt-in explanation shown)
+  7. SMS opt-in explanation during onboarding with consent capture (checkbox: "Customers consent to SMS messages")
+  8. SPF/DKIM/DMARC setup guidance checklist in settings (with verification status: pending/verified)
+  9. Branded short links for review URLs enabled (trust signal, not raw Google URL) using custom domain or bit.ly integration
+**Plans**: TBD
+
+### Phase 29: Agency-Mode Readiness & Landing Page
+**Goal**: Multi-location data model schema added (no UI yet), weekly performance reports auto-generated, campaign playbooks exportable, landing page copy updated for v2.0.
+**Depends on**: Phase 27 (analytics exist), Phase 24 (campaigns exist)
+**Requirements**: AGCY-01, AGCY-02, AGCY-03, LAND-01, LAND-02
+**Success Criteria** (what must be TRUE):
+  1. Multi-location data model schema added (business has location_id column, queries scoped by location_id) — no UI yet, schema-only
+  2. Weekly performance report auto-generated every Monday (sends count, opens count, reviews count, response rate) and emailed to business owner
+  3. Campaign playbooks exportable (download campaign config as JSON template, shareable across businesses)
+  4. Landing page copy updated for home services positioning ("Turn job completions into Google reviews automatically")
+  5. Existing homepage sections (hero, problem/solution, how it works, stats, outcome cards) updated with v2.0 messaging (multi-touch sequences, SMS, jobs workflow)
+  6. Landing page mentions SMS channel, multi-touch sequences, and job-centric workflow (not single-send contacts)
+**Plans**: TBD
 
 ## Phase Details
 
-### Phase 20: Status Badges & Layout Fixes
-**Goal**: Every status indicator across the app uses one consistent, Figma-spec badge component, and layout irritants (settings scroll, activity strip overflow) are resolved.
-**Depends on**: Phase 19 (complete)
-**Requirements**: BDGE-01, LAYO-01, LAYO-02
-**Success Criteria** (what must be TRUE):
-  1. Status badges on send page, history page, contacts page, drawers, and recent activity strip all render with identical colors, icons, and typography matching the Figma spec
-  2. Scrolling the settings page keeps the navbar visible and fixed at the top
-  3. Recent activity chips fill all available horizontal space before the View All button, with the last chip truncating gracefully when space runs out
-**Plans**: 2 plans
-Plans:
-- [x] 20-01-PLAN.md -- Rebuild StatusBadge with Figma-spec colors/icons + migrate scheduled-table
-- [x] 20-02-PLAN.md -- Sticky settings header + activity strip horizontal fill/truncation
-
-### Phase 21: Email Preview & Template Selection
-**Goal**: Users see a compact email confidence snippet before sending and can open a full rendered preview, and the template dropdown includes a shortcut to create new templates.
-**Depends on**: Phase 20 (badges used in preview context)
-**Requirements**: PREV-01, PREV-02, TMPL-01
-**Success Criteria** (what must be TRUE):
-  1. Below the compose area, a compact preview (80-140px) shows the subject line (1 line), body snippet (2-3 lines clamped), and a "View full email" link -- visible without scrolling or expanding a separate section
-  2. Clicking "View full email" opens a read-only modal displaying the subject, resolved body with contact name/variables filled in, a rendered review CTA button, footer text, and From/To header
-  3. Template dropdown on the send page lists all saved templates plus a "Create Template" option that navigates to the settings template page
-**Plans**: 2 plans
-Plans:
-- [x] 21-01-PLAN.md -- Compact preview snippet + full email preview modal
-- [x] 21-02-PLAN.md -- Template dropdown "Create Template" navigation option
-
-### Phase 22: Detail Drawers
-**Goal**: Users can inspect request details and contact details inline via drawers without leaving the current page.
-**Depends on**: Phase 20 (badges displayed in drawers)
-**Requirements**: DRWR-01, DRWR-02, DRWR-03, DRWR-04
-**Success Criteria** (what must be TRUE):
-  1. Clicking a recent activity chip on the send page opens the request detail drawer inline (no navigation to /history)
-  2. Clicking a contact row on the contacts page opens a detail drawer showing contact info, a notes field, and action items (send, edit, archive, view history)
-  3. The request detail drawer includes a resend option with a template selector dropdown
-  4. The contact detail drawer has an editable notes textbox; typing and saving persists the note to the database and it reappears on next open
-**Plans**: 3 plans
-Plans:
-- [x] 22-01-PLAN.md -- DB migration (notes column) + Textarea component + updateContactNotes action
-- [x] 22-02-PLAN.md -- Wire request detail drawer inline on send page
-- [x] 22-03-PLAN.md -- Contact detail drawer on contacts page with auto-saving notes
-
-### Phase 23: Onboarding & Setup Polish
-**Goal**: The onboarding setup flow is streamlined -- new users get a silent bonus credit, the checklist is simplified, completion is celebrated, and Help & Support is functional.
-**Depends on**: Phase 19 (complete) -- independent of Phases 20-22
-**Requirements**: ONBD-01, ONBD-02, ONBD-03, ONBD-04, ONBD-05
-**Success Criteria** (what must be TRUE):
-  1. A new user who completes onboarding has 1 extra send credit beyond their plan quota (added silently on the backend; the UI shows the standard quota number)
-  2. The setup checklist no longer includes a "create template" step; the only template-related action is choosing a template on the send page
-  3. After completing all checklist steps, the checklist is replaced by a "Setup Complete" banner with restart and finish options (restart resets checklist state, finish removes the banner permanently)
-  4. The Help & Support dropdown in the account menu includes a "Restart Setup Checklist" option that resets onboarding progress
-  5. The Help & Support menu item in the account dropdown is clickable and opens a functional dropdown submenu
-**Plans**: TBD
-
-### v1.4 Landing Page Redesign (Ready to Plan)
-
-**Milestone Goal:** Redesign all marketing pages (homepage, pricing) with creative, unique, high-converting layouts -- moving beyond template-like patterns to a distinctive brand experience that drives signups.
-
-- [ ] **Phase 24: Foundation & Hero** - Animation primitives + hero redesign + social proof strip
-- [ ] **Phase 25: Problem/Solution Storytelling** - Empathy section + how it works + stats
-- [ ] **Phase 26: Features, Testimonials & FAQ** - Benefit cards + testimonials + FAQ + final CTA
-- [ ] **Phase 27: Pricing, Nav/Footer & Polish** - Pricing redesign + nav/footer updates + mobile optimization
-
-### Phase 24: Foundation & Hero
-**Goal**: Visitors immediately understand the value proposition through an outcome-focused hero with animated product demo, and see social proof that builds trust within 5 seconds of landing.
-**Depends on**: Phase 19 (complete - design system established)
-**Requirements**: HERO-01, HERO-02, HERO-03, HERO-04, TECH-01, TECH-04
-**Success Criteria** (what must be TRUE):
-  1. Hero section displays a benefit-driven headline under 8 words that communicates "get more Google reviews in 2 minutes" value within 5 seconds of page load
-  2. Above-the-fold, an animated product demo shows the complete send flow (contact selection, message composition, send confirmation) using CSS scroll animations that work in dark mode and respect prefers-reduced-motion
-  3. Hero layout includes floating UI mockups with gradient effects, and the primary CTA ("Start Free Trial") is visible without scrolling
-  4. Immediately below the hero, a social proof strip displays "Trusted by X+ businesses" with visual logos or industry mentions (dentists, salons, contractors)
-  5. All new hero components use semantic color tokens (bg-card, text-foreground, border-border) and render correctly in both light and dark modes
-**Plans**: TBD
-
-### Phase 25: Problem/Solution Storytelling
-**Goal**: Visitors emotionally connect with review request pain points, see how AvisLoop solves them in 3 simple steps, and trust the solution through animated social proof statistics.
-**Depends on**: Phase 24 (animation primitives reused)
-**Requirements**: CONT-01, CONT-02, CONT-03, TRUST-02
-**Success Criteria** (what must be TRUE):
-  1. A problem/solution empathy section addresses specific review pain points (forgetting to ask, awkwardness of asking, complexity of existing tools) with emotional, relatable copy
-  2. A "How It Works" visual walkthrough shows 3 clear steps (Add contact, Write message, Send) with inline product screenshots or high-fidelity placeholders
-  3. Benefit-focused outcome cards communicate "Get more reviews," "Save time," and "No awkward asks" with supporting icons and copy (not feature lists)
-  4. Animated count-up statistics (reviews collected, businesses using, time saved) trigger on scroll into viewport and display real numbers
-**Plans**: 2 plans
-Plans:
-- [x] 25-01-PLAN.md -- ProblemSolutionSection (PAS empathy) + HowItWorksSection (3-step walkthrough)
-- [x] 25-02-PLAN.md -- OutcomeCardsSection + AnimatedStatsSection + landing page wiring
-
-### Phase 26: Features, Testimonials & FAQ
-**Goal**: Visitors see industry-specific social proof with outcome numbers, get common objections answered, and encounter the primary CTA again with risk-reversal messaging.
-**Depends on**: Phase 25 (storytelling flow complete)
-**Requirements**: TRUST-01, TRUST-03, TECH-05, TECH-06
-**Success Criteria** (what must be TRUE):
-  1. Industry-specific testimonials from different business types (dentist, salon, contractor) display specific outcome numbers ("Got 30 reviews in 2 weeks") with real photos or professional placeholders
-  2. A visual social proof bar replaces text-only brand names with business/industry logos that segment testimonials by type
-  3. FAQ section is redesigned with conversion-optimized placement and addresses key objections: setup time, email compatibility, response rates, and privacy concerns
-  4. Final CTA section repeats the primary CTA ("Start Free Trial") with social proof count and risk-reversal messaging ("No credit card required")
-**Plans**: TBD
-
-### Phase 27: Pricing, Nav/Footer & Polish
-**Goal**: Pricing page drives conversions through persuasive comparison layout, navigation and footer match the new creative direction, and all pages are mobile-first responsive with optimized performance.
-**Depends on**: Phase 26 (content sections complete)
-**Requirements**: TECH-02, TECH-03, TECH-07
-**Success Criteria** (what must be TRUE):
-  1. Pricing page displays a persuasive comparison layout with "Most Popular" tier highlighted, transparent pricing (no hidden fees), and risk-reversal copy ("Cancel anytime")
-  2. Navbar and footer are updated to match the new creative direction with consistent brand design system (colors, typography, spacing)
-  3. All new marketing components are mobile-first responsive with single-column stacking below 640px, 44px minimum touch targets, and optimized images (WebP format, blur placeholders)
-  4. Homepage and pricing page both achieve LCP under 2.5 seconds and CLS under 0.1 on 3G throttled mobile devices
-**Plans**: TBD
+See individual phase sections above for requirements, success criteria, and dependencies.
 
 ## Progress
 
@@ -205,24 +273,34 @@ Plans:
 | 15-16 | v1.2 | 9/9 | Complete | 2026-01-30 |
 | 17-18 | v1.2.1 | 4/4 | Complete | 2026-02-01 |
 | 19 | UX/UI Redesign | 8/8 | Complete | 2026-02-01 |
-| 20 | v1.3 | 2/2 | Complete | 2026-02-01 |
-| 21 | v1.3 | 2/2 | Complete | 2026-02-01 |
-| 22 | v1.3 | 3/3 | Complete | 2026-02-02 |
-| 23 | v1.3 | 0/TBD | Not started | - |
-| 24 | v1.4 | 0/TBD | Ready to plan | - |
-| 25 | v1.4 | 2/2 | Complete | 2026-02-02 |
-| 26 | v1.4 | 0/TBD | Not started | - |
-| 27 | v1.4 | 0/TBD | Not started | - |
+| 20 (v1.3) | Dashboard UX | 2/2 | Complete | 2026-02-01 |
+| 21 (v1.3) | Dashboard UX | 2/2 | Complete | 2026-02-01 |
+| 22 (v1.3) | Dashboard UX | 3/3 | Complete | 2026-02-02 |
+| 25 (v1.4) | Landing Page | 2/2 | Complete | 2026-02-02 |
+| **20 (v2.0)** | **Review Follow-Up** | **0/TBD** | **Not started** | **-** |
+| 21 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
+| 22 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
+| 23 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
+| 24 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
+| 25 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
+| 26 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
+| 27 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
+| 28 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
+| 29 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 
-**Total:** 27 phases, 82 plans complete (+ remaining v1.3 and v1.4 plans TBD).
+**Total:** 83 plans complete across shipped phases, 10 v2.0 phases planned.
 
 ## What's Next
 
-After v1.4:
-- **v2.0 SMS Channel** — Add Twilio SMS as second channel
-- **v2.0 Multi-Location** — Pro users manage multiple business locations
-- **v2.0 Analytics** — Send/open/click rate dashboards
-- **Production deployment** — Configure Resend, Google OAuth, Stripe for production
+**Current milestone:** v2.0 Review Follow-Up System (Phases 20-29)
+**Next action:** Plan Phase 20 (Database Migration & Customer Enhancement)
+
+After v2.0:
+- **v2.1 Integrations** — ServiceTitan/Jobber/Housecall Pro API integrations for auto job import
+- **v2.2 Review Inbox** — Ingest reviews from Google Business Profile, AI reply suggestions
+- **v3.0 Agency Mode** — Multi-business management UI, white-label option, client reporting portal
+- **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 
 ---
-*Last updated: 2026-02-02 after Phase 25 execution*
+*Last updated: 2026-02-02 after v2.0 roadmap creation*
+*v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
