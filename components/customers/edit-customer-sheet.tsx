@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
 import { updateCustomer, type CustomerActionState } from '@/lib/actions/customer'
 import type { Customer } from '@/lib/types/database'
+import { CheckCircle, Warning, Question } from '@phosphor-icons/react'
 
 interface EditCustomerSheetProps {
   customer: Customer | null
@@ -44,6 +45,18 @@ export function EditCustomerSheet({ customer, open, onOpenChange }: EditCustomer
   }, [customer])
 
   if (!customer) return null
+
+  // Format consent method for display
+  const formatConsentMethod = (method: string): string => {
+    const map: Record<string, string> = {
+      verbal_in_person: 'Verbal (in-person)',
+      phone_call: 'Phone call',
+      service_agreement: 'Service agreement',
+      website_form: 'Website form',
+      other: 'Other',
+    }
+    return map[method] || method
+  }
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -115,6 +128,47 @@ export function EditCustomerSheet({ customer, open, onOpenChange }: EditCustomer
               {isPending ? 'Saving...' : 'Save Changes'}
             </Button>
           </form>
+
+          <Separator />
+
+          {/* SMS Consent Status (Read-only) */}
+          <div>
+            <h3 className='font-medium mb-3'>SMS Consent</h3>
+            {customer.sms_consent_status === 'opted_in' && (
+              <div className='space-y-2'>
+                <div className='flex items-center gap-2 text-sm text-green-600 dark:text-green-400'>
+                  <CheckCircle className='h-4 w-4' />
+                  <span>Consented</span>
+                  {customer.sms_consent_at && (
+                    <span className='text-muted-foreground'>
+                      ({new Date(customer.sms_consent_at).toLocaleDateString()})
+                    </span>
+                  )}
+                </div>
+                {customer.sms_consent_method && (
+                  <div className='text-xs text-muted-foreground space-y-1'>
+                    <p>Method: {formatConsentMethod(customer.sms_consent_method)}</p>
+                    {customer.sms_consent_notes && <p>Notes: {customer.sms_consent_notes}</p>}
+                  </div>
+                )}
+              </div>
+            )}
+            {customer.sms_consent_status === 'opted_out' && (
+              <div className='flex items-center gap-2 text-sm text-red-600 dark:text-red-400'>
+                <Warning className='h-4 w-4' />
+                <span>Opted out</span>
+              </div>
+            )}
+            {customer.sms_consent_status === 'unknown' && (
+              <div className='flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400'>
+                <Question className='h-4 w-4' />
+                <span>SMS: Consent needed</span>
+              </div>
+            )}
+            <p className='text-xs text-muted-foreground mt-2'>
+              To update SMS consent, use the customer detail drawer.
+            </p>
+          </div>
 
           <Separator />
 

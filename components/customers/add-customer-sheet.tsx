@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useRef, useState } from 'react'
+import { useActionState, useEffect, useRef, useState } from 'react'
 import {
   Sheet,
   SheetContent,
@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { CheckCircle, Plus } from 'lucide-react'
 import { createCustomer, type CustomerActionState } from '@/lib/actions/customer'
+import { SmsConsentForm } from './sms-consent-form'
 
 interface AddCustomerSheetProps {
   open: boolean
@@ -23,6 +24,24 @@ export function AddCustomerSheet({ open, onOpenChange }: AddCustomerSheetProps) 
   const formRef = useRef<HTMLFormElement>(null)
   const [addAnother, setAddAnother] = useState(false)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [timezone, setTimezone] = useState('America/New_York')
+  const [smsConsent, setSmsConsent] = useState({
+    consented: false,
+    method: '',
+    notes: '',
+  })
+
+  // Detect timezone on mount
+  useEffect(() => {
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+      if (tz && tz.includes('/')) {
+        setTimezone(tz)
+      }
+    } catch {
+      // Use default
+    }
+  }, [])
 
   const [state, formAction, isPending] = useActionState<CustomerActionState | null, FormData>(
     async (prevState, formData) => {
@@ -49,6 +68,7 @@ export function AddCustomerSheet({ open, onOpenChange }: AddCustomerSheetProps) 
     if (isOpen) {
       formRef.current?.reset()
       setSuccessMessage(null)
+      setSmsConsent({ consented: false, method: '', notes: '' })
     }
     onOpenChange(isOpen)
   }
@@ -117,6 +137,22 @@ export function AddCustomerSheet({ open, onOpenChange }: AddCustomerSheetProps) 
                 <p className='text-sm text-red-500'>{state.fieldErrors.phone[0]}</p>
               )}
             </div>
+
+            {/* SMS Consent Section */}
+            <div className='pt-2'>
+              <SmsConsentForm
+                mode='inline'
+                onConsentChange={(consented, method, notes) => {
+                  setSmsConsent({ consented, method: method || '', notes: notes || '' })
+                }}
+              />
+            </div>
+
+            {/* Hidden fields for timezone and consent data */}
+            <input type='hidden' name='timezone' value={timezone} />
+            <input type='hidden' name='smsConsented' value={smsConsent.consented ? 'true' : 'false'} />
+            <input type='hidden' name='smsConsentMethod' value={smsConsent.method} />
+            <input type='hidden' name='smsConsentNotes' value={smsConsent.notes} />
 
             {state?.error && (
               <p className='text-sm text-red-500'>{state.error}</p>
