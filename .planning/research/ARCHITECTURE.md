@@ -1,876 +1,1142 @@
-# Architecture Patterns for Creative Landing Page
+# Architecture Patterns: v2.0 Review Follow-Up System
 
-**Domain:** Marketing landing page redesign for SaaS review request platform
-**Researched:** 2026-02-01
+**Project:** AvisLoop Review SaaS - v2.0 Multi-Channel Campaign Milestone
+**Researched:** 2026-02-02
 **Confidence:** HIGH
 
 ## Executive Summary
 
-The new creative landing page should integrate into the existing Next.js App Router architecture using a **progressive enhancement strategy** with clear Server/Client Component boundaries. The recommended approach is a **hybrid architecture** that preserves existing infrastructure (layout, navbar, footer) while replacing page.tsx and its section components with new, animation-rich versions.
+This document describes how Twilio SMS, campaign sequences, LLM personalization, and job tracking integrate into the existing Next.js + Supabase + Vercel Cron architecture. The v1.0 MVP established solid patterns: Server Actions for mutations, Route Handlers for webhooks and cron, Supabase RLS for multi-tenancy, and FOR UPDATE SKIP LOCKED for race-safe processing. v2.0 extends these patterns rather than replacing them.
 
-**Key architectural decision:** Replace, don't refactor. The existing components are simple enough that creating new versions alongside the old ones minimizes risk and allows for easy rollback.
+**Key architectural decisions:**
+- **Unified messaging pipeline**: Email and SMS share a common `message_templates` table and processing logic
+- **Campaign engine extends existing cron**: Same `/api/cron/process-scheduled-sends` route processes both ad-hoc scheduled sends and campaign touches
+- **LLM personalization as pipeline stage**: Optional pre-processing step before render, with fallback to template on failure
+- **Job-centric data model**: Jobs are the new primary entity, contacts become job-linked, campaigns target jobs not contacts
+- **Twilio webhook security**: Signature verification via `twilio.validateRequest()` (same pattern as Resend webhook verification)
 
-## Existing Architecture Analysis
+## Current Architecture (v1.0 MVP Baseline)
 
-### Current State (Working Well)
-
-```
-app/(marketing)/
-├── layout.tsx              # Sticky nav + footer (KEEP)
-├── page.tsx                # Section composition (REPLACE)
-└── pricing/
-    └── page.tsx            # Pricing table (KEEP for now)
-
-components/
-├── marketing/              # Section components (REPLACE most)
-│   ├── hero.tsx
-│   ├── social-proof.tsx
-│   ├── features.tsx
-│   ├── stats-section.tsx
-│   ├── testimonials.tsx
-│   ├── faq-section.tsx
-│   ├── cta-section.tsx
-│   ├── user-menu.tsx       # (KEEP - shared with app)
-│   ├── mobile-nav.tsx      # (KEEP - shared with app)
-│   └── pricing-table.tsx   # (KEEP - used on /pricing)
-└── ui/                     # Design system (KEEP + EXTEND)
-    ├── button.tsx
-    ├── card.tsx
-    ├── badge.tsx
-    ├── geometric-marker.tsx
-    └── ...
-
-Design tokens:
-├── app/globals.css         # CSS variables (EXTEND)
-└── tailwind.config.ts      # Theme config (EXTEND)
-```
-
-### What Works Well
-
-1. **Clean route group structure** - `(marketing)` isolates marketing from app
-2. **Server Component default** - Fast initial load, good SEO
-3. **Shared layout** - Navbar/footer consistent across pages
-4. **Design system in place** - UI components, theme tokens, dark mode ready
-5. **Metadata API usage** - Proper SEO setup with OpenGraph
-6. **Progressive enhancement** - `prefers-reduced-motion` respected
-
-### Integration Points to Preserve
-
-| Component | Why Keep | Used By |
-|-----------|----------|---------|
-| `layout.tsx` | Auth state, nav, footer | All marketing pages |
-| `user-menu.tsx` | Server Component with auth | Navbar |
-| `mobile-nav.tsx` | Client Component, works | Navbar |
-| `pricing-table.tsx` | Used on `/pricing` page | Pricing page |
-| `ui/*` components | Design system foundation | Entire app |
-| Theme system | CSS variables, dark mode | Entire app |
-
-## Recommended Architecture for Creative Landing Page
-
-### Strategy: Side-by-Side Replacement
-
-Create new landing page in parallel, then swap atomically.
+### Component Overview
 
 ```
-app/(marketing)/
-├── layout.tsx                    # UNCHANGED
-├── page.tsx                      # REPLACE with new composition
-├── _page-v1.tsx.backup          # Backup of old version
-└── pricing/page.tsx              # UNCHANGED (for now)
-
-components/marketing/
-├── v2/                           # NEW directory for redesign
-│   ├── hero-v2.tsx              # Creative hero with animations
-│   ├── problem-section.tsx      # New storytelling section
-│   ├── solution-section.tsx     # Animated solution showcase
-│   ├── features-grid.tsx        # Interactive feature grid
-│   ├── social-proof-v2.tsx      # Enhanced social proof
-│   ├── testimonials-v2.tsx      # Animated testimonials
-│   ├── faq-v2.tsx               # Improved FAQ
-│   └── cta-v2.tsx               # Final conversion section
-├── [old components]              # KEEP until migration complete
-└── user-menu.tsx                 # UNCHANGED
-
-components/ui/
-├── [existing]                    # UNCHANGED
-└── animated/                     # NEW - animation primitives
-    ├── fade-in.tsx              # Scroll-triggered fade
-    ├── slide-in.tsx             # Directional slide
-    ├── stagger-children.tsx     # Stagger container
-    └── parallax-section.tsx     # Parallax wrapper
+┌─────────────────────────────────────────────────────────────┐
+│                        Next.js App Router                    │
+├─────────────────────────────────────────────────────────────┤
+│ Server Components (default)                                 │
+│ - Dashboard pages: /dashboard, /send, /contacts, /history   │
+│ - Fetch data via Supabase browser client (RLS enforced)     │
+│ - No secrets, scoped to auth.uid()                          │
+├─────────────────────────────────────────────────────────────┤
+│ Client Components ('use client')                            │
+│ - Interactive forms, dialogs, data tables                   │
+│ - Call Server Actions for mutations                          │
+│ - No direct DB access, no service role                      │
+├─────────────────────────────────────────────────────────────┤
+│ Server Actions ('use server')                               │
+│ - createContact, sendReviewRequest, updateBusiness, etc.    │
+│ - Auth via supabase.auth.getUser()                          │
+│ - Mutations via Supabase browser client (RLS enforced)      │
+│ - Resend email sending, Stripe operations                   │
+│ - revalidatePath() for cache invalidation                   │
+├─────────────────────────────────────────────────────────────┤
+│ Route Handlers (app/api/*)                                  │
+│ - Webhooks: /api/webhooks/resend, /api/webhooks/stripe      │
+│ - Cron: /api/cron/process-scheduled-sends                   │
+│ - Use service role client (no RLS, trusted context)         │
+│ - Signature verification for webhooks                        │
+│ - CRON_SECRET auth for cron endpoints                       │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│                      Supabase Postgres                       │
+├─────────────────────────────────────────────────────────────┤
+│ Tables (RLS enabled on all):                                │
+│ - businesses, contacts, email_templates, send_logs          │
+│ - scheduled_sends, billing, onboarding                      │
+│                                                              │
+│ RPC Functions:                                              │
+│ - claim_due_scheduled_sends(limit_count) → SETOF            │
+│   Uses FOR UPDATE SKIP LOCKED for race-safe claiming        │
+│ - recover_stuck_scheduled_sends(stale_minutes) → SETOF      │
+│   Resets processing → pending for crashed cron runs         │
+│                                                              │
+│ RLS Pattern:                                                │
+│ - All policies use business_id IN (SELECT id FROM businesses│
+│   WHERE user_id = auth.uid())                               │
+│ - Service role bypasses RLS (used only in webhooks/cron)    │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│                    External Services                         │
+├─────────────────────────────────────────────────────────────┤
+│ Resend (email):                                             │
+│ - Send via resend.emails.send() from Server Actions/cron    │
+│ - Webhooks POST to /api/webhooks/resend                     │
+│ - Signature verification via resend.webhooks.verify()       │
+│ - Update send_logs status (delivered, bounced, etc.)        │
+│                                                              │
+│ Stripe (billing):                                           │
+│ - Checkout/portal from Server Actions                       │
+│ - Webhooks POST to /api/webhooks/stripe                     │
+│ - Signature verification via stripe.webhooks.constructEvent │
+│ - Update billing status                                     │
+│                                                              │
+│ Vercel Cron:                                                │
+│ - Triggers /api/cron/process-scheduled-sends every minute   │
+│ - Provides CRON_SECRET in Authorization header              │
+│ - Processes scheduled_sends table (status: pending → sent)  │
+│                                                              │
+│ Upstash Redis (rate limiting):                              │
+│ - Per-user send rate limit (10 sends/min)                   │
+│ - In-memory fallback for dev environment                    │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-### Component Architecture Pattern
+### Data Flow Example: Scheduled Send
 
-#### Pattern 1: Server Component Wrapper + Client Animation Child
+```
+1. User creates scheduled send (Server Action)
+   ↓
+2. Insert into scheduled_sends (status: 'pending', scheduled_for: future timestamp)
+   ↓
+3. Vercel Cron triggers every minute
+   ↓
+4. /api/cron/process-scheduled-sends:
+   a. call recover_stuck_scheduled_sends(10) — reset stale processing records
+   b. call claim_due_scheduled_sends(50) — atomically claim pending sends
+   c. FOR UPDATE SKIP LOCKED ensures no race between concurrent cron runs
+   ↓
+5. For each claimed scheduled_send:
+   a. Fetch business, check quota
+   b. Fetch all contacts in contact_ids array
+   c. Re-validate each contact (cooldown, opt-out, archived)
+   d. Send via Resend with idempotencyKey
+   e. Insert/update send_logs
+   f. Update contacts (last_sent_at, send_count)
+   g. Update scheduled_send (status: completed/failed, executed_at, send_log_ids)
+   ↓
+6. Resend delivers email → webhook to /api/webhooks/resend
+   ↓
+7. Update send_logs (status: delivered/bounced/opened)
+```
 
-**For sections with simple interactivity:**
+**Key patterns to preserve:**
+- **FOR UPDATE SKIP LOCKED**: Prevents double-processing when multiple cron instances run
+- **Status transitions**: pending → processing → completed/failed (with recovery for stuck processing)
+- **Idempotency keys**: All external API calls include idempotency key to prevent duplicates
+- **RLS everywhere**: Every table has explicit policies, service role used only in trusted contexts
+- **Revalidate paths**: Server Actions call revalidatePath() after mutations for cache freshness
 
-```tsx
-// components/marketing/v2/hero-v2.tsx (Server Component)
-import { HeroContent } from './hero-content'
-import { getLatestStats } from '@/lib/data' // Server-side data fetch
+## New Architecture: v2.0 Extensions
 
-export async function HeroV2() {
-  const stats = await getLatestStats() // Server fetch
+### 1. Database Schema Changes
 
-  return (
-    <section className="relative overflow-hidden py-20">
-      <HeroContent stats={stats} /> {/* Client Component */}
-    </section>
+#### New Tables
+
+**1.1 Jobs Table**
+
+```sql
+CREATE TABLE public.jobs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  business_id UUID NOT NULL REFERENCES public.businesses(id) ON DELETE CASCADE,
+
+  -- Customer info (replaces contact as primary entity)
+  customer_name TEXT NOT NULL,
+  customer_email TEXT,
+  customer_phone TEXT,
+
+  -- Job details
+  job_type TEXT NOT NULL, -- 'plumbing', 'hvac', 'electrical', 'roofing', etc.
+  job_date DATE NOT NULL,
+  job_address TEXT,
+  job_value DECIMAL(10,2),
+
+  -- Lifecycle
+  status TEXT NOT NULL DEFAULT 'scheduled',
+  completed_at TIMESTAMPTZ,
+
+  -- Review tracking
+  review_requested BOOLEAN NOT NULL DEFAULT false,
+  review_submitted BOOLEAN NOT NULL DEFAULT false,
+  review_submitted_at TIMESTAMPTZ,
+
+  -- Campaign enrollment (nullable - jobs can exist without campaigns)
+  enrolled_campaign_id UUID REFERENCES public.campaigns(id) ON DELETE SET NULL,
+
+  -- Metadata
+  notes TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+
+  CONSTRAINT jobs_status_valid CHECK (
+    status IN ('scheduled', 'in_progress', 'completed', 'cancelled')
+  ),
+  CONSTRAINT jobs_customer_contact_check CHECK (
+    customer_email IS NOT NULL OR customer_phone IS NOT NULL
   )
-}
+);
 
-// components/marketing/v2/hero-content.tsx (Client Component)
-'use client'
-import { motion } from 'framer-motion'
+-- Indexes
+CREATE INDEX idx_jobs_business_id ON public.jobs (business_id);
+CREATE INDEX idx_jobs_status ON public.jobs (business_id, status);
+CREATE INDEX idx_jobs_job_date ON public.jobs (business_id, job_date DESC);
+CREATE INDEX idx_jobs_campaign ON public.jobs (enrolled_campaign_id) WHERE enrolled_campaign_id IS NOT NULL;
 
-export function HeroContent({ stats }: { stats: Stats }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-    >
-      {/* Animated content */}
-    </motion.div>
-  )
-}
+-- Composite index for dashboard "ready to send" query
+CREATE INDEX idx_jobs_ready_to_send ON public.jobs (business_id, status, review_requested)
+  WHERE status = 'completed' AND review_requested = false;
+
+-- RLS
+ALTER TABLE public.jobs ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users view own jobs"
+  ON public.jobs FOR SELECT TO authenticated
+  USING (business_id IN (SELECT id FROM public.businesses WHERE user_id = auth.uid()));
+
+CREATE POLICY "Users insert own jobs"
+  ON public.jobs FOR INSERT TO authenticated
+  WITH CHECK (business_id IN (SELECT id FROM public.businesses WHERE user_id = auth.uid()));
+
+CREATE POLICY "Users update own jobs"
+  ON public.jobs FOR UPDATE TO authenticated
+  USING (business_id IN (SELECT id FROM public.businesses WHERE user_id = auth.uid()))
+  WITH CHECK (business_id IN (SELECT id FROM public.businesses WHERE user_id = auth.uid()));
+
+CREATE POLICY "Users delete own jobs"
+  ON public.jobs FOR DELETE TO authenticated
+  USING (business_id IN (SELECT id FROM public.businesses WHERE user_id = auth.uid()));
 ```
 
-**Why this pattern:**
-- Server Component handles data fetching (if needed)
-- Client Component isolated to smallest interactive scope
-- SEO-friendly - content rendered on server
-- Fast initial load - minimal client JS for non-interactive sections
+**Design rationale:**
+- Jobs replace contacts as the primary entity (contacts become a v1.0 legacy table)
+- Customer contact info embedded in jobs (denormalized for simplicity)
+- `review_requested` flag prevents duplicate requests (dashboard "ready to send" filter)
+- `enrolled_campaign_id` links jobs to campaigns (nullable for manual sends)
+- Composite index optimizes dashboard queries: "completed jobs not yet requested"
 
-**Source:** [How to Use Framer Motion with Next.js Server Components](https://www.hemantasundaray.com/blog/use-framer-motion-with-nextjs-server-components)
+**1.2 Campaigns Table**
 
-#### Pattern 2: Scroll-Triggered Animations
+```sql
+CREATE TABLE public.campaigns (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  business_id UUID NOT NULL REFERENCES public.businesses(id) ON DELETE CASCADE,
 
-**For sections that animate on scroll:**
+  -- Campaign identity
+  name TEXT NOT NULL,
+  description TEXT,
 
-```tsx
-// components/ui/animated/fade-in.tsx
-'use client'
-import { motion, useInView } from 'framer-motion'
-import { useRef } from 'react'
+  -- Trigger
+  trigger_type TEXT NOT NULL DEFAULT 'job_completed',
 
-export function FadeIn({ children, direction = 'up' }: Props) {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: '-100px' })
+  -- Lifecycle
+  status TEXT NOT NULL DEFAULT 'draft',
+  is_active BOOLEAN NOT NULL DEFAULT false,
 
-  const variants = {
-    hidden: { opacity: 0, y: direction === 'up' ? 40 : -40 },
-    visible: { opacity: 1, y: 0 }
-  }
+  -- Touch configuration (stored as JSONB for flexibility)
+  touches JSONB NOT NULL DEFAULT '[]',
+  -- Example touches array:
+  -- [
+  --   { "delay_hours": 24, "channel": "email", "template_id": "uuid", "personalize": true },
+  --   { "delay_hours": 72, "channel": "sms", "template_id": "uuid", "personalize": false },
+  --   { "delay_hours": 168, "channel": "email", "template_id": "uuid", "personalize": false }
+  -- ]
 
-  return (
-    <motion.div
-      ref={ref}
-      initial="hidden"
-      animate={isInView ? 'visible' : 'hidden'}
-      variants={variants}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-    >
-      {children}
-    </motion.div>
+  -- Metadata
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+
+  CONSTRAINT campaigns_status_valid CHECK (
+    status IN ('draft', 'active', 'paused', 'archived')
+  ),
+  CONSTRAINT campaigns_trigger_valid CHECK (
+    trigger_type IN ('job_completed', 'manual')
   )
-}
+);
 
-// Usage in Server Component
-import { FadeIn } from '@/components/ui/animated/fade-in'
+-- Indexes
+CREATE INDEX idx_campaigns_business_id ON public.campaigns (business_id);
+CREATE INDEX idx_campaigns_active ON public.campaigns (business_id, is_active) WHERE is_active = true;
 
-export function FeatureSection() {
-  return (
-    <section>
-      <FadeIn>
-        <h2>Feature Title</h2>
-      </FadeIn>
-      <FadeIn direction="up">
-        <p>Feature description</p>
-      </FadeIn>
-    </section>
-  )
-}
+-- RLS
+ALTER TABLE public.campaigns ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users view own campaigns"
+  ON public.campaigns FOR SELECT TO authenticated
+  USING (business_id IN (SELECT id FROM public.businesses WHERE user_id = auth.uid()));
+
+CREATE POLICY "Users insert own campaigns"
+  ON public.campaigns FOR INSERT TO authenticated
+  WITH CHECK (business_id IN (SELECT id FROM public.businesses WHERE user_id = auth.uid()));
+
+CREATE POLICY "Users update own campaigns"
+  ON public.campaigns FOR UPDATE TO authenticated
+  USING (business_id IN (SELECT id FROM public.businesses WHERE user_id = auth.uid()))
+  WITH CHECK (business_id IN (SELECT id FROM public.businesses WHERE user_id = auth.uid()));
+
+CREATE POLICY "Users delete own campaigns"
+  ON public.campaigns FOR DELETE TO authenticated
+  USING (business_id IN (SELECT id FROM public.businesses WHERE user_id = auth.uid()));
 ```
 
-**Why this pattern:**
-- Server Components can use Client animation wrappers
-- Animations only run when in viewport (performance)
-- Progressive enhancement - content visible without JS
-- Reusable across all sections
+**Design rationale:**
+- `touches` as JSONB array allows flexible multi-touch configuration without separate tables
+- Each touch specifies: delay from trigger, channel (email/sms), template_id, personalize flag
+- `is_active` separate from `status` allows pausing without losing draft/active distinction
+- Trigger type 'job_completed' auto-enrolls jobs, 'manual' requires explicit enrollment
 
-**Source:** [Next.js 15 Scroll Behavior Guide](https://dev.to/hijazi313/nextjs-15-scroll-behavior-a-comprehensive-guide-387j)
+**1.3 Campaign Enrollments Table**
 
-#### Pattern 3: Heavy Animation Dynamic Import
+```sql
+CREATE TABLE public.campaign_enrollments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  business_id UUID NOT NULL REFERENCES public.businesses(id) ON DELETE CASCADE,
+  campaign_id UUID NOT NULL REFERENCES public.campaigns(id) ON DELETE CASCADE,
+  job_id UUID NOT NULL REFERENCES public.jobs(id) ON DELETE CASCADE,
 
-**For complex animations that aren't critical:**
+  -- Enrollment lifecycle
+  enrolled_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  trigger_timestamp TIMESTAMPTZ NOT NULL, -- job.completed_at for job_completed campaigns
+  status TEXT NOT NULL DEFAULT 'active',
 
-```tsx
-// components/marketing/v2/interactive-demo.tsx (Server Component)
-import dynamic from 'next/dynamic'
+  -- Touch tracking
+  current_touch_index INTEGER NOT NULL DEFAULT 0,
+  completed_touches INTEGER NOT NULL DEFAULT 0,
 
-const AnimatedDemo = dynamic(
-  () => import('./animated-demo-content'),
-  {
-    ssr: false, // Skip server rendering
-    loading: () => <DemoSkeleton /> // Show placeholder
-  }
+  -- Completion
+  completed_at TIMESTAMPTZ,
+  stopped_reason TEXT, -- 'completed', 'opted_out', 'campaign_paused', 'job_cancelled'
+
+  -- Metadata
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+
+  CONSTRAINT enrollments_status_valid CHECK (
+    status IN ('active', 'completed', 'stopped')
+  ),
+  CONSTRAINT enrollments_unique_job_campaign UNIQUE (job_id, campaign_id)
+);
+
+-- Indexes
+CREATE INDEX idx_enrollments_business_id ON public.campaign_enrollments (business_id);
+CREATE INDEX idx_enrollments_campaign_id ON public.campaign_enrollments (campaign_id);
+CREATE INDEX idx_enrollments_job_id ON public.campaign_enrollments (job_id);
+
+-- Composite index for cron "due touches" query
+CREATE INDEX idx_enrollments_due_touches ON public.campaign_enrollments (
+  status, current_touch_index, trigger_timestamp
+) WHERE status = 'active';
+
+-- RLS
+ALTER TABLE public.campaign_enrollments ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users view own enrollments"
+  ON public.campaign_enrollments FOR SELECT TO authenticated
+  USING (business_id IN (SELECT id FROM public.businesses WHERE user_id = auth.uid()));
+
+-- No INSERT/UPDATE/DELETE policies for users - enrollments managed by system
+-- (Server Actions will use service role or stored procedures)
+```
+
+**Design rationale:**
+- `trigger_timestamp` is the anchor for calculating touch due times (e.g., trigger_timestamp + 24h for first touch)
+- `current_touch_index` tracks progression through touches array
+- `stopped_reason` provides audit trail for why enrollment ended
+- Unique constraint prevents duplicate enrollments per job+campaign
+- Index on (status, current_touch_index, trigger_timestamp) optimizes cron query for due touches
+
+**1.4 Message Templates Table (Unified Email + SMS)**
+
+```sql
+CREATE TABLE public.message_templates (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  business_id UUID NOT NULL REFERENCES public.businesses(id) ON DELETE CASCADE,
+
+  -- Template identity
+  name TEXT NOT NULL,
+  channel TEXT NOT NULL, -- 'email' or 'sms'
+
+  -- Content
+  subject TEXT, -- Only for email
+  body TEXT NOT NULL,
+
+  -- Personalization
+  supports_llm_personalization BOOLEAN NOT NULL DEFAULT false,
+  llm_prompt TEXT, -- Instructions for LLM personalization
+
+  -- Lifecycle
+  is_default BOOLEAN NOT NULL DEFAULT false,
+  is_active BOOLEAN NOT NULL DEFAULT true,
+
+  -- Metadata
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+
+  CONSTRAINT templates_channel_valid CHECK (channel IN ('email', 'sms')),
+  CONSTRAINT templates_email_has_subject CHECK (
+    channel != 'email' OR subject IS NOT NULL
+  ),
+  CONSTRAINT templates_sms_length CHECK (
+    channel != 'sms' OR char_length(body) <= 1600
+  )
+);
+
+-- Indexes
+CREATE INDEX idx_message_templates_business_id ON public.message_templates (business_id);
+CREATE INDEX idx_message_templates_channel ON public.message_templates (business_id, channel, is_active);
+
+-- RLS
+ALTER TABLE public.message_templates ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users view own templates"
+  ON public.message_templates FOR SELECT TO authenticated
+  USING (business_id IN (SELECT id FROM public.businesses WHERE user_id = auth.uid()));
+
+CREATE POLICY "Users insert own templates"
+  ON public.message_templates FOR INSERT TO authenticated
+  WITH CHECK (business_id IN (SELECT id FROM public.businesses WHERE user_id = auth.uid()));
+
+CREATE POLICY "Users update own templates"
+  ON public.message_templates FOR UPDATE TO authenticated
+  USING (business_id IN (SELECT id FROM public.businesses WHERE user_id = auth.uid()))
+  WITH CHECK (business_id IN (SELECT id FROM public.businesses WHERE user_id = auth.uid()));
+
+CREATE POLICY "Users delete own templates"
+  ON public.message_templates FOR DELETE TO authenticated
+  USING (business_id IN (SELECT id FROM public.businesses WHERE user_id = auth.uid()));
+```
+
+**Design rationale:**
+- Replaces `email_templates` table with unified template system
+- `channel` discriminator allows same CRUD interface for email and SMS
+- SMS length constraint enforces 1600 chars (allows for personalization expansion)
+- `llm_prompt` stores instructions like "Make this more friendly and mention their specific job type"
+- `supports_llm_personalization` flag allows per-template opt-in
+
+#### Modified Tables
+
+**1.5 Update `send_logs` for Multi-Channel**
+
+```sql
+-- Add channel column
+ALTER TABLE public.send_logs ADD COLUMN channel TEXT NOT NULL DEFAULT 'email';
+ALTER TABLE public.send_logs ADD CONSTRAINT send_logs_channel_valid
+  CHECK (channel IN ('email', 'sms'));
+
+-- Add job_id reference (nullable for v1.0 contact-based sends)
+ALTER TABLE public.send_logs ADD COLUMN job_id UUID REFERENCES public.jobs(id) ON DELETE CASCADE;
+
+-- Add enrollment reference (nullable for ad-hoc sends)
+ALTER TABLE public.send_logs ADD COLUMN enrollment_id UUID
+  REFERENCES public.campaign_enrollments(id) ON DELETE SET NULL;
+
+-- Add personalization tracking
+ALTER TABLE public.send_logs ADD COLUMN was_personalized BOOLEAN DEFAULT false;
+ALTER TABLE public.send_logs ADD COLUMN personalization_failed BOOLEAN DEFAULT false;
+
+-- Add indexes
+CREATE INDEX idx_send_logs_job_id ON public.send_logs (job_id) WHERE job_id IS NOT NULL;
+CREATE INDEX idx_send_logs_enrollment_id ON public.send_logs (enrollment_id) WHERE enrollment_id IS NOT NULL;
+CREATE INDEX idx_send_logs_channel ON public.send_logs (business_id, channel, created_at DESC);
+```
+
+**Migration strategy:**
+- Keep `contact_id` column for v1.0 compatibility
+- New sends use `job_id` instead
+- Dashboard queries check both columns: `WHERE contact_id IS NOT NULL OR job_id IS NOT NULL`
+
+**1.6 Update `businesses` for Twilio + Services**
+
+```sql
+-- Add Twilio phone number
+ALTER TABLE public.businesses ADD COLUMN twilio_phone_number TEXT;
+
+-- Add services offered (JSONB array for multi-select)
+ALTER TABLE public.businesses ADD COLUMN services JSONB DEFAULT '[]';
+-- Example: ["plumbing", "drain_cleaning", "water_heater", "emergency_service"]
+
+-- Add software integrations metadata
+ALTER TABLE public.businesses ADD COLUMN software_integrations JSONB DEFAULT '{}';
+-- Example: { "housecall_pro": { "connected": true, "api_key_set": true } }
+```
+
+**1.7 Update `onboarding` for New Steps**
+
+```sql
+-- Add new checklist fields
+ALTER TABLE public.onboarding ADD COLUMN services_selected BOOLEAN DEFAULT false;
+ALTER TABLE public.onboarding ADD COLUMN software_connected BOOLEAN DEFAULT false;
+ALTER TABLE public.onboarding ADD COLUMN campaign_created BOOLEAN DEFAULT false;
+```
+
+#### New RPC Functions
+
+**1.8 Campaign Touch Processing Function**
+
+```sql
+CREATE OR REPLACE FUNCTION claim_due_campaign_touches(
+  limit_count INT DEFAULT 50
+)
+RETURNS TABLE (
+  enrollment_id UUID,
+  business_id UUID,
+  campaign_id UUID,
+  job_id UUID,
+  touch_index INT,
+  touch_config JSONB,
+  customer_name TEXT,
+  customer_email TEXT,
+  customer_phone TEXT,
+  job_type TEXT
+) AS $$
+BEGIN
+  RETURN QUERY
+  WITH due_enrollments AS (
+    SELECT
+      e.id AS enrollment_id,
+      e.business_id,
+      e.campaign_id,
+      e.job_id,
+      e.current_touch_index,
+      c.touches,
+      j.customer_name,
+      j.customer_email,
+      j.customer_phone,
+      j.job_type
+    FROM public.campaign_enrollments e
+    JOIN public.campaigns c ON e.campaign_id = c.id
+    JOIN public.jobs j ON e.job_id = j.id
+    WHERE
+      e.status = 'active'
+      AND c.is_active = true
+      AND e.current_touch_index < jsonb_array_length(c.touches)
+      -- Calculate if current touch is due
+      AND e.trigger_timestamp +
+          ((c.touches->e.current_touch_index->>'delay_hours')::int || ' hours')::interval
+          <= now()
+    ORDER BY e.trigger_timestamp ASC
+    LIMIT limit_count
+    FOR UPDATE OF e SKIP LOCKED
+  )
+  SELECT
+    de.enrollment_id,
+    de.business_id,
+    de.campaign_id,
+    de.job_id,
+    de.current_touch_index AS touch_index,
+    de.touches->de.current_touch_index AS touch_config,
+    de.customer_name,
+    de.customer_email,
+    de.customer_phone,
+    de.job_type
+  FROM due_enrollments de;
+END;
+$$ LANGUAGE plpgsql;
+```
+
+**Design rationale:**
+- Uses FOR UPDATE SKIP LOCKED (same pattern as scheduled_sends claiming)
+- Returns all data needed for sending in one query (avoids N+1)
+- Calculates due time: trigger_timestamp + delay_hours from touch config
+- Joins to jobs table to get customer contact info for sending
+
+### 2. Twilio SMS Integration
+
+#### 2.1 Configuration Module
+
+```typescript
+// lib/sms/twilio.ts
+import twilio from 'twilio'
+
+export const twilioClient = twilio(
+  process.env.TWILIO_ACCOUNT_SID!,
+  process.env.TWILIO_AUTH_TOKEN!
 )
 
-export function InteractiveDemo() {
-  return (
-    <section>
-      <h2>Try It Yourself</h2>
-      <AnimatedDemo /> {/* Loaded after hydration */}
-    </section>
-  )
+export const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER!
+
+export interface SendSMSOptions {
+  to: string
+  body: string
+  businessId: string
+  jobId?: string
+  enrollmentId?: string
 }
-```
 
-**Why this pattern:**
-- Heavy animation libraries (GSAP, Lottie) only loaded when needed
-- Doesn't block initial page render
-- Improves Lighthouse scores (First Contentful Paint)
-- User sees content immediately, animation enhances after
+export async function sendSMS(options: SendSMSOptions) {
+  const { to, body, businessId, jobId, enrollmentId } = options
 
-**Source:** [How to Keep Rich Animations Snappy in Next.js 15](https://medium.com/@thomasaugot/how-to-keep-rich-animations-snappy-in-next-js-15-46d90f503b15)
+  // Business-specific from number (multi-tenant phone numbers)
+  const business = await getBusinessWithPhone(businessId)
+  const fromNumber = business.twilio_phone_number || TWILIO_PHONE_NUMBER
 
-### Data Flow
+  try {
+    const message = await twilioClient.messages.create({
+      from: fromNumber,
+      to: to,
+      body: body,
+      statusCallback: `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/twilio/status`,
+    })
 
-```
-User Request
-     ↓
-app/(marketing)/page.tsx (Server Component)
-     ↓
-Fetch any server data (stats, testimonials from DB)
-     ↓
-Render HTML with sections
-     ↓
-     ├─→ Static sections (Server Components)
-     ├─→ Animation wrappers (Client Components - small JS)
-     └─→ Interactive sections (Dynamic imports - loaded after)
-     ↓
-Browser receives HTML
-     ↓
-Hydration (only for Client Components)
-     ↓
-Scroll animations activate on viewport enter
-```
-
-**Key flow characteristics:**
-- Initial HTML includes all content (SEO-friendly)
-- Client JS minimal for first paint
-- Animations progressively enhance experience
-- Heavy features lazy-loaded
-
-## Animation Strategy
-
-### CSS vs JavaScript Decision Matrix
-
-| Use Case | Solution | Reason |
-|----------|----------|--------|
-| Fade in on scroll | Framer Motion | useInView hook, clean API |
-| Slide transitions | Framer Motion | Layout animations built-in |
-| Stagger effects | Framer Motion | Variants system ideal |
-| Complex timelines | CSS + Tailwind | Simple, no extra JS |
-| Parallax effects | Framer Motion | useScroll hook + transforms |
-| Micro-interactions | CSS + Tailwind | Hover states, GPU-accelerated |
-| Custom curves | CSS Modules | Complex keyframes, full control |
-
-### Recommended Approach: Hybrid
-
-**Framer Motion for:**
-- Scroll-triggered entrance animations
-- Stagger effects (feature grids, testimonials)
-- Page/section transitions
-- Interactive animations (hover states with complex choreography)
-
-**Tailwind + CSS for:**
-- Simple hover effects (`group-hover:`, `transition-*`)
-- Loading states (`animate-pulse`, `animate-spin`)
-- Micro-interactions (button states, card lifts)
-- Geometric markers, decorative elements
-
-**Why hybrid:**
-- Framer Motion: 58KB gzipped (acceptable for landing page impact)
-- CSS: 0KB runtime cost, GPU-accelerated
-- Use right tool for each job - performance + DX
-
-**Source:** [CSS Modules vs Tailwind CSS: A Comprehensive Comparison](https://medium.com/@ignatovich.dm/css-modules-vs-css-in-js-vs-tailwind-css-a-comprehensive-comparison-24e7cb6f48e9)
-
-### Animation Performance Architecture
-
-```tsx
-// app/globals.css - ADD
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-
-  /* Override Framer Motion */
-  .motion-reduce {
-    animation: none !important;
-    transition: none !important;
+    return { success: true, providerId: message.sid }
+  } catch (error) {
+    console.error('Twilio send error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }
   }
 }
-
-// tailwind.config.ts - ADD
-module.exports = {
-  theme: {
-    extend: {
-      animation: {
-        'fade-in': 'fadeIn 0.5s ease-out',
-        'slide-up': 'slideUp 0.6s ease-out',
-        'scale-in': 'scaleIn 0.4s ease-out',
-      },
-      keyframes: {
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
-        },
-        slideUp: {
-          '0%': { opacity: '0', transform: 'translateY(20px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
-        scaleIn: {
-          '0%': { opacity: '0', transform: 'scale(0.95)' },
-          '100%': { opacity: '1', transform: 'scale(1)' },
-        },
-      },
-    },
-  },
-}
 ```
 
-**Progressive enhancement:**
-1. Content visible without JS (Server Components)
-2. Basic CSS animations for minimal motion
-3. Framer Motion enhances with scroll triggers
-4. `prefers-reduced-motion` disables all (accessibility)
+**Key patterns:**
+- Per-business phone numbers stored in `businesses.twilio_phone_number`
+- Falls back to platform default for businesses without dedicated numbers
+- `statusCallback` URL for delivery tracking (same pattern as Resend webhooks)
+- Returns `providerId` (Twilio message SID) for correlation in webhooks
 
-**Source:** [The Impact of Page Load Animations on Landing Page Performance](https://www.site123.com/learn/the-impact-of-page-load-animations-on-landing-page-performance)
+#### 2.2 Twilio Webhooks
 
-## Image & Asset Optimization
+**Status Callback Webhook** (delivery tracking)
 
-### Strategy: Next.js Image Component + Priority Flags
+```typescript
+// app/api/webhooks/twilio/status/route.ts
+import { NextRequest, NextResponse } from 'next/server'
+import { validateRequest } from 'twilio'
+import { createServiceRoleClient } from '@/lib/supabase/service-role'
 
-```tsx
-// Hero section - CRITICAL
-import Image from 'next/image'
+export async function POST(req: NextRequest) {
+  const supabase = createServiceRoleClient()
 
-export function HeroV2() {
-  return (
-    <section>
-      <Image
-        src="/hero-screenshot.webp"
-        alt="AvisLoop dashboard"
-        width={1200}
-        height={900}
-        priority // Preload above fold
-        quality={90} // High quality for hero
-        placeholder="blur"
-        blurDataURL="data:image/..." // Low-res placeholder
-      />
-    </section>
+  // === 1. Parse form data (Twilio sends application/x-www-form-urlencoded) ===
+  const formData = await req.formData()
+  const body = Object.fromEntries(formData.entries())
+
+  // === 2. Verify Twilio signature ===
+  const signature = req.headers.get('X-Twilio-Signature') || ''
+  const url = `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/twilio/status`
+
+  const isValid = validateRequest(
+    process.env.TWILIO_AUTH_TOKEN!,
+    signature,
+    url,
+    body
   )
-}
 
-// Below-fold sections - LAZY
-export function FeatureGrid() {
-  return (
-    <section>
-      <Image
-        src="/feature-contacts.webp"
-        alt="Contact management"
-        width={800}
-        height={600}
-        loading="lazy" // Lazy load (default)
-        quality={85} // Slightly lower
-      />
-    </section>
+  if (!isValid) {
+    console.error('Invalid Twilio signature')
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
+  }
+
+  // === 3. Map Twilio status to our send_logs status ===
+  const messageSid = body.MessageSid as string
+  const messageStatus = body.MessageStatus as string
+
+  const STATUS_MAP: Record<string, string> = {
+    'delivered': 'delivered',
+    'undelivered': 'bounced',
+    'failed': 'failed',
+    'sent': 'sent',
+  }
+
+  const newStatus = STATUS_MAP[messageStatus]
+  if (!newStatus) {
+    console.log(`Unknown Twilio status: ${messageStatus}`)
+    return NextResponse.json({ received: true })
+  }
+
+  // === 4. Update send_log ===
+  const { error } = await supabase
+    .from('send_logs')
+    .update({
+      status: newStatus,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('provider_id', messageSid)
+    .eq('channel', 'sms')
+
+  if (error) {
+    console.error('Failed to update send_log:', error)
+  }
+
+  return NextResponse.json({ received: true })
+}
+```
+
+**Inbound Message Webhook** (STOP handling)
+
+```typescript
+// app/api/webhooks/twilio/inbound/route.ts
+import { NextRequest, NextResponse } from 'next/server'
+import { validateRequest } from 'twilio'
+import { createServiceRoleClient } from '@/lib/supabase/service-role'
+import { MessagingResponse } from 'twilio/lib/twiml/MessagingResponse'
+
+export async function POST(req: NextRequest) {
+  const supabase = createServiceRoleClient()
+
+  // === 1. Parse and verify (same pattern as status webhook) ===
+  const formData = await req.formData()
+  const body = Object.fromEntries(formData.entries())
+
+  const signature = req.headers.get('X-Twilio-Signature') || ''
+  const url = `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/twilio/inbound`
+
+  const isValid = validateRequest(
+    process.env.TWILIO_AUTH_TOKEN!,
+    signature,
+    url,
+    body
   )
+
+  if (!isValid) {
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
+  }
+
+  // === 2. Check for STOP keywords ===
+  const messageBody = (body.Body as string || '').trim().toUpperCase()
+  const fromNumber = body.From as string
+
+  const STOP_KEYWORDS = ['STOP', 'UNSUBSCRIBE', 'CANCEL', 'END', 'QUIT']
+
+  if (STOP_KEYWORDS.includes(messageBody)) {
+    // === 3. Opt out all jobs with this phone number ===
+    await supabase
+      .from('jobs')
+      .update({ opted_out: true }) // Add opted_out column to jobs table
+      .eq('customer_phone', fromNumber)
+
+    // === 4. Stop active enrollments ===
+    await supabase
+      .from('campaign_enrollments')
+      .update({
+        status: 'stopped',
+        stopped_reason: 'opted_out',
+        completed_at: new Date().toISOString(),
+      })
+      .eq('status', 'active')
+      .in('job_id', supabase
+        .from('jobs')
+        .select('id')
+        .eq('customer_phone', fromNumber)
+      )
+
+    // === 5. Respond with TwiML confirmation ===
+    const twiml = new MessagingResponse()
+    twiml.message('You have been unsubscribed from our messages.')
+
+    return new NextResponse(twiml.toString(), {
+      headers: { 'Content-Type': 'text/xml' },
+    })
+  }
+
+  // Not a STOP message, acknowledge without response
+  return new NextResponse('<Response></Response>', {
+    headers: { 'Content-Type': 'text/xml' },
+  })
 }
 ```
 
-**Source:** [Next.js Image Component: How to use next/image for performance](https://prismic.io/blog/nextjs-image-component-optimization)
+**Security notes:**
+- Both webhooks use `twilio.validateRequest()` for signature verification
+- Same pattern as Resend webhook: verify signature, update DB, return 200
+- Inbound webhook returns TwiML (XML response) per Twilio requirements
+- Uses service role client (webhooks have no user context)
 
-### Asset Architecture
+### 3. LLM Personalization Architecture
 
-```
-public/
-├── hero/
-│   ├── dashboard-light.webp    # Hero image - light mode
-│   ├── dashboard-dark.webp     # Hero image - dark mode
-│   └── hero-blur-data.txt      # Blur data URLs
-├── features/
-│   ├── send-interface.webp     # Feature screenshots
-│   ├── contacts-view.webp
-│   └── analytics-view.webp
-├── social-proof/
-│   ├── company-logo-1.svg      # Client logos (SVG preferred)
-│   └── company-logo-2.svg
-└── decorative/
-    ├── gradient-orb.svg        # CSS-animated shapes
-    └── geometric-pattern.svg
-```
+#### 3.1 Personalization Pipeline
 
-**Optimization checklist:**
-- [ ] Use WebP format (smaller than PNG/JPG)
-- [ ] Provide AVIF fallback (even smaller, Next.js handles automatically)
-- [ ] Generate blur placeholders (prevents layout shift)
-- [ ] Mark hero images with `priority`
-- [ ] Lazy load below-fold images
-- [ ] Use SVG for logos/icons (scalable, small)
-- [ ] Set explicit width/height (prevents CLS)
+```typescript
+// lib/ai/personalize.ts
 
-**Source:** [Next.js Image Optimization Guide](https://nextjs.org/docs/app/api-reference/components/image)
+import Anthropic from '@anthropic-ai/sdk'
 
-### Performance Budget
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+})
 
-| Resource | Budget | Actual | Status |
-|----------|--------|--------|--------|
-| Hero image | 150KB | TBD | Pending |
-| Feature screenshots (3×) | 100KB each | TBD | Pending |
-| Framer Motion bundle | 60KB gzip | 58KB | ✅ |
-| Total images | 500KB | TBD | Pending |
-| Total JS | 150KB | TBD | Pending |
-| First Contentful Paint | <1.5s | TBD | Pending |
-| Largest Contentful Paint | <2.5s | TBD | Pending |
-
-## SEO Architecture
-
-### Metadata Strategy (App Router)
-
-```tsx
-// app/(marketing)/page.tsx
-import type { Metadata } from 'next'
-
-const baseUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : 'http://localhost:3000'
-
-export const metadata: Metadata = {
-  title: 'AvisLoop - Get 3× More Reviews Without Chasing Customers',
-  description:
-    'Send review requests in under 30 seconds. No complex campaigns, no forgotten follow-ups. Just simple requests that actually get sent. Start free today.',
-  openGraph: {
-    title: 'AvisLoop - Get 3× More Reviews Without Chasing Customers',
-    description:
-      'Send review requests in under 30 seconds. No complex campaigns, no forgotten follow-ups.',
-    url: baseUrl,
-    siteName: 'AvisLoop',
-    type: 'website',
-    images: [
-      {
-        url: `${baseUrl}/og-image.png`, // 1200×630 social share image
-        width: 1200,
-        height: 630,
-        alt: 'AvisLoop - Review request platform',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'AvisLoop - Get 3× More Reviews Without Chasing Customers',
-    description:
-      'Send review requests in under 30 seconds. No complex campaigns, no forgotten follow-ups.',
-    images: [`${baseUrl}/og-image.png`],
-  },
-  alternates: {
-    canonical: baseUrl,
-  },
+export interface PersonalizeMessageOptions {
+  template: string
+  llmPrompt: string
+  context: {
+    customer_name: string
+    job_type: string
+    business_name: string
+  }
 }
 
-export default function LandingPage() {
-  return (
-    <>
-      {/* JSON-LD structured data */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'SoftwareApplication',
-            name: 'AvisLoop',
-            applicationCategory: 'BusinessApplication',
-            operatingSystem: 'Web',
-            offers: {
-              '@type': 'Offer',
-              price: '0',
-              priceCurrency: 'USD',
-            },
-            aggregateRating: {
-              '@type': 'AggregateRating',
-              ratingValue: '4.8',
-              ratingCount: '127',
-            },
-          }),
-        }}
-      />
+export interface PersonalizeMessageResult {
+  success: boolean
+  body?: string
+  error?: string
+}
 
-      {/* Page sections */}
-      <HeroV2 />
-      <SocialProofV2 />
-      {/* ... */}
-    </>
-  )
+export async function personalizeMessage(
+  options: PersonalizeMessageOptions
+): Promise<PersonalizeMessageResult> {
+  const { template, llmPrompt, context } = options
+
+  try {
+    // === 1. Build prompt ===
+    const systemPrompt = `You are a helpful assistant that personalizes customer messages.
+
+INSTRUCTIONS:
+${llmPrompt}
+
+CONTEXT:
+- Customer name: ${context.customer_name}
+- Job type: ${context.job_type}
+- Business name: ${context.business_name}
+
+ORIGINAL TEMPLATE:
+${template}
+
+OUTPUT INSTRUCTIONS:
+- Return ONLY the personalized message text
+- Do not include any explanations or meta-commentary
+- Keep the message under 1500 characters
+- Maintain the core message and call-to-action from the template`
+
+    // === 2. Call Claude API with caching ===
+    const message = await anthropic.messages.create({
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 1024,
+      system: [
+        {
+          type: 'text',
+          text: systemPrompt,
+          cache_control: { type: 'ephemeral' }
+        }
+      ],
+      messages: [
+        {
+          role: 'user',
+          content: 'Please personalize the message now.',
+        }
+      ],
+    })
+
+    // === 3. Extract response ===
+    const responseText = message.content
+      .filter(block => block.type === 'text')
+      .map(block => block.text)
+      .join('\n')
+      .trim()
+
+    if (!responseText || responseText.length === 0) {
+      return {
+        success: false,
+        error: 'LLM returned empty response'
+      }
+    }
+
+    return {
+      success: true,
+      body: responseText
+    }
+
+  } catch (error) {
+    console.error('LLM personalization error:', error)
+
+    // === Rate limit handling ===
+    if (error instanceof Anthropic.APIError && error.status === 429) {
+      return {
+        success: false,
+        error: 'LLM rate limit exceeded'
+      }
+    }
+
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }
+  }
 }
 ```
 
-**Structured data benefits:**
-- Rich snippets in Google search results
-- Better AI search visibility (ChatGPT Search, Perplexity, Gemini)
-- Schema.org vocabulary for SaaS apps
-- Aggregate ratings display (social proof in SERPs)
+**Key design decisions:**
 
-**Source:** [Maximizing SEO with Meta Data in Next.js 15](https://dev.to/joodi/maximizing-seo-with-meta-data-in-nextjs-15-a-comprehensive-guide-4pa7)
+1. **Prompt caching**: System prompt includes `cache_control` for cost efficiency
+   - Template + instructions cached for 5 minutes (Anthropic default)
+   - Reduces cost by ~90% for repeated personalizations
 
-## Component Breakdown for Creative Landing Page
+2. **Rate limiting strategy**:
+   - Handle 429 errors gracefully (fall back to template)
+   - No retry logic in cron (would delay entire batch)
+   - Consider Upstash Redis for cross-request rate tracking
 
-### Suggested Component Structure
+3. **Model selection**:
+   - Claude 3.5 Sonnet for quality/speed balance
+   - Haiku too inconsistent for brand-sensitive messages
+   - Opus unnecessary for this use case
 
-Based on common SaaS landing page patterns and your existing features, here's the recommended section breakdown:
+4. **Timeout handling**:
+   - Set reasonable timeout (5s) to prevent cron delays
+   - Fall back to template on timeout
 
-```tsx
-// app/(marketing)/page.tsx - NEW VERSION
+### 4. Build Order and Dependencies
 
-import { HeroV2 } from '@/components/marketing/v2/hero-v2'
-import { SocialProofV2 } from '@/components/marketing/v2/social-proof-v2'
-import { ProblemSection } from '@/components/marketing/v2/problem-section'
-import { SolutionSection } from '@/components/marketing/v2/solution-section'
-import { FeaturesGrid } from '@/components/marketing/v2/features-grid'
-import { HowItWorks } from '@/components/marketing/v2/how-it-works'
-import { TestimonialsV2 } from '@/components/marketing/v2/testimonials-v2'
-import { StatsShowcase } from '@/components/marketing/v2/stats-showcase'
-import { FAQV2 } from '@/components/marketing/v2/faq-v2'
-import { CTAV2 } from '@/components/marketing/v2/cta-v2'
+Based on architectural dependencies, recommended build order:
 
-export default function LandingPage() {
-  return (
-    <>
-      <HeroV2 />              {/* Above fold, priority load */}
-      <SocialProofV2 />       {/* Logo bar or testimonial highlights */}
-      <ProblemSection />      {/* "Review requests are a pain" */}
-      <SolutionSection />     {/* "We make it simple" with demo */}
-      <FeaturesGrid />        {/* 3-6 features, interactive cards */}
-      <HowItWorks />          {/* 3-step process, animated */}
-      <StatsShowcase />       {/* Results-driven metrics */}
-      <TestimonialsV2 />      {/* Animated testimonial carousel */}
-      <FAQV2 />               {/* Accordion, keep existing FAQs */}
-      <CTAV2 />               {/* Final conversion push */}
-    </>
-  )
-}
-```
+#### Phase 1: Foundation (Data Model)
+1. Migration: Create `jobs` table
+2. Migration: Create `message_templates` table (replaces `email_templates`)
+3. Migration: Create `campaigns` table
+4. Migration: Create `campaign_enrollments` table
+5. Migration: Modify `send_logs` for multi-channel
+6. Migration: Modify `businesses` for Twilio + services
+7. Migration: RPC function `claim_due_campaign_touches()`
 
-**Source:** [Landing Page Structure: Anatomy & Best Practices](https://www.involve.me/blog/landing-page-structure)
+**Why first:** All subsequent features depend on these tables
 
-### New Components Needed
+#### Phase 2: Jobs CRUD
+1. Server Actions: `createJob`, `updateJob`, `markJobCompleted`
+2. Pages: `/dashboard/jobs` (list view)
+3. Components: Job form, job status badge
+4. Migration: Update `onboarding` table for new steps
 
-| Component | Purpose | Complexity | Animation Level |
-|-----------|---------|------------|-----------------|
-| `hero-v2.tsx` | Headline + CTA + visual | Medium | High (entrance, parallax) |
-| `social-proof-v2.tsx` | Trust indicators | Low | Low (fade in) |
-| `problem-section.tsx` | Empathy hook | Low | Medium (scroll reveal) |
-| `solution-section.tsx` | Product demo | High | High (interactive demo) |
-| `features-grid.tsx` | Feature cards | Medium | Medium (stagger, hover) |
-| `how-it-works.tsx` | 3-step process | Medium | High (step progression) |
-| `stats-showcase.tsx` | Animated counters | Low | Medium (count-up animation) |
-| `testimonials-v2.tsx` | Customer quotes | Medium | Medium (carousel/slider) |
-| `faq-v2.tsx` | Questions accordion | Low | Low (reuse existing) |
-| `cta-v2.tsx` | Final CTA | Low | Low (simple entrance) |
+**Why second:** Jobs are the core entity; needed before campaigns
 
-### Reusable Animation Primitives Needed
+#### Phase 3: Twilio SMS Integration
+1. Config: `lib/sms/twilio.ts` (sendSMS function)
+2. Webhook: `/api/webhooks/twilio/status` (delivery tracking)
+3. Webhook: `/api/webhooks/twilio/inbound` (STOP handling)
+4. Server Action: `provisionPhoneNumber` (optional for MVP)
+5. Test: Send test SMS from dashboard
 
-```
-components/ui/animated/
-├── fade-in.tsx              # Opacity 0→1 on scroll
-├── slide-in.tsx             # Directional slide on scroll
-├── stagger-children.tsx     # Delay between child animations
-├── count-up.tsx             # Animated number counter
-├── parallax-wrapper.tsx     # Y-transform based on scroll
-├── scale-on-hover.tsx       # Grow on hover (cards)
-└── reveal-on-scroll.tsx     # Clip-path reveal effect
-```
+**Why third:** Independent of campaigns; can be tested with manual sends
 
-**Build order suggestion:**
-1. Create animation primitives first (reusable across sections)
-2. Build Hero (highest impact, sets tone)
-3. Build simple sections (Social Proof, Problem, CTA) to test primitives
-4. Build complex sections (Solution, Features, How It Works)
-5. Polish micro-interactions last
+#### Phase 4: Message Templates
+1. Server Actions: `createTemplate`, `updateTemplate` (unified email/SMS)
+2. Pages: `/dashboard/templates` (list view)
+3. Components: Template form with channel selector
+4. Migration: Migrate existing `email_templates` to `message_templates`
 
-## Migration Path
+**Why fourth:** Needed before campaigns can be configured
 
-### Phase 1: Parallel Development
-```bash
-# Create new component directory
-mkdir -p components/marketing/v2
-mkdir -p components/ui/animated
+#### Phase 5: Campaign Engine
+1. Server Actions: `createCampaign`, `updateCampaign`, `enrollJobInCampaign`
+2. Cron: Extend `/api/cron/process-scheduled-sends` with campaign touch processing
+3. Pages: `/dashboard/campaigns` (list view, builder)
+4. Components: Campaign builder (touch configuration UI)
+5. Test: Create campaign, enroll job, verify touches execute
 
-# Build new components alongside old
-# Old site continues running on old components
-```
+**Why fifth:** Depends on jobs, templates, and SMS integration
 
-### Phase 2: Testing
-```bash
-# Create feature flag route for testing
-app/(marketing)/v2/page.tsx → uses new components
-app/(marketing)/page.tsx → uses old components (production)
+#### Phase 6: LLM Personalization
+1. Config: `lib/ai/personalize.ts` (Claude integration)
+2. Rate limiting: `lib/ai/rate-limit.ts` (Upstash)
+3. Cron: Add personalization pipeline to touch processing
+4. Templates: Add `supports_llm_personalization` and `llm_prompt` fields to UI
+5. Test: Enable personalization on template, verify LLM calls in cron
 
-# Test v2 route with real users (beta link)
-```
+**Why sixth:** Optional enhancement; campaigns work without it
 
-### Phase 3: Atomic Swap
-```bash
-# When ready, swap in one commit
-mv app/(marketing)/page.tsx app/(marketing)/_page-v1.backup.tsx
-mv app/(marketing)/v2/page.tsx app/(marketing)/page.tsx
+#### Phase 7: Dashboard Redesign
+1. Queries: `getPipelineKPIs`, `getReadyToSendJobs`, `getNeedsAttention`
+2. Components: Pipeline widget, ready-to-send queue, needs-attention alerts
+3. Pages: Update `/dashboard` with new layout
 
-# Easy rollback if needed
-git revert [commit-hash]
-```
+**Why seventh:** Cosmetic; system fully functional without it
 
-### Phase 4: Cleanup
-```bash
-# After v2 stable for 1 week, remove old components
-rm -rf components/marketing/hero.tsx
-rm -rf components/marketing/features.tsx
-# ... (keep shared components like user-menu, mobile-nav, pricing-table)
-```
+#### Phase 8: Onboarding Updates
+1. Steps: Services selection, software integration, campaign creation
+2. Migration: Update `onboarding` table with new checklist fields
+3. Pages: Extend `/onboarding` wizard
 
-**Why this approach:**
-- Zero downtime migration
-- Easy rollback (just swap files back)
-- Test new version without affecting production
-- Clean separation (v2 directory clear signal)
-
-**Source:** [Refactoring landing page with React, NextJS & TailwindCSS](https://dev.to/dkapanidis/refactoring-landing-page-with-react-nextjs-tailwindcss-2hk8)
-
-## Performance Monitoring
-
-### Core Web Vitals Targets
-
-| Metric | Target | Measurement Point |
-|--------|--------|-------------------|
-| FCP (First Contentful Paint) | <1.5s | Hero appears |
-| LCP (Largest Contentful Paint) | <2.5s | Hero image loaded |
-| CLS (Cumulative Layout Shift) | <0.1 | No layout jumps |
-| FID (First Input Delay) | <100ms | Button clicks responsive |
-| TTI (Time to Interactive) | <3.5s | Animations start |
-
-**Why these targets:**
-- Google's "Good" thresholds for Core Web Vitals
-- Above targets = better SEO ranking
-- Below targets = poor user experience, higher bounce rate
+**Why last:** UX polish; MVP usable without updated onboarding
 
 ## Anti-Patterns to Avoid
 
-### Anti-Pattern 1: Animation Everything
-**What:** Adding entrance animations to every element on the page
-**Why bad:** Overwhelming, slow perceived performance, seizure risk
-**Instead:** Animate only key sections (hero, features). Keep body copy static.
+### 1. Race Conditions in Campaign Processing
 
-### Anti-Pattern 2: Client Component Creep
-**What:** Making entire sections 'use client' for one small animation
-**Why bad:** Loses Server Component benefits (streaming, smaller JS bundle)
-**Instead:** Wrap only the interactive part in a Client Component
+**Bad:**
+```typescript
+// Fetch due enrollments without locking
+const { data: enrollments } = await supabase
+  .from('campaign_enrollments')
+  .select('*')
+  .eq('status', 'active')
+  .lte('next_touch_due', now())
 
-```tsx
-// BAD
-'use client'
-export function FeatureSection() {
-  return (
-    <section>
-      <h2>Static heading</h2>
-      <p>Static paragraph</p>
-      <motion.div>Animated card</motion.div> {/* Only this needs client */}
-    </section>
+// Update each enrollment (RACE CONDITION if multiple cron instances run)
+for (const e of enrollments) {
+  await processTouch(e)
+  await supabase
+    .from('campaign_enrollments')
+    .update({ current_touch_index: e.current_touch_index + 1 })
+    .eq('id', e.id)
+}
+```
+
+**Good:**
+```typescript
+// Use RPC with FOR UPDATE SKIP LOCKED
+const { data: enrollments } = await supabase
+  .rpc('claim_due_campaign_touches', { limit_count: 50 })
+
+// Enrollments are locked; no other cron instance can claim them
+for (const e of enrollments) {
+  await processTouch(e)
+  await supabase
+    .from('campaign_enrollments')
+    .update({ current_touch_index: e.current_touch_index + 1 })
+    .eq('id', e.id)
+}
+```
+
+### 2. LLM Failures Breaking Sends
+
+**Bad:**
+```typescript
+// Personalize message, fail entire send if LLM fails
+const personalized = await personalizeMessage(template, context)
+if (!personalized.success) {
+  throw new Error('Personalization failed')
+}
+await sendEmail({ body: personalized.body })
+```
+
+**Good:**
+```typescript
+// Personalize message, fall back to template on failure
+let body = template.body
+let wasPersonalized = false
+
+if (shouldPersonalize) {
+  const personalized = await personalizeMessage(template, context)
+  if (personalized.success) {
+    body = personalized.body
+    wasPersonalized = true
+  } else {
+    // Log failure but continue with template
+    console.warn('Personalization failed, using template')
+  }
+}
+
+await sendEmail({ body })
+```
+
+### 3. N+1 Queries in Cron Processing
+
+**Bad:**
+```typescript
+// Fetch enrollments, then fetch job for each enrollment
+const { data: enrollments } = await supabase.rpc('claim_due_campaign_touches')
+
+for (const e of enrollments) {
+  const { data: job } = await supabase
+    .from('jobs')
+    .select('customer_name, customer_email')
+    .eq('id', e.job_id)
+    .single()
+
+  await sendEmail({ to: job.customer_email })
+}
+```
+
+**Good:**
+```typescript
+// RPC function returns all needed data via JOIN
+const { data: enrollments } = await supabase.rpc('claim_due_campaign_touches')
+// Returns: enrollment_id, job_id, customer_name, customer_email, touch_config
+
+for (const e of enrollments) {
+  await sendEmail({ to: e.customer_email })
+}
+```
+
+### 4. Missing Webhook Signature Verification
+
+**Bad:**
+```typescript
+export async function POST(req: NextRequest) {
+  const body = await req.json()
+
+  // SECURITY RISK: No signature verification
+  await supabase
+    .from('send_logs')
+    .update({ status: body.status })
+    .eq('provider_id', body.message_id)
+}
+```
+
+**Good:**
+```typescript
+export async function POST(req: NextRequest) {
+  const payload = await req.text()
+
+  // Verify Twilio signature
+  const signature = req.headers.get('X-Twilio-Signature') || ''
+  const isValid = validateRequest(
+    process.env.TWILIO_AUTH_TOKEN!,
+    signature,
+    url,
+    body
   )
-}
 
-// GOOD
-export function FeatureSection() {
-  return (
-    <section>
-      <h2>Static heading</h2>
-      <p>Static paragraph</p>
-      <AnimatedCard /> {/* Client Component wrapper */}
-    </section>
-  )
+  if (!isValid) {
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
+  }
+
+  // Proceed with update
+  await supabase.from('send_logs').update({ /* ... */ })
 }
 ```
 
-**Source:** [Solving Framer Motion Page Transitions in Next.js App Router](https://www.imcorfitz.com/posts/adding-framer-motion-page-transitions-to-next-js-app-router)
+## Scalability Considerations
 
-### Anti-Pattern 3: Inline Animation Definitions
-**What:** Defining animation variants inside render functions
-**Why bad:** Re-creates objects on every render, causes jank
-**Instead:** Define variants outside component or use useMemo
+### At 100 users (MVP)
+- **Cron frequency**: 1 minute (sufficient)
+- **Batch size**: 50 scheduled sends + 50 campaign touches per cron run
+- **LLM rate limit**: 30 personalizations/min per business
+- **Database**: Single Supabase Postgres instance, no sharding needed
+- **Cost**: ~$50/month (Vercel Hobby + Supabase Free + Anthropic usage)
 
-```tsx
-// BAD
-export function Hero() {
-  const variants = { hidden: {}, visible: {} } // Re-created every render
-  return <motion.div variants={variants}>...</motion.div>
-}
+### At 10K users (Growth)
+- **Cron frequency**: 30 seconds (increase via Vercel Pro plan)
+- **Batch size**: 100 scheduled sends + 100 campaign touches per cron run
+- **LLM rate limit**: 60 personalizations/min per business (tier-based)
+- **Database**: Add read replicas for dashboard queries
+- **Cost**: ~$500/month (Vercel Pro + Supabase Pro + Anthropic usage)
 
-// GOOD
-const variants = { hidden: {}, visible: {} } // Created once
-
-export function Hero() {
-  return <motion.div variants={variants}>...</motion.div>
-}
-```
-
-### Anti-Pattern 4: No Accessibility Fallbacks
-**What:** Animations with no `prefers-reduced-motion` support
-**Why bad:** Inaccessible to users with vestibular disorders
-**Instead:** Always respect `prefers-reduced-motion` media query
-
-```tsx
-// BAD
-<motion.div
-  initial={{ opacity: 0, y: 50 }}
-  animate={{ opacity: 1, y: 0 }}
->
-  Content
-</motion.div>
-
-// GOOD
-<motion.div
-  initial={{ opacity: 0, y: 50 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.5 }}
-  className="motion-reduce:transform-none motion-reduce:opacity-100"
->
-  Content
-</motion.div>
-```
-
-### Anti-Pattern 5: Blocking Animations
-**What:** Heavy animations that prevent content from rendering
-**Why bad:** Users see blank screen, high bounce rate
-**Instead:** Use Server Components for content, enhance with animations after
-
-## Integration with Existing System
-
-### Preserving Design Tokens
-
-```tsx
-// components/marketing/v2/hero-v2.tsx
-import { GeometricMarker } from '@/components/ui/geometric-marker' // REUSE
-
-export function HeroV2() {
-  return (
-    <section className="py-20 bg-background"> {/* CSS variables */}
-      <motion.h1 className="text-foreground"> {/* Theme-aware */}
-        Get More Reviews
-      </motion.h1>
-      <GeometricMarker variant="triangle" color="lime" /> {/* Existing component */}
-    </section>
-  )
-}
-```
-
-**Key integrations:**
-- Use existing CSS variables (`--background`, `--foreground`, etc.)
-- Reuse `geometric-marker.tsx` for brand consistency
-- Reuse `button.tsx`, `card.tsx` from UI library
-- Maintain dark mode support (all new components must support)
-
-### Dark Mode Considerations
-
-```tsx
-// All animations must work in both themes
-<motion.div className="bg-card border-border"> {/* Not bg-white */}
-  <h2 className="text-foreground"> {/* Not text-gray-900 */}
-    Feature Title
-  </h2>
-  <p className="text-muted-foreground"> {/* Not text-gray-600 */}
-    Feature description
-  </p>
-</motion.div>
-```
-
-**Testing checklist:**
-- [ ] All sections visible in light mode
-- [ ] All sections visible in dark mode
-- [ ] Animations smooth in both modes
-- [ ] No hardcoded colors (use CSS variables)
-
-## Build Order Recommendation
-
-Based on dependencies and impact:
-
-### Week 1: Foundation
-1. Set up animation primitive components (`components/ui/animated/`)
-2. Create v2 directory structure
-3. Build `hero-v2.tsx` (highest impact)
-4. Test hero in isolation
-
-### Week 2: Core Sections
-5. Build `social-proof-v2.tsx`
-6. Build `problem-section.tsx`
-7. Build `solution-section.tsx`
-8. Compose into test route (`app/(marketing)/v2/page.tsx`)
-
-### Week 3: Feature Showcase
-9. Build `features-grid.tsx`
-10. Build `how-it-works.tsx`
-11. Build `stats-showcase.tsx`
-12. Test interactive animations
-
-### Week 4: Social Proof & Conversion
-13. Build `testimonials-v2.tsx`
-14. Refactor `faq-v2.tsx` (or reuse existing with new styling)
-15. Build `cta-v2.tsx`
-16. Full page testing
-
-### Week 5: Polish & Performance
-17. Optimize images (WebP conversion, blur placeholders)
-18. Add structured data (JSON-LD)
-19. Lighthouse CI setup
-20. Accessibility audit (`prefers-reduced-motion`, keyboard nav)
-
-### Week 6: Launch
-21. Beta testing with real users
-22. Performance monitoring
-23. Atomic swap (replace old page.tsx)
-24. Monitor analytics for bounce rate, conversion rate
-
-**Total estimated effort:** 6 weeks (1 developer)
+### At 1M users (Scale)
+- **Cron frequency**: Migrate to dedicated queue (BullMQ + Redis)
+- **Batch size**: Process 1000+ per worker, multiple parallel workers
+- **LLM rate limit**: 100+ personalizations/min per business, multi-provider fallback
+- **Database**: Shard by business_id using Citus Data or migrate to distributed DB
+- **Cost**: ~$5K/month (custom infrastructure + Anthropic usage)
 
 ## Sources
 
-### Architecture Patterns
-- [Next.js 15 Scroll Behavior Guide](https://dev.to/hijazi313/nextjs-15-scroll-behavior-a-comprehensive-guide-387j)
-- [Smooth Scroll with Next.js, GSAP, Locomotive](https://blog.olivierlarose.com/tutorials/smooth-scroll)
-- [How to Use Framer Motion with Next.js Server Components](https://www.hemantasundaray.com/blog/use-framer-motion-with-nextjs-server-components)
-- [Solving Framer Motion Page Transitions in Next.js App Router](https://www.imcorfitz.com/posts/adding-framer-motion-page-transitions-to-next-js-app-router)
+### Twilio Integration
+- [Webhooks Security | Twilio](https://www.twilio.com/docs/usage/webhooks/webhooks-security)
+- [How to secure Twilio webhook URLs in Node.js | Twilio](https://www.twilio.com/en-us/blog/how-to-secure-twilio-webhook-urls-in-nodejs)
+- [Track Twilio SMS Delivery Status with Next.js Webhooks: Complete StatusCallback Guide](https://www.sent.dm/resources/twilio-node-js-next-js-delivery-status-and-callbacks)
+- [Important Change to the Twilio Phone Number Provisioning API | Twilio](https://www.twilio.com/en-us/blog/company/communications/change-phone-number-provisioning-api)
+- [GitHub - twilio/twilio-node: Node.js helper library](https://github.com/twilio/twilio-node)
 
-### Performance & Optimization
-- [How to Keep Rich Animations Snappy in Next.js 15](https://medium.com/@thomasaugot/how-to-keep-rich-animations-snappy-in-next-js-15-46d90f503b15)
-- [Optimizing Performance in Next.js Using Dynamic Imports](https://dev.to/bolajibolajoko51/optimizing-performance-in-nextjs-using-dynamic-imports-5b3)
-- [Next.js Image Optimization Guide](https://nextjs.org/docs/app/api-reference/components/image)
-- [Next.js Image Component: How to use next/image for performance](https://prismic.io/blog/nextjs-image-component-optimization)
+### Campaign Architecture
+- [Email drip sequences 101: How to architect a marketing automation workflow](https://www.linkedin.com/pulse/email-drip-sequences-101-how-architect-marketing-automation-ruben-dua)
+- [Data model best practices | Adobe Campaign](https://experienceleague.adobe.com/en/docs/campaign-classic/using/configuring-campaign-classic/data-model/data-model-best-practices)
 
-### SEO & Metadata
-- [Maximizing SEO with Meta Data in Next.js 15](https://dev.to/joodi/maximizing-seo-with-meta-data-in-nextjs-15-a-comprehensive-guide-4pa7)
-- [Next.js Metadata API Documentation](https://nextjs.org/learn/seo/metadata)
+### Multi-Channel Messaging
+- [12 Best Unified Messaging Platforms to Consider in 2026](https://www.tidio.com/blog/unified-messaging-platform/)
+- [What Is Unified Messaging? The Benefits, Features & Why It Matters Now](https://www.nextiva.com/blog/unified-messaging.html)
+- [Omnichannel Messaging Platform | OpenText Core Messaging](https://www.opentext.com/products/core-messaging)
 
-### Landing Page Best Practices
-- [Landing Page Structure: Anatomy & Best Practices](https://www.involve.me/blog/landing-page-structure)
-- [10 SaaS Landing Page Trends for 2026](https://www.saasframe.io/blog/10-saas-landing-page-trends-for-2026-with-real-examples)
-- [The Impact of Page Load Animations on Landing Page Performance](https://www.site123.com/learn/the-impact-of-page-load-animations-on-landing-page-performance)
+### LLM Rate Limiting
+- [Rate Limits for LLM Providers: working with rate limits from OpenAI, Anthropic, and DeepSeek | Requesty Blog](https://www.requesty.ai/blog/rate-limits-for-llm-providers-openai-anthropic-and-deepseek)
+- [Rate Limiting in AI Gateway : The Ultimate Guide](https://www.truefoundry.com/blog/rate-limiting-in-llm-gateway)
+- [Tackling Rate Limiting - Portkey Docs](https://portkey.ai/docs/guides/getting-started/tackling-rate-limiting)
+- [Rate limits | OpenAI API](https://platform.openai.com/docs/guides/rate-limits)
 
-### CSS & Styling Strategy
-- [CSS Modules vs Tailwind CSS: A Comprehensive Comparison](https://medium.com/@ignatovich.dm/css-modules-vs-css-in-js-vs-tailwind-css-a-comprehensive-comparison-24e7cb6f48e9)
-- [Page UI - Landing page components for React & Next.js](https://github.com/danmindru/page-ui)
-- [Refactoring landing page with React, NextJS & TailwindCSS](https://dev.to/dkapanidis/refactoring-landing-page-with-react-nextjs-tailwindcss-2hk8)
+### Job Tracking
+- [What Is Customer Lifecycle Management? Complete Guide for 2026 - Vtiger CRM Blog](https://www.vtiger.com/blog/https-www-vtiger-com-blog-what-is-customer-lifecycle-management/)
+- [Customer Management Software (CRM) for Service Businesses](https://www.commusoft.com/en-us/features/customer-database-software/)
+- [CRM Database Schema Example (A Practical Guide)](https://www.dragonflydb.io/databases/schema/crm)
+
+### SaaS Database Design
+- [Designing your SaaS Database for Scale with Postgres - Citus Data](https://www.citusdata.com/blog/2016/10/03/designing-your-saas-database-for-high-scalability/)
+- [Multi-tenant SaaS partitioning models for PostgreSQL - AWS Prescriptive Guidance](https://docs.aws.amazon.com/prescriptive-guidance/latest/saas-multitenant-managed-postgresql/partitioning-models.html)
