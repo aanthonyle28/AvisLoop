@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 **Phase:** Phase 20 - Database Migration & Customer Enhancement
-**Plan:** 07 of 7
-**Status:** Phase complete
-**Last activity:** 2026-02-03 -- Completed 20-07-PLAN.md
+**Plan:** 08/08 complete (A2P deferred)
+**Status:** Phase complete, verified
+**Last activity:** 2026-02-03 -- Phase 20 executed, verified, A2P deferred
 
-**Progress:** [████████████████████████████████░░░░░░░] 90/93+ total plans complete
+**Progress:** [█████████████████████████████████████░░░] 91/100+ total plans complete
 
 ```
 v1.0 MVP:           ████████████████████████████████████████████████ 48/48 SHIPPED
@@ -26,7 +26,8 @@ Phase 20 Layout:    ██ 2/2 COMPLETE (v1.3)
 Phase 21 Preview:   ██ 2/2 COMPLETE (v1.3)
 Phase 22 Drawers:   ███ 3/3 COMPLETE (v1.3)
 Phase 25 Story:     ██ 2/2 COMPLETE (v1.4)
-v2.0 (Ph 20-29):    ████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 7/TBD IN PROGRESS
+v2.0 Phase 20:      ████████ 8/8 COMPLETE (A2P deferred)
+v2.0 (Ph 21-29):    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 0/TBD BLOCKED
 ```
 
 ## What's Been Built
@@ -130,17 +131,20 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 ## Accumulated Context
 
 ### Todos
-- [ ] Plan Phase 20 (Database Migration & Customer Enhancement)
-- [ ] Start Twilio A2P 10DLC registration (2-4 week lead time)
-- [ ] Design customer tags UI/UX
+- [x] Plan Phase 20 (Database Migration & Customer Enhancement)
+- [x] Execute Phase 20 (8/8 plans complete)
+- [ ] Start Twilio A2P 10DLC registration (2-4 week lead time) — BLOCKS Phase 21
+- [ ] Plan Phase 21 (SMS Foundation & Compliance)
 - [ ] Design jobs table schema and RLS policies
 - [ ] Design campaign_enrollments schema
 - [ ] Design message_templates migration strategy
 
 ### Recent Changes
+- 2026-02-03: Phase 20 COMPLETE (8/8 plans, verified, A2P deferred)
+- 2026-02-03: Phase 20-08 deferred (A2P 10DLC registration skipped for now)
 - 2026-02-03: Phase 20-07 complete (SMS consent UI with TCPA audit trail and timezone capture)
 - 2026-02-03: Phase 20-06 complete (CSV import phone handling with review workflow)
-- 2026-02-03: Phase 20-05 complete (customer detail drawer with notes and tags)
+- 2026-02-03: Phase 20-05 complete (customer phone/tags columns, tag filter UI)
 - 2026-02-03: Phase 20-04 complete (contacts→customers terminology migration)
 - 2026-02-03: Phase 20-03 complete (libphonenumber-js utilities and schemas)
 - 2026-02-03: Phase 20-02 complete (customer field enhancements)
@@ -153,12 +157,12 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 ## Session Continuity
 
 **Last session:** 2026-02-03
-**Stopped at:** Completed 20-07-PLAN.md (SMS consent UI and timezone capture)
-**Resume file:** .planning/phases/20-database-migration-customer-enhancement/20-07-SUMMARY.md
-**Next action:** Phase 20 complete - ready for Phase 21 (SMS Foundation)
+**Stopped at:** Phase 20 complete (8/8 plans executed, verified)
+**Resume file:** .planning/phases/20-database-migration-customer-enhancement/20-VERIFICATION.md
+**Next action:** Plan Phase 21 (SMS Foundation & Compliance) — blocked by A2P registration
 
 **Key context for next session:**
-- Phase 20 is migration + customer enhancement + A2P registration (7 requirements)
-- A2P registration is critical path blocker (must complete before Phase 21)
-- Reuse existing contact patterns, extend with phone/tags/SMS fields
-- Customer timezone needed for quiet hours compliance in Phase 21
+- Phase 20 complete: customers table, phone validation, tags, SMS consent UI, timezone
+- A2P 10DLC registration deferred — BLOCKS Phase 21 execution (not planning)
+- Can plan Phase 21 now, but execution requires A2P approval
+- docs/SMS_COMPLIANCE.md tracks registration status
