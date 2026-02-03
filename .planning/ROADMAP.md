@@ -312,4 +312,4 @@ After v2.0:
 
 ---
 *Last updated: 2026-02-02 after Phase 20 planning*
-*v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
+*v2.0 phases replace old v1.3/v1.4 phases 20-25 per user request*
