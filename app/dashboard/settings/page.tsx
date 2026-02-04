@@ -5,7 +5,9 @@ import { BusinessSettingsForm } from '@/components/business-settings-form'
 import { EmailTemplateForm } from '@/components/email-template-form'
 import { TemplateList } from '@/components/template-list'
 import { IntegrationsSection } from '@/components/settings/integrations-section'
+import { ServiceTypesSection } from '@/components/settings/service-types-section'
 import { DeleteAccountDialog } from '@/components/settings/delete-account-dialog'
+import { getServiceTypeSettings } from '@/lib/data/business'
 import type { EmailTemplate } from '@/lib/types/database'
 
 // Loading skeleton for settings content
@@ -70,6 +72,9 @@ async function SettingsContent() {
     templates = data || []
   }
 
+  // Get service type settings
+  const serviceTypeSettings = await getServiceTypeSettings()
+
   return (
     <div className="max-w-4xl mx-auto">
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border px-6 py-4">
@@ -112,7 +117,19 @@ async function SettingsContent() {
           )}
         </section>
 
-        {/* Section 3: Integrations */}
+        {/* Section 3: Service Types */}
+        <section className="border border-border rounded-lg p-6 bg-card shadow-sm">
+          <h2 className="text-xl font-semibold mb-4">Service Types</h2>
+          <ServiceTypesSection
+            initialEnabled={serviceTypeSettings?.serviceTypesEnabled || []}
+            initialTiming={serviceTypeSettings?.serviceTypeTiming || {
+              hvac: 24, plumbing: 48, electrical: 24, cleaning: 4,
+              roofing: 72, painting: 48, handyman: 24, other: 24
+            }}
+          />
+        </section>
+
+        {/* Section 4: Integrations */}
         <section className="border border-border rounded-lg p-6 bg-card shadow-sm">
           <h2 className="text-xl font-semibold mb-4">Integrations</h2>
           <p className="text-muted-foreground mb-4">
@@ -121,7 +138,7 @@ async function SettingsContent() {
           <IntegrationsSection hasExistingKey={!!business?.api_key_hash} />
         </section>
 
-        {/* Section 4: Danger Zone */}
+        {/* Section 5: Danger Zone */}
         <section className="border border-red-200 dark:border-red-800 rounded-lg p-6 bg-card shadow-sm">
           <h2 className="text-xl font-semibold mb-2 text-red-600 dark:text-red-400">Danger Zone</h2>
           <p className="text-muted-foreground mb-4">
