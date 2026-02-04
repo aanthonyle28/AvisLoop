@@ -3,10 +3,10 @@
 ## Current Position
 
 **Milestone:** v2.0 Review Follow-Up System
-**Phase:** 26 of 10 (Review Funnel)
-**Plan:** 7 of 7 in Phase 26
-**Status:** Phase complete
-**Last activity:** 2026-02-04 - Completed 26-07-PLAN.md (Feedback Dashboard)
+**Phase:** 25 of 10 (LLM Personalization)
+**Plan:** 2 of 7 in Phase 25
+**Status:** In progress
+**Last activity:** 2026-02-04 - Completed 25-02-PLAN.md (Zod Schemas & Validation)
 
 **v2.0 Progress:** ██████████████████░░░░░░ (7/10 phases complete or nearly complete)
 
@@ -19,7 +19,7 @@
 | 22 | Jobs CRUD & Service Types | ✅ Complete |
 | 23 | Message Templates & Migration | ✅ Complete |
 | 24 | Multi-Touch Campaign Engine | ✅ Complete (11/11 plans) |
-| 25 | LLM Personalization | 📝 Context captured |
+| 25 | LLM Personalization | 🔄 In progress (2/7 plans) |
 | 26 | Review Funnel | ✅ Complete (7/7 plans) |
 | 27 | Dashboard Redesign | 📋 Not started |
 | 28 | Onboarding Redesign | 📋 Not started |
@@ -32,6 +32,16 @@
 Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) remains blocked on A2P approval for production SMS testing.
 
 ## Accumulated Decisions
+
+### Phase 25
+
+| Decision | Phase | Impact | Constraint |
+|----------|-------|--------|------------|
+| SMS 160-char limit for LLM output | 25-02 | Single SMS segment; opt-out appended separately | PersonalizedSmsSchema max 160 chars |
+| Discriminated union schema | 25-02 | Single parse handles email or SMS | PersonalizedMessageSchema keyed on channel |
+| Fail-fast output validation | 25-02 | Returns on first failure for performance | Order: critical > security > compliance |
+| Base64 detection in sanitizer | 25-02 | Truncates suspected base64 injection payloads | Input strings over 20 base64 chars truncated |
+| 2x template length cap | 25-02 | Output cannot exceed 2x original template | Prevents LLM verbosity |
 
 ### Phase 26
 
@@ -127,13 +137,13 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 - Phase 21-08: Webhook URLs must be configured in Twilio console after deployment
 
 **Next actions:**
-- Phase 27 (Dashboard Redesign) — can add unresolved feedback badge
-- Research/plan Phase 25 (LLM Personalization) — context captured
+- Continue Phase 25 (LLM Personalization) -- 25-03 through 25-07 remain
+- Phase 27 (Dashboard Redesign) -- can add unresolved feedback badge
 - Wait for A2P approval before Phase 21-08 execution
 - Phase 28-29 after earlier phases complete
 
 ## Session Continuity
 
-**Last session:** 2026-02-04T19:32:50Z
-**Stopped at:** Completed Phase 26 (Review Funnel) - all 7 plans executed
+**Last session:** 2026-02-04T23:11:05Z
+**Stopped at:** Completed 25-02-PLAN.md (Zod Schemas & Validation Utilities)
 **Resume file:** None
