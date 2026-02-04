@@ -4,9 +4,9 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** 24 of 10 (Multi-Touch Campaign Engine)
-**Plan:** 1 of 11 in Phase 24
+**Plan:** 4 of 11 in Phase 24
 **Status:** In progress
-**Last activity:** 2026-02-04 - Completed 21-03-PLAN.md
+**Last activity:** 2026-02-04 - Completed 24-04-PLAN.md
 
 **v2.0 Progress:** ████████░░░░░░░░░░░░░░░░ (3/10 phases complete, 2 phases active)
 
@@ -18,7 +18,7 @@
 | 21 | SMS Foundation & Compliance | 🔄 In progress (2/6 plans) |
 | 22 | Jobs CRUD & Service Types | ✅ Complete |
 | 23 | Message Templates & Migration | ✅ Complete |
-| 24 | Multi-Touch Campaign Engine | 🔄 In progress (3/11 plans) |
+| 24 | Multi-Touch Campaign Engine | 🔄 In progress (4/11 plans) |
 | 25 | LLM Personalization | 📋 Not started |
 | 26 | Review Funnel | 📋 Not started |
 | 27 | Dashboard Redesign | 📋 Not started |
@@ -61,6 +61,10 @@ Phase 21-01 database and client foundation complete. Plans 21-02 through 21-06 c
 | Conservative timing | 24-02 | 24h + 72h delays | Safe, proven email cadence |
 | Standard timing | 24-02 | 24h + 72h + 168h delays | Balanced multi-channel approach |
 | Aggressive timing | 24-02 | 4h + 24h + 72h + 168h delays | SMS-first for immediacy |
+| Atomic touch replacement | 24-04 | Delete all touches and re-insert on update | Simpler than diffing/merging |
+| Manual rollback on touch failure | 24-04 | Delete campaign if touches fail to insert | No transaction support in Supabase client |
+| Pause stops enrollments | 24-04 | Pausing campaign stops all active enrollments | Prevents confusing half-active state |
+| Delete blocked by enrollments | 24-04 | Cannot delete if active enrollments exist | Prevents orphaned enrollments |
 
 ### Phase 21
 
@@ -88,6 +92,6 @@ Phase 21-01 database and client foundation complete. Plans 21-02 through 21-06 c
 
 ## Session Continuity
 
-**Last session:** 2026-02-04T07:16:52Z
-**Stopped at:** Completed 21-03-PLAN.md (Twilio Webhook Endpoints)
+**Last session:** 2026-02-04T08:16:46Z
+**Stopped at:** Completed 24-04-PLAN.md (Campaign Data Functions & Actions)
 **Resume file:** None
