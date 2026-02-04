@@ -302,3 +302,54 @@ export async function getEmailTemplates() {
 
   return templates || []
 }
+
+/**
+ * Update business service type settings.
+ * Sets which service types are enabled and timing defaults.
+ */
+export async function updateServiceTypeSettings(settings: {
+  serviceTypesEnabled: string[]
+  serviceTypeTiming: Record<string, number>
+}): Promise<{ error?: string; success?: boolean }> {
+  const supabase = await createClient()
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return { error: 'You must be logged in' }
+  }
+
+  // Validate service types (8 valid types)
+  const validTypes = ['hvac', 'plumbing', 'electrical', 'cleaning', 'roofing', 'painting', 'handyman', 'other']
+  const filteredEnabled = settings.serviceTypesEnabled.filter(t => validTypes.includes(t))
+
+  // Validate timing values (1-168 hours)
+  const validatedTiming: Record<string, number> = {}
+  for (const [type, hours] of Object.entries(settings.serviceTypeTiming)) {
+    if (validTypes.includes(type) && typeof hours === 'number' && hours >= 1 && hours <= 168) {
+      validatedTiming[type] = hours
+    }
+  }
+
+  // Merge with defaults to ensure all types have values
+  const defaultTiming = {
+    hvac: 24, plumbing: 48, electrical: 24, cleaning: 4,
+    roofing: 72, painting: 48, handyman: 24, other: 24
+  }
+  const finalTiming = { ...defaultTiming, ...validatedTiming }
+
+  const { error } = await supabase
+    .from('businesses')
+    .update({
+      service_types_enabled: filteredEnabled,
+      service_type_timing: finalTiming,
+    })
+    .eq('user_id', user.id)
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  revalidatePath('/settings')
+  revalidatePath('/jobs')
+  return { success: true }
+}

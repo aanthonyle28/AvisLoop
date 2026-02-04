@@ -66,3 +66,33 @@ export async function getEmailTemplates() {
 
   return templates || []
 }
+
+/**
+ * Get business service type settings.
+ * Returns which service types are enabled and their timing defaults.
+ */
+export async function getServiceTypeSettings(): Promise<{
+  serviceTypesEnabled: string[]
+  serviceTypeTiming: Record<string, number>
+} | null> {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return null
+
+  const { data: business } = await supabase
+    .from('businesses')
+    .select('service_types_enabled, service_type_timing')
+    .eq('user_id', user.id)
+    .single()
+
+  if (!business) return null
+
+  return {
+    serviceTypesEnabled: business.service_types_enabled || [],
+    serviceTypeTiming: business.service_type_timing || {
+      hvac: 24, plumbing: 48, electrical: 24, cleaning: 4,
+      roofing: 72, painting: 48, handyman: 24, other: 24
+    },
+  }
+}
