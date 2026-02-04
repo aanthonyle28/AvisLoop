@@ -139,6 +139,19 @@ export async function POST(req: NextRequest) {
           console.error('Failed to opt-out contact:', optOutError)
         } else {
           console.log(`Contact ${sendLog.contact_id} opted out due to ${event.type}`)
+
+          // Stop any active campaign enrollments for this customer
+          await supabase
+            .from('campaign_enrollments')
+            .update({
+              status: 'stopped',
+              stop_reason: 'opted_out_email',
+              stopped_at: new Date().toISOString(),
+            })
+            .eq('customer_id', sendLog.contact_id)
+            .eq('status', 'active')
+
+          console.log(`Stopped active enrollments for customer ${sendLog.contact_id} - opted out of email`)
         }
       }
     }

@@ -746,6 +746,13 @@ export async function updateCustomerSmsConsent(
     return { error: error.message }
   }
 
+  // Note: Per CONTEXT.md, SMS opt-out should only skip SMS touches, not stop entire enrollment
+  // This is handled in the cron processor by checking sms_consent_status before sending SMS
+  // No enrollment stop needed here - just log for awareness
+  if (consent.status === 'opted_out') {
+    console.log(`Customer ${customerId} opted out of SMS - SMS touches will be skipped`)
+  }
+
   revalidatePath('/customers')
   return { success: true }
 }
