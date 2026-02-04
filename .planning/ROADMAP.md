@@ -150,17 +150,17 @@ Plans:
 ### Phase 22: Jobs CRUD & Service Types
 **Goal**: Users can create jobs linked to customers with service type and completion status, enabling job-centric workflow and service-specific analytics.
 **Depends on**: Phase 20 (customers table exists)
-**Requirements**: JOBS-01, JOBS-02, JOBS-03, JOBS-04, JOBS-05, JOBS-06, SVCT-01, SVCT-02, SVCT-03, SVCT-04
+**Requirements**: JOBS-01, JOBS-02, JOBS-03, JOBS-04, JOBS-05, JOBS-06, SVCT-01, SVCT-02
+**Deferred to later phases**: SVCT-03 (timing consumed during campaign creation - Phase 24), SVCT-04 (analytics by service type - Phase 27)
 **Success Criteria** (what must be TRUE):
   1. User can view /jobs page with list of all jobs (customer name, service type, status, completion date)
   2. User can create job with customer selector (dropdown search), service type (HVAC/plumbing/electrical/cleaning/roofing/painting/handyman/other), and status (completed/do-not-send)
   3. User can edit job details and mark job completed (completion timestamp saved, triggers campaign enrollment in Phase 24)
   4. Each job links to exactly one customer (foreign key enforced, customer details visible in job view)
-  5. Job completion (status changed to completed) triggers campaign enrollment (when campaign exists for that service type)
-  6. Service taxonomy saved as business setting during onboarding (multi-select: "Which services do you offer?")
-  7. Each service type has default timing rules (HVAC: 24h, plumbing: 48h, electrical: 24h, cleaning: 4h, roofing: 72h) configurable in settings
-  8. Campaign creation for specific service type auto-applies timing defaults (can be overridden)
-  9. Analytics page displays response rate and review rate breakdowns by service type
+  5. Job completion (status changed to completed) triggers campaign enrollment (when campaign exists for that service type) — enrollment logic implemented in Phase 24
+  6. Service taxonomy saved as business setting in /settings page (multi-select: "Which services do you offer?") — onboarding integration deferred to Phase 28
+  7. Each service type has default timing rules (HVAC: 24h, plumbing: 48h, electrical: 24h, cleaning: 4h, roofing: 72h) configurable in settings — stored in DB, consumed by Phase 24 campaign creation
+**Note**: Phase 22 adds schema columns and settings UI for service type timing. Phase 24 consumes timing when creating campaigns. Phase 27 adds analytics by service type. Phase 28 integrates service type selection into onboarding wizard.
 **Plans**: 5 plans in 3 waves
 Plans:
 - [ ] 22-01-PLAN.md — Database schema (jobs table + business service type settings)
@@ -185,7 +185,7 @@ Plans:
 ### Phase 24: Multi-Touch Campaign Engine
 **Goal**: Users can create multi-touch campaigns (up to 4 touches) with preset sequences, enroll jobs on completion, and automatically stop on review/opt-out.
 **Depends on**: Phase 22 (jobs trigger enrollment), Phase 23 (templates ready), Phase 21 (SMS sending works)
-**Requirements**: CAMP-01, CAMP-02, CAMP-03, CAMP-04, CAMP-05, CAMP-06, CAMP-07, CAMP-08, OPS-03, COMP-03
+**Requirements**: CAMP-01, CAMP-02, CAMP-03, CAMP-04, CAMP-05, CAMP-06, CAMP-07, CAMP-08, OPS-03, COMP-03, SVCT-03
 **Success Criteria** (what must be TRUE):
   1. User can select campaign preset during onboarding or settings (conservative: 2 emails; standard: 2 emails + 1 SMS; aggressive: 2 emails + 2 SMS)
   2. User can duplicate any campaign and customize touches (edit channel, timing delay, template)
@@ -197,6 +197,7 @@ Plans:
   8. Campaign creation allows service-type filtering ("only enroll HVAC jobs" or "all service types")
   9. Send pacing controls limit sends per hour per business (default 100/hour, configurable in settings) to avoid spam flags
   10. Campaign sends spread across time windows (throttle 100 sends over 60 minutes, not burst)
+  11. Campaign creation for specific service type auto-applies timing defaults from Phase 22 (can be overridden)
 **Plans**: TBD
 
 ### Phase 25: LLM Personalization
@@ -233,7 +234,7 @@ Plans:
 ### Phase 27: Dashboard Redesign
 **Goal**: Dashboard displays pipeline KPIs, ready-to-send queue, needs attention alerts, quick actions, and daily to-do list.
 **Depends on**: Phase 24 (campaign data exists), Phase 22 (jobs data exists)
-**Requirements**: DASH-01, DASH-02, DASH-03, DASH-04, DASH-05, NAV-01, NAV-02, OPS-01, OPS-02
+**Requirements**: DASH-01, DASH-02, DASH-03, DASH-04, DASH-05, NAV-01, NAV-02, OPS-01, OPS-02, SVCT-04
 **Success Criteria** (what must be TRUE):
   1. Dashboard displays pipeline KPIs widget (jobs ready to send count, active campaigns count, reviews this month count, response rate percentage)
   2. Ready-to-send queue lists completed jobs not yet enrolled in campaign (with quick enroll action)
@@ -244,6 +245,7 @@ Plans:
   7. Navigation badges show pending counts (queued sends count, attention items count)
   8. Exception handling dashboard displays failed sends with retry action, webhook errors with logs, budget warnings with upgrade prompt
   9. Daily to-do list items persist in database (user can dismiss/complete, reappear next day if not resolved)
+  10. Analytics page displays response rate and review rate breakdowns by service type
 **Plans**: TBD
 
 ### Phase 28: Onboarding Redesign
@@ -319,5 +321,5 @@ After v2.0:
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 
 ---
-*Last updated: 2026-02-03 after Phase 22 planning*
+*Last updated: 2026-02-03 after Phase 22 plan revision*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
