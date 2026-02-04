@@ -28,6 +28,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
     "libphonenumber-js": "^1.12.36",
     "lucide-react": "^0.511.0",
     "next": "latest",
@@ -42,6 +43,7 @@
     "sonner": "^2.0.7",
     "stripe": "^20.2.0",
     "tailwind-merge": "^3.3.0",
+    "twilio": "^5.12.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
