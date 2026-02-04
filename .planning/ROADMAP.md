@@ -161,7 +161,13 @@ Plans:
   7. Each service type has default timing rules (HVAC: 24h, plumbing: 48h, electrical: 24h, cleaning: 4h, roofing: 72h) configurable in settings
   8. Campaign creation for specific service type auto-applies timing defaults (can be overridden)
   9. Analytics page displays response rate and review rate breakdowns by service type
-**Plans**: TBD
+**Plans**: 5 plans in 3 waves
+Plans:
+- [ ] 22-01-PLAN.md — Database schema (jobs table + business service type settings)
+- [ ] 22-02-PLAN.md — Types, validations, and server actions for jobs CRUD
+- [ ] 22-03-PLAN.md — Jobs UI page with table, filters, and empty state
+- [ ] 22-04-PLAN.md — Add/edit job forms with customer selector
+- [ ] 22-05-PLAN.md — Service types settings section
 
 ### Phase 23: Message Templates & Migration
 **Goal**: Email and SMS messages use unified message_templates table with channel selector, replacing old email_templates.
@@ -288,7 +294,7 @@ See individual phase sections above for requirements, success criteria, and depe
 | 25 (v1.4) | Landing Page | 2/2 | Complete | 2026-02-02 |
 | **20 (v2.0)** | **Review Follow-Up** | **8/8** | **Complete** | **2026-02-03** |
 | 21 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
-| 22 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
+| **22 (v2.0)** | **Review Follow-Up** | **0/5** | **Planned** | - |
 | 23 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 | 24 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 | 25 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
@@ -302,7 +308,7 @@ See individual phase sections above for requirements, success criteria, and depe
 ## What's Next
 
 **Current milestone:** v2.0 Review Follow-Up System (Phases 20-29)
-**Next action:** Plan Phase 21 (SMS Foundation & Compliance)
+**Next action:** Execute Phase 22 (Jobs CRUD & Service Types)
 
 **Blocker:** Twilio A2P 10DLC registration required before Phase 21 execution (see docs/SMS_COMPLIANCE.md)
 
@@ -313,5 +319,5 @@ After v2.0:
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 
 ---
-*Last updated: 2026-02-02 after Phase 20 planning*
+*Last updated: 2026-02-03 after Phase 22 planning*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
