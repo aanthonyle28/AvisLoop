@@ -4,9 +4,9 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** 25 of 10 (LLM Personalization)
-**Plan:** 3 of 7 in Phase 25
+**Plan:** 4 of 7 in Phase 25
 **Status:** In progress
-**Last activity:** 2026-02-04 - Completed 25-03-PLAN.md (Core Personalization & Fallback Chain)
+**Last activity:** 2026-02-04 - Completed 25-04-PLAN.md (Server Action & Cron Integration)
 
 **v2.0 Progress:** ██████████████████░░░░░░ (7/10 phases complete or nearly complete)
 
@@ -19,7 +19,7 @@
 | 22 | Jobs CRUD & Service Types | ✅ Complete |
 | 23 | Message Templates & Migration | ✅ Complete |
 | 24 | Multi-Touch Campaign Engine | ✅ Complete (11/11 plans) |
-| 25 | LLM Personalization | 🔄 In progress (3/7 plans) |
+| 25 | LLM Personalization | 🔄 In progress (4/7 plans) |
 | 26 | Review Funnel | ✅ Complete (7/7 plans) |
 | 27 | Dashboard Redesign | 📋 Not started |
 | 28 | Onboarding Redesign | 📋 Not started |
@@ -46,6 +46,9 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | 3-second LLM timeout | 25-03 | Fast fallback to template on slow responses | GPT-4o-mini typically 1-2s |
 | Never-throw fallback pattern | 25-03 | personalizeWithFallback always returns a result | LLM failures never block sends |
 | Validation failures skip retry | 25-03 | Deterministic failures don't benefit from retry | Only transient errors (timeout, 429, 5xx) retried |
+| customBody replaces body text only | 25-04 | Email structure (heading, CTA, footer) stays consistent | LLM controls message tone, not email layout |
+| Triple-layer personalization safety | 25-04 | fallback never throws + try/catch + empty defaults | Personalization failure never blocks sends |
+| Job service_type in parallel fetch | 25-04 | Zero additional round-trips for personalization context | Added to existing Promise.all |
 
 ### Phase 26
 
@@ -141,13 +144,13 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 - Phase 21-08: Webhook URLs must be configured in Twilio console after deployment
 
 **Next actions:**
-- Continue Phase 25 (LLM Personalization) -- 25-04 through 25-07 remain
+- Continue Phase 25 (LLM Personalization) -- 25-05 through 25-07 remain
 - Phase 27 (Dashboard Redesign) -- can add unresolved feedback badge
 - Wait for A2P approval before Phase 21-08 execution
 - Phase 28-29 after earlier phases complete
 
 ## Session Continuity
 
-**Last session:** 2026-02-04T23:17:26Z
-**Stopped at:** Completed 25-03-PLAN.md (Core Personalization & Fallback Chain)
+**Last session:** 2026-02-04T23:19:47Z
+**Stopped at:** Completed 25-04-PLAN.md (Server Action & Cron Integration)
 **Resume file:** None
