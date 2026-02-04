@@ -4,9 +4,9 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** 25 of 10 (LLM Personalization)
-**Plan:** 2 of 7 in Phase 25
+**Plan:** 3 of 7 in Phase 25
 **Status:** In progress
-**Last activity:** 2026-02-04 - Completed 25-02-PLAN.md (Zod Schemas & Validation)
+**Last activity:** 2026-02-04 - Completed 25-03-PLAN.md (Core Personalization & Fallback Chain)
 
 **v2.0 Progress:** ██████████████████░░░░░░ (7/10 phases complete or nearly complete)
 
@@ -19,7 +19,7 @@
 | 22 | Jobs CRUD & Service Types | ✅ Complete |
 | 23 | Message Templates & Migration | ✅ Complete |
 | 24 | Multi-Touch Campaign Engine | ✅ Complete (11/11 plans) |
-| 25 | LLM Personalization | 🔄 In progress (2/7 plans) |
+| 25 | LLM Personalization | 🔄 In progress (3/7 plans) |
 | 26 | Review Funnel | ✅ Complete (7/7 plans) |
 | 27 | Dashboard Redesign | 📋 Not started |
 | 28 | Onboarding Redesign | 📋 Not started |
@@ -42,6 +42,10 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | Fail-fast output validation | 25-02 | Returns on first failure for performance | Order: critical > security > compliance |
 | Base64 detection in sanitizer | 25-02 | Truncates suspected base64 injection payloads | Input strings over 20 base64 chars truncated |
 | 2x template length cap | 25-02 | Output cannot exceed 2x original template | Prevents LLM verbosity |
+| 100 calls/hour LLM rate limit | 25-03 | Prevents runaway LLM costs per business | Upstash sliding window, ratelimit:llm prefix |
+| 3-second LLM timeout | 25-03 | Fast fallback to template on slow responses | GPT-4o-mini typically 1-2s |
+| Never-throw fallback pattern | 25-03 | personalizeWithFallback always returns a result | LLM failures never block sends |
+| Validation failures skip retry | 25-03 | Deterministic failures don't benefit from retry | Only transient errors (timeout, 429, 5xx) retried |
 
 ### Phase 26
 
@@ -137,13 +141,13 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 - Phase 21-08: Webhook URLs must be configured in Twilio console after deployment
 
 **Next actions:**
-- Continue Phase 25 (LLM Personalization) -- 25-03 through 25-07 remain
+- Continue Phase 25 (LLM Personalization) -- 25-04 through 25-07 remain
 - Phase 27 (Dashboard Redesign) -- can add unresolved feedback badge
 - Wait for A2P approval before Phase 21-08 execution
 - Phase 28-29 after earlier phases complete
 
 ## Session Continuity
 
-**Last session:** 2026-02-04T23:11:05Z
-**Stopped at:** Completed 25-02-PLAN.md (Zod Schemas & Validation Utilities)
+**Last session:** 2026-02-04T23:17:26Z
+**Stopped at:** Completed 25-03-PLAN.md (Core Personalization & Fallback Chain)
 **Resume file:** None
