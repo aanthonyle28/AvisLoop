@@ -70,6 +70,36 @@ export type Contact = Customer
 export type ContactInsert = CustomerInsert
 export type ContactUpdate = CustomerUpdate
 
+// Service type literal union
+export type ServiceType = 'hvac' | 'plumbing' | 'electrical' | 'cleaning' | 'roofing' | 'painting' | 'handyman' | 'other'
+
+// Job status literal union
+export type JobStatus = 'completed' | 'do_not_send'
+
+// Job interface matching database schema
+export interface Job {
+  id: string
+  business_id: string
+  customer_id: string
+  service_type: ServiceType
+  status: JobStatus
+  notes: string | null
+  completed_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+// Job with joined customer data for list views
+export interface JobWithCustomer extends Job {
+  customers: Pick<Customer, 'id' | 'name' | 'email' | 'phone'>
+}
+
+// Insert type (omit auto-generated fields)
+export type JobInsert = Omit<Job, 'id' | 'created_at' | 'updated_at'>
+
+// Update type (partial, omit immutable fields)
+export type JobUpdate = Partial<Omit<Job, 'id' | 'business_id' | 'created_at' | 'updated_at'>>
+
 export interface SendLog {
   id: string
   business_id: string
