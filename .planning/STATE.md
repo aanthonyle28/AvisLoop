@@ -4,9 +4,9 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** 26 of 10 (Review Funnel)
-**Plan:** 1 of 7 in Phase 26
+**Plan:** 2 of 7 in Phase 26
 **Status:** In progress
-**Last activity:** 2026-02-04 - Completed 26-01-PLAN.md
+**Last activity:** 2026-02-04 - Completed 26-02-PLAN.md
 
 **v2.0 Progress:** ████████░░░░░░░░░░░░░░░░ (3/10 phases complete, 3 phases active)
 
@@ -20,7 +20,7 @@
 | 23 | Message Templates & Migration | ✅ Complete |
 | 24 | Multi-Touch Campaign Engine | 🔄 In progress (7/11 plans) |
 | 25 | LLM Personalization | 📋 Not started |
-| 26 | Review Funnel | 🔄 In progress (1/7 plans) |
+| 26 | Review Funnel | 🔄 In progress (2/7 plans) |
 | 27 | Dashboard Redesign | 📋 Not started |
 | 28 | Onboarding Redesign | 📋 Not started |
 | 29 | Agency-Mode Readiness & Landing Page | 📋 Not started |
@@ -38,6 +38,10 @@ Phase 21-01 database and client foundation complete. Plans 21-02 through 21-06 c
 | Decision | Phase | Impact | Constraint |
 |----------|-------|--------|------------|
 | Rating constraint 1-5 | 26-01 | Table accepts full range | API route controls funnel routing (1-3 to feedback, 4-5 to review) |
+| base64url token encoding | 26-02 | URL-safe tokens without padding issues | All review URLs use base64url |
+| 30-day token expiration | 26-02 | Tokens expire after 30 days | Review links have time limit |
+| 4-star routing threshold | 26-02 | 4-5 stars -> Google, 1-3 stars -> feedback | GOOGLE_THRESHOLD = 4 constant |
+| Null return for invalid tokens | 26-02 | parseReviewToken returns null on error | Callers check for null, no try/catch needed |
 
 ### Phase 23
 
@@ -119,6 +123,6 @@ Phase 21-01 database and client foundation complete. Plans 21-02 through 21-06 c
 
 ## Session Continuity
 
-**Last session:** 2026-02-04T19:15:00Z
-**Stopped at:** Completed 26-01-PLAN.md (Feedback Schema)
+**Last session:** 2026-02-04T19:15:30Z
+**Stopped at:** Completed 26-02-PLAN.md (Token Utilities)
 **Resume file:** None
