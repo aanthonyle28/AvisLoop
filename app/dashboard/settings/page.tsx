@@ -2,13 +2,14 @@ import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { BusinessSettingsForm } from '@/components/business-settings-form'
-import { EmailTemplateForm } from '@/components/email-template-form'
+import { MessageTemplateForm } from '@/components/templates/message-template-form'
 import { TemplateList } from '@/components/template-list'
 import { IntegrationsSection } from '@/components/settings/integrations-section'
 import { ServiceTypesSection } from '@/components/settings/service-types-section'
 import { DeleteAccountDialog } from '@/components/settings/delete-account-dialog'
 import { getServiceTypeSettings } from '@/lib/data/business'
-import type { EmailTemplate } from '@/lib/types/database'
+import { getAvailableTemplates } from '@/lib/data/message-template'
+import type { MessageTemplate, EmailTemplate } from '@/lib/types/database'
 
 // Loading skeleton for settings content
 function SettingsLoadingSkeleton() {
@@ -60,8 +61,8 @@ async function SettingsContent() {
     .eq('user_id', user.id)
     .single()
 
-  // Get templates
-  let templates: EmailTemplate[] = []
+  // Get email templates for backward compat (BusinessSettingsForm dropdown)
+  let emailTemplates: EmailTemplate[] = []
   if (business) {
     const { data } = await supabase
       .from('email_templates')
@@ -69,8 +70,11 @@ async function SettingsContent() {
       .eq('business_id', business.id)
       .order('is_default', { ascending: false })
       .order('created_at', { ascending: true })
-    templates = data || []
+    emailTemplates = data || []
   }
+
+  // Get message templates for display (both user and system)
+  const messageTemplates: MessageTemplate[] = business ? await getAvailableTemplates() : []
 
   // Get service type settings
   const serviceTypeSettings = await getServiceTypeSettings()
@@ -80,7 +84,7 @@ async function SettingsContent() {
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border px-6 py-4">
         <h1 className="text-3xl font-bold">Settings</h1>
         <p className="text-muted-foreground mt-1">
-          Configure your business profile and email templates
+          Configure your business profile and message templates
         </p>
       </div>
 
@@ -88,30 +92,30 @@ async function SettingsContent() {
         {/* Section 1: Business Profile */}
         <section className="border border-border rounded-lg p-6 bg-card shadow-sm">
           <h2 className="text-xl font-semibold mb-4">Business Profile</h2>
-          <BusinessSettingsForm initialData={business} templates={templates} />
+          <BusinessSettingsForm initialData={business} templates={emailTemplates} />
         </section>
 
-        {/* Section 2: Email Templates */}
+        {/* Section 2: Message Templates */}
         <section className="border border-border rounded-lg p-6 bg-card shadow-sm">
-          <h2 className="text-xl font-semibold mb-4">Email Templates</h2>
+          <h2 className="text-xl font-semibold mb-4">Message Templates</h2>
           <p className="text-muted-foreground mb-4">
-            Customize your review request messages. Use variables like
-            {' '}{'{{CUSTOMER_NAME}}'}, {'{{BUSINESS_NAME}}'}, {'{{REVIEW_LINK}}'}, {'{{SENDER_NAME}}'}.
+            Create templates for email and SMS review requests. Use variables like
+            {' '}{'{{CUSTOMER_NAME}}'}, {'{{BUSINESS_NAME}}'}, {'{{REVIEW_LINK}}'}.
           </p>
 
           {/* Show existing templates */}
-          <TemplateList templates={templates} />
+          <TemplateList templates={messageTemplates} />
 
           {/* Only show template form if business exists */}
           {business && (
-            <div className="mt-6 pt-6 border-t">
+            <div className="mt-6 pt-6 border-t border-border">
               <h3 className="text-lg font-medium mb-4">Create New Template</h3>
-              <EmailTemplateForm />
+              <MessageTemplateForm />
             </div>
           )}
 
           {!business && (
-            <p className="text-amber-600 text-sm mt-4">
+            <p className="text-amber-600 dark:text-amber-500 text-sm mt-4">
               Save your business profile above before creating custom templates.
             </p>
           )}

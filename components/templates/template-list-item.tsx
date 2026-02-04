@@ -30,7 +30,7 @@ export function TemplateListItem({ template, onUpdate }: TemplateListItemProps) 
       } else {
         toast.error(result.error || 'Failed to copy template')
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to copy template')
     } finally {
       setIsCopying(false)
@@ -51,7 +51,7 @@ export function TemplateListItem({ template, onUpdate }: TemplateListItemProps) 
       } else {
         toast.error(result.error || 'Failed to delete template')
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to delete template')
     } finally {
       setIsDeleting(false)
