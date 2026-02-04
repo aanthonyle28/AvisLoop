@@ -61,20 +61,8 @@ async function SettingsContent() {
     .eq('user_id', user.id)
     .single()
 
-  // Get email templates for backward compat (BusinessSettingsForm dropdown)
-  let emailTemplates: EmailTemplate[] = []
-  if (business) {
-    const { data } = await supabase
-      .from('email_templates')
-      .select('*')
-      .eq('business_id', business.id)
-      .order('is_default', { ascending: false })
-      .order('created_at', { ascending: true })
-    emailTemplates = data || []
-  }
-
   // Get message templates for display (both user and system)
-  const messageTemplates: MessageTemplate[] = business ? await getAvailableTemplates() : []
+  const templates: MessageTemplate[] = business ? await getAvailableTemplates() : []
 
   // Get service type settings
   const serviceTypeSettings = await getServiceTypeSettings()
@@ -92,7 +80,7 @@ async function SettingsContent() {
         {/* Section 1: Business Profile */}
         <section className="border border-border rounded-lg p-6 bg-card shadow-sm">
           <h2 className="text-xl font-semibold mb-4">Business Profile</h2>
-          <BusinessSettingsForm initialData={business} templates={emailTemplates} />
+          <BusinessSettingsForm initialData={business} templates={templates} />
         </section>
 
         {/* Section 2: Message Templates */}
@@ -104,7 +92,7 @@ async function SettingsContent() {
           </p>
 
           {/* Show existing templates */}
-          <TemplateList templates={messageTemplates} />
+          <TemplateList templates={templates} />
 
           {/* Only show template form if business exists */}
           {business && (
