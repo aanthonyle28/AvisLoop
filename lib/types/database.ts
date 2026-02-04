@@ -226,3 +226,113 @@ export interface SendLogDetail {
 export interface ScheduledSendWithDetails extends ScheduledSend {
   sendLogs: SendLogDetail[]
 }
+
+// Campaign status literal union
+export type CampaignStatus = 'active' | 'paused'
+
+// Campaign definition
+export interface Campaign {
+  id: string
+  business_id: string | null  // NULL for system presets
+  name: string
+  service_type: ServiceType | null  // NULL = all services
+  status: CampaignStatus
+  is_preset: boolean
+  created_at: string
+  updated_at: string
+}
+
+// Insert type
+export type CampaignInsert = Omit<Campaign, 'id' | 'created_at' | 'updated_at'>
+
+// Update type
+export type CampaignUpdate = Partial<Omit<Campaign, 'id' | 'business_id' | 'is_preset' | 'created_at' | 'updated_at'>>
+
+// Campaign touch in a sequence
+export interface CampaignTouch {
+  id: string
+  campaign_id: string
+  touch_number: number  // 1-4
+  channel: MessageChannel
+  delay_hours: number
+  template_id: string | null
+  created_at: string
+}
+
+export type CampaignTouchInsert = Omit<CampaignTouch, 'id' | 'created_at'>
+export type CampaignTouchUpdate = Partial<Omit<CampaignTouch, 'id' | 'campaign_id' | 'created_at'>>
+
+// Campaign with nested touches for full view
+export interface CampaignWithTouches extends Campaign {
+  campaign_touches: CampaignTouch[]
+}
+
+// Enrollment status state machine
+export type EnrollmentStatus = 'active' | 'completed' | 'stopped'
+
+// Stop reason when enrollment ends
+export type EnrollmentStopReason =
+  | 'review_clicked'
+  | 'feedback_submitted'
+  | 'opted_out_sms'
+  | 'opted_out_email'
+  | 'owner_stopped'
+  | 'campaign_paused'
+  | 'campaign_deleted'
+  | 'repeat_job'
+
+// Touch status within enrollment
+export type TouchStatus = 'pending' | 'sent' | 'skipped' | 'failed'
+
+// Campaign enrollment tracking
+export interface CampaignEnrollment {
+  id: string
+  business_id: string
+  campaign_id: string
+  job_id: string
+  customer_id: string
+  status: EnrollmentStatus
+  stop_reason: EnrollmentStopReason | null
+  current_touch: number  // 1-4
+  touch_1_scheduled_at: string | null
+  touch_1_sent_at: string | null
+  touch_1_status: TouchStatus | null
+  touch_2_scheduled_at: string | null
+  touch_2_sent_at: string | null
+  touch_2_status: TouchStatus | null
+  touch_3_scheduled_at: string | null
+  touch_3_sent_at: string | null
+  touch_3_status: TouchStatus | null
+  touch_4_scheduled_at: string | null
+  touch_4_sent_at: string | null
+  touch_4_status: TouchStatus | null
+  enrolled_at: string
+  completed_at: string | null
+  stopped_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type CampaignEnrollmentInsert = Omit<CampaignEnrollment,
+  'id' | 'created_at' | 'updated_at' | 'completed_at' | 'stopped_at'
+>
+
+// Enrollment with related data for list views
+export interface CampaignEnrollmentWithDetails extends CampaignEnrollment {
+  customers: Pick<Customer, 'id' | 'name' | 'email' | 'phone'>
+  jobs: Pick<Job, 'id' | 'service_type' | 'completed_at'>
+  campaigns: Pick<Campaign, 'id' | 'name'>
+}
+
+// Claimed touch from RPC for cron processing
+export interface ClaimedCampaignTouch {
+  enrollment_id: string
+  business_id: string
+  campaign_id: string
+  job_id: string
+  customer_id: string
+  touch_number: number
+  channel: MessageChannel
+  template_id: string | null
+  scheduled_at: string
+}
