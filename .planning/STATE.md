@@ -6,7 +6,7 @@
 **Phase:** 24 of 10 (Multi-Touch Campaign Engine)
 **Plan:** 7 of 11 in Phase 24
 **Status:** In progress
-**Last activity:** 2026-02-04 - Completed 24-07-PLAN.md
+**Last activity:** 2026-02-04 - Completed 21-05-PLAN.md
 
 **v2.0 Progress:** ████████░░░░░░░░░░░░░░░░ (3/10 phases complete, 2 phases active)
 
@@ -15,7 +15,7 @@
 | Phase | Name | Status |
 |-------|------|--------|
 | 20 | Database Migration & Customer Enhancement | ✅ Complete |
-| 21 | SMS Foundation & Compliance | 🔄 In progress (4/6 plans) |
+| 21 | SMS Foundation & Compliance | 🔄 In progress (5/6 plans) |
 | 22 | Jobs CRUD & Service Types | ✅ Complete |
 | 23 | Message Templates & Migration | ✅ Complete |
 | 24 | Multi-Touch Campaign Engine | 🔄 In progress (7/11 plans) |
@@ -93,6 +93,10 @@ Phase 21-01 database and client foundation complete. Plans 21-02 through 21-06 c
 | Exponential backoff (1/5/15 min) | 21-04 | Industry standard retry timing | Balances retry speed vs. not overwhelming |
 | Max 3 retry attempts | 21-04 | Sufficient for transient failures | Prevents infinite loops |
 | Consent re-check on retry | 21-04 | Customer may opt out between queue and retry | TCPA compliance maintained |
+| SMS consent gate | 21-05 | SMS only sends to opted_in customers | Strict TCPA compliance |
+| Quiet hours queue | 21-05 | SMS outside 8am-9pm queued via retry | Not rejected, deferred |
+| SMS body auto-populate | 21-05 | Review link auto-populated when SMS selected | UX convenience |
+| Channel reset on change | 21-05 | Resets to email when customer changes and SMS unavailable | Prevents stuck state |
 
 ## Known Blockers / Concerns
 
@@ -108,6 +112,6 @@ Phase 21-01 database and client foundation complete. Plans 21-02 through 21-06 c
 
 ## Session Continuity
 
-**Last session:** 2026-02-04T07:25:01Z
-**Stopped at:** Completed 24-06-PLAN.md (Campaign Touch Processing Cron)
+**Last session:** 2026-02-04T18:05:08Z
+**Stopped at:** Completed 21-05-PLAN.md (SMS Send Action & Channel UI)
 **Resume file:** None
