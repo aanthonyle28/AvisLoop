@@ -2,9 +2,8 @@
 
 import { createClient } from '@/lib/supabase/server'
 import type {
-  Campaign,
+  CampaignTouch,
   CampaignWithTouches,
-  CampaignEnrollment,
   CampaignEnrollmentWithDetails,
   ServiceType,
 } from '@/lib/types/database'
@@ -59,7 +58,7 @@ export async function getCampaigns(
   return (data || []).map(campaign => ({
     ...campaign,
     campaign_touches: (campaign.campaign_touches || []).sort(
-      (a: any, b: any) => a.touch_number - b.touch_number
+      (a: CampaignTouch, b: CampaignTouch) => a.touch_number - b.touch_number
     ),
   })) as CampaignWithTouches[]
 }
@@ -87,7 +86,7 @@ export async function getCampaign(campaignId: string): Promise<CampaignWithTouch
   return {
     ...data,
     campaign_touches: (data.campaign_touches || []).sort(
-      (a: any, b: any) => a.touch_number - b.touch_number
+      (a: CampaignTouch, b: CampaignTouch) => a.touch_number - b.touch_number
     ),
   } as CampaignWithTouches
 }
@@ -110,7 +109,7 @@ export async function getCampaignPresets(): Promise<CampaignWithTouches[]> {
   return (data || []).map(campaign => ({
     ...campaign,
     campaign_touches: (campaign.campaign_touches || []).sort(
-      (a: any, b: any) => a.touch_number - b.touch_number
+      (a: CampaignTouch, b: CampaignTouch) => a.touch_number - b.touch_number
     ),
   })) as CampaignWithTouches[]
 }
@@ -217,7 +216,7 @@ export async function getActiveCampaignForJob(
   return {
     ...data,
     campaign_touches: (data.campaign_touches || []).sort(
-      (a: any, b: any) => a.touch_number - b.touch_number
+      (a: CampaignTouch, b: CampaignTouch) => a.touch_number - b.touch_number
     ),
   } as CampaignWithTouches
 }
