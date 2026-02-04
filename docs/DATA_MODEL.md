@@ -82,3 +82,78 @@ The `phone_status` field tracks phone number validation state:
 - `missing`: No phone number provided (email-only customer)
 
 Set to 'missing' by default on migration. App code updates to 'valid' when E.164 validation passes during customer creation/update.
+
+## Table: jobs
+
+Stores completed service jobs for each business. Each job links to exactly one customer and has a service type for campaign targeting.
+
+### Schema
+
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | UUID | NO | gen_random_uuid() | Primary key |
+| business_id | UUID | NO | - | FK to businesses |
+| customer_id | UUID | NO | - | FK to customers |
+| service_type | TEXT | NO | - | One of: hvac, plumbing, electrical, cleaning, roofing, painting, handyman, other |
+| status | TEXT | NO | 'completed' | 'completed' or 'do_not_send' |
+| notes | TEXT | YES | - | Internal notes about the job |
+| completed_at | TIMESTAMPTZ | YES | - | When job was marked completed (null if do_not_send) |
+| created_at | TIMESTAMPTZ | YES | NOW() | Created timestamp |
+| updated_at | TIMESTAMPTZ | YES | NOW() | Updated timestamp |
+
+### RLS Policies
+
+- Users can only view/insert/update/delete jobs for businesses they own
+- Business ownership verified via subquery: `business_id IN (SELECT id FROM businesses WHERE user_id = auth.uid())`
+
+### Indexes
+
+- idx_jobs_business_id (btree)
+- idx_jobs_customer_id (btree)
+- idx_jobs_business_status (btree on business_id, status)
+- idx_jobs_business_service_type (btree on business_id, service_type)
+- idx_jobs_completed_at (partial: completed_at IS NOT NULL)
+
+### Foreign Keys
+
+- jobs.business_id references businesses.id (CASCADE)
+- jobs.customer_id references customers.id (CASCADE)
+
+### Service Types
+
+Fixed set of 8 service types (stored lowercase):
+- hvac - Heating, ventilation, air conditioning
+- plumbing - Plumbing and water systems
+- electrical - Electrical work
+- cleaning - Cleaning services
+- roofing - Roof repair and installation
+- painting - Interior/exterior painting
+- handyman - General handyman services
+- other - Other services not listed
+
+### Status Workflow
+
+Simple two-state workflow for v2.0:
+- `completed` - Job is done, triggers campaign enrollment (Phase 24)
+- `do_not_send` - Job complete but should not trigger review request
+
+When status changes to 'completed', completed_at is set. Campaign enrollment logic (Phase 24) uses completed_at to determine timing.
+
+## Business Service Type Settings
+
+Added in Phase 22 for service-specific campaign timing:
+
+| Column | Type | Description |
+|--------|------|-------------|
+| service_types_enabled | TEXT[] | Array of service types this business offers |
+| service_type_timing | JSONB | Map of service type to hours until first campaign touch |
+
+Default timing values:
+- hvac: 24 hours
+- plumbing: 48 hours
+- electrical: 24 hours
+- cleaning: 4 hours
+- roofing: 72 hours
+- painting: 48 hours
+- handyman: 24 hours
+- other: 24 hours
