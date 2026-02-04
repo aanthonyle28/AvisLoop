@@ -330,26 +330,26 @@ See individual phase sections above for requirements, success criteria, and depe
 | 22 (v1.3) | Dashboard UX | 3/3 | Complete | 2026-02-02 |
 | 25 (v1.4) | Landing Page | 2/2 | Complete | 2026-02-02 |
 | **20 (v2.0)** | **Review Follow-Up** | **8/8** | **Complete** | **2026-02-03** |
-| 21 (v2.0) | Review Follow-Up | 0/6 | Blocked (A2P) | - |
+| 21 (v2.0) | Review Follow-Up | 7/8 | Blocked (A2P) | - |
 | **22 (v2.0)** | **Review Follow-Up** | **5/5** | **Complete** | **2026-02-04** |
 | **23 (v2.0)** | **Review Follow-Up** | **7/7** | **Complete** | **2026-02-04** |
 | **24 (v2.0)** | **Review Follow-Up** | **11/11** | **Complete** | **2026-02-04** |
-| 25 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
-| 26 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
+| 25 (v2.0) | Review Follow-Up | 0/TBD | Context captured | - |
+| **26 (v2.0)** | **Review Follow-Up** | **6/7** | **In progress** | - |
 | 27 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 | 28 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 | 29 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 
-**Total:** 114 plans complete across shipped phases, 6 v2.0 phases remaining.
+**Total:** 131 plans complete across shipped phases, 4 v2.0 phases remaining.
 
 ## What's Next
 
 **Current milestone:** v2.0 Review Follow-Up System (Phases 20-29)
-**Next action:** Execute Phase 25 (LLM Personalization) — requires planning first
+**Next action:** Complete Phase 26-07 (Review Funnel), then plan Phase 25 (LLM Personalization)
 
 **Blockers:**
-- Twilio A2P 10DLC registration required before Phase 21 execution (see docs/SMS_COMPLIANCE.md)
-- Phase 25 requires Phase 21 SMS sending to be complete for full functionality
+- Twilio A2P 10DLC registration required before Phase 21-08 execution (webhook verification)
+- Phase 25 can proceed without SMS — LLM personalization works for email channel
 
 After v2.0:
 - **v2.1 Integrations** — ServiceTitan/Jobber/Housecall Pro API integrations for auto job import
