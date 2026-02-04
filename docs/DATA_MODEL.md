@@ -157,3 +157,61 @@ Default timing values:
 - painting: 48 hours
 - handyman: 24 hours
 - other: 24 hours
+
+## Table: message_templates
+
+Unified template storage for email and SMS review request messages. Replaces email_templates (view exists for backward compatibility).
+
+### Schema
+
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | UUID | NO | gen_random_uuid() | Primary key |
+| business_id | UUID | YES | - | FK to businesses (NULL for system templates) |
+| name | TEXT | NO | - | Template name |
+| subject | TEXT | NO | - | Email subject (empty for SMS) |
+| body | TEXT | NO | - | Message body |
+| channel | TEXT | NO | - | 'email' or 'sms' |
+| service_type | TEXT | YES | - | Service category (hvac, plumbing, etc.) |
+| is_default | BOOLEAN | NO | false | System template flag |
+| created_at | TIMESTAMPTZ | YES | NOW() | Created timestamp |
+| updated_at | TIMESTAMPTZ | YES | NOW() | Updated timestamp |
+
+### Channel Discriminator
+
+- `email`: Full email template with subject + body
+- `sms`: SMS message with body only (subject should be empty string)
+
+### System Templates
+
+- 16 default system templates (8 service types x 2 channels)
+- System templates have `business_id = NULL` and `is_default = true`
+- All users can read system templates (RLS policy)
+- Users cannot modify or delete system templates
+- "Use this template" creates an editable copy for the business
+
+### Constraints
+
+- `channel IN ('email', 'sms')` - CHECK constraint
+- `service_type IN ('hvac', 'plumbing', 'electrical', 'cleaning', 'roofing', 'painting', 'handyman', 'other')` - CHECK constraint (nullable)
+- `name` minimum 1 character
+- `subject` minimum 1 character (for email)
+- `body` minimum 1 character
+
+### RLS Policies
+
+- Users can view their own templates (business_id matches)
+- Users can view system templates (is_default = true)
+- Users can only insert/update/delete their own templates (not system templates)
+
+### Indexes
+
+- idx_message_templates_business_id (btree)
+- idx_message_templates_channel (btree)
+- idx_message_templates_is_default (partial: WHERE is_default = true)
+
+### Compatibility
+
+- View `email_templates` exists for backward compatibility during migration window
+- View filters to `WHERE channel = 'email'`
+- Remove view in Phase 25 after all code updated
