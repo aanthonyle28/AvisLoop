@@ -143,6 +143,47 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // === Stop campaign if link clicked (review submission intent) ===
+    if (event.type === 'email.clicked') {
+      const enrollmentId = event.data.tags?.find((t: { name: string; value: string }) => t.name === 'enrollment_id')?.value
+
+      // If this was a campaign email, stop the enrollment
+      if (enrollmentId) {
+        await supabase
+          .from('campaign_enrollments')
+          .update({
+            status: 'stopped',
+            stop_reason: 'review_clicked',
+            stopped_at: new Date().toISOString(),
+          })
+          .eq('id', enrollmentId)
+          .eq('status', 'active')  // Only stop if still active
+
+        console.log(`Stopped enrollment ${enrollmentId} - review clicked`)
+      } else {
+        // Try to find enrollment via send_log
+        const { data: sendLog } = await supabase
+          .from('send_logs')
+          .select('campaign_enrollment_id')
+          .eq('id', sendLogId)
+          .single()
+
+        if (sendLog?.campaign_enrollment_id) {
+          await supabase
+            .from('campaign_enrollments')
+            .update({
+              status: 'stopped',
+              stop_reason: 'review_clicked',
+              stopped_at: new Date().toISOString(),
+            })
+            .eq('id', sendLog.campaign_enrollment_id)
+            .eq('status', 'active')
+
+          console.log(`Stopped enrollment ${sendLog.campaign_enrollment_id} - review clicked (via send_log)`)
+        }
+      }
+    }
+
     return NextResponse.json({ received: true })
   } catch (error) {
     console.error('Webhook processing error:', error)
