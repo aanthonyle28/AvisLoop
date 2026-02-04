@@ -1,13 +1,14 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { getCampaign, getCampaignEnrollments, getCampaignEnrollmentCounts } from '@/lib/data/campaign'
+import { getCampaign, getCampaignEnrollments, getCampaignEnrollmentCounts, getCampaignAnalytics } from '@/lib/data/campaign'
+import { CampaignStats } from '@/components/campaigns/campaign-stats'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { PencilSimple, EnvelopeSimple, ChatCircle, ArrowLeft } from '@phosphor-icons/react/dist/ssr'
+import { PencilSimple, EnvelopeSimple, ChatCircle, ArrowLeft, Sparkle } from '@phosphor-icons/react/dist/ssr'
 import { SERVICE_TYPE_LABELS } from '@/lib/validations/job'
-import { ENROLLMENT_STATUS_LABELS, STOP_REASON_LABELS, TOUCH_STATUS_LABELS } from '@/lib/constants/campaigns'
-import { formatDistanceToNow, format } from 'date-fns'
+import { ENROLLMENT_STATUS_LABELS, STOP_REASON_LABELS } from '@/lib/constants/campaigns'
+import { formatDistanceToNow } from 'date-fns'
 
 interface CampaignDetailPageProps {
   params: Promise<{ id: string }>
@@ -23,10 +24,11 @@ export async function generateMetadata({ params }: CampaignDetailPageProps) {
 
 export default async function CampaignDetailPage({ params }: CampaignDetailPageProps) {
   const { id } = await params
-  const [campaign, enrollments, counts] = await Promise.all([
+  const [campaign, enrollments, counts, analytics] = await Promise.all([
     getCampaign(id),
     getCampaignEnrollments(id, { limit: 20 }),
     getCampaignEnrollmentCounts(id),
+    getCampaignAnalytics(id),
   ])
 
   if (!campaign) {
@@ -50,6 +52,12 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
             <Badge variant={campaign.status === 'active' ? 'default' : 'secondary'}>
               {campaign.status === 'active' ? 'Active' : 'Paused'}
             </Badge>
+            {campaign.personalization_enabled && (
+              <Badge variant="secondary" className="gap-1">
+                <Sparkle weight="fill" className="h-3 w-3 text-amber-500" />
+                AI Personalized
+              </Badge>
+            )}
           </div>
           <p className="text-muted-foreground mt-1">
             {campaign.service_type
@@ -103,6 +111,15 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
           </CardContent>
         </Card>
       </div>
+
+      {/* Analytics */}
+      <CampaignStats
+        touchStats={analytics.touchStats}
+        stopReasons={analytics.stopReasons}
+        totalEnrollments={analytics.totalEnrollments}
+        avgTouchesCompleted={analytics.avgTouchesCompleted}
+        touchCount={campaign.campaign_touches.length}
+      />
 
       {/* Touch sequence visualization */}
       <Card>
