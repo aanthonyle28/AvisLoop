@@ -213,7 +213,19 @@ Plans:
   9. Send pacing controls limit sends per hour per business (default 100/hour, configurable in settings) to avoid spam flags
   10. Campaign sends spread across time windows (throttle 100 sends over 60 minutes, not burst)
   11. Campaign creation for specific service type auto-applies timing defaults from Phase 22 (can be overridden)
-**Plans**: TBD
+**Plans**: 11 plans in 5 waves
+Plans:
+- [ ] 24-01-PLAN.md — Database schema (campaigns, campaign_touches, campaign_enrollments, send_log extensions)
+- [ ] 24-02-PLAN.md — Atomic touch claiming RPC and campaign preset seeding
+- [ ] 24-03-PLAN.md — TypeScript types, Zod validations, and campaign constants
+- [ ] 24-04-PLAN.md — Campaign data functions and server actions (CRUD, duplicate, status toggle)
+- [ ] 24-05-PLAN.md — Enrollment server actions and job completion integration
+- [ ] 24-06-PLAN.md — Cron job for campaign touch processing with rate limiting and quiet hours
+- [ ] 24-07-PLAN.md — Campaigns page with list view, status toggle, and preset picker
+- [ ] 24-08-PLAN.md — Campaign detail page, edit page, and form components
+- [ ] 24-09-PLAN.md — Job completion enrollment checkbox and navigation update
+- [ ] 24-10-PLAN.md — Stop conditions (email click webhook, customer opt-out)
+- [ ] 24-11-PLAN.md — Campaign analytics and performance stats component
 
 ### Phase 25: LLM Personalization
 **Goal**: Campaign messages optionally personalized via GPT-4o-mini with guardrails, graceful fallback to templates, and cost tracking.
@@ -310,10 +322,10 @@ See individual phase sections above for requirements, success criteria, and depe
 | 22 (v1.3) | Dashboard UX | 3/3 | Complete | 2026-02-02 |
 | 25 (v1.4) | Landing Page | 2/2 | Complete | 2026-02-02 |
 | **20 (v2.0)** | **Review Follow-Up** | **8/8** | **Complete** | **2026-02-03** |
-| 21 (v2.0) | Review Follow-Up | 0/TBD | Blocked (A2P) | - |
+| 21 (v2.0) | Review Follow-Up | 0/6 | Blocked (A2P) | - |
 | **22 (v2.0)** | **Review Follow-Up** | **5/5** | **Complete** | **2026-02-04** |
 | **23 (v2.0)** | **Review Follow-Up** | **7/7** | **Complete** | **2026-02-04** |
-| 24 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
+| 24 (v2.0) | Review Follow-Up | 0/11 | Planned | - |
 | 25 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 | 26 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 | 27 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
@@ -325,7 +337,7 @@ See individual phase sections above for requirements, success criteria, and depe
 ## What's Next
 
 **Current milestone:** v2.0 Review Follow-Up System (Phases 20-29)
-**Next action:** Plan Phase 24 (Multi-Touch Campaign Engine)
+**Next action:** Execute Phase 24 (Multi-Touch Campaign Engine)
 
 **Blocker:** Twilio A2P 10DLC registration required before Phase 21 execution (see docs/SMS_COMPLIANCE.md)
 
@@ -336,5 +348,5 @@ After v2.0:
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 
 ---
-*Last updated: 2026-02-04 after Phase 23 execution complete*
+*Last updated: 2026-02-04 after Phase 24 planning complete*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
