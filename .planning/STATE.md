@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 
 ## Current Position
 
-**Phase:** Phase 20 - Database Migration & Customer Enhancement
-**Plan:** 08/08 complete (A2P deferred)
-**Status:** Phase complete, verified
-**Last activity:** 2026-02-03 -- Phase 20 executed, verified, A2P deferred
+**Phase:** Phase 22 - Jobs CRUD & Service Types
+**Plan:** 01/04 complete
+**Status:** In progress
+**Last activity:** 2026-02-04 -- Completed 22-01 (Jobs table schema)
 
-**Progress:** [█████████████████████████████████████░░░] 91/100+ total plans complete
+**Progress:** [█████████████████████████████████████░░░] 92/100+ total plans complete
 
 ```
 v1.0 MVP:           ████████████████████████████████████████████████ 48/48 SHIPPED
@@ -27,7 +27,8 @@ Phase 21 Preview:   ██ 2/2 COMPLETE (v1.3)
 Phase 22 Drawers:   ███ 3/3 COMPLETE (v1.3)
 Phase 25 Story:     ██ 2/2 COMPLETE (v1.4)
 v2.0 Phase 20:      ████████ 8/8 COMPLETE (A2P deferred)
-v2.0 (Ph 21-29):    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 0/TBD BLOCKED
+v2.0 Phase 22:      █░░░ 1/4 IN PROGRESS
+v2.0 (Ph 21,23-29): ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 0/TBD PENDING
 ```
 
 ## What's Been Built
@@ -105,6 +106,9 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 | csv-phone-best-effort | CSV import uses best-effort phone parsing (invalid phones don't block import) | Better UX - import succeeds, user fixes phone issues after via review workflow | 2026-02-03 |
 | sms-consent-drawer-only | SMS consent status editable only in drawer, read-only in edit form | Prevents accidental audit trail corruption, forces deliberate consent changes | 2026-02-03 |
 | timezone-auto-detect | Auto-detect timezone from browser Intl API on customer creation | Prepares for Phase 21 quiet hours enforcement, defaults to America/New_York | 2026-02-03 |
+| service-type-text-check | Use TEXT with CHECK constraint for service types (not ENUM) | Easier to add/remove types in future migrations | 2026-02-04 |
+| service-type-lowercase | Store service types lowercase in database | Avoids casing issues in queries and UI matching | 2026-02-04 |
+| service-timing-defaults | Per-service timing defaults in JSONB (cleaning 4h, roofing 72h, etc.) | Based on service completion verification needs | 2026-02-04 |
 
 ## Open Questions
 
@@ -133,13 +137,17 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 ### Todos
 - [x] Plan Phase 20 (Database Migration & Customer Enhancement)
 - [x] Execute Phase 20 (8/8 plans complete)
+- [x] Design jobs table schema and RLS policies (22-01 complete)
+- [ ] Execute Phase 22-02 (Jobs TypeScript types)
+- [ ] Execute Phase 22-03 (Jobs API routes)
+- [ ] Execute Phase 22-04 (Jobs UI components)
 - [ ] Start Twilio A2P 10DLC registration (2-4 week lead time) — BLOCKS Phase 21
 - [ ] Plan Phase 21 (SMS Foundation & Compliance)
-- [ ] Design jobs table schema and RLS policies
 - [ ] Design campaign_enrollments schema
 - [ ] Design message_templates migration strategy
 
 ### Recent Changes
+- 2026-02-04: Phase 22-01 complete (Jobs table schema, service type settings, DATA_MODEL.md)
 - 2026-02-03: Phase 20 COMPLETE (8/8 plans, verified, A2P deferred)
 - 2026-02-03: Phase 20-08 deferred (A2P 10DLC registration skipped for now)
 - 2026-02-03: Phase 20-07 complete (SMS consent UI with TCPA audit trail and timezone capture)
@@ -156,13 +164,14 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 
 ## Session Continuity
 
-**Last session:** 2026-02-03
-**Stopped at:** Phase 20 complete (8/8 plans executed, verified)
-**Resume file:** .planning/phases/20-database-migration-customer-enhancement/20-VERIFICATION.md
-**Next action:** Plan Phase 21 (SMS Foundation & Compliance) — blocked by A2P registration
+**Last session:** 2026-02-04
+**Stopped at:** Phase 22-01 complete (Jobs table schema)
+**Resume file:** .planning/phases/22-jobs-crud-service-types/22-01-SUMMARY.md
+**Next action:** Execute Phase 22-02 (Jobs TypeScript types)
 
 **Key context for next session:**
-- Phase 20 complete: customers table, phone validation, tags, SMS consent UI, timezone
-- A2P 10DLC registration deferred — BLOCKS Phase 21 execution (not planning)
-- Can plan Phase 21 now, but execution requires A2P approval
-- docs/SMS_COMPLIANCE.md tracks registration status
+- Phase 22-01 complete: jobs table, service type taxonomy, business settings
+- Jobs table ready with RLS, indexes, FK to customers/businesses
+- TypeScript types and validation schemas already exist (from parallel work)
+- Continue with 22-02 (types), 22-03 (API), 22-04 (UI)
+- Phase 21 (SMS) blocked by A2P registration — can skip to Phase 22-23
