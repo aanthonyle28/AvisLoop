@@ -51,7 +51,7 @@ async function HistoryContent({ searchParams }: HistoryPageProps) {
       currentPage={page}
       pageSize={limit}
       business={businessWithTemplates}
-      templates={businessWithTemplates.email_templates || []}
+      templates={businessWithTemplates.message_templates || []}
     />
   )
 }

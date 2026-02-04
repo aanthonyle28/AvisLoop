@@ -6,14 +6,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import type { Contact, Business, EmailTemplate } from '@/lib/types/database'
+import type { Contact, Business, MessageTemplate } from '@/lib/types/database'
 
 interface EmailPreviewModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   contact: Contact | null
   business: Business
-  template: EmailTemplate | null
+  template: MessageTemplate | null
 }
 
 function resolveTemplate(

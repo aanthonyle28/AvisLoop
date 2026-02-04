@@ -9,15 +9,15 @@ import { findOrCreateCustomer } from '@/lib/actions/customer'
 import { SendSettingsBar } from './send-settings-bar'
 import { MessagePreview } from './message-preview'
 import { EmailPreviewModal } from './email-preview-modal'
-import type { Customer, Business, EmailTemplate } from '@/lib/types/database'
+import type { Customer, Business, MessageTemplate } from '@/lib/types/database'
 import { Loader2 } from 'lucide-react'
 
 type SchedulePreset = 'immediately' | '1hour' | 'morning' | 'custom'
 
 interface QuickSendTabProps {
   customers: Customer[]
-  business: Business & { email_templates?: EmailTemplate[] }
-  templates: EmailTemplate[]
+  business: Business & { message_templates?: MessageTemplate[] }
+  templates: MessageTemplate[]
   monthlyUsage: { count: number; limit: number; tier: string }
   hasReviewLink: boolean
 }

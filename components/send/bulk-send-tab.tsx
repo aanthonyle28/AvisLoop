@@ -23,7 +23,7 @@ import { Button } from '@/components/ui/button'
 import { SendSettingsBar } from './send-settings-bar'
 import { BulkSendActionBar } from './bulk-send-action-bar'
 import { createBulkSendColumns } from './bulk-send-columns'
-import type { Customer, EmailTemplate } from '@/lib/types/database'
+import type { Customer, MessageTemplate } from '@/lib/types/database'
 
 type SchedulePreset = 'immediately' | '1hour' | 'morning' | 'custom'
 
@@ -31,7 +31,7 @@ type FilterType = 'never-sent' | 'added-today' | 'sent-30-days' | 'issues'
 
 interface BulkSendTabProps {
   customers: Customer[]
-  templates: EmailTemplate[]
+  templates: MessageTemplate[]
   monthlyUsage: { count: number; limit: number; tier: string }
   hasReviewLink: boolean
   resendReadyContactIds: string[]

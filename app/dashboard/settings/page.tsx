@@ -9,7 +9,7 @@ import { ServiceTypesSection } from '@/components/settings/service-types-section
 import { DeleteAccountDialog } from '@/components/settings/delete-account-dialog'
 import { getServiceTypeSettings } from '@/lib/data/business'
 import { getAvailableTemplates } from '@/lib/data/message-template'
-import type { MessageTemplate, EmailTemplate } from '@/lib/types/database'
+import type { MessageTemplate } from '@/lib/types/database'
 
 // Loading skeleton for settings content
 function SettingsLoadingSkeleton() {

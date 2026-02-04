@@ -2,12 +2,12 @@
 
 import { useActionState } from 'react'
 import { updateBusiness, type BusinessActionState } from '@/lib/actions/business'
-import type { Business, EmailTemplate } from '@/lib/types/database'
+import type { Business, MessageTemplate } from '@/lib/types/database'
 import { Button } from '@/components/ui/button'
 
 interface BusinessSettingsFormProps {
   initialData: Business | null
-  templates: EmailTemplate[]
+  templates: MessageTemplate[]
 }
 
 export function BusinessSettingsForm({ initialData, templates }: BusinessSettingsFormProps) {

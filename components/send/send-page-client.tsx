@@ -10,13 +10,13 @@ import { RecentActivityStrip } from './recent-activity-strip'
 import { StatStrip } from './stat-strip'
 import { RequestDetailDrawer } from '@/components/history/request-detail-drawer'
 import { sendReviewRequest } from '@/lib/actions/send'
-import type { Customer, Business, EmailTemplate, SendLogWithCustomer } from '@/lib/types/database'
+import type { Customer, Business, MessageTemplate, SendLogWithCustomer } from '@/lib/types/database'
 import type { RecentActivity } from './recent-activity-strip'
 
 interface SendPageClientProps {
   customers: Customer[]
-  business: Business & { email_templates?: EmailTemplate[] }
-  templates: EmailTemplate[]
+  business: Business & { message_templates?: MessageTemplate[] }
+  templates: MessageTemplate[]
   monthlyUsage: { count: number; limit: number; tier: string }
   hasReviewLink: boolean
   recentActivity: RecentActivity[]

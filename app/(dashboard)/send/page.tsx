@@ -34,7 +34,8 @@ export default async function SendPage() {
   ])
 
   const hasReviewLink = !!business.google_review_link
-  const templates = business.email_templates || []
+  // Filter for email templates only (SMS in Phase 21)
+  const templates = (business.message_templates || []).filter((t: { channel: string }) => t.channel === 'email')
   const resendReadyContactIds = resendReadyContacts.map((c: { id: string }) => c.id)
 
   const displayName = business.default_sender_name || business.name || 'there'

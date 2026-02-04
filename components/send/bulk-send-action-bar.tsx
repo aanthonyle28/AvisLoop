@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { BulkSendConfirmDialog } from './bulk-send-confirm-dialog'
-import type { Contact, EmailTemplate } from '@/lib/types/database'
+import type { Contact, MessageTemplate } from '@/lib/types/database'
 
 type SchedulePreset = 'immediately' | '1hour' | 'morning' | 'custom'
 
@@ -12,7 +12,7 @@ interface BulkSendActionBarProps {
   filteredCount: number
   selectedContacts: Contact[]
   allFilteredContacts: Contact[]
-  template: EmailTemplate
+  template: MessageTemplate
   schedulePreset: SchedulePreset
   customDateTime: string
   resendReadyIds: Set<string>

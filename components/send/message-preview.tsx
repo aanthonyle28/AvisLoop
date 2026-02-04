@@ -1,11 +1,11 @@
 'use client'
 
-import type { Contact, Business, EmailTemplate } from '@/lib/types/database'
+import type { Contact, Business, MessageTemplate } from '@/lib/types/database'
 
 interface MessagePreviewProps {
   contact: Contact | null
   business: Business
-  template: EmailTemplate | null
+  template: MessageTemplate | null
   onViewFull?: () => void
 }
 

@@ -16,7 +16,7 @@ import { scheduleReviewRequest } from '@/lib/actions/schedule'
 import { toastError } from '@/lib/utils/toast'
 import { toast } from 'sonner'
 import { COOLDOWN_DAYS } from '@/lib/constants/billing'
-import type { Contact, EmailTemplate } from '@/lib/types/database'
+import type { Contact, MessageTemplate } from '@/lib/types/database'
 import { format } from 'date-fns'
 
 type SchedulePreset = 'immediately' | '1hour' | 'morning' | 'custom'
@@ -25,7 +25,7 @@ interface BulkSendConfirmDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   contacts: Contact[]
-  template: EmailTemplate
+  template: MessageTemplate
   schedulePreset: SchedulePreset
   customDateTime: string
   resendReadyIds: Set<string>

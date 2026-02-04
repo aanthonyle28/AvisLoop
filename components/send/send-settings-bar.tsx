@@ -2,13 +2,13 @@
 
 import { useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import type { EmailTemplate } from '@/lib/types/database'
+import type { MessageTemplate } from '@/lib/types/database'
 import { format } from 'date-fns'
 
 type SchedulePreset = 'immediately' | '1hour' | 'morning' | 'custom'
 
 interface SendSettingsBarProps {
-  templates: EmailTemplate[]
+  templates: MessageTemplate[]
   selectedTemplateId: string
   onTemplateChange: (templateId: string) => void
   schedulePreset: SchedulePreset

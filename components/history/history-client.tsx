@@ -10,7 +10,7 @@ import { RequestDetailDrawer } from './request-detail-drawer'
 import { Button } from '@/components/ui/button'
 import { CaretLeft, CaretRight } from '@phosphor-icons/react'
 import { sendReviewRequest } from '@/lib/actions/send'
-import type { SendLogWithContact, Business, EmailTemplate } from '@/lib/types/database'
+import type { SendLogWithContact, Business, MessageTemplate } from '@/lib/types/database'
 
 interface HistoryClientProps {
   initialLogs: SendLogWithContact[]
@@ -18,7 +18,7 @@ interface HistoryClientProps {
   currentPage: number
   pageSize: number
   business: Business
-  templates: EmailTemplate[]
+  templates: MessageTemplate[]
 }
 
 export function HistoryClient({ initialLogs, total, currentPage, pageSize, business, templates }: HistoryClientProps) {

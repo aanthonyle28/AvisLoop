@@ -20,7 +20,7 @@ import { StatusBadge } from './status-badge'
 import { MessagePreview } from '@/components/send/message-preview'
 import { ArrowClockwise, X, Link as LinkIcon, CaretDown } from '@phosphor-icons/react'
 import { format } from 'date-fns'
-import type { SendLogWithContact, Business, EmailTemplate } from '@/lib/types/database'
+import type { SendLogWithContact, Business, MessageTemplate } from '@/lib/types/database'
 import type { SendStatus } from './status-badge'
 import { COOLDOWN_DAYS } from '@/lib/constants/billing'
 
@@ -29,7 +29,7 @@ interface RequestDetailDrawerProps {
   onOpenChange: (open: boolean) => void
   request: SendLogWithContact | null
   business: Business
-  templates: EmailTemplate[]
+  templates: MessageTemplate[]
   onResend: (contactId: string, templateId: string | null) => Promise<void>
   onCancel: (requestId: string) => Promise<void>
 }
