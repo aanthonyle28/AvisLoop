@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { TouchSequenceEditor } from './touch-sequence-editor'
+import { PersonalizationPreview } from '@/components/ai/personalization-preview'
 import { createCampaign, updateCampaign } from '@/lib/actions/campaign'
 import { campaignWithTouchesSchema, type CampaignWithTouchesFormData } from '@/lib/validations/campaign'
 import { SERVICE_TYPE_LABELS } from '@/lib/validations/job'
@@ -185,6 +186,46 @@ export function CampaignForm({ campaign, templates }: CampaignFormProps) {
           </div>
         </div>
       </details>
+
+      {/* Personalization Preview */}
+      {personalizationEnabled && touches.length > 0 && (
+        <div className="space-y-4">
+          <div>
+            <Label>Personalization Preview</Label>
+            <p className="text-sm text-muted-foreground">
+              See how AI will customize messages for each touch in this campaign
+            </p>
+          </div>
+
+          {touches.map((touch) => {
+            const template = touch.template_id
+              ? templates.find((t) => t.id === touch.template_id)
+              : null
+
+            if (!template) return null
+
+            return (
+              <div key={touch.touch_number} className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">
+                  Touch {touch.touch_number} - {touch.channel === 'email' ? 'Email' : 'SMS'}
+                </p>
+                <PersonalizationPreview
+                  templateBody={template.body}
+                  templateSubject={touch.channel === 'email' ? template.subject : undefined}
+                  channel={touch.channel}
+                  serviceType={watch('service_type') || undefined}
+                />
+              </div>
+            )
+          })}
+
+          {touches.every((t) => !t.template_id) && (
+            <p className="text-sm text-muted-foreground italic">
+              Select a template for at least one touch to preview personalization
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Submit */}
       <div className="flex gap-4">
