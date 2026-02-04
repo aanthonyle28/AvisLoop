@@ -3,10 +3,10 @@
 ## Current Position
 
 **Milestone:** v2.0 Review Follow-Up System
-**Phase:** 24 of 10 (Multi-Touch Campaign Engine)
-**Plan:** 2 of 7 in Phase 24
+**Phase:** 21 of 10 (SMS Foundation & Compliance)
+**Plan:** 1 of 6 in Phase 21
 **Status:** In progress
-**Last activity:** 2026-02-04 - Completed 24-02-PLAN.md
+**Last activity:** 2026-02-04 - Completed 21-01-PLAN.md
 
 **v2.0 Progress:** ████████░░░░░░░░░░░░░░░░ (3/10 phases complete)
 
@@ -15,7 +15,7 @@
 | Phase | Name | Status |
 |-------|------|--------|
 | 20 | Database Migration & Customer Enhancement | ✅ Complete |
-| 21 | SMS Foundation & Compliance | ⏸️ Blocked (A2P) |
+| 21 | SMS Foundation & Compliance | 🔄 In progress (1/6 plans) |
 | 22 | Jobs CRUD & Service Types | ✅ Complete |
 | 23 | Message Templates & Migration | ✅ Complete |
 | 24 | Multi-Touch Campaign Engine | 🔄 In progress (2/7 plans) |
@@ -27,9 +27,9 @@
 
 ## Blocker
 
-**Phase 21 blocked:** Twilio A2P 10DLC campaign registration pending (brand approved 2026-02-03, campaign submitted same day, typically 1-3 business days for approval).
+**Phase 21 A2P registration:** Twilio A2P 10DLC campaign registration pending (brand approved 2026-02-03, campaign submitted same day, typically 1-3 business days for approval).
 
-Phase 24 can proceed in parallel since it doesn't depend on SMS sending working.
+Phase 21-01 database and client foundation complete. Plans 21-02 through 21-06 can proceed but runtime SMS tests require A2P approval.
 
 ## Accumulated Decisions
 
@@ -58,17 +58,28 @@ Phase 24 can proceed in parallel since it doesn't depend on SMS sending working.
 | Standard timing | 24-02 | 24h + 72h + 168h delays | Balanced multi-channel approach |
 | Aggressive timing | 24-02 | 4h + 24h + 72h + 168h delays | SMS-first for immediacy |
 
+### Phase 21 (21-01)
+
+| Decision | Phase | Impact | Constraint |
+|----------|-------|--------|------------|
+| JSONB for provider_message_id | 21-01 | Multi-provider IDs in single column | Stores { resend_id, twilio_sid } |
+| Parallel customer_id column | 21-01 | Supports contacts/customers migration window | Both columns reference same data |
+| Null client pattern | 21-01 | twilioClient is null when not configured | Use isSmsEnabled() before sending |
+| SMS soft limit 320 chars | 21-01 | Matches Phase 23, allows 2 segments | Prevents excessive SMS costs |
+
 ## Known Blockers / Concerns
 
 **Current blockers:**
-- Phase 21: Twilio A2P campaign approval (1-3 business days)
+- Phase 21: Twilio A2P campaign approval (1-3 business days from 2026-02-03)
+- Phase 21: Twilio env vars must be configured before runtime SMS tests
 
 **Next actions:**
-- Plan Phase 24 (Multi-Touch Campaign Engine) - can proceed without SMS
-- Wait for A2P approval before Phase 21 execution
+- Continue Phase 21-02 through 21-06 (code can be written, runtime tests blocked)
+- Continue Phase 24 in parallel (doesn't depend on SMS sending)
+- Wait for A2P approval before production SMS testing
 
 ## Session Continuity
 
-**Last session:** 2026-02-04T07:07:25Z
-**Stopped at:** Completed 24-02-PLAN.md
+**Last session:** 2026-02-04T07:09:03Z
+**Stopped at:** Completed 21-01-PLAN.md
 **Resume file:** None
