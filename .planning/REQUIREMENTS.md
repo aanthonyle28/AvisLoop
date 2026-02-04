@@ -92,10 +92,10 @@ Requirements for Review Follow-Up System Redesign. Each maps to roadmap phases.
 
 ### Templates
 
-- [ ] **TMPL-01**: Unified message_templates table supporting both email and SMS channels
-- [ ] **TMPL-02**: Template CRUD with channel selector (email/SMS) and character limit enforcement
-- [ ] **TMPL-03**: Default templates per service category (HVAC, plumbing, electrical, etc.)
-- [ ] **TMPL-04**: Migration from existing email_templates to message_templates (backward compatible)
+- [x] **TMPL-01**: Unified message_templates table supporting both email and SMS channels *(Phase 23 - 2026-02-04)*
+- [x] **TMPL-02**: Template CRUD with channel selector (email/SMS) and character limit enforcement *(Phase 23 - 2026-02-04)*
+- [x] **TMPL-03**: Default templates per service category (HVAC, plumbing, electrical, etc.) *(Phase 23 - 2026-02-04)*
+- [x] **TMPL-04**: Migration from existing email_templates to message_templates (backward compatible) *(Phase 23 - 2026-02-04)*
 
 ### Service-Type Timing
 
