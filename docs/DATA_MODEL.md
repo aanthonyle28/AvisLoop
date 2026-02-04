@@ -432,3 +432,56 @@ Send logs table extended in Phase 24 with campaign tracking fields.
 
 - send_logs.campaign_id references campaigns.id (SET NULL)
 - send_logs.campaign_enrollment_id references campaign_enrollments.id (SET NULL)
+
+## Table: customer_feedback
+
+Stores private feedback from customers who rate their experience 1-3 stars in the review funnel. Added in Phase 26.
+
+### Schema
+
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | UUID | NO | gen_random_uuid() | Primary key |
+| business_id | UUID | NO | - | FK to businesses |
+| customer_id | UUID | NO | - | FK to customers |
+| enrollment_id | UUID | YES | - | FK to campaign_enrollments (NULL for non-campaign) |
+| rating | INT | NO | - | Satisfaction rating (1-5) |
+| feedback_text | TEXT | YES | - | Customer's written feedback |
+| submitted_at | TIMESTAMPTZ | YES | NOW() | When feedback was submitted |
+| resolved_at | TIMESTAMPTZ | YES | - | When business resolved the feedback |
+| resolved_by | UUID | YES | - | User who resolved the feedback |
+| internal_notes | TEXT | YES | - | Business owner's internal notes |
+| created_at | TIMESTAMPTZ | YES | NOW() | Created timestamp |
+| updated_at | TIMESTAMPTZ | YES | NOW() | Updated timestamp |
+
+### Purpose
+
+The review funnel routes 1-3 star ratings to a private feedback form instead of Google reviews. This table:
+- Stores negative feedback privately (no public review)
+- Links feedback to campaign enrollment for stop conditions
+- Tracks resolution status for follow-up workflow
+- Enables email notifications to business owner
+
+### Constraints
+
+- `rating BETWEEN 1 AND 5` - Valid star ratings only
+
+### RLS Policies
+
+- SELECT: Users can view feedback for businesses they own
+- INSERT: Anonymous and authenticated users can insert (token validated in API route)
+- UPDATE: Users can update feedback for businesses they own (for resolution)
+
+### Indexes
+
+- idx_feedback_business_id (btree)
+- idx_feedback_customer_id (btree)
+- idx_feedback_enrollment_id (btree)
+- idx_feedback_unresolved (partial: WHERE resolved_at IS NULL on business_id, submitted_at DESC)
+
+### Foreign Keys
+
+- customer_feedback.business_id references businesses.id (CASCADE)
+- customer_feedback.customer_id references customers.id (CASCADE)
+- customer_feedback.enrollment_id references campaign_enrollments.id (SET NULL)
+- customer_feedback.resolved_by references auth.users.id (SET NULL)
