@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { campaignWithTouchesSchema } from '@/lib/validations/campaign'
 import type { CampaignWithTouchesFormData } from '@/lib/validations/campaign'
+import type { CampaignTouch } from '@/lib/types/database'
 
 type ActionState = {
   error?: string
@@ -255,7 +256,7 @@ export async function duplicateCampaign(
 
   // Copy touches
   if (source.campaign_touches?.length) {
-    const touchCopies = source.campaign_touches.map((t: any) => ({
+    const touchCopies = source.campaign_touches.map((t: CampaignTouch) => ({
       campaign_id: newCampaign.id,
       touch_number: t.touch_number,
       channel: t.channel,
