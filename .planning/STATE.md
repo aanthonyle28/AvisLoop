@@ -61,6 +61,8 @@ Phase 21-01 database and client foundation complete. Plans 21-02 through 21-06 c
 | Conservative timing | 24-02 | 24h + 72h delays | Safe, proven email cadence |
 | Standard timing | 24-02 | 24h + 72h + 168h delays | Balanced multi-channel approach |
 | Aggressive timing | 24-02 | 4h + 24h + 72h + 168h delays | SMS-first for immediacy |
+| Sequential touch validation | 24-03 | Zod refine validates touch numbers 1,2,3,4 | Prevents gaps/duplicates at form layer |
+| Preset constants | 24-03 | CAMPAIGN_PRESETS mirrors seeded data | Client-side access without DB query |
 | Atomic touch replacement | 24-04 | Delete all touches and re-insert on update | Simpler than diffing/merging |
 | Manual rollback on touch failure | 24-04 | Delete campaign if touches fail to insert | No transaction support in Supabase client |
 | Pause stops enrollments | 24-04 | Pausing campaign stops all active enrollments | Prevents confusing half-active state |
@@ -92,6 +94,6 @@ Phase 21-01 database and client foundation complete. Plans 21-02 through 21-06 c
 
 ## Session Continuity
 
-**Last session:** 2026-02-04T08:16:46Z
-**Stopped at:** Completed 24-04-PLAN.md (Campaign Data Functions & Actions)
+**Last session:** 2026-02-04T07:18:59Z
+**Stopped at:** Completed 24-03-PLAN.md (Campaign Types & Validation)
 **Resume file:** None
