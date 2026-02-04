@@ -58,6 +58,7 @@ export const jobSchema = z.object({
     .max(1000, 'Notes must be under 1000 characters')
     .optional()
     .or(z.literal('')),
+  enrollInCampaign: z.boolean().optional().default(true),
 })
 
 // Infer types from schema

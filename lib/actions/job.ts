@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { jobSchema } from '@/lib/validations/job'
+import { enrollJobInCampaign } from '@/lib/actions/enrollment'
 
 export type JobActionState = {
   error?: string
@@ -44,13 +45,14 @@ export async function createJob(
     serviceType: formData.get('serviceType'),
     status: formData.get('status') || 'completed',
     notes: formData.get('notes') || '',
+    enrollInCampaign: formData.get('enrollInCampaign') === 'true' || formData.get('enrollInCampaign') === null,
   })
 
   if (!parsed.success) {
     return { fieldErrors: parsed.error.flatten().fieldErrors }
   }
 
-  const { customerId, serviceType, status, notes } = parsed.data
+  const { customerId, serviceType, status, notes, enrollInCampaign } = parsed.data
 
   // Validate customer belongs to this business (prevent cross-tenant data leak)
   const { data: customer, error: customerError } = await supabase
@@ -80,6 +82,22 @@ export async function createJob(
 
   if (error) {
     return { error: error.message }
+  }
+
+  // Enroll in campaign if status is 'completed' and enrollInCampaign is true
+  if (status === 'completed' && enrollInCampaign !== false) {
+    // enrollInCampaign defaults to true if not specified
+    // enrollJobInCampaign handles:
+    // - Finding matching campaign (service-type specific or "all services")
+    // - Checking 30-day cooldown
+    // - Canceling existing enrollments (repeat job)
+    // - Calculating touch 1 timing from business's service_type_timing (SVCT-03)
+    const enrollResult = await enrollJobInCampaign(newJob.id)
+
+    // Don't fail the job creation if enrollment fails - just log
+    if (!enrollResult.success && !enrollResult.skipped) {
+      console.warn('Enrollment failed:', enrollResult.error)
+    }
   }
 
   revalidatePath('/jobs')
@@ -124,13 +142,14 @@ export async function updateJob(
     serviceType: formData.get('serviceType'),
     status: formData.get('status') || 'completed',
     notes: formData.get('notes') || '',
+    enrollInCampaign: formData.get('enrollInCampaign') === 'true' || formData.get('enrollInCampaign') === null,
   })
 
   if (!parsed.success) {
     return { fieldErrors: parsed.error.flatten().fieldErrors }
   }
 
-  const { customerId, serviceType, status, notes } = parsed.data
+  const { customerId, serviceType, status, notes, enrollInCampaign } = parsed.data
 
   // Validate customer belongs to this business
   const { data: customer } = await supabase
@@ -177,6 +196,22 @@ export async function updateJob(
     return { error: error.message }
   }
 
+  // Enroll in campaign if status changed to 'completed' and enrollInCampaign is true
+  if (status === 'completed' && currentJob?.status !== 'completed' && enrollInCampaign !== false) {
+    // enrollInCampaign defaults to true if not specified
+    // enrollJobInCampaign handles:
+    // - Finding matching campaign (service-type specific or "all services")
+    // - Checking 30-day cooldown
+    // - Canceling existing enrollments (repeat job)
+    // - Calculating touch 1 timing from business's service_type_timing (SVCT-03)
+    const enrollResult = await enrollJobInCampaign(jobId)
+
+    // Don't fail the job update if enrollment fails - just log
+    if (!enrollResult.success && !enrollResult.skipped) {
+      console.warn('Enrollment failed:', enrollResult.error)
+    }
+  }
+
   revalidatePath('/jobs')
   return { success: true, data: { id: jobId } }
 }
@@ -209,8 +244,12 @@ export async function deleteJob(jobId: string): Promise<JobActionState> {
 
 /**
  * Mark job as completed (sets status and completed_at).
+ * Also enrolls job in campaign by default.
  */
-export async function markJobCompleted(jobId: string): Promise<JobActionState> {
+export async function markJobCompleted(
+  jobId: string,
+  enrollInCampaign: boolean = true
+): Promise<JobActionState> {
   const supabase = await createClient()
 
   const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -228,6 +267,16 @@ export async function markJobCompleted(jobId: string): Promise<JobActionState> {
 
   if (error) {
     return { error: error.message }
+  }
+
+  // Enroll in campaign if enrollInCampaign is true (default)
+  if (enrollInCampaign) {
+    const enrollResult = await enrollJobInCampaign(jobId)
+
+    // Don't fail the job update if enrollment fails - just log
+    if (!enrollResult.success && !enrollResult.skipped) {
+      console.warn('Enrollment failed:', enrollResult.error)
+    }
   }
 
   revalidatePath('/jobs')
