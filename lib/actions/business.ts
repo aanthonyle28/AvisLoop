@@ -136,6 +136,8 @@ export async function saveReviewLink(
 
 /**
  * Create a new email template for the user's business.
+ * @deprecated Use createMessageTemplate from lib/actions/message-template.ts instead.
+ * This function is maintained for backward compatibility only.
  */
 export async function createEmailTemplate(
   _prevState: BusinessActionState | null,
@@ -173,14 +175,16 @@ export async function createEmailTemplate(
 
   const { name, subject, body } = parsed.data
 
-  // Insert new template
+  // Insert new template (using message_templates with channel='email')
   const { error } = await supabase
-    .from('email_templates')
+    .from('message_templates')
     .insert({
       business_id: business.id,
       name,
       subject,
       body,
+      channel: 'email',
+      service_type: null,
       is_default: false, // User-created templates are not system defaults
     })
 
@@ -195,6 +199,8 @@ export async function createEmailTemplate(
 /**
  * Delete an email template.
  * Only allows deleting user's own non-default templates.
+ * @deprecated Use deleteMessageTemplate from lib/actions/message-template.ts instead.
+ * This function is maintained for backward compatibility only.
  */
 export async function deleteEmailTemplate(
   templateId: string
@@ -210,7 +216,7 @@ export async function deleteEmailTemplate(
   // Verify template belongs to user's business and is not a default
   // RLS handles ownership check, but we check is_default explicitly
   const { data: template } = await supabase
-    .from('email_templates')
+    .from('message_templates')
     .select('is_default')
     .eq('id', templateId)
     .single()
@@ -225,7 +231,7 @@ export async function deleteEmailTemplate(
 
   // Delete template (RLS ensures user can only delete their own)
   const { error } = await supabase
-    .from('email_templates')
+    .from('message_templates')
     .delete()
     .eq('id', templateId)
 
@@ -255,11 +261,13 @@ export async function getBusiness() {
     .from('businesses')
     .select(`
       *,
-      email_templates!email_templates_business_id_fkey (
+      message_templates!message_templates_business_id_fkey (
         id,
         name,
         subject,
         body,
+        channel,
+        service_type,
         is_default,
         created_at
       )
@@ -271,8 +279,10 @@ export async function getBusiness() {
 }
 
 /**
- * Fetch all templates for the current user's business.
+ * Fetch all email templates for the current user's business.
  * Includes both system defaults and user-created templates.
+ * @deprecated Use getMessageTemplates from lib/data/message-template.ts with channel='email' instead.
+ * This function is maintained for backward compatibility only.
  */
 export async function getEmailTemplates() {
   const supabase = await createClient()
@@ -294,9 +304,10 @@ export async function getEmailTemplates() {
   }
 
   const { data: templates } = await supabase
-    .from('email_templates')
+    .from('message_templates')
     .select('*')
     .eq('business_id', business.id)
+    .eq('channel', 'email') // Filter for email templates only
     .order('is_default', { ascending: false }) // System defaults first
     .order('created_at', { ascending: true })
 
