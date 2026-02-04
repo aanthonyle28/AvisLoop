@@ -53,6 +53,7 @@ export async function createCampaign(
       name: campaignData.name,
       service_type: campaignData.service_type,
       status: campaignData.status,
+      personalization_enabled: campaignData.personalization_enabled,
       is_preset: false,
     })
     .select('id')
@@ -129,6 +130,7 @@ export async function updateCampaign(
       name: campaignData.name,
       service_type: campaignData.service_type,
       status: campaignData.status,
+      personalization_enabled: campaignData.personalization_enabled,
     })
     .eq('id', campaignId)
 

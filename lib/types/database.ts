@@ -238,6 +238,7 @@ export interface Campaign {
   service_type: ServiceType | null  // NULL = all services
   status: CampaignStatus
   is_preset: boolean
+  personalization_enabled: boolean  // AI personalization toggle (default: true)
   created_at: string
   updated_at: string
 }

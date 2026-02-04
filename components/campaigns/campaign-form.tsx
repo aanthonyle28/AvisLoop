@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -45,6 +45,7 @@ export function CampaignForm({ campaign, templates }: CampaignFormProps) {
       name: campaign?.name || '',
       service_type: campaign?.service_type || null,
       status: campaign?.status || 'active',
+      personalization_enabled: campaign?.personalization_enabled ?? true,
       touches: campaign?.campaign_touches?.map(t => ({
         touch_number: t.touch_number,
         channel: t.channel,
@@ -57,10 +58,7 @@ export function CampaignForm({ campaign, templates }: CampaignFormProps) {
   })
 
   const touches = watch('touches')
-
-  // Personalization toggle - local state for now, DB column in 25-07
-  // Default ON: most users benefit from AI personalization
-  const [personalizationEnabled, setPersonalizationEnabled] = useState(true)
+  const personalizationEnabled = watch('personalization_enabled')
 
   const onSubmit = (data: CampaignWithTouchesFormData) => {
     startTransition(async () => {
@@ -182,7 +180,7 @@ export function CampaignForm({ campaign, templates }: CampaignFormProps) {
             <Switch
               id="personalization"
               checked={personalizationEnabled}
-              onCheckedChange={setPersonalizationEnabled}
+              onCheckedChange={(checked) => setValue('personalization_enabled', checked)}
             />
           </div>
         </div>

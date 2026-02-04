@@ -13,7 +13,8 @@ const channelEnum = z.enum(['email', 'sms'])
 export const campaignSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100, 'Name too long'),
   service_type: serviceTypeEnum.nullable(),  // NULL = all services
-  status: campaignStatusEnum.default('active'),
+  status: campaignStatusEnum,  // Required, form provides default
+  personalization_enabled: z.boolean(),  // AI personalization toggle (default true via form)
 })
 
 export type CampaignFormData = z.infer<typeof campaignSchema>
