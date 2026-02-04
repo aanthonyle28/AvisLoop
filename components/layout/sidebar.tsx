@@ -14,6 +14,8 @@ import {
   CaretRight,
   ArrowsClockwise,
   Briefcase,
+  Megaphone,
+  ChatCircleText,
 } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { AccountMenu } from './account-menu'
@@ -28,7 +30,9 @@ const mainNav: NavItem[] = [
   { icon: PaperPlaneTilt, label: 'Send', href: '/send' },
   { icon: AddressBook, label: 'Customers', href: '/customers' },
   { icon: Briefcase, label: 'Jobs', href: '/jobs' },
+  { icon: Megaphone, label: 'Campaigns', href: '/campaigns' },
   { icon: ClockCounterClockwise, label: 'Requests', href: '/history' },
+  { icon: ChatCircleText, label: 'Feedback', href: '/feedback' },
 ]
 
 export function Sidebar() {
