@@ -7,8 +7,10 @@ import { TemplateList } from '@/components/template-list'
 import { IntegrationsSection } from '@/components/settings/integrations-section'
 import { ServiceTypesSection } from '@/components/settings/service-types-section'
 import { DeleteAccountDialog } from '@/components/settings/delete-account-dialog'
+import { PersonalizationSection } from '@/components/settings/personalization-section'
 import { getServiceTypeSettings } from '@/lib/data/business'
 import { getAvailableTemplates } from '@/lib/data/message-template'
+import { getPersonalizationSummary } from '@/lib/data/personalization'
 import type { MessageTemplate } from '@/lib/types/database'
 
 // Loading skeleton for settings content
@@ -61,11 +63,12 @@ async function SettingsContent() {
     .eq('user_id', user.id)
     .single()
 
-  // Get message templates for display (both user and system)
-  const templates: MessageTemplate[] = business ? await getAvailableTemplates() : []
-
-  // Get service type settings
-  const serviceTypeSettings = await getServiceTypeSettings()
+  // Get message templates, service types, and personalization stats in parallel
+  const [templates, serviceTypeSettings, personalizationSummary] = await Promise.all([
+    business ? getAvailableTemplates() : Promise.resolve([] as MessageTemplate[]),
+    getServiceTypeSettings(),
+    getPersonalizationSummary(),
+  ])
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -121,7 +124,17 @@ async function SettingsContent() {
           />
         </section>
 
-        {/* Section 4: Integrations */}
+        {/* Section 4: AI Personalization */}
+        <section className="border border-border rounded-lg p-6 bg-card shadow-sm">
+          <h2 className="text-xl font-semibold mb-4">AI Personalization</h2>
+          <p className="text-muted-foreground mb-4">
+            Messages are automatically personalized using AI before sending. View
+            performance stats and LLM usage for your account.
+          </p>
+          <PersonalizationSection summary={personalizationSummary} />
+        </section>
+
+        {/* Section 5: Integrations */}
         <section className="border border-border rounded-lg p-6 bg-card shadow-sm">
           <h2 className="text-xl font-semibold mb-4">Integrations</h2>
           <p className="text-muted-foreground mb-4">
@@ -130,7 +143,7 @@ async function SettingsContent() {
           <IntegrationsSection hasExistingKey={!!business?.api_key_hash} />
         </section>
 
-        {/* Section 5: Danger Zone */}
+        {/* Section 6: Danger Zone */}
         <section className="border border-red-200 dark:border-red-800 rounded-lg p-6 bg-card shadow-sm">
           <h2 className="text-xl font-semibold mb-2 text-red-600 dark:text-red-400">Danger Zone</h2>
           <p className="text-muted-foreground mb-4">
