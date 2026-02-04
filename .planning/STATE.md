@@ -3,12 +3,12 @@
 ## Current Position
 
 **Milestone:** v2.0 Review Follow-Up System
-**Phase:** 21 of 10 (SMS Foundation & Compliance)
-**Plan:** 1 of 6 in Phase 21
+**Phase:** 24 of 10 (Multi-Touch Campaign Engine)
+**Plan:** 1 of 11 in Phase 24
 **Status:** In progress
-**Last activity:** 2026-02-04 - Completed 21-01-PLAN.md
+**Last activity:** 2026-02-04 - Completed 24-01-PLAN.md
 
-**v2.0 Progress:** ████████░░░░░░░░░░░░░░░░ (3/10 phases complete)
+**v2.0 Progress:** ████████░░░░░░░░░░░░░░░░ (3/10 phases complete, 2 phases active)
 
 ## v2.0 Phase Status
 
@@ -18,7 +18,7 @@
 | 21 | SMS Foundation & Compliance | 🔄 In progress (1/6 plans) |
 | 22 | Jobs CRUD & Service Types | ✅ Complete |
 | 23 | Message Templates & Migration | ✅ Complete |
-| 24 | Multi-Touch Campaign Engine | 🔄 In progress (2/7 plans) |
+| 24 | Multi-Touch Campaign Engine | 🔄 In progress (3/11 plans) |
 | 25 | LLM Personalization | 📋 Not started |
 | 26 | Review Funnel | 📋 Not started |
 | 27 | Dashboard Redesign | 📋 Not started |
@@ -48,10 +48,14 @@ Phase 21-01 database and client foundation complete. Plans 21-02 through 21-06 c
 | Email preview design | 23-05 | Shows From/To, subject, body, CTA button, footer | Matches production email rendering |
 | SMS preview design | 23-05 | Phone mockup with bubble, opt-out footer, character count | Simulates customer's view of SMS |
 
-### Phase 24 (24-02)
+### Phase 24
 
 | Decision | Phase | Impact | Constraint |
 |----------|-------|--------|------------|
+| Denormalized touch timestamps | 24-01 | Fast due-touch queries without joins | Touch scheduled/sent times duplicated in enrollments |
+| Service type NULL semantics | 24-01 | NULL = "all services" campaign | Simple default without discriminator field |
+| Timing anchored to scheduled_at | 24-01 | Prevents cascading delays | Touch 2 = Touch 1 scheduled + delay (not sent + delay) |
+| Partial indexes per touch | 24-01 | Sub-millisecond cron queries | Four separate indexes for touches 1-4 |
 | Skip recovery function | 24-02 | FOR UPDATE SKIP LOCKED handles crashed workers | No explicit recovery RPC needed |
 | Template_id NULL for presets | 24-02 | Presets don't prescribe templates | Users configure templates after duplication |
 | Conservative timing | 24-02 | 24h + 72h delays | Safe, proven email cadence |
@@ -80,6 +84,6 @@ Phase 21-01 database and client foundation complete. Plans 21-02 through 21-06 c
 
 ## Session Continuity
 
-**Last session:** 2026-02-04T07:09:03Z
-**Stopped at:** Completed 21-01-PLAN.md
+**Last session:** 2026-02-04T07:09:02Z
+**Stopped at:** Completed 24-01-PLAN.md (Campaign Database Schema)
 **Resume file:** None
