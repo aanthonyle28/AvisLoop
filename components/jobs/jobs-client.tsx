@@ -1,0 +1,77 @@
+'use client'
+
+import { useState } from 'react'
+import { Plus } from '@phosphor-icons/react'
+import { Button } from '@/components/ui/button'
+import { JobTable } from './job-table'
+import { JobFilters, type JobFiltersState } from './job-filters'
+import { EmptyState } from './empty-state'
+import { AddJobSheet } from './add-job-sheet'
+import type { JobWithCustomer, Customer } from '@/lib/types/database'
+
+interface JobsClientProps {
+  initialJobs: JobWithCustomer[]
+  totalJobs: number
+  customers: Customer[]
+}
+
+export function JobsClient({ initialJobs, totalJobs, customers }: JobsClientProps) {
+  const [filters, setFilters] = useState<JobFiltersState>({
+    status: null,
+    serviceType: null,
+    search: '',
+  })
+  const [showAddSheet, setShowAddSheet] = useState(false)
+
+  // Filter jobs client-side (for initial load, server-side filtering for large datasets)
+  const filteredJobs = initialJobs.filter(job => {
+    if (filters.status && job.status !== filters.status) return false
+    if (filters.serviceType && job.service_type !== filters.serviceType) return false
+    if (filters.search) {
+      const query = filters.search.toLowerCase()
+      const customerName = job.customers?.name?.toLowerCase() || ''
+      const customerEmail = job.customers?.email?.toLowerCase() || ''
+      if (!customerName.includes(query) && !customerEmail.includes(query)) return false
+    }
+    return true
+  })
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Jobs</h1>
+          <p className="text-muted-foreground">
+            {totalJobs} {totalJobs === 1 ? 'job' : 'jobs'} total
+          </p>
+        </div>
+        <Button onClick={() => setShowAddSheet(true)}>
+          <Plus className="mr-2 h-4 w-4" weight="bold" />
+          Add Job
+        </Button>
+      </div>
+
+      {/* Filters */}
+      <JobFilters filters={filters} onFiltersChange={setFilters} />
+
+      {/* Table or Empty State */}
+      {filteredJobs.length === 0 ? (
+        <EmptyState
+          hasFilters={!!(filters.status || filters.serviceType || filters.search)}
+          onClearFilters={() => setFilters({ status: null, serviceType: null, search: '' })}
+          onAddJob={() => setShowAddSheet(true)}
+        />
+      ) : (
+        <JobTable jobs={filteredJobs} customers={customers} />
+      )}
+
+      {/* Add Job Sheet */}
+      <AddJobSheet
+        open={showAddSheet}
+        onOpenChange={setShowAddSheet}
+        customers={customers}
+      />
+    </div>
+  )
+}
