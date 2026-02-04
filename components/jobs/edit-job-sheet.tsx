@@ -13,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Checkbox } from '@/components/ui/checkbox'
 import { CustomerSelector } from './customer-selector'
 import { ServiceTypeSelect } from './service-type-select'
 import { updateJob, type JobActionState } from '@/lib/actions/job'
@@ -37,6 +38,7 @@ export function EditJobSheet({ open, onOpenChange, job, customers }: EditJobShee
   const [serviceType, setServiceType] = useState<ServiceType>(job.service_type)
   const [status, setStatus] = useState<JobStatus>(job.status)
   const [notes, setNotes] = useState(job.notes || '')
+  const [enrollInCampaign, setEnrollInCampaign] = useState(true)
 
   // Reset form when job changes
   useEffect(() => {
@@ -44,6 +46,7 @@ export function EditJobSheet({ open, onOpenChange, job, customers }: EditJobShee
     setServiceType(job.service_type)
     setStatus(job.status)
     setNotes(job.notes || '')
+    setEnrollInCampaign(true)
   }, [job])
 
   // Handle success/error
@@ -62,6 +65,10 @@ export function EditJobSheet({ open, onOpenChange, job, customers }: EditJobShee
     formData.set('serviceType', serviceType)
     formData.set('status', status)
     formData.set('notes', notes)
+    if (status === 'completed' && job.status !== 'completed') {
+      // Only send enrollInCampaign when changing status to completed
+      formData.set('enrollInCampaign', enrollInCampaign.toString())
+    }
     formAction(formData)
   }
 
@@ -117,6 +124,25 @@ export function EditJobSheet({ open, onOpenChange, job, customers }: EditJobShee
                 : 'Do Not Send jobs will not trigger review requests.'}
             </p>
           </div>
+
+          {/* Campaign enrollment checkbox - only when changing status to completed */}
+          {status === 'completed' && job.status !== 'completed' && (
+            <div className="space-y-2 rounded-lg border bg-muted/50 p-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="enrollInCampaign"
+                  checked={enrollInCampaign}
+                  onCheckedChange={(checked) => setEnrollInCampaign(!!checked)}
+                />
+                <Label htmlFor="enrollInCampaign" className="font-normal cursor-pointer">
+                  Enroll in review campaign
+                </Label>
+              </div>
+              <p className="text-xs text-muted-foreground ml-6">
+                Automatically send review requests based on your active campaign
+              </p>
+            </div>
+          )}
 
           {/* Notes */}
           <div className="space-y-2">
