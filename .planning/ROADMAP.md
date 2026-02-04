@@ -180,7 +180,15 @@ Plans:
   4. Existing email_templates migrated to message_templates with channel = email (backward compatible, no data loss)
   5. Template preview shows appropriate rendering (email: subject + body + CTA button, SMS: body only with character count)
   6. Campaign touch configuration references message_templates by ID (not email_templates)
-**Plans**: TBD
+**Plans**: 7 plans in 4 waves
+Plans:
+- [ ] 23-01-PLAN.md — Database migration (rename email_templates to message_templates, add channel column, RLS)
+- [ ] 23-02-PLAN.md — TypeScript types, Zod validations, and default templates constants
+- [ ] 23-03-PLAN.md — Server actions and data functions for message templates
+- [ ] 23-04-PLAN.md — Tab-based template form with channel selector and SMS character counter
+- [ ] 23-05-PLAN.md — Email and SMS preview components
+- [ ] 23-06-PLAN.md — Settings page update with new template form and list
+- [ ] 23-07-PLAN.md — Codebase migration (update all email_templates references)
 
 ### Phase 24: Multi-Touch Campaign Engine
 **Goal**: Users can create multi-touch campaigns (up to 4 touches) with preset sequences, enroll jobs on completion, and automatically stop on review/opt-out.
@@ -297,7 +305,7 @@ See individual phase sections above for requirements, success criteria, and depe
 | **20 (v2.0)** | **Review Follow-Up** | **8/8** | **Complete** | **2026-02-03** |
 | 21 (v2.0) | Review Follow-Up | 0/TBD | Blocked (A2P) | - |
 | **22 (v2.0)** | **Review Follow-Up** | **5/5** | **Complete** | **2026-02-04** |
-| 23 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
+| 23 (v2.0) | Review Follow-Up | 0/7 | Planned | - |
 | 24 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 | 25 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 | 26 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
@@ -310,7 +318,7 @@ See individual phase sections above for requirements, success criteria, and depe
 ## What's Next
 
 **Current milestone:** v2.0 Review Follow-Up System (Phases 20-29)
-**Next action:** Plan Phase 23 (Message Templates & Migration) or Phase 21 (SMS, if A2P approved)
+**Next action:** Execute Phase 23 (Message Templates & Migration)
 
 **Blocker:** Twilio A2P 10DLC registration required before Phase 21 execution (see docs/SMS_COMPLIANCE.md)
 
@@ -321,5 +329,5 @@ After v2.0:
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 
 ---
-*Last updated: 2026-02-04 after Phase 22 execution complete*
+*Last updated: 2026-02-03 after Phase 23 planning complete*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
