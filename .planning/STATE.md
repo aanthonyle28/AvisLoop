@@ -4,9 +4,9 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** 26 of 10 (Review Funnel)
-**Plan:** 5 of 7 in Phase 26
+**Plan:** 6 of 7 in Phase 26
 **Status:** In progress
-**Last activity:** 2026-02-04 - Completed 26-05-PLAN.md
+**Last activity:** 2026-02-04 - Completed 26-06-PLAN.md
 
 **v2.0 Progress:** ████████░░░░░░░░░░░░░░░░ (3/10 phases complete, 3 phases active)
 
@@ -20,7 +20,7 @@
 | 23 | Message Templates & Migration | ✅ Complete |
 | 24 | Multi-Touch Campaign Engine | 🔄 In progress (7/11 plans) |
 | 25 | LLM Personalization | 📋 Not started |
-| 26 | Review Funnel | 🔄 In progress (5/7 plans) |
+| 26 | Review Funnel | 🔄 In progress (6/7 plans) |
 | 27 | Dashboard Redesign | 📋 Not started |
 | 28 | Onboarding Redesign | 📋 Not started |
 | 29 | Agency-Mode Readiness & Landing Page | 📋 Not started |
@@ -49,6 +49,10 @@ Phase 21-01 database and client foundation complete. Plans 21-02 through 21-06 c
 | Service role for public pages | 26-05 | No user session on public review pages | Service role bypasses RLS after token validation |
 | Step-based flow state machine | 26-05 | Clean separation of UI states | States: rating, feedback, redirecting, complete |
 | Non-blocking API calls | 26-05 | recordRatingAndStop doesn't block UI flow | API errors logged but don't prevent completion |
+| Service role for public APIs | 26-06 | Rating/feedback APIs have no user session | Token validation happens in route handler |
+| Non-blocking enrollment stop | 26-06 | Enrollment stop failure doesn't fail request | Logged for debugging but request succeeds |
+| Non-blocking email notification | 26-06 | Email failure doesn't fail feedback save | Feedback is primary, notification secondary |
+| XSS protection in emails | 26-06 | HTML escaping for user-provided content | Prevents injection in notification emails |
 
 ### Phase 23
 
@@ -123,13 +127,13 @@ Phase 21-01 database and client foundation complete. Plans 21-02 through 21-06 c
 - Phase 21: Webhook URLs must be configured in Twilio console after production deployment
 
 **Next actions:**
-- Continue Phase 26 (Review Funnel) - 26-06 through 26-07
+- Complete Phase 26 (Review Funnel) - 26-07 remaining
 - Continue Phase 21-06 when ready
 - Continue Phase 24-08 through 24-11 when ready
 - Wait for A2P approval before production SMS testing
 
 ## Session Continuity
 
-**Last session:** 2026-02-04T19:38:00Z
-**Stopped at:** Completed 26-05-PLAN.md (Public Review Page)
+**Last session:** 2026-02-04T19:26:00Z
+**Stopped at:** Completed 26-06-PLAN.md (Rating & Feedback API Routes)
 **Resume file:** None
