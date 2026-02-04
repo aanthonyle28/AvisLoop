@@ -1,42 +1,42 @@
 # PROJECT_STATE
 
 ## Now
-- All 10 phases complete (MVP milestone done)
-- 8 post-MVP bugs fixed
-- Landing page redesigned with new aesthetic
-- Dashboard design tweaks applied (Figma alignment)
-- Onboarding flow fixed and test send walkthrough added
-- 3 blocking bugs fixed (onboarding redirect, step 2 finish, missing is_test column)
-- Stat cards always visible (no longer gated behind test_sent)
-- Resend integration confirmed working (API key + FROM domain configured)
-- Theme toggle added to account menu (dark/light/system via next-themes)
-- Dark mode fully tested and fixed across all pages (12 component files)
+- v1.0-v1.4 milestones complete (shipped through 2026-02-02)
+- v2.0 Review Follow-Up System in progress
+- Phase 20 (Database Migration & Customer Enhancement) complete
+- Phase 21 (SMS Foundation) blocked on Twilio A2P campaign approval
+- Phase 22 (Jobs CRUD & Service Types) complete
+- Phase 23 (Message Templates & Migration) complete
+- Twilio A2P: Brand approved, campaign pending (1-3 business days)
 
-## Last session summary (dark mode fixes)
-- **Fix: Dark mode across 12 files** — replaced all hardcoded `bg-white`, `text-gray-*`, `border-gray-*`, `bg-gray-*` classes with CSS variable-based theme tokens (`bg-card`, `bg-background`, `text-foreground`, `text-muted-foreground`, `border-border`, `bg-muted`) so all dashboard and settings components adapt to dark mode
-- **Files fixed**: `stat-strip.tsx`, `recent-activity-strip.tsx`, `quick-send-tab.tsx`, `message-preview.tsx`, `bulk-send-action-bar.tsx`, `settings/page.tsx`, `business-settings-form.tsx`, `email-template-form.tsx`, `integrations-section.tsx`, `delete-account-dialog.tsx`, `status-badge.tsx`
-- **Pattern**: `bg-white` → `bg-card`, `border-[#E3E3E3]`/`border-gray-300` → `border-border`, `text-gray-700` → `text-foreground`, `text-gray-500/600` → `text-muted-foreground`, `bg-gray-50/100/200` → `bg-muted`, semantic color badges → explicit `dark:` variants
-- **Tested** all pages with Playwright in dark mode: landing, pricing, send, contacts, history, billing, settings
+## Last session summary (Phase 23 complete)
+- **Phase 23 complete (7/7 plans)**: Unified message_templates table supporting email + SMS
+- **Database**: email_templates renamed to message_templates with channel column
+- **UI**: Tab-based template form with SMS character counter, preview components
+- **Migration**: All code updated to use MessageTemplate type (backward compat via @deprecated)
+- **System templates**: 16 default templates (8 service types x 2 channels)
 - Lint + typecheck clean
 
 ## What's been built
 - **Auth**: Sign up, sign in, sign out, password reset, session persistence
-- **Business**: Business profile form, email template management
-- **Contacts**: Full CRUD, bulk operations, CSV import, search, filtering, archive/restore
+- **Business**: Business profile form, message template management (email + SMS)
+- **Customers**: Full CRUD, bulk operations, CSV import, tags, phone validation, SMS consent tracking
+- **Jobs**: Jobs table with service types, completion status, timing defaults
 - **Security**: SQL injection protection, pagination, bulk limits, rate limiting, middleware route protection
 - **Sending**: Contact selector, message preview, Resend integration, cooldown, quotas
 - **History**: Send history with date filtering, search, status badges
 - **Billing**: Stripe integration, tier enforcement, usage tracking
 - **Onboarding**: Setup wizard, dashboard checklist, completion redirect
 - **Marketing**: Landing page, pricing page, responsive design, mobile nav menu
-- **Polish**: Design system, loading states, micro-interactions, accessibility, branded titles, dark/light/system theme toggle, full dark mode support across all pages
+- **Polish**: Design system, loading states, micro-interactions, accessibility, branded titles, dark/light/system theme toggle, full dark mode support
 
 ## Next steps
-1. Configure Supabase Google OAuth provider in dashboard
-2. Replace image placeholders with real screenshots
-3. Production deployment prep
-4. Optional: /gsd:audit-milestone or /gsd:complete-milestone
+1. Wait for Twilio A2P campaign approval (1-3 business days)
+2. Plan Phase 24 (Multi-Touch Campaign Engine)
+3. Configure Google OAuth provider in Supabase dashboard
+4. Production deployment prep
 
 ## Open questions / decisions needed
+- Twilio A2P campaign approval (blocker for Phase 21 SMS sending)
 - Google OAuth provider config in Supabase dashboard
 - Production domain and deployment

@@ -2,29 +2,35 @@
 
 ## Current Position
 
-**Phase:** Phase 23 - Message Templates & Migration
-**Plan:** 7 of 7 (Update Template References)
-**Status:** Phase complete
-**Last activity:** 2026-02-04 - Completed 23-07-PLAN.md
+**Milestone:** v2.0 Review Follow-Up System
+**Phase:** Between phases (Phase 23 complete, Phase 24 next)
+**Status:** Awaiting next phase planning
+**Last activity:** 2026-02-04 - Phase 23 complete
 
-**Progress:** ███████████████████████ (7/7 plans complete in current phase)
+**v2.0 Progress:** ████████░░░░░░░░░░░░░░░░ (3/10 phases complete)
 
-## Phase 23 Summary
+## v2.0 Phase Status
 
-**Objective:** Migrate email_templates to unified message_templates table supporting both email and SMS channels.
+| Phase | Name | Status |
+|-------|------|--------|
+| 20 | Database Migration & Customer Enhancement | ✅ Complete |
+| 21 | SMS Foundation & Compliance | ⏸️ Blocked (A2P) |
+| 22 | Jobs CRUD & Service Types | ✅ Complete |
+| 23 | Message Templates & Migration | ✅ Complete |
+| 24 | Multi-Touch Campaign Engine | 📋 Not started |
+| 25 | LLM Personalization | 📋 Not started |
+| 26 | Review Funnel | 📋 Not started |
+| 27 | Dashboard Redesign | 📋 Not started |
+| 28 | Onboarding Redesign | 📋 Not started |
+| 29 | Agency-Mode Readiness & Landing Page | 📋 Not started |
 
-**Plans completed:**
-- ✅ 23-01: Database Migration (message_templates table, RLS, system defaults)
-- ✅ 23-02: Type Definitions & Validation (discriminated union, default constants)
-- ✅ 23-03: Server Actions & Data Functions (CRUD API with validation)
-- ✅ 23-04: Settings UI - Template Form (tab-based form, SMS character counter)
-- ✅ 23-05: Message Template Previews (email/SMS preview components with character counter)
-- ✅ 23-06: Settings Integration (updated settings page to use message templates)
-- ✅ 23-07: Update Template References (migrated all code to use message_templates)
+## Blocker
 
-**Plans remaining:** None (Phase 23 complete)
+**Phase 21 blocked:** Twilio A2P 10DLC campaign registration pending (brand approved 2026-02-03, campaign submitted same day, typically 1-3 business days for approval).
 
-## Accumulated Decisions
+Phase 24 can proceed in parallel since it doesn't depend on SMS sending working.
+
+## Accumulated Decisions (Phase 23)
 
 | Decision | Phase | Impact | Constraint |
 |----------|-------|--------|------------|
@@ -38,20 +44,18 @@
 | Read-only opt-out footer | 23-04 | Opt-out text shown as notice, not editable | TCPA compliance, no user customization |
 | Email preview design | 23-05 | Shows From/To, subject, body, CTA button, footer | Matches production email rendering |
 | SMS preview design | 23-05 | Phone mockup with bubble, opt-out footer, character count | Simulates customer's view of SMS |
-| Character counting on raw text | 23-05 | Count uses template text before placeholder resolution | Shows actual SMS cost to user |
-| Backward compatibility via @deprecated | 23-07 | Old email_templates functions marked deprecated | Gradual migration path, no breaking changes |
-| Type unification across UI | 23-07 | All components use MessageTemplate type | Consistent interface for email/SMS templates |
 
 ## Known Blockers / Concerns
 
-**Current blockers:** None
+**Current blockers:**
+- Phase 21: Twilio A2P campaign approval (1-3 business days)
 
-**Concerns for future phases:**
-- Phase 21 (SMS): Ready to add SMS sending with channel='sms' filter
-- Phase 24+ (Campaigns): Can use message_templates with service_type filtering
+**Next actions:**
+- Plan Phase 24 (Multi-Touch Campaign Engine) - can proceed without SMS
+- Wait for A2P approval before Phase 21 execution
 
 ## Session Continuity
 
-**Last session:** 2026-02-04 02:55 UTC
-**Stopped at:** Completed 23-07-PLAN.md (Phase 23 complete)
+**Last session:** 2026-02-04
+**Stopped at:** Phase 23 complete, docs updated
 **Resume file:** None

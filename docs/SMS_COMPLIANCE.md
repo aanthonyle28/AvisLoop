@@ -2,26 +2,28 @@
 
 ## A2P 10DLC Registration
 
-**Status:** PENDING
-**Brand Registration ID:** [not yet registered]
-**Campaign ID:** [not yet registered]
-**Approval Date:** [pending]
+**Status:** CAMPAIGN PENDING
+**Brand Registration:** APPROVED (2026-02-03)
+**Campaign Registration:** PENDING (submitted 2026-02-03, typically 1-3 business days)
+**Approval Date:** [awaiting campaign approval]
 
-> **IMPORTANT:** A2P 10DLC registration must be completed before Phase 21 (SMS Foundation & Compliance) can begin. Registration typically takes 3-7 business days.
+> **IMPORTANT:** Campaign registration must be approved before Phase 21 (SMS Foundation & Compliance) can begin execution. Typically 1-3 business days.
 
-### Registration Steps (TODO)
+### Registration Progress
 
-1. Create Twilio account at twilio.com
-2. Register A2P 10DLC Brand (Twilio Console → Messaging → Trust Hub → Brand Registrations)
-3. Register A2P 10DLC Campaign (after brand approval)
-4. Add credentials to .env.local:
-   - TWILIO_ACCOUNT_SID
-   - TWILIO_AUTH_TOKEN
+- [x] Create Twilio account
+- [x] Register A2P 10DLC Brand — APPROVED
+- [x] Submit A2P 10DLC Campaign — PENDING
+- [x] Add credentials to .env.local (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+- [ ] Campaign approval (waiting)
 
-### Registration Details (to be completed)
+### Registration Details
+
+**Business Type:** Sole Proprietorship
+**Campaign Use Case:** Sole Proprietorship (single number limit)
 
 **Business Information:**
-- Legal Name: [to be filled]
+- Legal Name: [redacted]
 - EIN/Tax ID: [redacted]
 - Industry: Professional Services
 
@@ -68,14 +70,14 @@ Per TCPA Jan 2026 rules, informal opt-out messages ("Leave me alone", "Don't tex
 ## Twilio Configuration
 
 **Environment Variables:**
-- TWILIO_ACCOUNT_SID: [not yet configured]
-- TWILIO_AUTH_TOKEN: [not yet configured]
-- TWILIO_PHONE_NUMBER: [to be configured in Phase 21]
+- TWILIO_ACCOUNT_SID: Configured in .env.local
+- TWILIO_AUTH_TOKEN: Configured in .env.local
+- TWILIO_PHONE_NUMBER: [to be configured in Phase 21 after campaign approval]
 
 **Webhook Endpoints (Phase 21):**
 - /api/webhooks/twilio/inbound - Handles STOP keywords
 - /api/webhooks/twilio/status - Delivery status updates
 
 ---
-*Last updated: 2026-02-02*
-*Status: Awaiting A2P 10DLC registration before Phase 21*
+*Last updated: 2026-02-03*
+*Status: Brand approved, campaign pending — awaiting approval before Phase 21 execution*
