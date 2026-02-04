@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 **Phase:** Phase 22 - Jobs CRUD & Service Types
-**Plan:** 04/04 complete
-**Status:** Phase complete
-**Last activity:** 2026-02-04 -- Completed 22-04 (Add/Edit job forms)
+**Plan:** 04/05 complete
+**Status:** In progress (22-05 pending)
+**Last activity:** 2026-02-03 -- Completed 22-03 (Jobs page and list components)
 
 **Progress:** [█████████████████████████████████████████░] 95/100+ total plans complete
 
@@ -27,7 +27,7 @@ Phase 21 Preview:   ██ 2/2 COMPLETE (v1.3)
 Phase 22 Drawers:   ███ 3/3 COMPLETE (v1.3)
 Phase 25 Story:     ██ 2/2 COMPLETE (v1.4)
 v2.0 Phase 20:      ████████ 8/8 COMPLETE (A2P deferred)
-v2.0 Phase 22:      ████ 4/4 COMPLETE
+v2.0 Phase 22:      ████░ 4/5 (22-05 pending)
 v2.0 (Ph 21,23-29): ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 0/TBD PENDING
 ```
 
@@ -168,14 +168,16 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 
 ## Session Continuity
 
-**Last session:** 2026-02-04
-**Stopped at:** Phase 22 COMPLETE (Jobs CRUD & Service Types)
-**Resume file:** .planning/phases/22-jobs-crud-service-types/22-04-SUMMARY.md
-**Next action:** Plan Phase 23 (Message Templates & Migration) or Phase 21 (SMS Foundation)
+**Last session:** 2026-02-03
+**Stopped at:** Completed 22-03-PLAN.md (Jobs page and list components)
+**Resume file:** .planning/phases/22-jobs-crud-service-types/22-03-SUMMARY.md
+**Next action:** Execute 22-05 (Service Type Settings UI)
 
 **Key context for next session:**
-- Phase 22 COMPLETE: Jobs table, types, validations, server actions, page, forms
+- Phase 22: 4/5 complete, 22-05 (Service Type Settings UI) pending
+- Jobs UI complete: page, table, filters, empty state, add/edit sheets
 - Components: CustomerSelector, ServiceTypeSelect, AddJobSheet, EditJobSheet
 - Server actions: createJob, updateJob, deleteJob, markJobCompleted, markJobDoNotSend
 - Data functions: getJobs, getJob, getJobCounts
-- Phase 21 (SMS) blocked by A2P registration -- can proceed to Phase 23
+- Service type settings data layer ready (getServiceTypeSettings, updateServiceTypeSettings)
+- Phase 21 (SMS) blocked by A2P registration -- can proceed to Phase 23 after 22-05
