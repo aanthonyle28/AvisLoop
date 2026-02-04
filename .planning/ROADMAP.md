@@ -145,7 +145,14 @@ Plans:
   6. Twilio webhooks verify signature (twilio.validateRequest) and reject invalid requests with 403
   7. send_logs table includes channel column (email/sms) and provider-specific IDs (Twilio message_sid or Resend email_id)
   8. Failed SMS sends (Twilio down, invalid number) queue for retry with exponential backoff (3 attempts max, then mark failed)
-**Plans**: TBD
+**Plans**: 6 plans in 5 waves
+Plans:
+- [ ] 21-01-PLAN.md — Database schema (extend send_logs, create sms_retry_queue, Twilio client)
+- [ ] 21-02-PLAN.md — Quiet hours enforcement and core SMS sending
+- [ ] 21-03-PLAN.md — Twilio webhooks (STOP handling, delivery status)
+- [ ] 21-04-PLAN.md — SMS retry queue processing (cron + exponential backoff)
+- [ ] 21-05-PLAN.md — UI updates (channel selector, character counter, send action)
+- [ ] 21-06-PLAN.md — Integration verification and documentation
 
 ### Phase 22: Jobs CRUD & Service Types
 **Goal**: Users can create jobs linked to customers with service type and completion status, enabling job-centric workflow and service-specific analytics.
