@@ -127,10 +127,11 @@ export async function sendReviewRequest(
 
   if (templateId) {
     const { data: tpl } = await supabase
-      .from('email_templates')
+      .from('message_templates')
       .select('name, subject, body')
       .eq('id', templateId)
       .eq('business_id', business.id)
+      .eq('channel', 'email')
       .single()
     template = tpl
   }
@@ -381,10 +382,11 @@ export async function batchSendReviewRequest(
 
   if (templateId) {
     const { data: tpl } = await supabase
-      .from('email_templates')
+      .from('message_templates')
       .select('name, subject, body')
       .eq('id', templateId)
       .eq('business_id', business.id)
+      .eq('channel', 'email')
       .single()
     template = tpl
   }

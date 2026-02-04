@@ -177,10 +177,11 @@ export async function GET(request: Request) {
 
         if (scheduledSend.template_id) {
           const { data: tpl } = await supabase
-            .from('email_templates')
+            .from('message_templates')
             .select('name, subject, body')
             .eq('id', scheduledSend.template_id)
             .eq('business_id', scheduledSend.business_id)
+            .eq('channel', 'email')
             .single()
           template = tpl
         }
