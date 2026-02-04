@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 
 ## Current Position
 
-**Phase:** Phase 22 - Jobs CRUD & Service Types
-**Plan:** 05/05 complete
-**Status:** Phase complete
-**Last activity:** 2026-02-04 -- Completed 22-05 (Service Type Settings UI)
+**Phase:** Phase 23 - Message Templates & Migration
+**Plan:** 01/07 complete
+**Status:** In progress
+**Last activity:** 2026-02-04 -- Completed 23-01 (Database Migration)
 
-**Progress:** [██████████████████████████████████████████] 96/100+ total plans complete
+**Progress:** [██████████████████████████████████████████] 97/100+ total plans complete
 
 ```
 v1.0 MVP:           ████████████████████████████████████████████████ 48/48 SHIPPED
@@ -28,7 +28,8 @@ Phase 22 Drawers:   ███ 3/3 COMPLETE (v1.3)
 Phase 25 Story:     ██ 2/2 COMPLETE (v1.4)
 v2.0 Phase 20:      ████████ 8/8 COMPLETE (A2P deferred)
 v2.0 Phase 22:      █████ 5/5 COMPLETE
-v2.0 (Ph 21,23-29): ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 0/TBD PENDING
+v2.0 Phase 23:      █░░░░░░ 1/7 IN PROGRESS
+v2.0 (Ph 21,24-29): ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 0/TBD PENDING
 ```
 
 ## What's Been Built
@@ -110,6 +111,9 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 | service-type-lowercase | Store service types lowercase in database | Avoids casing issues in queries and UI matching | 2026-02-04 |
 | service-timing-defaults | Per-service timing defaults in JSONB (cleaning 4h, roofing 72h, etc.) | Based on service completion verification needs | 2026-02-04 |
 | data-layer-separation | lib/data/ for reads, lib/actions/ for mutations | Matches existing business.ts pattern, keeps data layer clean | 2026-02-04 |
+| channel-discriminator | Use channel column ('email'/'sms') instead of separate tables | Simpler schema, shared RLS policies, easier template management | 2026-02-04 |
+| system-templates-null-business | System templates have business_id NULL instead of magic UUID | Clearer intent, simpler RLS (OR is_default = true), easier to query | 2026-02-04 |
+| backward-compatible-view | Create email_templates view during migration window | Allows rollback, gives time to update app code, zero-downtime migration | 2026-02-04 |
 
 ## Open Questions
 
@@ -143,12 +147,14 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 - [x] Execute Phase 22-03 (Jobs page and list components)
 - [x] Execute Phase 22-04 (Add/Edit job forms)
 - [x] Execute Phase 22-05 (Service Type Settings UI)
+- [x] Execute Phase 23-01 (Database migration for message_templates)
 - [ ] Start Twilio A2P 10DLC registration (2-4 week lead time) -- BLOCKS Phase 21
 - [ ] Plan Phase 21 (SMS Foundation & Compliance)
 - [ ] Design campaign_enrollments schema
-- [ ] Design message_templates migration strategy
+- [ ] Execute Phase 23-02 through 23-07 (Template UI and code updates)
 
 ### Recent Changes
+- 2026-02-04: Phase 23-01 complete (message_templates migration, 16 default templates, RLS)
 - 2026-02-04: Phase 22 COMPLETE (5/5 plans, Jobs CRUD & Service Types)
 - 2026-02-04: Phase 22-05 complete (ServiceTypesSection component, settings integration)
 - 2026-02-04: Phase 22-04 complete (Add/Edit job forms with customer selector)
@@ -172,14 +178,16 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 ## Session Continuity
 
 **Last session:** 2026-02-04
-**Stopped at:** Phase 22 COMPLETE (Jobs CRUD & Service Types)
-**Resume file:** .planning/phases/22-jobs-crud-service-types/22-05-SUMMARY.md
-**Next action:** Plan Phase 23 (Message Templates & Migration) or Phase 21 (SMS Foundation)
+**Stopped at:** Phase 23-01 COMPLETE (Message Templates Database Migration)
+**Resume file:** .planning/phases/23-message-templates-migration/23-01-SUMMARY.md
+**Next action:** Execute Phase 23-02 (Template Selector UI) or continue with 23-03 through 23-07
 
 **Key context for next session:**
-- Phase 22 COMPLETE: Jobs table, types, validations, server actions, page, forms, service type settings
-- Components: CustomerSelector, ServiceTypeSelect, AddJobSheet, EditJobSheet, ServiceTypesSection
-- Server actions: createJob, updateJob, deleteJob, markJobCompleted, markJobDoNotSend, updateServiceTypeSettings
-- Data functions: getJobs, getJob, getJobCounts, getServiceTypeSettings
-- Service type settings configurable in settings page with timing defaults
-- Phase 21 (SMS) blocked by A2P registration -- can proceed to Phase 23
+- Phase 23-01 COMPLETE: message_templates table created with channel discriminator
+- Migration: email_templates → message_templates with backward-compatible view
+- 16 system default templates inserted (8 service types x 2 channels)
+- RLS policies allow reading system templates (is_default=true)
+- business_id nullable for system templates
+- Indexes: channel, is_default (partial), business_id
+- DATA_MODEL.md updated with complete schema documentation
+- Phase 21 (SMS) blocked by A2P registration -- proceeding with Phase 23
