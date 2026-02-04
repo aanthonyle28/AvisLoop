@@ -1,193 +1,48 @@
 # Project State
 
-## Project Reference
-
-See: .planning/PROJECT.md (updated 2026-02-02)
-
-**Core value:** Turn job completions into Google reviews automatically -- multi-touch follow-up sequences that send the right message at the right time.
-**Current focus:** Milestone v2.0 -- Review Follow-Up System
-
 ## Current Position
 
 **Phase:** Phase 23 - Message Templates & Migration
-**Plan:** 01/07 complete
+**Plan:** 3 of 7 (Message Templates - Server Actions & Data Functions)
 **Status:** In progress
-**Last activity:** 2026-02-04 -- Completed 23-01 (Database Migration)
+**Last activity:** 2026-02-04 - Completed 23-03-PLAN.md
 
-**Progress:** [██████████████████████████████████████████] 97/100+ total plans complete
+**Progress:** ░░░░░░░░░░░░░░░░░░░░░░███ (2/7 plans complete in current phase)
 
-```
-v1.0 MVP:           ████████████████████████████████████████████████ 48/48 SHIPPED
-v1.1 Scheduled:     █████ 5/5 SHIPPED
-v1.2 Onboarding:    █████████ 9/9 SHIPPED
-v1.2.1 Tech Debt:   ████ 4/4 SHIPPED
-Phase 19 UX:        ████████ 8/8 COMPLETE
-Phase 20 Layout:    ██ 2/2 COMPLETE (v1.3)
-Phase 21 Preview:   ██ 2/2 COMPLETE (v1.3)
-Phase 22 Drawers:   ███ 3/3 COMPLETE (v1.3)
-Phase 25 Story:     ██ 2/2 COMPLETE (v1.4)
-v2.0 Phase 20:      ████████ 8/8 COMPLETE (A2P deferred)
-v2.0 Phase 22:      █████ 5/5 COMPLETE
-v2.0 Phase 23:      █░░░░░░ 1/7 IN PROGRESS
-v2.0 (Ph 21,24-29): ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 0/TBD PENDING
-```
+## Phase 23 Summary
 
-## What's Been Built
+**Objective:** Migrate email_templates to unified message_templates table supporting both email and SMS channels.
 
-See .planning/ROADMAP.md for full history.
+**Plans completed:**
+- ✅ 23-01: Database Migration (message_templates table, RLS, system defaults)
+- ✅ 23-03: Server Actions & Data Functions (CRUD API with validation)
 
-**v1.0 through v1.4 (shipped):**
-- Auth, business profiles, contacts, sending, history, billing, onboarding, public pages
-- Scheduled sending with cron processing
-- Design system overhaul, Google OAuth, simplified onboarding
-- Send-first dashboard with 3-page nav, stat/activity strips, request detail drawer
-- Unified status badges, email preview (compact + full modal), contact detail drawers
-- Landing page problem/solution storytelling sections
+**Plans remaining:**
+- ⏳ 23-02: Type Definitions & Validation (parallel with 23-03)
+- 🔜 23-04: Settings UI Refactor
+- 🔜 23-05: Send Flow Integration
+- 🔜 23-06: Backward Compatibility Testing
+- 🔜 23-07: Deprecation & Cleanup
 
-**Reusable components for v2.0:**
-- StatusBadge component (Figma-spec colors/icons)
-- Request detail drawer (Sheet-based, resend support)
-- Contact detail drawer (auto-saving notes)
-- Email preview (compact snippet + full modal)
-- Template selector with "Create Template" option
-- Textarea component
-- Design system (CSS variables, dark mode, Phosphor icons, Kumbh Sans)
+## Accumulated Decisions
 
-**v2.0 Roadmap (Phases 20-29):**
-- Phase 20: Database Migration & Customer Enhancement (customers table, phone, tags, SMS fields, A2P registration, timezone)
-- Phase 21: SMS Foundation & Compliance (Twilio sending, STOP handling, quiet hours, webhook verification)
-- Phase 22: Jobs CRUD & Service Types (jobs table, service taxonomy, completion triggers, timing defaults)
-- Phase 23: Message Templates & Migration (unified email+SMS templates, channel selector, migration)
-- Phase 24: Multi-Touch Campaign Engine (preset sequences, enrollment, cron processing, analytics)
-- Phase 25: LLM Personalization (Vercel AI SDK, GPT-4o-mini, guardrails, fallback)
-- Phase 26: Review Funnel (satisfaction filter, conditional routing, feedback storage)
-- Phase 27: Dashboard Redesign (pipeline KPIs, ready-to-send queue, attention alerts, quick actions, to-do list)
-- Phase 28: Onboarding Redesign (services offered, software used, default campaign, SMS opt-in)
-- Phase 29: Agency-Mode Readiness & Landing Page (multi-location schema, performance reports, playbooks, copy updates)
+| Decision | Phase | Impact | Constraint |
+|----------|-------|--------|------------|
+| Discriminated union validation | 23-03 | Email requires subject, SMS does not | All template forms must handle channel field |
+| System template protection | 23-03 | is_default=true templates cannot be edited/deleted | Users must copy to customize |
+| Channel-based filtering | 23-03 | All data functions accept optional channel param | UI can filter email vs SMS templates |
 
-## Tech Stack
+## Known Blockers / Concerns
 
-Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, Resend, Stripe, Upstash Redis, Phosphor Icons, Kumbh Sans, react-countup
+**Current blockers:** None
 
-**New for v2.0:** Twilio (SMS), Vercel AI SDK (LLM), OpenAI GPT-4o-mini, Anthropic Claude Haiku (fallback), date-fns-tz
-
-## Blockers & Concerns
-
-**Pre-Phase 21 blockers:**
-- Twilio account setup required
-- A2P 10DLC brand registration (2-4 weeks approval time) -- CRITICAL PATH
-- A2P 10DLC campaign registration -- must complete before Phase 21 starts
-- TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN env vars
-
-**Pre-Phase 25 blockers:**
-- OPENAI_API_KEY env var (GPT-4o-mini)
-- ANTHROPIC_API_KEY env var (Claude Haiku fallback)
-
-**Production deployment blockers (unchanged):**
-- Resend FROM email domain verification
-- Google OAuth provider configured in Supabase dashboard
-- CRON_SECRET env var
-- Stripe production keys
-
-## Decisions
-
-| ID | Decision | Context | Date |
-|----|----------|---------|------|
-| v2-product-pivot | Transform from single-send to follow-up system | Home services need sequences, not one-off emails | 2026-02-02 |
-| home-services-first | Optimize for home services, keep general enough | HVAC/plumbing/electrical primary, other verticals secondary | 2026-02-02 |
-| twilio-sms | Use Twilio for SMS channel | Most popular, well-documented, A2P support | 2026-02-02 |
-| vercel-ai-sdk | Use Vercel AI SDK for LLM abstraction | Provider-agnostic, GPT-4o-mini primary, Haiku fallback | 2026-02-02 |
-| llm-fallback-pattern | GPT-4o-mini primary, Haiku on constraint violation | Cost optimization with quality safety net | 2026-02-02 |
-| preset-plus-customize | Campaign presets (conservative/standard/aggressive) + duplicate & edit | Best of both: quick start + full control | 2026-02-02 |
-| jobs-basic-crud | Jobs with list/add/edit/delete, service type, status, customer link | Minimal but functional job tracking for v2.0 | 2026-02-02 |
-| reuse-what-fits | Keep working components (badges, drawers, preview), replace what changes | Preserve investment in Phase 19-25 work | 2026-02-02 |
-| phase-numbering-restart | Start v2.0 phases from 20 (overwrite old v1.3/v1.4 phases 20-26) | Clean slate for new milestone | 2026-02-02 |
-| 10-phase-structure | 76 requirements across 10 phases (20-29) | Balanced depth (standard config), natural delivery boundaries | 2026-02-02 |
-| compatibility-view-pattern | Create view 'contacts' as SELECT * FROM customers during table rename | Allows safe rollback during migration window, zero-downtime migration | 2026-02-03 |
-| csv-phone-best-effort | CSV import uses best-effort phone parsing (invalid phones don't block import) | Better UX - import succeeds, user fixes phone issues after via review workflow | 2026-02-03 |
-| sms-consent-drawer-only | SMS consent status editable only in drawer, read-only in edit form | Prevents accidental audit trail corruption, forces deliberate consent changes | 2026-02-03 |
-| timezone-auto-detect | Auto-detect timezone from browser Intl API on customer creation | Prepares for Phase 21 quiet hours enforcement, defaults to America/New_York | 2026-02-03 |
-| service-type-text-check | Use TEXT with CHECK constraint for service types (not ENUM) | Easier to add/remove types in future migrations | 2026-02-04 |
-| service-type-lowercase | Store service types lowercase in database | Avoids casing issues in queries and UI matching | 2026-02-04 |
-| service-timing-defaults | Per-service timing defaults in JSONB (cleaning 4h, roofing 72h, etc.) | Based on service completion verification needs | 2026-02-04 |
-| data-layer-separation | lib/data/ for reads, lib/actions/ for mutations | Matches existing business.ts pattern, keeps data layer clean | 2026-02-04 |
-| channel-discriminator | Use channel column ('email'/'sms') instead of separate tables | Simpler schema, shared RLS policies, easier template management | 2026-02-04 |
-| system-templates-null-business | System templates have business_id NULL instead of magic UUID | Clearer intent, simpler RLS (OR is_default = true), easier to query | 2026-02-04 |
-| backward-compatible-view | Create email_templates view during migration window | Allows rollback, gives time to update app code, zero-downtime migration | 2026-02-04 |
-
-## Open Questions
-
-**Phase 20 (Migration):**
-- Existing customers migration: email opt-in campaign vs. SMS disabled by default?
-- Job status workflow: does "complete" mean technician-complete or office-verified?
-
-**Phase 21 (SMS):**
-- Double opt-in vs. single opt-in for SMS consent?
-- Twilio number provisioning: shared number or per-business numbers?
-
-**Phase 24 (Campaigns):**
-- Campaign timing defaults: validate 24h/72h/168h with customer interviews?
-- Multi-day job handling: project_id field vs. customer_id grouping?
-
-**Phase 25 (LLM):**
-- Model quality: GPT-4o-mini sufficient or need GPT-4o? (A/B test during implementation)
-- Cost budget: $50/month per business acceptable?
-
-**Phase 26 (Review Funnel):**
-- Transparency: should customer know routing is based on rating?
-- Notification: who gets notified on negative feedback (owner, manager, technician)?
-
-## Accumulated Context
-
-### Todos
-- [x] Plan Phase 20 (Database Migration & Customer Enhancement)
-- [x] Execute Phase 20 (8/8 plans complete)
-- [x] Design jobs table schema and RLS policies (22-01 complete)
-- [x] Execute Phase 22-02 (Jobs TypeScript types, validations, server actions)
-- [x] Execute Phase 22-03 (Jobs page and list components)
-- [x] Execute Phase 22-04 (Add/Edit job forms)
-- [x] Execute Phase 22-05 (Service Type Settings UI)
-- [x] Execute Phase 23-01 (Database migration for message_templates)
-- [ ] Start Twilio A2P 10DLC registration (2-4 week lead time) -- BLOCKS Phase 21
-- [ ] Plan Phase 21 (SMS Foundation & Compliance)
-- [ ] Design campaign_enrollments schema
-- [ ] Execute Phase 23-02 through 23-07 (Template UI and code updates)
-
-### Recent Changes
-- 2026-02-04: Phase 23-01 complete (message_templates migration, 16 default templates, RLS)
-- 2026-02-04: Phase 22 COMPLETE (5/5 plans, Jobs CRUD & Service Types)
-- 2026-02-04: Phase 22-05 complete (ServiceTypesSection component, settings integration)
-- 2026-02-04: Phase 22-04 complete (Add/Edit job forms with customer selector)
-- 2026-02-04: Phase 22-03 complete (Jobs page and list components)
-- 2026-02-04: Phase 22-02 complete (Job types, validations, server actions, data fetching)
-- 2026-02-04: Phase 22-01 complete (Jobs table schema, service type settings, DATA_MODEL.md)
-- 2026-02-03: Phase 20 COMPLETE (8/8 plans, verified, A2P deferred)
-- 2026-02-03: Phase 20-08 deferred (A2P 10DLC registration skipped for now)
-- 2026-02-03: Phase 20-07 complete (SMS consent UI with TCPA audit trail and timezone capture)
-- 2026-02-03: Phase 20-06 complete (CSV import phone handling with review workflow)
-- 2026-02-03: Phase 20-05 complete (customer phone/tags columns, tag filter UI)
-- 2026-02-03: Phase 20-04 complete (contacts→customers terminology migration)
-- 2026-02-03: Phase 20-03 complete (libphonenumber-js utilities and schemas)
-- 2026-02-03: Phase 20-02 complete (customer field enhancements)
-- 2026-02-03: Phase 20-01 complete (contacts table renamed to customers)
-- 2026-02-02: v2.0 roadmap created (76 requirements mapped to 10 phases)
-
-### Known Issues
-- None (v1.0-v1.4 shipped clean)
+**Concerns for next plans:**
+- 23-04 Settings UI: Need to design system template browser/copy workflow
+- 23-05 Send flow: Existing send forms reference email_templates (backward compat view exists)
+- 23-06 Testing: Need comprehensive test coverage for backward compat view
 
 ## Session Continuity
 
-**Last session:** 2026-02-04
-**Stopped at:** Phase 23-01 COMPLETE (Message Templates Database Migration)
-**Resume file:** .planning/phases/23-message-templates-migration/23-01-SUMMARY.md
-**Next action:** Execute Phase 23-02 (Template Selector UI) or continue with 23-03 through 23-07
-
-**Key context for next session:**
-- Phase 23-01 COMPLETE: message_templates table created with channel discriminator
-- Migration: email_templates → message_templates with backward-compatible view
-- 16 system default templates inserted (8 service types x 2 channels)
-- RLS policies allow reading system templates (is_default=true)
-- business_id nullable for system templates
-- Indexes: channel, is_default (partial), business_id
-- DATA_MODEL.md updated with complete schema documentation
-- Phase 21 (SMS) blocked by A2P registration -- proceeding with Phase 23
+**Last session:** 2026-02-04 02:31 UTC
+**Stopped at:** Completed 23-03-PLAN.md
+**Resume file:** None
