@@ -256,7 +256,15 @@ Plans:
   4. Private feedback stored in database with customer reference and business owner receives email notification on submission
   5. Pre-qualification page frames as "share your experience" (not "leave a review if happy") to avoid review gating language
   6. Feedback dashboard shows all private feedback with response workflow (mark as resolved, add notes)
-**Plans**: TBD
+**Plans**: 7 plans in 4 waves
+Plans:
+- [ ] 26-01-PLAN.md — Database schema (customer_feedback table with RLS)
+- [ ] 26-02-PLAN.md — Token utilities and routing logic
+- [ ] 26-03-PLAN.md — TypeScript types, validations, and data functions
+- [ ] 26-04-PLAN.md — Star rating and feedback form components
+- [ ] 26-05-PLAN.md — Public review page (/r/[token]) with routing flow
+- [ ] 26-06-PLAN.md — API routes for rating and feedback submission
+- [ ] 26-07-PLAN.md — Feedback dashboard and navigation integration
 
 ### Phase 27: Dashboard Redesign
 **Goal**: Dashboard displays pipeline KPIs, ready-to-send queue, needs attention alerts, quick actions, and daily to-do list.
