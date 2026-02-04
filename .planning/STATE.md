@@ -4,9 +4,9 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** 24 of 10 (Multi-Touch Campaign Engine)
-**Plan:** 4 of 11 in Phase 24
+**Plan:** 5 of 11 in Phase 24
 **Status:** In progress
-**Last activity:** 2026-02-04 - Completed 24-04-PLAN.md
+**Last activity:** 2026-02-04 - Completed 24-05-PLAN.md
 
 **v2.0 Progress:** ████████░░░░░░░░░░░░░░░░ (3/10 phases complete, 2 phases active)
 
@@ -18,7 +18,7 @@
 | 21 | SMS Foundation & Compliance | 🔄 In progress (2/6 plans) |
 | 22 | Jobs CRUD & Service Types | ✅ Complete |
 | 23 | Message Templates & Migration | ✅ Complete |
-| 24 | Multi-Touch Campaign Engine | 🔄 In progress (4/11 plans) |
+| 24 | Multi-Touch Campaign Engine | 🔄 In progress (5/11 plans) |
 | 25 | LLM Personalization | 📋 Not started |
 | 26 | Review Funnel | 📋 Not started |
 | 27 | Dashboard Redesign | 📋 Not started |
@@ -67,6 +67,11 @@ Phase 21-01 database and client foundation complete. Plans 21-02 through 21-06 c
 | Manual rollback on touch failure | 24-04 | Delete campaign if touches fail to insert | No transaction support in Supabase client |
 | Pause stops enrollments | 24-04 | Pausing campaign stops all active enrollments | Prevents confusing half-active state |
 | Delete blocked by enrollments | 24-04 | Cannot delete if active enrollments exist | Prevents orphaned enrollments |
+| 30-day enrollment cooldown | 24-05 | Customer can't re-enroll within 30 days | Prevents over-messaging repeat customers |
+| enrollInCampaign defaults true | 24-05 | Checkbox on by default in job forms | Users opt out if needed |
+| Non-blocking enrollment | 24-05 | Job succeeds even if enrollment fails | Better UX, enrollment logged but doesn't block |
+| Service timing override | 24-05 | business.service_type_timing overrides campaign delay | Per-business customization (SVCT-03) |
+| Repeat job cancels old enrollment | 24-05 | New job stops old enrollment with 'repeat_job' reason | One active enrollment per customer |
 
 ### Phase 21
 
@@ -94,6 +99,6 @@ Phase 21-01 database and client foundation complete. Plans 21-02 through 21-06 c
 
 ## Session Continuity
 
-**Last session:** 2026-02-04T07:18:59Z
-**Stopped at:** Completed 24-03-PLAN.md (Campaign Types & Validation)
+**Last session:** 2026-02-04T07:18:18Z
+**Stopped at:** Completed 24-05-PLAN.md (Enrollment Actions & Job Integration)
 **Resume file:** None
