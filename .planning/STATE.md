@@ -4,26 +4,26 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** 25 of 10 (LLM Personalization)
-**Plan:** 6 of 7 in Phase 25
-**Status:** In progress
-**Last activity:** 2026-02-04 - Completed 25-06-PLAN.md (Observability & Settings UI)
+**Plan:** 7 of 7 in Phase 25
+**Status:** Phase complete
+**Last activity:** 2026-02-04 - Completed 25-07-PLAN.md (Campaign Preview Integration)
 
-**v2.0 Progress:** ██████████████████░░░░░░ (7/10 phases complete or nearly complete)
+**v2.0 Progress:** ████████████████████░░░░ (8/10 phases complete or nearly complete)
 
 ## v2.0 Phase Status
 
 | Phase | Name | Status |
 |-------|------|--------|
-| 20 | Database Migration & Customer Enhancement | ✅ Complete |
-| 21 | SMS Foundation & Compliance | ⏸️ Blocked (7/8 plans, A2P pending) |
-| 22 | Jobs CRUD & Service Types | ✅ Complete |
-| 23 | Message Templates & Migration | ✅ Complete |
-| 24 | Multi-Touch Campaign Engine | ✅ Complete (11/11 plans) |
-| 25 | LLM Personalization | 🔄 In progress (6/7 plans) |
-| 26 | Review Funnel | ✅ Complete (7/7 plans) |
-| 27 | Dashboard Redesign | 📋 Not started |
-| 28 | Onboarding Redesign | 📋 Not started |
-| 29 | Agency-Mode Readiness & Landing Page | 📋 Not started |
+| 20 | Database Migration & Customer Enhancement | Complete |
+| 21 | SMS Foundation & Compliance | Blocked (7/8 plans, A2P pending) |
+| 22 | Jobs CRUD & Service Types | Complete |
+| 23 | Message Templates & Migration | Complete |
+| 24 | Multi-Touch Campaign Engine | Complete (11/11 plans) |
+| 25 | LLM Personalization | Complete (7/7 plans) |
+| 26 | Review Funnel | Complete (7/7 plans) |
+| 27 | Dashboard Redesign | Not started |
+| 28 | Onboarding Redesign | Not started |
+| 29 | Agency-Mode Readiness & Landing Page | Not started |
 
 ## Blocker
 
@@ -55,6 +55,9 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | 95% estimated personalization rate | 25-06 | MVP approximation until send_logs tracking column | isEstimated flag makes this transparent in UI |
 | Local state personalization toggle | 25-06 | Campaign form toggle uses React state only | DB column for persistence deferred to 25-07 |
 | Parallel settings data fetch | 25-06 | Promise.all for templates + service types + stats | Eliminates sequential waterfall on settings page |
+| personalization_enabled DB column | 25-07 | Boolean NOT NULL DEFAULT TRUE on campaigns | Per-campaign toggle persisted to database |
+| Form-controlled toggle state | 25-07 | Replaced useState with form watch/setValue | Enables DB persistence through form submission |
+| Shared form preview integration | 25-07 | PersonalizationPreview in CampaignForm component | Single integration point for new + edit pages |
 
 ### Phase 26
 
@@ -150,13 +153,12 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 - Phase 21-08: Webhook URLs must be configured in Twilio console after deployment
 
 **Next actions:**
-- Continue Phase 25 (LLM Personalization) -- 25-07 remains
 - Phase 27 (Dashboard Redesign) -- can add unresolved feedback badge
 - Wait for A2P approval before Phase 21-08 execution
 - Phase 28-29 after earlier phases complete
 
 ## Session Continuity
 
-**Last session:** 2026-02-04T23:29:53Z
-**Stopped at:** Completed 25-06-PLAN.md (Observability & Settings UI)
+**Last session:** 2026-02-04T23:36:12Z
+**Stopped at:** Completed 25-07-PLAN.md (Campaign Preview Integration) - Phase 25 complete
 **Resume file:** None
