@@ -15,7 +15,7 @@
 | Phase | Name | Status |
 |-------|------|--------|
 | 20 | Database Migration & Customer Enhancement | ✅ Complete |
-| 21 | SMS Foundation & Compliance | 🔄 In progress (2/6 plans) |
+| 21 | SMS Foundation & Compliance | 🔄 In progress (4/6 plans) |
 | 22 | Jobs CRUD & Service Types | ✅ Complete |
 | 23 | Message Templates & Migration | ✅ Complete |
 | 24 | Multi-Touch Campaign Engine | 🔄 In progress (7/11 plans) |
@@ -87,6 +87,9 @@ Phase 21-01 database and client foundation complete. Plans 21-02 through 21-06 c
 | Public URL for webhook validation | 21-03 | NEXT_PUBLIC_SITE_URL for signature check | Must match what Twilio sees (not proxy URL) |
 | Update all matching phones on STOP | 21-03 | Phone collision safety | Shared phone numbers all opt out together |
 | Status priority system | 21-03 | Numeric priority prevents out-of-order corruption | Failed (99) always wins |
+| Exponential backoff (1/5/15 min) | 21-04 | Industry standard retry timing | Balances retry speed vs. not overwhelming |
+| Max 3 retry attempts | 21-04 | Sufficient for transient failures | Prevents infinite loops |
+| Consent re-check on retry | 21-04 | Customer may opt out between queue and retry | TCPA compliance maintained |
 
 ## Known Blockers / Concerns
 
