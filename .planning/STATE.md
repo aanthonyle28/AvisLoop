@@ -3,12 +3,12 @@
 ## Current Position
 
 **Milestone:** v2.0 Review Follow-Up System
-**Phase:** 24 of 10 (Multi-Touch Campaign Engine)
-**Plan:** 7 of 11 in Phase 24
+**Phase:** 26 of 10 (Review Funnel)
+**Plan:** 1 of 7 in Phase 26
 **Status:** In progress
-**Last activity:** 2026-02-04 - Completed 21-05-PLAN.md
+**Last activity:** 2026-02-04 - Completed 26-01-PLAN.md
 
-**v2.0 Progress:** ████████░░░░░░░░░░░░░░░░ (3/10 phases complete, 2 phases active)
+**v2.0 Progress:** ████████░░░░░░░░░░░░░░░░ (3/10 phases complete, 3 phases active)
 
 ## v2.0 Phase Status
 
@@ -20,7 +20,7 @@
 | 23 | Message Templates & Migration | ✅ Complete |
 | 24 | Multi-Touch Campaign Engine | 🔄 In progress (7/11 plans) |
 | 25 | LLM Personalization | 📋 Not started |
-| 26 | Review Funnel | 📋 Not started |
+| 26 | Review Funnel | 🔄 In progress (1/7 plans) |
 | 27 | Dashboard Redesign | 📋 Not started |
 | 28 | Onboarding Redesign | 📋 Not started |
 | 29 | Agency-Mode Readiness & Landing Page | 📋 Not started |
@@ -32,6 +32,12 @@
 Phase 21-01 database and client foundation complete. Plans 21-02 through 21-06 can proceed but runtime SMS tests require A2P approval.
 
 ## Accumulated Decisions
+
+### Phase 26
+
+| Decision | Phase | Impact | Constraint |
+|----------|-------|--------|------------|
+| Rating constraint 1-5 | 26-01 | Table accepts full range | API route controls funnel routing (1-3 to feedback, 4-5 to review) |
 
 ### Phase 23
 
@@ -106,12 +112,13 @@ Phase 21-01 database and client foundation complete. Plans 21-02 through 21-06 c
 - Phase 21: Webhook URLs must be configured in Twilio console after production deployment
 
 **Next actions:**
-- Continue Phase 21-02 through 21-06 (code can be written, runtime tests blocked)
-- Continue Phase 24 in parallel (doesn't depend on SMS sending)
+- Continue Phase 26 (Review Funnel) - 26-02 through 26-07
+- Continue Phase 21-06 when ready
+- Continue Phase 24-08 through 24-11 when ready
 - Wait for A2P approval before production SMS testing
 
 ## Session Continuity
 
-**Last session:** 2026-02-04T18:05:08Z
-**Stopped at:** Completed 21-05-PLAN.md (SMS Send Action & Channel UI)
+**Last session:** 2026-02-04T19:15:00Z
+**Stopped at:** Completed 26-01-PLAN.md (Feedback Schema)
 **Resume file:** None
