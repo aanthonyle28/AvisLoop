@@ -4,13 +4,18 @@ import { useState, useTransition, useMemo, useRef, useEffect } from 'react'
 import { toast } from 'sonner'
 import { MagnifyingGlass, X, PaperPlaneTilt } from '@phosphor-icons/react'
 import { batchSendReviewRequest } from '@/lib/actions/send'
+import { sendSmsRequest } from '@/lib/actions/send-sms.action'
 import { scheduleReviewRequest } from '@/lib/actions/schedule'
 import { findOrCreateCustomer } from '@/lib/actions/customer'
 import { SendSettingsBar } from './send-settings-bar'
 import { MessagePreview } from './message-preview'
 import { EmailPreviewModal } from './email-preview-modal'
+import { ChannelSelector } from './channel-selector'
+import { SmsCharacterCounter, SmsCharacterNotice } from './sms-character-counter'
 import type { Customer, Business, MessageTemplate } from '@/lib/types/database'
 import { Loader2 } from 'lucide-react'
+
+type Channel = 'email' | 'sms'
 
 type SchedulePreset = 'immediately' | '1hour' | 'morning' | 'custom'
 
@@ -31,6 +36,8 @@ export function QuickSendTab({
 }: QuickSendTabProps) {
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
+  const [channel, setChannel] = useState<Channel>('email')
+  const [smsBody, setSmsBody] = useState('')
   const [selectedTemplateId, setSelectedTemplateId] = useState(
     templates.find(t => t.is_default)?.id || templates[0]?.id || ''
   )
@@ -43,12 +50,26 @@ export function QuickSendTab({
   const suggestionsRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // Email search and matching
+  // Email search and matching (must be declared before SMS hooks that depend on it)
   const matchedCustomer = useMemo(() => {
     if (!email.trim()) return null
     const normalizedEmail = email.toLowerCase().trim()
     return customers.find(c => c.email.toLowerCase() === normalizedEmail) || null
   }, [email, customers])
+
+  // SMS availability checks
+  const canSendSms = useMemo(() => {
+    if (!matchedCustomer) return false
+    return matchedCustomer.phone_status === 'valid' && matchedCustomer.sms_consent_status === 'opted_in'
+  }, [matchedCustomer])
+
+  const smsDisabledReason = useMemo(() => {
+    if (!matchedCustomer) return 'Select a customer first'
+    if (!matchedCustomer.phone) return 'Customer has no phone number'
+    if (matchedCustomer.phone_status !== 'valid') return 'Phone number is invalid'
+    if (matchedCustomer.sms_consent_status !== 'opted_in') return 'Customer has not opted in to SMS'
+    return undefined
+  }, [matchedCustomer])
 
   // Autocomplete suggestions - search by email AND name
   const suggestions = useMemo(() => {
@@ -87,6 +108,23 @@ export function QuickSendTab({
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  // Reset channel to email when customer changes and SMS not available
+  useEffect(() => {
+    if (channel === 'sms' && !canSendSms) {
+      setChannel('email')
+    }
+  }, [matchedCustomer, canSendSms, channel])
+
+  // Set default SMS body with review link when switching to SMS
+  useEffect(() => {
+    if (channel === 'sms' && !smsBody && business.google_review_link) {
+      const customerName = matchedCustomer?.name || name || 'there'
+      setSmsBody(
+        `Hi ${customerName}! Thanks for choosing ${business.name}. We'd love your feedback - please leave us a review: ${business.google_review_link}`
+      )
+    }
+  }, [channel, smsBody, business.name, business.google_review_link, matchedCustomer?.name, name])
 
   const getScheduledFor = (): string | null => {
     const now = Date.now()
@@ -147,8 +185,15 @@ export function QuickSendTab({
       return
     }
 
-    if (!selectedTemplateId) {
+    // For email channel, require template
+    if (channel === 'email' && !selectedTemplateId) {
       toast.error('Please select a template')
+      return
+    }
+
+    // For SMS channel, require body
+    if (channel === 'sms' && !smsBody.trim()) {
+      toast.error('Please enter an SMS message')
       return
     }
 
@@ -186,6 +231,38 @@ export function QuickSendTab({
           return
         }
 
+        // Handle SMS channel
+        if (channel === 'sms') {
+          const formData = new FormData()
+          formData.append('customerId', contactId)
+          formData.append('body', smsBody)
+          if (selectedTemplateId) {
+            formData.append('templateId', selectedTemplateId)
+          }
+
+          const result = await sendSmsRequest(null, formData)
+
+          if (result.error) {
+            toast.error(result.error)
+          } else if (result.queued && result.queuedFor) {
+            const queuedTime = new Date(result.queuedFor).toLocaleTimeString([], {
+              hour: 'numeric',
+              minute: '2-digit',
+            })
+            toast.success(`SMS queued for ${queuedTime} (quiet hours)`)
+            setEmail('')
+            setName('')
+            setSmsBody('')
+          } else if (result.success) {
+            toast.success('SMS sent successfully')
+            setEmail('')
+            setName('')
+            setSmsBody('')
+          }
+          return
+        }
+
+        // Handle email channel
         const scheduledFor = getScheduledFor()
         const formData = new FormData()
         formData.append('contactIds', JSON.stringify([contactId]))
@@ -357,6 +434,38 @@ export function QuickSendTab({
             </div>
           )}
         </div>
+
+        {/* Channel Selector - show when customer is selected */}
+        {matchedCustomer && (
+          <div className="space-y-2">
+            <label className="block text-sm font-medium">Channel</label>
+            <ChannelSelector
+              value={channel}
+              onChange={setChannel}
+              smsDisabled={!canSendSms}
+              smsDisabledReason={smsDisabledReason}
+            />
+          </div>
+        )}
+
+        {/* SMS Message Body - show when SMS channel selected */}
+        {channel === 'sms' && matchedCustomer && (
+          <div className="space-y-2">
+            <label htmlFor="sms-body" className="block text-sm font-medium">
+              SMS Message
+            </label>
+            <textarea
+              id="sms-body"
+              value={smsBody}
+              onChange={(e) => setSmsBody(e.target.value)}
+              placeholder="Enter your SMS message..."
+              rows={4}
+              className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
+            />
+            <SmsCharacterCounter text={smsBody} />
+            <SmsCharacterNotice length={smsBody.length} />
+          </div>
+        )}
 
         {/* Recently Added chips */}
         {recentCustomers.length > 0 && (
