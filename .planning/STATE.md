@@ -81,6 +81,9 @@ Phase 21-01 database and client foundation complete. Plans 21-02 through 21-06 c
 | Parallel customer_id column | 21-01 | Supports contacts/customers migration window | Both columns reference same data |
 | Null client pattern | 21-01 | twilioClient is null when not configured | Use isSmsEnabled() before sending |
 | SMS soft limit 320 chars | 21-01 | Matches Phase 23, allows 2 segments | Prevents excessive SMS costs |
+| date-fns-tz v3 API | 21-02 | toZonedTime/fromZonedTime function names | Renamed from utcToZonedTime/zonedTimeToUtc |
+| Timezone fallback | 21-02 | America/New_York default for invalid timezones | Falls back with console warning |
+| STOP keyword detection | 21-02 | Skip opt-out footer if STOP present | Case-insensitive check before appending |
 | Public URL for webhook validation | 21-03 | NEXT_PUBLIC_SITE_URL for signature check | Must match what Twilio sees (not proxy URL) |
 | Update all matching phones on STOP | 21-03 | Phone collision safety | Shared phone numbers all opt out together |
 | Status priority system | 21-03 | Numeric priority prevents out-of-order corruption | Failed (99) always wins |
