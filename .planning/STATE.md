@@ -6,7 +6,7 @@
 **Phase:** 24 of 10 (Multi-Touch Campaign Engine)
 **Plan:** 1 of 11 in Phase 24
 **Status:** In progress
-**Last activity:** 2026-02-04 - Completed 24-01-PLAN.md
+**Last activity:** 2026-02-04 - Completed 21-03-PLAN.md
 
 **v2.0 Progress:** ████████░░░░░░░░░░░░░░░░ (3/10 phases complete, 2 phases active)
 
@@ -15,7 +15,7 @@
 | Phase | Name | Status |
 |-------|------|--------|
 | 20 | Database Migration & Customer Enhancement | ✅ Complete |
-| 21 | SMS Foundation & Compliance | 🔄 In progress (1/6 plans) |
+| 21 | SMS Foundation & Compliance | 🔄 In progress (2/6 plans) |
 | 22 | Jobs CRUD & Service Types | ✅ Complete |
 | 23 | Message Templates & Migration | ✅ Complete |
 | 24 | Multi-Touch Campaign Engine | 🔄 In progress (3/11 plans) |
@@ -62,7 +62,7 @@ Phase 21-01 database and client foundation complete. Plans 21-02 through 21-06 c
 | Standard timing | 24-02 | 24h + 72h + 168h delays | Balanced multi-channel approach |
 | Aggressive timing | 24-02 | 4h + 24h + 72h + 168h delays | SMS-first for immediacy |
 
-### Phase 21 (21-01)
+### Phase 21
 
 | Decision | Phase | Impact | Constraint |
 |----------|-------|--------|------------|
@@ -70,12 +70,16 @@ Phase 21-01 database and client foundation complete. Plans 21-02 through 21-06 c
 | Parallel customer_id column | 21-01 | Supports contacts/customers migration window | Both columns reference same data |
 | Null client pattern | 21-01 | twilioClient is null when not configured | Use isSmsEnabled() before sending |
 | SMS soft limit 320 chars | 21-01 | Matches Phase 23, allows 2 segments | Prevents excessive SMS costs |
+| Public URL for webhook validation | 21-03 | NEXT_PUBLIC_SITE_URL for signature check | Must match what Twilio sees (not proxy URL) |
+| Update all matching phones on STOP | 21-03 | Phone collision safety | Shared phone numbers all opt out together |
+| Status priority system | 21-03 | Numeric priority prevents out-of-order corruption | Failed (99) always wins |
 
 ## Known Blockers / Concerns
 
 **Current blockers:**
 - Phase 21: Twilio A2P campaign approval (1-3 business days from 2026-02-03)
 - Phase 21: Twilio env vars must be configured before runtime SMS tests
+- Phase 21: Webhook URLs must be configured in Twilio console after production deployment
 
 **Next actions:**
 - Continue Phase 21-02 through 21-06 (code can be written, runtime tests blocked)
@@ -84,6 +88,6 @@ Phase 21-01 database and client foundation complete. Plans 21-02 through 21-06 c
 
 ## Session Continuity
 
-**Last session:** 2026-02-04T07:09:02Z
-**Stopped at:** Completed 24-01-PLAN.md (Campaign Database Schema)
+**Last session:** 2026-02-04T07:16:52Z
+**Stopped at:** Completed 21-03-PLAN.md (Twilio Webhook Endpoints)
 **Resume file:** None
