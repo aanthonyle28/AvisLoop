@@ -1,80 +1,104 @@
 import { useMemo } from 'react'
 
-/**
- * GSM-7 character set regex (standard SMS encoding).
- * Characters outside this set require Unicode (UCS-2) encoding.
- */
-const GSM7_REGEX = /^[@£$¥èéùìòÇ\nØø\rÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ !"#¤%&'()*+,\-.\/0-9:;<=>?¡A-ZÄÖÑÜ§¿a-zäöñüà\^{}\\\[~\]|€]*$/
-
-/**
- * Detects if text uses GSM-7 encoding or requires Unicode.
- * GSM-7: 160 chars per segment
- * Unicode: 70 chars per segment
- */
-function detectEncoding(text: string): 'GSM-7' | 'Unicode' {
-  return GSM7_REGEX.test(text) ? 'GSM-7' : 'Unicode'
-}
-
-/**
- * Warning level based on character count.
- */
-type WarningLevel = 'none' | 'warning' | 'danger'
-
-interface SMSCharacterCountResult {
+export interface SMSCharacterInfo {
   length: number
   limit: number
+  encoding: 'GSM-7' | 'UCS-2'
   segments: number
-  remaining: number
-  encoding: 'GSM-7' | 'Unicode'
-  warning: WarningLevel
+  warning: 'none' | 'warning' | 'error'
   warningMessage: string | null
 }
 
 /**
- * Hook to count SMS characters with GSM-7 vs Unicode detection.
- * Provides warnings at 140+ chars (yellow) and 160+ chars (red).
+ * Hook to calculate SMS character count, encoding, and segment count
+ *
+ * GSM-7 encoding:
+ * - Standard characters: 160 chars/segment (1st), 153 chars/segment (2nd+)
+ * - Extended characters (^{}[]\|~€): count as 2 characters
+ *
+ * UCS-2 encoding (Unicode):
+ * - Any non-GSM character triggers UCS-2
+ * - 70 chars/segment (1st), 67 chars/segment (2nd+)
  */
-export function useSMSCharacterCounter(text: string): SMSCharacterCountResult {
+export function useSMSCharacterCounter(text: string): SMSCharacterInfo {
   return useMemo(() => {
-    const length = text.length
-    const encoding = detectEncoding(text)
+    if (!text) {
+      return {
+        length: 0,
+        limit: 160,
+        encoding: 'GSM-7',
+        segments: 0,
+        warning: 'none',
+        warningMessage: null,
+      }
+    }
 
-    // Segment limits depend on encoding
-    const singleSegmentLimit = encoding === 'GSM-7' ? 160 : 70
-    const multiSegmentLimit = encoding === 'GSM-7' ? 153 : 67 // Concatenation uses some bytes
+    // GSM-7 basic character set
+    const gsmBasic = '@£$¥èéùìòÇ\nØø\rÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ !"#¤%&\'()*+,-./0123456789:;<=>?¡ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÑÜ§¿abcdefghijklmnopqrstuvwxyzäöñüà'
+    // GSM-7 extended characters (count as 2)
+    const gsmExtended = '^{}\[~]|€'
+
+    let encoding: 'GSM-7' | 'UCS-2' = 'GSM-7'
+    let charCount = 0
+
+    // Check each character
+    for (const char of text) {
+      if (gsmBasic.includes(char)) {
+        charCount += 1
+      } else if (gsmExtended.includes(char)) {
+        charCount += 2
+      } else {
+        // Non-GSM character forces UCS-2 encoding
+        encoding = 'UCS-2'
+        break
+      }
+    }
+
+    // If UCS-2, just use raw length
+    if (encoding === 'UCS-2') {
+      charCount = text.length
+    }
 
     // Calculate segments
     let segments: number
-    if (length === 0) {
-      segments = 0
-    } else if (length <= singleSegmentLimit) {
-      segments = 1
+    let limit: number
+
+    if (encoding === 'GSM-7') {
+      if (charCount <= 160) {
+        segments = 1
+        limit = 160
+      } else {
+        segments = Math.ceil(charCount / 153)
+        limit = 153 * segments
+      }
     } else {
-      segments = Math.ceil(length / multiSegmentLimit)
+      // UCS-2
+      if (charCount <= 70) {
+        segments = 1
+        limit = 70
+      } else {
+        segments = Math.ceil(charCount / 67)
+        limit = 67 * segments
+      }
     }
 
-    // Calculate effective limit for current segment count
-    const limit = segments <= 1 ? singleSegmentLimit : multiSegmentLimit * segments
-    const remaining = limit - length
-
-    // Warning levels
-    let warning: WarningLevel = 'none'
+    // Determine warning level
+    let warning: 'none' | 'warning' | 'error' = 'none'
     let warningMessage: string | null = null
 
-    if (length >= 160) {
-      warning = 'danger'
-      warningMessage = `Using ${segments} SMS segments (higher cost)`
-    } else if (length >= 140) {
+    if (segments > 2) {
+      warning = 'error'
+      warningMessage = 'Message exceeds 2 segments (may incur extra charges)'
+    } else if (segments > 1) {
       warning = 'warning'
-      warningMessage = `Approaching ${singleSegmentLimit} character limit`
+      warningMessage = 'Message will be split into multiple SMS segments'
     }
 
     return {
-      length,
+      length: charCount,
       limit,
-      segments,
-      remaining,
       encoding,
+      segments,
       warning,
       warningMessage,
     }
