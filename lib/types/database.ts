@@ -14,6 +14,35 @@ export interface Business {
   updated_at: string
 }
 
+// Message channel literal union
+export type MessageChannel = 'email' | 'sms'
+
+// Unified message template supporting both email and SMS
+export interface MessageTemplate {
+  id: string
+  business_id: string | null  // NULL for system templates
+  name: string
+  subject: string        // Required for email, empty string for SMS
+  body: string
+  channel: MessageChannel
+  service_type: ServiceType | null  // Links to service category
+  is_default: boolean
+  created_at: string
+  updated_at: string
+}
+
+// Insert type (omit auto-generated fields)
+export type MessageTemplateInsert = Omit<MessageTemplate, 'id' | 'created_at' | 'updated_at'>
+
+// Update type (partial, omit immutable fields)
+export type MessageTemplateUpdate = Partial<Omit<MessageTemplate, 'id' | 'business_id' | 'created_at' | 'updated_at'>>
+
+// Combined type for business with nested templates
+export interface BusinessWithMessageTemplates extends Business {
+  message_templates: MessageTemplate[]
+}
+
+/** @deprecated Use MessageTemplate with channel='email' instead */
 export interface EmailTemplate {
   id: string
   business_id: string
@@ -27,7 +56,8 @@ export interface EmailTemplate {
 
 // Combined type for business with nested templates (from Supabase joins)
 export interface BusinessWithTemplates extends Business {
-  email_templates: EmailTemplate[]
+  email_templates: EmailTemplate[]  // Keep for backward compat
+  message_templates?: MessageTemplate[]  // New unified templates
 }
 
 // Insert/Update types (omit auto-generated fields)
