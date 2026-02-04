@@ -163,11 +163,11 @@ Plans:
 **Note**: Phase 22 adds schema columns and settings UI for service type timing. Phase 24 consumes timing when creating campaigns. Phase 27 adds analytics by service type. Phase 28 integrates service type selection into onboarding wizard.
 **Plans**: 5 plans in 3 waves
 Plans:
-- [ ] 22-01-PLAN.md — Database schema (jobs table + business service type settings)
-- [ ] 22-02-PLAN.md — Types, validations, and server actions for jobs CRUD
-- [ ] 22-03-PLAN.md — Jobs UI page with table, filters, and empty state
-- [ ] 22-04-PLAN.md — Add/edit job forms with customer selector
-- [ ] 22-05-PLAN.md — Service types settings section
+- [x] 22-01-PLAN.md — Database schema (jobs table + business service type settings)
+- [x] 22-02-PLAN.md — Types, validations, and server actions for jobs CRUD
+- [x] 22-03-PLAN.md — Jobs UI page with table, filters, and empty state
+- [x] 22-04-PLAN.md — Add/edit job forms with customer selector
+- [x] 22-05-PLAN.md — Service types settings section
 
 ### Phase 23: Message Templates & Migration
 **Goal**: Email and SMS messages use unified message_templates table with channel selector, replacing old email_templates.
@@ -295,8 +295,8 @@ See individual phase sections above for requirements, success criteria, and depe
 | 22 (v1.3) | Dashboard UX | 3/3 | Complete | 2026-02-02 |
 | 25 (v1.4) | Landing Page | 2/2 | Complete | 2026-02-02 |
 | **20 (v2.0)** | **Review Follow-Up** | **8/8** | **Complete** | **2026-02-03** |
-| 21 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
-| **22 (v2.0)** | **Review Follow-Up** | **0/5** | **Planned** | - |
+| 21 (v2.0) | Review Follow-Up | 0/TBD | Blocked (A2P) | - |
+| **22 (v2.0)** | **Review Follow-Up** | **5/5** | **Complete** | **2026-02-04** |
 | 23 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 | 24 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 | 25 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
@@ -305,12 +305,12 @@ See individual phase sections above for requirements, success criteria, and depe
 | 28 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 | 29 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 
-**Total:** 91 plans complete across shipped phases, 9 v2.0 phases remaining.
+**Total:** 96 plans complete across shipped phases, 8 v2.0 phases remaining.
 
 ## What's Next
 
 **Current milestone:** v2.0 Review Follow-Up System (Phases 20-29)
-**Next action:** Execute Phase 22 (Jobs CRUD & Service Types)
+**Next action:** Plan Phase 23 (Message Templates & Migration) or Phase 21 (SMS, if A2P approved)
 
 **Blocker:** Twilio A2P 10DLC registration required before Phase 21 execution (see docs/SMS_COMPLIANCE.md)
 
@@ -321,5 +321,5 @@ After v2.0:
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 
 ---
-*Last updated: 2026-02-03 after Phase 22 plan revision*
+*Last updated: 2026-02-04 after Phase 22 execution complete*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
