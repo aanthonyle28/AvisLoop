@@ -72,6 +72,9 @@ Phase 21-01 database and client foundation complete. Plans 21-02 through 21-06 c
 | Non-blocking enrollment | 24-05 | Job succeeds even if enrollment fails | Better UX, enrollment logged but doesn't block |
 | Service timing override | 24-05 | business.service_type_timing overrides campaign delay | Per-business customization (SVCT-03) |
 | Repeat job cancels old enrollment | 24-05 | New job stops old enrollment with 'repeat_job' reason | One active enrollment per customer |
+| Quiet hours deferred scheduling | 24-06 | Update scheduled_at instead of failing | Touches automatically retry at next 8am |
+| Rate limit defers, doesn't fail | 24-06 | Leave as pending, retry next minute | Smoother burst handling, no lost touches |
+| Failed touches advance sequence | 24-06 | Schedule next touch even on failure | Customer gets remaining touches in campaign |
 
 ### Phase 21
 
@@ -105,6 +108,6 @@ Phase 21-01 database and client foundation complete. Plans 21-02 through 21-06 c
 
 ## Session Continuity
 
-**Last session:** 2026-02-04T07:25:31Z
-**Stopped at:** Completed 24-07-PLAN.md (Campaigns List UI & Preset Picker)
+**Last session:** 2026-02-04T07:25:01Z
+**Stopped at:** Completed 24-06-PLAN.md (Campaign Touch Processing Cron)
 **Resume file:** None
