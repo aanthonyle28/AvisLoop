@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 **Phase:** Phase 22 - Jobs CRUD & Service Types
-**Plan:** 02/04 complete
-**Status:** In progress
-**Last activity:** 2026-02-04 -- Completed 22-02 (Jobs CRUD types, validations, server actions)
+**Plan:** 04/04 complete
+**Status:** Phase complete
+**Last activity:** 2026-02-04 -- Completed 22-04 (Add/Edit job forms)
 
-**Progress:** [█████████████████████████████████████░░░] 93/100+ total plans complete
+**Progress:** [█████████████████████████████████████████░] 95/100+ total plans complete
 
 ```
 v1.0 MVP:           ████████████████████████████████████████████████ 48/48 SHIPPED
@@ -27,7 +27,7 @@ Phase 21 Preview:   ██ 2/2 COMPLETE (v1.3)
 Phase 22 Drawers:   ███ 3/3 COMPLETE (v1.3)
 Phase 25 Story:     ██ 2/2 COMPLETE (v1.4)
 v2.0 Phase 20:      ████████ 8/8 COMPLETE (A2P deferred)
-v2.0 Phase 22:      ██░░ 2/4 IN PROGRESS
+v2.0 Phase 22:      ████ 4/4 COMPLETE
 v2.0 (Ph 21,23-29): ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 0/TBD PENDING
 ```
 
@@ -140,14 +140,16 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 - [x] Execute Phase 20 (8/8 plans complete)
 - [x] Design jobs table schema and RLS policies (22-01 complete)
 - [x] Execute Phase 22-02 (Jobs TypeScript types, validations, server actions)
-- [ ] Execute Phase 22-03 (Jobs UI page and components)
-- [ ] Execute Phase 22-04 (Jobs list and detail views)
-- [ ] Start Twilio A2P 10DLC registration (2-4 week lead time) — BLOCKS Phase 21
+- [x] Execute Phase 22-03 (Jobs page and list components)
+- [x] Execute Phase 22-04 (Add/Edit job forms)
+- [ ] Start Twilio A2P 10DLC registration (2-4 week lead time) -- BLOCKS Phase 21
 - [ ] Plan Phase 21 (SMS Foundation & Compliance)
 - [ ] Design campaign_enrollments schema
 - [ ] Design message_templates migration strategy
 
 ### Recent Changes
+- 2026-02-04: Phase 22-04 complete (Add/Edit job forms with customer selector)
+- 2026-02-04: Phase 22-03 complete (Jobs page and list components)
 - 2026-02-04: Phase 22-02 complete (Job types, validations, server actions, data fetching)
 - 2026-02-04: Phase 22-01 complete (Jobs table schema, service type settings, DATA_MODEL.md)
 - 2026-02-03: Phase 20 COMPLETE (8/8 plans, verified, A2P deferred)
@@ -167,14 +169,13 @@ Next.js 15 (App Router), TypeScript, Supabase (Postgres + Auth), Tailwind CSS, R
 ## Session Continuity
 
 **Last session:** 2026-02-04
-**Stopped at:** Phase 22-02 complete (Jobs CRUD types, validations, server actions)
-**Resume file:** .planning/phases/22-jobs-crud-service-types/22-02-SUMMARY.md
-**Next action:** Execute Phase 22-03 (Jobs UI page and components)
+**Stopped at:** Phase 22 COMPLETE (Jobs CRUD & Service Types)
+**Resume file:** .planning/phases/22-jobs-crud-service-types/22-04-SUMMARY.md
+**Next action:** Plan Phase 23 (Message Templates & Migration) or Phase 21 (SMS Foundation)
 
 **Key context for next session:**
-- Phase 22-01 complete: jobs table, service type taxonomy, business settings
-- Phase 22-02 complete: Job types, Zod validations, server actions, data fetching
-- Jobs ready for UI implementation (22-03, 22-04)
+- Phase 22 COMPLETE: Jobs table, types, validations, server actions, page, forms
+- Components: CustomerSelector, ServiceTypeSelect, AddJobSheet, EditJobSheet
 - Server actions: createJob, updateJob, deleteJob, markJobCompleted, markJobDoNotSend
 - Data functions: getJobs, getJob, getJobCounts
-- Phase 21 (SMS) blocked by A2P registration — can skip to Phase 22-23
+- Phase 21 (SMS) blocked by A2P registration -- can proceed to Phase 23
