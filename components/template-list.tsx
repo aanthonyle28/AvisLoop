@@ -1,10 +1,12 @@
-import type { EmailTemplate } from '@/lib/types/database'
+import type { MessageTemplate } from '@/lib/types/database'
+import { TemplateListItem } from '@/components/templates/template-list-item'
 
 interface TemplateListProps {
-  templates: EmailTemplate[]
+  templates: MessageTemplate[]
+  onUpdate?: () => void
 }
 
-export function TemplateList({ templates }: TemplateListProps) {
+export function TemplateList({ templates, onUpdate }: TemplateListProps) {
   if (templates.length === 0) {
     return (
       <p className="text-muted-foreground italic">
@@ -13,36 +15,47 @@ export function TemplateList({ templates }: TemplateListProps) {
     )
   }
 
+  // Group templates by channel
+  const emailTemplates = templates.filter(t => t.channel === 'email')
+  const smsTemplates = templates.filter(t => t.channel === 'sms')
+
   return (
-    <div className="space-y-4">
-      {templates.map((template) => (
-        <div
-          key={template.id}
-          className="border rounded-md p-4 bg-muted/50"
-        >
-          <div className="flex items-center justify-between mb-2">
-            <h4 className="font-medium">
-              {template.name}
-              {template.is_default && (
-                <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
-                  System Default
-                </span>
-              )}
-            </h4>
+    <div className="space-y-6">
+      {/* Email Templates Section */}
+      {emailTemplates.length > 0 && (
+        <div>
+          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+            Email Templates ({emailTemplates.length})
+          </h3>
+          <div className="space-y-3">
+            {emailTemplates.map((template) => (
+              <TemplateListItem
+                key={template.id}
+                template={template}
+                onUpdate={onUpdate}
+              />
+            ))}
           </div>
-          <p className="text-sm text-muted-foreground mb-2">
-            <span className="font-medium">Subject:</span> {template.subject}
-          </p>
-          <details className="text-sm">
-            <summary className="cursor-pointer text-primary hover:text-primary/80">
-              View body
-            </summary>
-            <pre className="mt-2 p-3 bg-background border rounded text-xs whitespace-pre-wrap font-mono">
-              {template.body}
-            </pre>
-          </details>
         </div>
-      ))}
+      )}
+
+      {/* SMS Templates Section */}
+      {smsTemplates.length > 0 && (
+        <div>
+          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+            SMS Templates ({smsTemplates.length})
+          </h3>
+          <div className="space-y-3">
+            {smsTemplates.map((template) => (
+              <TemplateListItem
+                key={template.id}
+                template={template}
+                onUpdate={onUpdate}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
