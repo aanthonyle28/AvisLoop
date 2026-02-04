@@ -243,7 +243,15 @@ Plans:
   9. Auto-fallback triggers: timeout over 3s, output over 2x template length, missing required placeholders, profanity/inappropriate content
   10. Campaign launch shows batch preview of 3-5 personalized message samples before confirming send
   11. Rate limiting per business: 100 LLM calls/hour with cost tracking dashboard (estimated cost per month shown in settings)
-**Plans**: TBD
+**Plans**: 7 plans in 5 waves
+Plans:
+- [ ] 25-01-PLAN.md — Install AI SDK and create foundation (client, prompts)
+- [ ] 25-02-PLAN.md — Zod schemas and input/output validation utilities
+- [ ] 25-03-PLAN.md — Core personalization function with fallback chain and rate limiting
+- [ ] 25-04-PLAN.md — Server action and cron processor integration
+- [ ] 25-05-PLAN.md — Preview components (samples, diff view, regenerate)
+- [ ] 25-06-PLAN.md — Stats tracking and settings UI (toggle, usage display)
+- [ ] 25-07-PLAN.md — Campaign creation/edit preview integration and database migration
 
 ### Phase 26: Review Funnel
 **Goal**: Review requests route through satisfaction filter (4-5 stars to Google, 1-3 stars to private feedback), preventing negative public reviews.
@@ -334,7 +342,7 @@ See individual phase sections above for requirements, success criteria, and depe
 | **22 (v2.0)** | **Review Follow-Up** | **5/5** | **Complete** | **2026-02-04** |
 | **23 (v2.0)** | **Review Follow-Up** | **7/7** | **Complete** | **2026-02-04** |
 | **24 (v2.0)** | **Review Follow-Up** | **11/11** | **Complete** | **2026-02-04** |
-| 25 (v2.0) | Review Follow-Up | 0/TBD | Context captured | - |
+| 25 (v2.0) | Review Follow-Up | 0/7 | Planned | - |
 | **26 (v2.0)** | **Review Follow-Up** | **7/7** | **Complete** | **2026-02-04** |
 | 27 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 | 28 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
@@ -345,7 +353,7 @@ See individual phase sections above for requirements, success criteria, and depe
 ## What's Next
 
 **Current milestone:** v2.0 Review Follow-Up System (Phases 20-29)
-**Next action:** Plan Phase 27 (Dashboard Redesign) — Phase 25 (LLM) and Phase 21 (SMS) can proceed in parallel
+**Next action:** Execute Phase 25 (LLM Personalization) — 7 plans in 5 waves
 
 **Blockers:**
 - Twilio A2P 10DLC registration required before Phase 21-08 execution (webhook verification)
@@ -358,5 +366,5 @@ After v2.0:
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 
 ---
-*Last updated: 2026-02-04 after Phase 26 complete (Review Funnel)*
+*Last updated: 2026-02-04 after Phase 25 planning complete (LLM Personalization)*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
