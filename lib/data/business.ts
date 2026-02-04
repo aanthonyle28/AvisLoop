@@ -14,16 +14,18 @@ export async function getBusiness() {
   }
 
   // Use explicit FK hint to resolve ambiguity from circular relationship
-  // (businesses.default_template_id -> email_templates, email_templates.business_id -> businesses)
+  // (businesses.default_template_id -> message_templates, message_templates.business_id -> businesses)
   const { data: business } = await supabase
     .from('businesses')
     .select(`
       *,
-      email_templates!email_templates_business_id_fkey (
+      message_templates!message_templates_business_id_fkey (
         id,
         name,
         subject,
         body,
+        channel,
+        service_type,
         is_default,
         created_at
       )
@@ -35,8 +37,10 @@ export async function getBusiness() {
 }
 
 /**
- * Fetch all templates for the current user's business.
+ * Fetch all email templates for the current user's business.
  * Includes both system defaults and user-created templates.
+ * @deprecated Use getMessageTemplates from lib/data/message-template.ts with channel='email' instead.
+ * This function is maintained for backward compatibility only.
  */
 export async function getEmailTemplates() {
   const supabase = await createClient()
@@ -58,9 +62,10 @@ export async function getEmailTemplates() {
   }
 
   const { data: templates } = await supabase
-    .from('email_templates')
+    .from('message_templates')
     .select('*')
     .eq('business_id', business.id)
+    .eq('channel', 'email') // Filter for email templates only
     .order('is_default', { ascending: false }) // System defaults first
     .order('created_at', { ascending: true })
 
