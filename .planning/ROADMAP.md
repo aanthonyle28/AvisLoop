@@ -138,9 +138,9 @@ Plans:
 **Requirements**: SMS-01, SMS-04, SMS-05, SMS-06, SMS-07, SMS-08, SMS-09, COMP-04, DLVR-02
 **Success Criteria** (what must be TRUE):
   1. User can send manual SMS from /send page with channel selector (email/SMS toggle), message preview shows character count (160 GSM-7 limit)
-  2. SMS sending only enabled for customers with sms_opt_in = true and phone number present (graceful fallback to email if no phone)
+  2. SMS sending only enabled for customers with sms_consent_status = 'opted_in' and phone number present (graceful fallback to email if no phone)
   3. Customer receives SMS from branded sender (business name in FROM field), message includes review link + opt-out footer
-  4. Customer can reply STOP/STOPALL/UNSUBSCRIBE/CANCEL/END/QUIT to opt out; Twilio webhook updates sms_opt_in = false and sends confirmation within 5 minutes
+  4. Customer can reply STOP/STOPALL/UNSUBSCRIBE/CANCEL/END/QUIT to opt out; Twilio webhook updates sms_consent_status = 'opted_out' and sends confirmation within 5 minutes
   5. SMS messages outside 8am-9pm customer local time are queued and sent at next available window (date-fns-tz timezone conversion)
   6. Twilio webhooks verify signature (twilio.validateRequest) and reject invalid requests with 403
   7. send_logs table includes channel column (email/sms) and provider-specific IDs (Twilio message_sid or Resend email_id)
@@ -215,17 +215,17 @@ Plans:
   11. Campaign creation for specific service type auto-applies timing defaults from Phase 22 (can be overridden)
 **Plans**: 11 plans in 5 waves
 Plans:
-- [ ] 24-01-PLAN.md — Database schema (campaigns, campaign_touches, campaign_enrollments, send_log extensions)
-- [ ] 24-02-PLAN.md — Atomic touch claiming RPC and campaign preset seeding
-- [ ] 24-03-PLAN.md — TypeScript types, Zod validations, and campaign constants
-- [ ] 24-04-PLAN.md — Campaign data functions and server actions (CRUD, duplicate, status toggle)
-- [ ] 24-05-PLAN.md — Enrollment server actions and job completion integration
-- [ ] 24-06-PLAN.md — Cron job for campaign touch processing with rate limiting and quiet hours
-- [ ] 24-07-PLAN.md — Campaigns page with list view, status toggle, and preset picker
-- [ ] 24-08-PLAN.md — Campaign detail page, edit page, and form components
-- [ ] 24-09-PLAN.md — Job completion enrollment checkbox and navigation update
-- [ ] 24-10-PLAN.md — Stop conditions (email click webhook, customer opt-out)
-- [ ] 24-11-PLAN.md — Campaign analytics and performance stats component
+- [x] 24-01-PLAN.md — Database schema (campaigns, campaign_touches, campaign_enrollments, send_log extensions)
+- [x] 24-02-PLAN.md — Atomic touch claiming RPC and campaign preset seeding
+- [x] 24-03-PLAN.md — TypeScript types, Zod validations, and campaign constants
+- [x] 24-04-PLAN.md — Campaign data functions and server actions (CRUD, duplicate, status toggle)
+- [x] 24-05-PLAN.md — Enrollment server actions and job completion integration
+- [x] 24-06-PLAN.md — Cron job for campaign touch processing with rate limiting and quiet hours
+- [x] 24-07-PLAN.md — Campaigns page with list view, status toggle, and preset picker
+- [x] 24-08-PLAN.md — Campaign detail page, edit page, and form components
+- [x] 24-09-PLAN.md — Job completion enrollment checkbox and navigation update
+- [x] 24-10-PLAN.md — Stop conditions (email click webhook, customer opt-out)
+- [x] 24-11-PLAN.md — Campaign analytics and performance stats component
 
 ### Phase 25: LLM Personalization
 **Goal**: Campaign messages optionally personalized via GPT-4o-mini with guardrails, graceful fallback to templates, and cost tracking.
@@ -325,21 +325,23 @@ See individual phase sections above for requirements, success criteria, and depe
 | 21 (v2.0) | Review Follow-Up | 0/6 | Blocked (A2P) | - |
 | **22 (v2.0)** | **Review Follow-Up** | **5/5** | **Complete** | **2026-02-04** |
 | **23 (v2.0)** | **Review Follow-Up** | **7/7** | **Complete** | **2026-02-04** |
-| 24 (v2.0) | Review Follow-Up | 0/11 | Planned | - |
+| **24 (v2.0)** | **Review Follow-Up** | **11/11** | **Complete** | **2026-02-04** |
 | 25 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 | 26 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 | 27 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 | 28 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 | 29 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 
-**Total:** 103 plans complete across shipped phases, 7 v2.0 phases remaining.
+**Total:** 114 plans complete across shipped phases, 6 v2.0 phases remaining.
 
 ## What's Next
 
 **Current milestone:** v2.0 Review Follow-Up System (Phases 20-29)
-**Next action:** Execute Phase 24 (Multi-Touch Campaign Engine)
+**Next action:** Execute Phase 25 (LLM Personalization) — requires planning first
 
-**Blocker:** Twilio A2P 10DLC registration required before Phase 21 execution (see docs/SMS_COMPLIANCE.md)
+**Blockers:**
+- Twilio A2P 10DLC registration required before Phase 21 execution (see docs/SMS_COMPLIANCE.md)
+- Phase 25 requires Phase 21 SMS sending to be complete for full functionality
 
 After v2.0:
 - **v2.1 Integrations** — ServiceTitan/Jobber/Housecall Pro API integrations for auto job import
@@ -348,5 +350,5 @@ After v2.0:
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 
 ---
-*Last updated: 2026-02-04 after Phase 24 planning complete*
+*Last updated: 2026-02-04 after Phase 24 complete (milestone audit cleanup)*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
