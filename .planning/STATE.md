@@ -3,9 +3,10 @@
 ## Current Position
 
 **Milestone:** v2.0 Review Follow-Up System
-**Phase:** Between phases (Phase 23 complete, Phase 24 next)
-**Status:** Awaiting next phase planning
-**Last activity:** 2026-02-04 - Phase 23 complete
+**Phase:** 24 of 10 (Multi-Touch Campaign Engine)
+**Plan:** 2 of 7 in Phase 24
+**Status:** In progress
+**Last activity:** 2026-02-04 - Completed 24-02-PLAN.md
 
 **v2.0 Progress:** ████████░░░░░░░░░░░░░░░░ (3/10 phases complete)
 
@@ -17,7 +18,7 @@
 | 21 | SMS Foundation & Compliance | ⏸️ Blocked (A2P) |
 | 22 | Jobs CRUD & Service Types | ✅ Complete |
 | 23 | Message Templates & Migration | ✅ Complete |
-| 24 | Multi-Touch Campaign Engine | 📋 Not started |
+| 24 | Multi-Touch Campaign Engine | 🔄 In progress (2/7 plans) |
 | 25 | LLM Personalization | 📋 Not started |
 | 26 | Review Funnel | 📋 Not started |
 | 27 | Dashboard Redesign | 📋 Not started |
@@ -30,7 +31,9 @@
 
 Phase 24 can proceed in parallel since it doesn't depend on SMS sending working.
 
-## Accumulated Decisions (Phase 23)
+## Accumulated Decisions
+
+### Phase 23
 
 | Decision | Phase | Impact | Constraint |
 |----------|-------|--------|------------|
@@ -45,6 +48,16 @@ Phase 24 can proceed in parallel since it doesn't depend on SMS sending working.
 | Email preview design | 23-05 | Shows From/To, subject, body, CTA button, footer | Matches production email rendering |
 | SMS preview design | 23-05 | Phone mockup with bubble, opt-out footer, character count | Simulates customer's view of SMS |
 
+### Phase 24 (24-02)
+
+| Decision | Phase | Impact | Constraint |
+|----------|-------|--------|------------|
+| Skip recovery function | 24-02 | FOR UPDATE SKIP LOCKED handles crashed workers | No explicit recovery RPC needed |
+| Template_id NULL for presets | 24-02 | Presets don't prescribe templates | Users configure templates after duplication |
+| Conservative timing | 24-02 | 24h + 72h delays | Safe, proven email cadence |
+| Standard timing | 24-02 | 24h + 72h + 168h delays | Balanced multi-channel approach |
+| Aggressive timing | 24-02 | 4h + 24h + 72h + 168h delays | SMS-first for immediacy |
+
 ## Known Blockers / Concerns
 
 **Current blockers:**
@@ -56,6 +69,6 @@ Phase 24 can proceed in parallel since it doesn't depend on SMS sending working.
 
 ## Session Continuity
 
-**Last session:** 2026-02-04
-**Stopped at:** Phase 23 complete, docs updated
+**Last session:** 2026-02-04T07:07:25Z
+**Stopped at:** Completed 24-02-PLAN.md
 **Resume file:** None
