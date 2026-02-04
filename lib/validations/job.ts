@@ -47,9 +47,9 @@ export const DEFAULT_TIMING_HOURS: Record<typeof SERVICE_TYPES[number], number> 
 // Job creation/update schema
 export const jobSchema = z.object({
   customerId: z
-    .string({ message: 'Please select a customer' })
+    .string()
     .uuid('Please select a valid customer'),
-  serviceType: z.enum(SERVICE_TYPES, { message: 'Please select a service type' }),
+  serviceType: z.enum(SERVICE_TYPES),
   status: z
     .enum(JOB_STATUSES)
     .default('completed'),
