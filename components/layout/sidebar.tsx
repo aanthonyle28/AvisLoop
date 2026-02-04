@@ -13,6 +13,7 @@ import {
   CaretLeft,
   CaretRight,
   ArrowsClockwise,
+  Briefcase,
 } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { AccountMenu } from './account-menu'
@@ -25,7 +26,8 @@ interface NavItem {
 
 const mainNav: NavItem[] = [
   { icon: PaperPlaneTilt, label: 'Send', href: '/send' },
-  { icon: AddressBook, label: 'Contacts', href: '/contacts' },
+  { icon: AddressBook, label: 'Customers', href: '/customers' },
+  { icon: Briefcase, label: 'Jobs', href: '/jobs' },
   { icon: ClockCounterClockwise, label: 'Requests', href: '/history' },
 ]
 
