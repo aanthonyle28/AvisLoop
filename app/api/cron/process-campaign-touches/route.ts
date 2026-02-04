@@ -210,7 +210,6 @@ async function sendEmailTouch(
 
   // Fetch template if specified
   let subject = `${business.name} would love your feedback!`
-  let templateBody: string | null = null
 
   if (touch.template_id) {
     const { data: template } = await supabase
@@ -221,7 +220,7 @@ async function sendEmailTouch(
 
     if (template) {
       subject = template.subject || subject
-      templateBody = template.body
+      // TODO: Use template.body for custom email rendering in future
     }
   }
 
