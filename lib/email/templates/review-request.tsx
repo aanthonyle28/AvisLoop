@@ -15,6 +15,8 @@ export interface ReviewRequestEmailProps {
   businessName: string
   reviewLink: string
   senderName: string
+  /** Optional LLM-personalized body text. When provided, replaces default body. */
+  customBody?: string
 }
 
 export function ReviewRequestEmail({
@@ -22,6 +24,7 @@ export function ReviewRequestEmail({
   businessName,
   reviewLink,
   senderName,
+  customBody,
 }: ReviewRequestEmailProps) {
   return (
     <Html>
@@ -31,10 +34,14 @@ export function ReviewRequestEmail({
         <Container style={container}>
           <Heading style={h1}>Hi {customerName},</Heading>
 
-          <Text style={text}>
-            Thank you for choosing {businessName}! We&apos;d really appreciate it if
-            you could take a moment to share your experience.
-          </Text>
+          {customBody ? (
+            <Text style={text}>{customBody}</Text>
+          ) : (
+            <Text style={text}>
+              Thank you for choosing {businessName}! We&apos;d really appreciate it if
+              you could take a moment to share your experience.
+            </Text>
+          )}
 
           {reviewLink ? (
             <Button href={reviewLink} style={button}>

@@ -7,6 +7,7 @@ import { ReviewRequestEmail } from '@/lib/email/templates/review-request'
 import { render } from '@react-email/render'
 import { adjustForQuietHours } from '@/lib/utils/quiet-hours'
 import { DEFAULT_EMAIL_RATE_LIMIT, DEFAULT_SMS_RATE_LIMIT } from '@/lib/constants/campaigns'
+import { personalizeWithFallback } from '@/lib/ai/fallback'
 import type { ClaimedCampaignTouch } from '@/lib/types/database'
 
 // Initialize rate limiters (lazy - only if Redis env vars present)
@@ -87,9 +88,9 @@ export async function GET(request: Request) {
       processed++
 
       try {
-        // Fetch business and customer
+        // Fetch business, customer, and job (for service_type context)
         // NOTE: Customer select includes send_count for tracking updates
-        const [{ data: business }, { data: customer }] = await Promise.all([
+        const [{ data: business }, { data: customer }, { data: job }] = await Promise.all([
           supabase
             .from('businesses')
             .select('id, name, google_review_link, default_sender_name')
@@ -99,6 +100,11 @@ export async function GET(request: Request) {
             .from('customers')
             .select('id, name, email, phone, timezone, opted_out, sms_consent_status, send_count')
             .eq('id', touch.customer_id)
+            .single(),
+          supabase
+            .from('jobs')
+            .select('service_type')
+            .eq('id', touch.job_id)
             .single(),
         ])
 
@@ -161,7 +167,7 @@ export async function GET(request: Request) {
 
         // === 7. Send message ===
         if (touch.channel === 'email') {
-          const sendResult = await sendEmailTouch(supabase, touch, business, customer)
+          const sendResult = await sendEmailTouch(supabase, touch, business, customer, job?.service_type)
           if (sendResult.success) {
             sent++
           } else {
@@ -196,12 +202,14 @@ export async function GET(request: Request) {
 
 /**
  * Send email touch and update enrollment state.
+ * Attempts LLM personalization before sending; falls back to template on failure.
  */
 async function sendEmailTouch(
   supabase: ReturnType<typeof createServiceRoleClient>,
   touch: ClaimedCampaignTouch,
   business: { id: string; name: string; google_review_link: string | null; default_sender_name: string | null },
-  customer: { id: string; name: string; email: string; send_count: number | null }
+  customer: { id: string; name: string; email: string; send_count: number | null },
+  serviceType?: string
 ): Promise<{ success: boolean; error?: string }> {
   if (!business.google_review_link) {
     await markTouchFailed(supabase, touch, 'No review link configured')
@@ -210,6 +218,7 @@ async function sendEmailTouch(
 
   // Fetch template if specified
   let subject = `${business.name} would love your feedback!`
+  let templateBody = ''
 
   if (touch.template_id) {
     const { data: template } = await supabase
@@ -220,9 +229,49 @@ async function sendEmailTouch(
 
     if (template) {
       subject = template.subject || subject
-      // TODO: Use template.body for custom email rendering in future
+      templateBody = template.body || ''
     }
   }
+
+  // === Attempt LLM personalization ===
+  // Personalization failure NEVER blocks sends - falls back to template
+  let personalizedBody = ''
+  let personalizedSubject = ''
+  let wasPersonalized = false
+
+  if (templateBody) {
+    try {
+      const personalizationResult = await personalizeWithFallback({
+        template: templateBody,
+        customerName: customer.name,
+        businessName: business.name,
+        serviceType,
+        touchNumber: (touch.touch_number as 1 | 2 | 3 | 4),
+        channel: 'email',
+        reviewLink: business.google_review_link,
+        isRepeatCustomer: (customer.send_count || 0) > 1,
+        businessId: business.id,
+      })
+
+      wasPersonalized = personalizationResult.personalized
+      if (wasPersonalized) {
+        personalizedBody = personalizationResult.message
+        personalizedSubject = personalizationResult.subject || ''
+      }
+
+      if (!wasPersonalized && personalizationResult.fallbackReason) {
+        console.log(
+          `Personalization fallback for ${touch.enrollment_id}/${touch.touch_number}: ${personalizationResult.fallbackReason}`
+        )
+      }
+    } catch (error) {
+      // Personalization error should NEVER block sends
+      console.warn('Personalization error (non-blocking):', error)
+    }
+  }
+
+  // Use personalized subject if available, otherwise original
+  const finalSubject = (wasPersonalized && personalizedSubject) ? personalizedSubject : subject
 
   // Create send_log entry
   const { data: sendLog, error: logError } = await supabase
@@ -236,7 +285,7 @@ async function sendEmailTouch(
       touch_number: touch.touch_number,
       channel: 'email',
       status: 'pending',
-      subject,
+      subject: finalSubject,
     })
     .select('id')
     .single()
@@ -249,12 +298,14 @@ async function sendEmailTouch(
   // Render and send email
   const senderName = business.default_sender_name || business.name
 
+  // Use personalized body in email if available, otherwise default template
   const html = await render(
     ReviewRequestEmail({
       customerName: customer.name,
       businessName: business.name,
       reviewLink: business.google_review_link,
       senderName,
+      ...(wasPersonalized && personalizedBody ? { customBody: personalizedBody } : {}),
     })
   )
 
@@ -262,7 +313,7 @@ async function sendEmailTouch(
     {
       from: `${senderName} <${RESEND_FROM_EMAIL}>`,
       to: customer.email,
-      subject,
+      subject: finalSubject,
       html,
       tags: [
         { name: 'send_log_id', value: sendLog.id },
@@ -270,6 +321,7 @@ async function sendEmailTouch(
         { name: 'campaign_id', value: touch.campaign_id },
         { name: 'enrollment_id', value: touch.enrollment_id },
         { name: 'touch_number', value: String(touch.touch_number) },
+        { name: 'personalized', value: wasPersonalized ? 'true' : 'false' },
       ],
     },
     { idempotencyKey: `campaign-touch-${touch.enrollment_id}-${touch.touch_number}` }
