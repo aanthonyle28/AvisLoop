@@ -10,11 +10,16 @@ import { OnboardingWizard } from '@/components/onboarding/onboarding-wizard'
  * Server component that:
  * - Redirects to /login if not authenticated
  * - Redirects to /dashboard if onboarding already complete
- * - Fetches business data for step components
- * - Renders wizard shell with 2-step flow
+ * - Fetches business data and campaign presets for step components
+ * - Renders wizard shell with 7-step flow
  *
- * Step 1: Business Name (required)
- * Step 2: Google Review Link (optional/skippable)
+ * Step 1: Business Basics (required)
+ * Step 2: Review Destination (optional/skippable)
+ * Step 3: Services Offered (required)
+ * Step 4: Software Used (optional/skippable)
+ * Step 5: Campaign Preset (required)
+ * Step 6: Import Customers (optional/skippable)
+ * Step 7: SMS Consent (required)
  */
 export default async function OnboardingPage({
   searchParams,
@@ -43,11 +48,34 @@ export default async function OnboardingPage({
   const params = await searchParams
   const stepParam = parseInt(params.step || '1', 10)
 
-  // Validate step range (1-2), clamp if out of range
-  const currentStep = Math.min(Math.max(1, stepParam), 2)
+  // Validate step range (1-7), clamp if out of range
+  const currentStep = Math.min(Math.max(1, stepParam), 7)
 
   // Fetch business data for step components
   const business = await getBusiness()
 
-  return <OnboardingWizard initialStep={currentStep} business={business} />
+  // Fetch campaign presets for step 5 (system presets available to all users)
+  const { data: presets } = await supabase
+    .from('campaigns')
+    .select('*, campaign_touches (*)')
+    .eq('is_preset', true)
+    .order('name')
+
+  // Map business data to OnboardingBusiness type
+  const onboardingBusiness = business ? {
+    name: business.name,
+    phone: business.phone || null,
+    google_review_link: business.google_review_link || null,
+    software_used: business.software_used || null,
+    service_types_enabled: business.service_types_enabled || null,
+    sms_consent_acknowledged: business.sms_consent_acknowledged || false,
+  } : null
+
+  return (
+    <OnboardingWizard
+      initialStep={currentStep}
+      business={onboardingBusiness}
+      campaignPresets={presets || []}
+    />
+  )
 }
