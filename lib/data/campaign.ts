@@ -220,3 +220,96 @@ export async function getActiveCampaignForJob(
     ),
   } as CampaignWithTouches
 }
+
+/**
+ * Get campaign analytics: touch performance, stop reasons, and send stats.
+ */
+export async function getCampaignAnalytics(campaignId: string): Promise<{
+  touchStats: Array<{
+    touchNumber: number
+    sent: number
+    pending: number
+    skipped: number
+    failed: number
+  }>
+  stopReasons: Record<string, number>
+  totalEnrollments: number
+  avgTouchesCompleted: number
+}> {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return {
+      touchStats: [],
+      stopReasons: {},
+      totalEnrollments: 0,
+      avgTouchesCompleted: 0,
+    }
+  }
+
+  // Get all enrollments for this campaign
+  const { data: enrollments } = await supabase
+    .from('campaign_enrollments')
+    .select(`
+      status,
+      stop_reason,
+      touch_1_status,
+      touch_2_status,
+      touch_3_status,
+      touch_4_status
+    `)
+    .eq('campaign_id', campaignId)
+
+  if (!enrollments || enrollments.length === 0) {
+    return {
+      touchStats: [],
+      stopReasons: {},
+      totalEnrollments: 0,
+      avgTouchesCompleted: 0,
+    }
+  }
+
+  // Calculate touch stats
+  const touchStats = [1, 2, 3, 4].map(touchNumber => {
+    const statusKey = `touch_${touchNumber}_status` as keyof typeof enrollments[0]
+    const statuses = enrollments.map(e => e[statusKey]).filter(Boolean)
+
+    return {
+      touchNumber,
+      sent: statuses.filter(s => s === 'sent').length,
+      pending: statuses.filter(s => s === 'pending').length,
+      skipped: statuses.filter(s => s === 'skipped').length,
+      failed: statuses.filter(s => s === 'failed').length,
+    }
+  })
+
+  // Calculate stop reasons
+  const stopReasons: Record<string, number> = {}
+  enrollments
+    .filter(e => e.status === 'stopped' && e.stop_reason)
+    .forEach(e => {
+      const reason = e.stop_reason as string
+      stopReasons[reason] = (stopReasons[reason] || 0) + 1
+    })
+
+  // Calculate average touches completed
+  let totalTouchesCompleted = 0
+  enrollments.forEach(e => {
+    let completed = 0
+    if (e.touch_1_status === 'sent') completed++
+    if (e.touch_2_status === 'sent') completed++
+    if (e.touch_3_status === 'sent') completed++
+    if (e.touch_4_status === 'sent') completed++
+    totalTouchesCompleted += completed
+  })
+
+  return {
+    touchStats,
+    stopReasons,
+    totalEnrollments: enrollments.length,
+    avgTouchesCompleted: enrollments.length > 0
+      ? Math.round((totalTouchesCompleted / enrollments.length) * 10) / 10
+      : 0,
+  }
+}

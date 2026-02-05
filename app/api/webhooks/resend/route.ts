@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
 
       if (sendLog?.contact_id) {
         const { error: optOutError } = await supabase
-          .from('contacts')
+          .from('customers')
           .update({ opted_out: true })
           .eq('id', sendLog.contact_id)
 

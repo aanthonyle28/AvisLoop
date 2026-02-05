@@ -326,6 +326,7 @@ Plans:
   4. Landing page copy updated for home services positioning ("Turn job completions into Google reviews automatically")
   5. Existing homepage sections (hero, problem/solution, how it works, stats, outcome cards) updated with v2.0 messaging (multi-touch sequences, SMS, jobs workflow)
   6. Landing page mentions SMS channel, multi-touch sequences, and job-centric workflow (not single-send contacts)
+**Future consideration**: Operator admin dashboard — aggregate LLM spend across all tenants, margin analysis, cost-per-tenant breakdown. Currently business owners see their estimated cost in Settings; operator monitors actual spend via API provider dashboards (Google AI, OpenAI, OpenRouter).
 **Plans**: TBD
 
 ## Phase Details

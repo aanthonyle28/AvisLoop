@@ -84,7 +84,7 @@ export async function getServiceTypeAnalytics(
     // Map enrollments to service types
     const enrollmentToServiceType = new Map<string, string>()
     enrollments.forEach((enrollment) => {
-      const jobs = enrollment.jobs as { service_type: string } | null
+      const jobs = enrollment.jobs as unknown as { service_type: string } | null
       const serviceType = jobs?.service_type
       if (serviceType) {
         enrollmentToServiceType.set(enrollment.id, serviceType)

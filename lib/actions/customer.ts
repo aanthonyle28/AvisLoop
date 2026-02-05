@@ -887,3 +887,75 @@ export async function getCustomersWithPhoneIssues(): Promise<Array<{
     rawPhone: c.phone || '',
   }))
 }
+
+/**
+ * Opt out a customer from email communications.
+ * This also stops any active campaign enrollments for the customer.
+ */
+export async function optOutCustomerEmail(
+  customerId: string
+): Promise<CustomerActionState> {
+  const supabase = await createClient()
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return { error: 'You must be logged in' }
+  }
+
+  // Update customer opted_out status
+  const { error: updateError } = await supabase
+    .from('customers')
+    .update({ opted_out: true })
+    .eq('id', customerId)
+
+  if (updateError) {
+    return { error: updateError.message }
+  }
+
+  // Stop any active campaign enrollments for this customer
+  const { error: enrollmentError } = await supabase
+    .from('campaign_enrollments')
+    .update({
+      status: 'stopped',
+      stop_reason: 'opted_out_email',
+      stopped_at: new Date().toISOString(),
+    })
+    .eq('customer_id', customerId)
+    .eq('status', 'active')
+
+  if (enrollmentError) {
+    console.error('Failed to stop enrollments:', enrollmentError)
+    // Don't fail the opt-out - the customer is opted out, just log enrollment issue
+  }
+
+  revalidatePath('/customers')
+  revalidatePath('/campaigns')
+  return { success: true }
+}
+
+/**
+ * Opt in a customer to email communications.
+ * This does NOT re-activate any stopped enrollments.
+ */
+export async function optInCustomerEmail(
+  customerId: string
+): Promise<CustomerActionState> {
+  const supabase = await createClient()
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return { error: 'You must be logged in' }
+  }
+
+  const { error } = await supabase
+    .from('customers')
+    .update({ opted_out: false })
+    .eq('id', customerId)
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  revalidatePath('/customers')
+  return { success: true }
+}
