@@ -279,21 +279,25 @@ Plans:
 - [x] 26-07-PLAN.md — Feedback dashboard and navigation integration
 
 ### Phase 27: Dashboard Redesign
-**Goal**: Dashboard displays pipeline KPIs, ready-to-send queue, needs attention alerts, quick actions, and daily to-do list.
-**Depends on**: Phase 24 (campaign data exists), Phase 22 (jobs data exists)
-**Requirements**: DASH-01, DASH-02, DASH-03, DASH-04, DASH-05, NAV-01, NAV-02, OPS-01, OPS-02, SVCT-04
+**Goal**: Dashboard transformed into operational command center with action summary banner, two-tier KPI widgets, ready-to-send queue with service-type urgency, and severity-sorted attention alerts.
+**Depends on**: Phase 24 (campaign data exists), Phase 22 (jobs data exists), Phase 26 (feedback data exists)
+**Requirements**: DASH-01, DASH-02, DASH-03, NAV-01, NAV-02, OPS-02, SVCT-04
 **Success Criteria** (what must be TRUE):
-  1. Dashboard displays pipeline KPIs widget (jobs ready to send count, active campaigns count, reviews this month count, response rate percentage)
-  2. Ready-to-send queue lists completed jobs not yet enrolled in campaign (with quick enroll action)
-  3. Needs attention alerts display failed sends, STOP requests, campaign issues, budget warnings with badge counts
-  4. Quick actions buttons: "Add Job", "Enroll in Campaign", "Send Manual Request" (no navigation, inline modals)
-  5. Daily to-do list shows prioritized action items (jobs to close out, follow-ups due today, issues to resolve) with completion checkboxes
-  6. Navigation restructured: Send/Queue, Customers, Jobs, Campaigns, Activity/History (5 items, no dashboard link)
-  7. Navigation badges show pending counts (queued sends count, attention items count)
-  8. Exception handling dashboard displays failed sends with retry action, webhook errors with logs, budget warnings with upgrade prompt
-  9. Daily to-do list items persist in database (user can dismiss/complete, reappear next day if not resolved)
-  10. Analytics page displays response rate and review rate breakdowns by service type
-**Plans**: TBD
+  1. Dashboard displays two-tier KPI widgets (outcome: reviews, rating, conversion; pipeline: sends, sequences, pending) with trend comparisons
+  2. Ready-to-send queue lists completed jobs not yet enrolled in campaign with quick enroll action and service-type-aware urgency flags
+  3. Needs attention alerts display failed sends and unresolved negative feedback with contextual inline actions (Retry, Update contact, Respond)
+  4. Action summary banner shows "All caught up" or itemized count of pending items
+  5. Navigation includes Dashboard as first item with attention badge count and persistent "Add Job" button in sidebar
+  6. Analytics page displays response rate and review rate breakdowns by service type
+**Plans**: 7 plans in 4 waves
+Plans:
+- [ ] 27-01-PLAN.md — Dashboard data layer (types and Supabase queries)
+- [ ] 27-02-PLAN.md — Action summary banner and KPI widgets components
+- [ ] 27-03-PLAN.md — Ready-to-send queue with quick-enroll server action
+- [ ] 27-04-PLAN.md — Attention alerts with contextual inline actions
+- [ ] 27-05-PLAN.md — Dashboard page assembly and navigation updates
+- [ ] 27-06-PLAN.md — Analytics page with service type breakdowns
+- [ ] 27-07-PLAN.md — Build verification and visual checkpoint
 
 ### Phase 28: Onboarding Redesign
 **Goal**: New users complete setup wizard (business basics, review destination, services offered, software used, default campaign, import customers, SMS opt-in).
@@ -346,22 +350,21 @@ See individual phase sections above for requirements, success criteria, and depe
 | **22 (v2.0)** | **Review Follow-Up** | **5/5** | **Complete** | **2026-02-04** |
 | **23 (v2.0)** | **Review Follow-Up** | **7/7** | **Complete** | **2026-02-04** |
 | **24 (v2.0)** | **Review Follow-Up** | **11/11** | **Complete** | **2026-02-04** |
-| 25 (v2.0) | Review Follow-Up | 0/7 | Planned | - |
+| **25 (v2.0)** | **Review Follow-Up** | **7/7** | **Complete** | **2026-02-04** |
 | **26 (v2.0)** | **Review Follow-Up** | **7/7** | **Complete** | **2026-02-04** |
-| 27 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
+| 27 (v2.0) | Review Follow-Up | 0/7 | Planned | - |
 | 28 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 | 29 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 
-**Total:** 138 plans complete across shipped phases, 3 v2.0 phases remaining.
+**Total:** 138 plans complete across shipped phases, 2 v2.0 phases remaining after Phase 27.
 
 ## What's Next
 
 **Current milestone:** v2.0 Review Follow-Up System (Phases 20-29)
-**Next action:** Execute Phase 25 (LLM Personalization) — 7 plans in 5 waves
+**Next action:** Execute Phase 27 (Dashboard Redesign) -- 7 plans in 4 waves
 
 **Blockers:**
 - Twilio A2P 10DLC registration required before Phase 21-08 execution (webhook verification)
-- Phase 25 can proceed without SMS — LLM personalization works for email channel
 
 After v2.0:
 - **v2.1 Integrations** — ServiceTitan/Jobber/Housecall Pro API integrations for auto job import
@@ -370,5 +373,5 @@ After v2.0:
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 
 ---
-*Last updated: 2026-02-04 after Phase 25 planning complete (LLM Personalization)*
+*Last updated: 2026-02-04 after Phase 27 planning complete (Dashboard Redesign)*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
