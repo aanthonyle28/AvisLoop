@@ -4,9 +4,9 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** 28 of 10 (Onboarding Redesign)
-**Plan:** 4 of 8 in Phase 28
+**Plan:** 6 of 8 in Phase 28
 **Status:** In progress
-**Last activity:** 2026-02-05 - Completed 28-04-PLAN.md (7-Step Wizard Shell)
+**Last activity:** 2026-02-05 - Completed 28-06-PLAN.md (Step Components 5-7)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/10 phases complete or nearly complete)
 
@@ -22,7 +22,7 @@
 | 25 | LLM Personalization | Complete (11/11 plans) |
 | 26 | Review Funnel | Complete (7/7 plans) |
 | 27 | Dashboard Redesign | In progress (6/7 plans) |
-| 28 | Onboarding Redesign | In progress (4/8 plans) |
+| 28 | Onboarding Redesign | In progress (6/8 plans) |
 | 29 | Agency-Mode Readiness & Landing Page | Not started |
 
 ## Blocker
@@ -94,6 +94,9 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | Placeholder step components | 28-04 | PlaceholderStep for steps 3-7 during shell build | Enables parallel work on wizard shell vs step components |
 | Step 2 navigates forward | 28-04 | GoogleReviewLinkStep calls onGoToNext not onComplete | Mid-flow step behavior in 7-step wizard |
 | Existing client for presets | 28-04 | Use authenticated supabase client for preset fetch | RLS allows SELECT for system presets, no service role needed |
+| Self-contained onboarding preset picker | 28-06 | Step 5 creates campaign and continues wizard | Doesn't navigate to edit page like full PresetPicker |
+| No import state tracking | 28-06 | Don't track import completion in localStorage | CSV import deduplicates by email, simpler implementation |
+| SMS consent required | 28-06 | Step 7 acknowledgment not skippable | TCPA compliance requires explicit acknowledgment |
 
 ### Phase 27
 
