@@ -4,9 +4,9 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** 25 of 10 (LLM Personalization)
-**Plan:** 9 of 11 in Phase 25
+**Plan:** 10 of 11 in Phase 25
 **Status:** In progress (gap closure)
-**Last activity:** 2026-02-05 - Completed 25-09-PLAN.md (Profanity Detection)
+**Last activity:** 2026-02-04 - Completed 25-10-PLAN.md (Multi-Model Routing)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/10 phases complete or nearly complete)
 
@@ -19,7 +19,7 @@
 | 22 | Jobs CRUD & Service Types | Complete |
 | 23 | Message Templates & Migration | Complete |
 | 24 | Multi-Touch Campaign Engine | Complete (11/11 plans) |
-| 25 | LLM Personalization | In progress (9/11 plans, gap closure) |
+| 25 | LLM Personalization | In progress (10/11 plans, gap closure) |
 | 26 | Review Funnel | Complete (7/7 plans) |
 | 27 | Dashboard Redesign | Not started |
 | 28 | Onboarding Redesign | Not started |
@@ -64,6 +64,12 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | Separate PROFANITY_PATTERNS array | 25-09 | Profanity detection separate from business content rules | Clean separation of concerns |
 | 10 regex profanity patterns | 25-09 | Covers 6 content categories (profanity, sexual, violence, discrimination, threats, drugs) | <50ms validation budget maintained |
 | contains_profanity failure reason | 25-09 | Separate from contains_prohibited_content | Distinct fallback trigger for inappropriate language |
+| Gemini Flash for bulk/standard | 25-10 | 70% of calls use Gemini Flash (SMS + email touch 1) | Lower cost for high-volume simple personalization |
+| GPT-4o-mini for quality/preview | 25-10 | 25% of calls use GPT-4o-mini (email touch 2+, preview) | Higher quality for variation and samples |
+| DeepSeek V3 for edge cases | 25-10 | 5% of calls use DeepSeek via OpenRouter | Experimentation and complex scenarios |
+| Secondary model fallback | 25-10 | Validation failures try secondary model before template | Gemini ↔ GPT-4o-mini cross-provider resilience |
+| inferModelTask() auto-routing | 25-10 | Model selected based on channel + touch number | No explicit task parameter needed |
+| MODEL_COSTS export | 25-10 | Cost constants per model for tracking | Enables downstream cost attribution (25-11) |
 
 ### Phase 26
 
@@ -165,6 +171,6 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 
 ## Session Continuity
 
-**Last session:** 2026-02-05T00:16:56Z
-**Stopped at:** Completed 25-09-PLAN.md (Profanity Detection) - Gap closure in progress
+**Last session:** 2026-02-04T23:54:08Z
+**Stopped at:** Completed 25-10-PLAN.md (Multi-Model Routing) - Gap closure in progress
 **Resume file:** None
