@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { getLLMUsage } from '@/lib/ai/rate-limit'
+import { MODEL_COSTS, MODELS } from '@/lib/ai/client'
 
 // -----------------------------------------------------------------------
 // Personalization Stats Data Functions
@@ -12,6 +13,18 @@ import { getLLMUsage } from '@/lib/ai/rate-limit'
 //   - Query: SELECT COUNT(*) FILTER (WHERE personalized) / COUNT(*) FROM send_logs
 //   - Remove isEstimated flag once real data is available
 // -----------------------------------------------------------------------
+
+// Average token estimates per personalization call
+// Based on typical review request message length and LLM response
+const AVG_INPUT_TOKENS = 350   // System prompt (~200) + user prompt (~150)
+const AVG_OUTPUT_TOKENS = 150  // Personalized message body
+
+// Model distribution for cost weighting (from CONTEXT.md)
+const MODEL_DISTRIBUTION = {
+  [MODELS.GEMINI_FLASH]: 0.70,  // 70% of calls
+  [MODELS.GPT_4O_MINI]: 0.25,   // 25% of calls
+  [MODELS.DEEPSEEK_V3]: 0.05,   // 5% of calls
+} as const
 
 /** Stats about personalization performance for a business. */
 export interface PersonalizationStats {
@@ -43,6 +56,18 @@ export interface LLMUsageStats {
   isConfigured: boolean
 }
 
+/** Cost estimate for LLM personalization. */
+export interface CostEstimate {
+  /** Estimated cost per LLM call in USD */
+  costPerCall: number
+  /** Estimated monthly cost in USD based on current volume */
+  estimatedMonthlyCost: number
+  /** Whether the estimate is based on actual data or projections */
+  isProjection: boolean
+  /** Weekly send volume used for projection */
+  weeklyVolume: number
+}
+
 /** Combined personalization summary for settings/dashboard. */
 export interface PersonalizationSummary {
   stats: PersonalizationStats
@@ -51,11 +76,41 @@ export interface PersonalizationSummary {
   health: 'great' | 'good' | 'degraded'
   /** Human-readable health message */
   healthMessage: string
+  costEstimate: CostEstimate
 }
 
 // MVP estimated personalization rate (95% success rate based on
 // production LLM reliability with fallback chain)
 const ESTIMATED_PERSONALIZATION_RATE = 95
+
+/**
+ * Calculate estimated cost per LLM call based on weighted model distribution.
+ * Returns cost in USD.
+ */
+function calculateWeightedCostPerCall(): number {
+  let totalCost = 0
+
+  for (const [modelId, weight] of Object.entries(MODEL_DISTRIBUTION)) {
+    const costs = MODEL_COSTS[modelId as keyof typeof MODEL_COSTS]
+    if (!costs) continue
+
+    const inputCost = (AVG_INPUT_TOKENS / 1_000_000) * costs.input
+    const outputCost = (AVG_OUTPUT_TOKENS / 1_000_000) * costs.output
+    totalCost += (inputCost + outputCost) * weight
+  }
+
+  return totalCost
+}
+
+/**
+ * Estimate monthly cost based on weekly send volume.
+ * Assumes consistent weekly volume projected over 4.3 weeks/month.
+ */
+function estimateMonthlyCost(weeklySends: number): number {
+  const costPerCall = calculateWeightedCostPerCall()
+  const monthlyProjectedCalls = weeklySends * 4.3  // ~4.3 weeks per month
+  return monthlyProjectedCalls * costPerCall
+}
 
 /**
  * Get personalization stats for the current user's business.
@@ -187,11 +242,21 @@ export async function getPersonalizationSummary(): Promise<PersonalizationSummar
     healthMessage = 'Approaching LLM rate limit - some messages may use template fallback'
   }
 
+  // Calculate cost estimate
+  const costPerCall = calculateWeightedCostPerCall()
+  const costEstimate: CostEstimate = {
+    costPerCall,
+    estimatedMonthlyCost: estimateMonthlyCost(stats.campaignSendsThisWeek),
+    isProjection: true,
+    weeklyVolume: stats.campaignSendsThisWeek,
+  }
+
   return {
     stats,
     usage,
     health,
     healthMessage,
+    costEstimate,
   }
 }
 
