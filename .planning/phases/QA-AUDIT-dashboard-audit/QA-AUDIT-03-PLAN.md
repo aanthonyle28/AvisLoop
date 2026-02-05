@@ -14,9 +14,9 @@ must_haves:
     - "Both pages tested in light+dark mode and desktop+mobile viewports"
     - "Jobs page feels like a primary workflow page in V2 model"
   artifacts:
-    - path: "audit-screenshots/jobs-*.png"
+    - path: "C:\\AvisLoop\\audit-screenshots\\jobs-*.png"
       provides: "Jobs page baseline screenshots"
-    - path: "audit-screenshots/campaigns-*.png"
+    - path: "C:\\AvisLoop\\audit-screenshots\\campaigns-*.png"
       provides: "Campaigns list page baseline screenshots"
   key_links:
     - from: "Jobs page"
@@ -52,15 +52,17 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
   <name>Task 1: Audit Jobs Page (/jobs)</name>
   <files></files>
   <action>
-    **IMPORTANT: This is a QA testing task. Do NOT write code files. Use Playwright MCP tools and Supabase MCP for testing.**
+    **IMPORTANT: This is a QA testing task. Do NOT write code files. Use Playwright MCP tools and Supabase MCP (execute_sql) for testing.**
+
+    **All screenshots must use absolute path `C:\AvisLoop\audit-screenshots\` as the destination directory.**
 
     Navigate to `http://localhost:3000/jobs`.
 
     **Screenshot baseline:**
-    - Desktop light: `audit-screenshots/jobs-desktop-light.png`
-    - Desktop dark: `audit-screenshots/jobs-desktop-dark.png`
-    - Mobile light: `audit-screenshots/jobs-mobile-light.png`
-    - Mobile dark: `audit-screenshots/jobs-mobile-dark.png`
+    - Desktop light: `C:\AvisLoop\audit-screenshots\jobs-desktop-light.png`
+    - Desktop dark: `C:\AvisLoop\audit-screenshots\jobs-desktop-dark.png`
+    - Mobile light: `C:\AvisLoop\audit-screenshots\jobs-mobile-light.png`
+    - Mobile dark: `C:\AvisLoop\audit-screenshots\jobs-mobile-dark.png`
 
     **Job list table:**
     - Verify columns: Customer name, Service type, Status, Completion date
@@ -71,6 +73,7 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     - Check sorting (click column headers if sortable)
 
     **Data cross-check:**
+    Use the **Supabase MCP execute_sql tool** to run:
     ```sql
     SELECT j.id, c.name as customer_name, j.service_type, j.status, j.completed_at
     FROM jobs j
@@ -126,8 +129,8 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     **Record findings with severity and fix suggestions.**
   </action>
   <verify>
-    - 4 jobs page screenshots captured
-    - Job list data cross-checked against database
+    - 4 jobs page screenshots captured in `C:\AvisLoop\audit-screenshots\`
+    - Job list data cross-checked against database using Supabase MCP execute_sql
     - Add/edit job flows tested
     - Legacy terminology scan complete
     - V2 alignment assessed
@@ -139,15 +142,17 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
   <name>Task 2: Audit Campaigns List Page (/campaigns)</name>
   <files></files>
   <action>
-    **IMPORTANT: This is a QA testing task. Do NOT write code files. Use Playwright MCP tools and Supabase MCP for testing.**
+    **IMPORTANT: This is a QA testing task. Do NOT write code files. Use Playwright MCP tools and Supabase MCP (execute_sql) for testing.**
+
+    **All screenshots must use absolute path `C:\AvisLoop\audit-screenshots\` as the destination directory.**
 
     Navigate to `http://localhost:3000/campaigns`.
 
     **Screenshot baseline:**
-    - Desktop light: `audit-screenshots/campaigns-desktop-light.png`
-    - Desktop dark: `audit-screenshots/campaigns-desktop-dark.png`
-    - Mobile light: `audit-screenshots/campaigns-mobile-light.png`
-    - Mobile dark: `audit-screenshots/campaigns-mobile-dark.png`
+    - Desktop light: `C:\AvisLoop\audit-screenshots\campaigns-desktop-light.png`
+    - Desktop dark: `C:\AvisLoop\audit-screenshots\campaigns-desktop-dark.png`
+    - Mobile light: `C:\AvisLoop\audit-screenshots\campaigns-mobile-light.png`
+    - Mobile dark: `C:\AvisLoop\audit-screenshots\campaigns-mobile-dark.png`
 
     **Campaign list:**
     - Verify campaign cards/rows display: Name, Service type, Status (active/paused), Touch count
@@ -155,6 +160,7 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     - Check visual treatment of active vs paused campaigns
 
     **Data cross-check:**
+    Use the **Supabase MCP execute_sql tool** to run:
     ```sql
     SELECT c.id, c.name, c.service_type, c.status, c.is_preset,
       (SELECT COUNT(*) FROM campaign_touches ct WHERE ct.campaign_id = c.id) as touch_count,
@@ -195,8 +201,8 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     **Record findings with severity and fix suggestions.**
   </action>
   <verify>
-    - 4 campaigns page screenshots captured
-    - Campaign data cross-checked against database
+    - 4 campaigns page screenshots captured in `C:\AvisLoop\audit-screenshots\`
+    - Campaign data cross-checked against database using Supabase MCP execute_sql
     - Preset picker tested
     - Status toggle tested
     - Empty state tested
@@ -209,14 +215,14 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
 
 <verification>
 - Jobs and Campaigns pages both fully tested in all viewport+theme combinations
-- Data accuracy verified for both pages
+- Data accuracy verified for both pages via Supabase MCP execute_sql
 - CRUD operations tested on Jobs
 - Campaign presets and status toggle tested
 - V2 alignment verified: these feel like primary workflow pages
 </verification>
 
 <success_criteria>
-- 8 total screenshots (4 per page)
+- 8 total screenshots (4 per page) in `C:\AvisLoop\audit-screenshots\`
 - Job list matches database
 - Campaign list matches database
 - Add/edit job flow works

@@ -14,9 +14,9 @@ must_haves:
     - "Navigation order assessed for V2 alignment"
     - "Cross-cutting design consistency verified"
   artifacts:
-    - path: "audit-screenshots/scheduled-*.png"
+    - path: "C:\\AvisLoop\\audit-screenshots\\scheduled-*.png"
       provides: "Scheduled page screenshots (orphaned route)"
-    - path: "audit-screenshots/contacts-redirect-*.png"
+    - path: "C:\\AvisLoop\\audit-screenshots\\contacts-redirect-*.png"
       provides: "Contacts redirect verification"
   key_links:
     - from: "/contacts route"
@@ -53,11 +53,13 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
   <action>
     **IMPORTANT: This is a QA testing task. Do NOT write code files. Use Playwright MCP tools for testing.**
 
+    **All screenshots must use absolute path `C:\AvisLoop\audit-screenshots\` as the destination directory.**
+
     **--- Orphaned Route: /scheduled ---**
 
     Navigate to `http://localhost:3000/scheduled`.
 
-    **Screenshot:** `audit-screenshots/scheduled-desktop-light.png`
+    **Screenshot:** `C:\AvisLoop\audit-screenshots\scheduled-desktop-light.png`
 
     **Check:**
     - Does the page render? (or 404?)
@@ -75,7 +77,7 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
 
     Navigate to `http://localhost:3000/contacts`.
 
-    **Screenshot:** `audit-screenshots/contacts-redirect.png` (capture the redirect target)
+    **Screenshot:** `C:\AvisLoop\audit-screenshots\contacts-redirect.png` (capture the redirect target)
 
     **Check:**
     - Verify it redirects to /customers
@@ -116,7 +118,7 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     - Open the Account menu (bottom of sidebar)
     - Verify it contains: Settings, Billing, Sign Out (or similar)
     - This is the only access to Settings and Billing — verify links work
-    - Take screenshot: `audit-screenshots/account-menu.png`
+    - Take screenshot: `C:\AvisLoop\audit-screenshots\account-menu.png`
 
     **Sidebar collapse behavior:**
     - Click collapse button
@@ -130,7 +132,7 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     - Verify sidebar is hidden
     - Check for hamburger menu or mobile nav
     - If mobile nav exists, verify all pages accessible
-    - Take screenshot: `audit-screenshots/mobile-nav.png`
+    - Take screenshot: `C:\AvisLoop\audit-screenshots\mobile-nav.png`
 
     **Record findings with severity and fix suggestions.**
   </action>
@@ -147,14 +149,16 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
 </task>
 
 <task type="auto">
-  <name>Task 2: Cross-Cutting Checks (Legacy Terms, Icons, Design)</name>
+  <name>Task 2: Codebase Legacy Terminology Sweep</name>
   <files></files>
   <action>
-    **IMPORTANT: This is a QA testing task. Do NOT write code files. Use Playwright MCP tools and grep/search for code-level checks.**
+    **IMPORTANT: This is a code-level search task. Use the Grep tool (NOT Playwright) for codebase searches.**
+
+    **This task focuses ONLY on the codebase-wide legacy terminology sweep. It is a systematic search-and-classify operation.**
 
     **--- Comprehensive Legacy Terminology Sweep ---**
 
-    Search the entire codebase for legacy terminology in USER-FACING locations. Use grep/ripgrep or the Grep tool (NOT Playwright for this part).
+    Search the entire codebase for legacy terminology in USER-FACING locations. Use the Grep tool for all searches.
 
     **Search 1: "contact" in user-facing files**
     Search in: `app/(dashboard)/**/*.tsx`, `components/**/*.tsx`
@@ -192,14 +196,29 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     - Severity (Critical/Medium/Low)
     - Whether it's user-facing or code-internal
     - Fix suggestion
+  </action>
+  <verify>
+    - All 4 grep searches completed
+    - Each hit classified by severity
+    - False positives filtered out
+    - Complete findings list compiled
+  </verify>
+  <done>Codebase-wide legacy terminology sweep complete with classified findings list.</done>
+</task>
 
-    ---
+<task type="auto">
+  <name>Task 3: Cross-Cutting Design Consistency Check</name>
+  <files></files>
+  <action>
+    **IMPORTANT: This task uses BOTH Grep tool (for code searches) and Playwright MCP tools (for visual verification).**
+
+    **All screenshots must use absolute path `C:\AvisLoop\audit-screenshots\` as the destination directory.**
 
     **--- Icon System Consistency Check ---**
 
     **Known issue:** Feedback page may use lucide-react icons instead of Phosphor.
 
-    Search for lucide-react imports across dashboard components:
+    Use the Grep tool to search for lucide-react imports across dashboard components:
     Pattern: `from ['"]lucide-react['"]` or `from 'lucide-react'`
     Location: `app/(dashboard)/**/*.tsx`, `components/**/*.tsx`
 
@@ -215,10 +234,11 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     **--- Design System Consistency ---**
 
     **Font check:**
-    - Navigate to 3-4 different pages and verify Kumbh Sans is applied
+    - Navigate to 3-4 different pages using Playwright MCP and verify Kumbh Sans is applied
     - Check that no pages fall back to system fonts
 
     **Color variable usage:**
+    - Use Grep tool to check components for hardcoded colors vs design tokens
     - Verify cards use `bg-card` or `bg-white dark:bg-card` (not hardcoded colors)
     - Check borders use `border-border` (not hardcoded gray)
     - Check text uses `text-foreground` or `text-muted-foreground` (not hardcoded)
@@ -230,7 +250,7 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     - Verify card spacing is consistent
 
     **Theme toggle:**
-    - Find and test the theme toggle (light/dark/system)
+    - Find and test the theme toggle (light/dark/system) using Playwright MCP
     - Verify it works from any page
     - Verify theme persists across navigation
     - Verify theme persists across page refresh
@@ -238,13 +258,13 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     **Record all findings with severity and fix suggestions.**
   </action>
   <verify>
-    - Comprehensive legacy terminology sweep complete
-    - Icon system consistency checked (lucide-react vs Phosphor)
-    - Design system consistency verified
+    - lucide-react imports fully documented
+    - Font consistency checked
+    - Color variable usage audited
     - Theme toggle tested
     - All findings compiled with severity
   </verify>
-  <done>Cross-cutting audit complete: legacy terminology catalogue, icon consistency, design system, theme toggle.</done>
+  <done>Cross-cutting design audit complete: icon consistency, design system, theme toggle.</done>
 </task>
 
 </tasks>

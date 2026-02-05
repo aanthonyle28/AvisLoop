@@ -54,7 +54,24 @@ Output: `docs/QA-AUDIT.md` — the complete QA audit report.
   <name>Task 1: Compile QA Audit Report</name>
   <files>docs/QA-AUDIT.md</files>
   <action>
-    Read ALL summary files from Plans 01-08. Aggregate every finding into a single structured report.
+    **STEP 1: Load all summary files using the Read tool.**
+
+    Before compiling the report, you MUST use the Read tool to load ALL 8 summary files from the phase directory. Read each of these files explicitly:
+
+    1. `C:\AvisLoop\.planning\phases\QA-AUDIT-dashboard-audit\QA-AUDIT-01-SUMMARY.md`
+    2. `C:\AvisLoop\.planning\phases\QA-AUDIT-dashboard-audit\QA-AUDIT-02-SUMMARY.md`
+    3. `C:\AvisLoop\.planning\phases\QA-AUDIT-dashboard-audit\QA-AUDIT-03-SUMMARY.md`
+    4. `C:\AvisLoop\.planning\phases\QA-AUDIT-dashboard-audit\QA-AUDIT-04-SUMMARY.md`
+    5. `C:\AvisLoop\.planning\phases\QA-AUDIT-dashboard-audit\QA-AUDIT-05-SUMMARY.md`
+    6. `C:\AvisLoop\.planning\phases\QA-AUDIT-dashboard-audit\QA-AUDIT-06-SUMMARY.md`
+    7. `C:\AvisLoop\.planning\phases\QA-AUDIT-dashboard-audit\QA-AUDIT-07-SUMMARY.md`
+    8. `C:\AvisLoop\.planning\phases\QA-AUDIT-dashboard-audit\QA-AUDIT-08-SUMMARY.md`
+
+    Read all 8 files (you can read them in parallel) BEFORE proceeding to Step 2. Do not rely on the @-references in the context section alone — explicitly load each file with the Read tool to ensure full content is available.
+
+    **STEP 2: Aggregate findings and compile report.**
+
+    After reading all 8 summaries, aggregate every finding into a single structured report.
 
     **Create `docs/QA-AUDIT.md` with this structure:**
 
@@ -164,7 +181,7 @@ Output: `docs/QA-AUDIT.md` — the complete QA audit report.
 
     | Screenshot | Page | Theme | Viewport | Path |
     |------------|------|-------|----------|------|
-    | Login | Login | Light | Desktop | audit-screenshots/login-desktop-light.png |
+    | Login | Login | Light | Desktop | C:\AvisLoop\audit-screenshots\login-desktop-light.png |
     | ... | ... | ... | ... | ... |
 
     ## Recommendations
@@ -187,7 +204,7 @@ Output: `docs/QA-AUDIT.md` — the complete QA audit report.
     - Findings within each page section sorted by severity (Critical first)
     - Use consistent formatting throughout
     - Include actual data from cross-checks (what was expected vs what was displayed)
-    - Reference screenshot file paths for visual evidence
+    - Reference screenshot file paths for visual evidence (use absolute paths: `C:\AvisLoop\audit-screenshots\...`)
     - Be specific about V2 alignment concerns (not vague "could be better")
     - Legacy terminology table should list EVERY instance found
   </action>

@@ -14,9 +14,9 @@ must_haves:
     - "Both pages tested in light+dark mode and desktop+mobile viewports"
     - "Customers page feels secondary in V2 model (not a primary CRM destination)"
   artifacts:
-    - path: "audit-screenshots/customers-*.png"
+    - path: "C:\\AvisLoop\\audit-screenshots\\customers-*.png"
       provides: "Customers page baseline screenshots"
-    - path: "audit-screenshots/feedback-*.png"
+    - path: "C:\\AvisLoop\\audit-screenshots\\feedback-*.png"
       provides: "Feedback page baseline screenshots"
   key_links:
     - from: "Customers page list"
@@ -52,15 +52,17 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
   <name>Task 1: Audit Customers Page (/customers)</name>
   <files></files>
   <action>
-    **IMPORTANT: This is a QA testing task. Do NOT write code files. Use Playwright MCP tools and Supabase MCP for testing.**
+    **IMPORTANT: This is a QA testing task. Do NOT write code files. Use Playwright MCP tools and Supabase MCP (execute_sql) for testing.**
+
+    **All screenshots must use absolute path `C:\AvisLoop\audit-screenshots\` as the destination directory.**
 
     Navigate to `http://localhost:3000/customers`.
 
     **Screenshot baseline:**
-    - Desktop light: `audit-screenshots/customers-desktop-light.png`
-    - Desktop dark: `audit-screenshots/customers-desktop-dark.png`
-    - Mobile light: `audit-screenshots/customers-mobile-light.png`
-    - Mobile dark: `audit-screenshots/customers-mobile-dark.png`
+    - Desktop light: `C:\AvisLoop\audit-screenshots\customers-desktop-light.png`
+    - Desktop dark: `C:\AvisLoop\audit-screenshots\customers-desktop-dark.png`
+    - Mobile light: `C:\AvisLoop\audit-screenshots\customers-mobile-light.png`
+    - Mobile dark: `C:\AvisLoop\audit-screenshots\customers-mobile-dark.png`
 
     **Customer list table:**
     - Verify columns: Name, Email, Phone, Status, Tags, SMS Consent
@@ -72,6 +74,7 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     - Check search functionality (search by name or email)
 
     **Data cross-check:**
+    Use the **Supabase MCP execute_sql tool** to run:
     ```sql
     SELECT id, name, email, phone, status, tags, phone_status,
       sms_consent_status, last_sent_at, send_count
@@ -153,8 +156,8 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     **Record findings with severity and fix suggestions.**
   </action>
   <verify>
-    - 4 customers page screenshots captured
-    - Customer data cross-checked against database
+    - 4 customers page screenshots captured in `C:\AvisLoop\audit-screenshots\`
+    - Customer data cross-checked against database using Supabase MCP execute_sql
     - Add/edit customer flows tested
     - Bulk operations tested
     - Legacy terminology thoroughly scanned
@@ -168,15 +171,17 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
   <name>Task 2: Audit Feedback Page (/feedback)</name>
   <files></files>
   <action>
-    **IMPORTANT: This is a QA testing task. Do NOT write code files. Use Playwright MCP tools and Supabase MCP for testing.**
+    **IMPORTANT: This is a QA testing task. Do NOT write code files. Use Playwright MCP tools and Supabase MCP (execute_sql) for testing.**
+
+    **All screenshots must use absolute path `C:\AvisLoop\audit-screenshots\` as the destination directory.**
 
     Navigate to `http://localhost:3000/feedback`.
 
     **Screenshot baseline:**
-    - Desktop light: `audit-screenshots/feedback-desktop-light.png`
-    - Desktop dark: `audit-screenshots/feedback-desktop-dark.png`
-    - Mobile light: `audit-screenshots/feedback-mobile-light.png`
-    - Mobile dark: `audit-screenshots/feedback-mobile-dark.png`
+    - Desktop light: `C:\AvisLoop\audit-screenshots\feedback-desktop-light.png`
+    - Desktop dark: `C:\AvisLoop\audit-screenshots\feedback-desktop-dark.png`
+    - Mobile light: `C:\AvisLoop\audit-screenshots\feedback-mobile-light.png`
+    - Mobile dark: `C:\AvisLoop\audit-screenshots\feedback-mobile-dark.png`
 
     **Feedback list:**
     - Verify list displays: Customer name, Rating (stars), Feedback text, Date, Resolution status
@@ -186,6 +191,7 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     - Check search functionality (if available)
 
     **Data cross-check:**
+    Use the **Supabase MCP execute_sql tool** to run:
     ```sql
     SELECT cf.id, c.name as customer_name, cf.rating, cf.feedback_text,
       cf.submitted_at, cf.resolved_at, cf.internal_notes
@@ -206,7 +212,7 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
 
     **Feedback stats:**
     - Check if summary stats displayed (total feedback, unresolved count, average rating)
-    - Cross-check stats with database:
+    - Cross-check stats with database using the **Supabase MCP execute_sql tool**:
     ```sql
     SELECT
       COUNT(*) as total,
@@ -245,8 +251,8 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     **Record findings with severity and fix suggestions.**
   </action>
   <verify>
-    - 4 feedback page screenshots captured
-    - Feedback data cross-checked against database
+    - 4 feedback page screenshots captured in `C:\AvisLoop\audit-screenshots\`
+    - Feedback data cross-checked against database using Supabase MCP execute_sql
     - Resolution workflow tested
     - Icon consistency checked (lucide-react issue)
     - V2 alignment assessed
@@ -259,7 +265,7 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
 
 <verification>
 - Both pages fully tested in all viewport+theme combinations
-- Data accuracy verified for both pages
+- Data accuracy verified for both pages via Supabase MCP execute_sql
 - Customer CRUD operations tested
 - Feedback resolution workflow tested
 - Legacy terminology scan thorough on Customers page (highest risk)
@@ -267,7 +273,7 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
 </verification>
 
 <success_criteria>
-- 8 total screenshots (4 per page)
+- 8 total screenshots (4 per page) in `C:\AvisLoop\audit-screenshots\`
 - Customer list matches database
 - Feedback list matches database
 - Customer CRUD works

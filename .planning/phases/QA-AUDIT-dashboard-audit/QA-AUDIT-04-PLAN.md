@@ -14,11 +14,11 @@ must_haves:
     - "New campaign page works for creating campaigns from scratch"
     - "All campaign sub-routes tested in both themes and viewports"
   artifacts:
-    - path: "audit-screenshots/campaign-detail-*.png"
+    - path: "C:\\AvisLoop\\audit-screenshots\\campaign-detail-*.png"
       provides: "Campaign detail page screenshots"
-    - path: "audit-screenshots/campaign-edit-*.png"
+    - path: "C:\\AvisLoop\\audit-screenshots\\campaign-edit-*.png"
       provides: "Campaign edit page screenshots"
-    - path: "audit-screenshots/campaign-new-*.png"
+    - path: "C:\\AvisLoop\\audit-screenshots\\campaign-new-*.png"
       provides: "New campaign page screenshots"
   key_links:
     - from: "Campaign detail"
@@ -55,9 +55,11 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
   <name>Task 1: Audit Campaign Detail Page (/campaigns/[id])</name>
   <files></files>
   <action>
-    **IMPORTANT: This is a QA testing task. Do NOT write code files. Use Playwright MCP tools and Supabase MCP for testing.**
+    **IMPORTANT: This is a QA testing task. Do NOT write code files. Use Playwright MCP tools and Supabase MCP (execute_sql) for testing.**
 
-    First, find an existing campaign ID:
+    **All screenshots must use absolute path `C:\AvisLoop\audit-screenshots\` as the destination directory.**
+
+    First, use the **Supabase MCP execute_sql tool** to find an existing campaign ID:
     ```sql
     SELECT id, name, service_type, status FROM campaigns
     WHERE business_id = '<biz_id>' LIMIT 1;
@@ -66,10 +68,10 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     Navigate to `http://localhost:3000/campaigns/<campaign_id>`.
 
     **Screenshot baseline:**
-    - Desktop light: `audit-screenshots/campaign-detail-desktop-light.png`
-    - Desktop dark: `audit-screenshots/campaign-detail-desktop-dark.png`
-    - Mobile light: `audit-screenshots/campaign-detail-mobile-light.png`
-    - Mobile dark: `audit-screenshots/campaign-detail-mobile-dark.png`
+    - Desktop light: `C:\AvisLoop\audit-screenshots\campaign-detail-desktop-light.png`
+    - Desktop dark: `C:\AvisLoop\audit-screenshots\campaign-detail-desktop-dark.png`
+    - Mobile light: `C:\AvisLoop\audit-screenshots\campaign-detail-mobile-light.png`
+    - Mobile dark: `C:\AvisLoop\audit-screenshots\campaign-detail-mobile-dark.png`
 
     **Campaign header/info:**
     - Campaign name displayed prominently
@@ -85,6 +87,7 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     - Visual representation is intuitive (timeline or numbered steps)
 
     **Data cross-check (touches):**
+    Use the **Supabase MCP execute_sql tool** to run:
     ```sql
     SELECT ct.touch_number, ct.channel, ct.delay_hours, mt.name as template_name
     FROM campaign_touches ct
@@ -101,6 +104,7 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     - Check if enrollment count matches database
 
     **Data cross-check (enrollments):**
+    Use the **Supabase MCP execute_sql tool** to run:
     ```sql
     SELECT ce.id, c.name as customer_name, ce.status, ce.current_touch,
       ce.stop_reason, ce.enrolled_at
@@ -125,9 +129,9 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     **Record findings with severity and fix suggestions.**
   </action>
   <verify>
-    - 4 campaign detail screenshots captured
-    - Touch sequence cross-checked against database
-    - Enrollment list cross-checked against database
+    - 4 campaign detail screenshots captured in `C:\AvisLoop\audit-screenshots\`
+    - Touch sequence cross-checked against database using Supabase MCP execute_sql
+    - Enrollment list cross-checked against database using Supabase MCP execute_sql
     - Performance stats verified (if present)
     - All findings documented
   </verify>
@@ -140,15 +144,17 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
   <action>
     **IMPORTANT: This is a QA testing task. Do NOT write code files. Use Playwright MCP tools for testing.**
 
+    **All screenshots must use absolute path `C:\AvisLoop\audit-screenshots\` as the destination directory.**
+
     **--- Campaign Edit Page (/campaigns/[id]/edit) ---**
 
     Navigate to `http://localhost:3000/campaigns/<campaign_id>/edit`.
 
     **Screenshot baseline:**
-    - Desktop light: `audit-screenshots/campaign-edit-desktop-light.png`
-    - Desktop dark: `audit-screenshots/campaign-edit-desktop-dark.png`
-    - Mobile light: `audit-screenshots/campaign-edit-mobile-light.png`
-    - Mobile dark: `audit-screenshots/campaign-edit-mobile-dark.png`
+    - Desktop light: `C:\AvisLoop\audit-screenshots\campaign-edit-desktop-light.png`
+    - Desktop dark: `C:\AvisLoop\audit-screenshots\campaign-edit-desktop-dark.png`
+    - Mobile light: `C:\AvisLoop\audit-screenshots\campaign-edit-mobile-light.png`
+    - Mobile dark: `C:\AvisLoop\audit-screenshots\campaign-edit-mobile-dark.png`
 
     **Campaign edit form:**
     - Campaign name field pre-filled
@@ -179,8 +185,8 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     Navigate to `http://localhost:3000/campaigns/new`.
 
     **Screenshot baseline:**
-    - Desktop light: `audit-screenshots/campaign-new-desktop-light.png`
-    - Desktop dark: `audit-screenshots/campaign-new-desktop-dark.png`
+    - Desktop light: `C:\AvisLoop\audit-screenshots\campaign-new-desktop-light.png`
+    - Desktop dark: `C:\AvisLoop\audit-screenshots\campaign-new-desktop-dark.png`
 
     **New campaign form:**
     - Empty form state (no pre-filled values)
@@ -214,7 +220,7 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     **Record findings with severity and fix suggestions.**
   </action>
   <verify>
-    - 6 campaign edit screenshots + 2 campaign new screenshots captured
+    - 6 campaign edit screenshots + 2 campaign new screenshots captured in `C:\AvisLoop\audit-screenshots\`
     - Edit form pre-fills correctly
     - Touch editor works (add, remove, modify)
     - New campaign creation works end-to-end
@@ -228,15 +234,15 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
 
 <verification>
 - All three campaign sub-routes tested
-- Touch sequence data matches database
-- Enrollment data matches database
+- Touch sequence data matches database (verified via Supabase MCP execute_sql)
+- Enrollment data matches database (verified via Supabase MCP execute_sql)
 - Campaign creation flow works end-to-end
 - Campaign edit flow saves changes correctly
 - Form validation prevents invalid input
 </verification>
 
 <success_criteria>
-- 10+ screenshots across 3 campaign pages
+- 10+ screenshots across 3 campaign pages in `C:\AvisLoop\audit-screenshots\`
 - Campaign detail shows accurate touch and enrollment data
 - Campaign edit form saves correctly
 - New campaign creation works

@@ -14,9 +14,9 @@ must_haves:
     - "Dashboard KPI values match database query results"
     - "Both pages tested in light+dark mode and desktop+mobile viewports"
   artifacts:
-    - path: "audit-screenshots/dashboard-*.png"
+    - path: "C:\\AvisLoop\\audit-screenshots\\dashboard-*.png"
       provides: "Dashboard page baseline screenshots"
-    - path: "audit-screenshots/analytics-*.png"
+    - path: "C:\\AvisLoop\\audit-screenshots\\analytics-*.png"
       provides: "Analytics page baseline screenshots"
   key_links:
     - from: "Dashboard KPI widgets"
@@ -54,13 +54,15 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
   <action>
     **IMPORTANT: This is a QA testing task. Do NOT write code files. Use Playwright MCP tools and Supabase MCP (execute_sql) for testing.**
 
+    **All screenshots must use absolute path `C:\AvisLoop\audit-screenshots\` as the destination directory.**
+
     Navigate to `http://localhost:3000/dashboard` (logged in as populated account).
 
     **Screenshot baseline:**
-    - Desktop light: `audit-screenshots/dashboard-desktop-light.png` (1280x800)
-    - Desktop dark: `audit-screenshots/dashboard-desktop-dark.png`
-    - Mobile light: `audit-screenshots/dashboard-mobile-light.png` (375x667)
-    - Mobile dark: `audit-screenshots/dashboard-mobile-dark.png`
+    - Desktop light: `C:\AvisLoop\audit-screenshots\dashboard-desktop-light.png` (1280x800)
+    - Desktop dark: `C:\AvisLoop\audit-screenshots\dashboard-desktop-dark.png`
+    - Mobile light: `C:\AvisLoop\audit-screenshots\dashboard-mobile-light.png` (375x667)
+    - Mobile dark: `C:\AvisLoop\audit-screenshots\dashboard-mobile-dark.png`
 
     **Action Summary Banner:**
     - Check if banner shows "All caught up" (green with CheckCircle) or pending items count (yellow with WarningCircle)
@@ -75,7 +77,7 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     - Verify pipeline cards are static (not clickable)
 
     **Data Cross-Check (CRITICAL):**
-    Using Supabase MCP execute_sql, get the logged-in user's business_id, then:
+    Use the **Supabase MCP execute_sql tool** to run each of the following queries. Get the logged-in user's business_id first, then cross-check each KPI:
     ```sql
     -- Get business_id for current user
     SELECT b.id as business_id FROM businesses b WHERE b.user_id = '<user_id>';
@@ -139,8 +141,8 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     - Fix suggestion (file, component, what to change)
   </action>
   <verify>
-    - 4 dashboard screenshots captured
-    - KPI data cross-checked against database
+    - 4 dashboard screenshots captured in `C:\AvisLoop\audit-screenshots\`
+    - KPI data cross-checked against database using Supabase MCP execute_sql
     - Ready-to-send queue tested
     - Attention alerts tested
     - Legacy terminology scan complete
@@ -153,15 +155,17 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
   <name>Task 2: Audit Analytics Page (/analytics)</name>
   <files></files>
   <action>
-    **IMPORTANT: This is a QA testing task. Do NOT write code files. Use Playwright MCP tools and Supabase MCP for testing.**
+    **IMPORTANT: This is a QA testing task. Do NOT write code files. Use Playwright MCP tools and Supabase MCP (execute_sql) for testing.**
+
+    **All screenshots must use absolute path `C:\AvisLoop\audit-screenshots\` as the destination directory.**
 
     Navigate to `http://localhost:3000/analytics`.
 
     **Screenshot baseline:**
-    - Desktop light: `audit-screenshots/analytics-desktop-light.png`
-    - Desktop dark: `audit-screenshots/analytics-desktop-dark.png`
-    - Mobile light: `audit-screenshots/analytics-mobile-light.png`
-    - Mobile dark: `audit-screenshots/analytics-mobile-dark.png`
+    - Desktop light: `C:\AvisLoop\audit-screenshots\analytics-desktop-light.png`
+    - Desktop dark: `C:\AvisLoop\audit-screenshots\analytics-desktop-dark.png`
+    - Mobile light: `C:\AvisLoop\audit-screenshots\analytics-mobile-light.png`
+    - Mobile dark: `C:\AvisLoop\audit-screenshots\analytics-mobile-dark.png`
 
     **Service Type Breakdown Charts:**
     - Verify charts render for each enabled service type
@@ -170,7 +174,7 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     - Check service types sorted by volume (most active first)
 
     **Data Cross-Check:**
-    Using Supabase MCP execute_sql:
+    Use the **Supabase MCP execute_sql tool** to run each of the following queries and compare results with displayed chart values:
     ```sql
     -- Sends by service type
     SELECT j.service_type, COUNT(sl.id) as sends
@@ -215,8 +219,8 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     **Record findings with severity and fix suggestions.**
   </action>
   <verify>
-    - 4 analytics screenshots captured
-    - Data cross-checked against database
+    - 4 analytics screenshots captured in `C:\AvisLoop\audit-screenshots\`
+    - Data cross-checked against database using Supabase MCP execute_sql
     - Empty state tested (if possible)
     - V2 alignment verified
     - All findings documented
@@ -227,15 +231,15 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
 </tasks>
 
 <verification>
-- Dashboard data accuracy verified against database
-- Analytics data accuracy verified against database
+- Dashboard data accuracy verified against database via Supabase MCP execute_sql
+- Analytics data accuracy verified against database via Supabase MCP execute_sql
 - Both pages tested in all 4 viewport+theme combinations
 - No Critical findings related to data inconsistency
 - Legacy terminology scan complete for both pages
 </verification>
 
 <success_criteria>
-- 8 total screenshots (4 per page)
+- 8 total screenshots (4 per page) in `C:\AvisLoop\audit-screenshots\`
 - Dashboard KPI values match database queries
 - Analytics chart values match database aggregations
 - All interactive elements tested (banner, quick enroll, alert actions)

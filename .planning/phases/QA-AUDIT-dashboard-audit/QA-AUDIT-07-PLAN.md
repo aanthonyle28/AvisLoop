@@ -14,11 +14,11 @@ must_haves:
     - "Settings page renders all sections with working forms"
     - "All three pages tested in light+dark mode and desktop+mobile viewports"
   artifacts:
-    - path: "audit-screenshots/history-*.png"
+    - path: "C:\\AvisLoop\\audit-screenshots\\history-*.png"
       provides: "History page baseline screenshots"
-    - path: "audit-screenshots/billing-*.png"
+    - path: "C:\\AvisLoop\\audit-screenshots\\billing-*.png"
       provides: "Billing page baseline screenshots"
-    - path: "audit-screenshots/settings-*.png"
+    - path: "C:\\AvisLoop\\audit-screenshots\\settings-*.png"
       provides: "Settings page baseline screenshots"
   key_links:
     - from: "History page"
@@ -55,15 +55,17 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
   <name>Task 1: Audit History Page (/history)</name>
   <files></files>
   <action>
-    **IMPORTANT: This is a QA testing task. Do NOT write code files. Use Playwright MCP tools and Supabase MCP for testing.**
+    **IMPORTANT: This is a QA testing task. Do NOT write code files. Use Playwright MCP tools and Supabase MCP (execute_sql) for testing.**
+
+    **All screenshots must use absolute path `C:\AvisLoop\audit-screenshots\` as the destination directory.**
 
     Navigate to `http://localhost:3000/history`.
 
     **Screenshot baseline:**
-    - Desktop light: `audit-screenshots/history-desktop-light.png`
-    - Desktop dark: `audit-screenshots/history-desktop-dark.png`
-    - Mobile light: `audit-screenshots/history-mobile-light.png`
-    - Mobile dark: `audit-screenshots/history-mobile-dark.png`
+    - Desktop light: `C:\AvisLoop\audit-screenshots\history-desktop-light.png`
+    - Desktop dark: `C:\AvisLoop\audit-screenshots\history-desktop-dark.png`
+    - Mobile light: `C:\AvisLoop\audit-screenshots\history-mobile-light.png`
+    - Mobile dark: `C:\AvisLoop\audit-screenshots\history-mobile-dark.png`
 
     **Send log list:**
     - Verify entries display: Customer name, Channel (email/SMS), Status, Date/time
@@ -73,6 +75,7 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     - Check date/time formatting (consistent, readable)
 
     **Data cross-check:**
+    Use the **Supabase MCP execute_sql tool** to run:
     ```sql
     SELECT sl.id, c.name as customer_name, sl.channel, sl.status,
       sl.created_at, cam.name as campaign_name, sl.touch_number
@@ -115,8 +118,8 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     **Record findings with severity and fix suggestions.**
   </action>
   <verify>
-    - 4 history page screenshots captured
-    - Send log data cross-checked against database
+    - 4 history page screenshots captured in `C:\AvisLoop\audit-screenshots\`
+    - Send log data cross-checked against database using Supabase MCP execute_sql
     - Filtering tested
     - Legacy terminology scanned
     - All findings documented
@@ -128,17 +131,19 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
   <name>Task 2: Audit Billing and Settings Pages</name>
   <files></files>
   <action>
-    **IMPORTANT: This is a QA testing task. Do NOT write code files. Use Playwright MCP tools and Supabase MCP for testing.**
+    **IMPORTANT: This is a QA testing task. Do NOT write code files. Use Playwright MCP tools and Supabase MCP (execute_sql) for testing.**
+
+    **All screenshots must use absolute path `C:\AvisLoop\audit-screenshots\` as the destination directory.**
 
     **--- Billing Page (/billing) ---**
 
     Navigate to `http://localhost:3000/billing`.
 
     **Screenshot baseline:**
-    - Desktop light: `audit-screenshots/billing-desktop-light.png`
-    - Desktop dark: `audit-screenshots/billing-desktop-dark.png`
-    - Mobile light: `audit-screenshots/billing-mobile-light.png`
-    - Mobile dark: `audit-screenshots/billing-mobile-dark.png`
+    - Desktop light: `C:\AvisLoop\audit-screenshots\billing-desktop-light.png`
+    - Desktop dark: `C:\AvisLoop\audit-screenshots\billing-desktop-dark.png`
+    - Mobile light: `C:\AvisLoop\audit-screenshots\billing-mobile-light.png`
+    - Mobile dark: `C:\AvisLoop\audit-screenshots\billing-mobile-dark.png`
 
     **Subscription section:**
     - Current plan displayed (trial/starter/pro/enterprise)
@@ -152,6 +157,7 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     - Verify "customers" language (not "contacts")
 
     **Usage data cross-check:**
+    Use the **Supabase MCP execute_sql tool** to run:
     ```sql
     -- Monthly sends
     SELECT COUNT(*) FROM send_logs
@@ -191,10 +197,10 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     Navigate to `http://localhost:3000/settings`.
 
     **Screenshot baseline:**
-    - Desktop light: `audit-screenshots/settings-desktop-light.png`
-    - Desktop dark: `audit-screenshots/settings-desktop-dark.png`
-    - Mobile light: `audit-screenshots/settings-mobile-light.png`
-    - Mobile dark: `audit-screenshots/settings-mobile-dark.png`
+    - Desktop light: `C:\AvisLoop\audit-screenshots\settings-desktop-light.png`
+    - Desktop dark: `C:\AvisLoop\audit-screenshots\settings-desktop-dark.png`
+    - Mobile light: `C:\AvisLoop\audit-screenshots\settings-mobile-light.png`
+    - Mobile dark: `C:\AvisLoop\audit-screenshots\settings-mobile-dark.png`
 
     **Test each settings section:**
 
@@ -212,6 +218,7 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
        - Edit existing template
        - Delete template (not system templates)
        - System templates shown but read-only
+       - "Use this template" creates an editable copy for the business
 
     3. **Service Types:**
        - Multi-select for enabled service types
@@ -263,8 +270,8 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     **Record findings with severity and fix suggestions.**
   </action>
   <verify>
-    - 8 screenshots (4 billing, 4 settings)
-    - Billing usage data cross-checked against database
+    - 8 screenshots (4 billing, 4 settings) in `C:\AvisLoop\audit-screenshots\`
+    - Billing usage data cross-checked against database using Supabase MCP execute_sql
     - All settings sections tested
     - Legacy terminology scanned on both pages
     - Navigation access to billing verified
@@ -277,14 +284,14 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
 
 <verification>
 - History, Billing, and Settings all fully tested
-- Data accuracy verified for History and Billing
+- Data accuracy verified for History and Billing via Supabase MCP execute_sql
 - All settings sections interactive-tested
 - Legacy terminology scanned on all three pages
 - Both themes and viewports tested
 </verification>
 
 <success_criteria>
-- 12 total screenshots (4 per page)
+- 12 total screenshots (4 per page) in `C:\AvisLoop\audit-screenshots\`
 - History log data matches database
 - Billing usage matches database
 - All settings forms work (save and persist)

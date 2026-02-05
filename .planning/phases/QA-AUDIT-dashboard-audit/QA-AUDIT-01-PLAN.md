@@ -13,9 +13,9 @@ must_haves:
     - "Onboarding wizard renders all 7 steps with correct flow"
     - "Screenshots captured for login and all onboarding steps in both themes and viewports"
   artifacts:
-    - path: "audit-screenshots/login-*.png"
+    - path: "C:\\AvisLoop\\audit-screenshots\\login-*.png"
       provides: "Login page baseline screenshots"
-    - path: "audit-screenshots/onboarding-*.png"
+    - path: "C:\\AvisLoop\\audit-screenshots\\onboarding-*.png"
       provides: "Onboarding wizard step screenshots"
   key_links:
     - from: "login page"
@@ -53,9 +53,15 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
   <action>
     **IMPORTANT: This is a QA testing task. Do NOT write code files. Use Playwright MCP tools (browser_navigate, browser_snapshot, browser_click, browser_type, browser_take_screenshot) and Supabase MCP (execute_sql) to test.**
 
-    1. Start the dev server if not running (`pnpm dev`)
-    2. Navigate to `http://localhost:3000/login` using browser_navigate
-    3. Take screenshot: `audit-screenshots/login-desktop-light.png` (1280x800 viewport)
+    **SETUP (run once for entire audit phase):**
+    1. Create the screenshot directory: Use Bash to run `mkdir -p C:\AvisLoop\audit-screenshots` (or equivalent on Windows: `mkdir C:\AvisLoop\audit-screenshots` if it doesn't exist).
+    2. Start the dev server if not running (`pnpm dev`)
+    3. Check if a test account exists by navigating to `http://localhost:3000/login` and attempting login with common test credentials. If no test account exists, use the sign-up flow at `http://localhost:3000/signup` to create one (e.g., `audit-test@avisloop.com` / `AuditTest123!`). Store the working credentials mentally for use in ALL subsequent audit plans (02-08).
+
+    **All screenshots in this plan and all subsequent plans must use absolute path `C:\AvisLoop\audit-screenshots\` as the destination directory.**
+
+    4. Navigate to `http://localhost:3000/login` using browser_navigate
+    5. Take screenshot: `C:\AvisLoop\audit-screenshots\login-desktop-light.png` (1280x800 viewport)
 
     **Login page checks:**
     - Page has proper title (check document title or heading)
@@ -68,7 +74,7 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     - Branding: AvisLoop logo/name visible
 
     **Login interaction test:**
-    - Enter valid test credentials (use existing test account or sign up)
+    - Enter valid test credentials (use the test account from setup step above)
     - Submit the form
     - Verify redirect to `/dashboard` (or `/onboarding` if new user)
     - Verify no error toasts on successful login
@@ -81,15 +87,15 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
 
     **Dark mode test:**
     - Switch to dark mode (toggle theme or use browser_navigate with dark mode)
-    - Take screenshot: `audit-screenshots/login-desktop-dark.png`
+    - Take screenshot: `C:\AvisLoop\audit-screenshots\login-desktop-dark.png`
     - Verify text is readable against dark background
     - Verify form inputs have visible borders
 
     **Mobile test:**
     - Resize to 375x667 viewport
-    - Take screenshot: `audit-screenshots/login-mobile-light.png`
+    - Take screenshot: `C:\AvisLoop\audit-screenshots\login-mobile-light.png`
     - Verify layout doesn't break (no horizontal scroll, inputs don't overflow)
-    - Switch to dark mode, take screenshot: `audit-screenshots/login-mobile-dark.png`
+    - Switch to dark mode, take screenshot: `C:\AvisLoop\audit-screenshots\login-mobile-dark.png`
 
     **Record findings with severity:**
     - Critical: Login doesn't work, redirect fails
@@ -97,12 +103,13 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     - Low: Minor spacing issues, placeholder text could be better
   </action>
   <verify>
+    - `C:\AvisLoop\audit-screenshots\` directory exists
     - 4 login screenshots captured (desktop light/dark, mobile light/dark)
-    - Login flow works end-to-end
+    - Login flow works end-to-end with test credentials
     - Error state tested
     - All findings documented with severity
   </verify>
-  <done>Login page audited across all 4 viewport+theme combinations, interaction tested, findings documented.</done>
+  <done>Screenshot directory created, test account confirmed working, login page audited across all 4 viewport+theme combinations, interaction tested, findings documented.</done>
 </task>
 
 <task type="auto">
@@ -110,6 +117,8 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
   <files></files>
   <action>
     **IMPORTANT: This is a QA testing task. Do NOT write code files. Use Playwright MCP tools to test.**
+
+    **All screenshots must use absolute path `C:\AvisLoop\audit-screenshots\` as the destination directory.**
 
     Navigate to `http://localhost:3000/onboarding` (may need a fresh user or direct URL).
 
@@ -121,7 +130,7 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     - Google review link input with label
     - Next button works
     - Validation works (try submitting empty)
-    - Take screenshot: `audit-screenshots/onboarding-step1-desktop-light.png`
+    - Take screenshot: `C:\AvisLoop\audit-screenshots\onboarding-step1-desktop-light.png`
 
     **Step 2 - Review Destination:**
     - Google review link validation/preview
@@ -181,7 +190,7 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     - Fix suggestion (file, component, what to change)
   </action>
   <verify>
-    - Screenshots for all 7 steps captured
+    - Screenshots for all 7 steps captured in `C:\AvisLoop\audit-screenshots\`
     - Dark mode tested
     - Mobile tested
     - Legacy terminology scan complete
@@ -200,6 +209,8 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
 </verification>
 
 <success_criteria>
+- Screenshot directory `C:\AvisLoop\audit-screenshots\` exists
+- Test account created/confirmed for all subsequent audit plans
 - Login page fully audited (4 screenshots, interaction tested, error states checked)
 - All 7 onboarding steps audited (screenshots, interactions, validations)
 - Both light and dark mode tested
@@ -211,5 +222,5 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
 <output>
 After completion, create `.planning/phases/QA-AUDIT-dashboard-audit/QA-AUDIT-01-SUMMARY.md`
 
-Include: Total findings count by severity, key screenshots taken, any blockers discovered.
+Include: Total findings count by severity, key screenshots taken, any blockers discovered, test account credentials used (for reference in subsequent plans).
 </output>

@@ -14,7 +14,7 @@ must_haves:
     - "Send page feels SECONDARY to Campaigns in V2 model"
     - "Both tabs tested in light+dark mode and desktop+mobile viewports"
   artifacts:
-    - path: "audit-screenshots/send-*.png"
+    - path: "C:\\AvisLoop\\audit-screenshots\\send-*.png"
       provides: "Send page baseline screenshots"
   key_links:
     - from: "Send page Quick Send"
@@ -53,13 +53,15 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
   <action>
     **IMPORTANT: This is a QA testing task. Do NOT write code files. Use Playwright MCP tools for testing.**
 
+    **All screenshots must use absolute path `C:\AvisLoop\audit-screenshots\` as the destination directory.**
+
     Navigate to `http://localhost:3000/send` (should default to Quick Send tab).
 
     **Screenshot baseline:**
-    - Desktop light: `audit-screenshots/send-quicksend-desktop-light.png`
-    - Desktop dark: `audit-screenshots/send-quicksend-desktop-dark.png`
-    - Mobile light: `audit-screenshots/send-quicksend-mobile-light.png`
-    - Mobile dark: `audit-screenshots/send-quicksend-mobile-dark.png`
+    - Desktop light: `C:\AvisLoop\audit-screenshots\send-quicksend-desktop-light.png`
+    - Desktop dark: `C:\AvisLoop\audit-screenshots\send-quicksend-desktop-dark.png`
+    - Mobile light: `C:\AvisLoop\audit-screenshots\send-quicksend-mobile-light.png`
+    - Mobile dark: `C:\AvisLoop\audit-screenshots\send-quicksend-mobile-dark.png`
 
     **Quick Send tab layout:**
     - Tab selector visible (Quick Send / Bulk Send)
@@ -126,7 +128,7 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     **Record findings with severity and fix suggestions.**
   </action>
   <verify>
-    - 4 Quick Send screenshots captured
+    - 4 Quick Send screenshots captured in `C:\AvisLoop\audit-screenshots\`
     - Customer selector tested
     - Template selector tested
     - Channel selector tested (if available)
@@ -143,13 +145,15 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
   <action>
     **IMPORTANT: This is a QA testing task. Do NOT write code files. Use Playwright MCP tools for testing.**
 
+    **All screenshots must use absolute path `C:\AvisLoop\audit-screenshots\` as the destination directory.**
+
     Navigate to `http://localhost:3000/send` and click the "Bulk Send" tab.
 
     **Screenshot baseline:**
-    - Desktop light: `audit-screenshots/send-bulksend-desktop-light.png`
-    - Desktop dark: `audit-screenshots/send-bulksend-desktop-dark.png`
-    - Mobile light: `audit-screenshots/send-bulksend-mobile-light.png`
-    - Mobile dark: `audit-screenshots/send-bulksend-mobile-dark.png`
+    - Desktop light: `C:\AvisLoop\audit-screenshots\send-bulksend-desktop-light.png`
+    - Desktop dark: `C:\AvisLoop\audit-screenshots\send-bulksend-desktop-dark.png`
+    - Mobile light: `C:\AvisLoop\audit-screenshots\send-bulksend-mobile-light.png`
+    - Mobile dark: `C:\AvisLoop\audit-screenshots\send-bulksend-mobile-dark.png`
 
     **Bulk Send tab layout:**
     - Customer list with checkboxes
@@ -182,8 +186,8 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     **LEGACY TERMINOLOGY SCAN (HIGH RISK):**
     - Same as Quick Send tab — check ALL visible text
     - Bulk send is especially high risk for "contacts" language:
-      - "Select contacts" → should be "Select customers"
-      - "X contacts selected" → should be "X customers selected"
+      - "Select contacts" -> should be "Select customers"
+      - "X contacts selected" -> should be "X customers selected"
       - Column headers, filter labels, action labels
     - Use browser_snapshot to capture DOM text
     - Flag all instances
@@ -208,7 +212,7 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
     **Record findings with severity and fix suggestions.**
   </action>
   <verify>
-    - 4 Bulk Send screenshots captured
+    - 4 Bulk Send screenshots captured in `C:\AvisLoop\audit-screenshots\`
     - Customer selection tested
     - Filter chips tested
     - Bulk send confirmation dialog tested
@@ -229,7 +233,7 @@ Output: Findings documented in scratch notes for final report compilation (Plan 
 </verification>
 
 <success_criteria>
-- 8 total screenshots (4 per tab)
+- 8 total screenshots (4 per tab) in `C:\AvisLoop\audit-screenshots\`
 - All form interactions tested
 - Legacy "contacts" language fully scanned and documented
 - V2 alignment assessed: Send page should feel secondary, not primary
