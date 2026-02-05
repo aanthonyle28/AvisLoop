@@ -59,3 +59,13 @@ export interface DashboardCounts {
   attentionAlerts: number
   total: number              // readyToSend + attentionAlerts
 }
+
+// Quick enroll result for dashboard inline actions
+export type QuickEnrollResult = {
+  success: boolean
+  error?: string
+  enrolled?: boolean
+  campaignName?: string
+  noMatchingCampaign?: boolean  // true if no campaign exists for service type
+  serviceType?: string
+}
