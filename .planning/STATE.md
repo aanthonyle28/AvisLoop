@@ -4,9 +4,9 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** 27 of 10 (Dashboard Redesign)
-**Plan:** 2 of 7 in Phase 27
+**Plan:** 3 of 7 in Phase 27
 **Status:** In progress
-**Last activity:** 2026-02-04 - Completed 27-02-PLAN.md (Action Summary Banner and KPI Widgets)
+**Last activity:** 2026-02-04 - Completed 27-03-PLAN.md (Ready-to-Send Queue)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/10 phases complete or nearly complete)
 
@@ -21,7 +21,7 @@
 | 24 | Multi-Touch Campaign Engine | Complete (11/11 plans) |
 | 25 | LLM Personalization | Complete (11/11 plans) |
 | 26 | Review Funnel | Complete (7/7 plans) |
-| 27 | Dashboard Redesign | In progress (2/7 plans) |
+| 27 | Dashboard Redesign | In progress (3/7 plans) |
 | 28 | Onboarding Redesign | Not started |
 | 29 | Agency-Mode Readiness & Landing Page | Not started |
 
@@ -87,6 +87,10 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | Two-tier KPI sizing | 27-02 | Outcome text-4xl, pipeline text-2xl | Emphasizes business outcomes over pipeline activity |
 | Clickable outcome cards only | 27-02 | Outcome cards wrapped in Link, pipeline cards static | Outcomes have meaningful detail pages |
 | Zero trend display | 27-02 | Show muted dash instead of 0% | Cleaner UI, avoids implying data when no change |
+| Quick enroll auto-matching | 27-03 | Reuses getActiveCampaignForJob for campaign match | Service-specific first, then all-services fallback |
+| Missing campaign toast action | 27-03 | Shows inline "Create Campaign" action button | Guides user to fix without blocking UI |
+| Queue limit 5 jobs | 27-03 | Shows first 5 with "Show all" link | Keeps dashboard focused on urgent items |
+| Stale warning flag | 27-03 | Yellow WarningCircle with threshold tooltip | Visual urgency without text clutter |
 
 ### Phase 26
 
@@ -188,6 +192,6 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 
 ## Session Continuity
 
-**Last session:** 2026-02-04T21:20:00Z
-**Stopped at:** Completed 27-02-PLAN.md (Action Summary Banner and KPI Widgets)
+**Last session:** 2026-02-05T00:39:24Z
+**Stopped at:** Completed 27-03-PLAN.md (Ready-to-Send Queue)
 **Resume file:** None
