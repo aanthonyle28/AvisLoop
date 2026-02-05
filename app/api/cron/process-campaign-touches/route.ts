@@ -88,9 +88,9 @@ export async function GET(request: Request) {
       processed++
 
       try {
-        // Fetch business, customer, and job (for service_type context)
+        // Fetch business, customer, job (for service_type context), and campaign (for personalization toggle)
         // NOTE: Customer select includes send_count for tracking updates
-        const [{ data: business }, { data: customer }, { data: job }] = await Promise.all([
+        const [{ data: business }, { data: customer }, { data: job }, { data: campaign }] = await Promise.all([
           supabase
             .from('businesses')
             .select('id, name, google_review_link, default_sender_name')
@@ -105,6 +105,11 @@ export async function GET(request: Request) {
             .from('jobs')
             .select('service_type')
             .eq('id', touch.job_id)
+            .single(),
+          supabase
+            .from('campaigns')
+            .select('personalization_enabled')
+            .eq('id', touch.campaign_id)
             .single(),
         ])
 
@@ -167,7 +172,14 @@ export async function GET(request: Request) {
 
         // === 7. Send message ===
         if (touch.channel === 'email') {
-          const sendResult = await sendEmailTouch(supabase, touch, business, customer, job?.service_type)
+          const sendResult = await sendEmailTouch(
+            supabase,
+            touch,
+            business,
+            customer,
+            job?.service_type,
+            campaign?.personalization_enabled !== false
+          )
           if (sendResult.success) {
             sent++
           } else {
@@ -209,7 +221,8 @@ async function sendEmailTouch(
   touch: ClaimedCampaignTouch,
   business: { id: string; name: string; google_review_link: string | null; default_sender_name: string | null },
   customer: { id: string; name: string; email: string; send_count: number | null },
-  serviceType?: string
+  serviceType: string | undefined,
+  personalizationEnabled: boolean
 ): Promise<{ success: boolean; error?: string }> {
   if (!business.google_review_link) {
     await markTouchFailed(supabase, touch, 'No review link configured')
@@ -239,7 +252,7 @@ async function sendEmailTouch(
   let personalizedSubject = ''
   let wasPersonalized = false
 
-  if (templateBody) {
+  if (templateBody && personalizationEnabled) {
     try {
       const personalizationResult = await personalizeWithFallback({
         template: templateBody,
@@ -268,6 +281,8 @@ async function sendEmailTouch(
       // Personalization error should NEVER block sends
       console.warn('Personalization error (non-blocking):', error)
     }
+  } else if (templateBody && !personalizationEnabled) {
+    console.log(`Personalization disabled for campaign ${touch.campaign_id}, using raw template`)
   }
 
   // Use personalized subject if available, otherwise original

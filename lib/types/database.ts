@@ -336,4 +336,5 @@ export interface ClaimedCampaignTouch {
   channel: MessageChannel
   template_id: string | null
   scheduled_at: string
+  personalization_enabled: boolean  // Campaign-level AI toggle
 }
