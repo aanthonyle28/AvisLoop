@@ -1,6 +1,7 @@
 import { backOff } from 'exponential-backoff'
 import { personalizeMessage, type PersonalizeResult } from './personalize'
 import { checkLLMRateLimit, LLMRateLimitError } from './rate-limit'
+import { getModelForTask, getSecondaryModel, inferModelTask } from './client'
 import type { PersonalizationContext } from './prompts'
 
 export type FallbackReason =
@@ -119,11 +120,33 @@ export async function personalizeWithFallback(
     const errorMessage =
       error instanceof Error ? error.message : 'Unknown error'
 
-    console.warn('LLM personalization failed, using template fallback:', {
+    console.warn('Primary model failed:', {
       error: errorMessage,
       businessId: ctx.businessId,
       channel: ctx.channel,
     })
+
+    // If primary model failed due to validation, try secondary model
+    // before falling back to raw template
+    if (errorMessage.includes('validation')) {
+      try {
+        const task = inferModelTask(ctx.channel, ctx.touchNumber)
+        const primary = getModelForTask(task)
+        const secondary = getSecondaryModel(primary.modelId)
+
+        console.log(`Primary model validation failed, trying secondary: ${secondary.modelId}`)
+
+        const secondaryResult = await withTimeout(
+          personalizeMessage(ctx, { modelOverride: secondary }),
+          LLM_TIMEOUT_MS
+        )
+
+        return secondaryResult
+      } catch (secondaryError) {
+        console.warn('Secondary model also failed, falling back to template:', secondaryError)
+        // Fall through to raw template fallback below
+      }
+    }
 
     // Classify fallback reason
     let fallbackReason: FallbackReason = 'api_error'
