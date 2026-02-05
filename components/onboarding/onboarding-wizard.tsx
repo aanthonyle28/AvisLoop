@@ -7,6 +7,7 @@ import { OnboardingProgress } from './onboarding-progress'
 import { OnboardingSteps } from './onboarding-steps'
 import { markOnboardingComplete } from '@/lib/actions/onboarding'
 import type { OnboardingBusiness } from '@/lib/types/onboarding'
+import type { CampaignWithTouches } from '@/lib/types/database'
 
 // Schema for localStorage draft data validation (SEC-04)
 // Using safeParse instead of catch for Zod 4 compatibility
@@ -19,8 +20,13 @@ type StepConfig = {
 }
 
 const STEPS: StepConfig[] = [
-  { id: 1, title: 'Business Name', skippable: false },
-  { id: 2, title: 'Google Review Link', skippable: true },
+  { id: 1, title: 'Business Basics', skippable: false },
+  { id: 2, title: 'Review Destination', skippable: true },
+  { id: 3, title: 'Services Offered', skippable: false },
+  { id: 4, title: 'Software Used', skippable: true },
+  { id: 5, title: 'Campaign Preset', skippable: false },
+  { id: 6, title: 'Import Customers', skippable: true },
+  { id: 7, title: 'SMS Consent', skippable: false },
 ]
 
 const STORAGE_KEY = 'onboarding-draft'
@@ -28,8 +34,7 @@ const STORAGE_KEY = 'onboarding-draft'
 interface OnboardingWizardProps {
   initialStep: number
   business: OnboardingBusiness
-  firstContact?: unknown // Future use
-  defaultTemplate?: unknown // Future use
+  campaignPresets?: CampaignWithTouches[] // For step 5
 }
 
 /**
@@ -45,6 +50,7 @@ interface OnboardingWizardProps {
 export function OnboardingWizard({
   initialStep,
   business,
+  campaignPresets,
 }: OnboardingWizardProps) {
   const router = useRouter()
   const [currentStep, setCurrentStep] = useState(initialStep)
@@ -128,6 +134,7 @@ export function OnboardingWizard({
         <OnboardingSteps
           currentStep={currentStep}
           business={business}
+          campaignPresets={campaignPresets}
           onGoToNext={goToNext}
           onGoBack={goBack}
           onComplete={handleComplete}
