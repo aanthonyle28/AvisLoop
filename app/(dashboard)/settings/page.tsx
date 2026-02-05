@@ -9,6 +9,7 @@ import { ServiceTypesSection } from '@/components/settings/service-types-section
 import { DeleteAccountDialog } from '@/components/settings/delete-account-dialog'
 import { PersonalizationSection } from '@/components/settings/personalization-section'
 import { EmailAuthChecklist } from '@/components/settings/email-auth-checklist'
+import { BrandedLinksSection } from '@/components/settings/branded-links-section'
 import { getServiceTypeSettings } from '@/lib/data/business'
 import { getAvailableTemplates } from '@/lib/data/message-template'
 import { getPersonalizationSummary } from '@/lib/data/personalization'
@@ -136,6 +137,18 @@ async function SettingsContent() {
             These are configured through your Resend dashboard.
           </p>
           <EmailAuthChecklist />
+        </section>
+
+        {/* Section 4.75: Branded Review Link */}
+        <section className="border border-border rounded-lg p-6 bg-card shadow-sm">
+          <h2 className="text-xl font-semibold mb-4">Branded Review Link</h2>
+          <p className="text-muted-foreground mb-4">
+            Create a short, branded link for your Google review page. This appears more trustworthy in messages.
+          </p>
+          <BrandedLinksSection
+            googleReviewLink={business?.google_review_link}
+            brandedReviewLink={business?.branded_review_link}
+          />
         </section>
 
         {/* Section 5: Integrations */}
