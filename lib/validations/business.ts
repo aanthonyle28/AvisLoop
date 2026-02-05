@@ -7,6 +7,12 @@ export const businessSchema = z.object({
     .min(1, 'Business name is required')
     .max(100, 'Business name must be less than 100 characters')
     .trim(),
+  phone: z
+    .string()
+    .max(20, 'Phone number too long')
+    .trim()
+    .optional()
+    .or(z.literal('')),
   googleReviewLink: z
     .string()
     .url('Please enter a valid URL')
@@ -26,25 +32,5 @@ export const businessSchema = z.object({
     .or(z.literal('')),
 })
 
-// Email template validation
-export const emailTemplateSchema = z.object({
-  name: z
-    .string()
-    .min(1, 'Template name is required')
-    .max(100, 'Template name must be less than 100 characters')
-    .trim(),
-  subject: z
-    .string()
-    .min(1, 'Email subject is required')
-    .max(200, 'Subject must be less than 200 characters')
-    .trim(),
-  body: z
-    .string()
-    .min(1, 'Email body is required')
-    .max(5000, 'Body must be less than 5000 characters')
-    .trim(),
-})
-
 // Type exports
 export type BusinessInput = z.infer<typeof businessSchema>
-export type EmailTemplateInput = z.infer<typeof emailTemplateSchema>

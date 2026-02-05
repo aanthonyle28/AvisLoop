@@ -1,5 +1,5 @@
-// Database table types for businesses and email_templates
-// These types match the schema in supabase/migrations/00002_create_business.sql
+// Database table types for businesses and message_templates
+// These types match the schema in supabase/migrations
 
 export interface Business {
   id: string
@@ -8,6 +8,10 @@ export interface Business {
   google_review_link: string | null
   default_sender_name: string | null
   default_template_id: string | null
+  phone: string | null
+  software_used: string | null
+  sms_consent_acknowledged: boolean
+  sms_consent_acknowledged_at: string | null
   tier: 'basic' | 'pro' | 'trial'
   stripe_customer_id: string | null
   created_at: string
@@ -42,30 +46,9 @@ export interface BusinessWithMessageTemplates extends Business {
   message_templates: MessageTemplate[]
 }
 
-/** @deprecated Use MessageTemplate with channel='email' instead */
-export interface EmailTemplate {
-  id: string
-  business_id: string
-  name: string
-  subject: string
-  body: string
-  is_default: boolean
-  created_at: string
-  updated_at: string
-}
-
-// Combined type for business with nested templates (from Supabase joins)
-export interface BusinessWithTemplates extends Business {
-  email_templates: EmailTemplate[]  // Keep for backward compat
-  message_templates?: MessageTemplate[]  // New unified templates
-}
-
 // Insert/Update types (omit auto-generated fields)
 export type BusinessInsert = Omit<Business, 'id' | 'created_at' | 'updated_at'>
 export type BusinessUpdate = Partial<Omit<Business, 'id' | 'user_id' | 'created_at' | 'updated_at'>>
-
-export type EmailTemplateInsert = Omit<EmailTemplate, 'id' | 'created_at' | 'updated_at'>
-export type EmailTemplateUpdate = Partial<Omit<EmailTemplate, 'id' | 'business_id' | 'created_at' | 'updated_at'>>
 
 export interface Customer {
   id: string
