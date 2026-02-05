@@ -252,10 +252,10 @@ Plans:
 - [x] 25-05-PLAN.md — Preview components (samples, diff view, regenerate)
 - [x] 25-06-PLAN.md — Stats tracking and settings UI (toggle, usage display)
 - [x] 25-07-PLAN.md — Campaign creation/edit preview integration and database migration
-- [ ] 25-08-PLAN.md — Fix personalization toggle defect in cron processor (gap closure)
-- [ ] 25-09-PLAN.md — Profanity/inappropriate content detection (gap closure)
-- [ ] 25-10-PLAN.md — Multi-model routing: Gemini Flash, GPT-4o-mini, DeepSeek V3 (gap closure)
-- [ ] 25-11-PLAN.md — Cost tracking and monthly estimate in settings (gap closure)
+- [x] 25-08-PLAN.md — Fix personalization toggle defect in cron processor (gap closure)
+- [x] 25-09-PLAN.md — Profanity/inappropriate content detection (gap closure)
+- [x] 25-10-PLAN.md — Multi-model routing: Gemini Flash, GPT-4o-mini, DeepSeek V3 (gap closure)
+- [x] 25-11-PLAN.md — Cost tracking and monthly estimate in settings (gap closure)
 
 ### Phase 26: Review Funnel
 **Goal**: Review requests route through satisfaction filter (4-5 stars to Google, 1-3 stars to private feedback), preventing negative public reviews.
@@ -350,7 +350,7 @@ See individual phase sections above for requirements, success criteria, and depe
 | **22 (v2.0)** | **Review Follow-Up** | **5/5** | **Complete** | **2026-02-04** |
 | **23 (v2.0)** | **Review Follow-Up** | **7/7** | **Complete** | **2026-02-04** |
 | **24 (v2.0)** | **Review Follow-Up** | **11/11** | **Complete** | **2026-02-04** |
-| **25 (v2.0)** | **Review Follow-Up** | **7/7** | **Complete** | **2026-02-04** |
+| **25 (v2.0)** | **Review Follow-Up** | **11/11** | **Complete** | **2026-02-04** |
 | **26 (v2.0)** | **Review Follow-Up** | **7/7** | **Complete** | **2026-02-04** |
 | 27 (v2.0) | Review Follow-Up | 0/7 | Planned | - |
 | 28 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
@@ -361,7 +361,7 @@ See individual phase sections above for requirements, success criteria, and depe
 ## What's Next
 
 **Current milestone:** v2.0 Review Follow-Up System (Phases 20-29)
-**Next action:** Execute Phase 27 (Dashboard Redesign) -- 7 plans in 4 waves
+**Next action:** Plan Phase 27 (Dashboard Redesign)
 
 **Blockers:**
 - Twilio A2P 10DLC registration required before Phase 21-08 execution (webhook verification)
