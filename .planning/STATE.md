@@ -4,9 +4,9 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** 25 of 10 (LLM Personalization)
-**Plan:** 7 of 7 in Phase 25
+**Plan:** 8 of 8 in Phase 25
 **Status:** Phase complete
-**Last activity:** 2026-02-04 - Completed 25-07-PLAN.md (Campaign Preview Integration)
+**Last activity:** 2026-02-05 - Completed 25-08-PLAN.md (Personalization Toggle Gap Closure)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/10 phases complete or nearly complete)
 
@@ -19,7 +19,7 @@
 | 22 | Jobs CRUD & Service Types | Complete |
 | 23 | Message Templates & Migration | Complete |
 | 24 | Multi-Touch Campaign Engine | Complete (11/11 plans) |
-| 25 | LLM Personalization | Complete (7/7 plans) |
+| 25 | LLM Personalization | Complete (8/8 plans) |
 | 26 | Review Funnel | Complete (7/7 plans) |
 | 27 | Dashboard Redesign | Not started |
 | 28 | Onboarding Redesign | Not started |
@@ -58,6 +58,8 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | personalization_enabled DB column | 25-07 | Boolean NOT NULL DEFAULT TRUE on campaigns | Per-campaign toggle persisted to database |
 | Form-controlled toggle state | 25-07 | Replaced useState with form watch/setValue | Enables DB persistence through form submission |
 | Shared form preview integration | 25-07 | PersonalizationPreview in CampaignForm component | Single integration point for new + edit pages |
+| Cron processor personalization check | 25-08 | Fetch campaign.personalization_enabled in touch loop | LLM call skipped when toggle OFF |
+| Default to true on missing campaign | 25-08 | campaign?.personalization_enabled !== false | Fail-safe behavior for personalization |
 
 ### Phase 26
 
@@ -159,6 +161,6 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 
 ## Session Continuity
 
-**Last session:** 2026-02-04T23:36:12Z
-**Stopped at:** Completed 25-07-PLAN.md (Campaign Preview Integration) - Phase 25 complete
+**Last session:** 2026-02-05T00:16:45Z
+**Stopped at:** Completed 25-08-PLAN.md (Personalization Toggle Gap Closure) - Phase 25 complete
 **Resume file:** None
