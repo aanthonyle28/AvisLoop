@@ -78,6 +78,9 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 
 | Decision | Phase | Impact | Constraint |
 |----------|-------|--------|------------|
+| Business phone column nullable TEXT | 28-01 | Phone stored as TEXT, E.164 validated in app | No DB constraint, better error messages |
+| Software enum in Zod | 28-01 | CRM/software options validated in code | Easier to add new options without migration |
+| SMS consent boolean flag | 28-01 | sms_consent_acknowledged + timestamp tracks TCPA | Simple onboarding gate with audit trail |
 | Display-only email auth guidance | 28-02 | No verification API calls | Resend handles DNS verification in their dashboard |
 | Link to Resend dashboard | 28-02 | Users configure DNS through Resend | External links with ArrowSquareOut icon |
 | Setup in Resend badge status | 28-02 | All DNS records show same badge | No client-side verification available |
