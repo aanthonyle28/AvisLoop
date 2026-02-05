@@ -321,7 +321,7 @@ export async function getAttentionAlerts(businessId: string): Promise<AttentionA
     ] = await Promise.all([
       supabase
         .from('send_logs')
-        .select('id, status, error_message, created_at, customer_id, customers!inner(id, name)')
+        .select('id, status, error_message, created_at, customer_id, customers!send_logs_customer_id_fkey(id, name)')
         .eq('business_id', businessId)
         .in('status', ['failed', 'bounced'])
         .not('error_message', 'like', '[ACK]%') // Exclude acknowledged alerts

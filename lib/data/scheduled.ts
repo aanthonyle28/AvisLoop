@@ -80,14 +80,14 @@ export async function getScheduledSendsWithDetails(): Promise<ScheduledSendWithD
       if (send.status === 'completed' && send.send_log_ids && send.send_log_ids.length > 0) {
         const { data: sendLogs } = await supabase
           .from('send_logs')
-          .select('id, contact_id, status, error_message, contacts!inner(name, email)')
+          .select('id, contact_id, status, error_message, customers!send_logs_customer_id_fkey!inner(name, email)')
           .in('id', send.send_log_ids)
           .eq('business_id', business.id)
 
         // Map the response to match SendLogDetail type
-        // Note: Supabase returns contacts as an array from the join, so we take the first element
+        // Note: Supabase returns customers as an object from the join
         const mappedSendLogs: SendLogDetail[] = (sendLogs || []).map((log) => {
-          const contactData = Array.isArray(log.contacts) ? log.contacts[0] : log.contacts
+          const contactData = Array.isArray(log.customers) ? log.customers[0] : log.customers
           return {
             id: log.id,
             contact_id: log.contact_id,

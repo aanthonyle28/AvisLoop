@@ -40,7 +40,7 @@ export async function getSendLogs(options?: {
   // Build query
   let query = supabase
     .from('send_logs')
-    .select('*, contacts!inner(name, email)', { count: 'exact' })
+    .select('*, customers!send_logs_customer_id_fkey!inner(name, email)', { count: 'exact' })
     .eq('business_id', business.id)
     .order('created_at', { ascending: false })
 
@@ -52,7 +52,7 @@ export async function getSendLogs(options?: {
   if (options?.query) {
     const escapedQuery = escapeLikePattern(options.query)
     query = query.or(`name.ilike.%${escapedQuery}%,email.ilike.%${escapedQuery}%`, {
-      referencedTable: 'contacts'
+      referencedTable: 'customers'
     })
   }
 
@@ -347,7 +347,7 @@ export async function getRecentActivity(limit: number = 5): Promise<Array<{
 
   const { data, error } = await supabase
     .from('send_logs')
-    .select('id, subject, status, created_at, contacts(name, email)')
+    .select('id, subject, status, created_at, customers!send_logs_customer_id_fkey(name, email)')
     .eq('business_id', business.id)
     .order('created_at', { ascending: false })
     .limit(limit)
@@ -361,13 +361,12 @@ export async function getRecentActivity(limit: number = 5): Promise<Array<{
     return []
   }
 
-  // Flatten the nested contacts structure
-  // Note: contacts is an object in the response, not an array
+  // Flatten the nested customers structure
   type ContactData = { name: string; email: string }
 
   return data
     .map((row) => {
-      const contact = row.contacts as ContactData | ContactData[] | null
+      const contact = row.customers as ContactData | ContactData[] | null
       // Handle both single object and array cases
       const contactObj = Array.isArray(contact) ? contact[0] : contact
 
@@ -407,7 +406,7 @@ export async function getRecentActivityFull(limit: number = 5): Promise<SendLogW
 
   const { data, error } = await supabase
     .from('send_logs')
-    .select('*, contacts(name, email)')
+    .select('*, customers!send_logs_customer_id_fkey(name, email)')
     .eq('business_id', business.id)
     .order('created_at', { ascending: false })
     .limit(limit)
