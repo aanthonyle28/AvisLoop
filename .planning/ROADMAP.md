@@ -313,7 +313,15 @@ Plans:
   7. SMS opt-in explanation during onboarding with consent capture (checkbox: "Customers consent to SMS messages")
   8. SPF/DKIM/DMARC setup guidance checklist in settings (with verification status: pending/verified)
   9. Branded short links for review URLs enabled (trust signal, not raw Google URL) using custom domain or bit.ly integration
-**Plans**: TBD
+**Plans**: 7 plans in 4 waves
+Plans:
+- [ ] 28-01-PLAN.md — Database schema, TypeScript types, and validation schemas
+- [ ] 28-02-PLAN.md — Email authentication checklist in settings
+- [ ] 28-03-PLAN.md — Server actions for onboarding steps
+- [ ] 28-04-PLAN.md — Wizard shell expansion (2 to 7 steps)
+- [ ] 28-05-PLAN.md — Step components 1-4 (Business, Review, Services, Software)
+- [ ] 28-06-PLAN.md — Step components 5-7 (Campaign, Import, SMS Consent)
+- [ ] 28-07-PLAN.md — Build verification and visual checkpoint
 
 ### Phase 29: Agency-Mode Readiness & Landing Page
 **Goal**: Multi-location data model schema added (no UI yet), weekly performance reports auto-generated, campaign playbooks exportable, landing page copy updated for v2.0.
@@ -354,7 +362,7 @@ See individual phase sections above for requirements, success criteria, and depe
 | **25 (v2.0)** | **Review Follow-Up** | **11/11** | **Complete** | **2026-02-04** |
 | **26 (v2.0)** | **Review Follow-Up** | **7/7** | **Complete** | **2026-02-04** |
 | 27 (v2.0) | Review Follow-Up | 0/7 | Planned | - |
-| 28 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
+| 28 (v2.0) | Review Follow-Up | 0/7 | Planned | - |
 | 29 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 
 **Total:** 138 plans complete across shipped phases, 2 v2.0 phases remaining after Phase 27.
