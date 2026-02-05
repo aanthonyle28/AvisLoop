@@ -8,10 +8,15 @@ import { IntegrationsSection } from '@/components/settings/integrations-section'
 import { ServiceTypesSection } from '@/components/settings/service-types-section'
 import { DeleteAccountDialog } from '@/components/settings/delete-account-dialog'
 import { PersonalizationSection } from '@/components/settings/personalization-section'
+import { EmailAuthChecklist } from '@/components/settings/email-auth-checklist'
 import { getServiceTypeSettings } from '@/lib/data/business'
 import { getAvailableTemplates } from '@/lib/data/message-template'
 import { getPersonalizationSummary } from '@/lib/data/personalization'
 import type { MessageTemplate } from '@/lib/types/database'
+
+export const metadata = {
+  title: 'Settings',
+}
 
 // Loading skeleton for settings content
 function SettingsLoadingSkeleton() {
@@ -45,21 +50,10 @@ async function SettingsContent() {
     redirect('/login')
   }
 
-  // Fetch business data directly
-  // Use explicit FK hint (!inner) to resolve ambiguity from circular relationship
+  // Fetch business data
   const { data: business } = await supabase
     .from('businesses')
-    .select(`
-      *,
-      email_templates!email_templates_business_id_fkey (
-        id,
-        name,
-        subject,
-        body,
-        is_default,
-        created_at
-      )
-    `)
+    .select('*')
     .eq('user_id', user.id)
     .single()
 
@@ -134,11 +128,21 @@ async function SettingsContent() {
           <PersonalizationSection summary={personalizationSummary} />
         </section>
 
+        {/* Section 4.5: Email Authentication */}
+        <section className="border border-border rounded-lg p-6 bg-card shadow-sm">
+          <h2 className="text-xl font-semibold mb-4">Email Authentication</h2>
+          <p className="text-muted-foreground mb-4">
+            Improve email deliverability by setting up DNS authentication records.
+            These are configured through your Resend dashboard.
+          </p>
+          <EmailAuthChecklist />
+        </section>
+
         {/* Section 5: Integrations */}
         <section className="border border-border rounded-lg p-6 bg-card shadow-sm">
           <h2 className="text-xl font-semibold mb-4">Integrations</h2>
           <p className="text-muted-foreground mb-4">
-            Connect external tools like Zapier or Make to automatically add contacts.
+            Connect external tools like Zapier or Make to automatically add customers.
           </p>
           <IntegrationsSection hasExistingKey={!!business?.api_key_hash} />
         </section>
