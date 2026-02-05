@@ -4,9 +4,9 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** 25 of 10 (LLM Personalization)
-**Plan:** 8 of 8 in Phase 25
-**Status:** Phase complete
-**Last activity:** 2026-02-05 - Completed 25-08-PLAN.md (Personalization Toggle Gap Closure)
+**Plan:** 9 of 11 in Phase 25
+**Status:** In progress (gap closure)
+**Last activity:** 2026-02-05 - Completed 25-09-PLAN.md (Profanity Detection)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/10 phases complete or nearly complete)
 
@@ -19,7 +19,7 @@
 | 22 | Jobs CRUD & Service Types | Complete |
 | 23 | Message Templates & Migration | Complete |
 | 24 | Multi-Touch Campaign Engine | Complete (11/11 plans) |
-| 25 | LLM Personalization | Complete (8/8 plans) |
+| 25 | LLM Personalization | In progress (9/11 plans, gap closure) |
 | 26 | Review Funnel | Complete (7/7 plans) |
 | 27 | Dashboard Redesign | Not started |
 | 28 | Onboarding Redesign | Not started |
@@ -60,6 +60,10 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | Shared form preview integration | 25-07 | PersonalizationPreview in CampaignForm component | Single integration point for new + edit pages |
 | Cron processor personalization check | 25-08 | Fetch campaign.personalization_enabled in touch loop | LLM call skipped when toggle OFF |
 | Default to true on missing campaign | 25-08 | campaign?.personalization_enabled !== false | Fail-safe behavior for personalization |
+| Word boundary profanity matching | 25-09 | Use \b anchors in regex patterns | Prevents false positives (Scunthorpe problem) |
+| Separate PROFANITY_PATTERNS array | 25-09 | Profanity detection separate from business content rules | Clean separation of concerns |
+| 10 regex profanity patterns | 25-09 | Covers 6 content categories (profanity, sexual, violence, discrimination, threats, drugs) | <50ms validation budget maintained |
+| contains_profanity failure reason | 25-09 | Separate from contains_prohibited_content | Distinct fallback trigger for inappropriate language |
 
 ### Phase 26
 
@@ -161,6 +165,6 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 
 ## Session Continuity
 
-**Last session:** 2026-02-05T00:16:45Z
-**Stopped at:** Completed 25-08-PLAN.md (Personalization Toggle Gap Closure) - Phase 25 complete
+**Last session:** 2026-02-05T00:16:56Z
+**Stopped at:** Completed 25-09-PLAN.md (Profanity Detection) - Gap closure in progress
 **Resume file:** None
