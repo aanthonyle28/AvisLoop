@@ -3,10 +3,10 @@
 ## Current Position
 
 **Milestone:** v2.0 Review Follow-Up System
-**Phase:** 25 of 10 (LLM Personalization)
-**Plan:** 11 of 11 in Phase 25
-**Status:** Phase complete
-**Last activity:** 2026-02-04 - Completed 25-11-PLAN.md (Cost Tracking)
+**Phase:** 27 of 10 (Dashboard Redesign)
+**Plan:** 1 of 7 in Phase 27
+**Status:** In progress
+**Last activity:** 2026-02-04 - Completed 27-01-PLAN.md (Dashboard Data Layer)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/10 phases complete or nearly complete)
 
@@ -21,7 +21,7 @@
 | 24 | Multi-Touch Campaign Engine | Complete (11/11 plans) |
 | 25 | LLM Personalization | Complete (11/11 plans) |
 | 26 | Review Funnel | Complete (7/7 plans) |
-| 27 | Dashboard Redesign | Not started |
+| 27 | Dashboard Redesign | In progress (1/7 plans) |
 | 28 | Onboarding Redesign | Not started |
 | 29 | Agency-Mode Readiness & Landing Page | Not started |
 
@@ -73,6 +73,15 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | 350/150 token estimates | 25-11 | Average input/output tokens per personalization call | Basis for cost calculation |
 | 4.3 weeks per month | 25-11 | Monthly projection multiplier | Weekly sends × 4.3 = monthly estimate |
 | Cost transparency display | 25-11 | Settings shows estimated monthly cost | Internal transparency, not user-facing billing |
+
+### Phase 27
+
+| Decision | Phase | Impact | Constraint |
+|----------|-------|--------|------------|
+| Two-step enrollment filtering | 27-01 | Ready-to-send uses explicit fetch-then-filter | Supabase client doesn't support NOT EXISTS well |
+| Internal auth for counts | 27-01 | getDashboardCounts takes no businessId parameter | Matches getMonthlyUsage pattern for nav badge |
+| Parallel KPI queries | 27-01 | All KPI queries wrapped in Promise.all | Eliminates waterfalls, ~11x performance improvement |
+| Context-aware trend periods | 27-01 | Activity metrics weekly, outcome metrics monthly | Matches CONTEXT.md decision for meaningful trends |
 
 ### Phase 26
 
@@ -174,6 +183,6 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 
 ## Session Continuity
 
-**Last session:** 2026-02-04
-**Stopped at:** Phase 25 verified (11/11 must-haves passed) - all gap closure plans executed
+**Last session:** 2026-02-04T00:30:00Z
+**Stopped at:** Completed 27-01-PLAN.md (Dashboard Data Layer)
 **Resume file:** None
