@@ -10,6 +10,9 @@ export type OnboardingStatus = {
   steps: {
     hasBusinessProfile: boolean
     hasReviewLink: boolean
+    hasPhone: boolean
+    hasServiceTypes: boolean
+    hasSMSConsent: boolean
     hasContacts: boolean
     hasSentMessage: boolean
   }
@@ -46,7 +49,7 @@ export async function getOnboardingStatus(): Promise<OnboardingStatus | null> {
   // Get business with onboarding columns
   const { data: business } = await supabase
     .from('businesses')
-    .select('id, onboarding_completed_at, google_review_link')
+    .select('id, onboarding_completed_at, google_review_link, phone, software_used, service_types_enabled, sms_consent_acknowledged')
     .eq('user_id', user.id)
     .single()
 
@@ -58,6 +61,9 @@ export async function getOnboardingStatus(): Promise<OnboardingStatus | null> {
       steps: {
         hasBusinessProfile: false,
         hasReviewLink: false,
+        hasPhone: false,
+        hasServiceTypes: false,
+        hasSMSConsent: false,
         hasContacts: false,
         hasSentMessage: false,
       }
@@ -83,6 +89,9 @@ export async function getOnboardingStatus(): Promise<OnboardingStatus | null> {
     steps: {
       hasBusinessProfile: true, // Business exists
       hasReviewLink: !!business.google_review_link,
+      hasPhone: !!business.phone,
+      hasServiceTypes: Array.isArray(business.service_types_enabled) && business.service_types_enabled.length > 0,
+      hasSMSConsent: !!business.sms_consent_acknowledged,
       hasContacts: (contactCount ?? 0) > 0,
       hasSentMessage: (sendCount ?? 0) > 0,
     }
