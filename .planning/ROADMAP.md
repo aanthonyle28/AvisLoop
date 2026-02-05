@@ -338,6 +338,29 @@ Plans:
 **Future consideration**: Operator admin dashboard — aggregate LLM spend across all tenants, margin analysis, cost-per-tenant breakdown. Currently business owners see their estimated cost in Settings; operator monitors actual spend via API provider dashboards (Google AI, OpenAI, OpenRouter).
 **Plans**: TBD
 
+### Phase QA-AUDIT: Dashboard QA Test & UX Audit
+**Goal**: Systematically test every page, button, and feature in the authenticated dashboard using Playwright MCP. Verify v2.0 campaign-first model coherence. Cross-check data against database. Identify UX gaps, broken flows, legacy references, orphaned features, and design inconsistencies.
+**Depends on**: Phases 20-28 (dashboard features built)
+**Success Criteria** (what must be TRUE):
+  1. All 15 dashboard routes tested with screenshots in light+dark mode, desktop+mobile viewports
+  2. Data consistency cross-checked (KPIs, counts, lists) against Supabase database queries
+  3. Legacy terminology ("contacts", "send request", "email template") catalogued with file paths and severity
+  4. V2 alignment assessed: navigation order, feature prominence, campaign-first model coherence
+  5. Orphaned features identified (/scheduled page, legacy redirects)
+  6. Per-page grades assigned (Pass/Needs Work/Fail) with overall dashboard health scorecard
+  7. Complete report at docs/QA-AUDIT.md with actionable fix suggestions for every finding
+**Plans**: 9 plans in 2 waves
+Plans:
+- [ ] QA-AUDIT-01-PLAN.md — Login flow and onboarding wizard audit
+- [ ] QA-AUDIT-02-PLAN.md — Dashboard and analytics pages audit
+- [ ] QA-AUDIT-03-PLAN.md — Jobs and campaigns list pages audit
+- [ ] QA-AUDIT-04-PLAN.md — Campaign detail, edit, and new pages audit
+- [ ] QA-AUDIT-05-PLAN.md — Send page (Quick Send + Bulk Send) audit
+- [ ] QA-AUDIT-06-PLAN.md — Customers and feedback pages audit
+- [ ] QA-AUDIT-07-PLAN.md — History, billing, and settings pages audit
+- [ ] QA-AUDIT-08-PLAN.md — Orphaned routes, navigation, and cross-cutting checks
+- [ ] QA-AUDIT-09-PLAN.md — Compile final docs/QA-AUDIT.md report
+
 ## Phase Details
 
 See individual phase sections above for requirements, success criteria, and dependencies.
@@ -363,15 +386,16 @@ See individual phase sections above for requirements, success criteria, and depe
 | **25 (v2.0)** | **Review Follow-Up** | **11/11** | **Complete** | **2026-02-04** |
 | **26 (v2.0)** | **Review Follow-Up** | **7/7** | **Complete** | **2026-02-04** |
 | 27 (v2.0) | Review Follow-Up | 0/7 | Planned | - |
-| 28 (v2.0) | Review Follow-Up | 0/7 | Planned | - |
+| 28 (v2.0) | Review Follow-Up | 0/8 | In progress | - |
 | 29 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
+| QA-AUDIT | Dashboard Audit | 0/9 | Planned | - |
 
 **Total:** 138 plans complete across shipped phases, 2 v2.0 phases remaining after Phase 27.
 
 ## What's Next
 
 **Current milestone:** v2.0 Review Follow-Up System (Phases 20-29)
-**Next action:** Plan Phase 27 (Dashboard Redesign)
+**Next action:** Execute QA-AUDIT phase (Dashboard QA Test & UX Audit)
 
 **Blockers:**
 - Twilio A2P 10DLC registration required before Phase 21-08 execution (webhook verification)
@@ -383,5 +407,5 @@ After v2.0:
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 
 ---
-*Last updated: 2026-02-04 after Phase 27 planning complete (Dashboard Redesign)*
+*Last updated: 2026-02-05 after QA-AUDIT phase planning complete (Dashboard QA Test & UX Audit)*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
