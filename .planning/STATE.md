@@ -3,10 +3,10 @@
 ## Current Position
 
 **Milestone:** v2.0 Review Follow-Up System
-**Phase:** 27 of 10 (Dashboard Redesign)
-**Plan:** 5 of 7 in Phase 27
+**Phase:** 28 of 10 (Onboarding Redesign)
+**Plan:** 2 of 7 in Phase 28
 **Status:** In progress
-**Last activity:** 2026-02-05 - Completed 27-05-PLAN.md (Dashboard Assembly & Navigation)
+**Last activity:** 2026-02-05 - Completed 28-02-PLAN.md (Email Authentication Guidance)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/10 phases complete or nearly complete)
 
@@ -22,7 +22,7 @@
 | 25 | LLM Personalization | Complete (11/11 plans) |
 | 26 | Review Funnel | Complete (7/7 plans) |
 | 27 | Dashboard Redesign | In progress (6/7 plans) |
-| 28 | Onboarding Redesign | Not started |
+| 28 | Onboarding Redesign | In progress (2/7 plans) |
 | 29 | Agency-Mode Readiness & Landing Page | Not started |
 
 ## Blocker
@@ -73,6 +73,14 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | 350/150 token estimates | 25-11 | Average input/output tokens per personalization call | Basis for cost calculation |
 | 4.3 weeks per month | 25-11 | Monthly projection multiplier | Weekly sends × 4.3 = monthly estimate |
 | Cost transparency display | 25-11 | Settings shows estimated monthly cost | Internal transparency, not user-facing billing |
+
+### Phase 28
+
+| Decision | Phase | Impact | Constraint |
+|----------|-------|--------|------------|
+| Display-only email auth guidance | 28-02 | No verification API calls | Resend handles DNS verification in their dashboard |
+| Link to Resend dashboard | 28-02 | Users configure DNS through Resend | External links with ArrowSquareOut icon |
+| Setup in Resend badge status | 28-02 | All DNS records show same badge | No client-side verification available |
 
 ### Phase 27
 
@@ -204,6 +212,6 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 
 ## Session Continuity
 
-**Last session:** 2026-02-05T00:50:36Z
-**Stopped at:** Completed 27-05-PLAN.md (Dashboard Assembly & Navigation)
+**Last session:** 2026-02-05T04:50:43Z
+**Stopped at:** Completed 28-02-PLAN.md (Email Authentication Guidance)
 **Resume file:** None
