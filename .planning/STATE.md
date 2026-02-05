@@ -4,9 +4,9 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** 28 of 10 (Onboarding Redesign)
-**Plan:** 2 of 7 in Phase 28
+**Plan:** 3 of 7 in Phase 28
 **Status:** In progress
-**Last activity:** 2026-02-05 - Completed 28-02-PLAN.md (Email Authentication Guidance)
+**Last activity:** 2026-02-05 - Completed 28-08-PLAN.md (Branded Short Links)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/10 phases complete or nearly complete)
 
@@ -22,7 +22,7 @@
 | 25 | LLM Personalization | Complete (11/11 plans) |
 | 26 | Review Funnel | Complete (7/7 plans) |
 | 27 | Dashboard Redesign | In progress (6/7 plans) |
-| 28 | Onboarding Redesign | In progress (2/7 plans) |
+| 28 | Onboarding Redesign | In progress (3/7 plans) |
 | 29 | Agency-Mode Readiness & Landing Page | Not started |
 
 ## Blocker
@@ -84,6 +84,10 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | Display-only email auth guidance | 28-02 | No verification API calls | Resend handles DNS verification in their dashboard |
 | Link to Resend dashboard | 28-02 | Users configure DNS through Resend | External links with ArrowSquareOut icon |
 | Setup in Resend badge status | 28-02 | All DNS records show same badge | No client-side verification available |
+| Direct Bitly API (no SDK) | 28-08 | Simple fetch() call to /shorten endpoint | No @bitly/bitly-api-client dependency for single endpoint |
+| Store short link on business | 28-08 | branded_review_link column on businesses table | Reuses link, saves API quota (1,500/month free tier) |
+| Post-onboarding settings feature | 28-08 | Branded links not in wizard, settings only | Removes Bitly API blocker from onboarding flow |
+| Confirmation for regenerate | 28-08 | Dialog prevents accidental link replacement | Old link lost if regenerated (no history) |
 
 ### Phase 27
 
@@ -215,6 +219,6 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 
 ## Session Continuity
 
-**Last session:** 2026-02-05T04:50:43Z
-**Stopped at:** Completed 28-02-PLAN.md (Email Authentication Guidance)
+**Last session:** 2026-02-05T04:53:35Z
+**Stopped at:** Completed 28-08-PLAN.md (Branded Short Links)
 **Resume file:** None
