@@ -313,7 +313,7 @@ Plans:
   7. SMS opt-in explanation during onboarding with consent capture (checkbox: "Customers consent to SMS messages")
   8. SPF/DKIM/DMARC setup guidance checklist in settings (with verification status: pending/verified)
   9. Branded short links for review URLs enabled (trust signal, not raw Google URL) using custom domain or bit.ly integration
-**Plans**: 7 plans in 4 waves
+**Plans**: 8 plans in 4 waves
 Plans:
 - [ ] 28-01-PLAN.md — Database schema, TypeScript types, and validation schemas
 - [ ] 28-02-PLAN.md — Email authentication checklist in settings
@@ -322,6 +322,7 @@ Plans:
 - [ ] 28-05-PLAN.md — Step components 1-4 (Business, Review, Services, Software)
 - [ ] 28-06-PLAN.md — Step components 5-7 (Campaign, Import, SMS Consent)
 - [ ] 28-07-PLAN.md — Build verification and visual checkpoint
+- [ ] 28-08-PLAN.md — Branded short links in settings (DLVR-03, Bitly integration)
 
 ### Phase 29: Agency-Mode Readiness & Landing Page
 **Goal**: Multi-location data model schema added (no UI yet), weekly performance reports auto-generated, campaign playbooks exportable, landing page copy updated for v2.0.
