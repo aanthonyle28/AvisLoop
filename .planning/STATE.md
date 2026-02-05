@@ -4,9 +4,9 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** 28 of 10 (Onboarding Redesign)
-**Plan:** 3 of 7 in Phase 28
+**Plan:** 4 of 8 in Phase 28
 **Status:** In progress
-**Last activity:** 2026-02-05 - Completed 28-08-PLAN.md (Branded Short Links)
+**Last activity:** 2026-02-05 - Completed 28-03-PLAN.md (Onboarding Server Actions)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/10 phases complete or nearly complete)
 
@@ -22,7 +22,7 @@
 | 25 | LLM Personalization | Complete (11/11 plans) |
 | 26 | Review Funnel | Complete (7/7 plans) |
 | 27 | Dashboard Redesign | In progress (6/7 plans) |
-| 28 | Onboarding Redesign | In progress (3/7 plans) |
+| 28 | Onboarding Redesign | In progress (4/8 plans) |
 | 29 | Agency-Mode Readiness & Landing Page | Not started |
 
 ## Blocker
@@ -88,6 +88,9 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | Store short link on business | 28-08 | branded_review_link column on businesses table | Reuses link, saves API quota (1,500/month free tier) |
 | Post-onboarding settings feature | 28-08 | Branded links not in wizard, settings only | Removes Bitly API blocker from onboarding flow |
 | Confirmation for regenerate | 28-08 | Dialog prevents accidental link replacement | Old link lost if regenerated (no history) |
+| Step 3 sets both columns | 28-03 | saveServicesOffered sets service_types_enabled AND service_type_timing | Prevents incomplete state for campaign enrollment |
+| Wrapper for campaign duplication | 28-03 | createCampaignFromPreset wraps duplicateCampaign | Single source of truth, consistent API shape |
+| Zod issues array for errors | 28-03 | Use parsed.error.issues[0] not .errors[0] | Correct TypeScript API for ZodError |
 
 ### Phase 27
 
@@ -219,6 +222,6 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 
 ## Session Continuity
 
-**Last session:** 2026-02-05T04:53:35Z
-**Stopped at:** Completed 28-08-PLAN.md (Branded Short Links)
+**Last session:** 2026-02-05T05:01:08Z
+**Stopped at:** Completed 28-03-PLAN.md (Onboarding Server Actions)
 **Resume file:** None
