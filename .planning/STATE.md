@@ -4,9 +4,9 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** 27 of 10 (Dashboard Redesign)
-**Plan:** 4 of 7 in Phase 27
+**Plan:** 6 of 7 in Phase 27
 **Status:** In progress
-**Last activity:** 2026-02-04 - Completed 27-04-PLAN.md (Attention Alerts)
+**Last activity:** 2026-02-04 - Completed 27-06-PLAN.md (Analytics with Service Type Breakdown)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/10 phases complete or nearly complete)
 
@@ -21,7 +21,7 @@
 | 24 | Multi-Touch Campaign Engine | Complete (11/11 plans) |
 | 25 | LLM Personalization | Complete (11/11 plans) |
 | 26 | Review Funnel | Complete (7/7 plans) |
-| 27 | Dashboard Redesign | In progress (4/7 plans) |
+| 27 | Dashboard Redesign | In progress (6/7 plans) |
 | 28 | Onboarding Redesign | Not started |
 | 29 | Agency-Mode Readiness & Landing Page | Not started |
 
@@ -95,6 +95,9 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | Contextual alert actions | 27-04 | Failed: Retry, Bounced: Update contact, Feedback: Respond | No generic "Fix" or "Retry" buttons |
 | Overflow menu for acknowledge | 27-04 | Permanent failures show acknowledge in overflow menu | Forces deliberate choice, not casual dismiss |
 | Show 3 alerts by default | 27-04 | Expandable to view all | Keeps dashboard focused on urgent items |
+| JS aggregation for analytics | 27-06 | Fetch separately and aggregate in JS | Supabase client doesn't support complex GROUP BY |
+| Two-rate display | 27-06 | Response rate (reviews + feedback) and review rate (reviews only) | Shows both engagement and public outcome |
+| Volume-based sorting | 27-06 | Sort service types by total sent descending | Most active service types appear first |
 
 ### Phase 26
 
@@ -196,6 +199,6 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 
 ## Session Continuity
 
-**Last session:** 2026-02-04T18:43:33Z
-**Stopped at:** Completed 27-04-PLAN.md (Attention Alerts)
+**Last session:** 2026-02-04T19:02:50Z
+**Stopped at:** Completed 27-06-PLAN.md (Analytics with Service Type Breakdown)
 **Resume file:** None
