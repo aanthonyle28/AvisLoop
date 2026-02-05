@@ -20,6 +20,7 @@ export type ValidationFailureReason =
   | 'contains_html'
   | 'contains_unknown_url'
   | 'contains_prohibited_content'
+  | 'contains_profanity'
   | 'contains_unresolved_token'
 
 // ============================================================
@@ -110,6 +111,34 @@ const PROHIBITED_PATTERNS: RegExp[] = [
   /#1\s+(rated|ranked)/i,
 ]
 
+// Profanity and inappropriate content patterns (SC #9 compliance)
+// Uses word boundary matching (\b) to avoid false positives on substrings
+const PROFANITY_PATTERNS: RegExp[] = [
+  // Common profanity (word boundaries to prevent substring matches)
+  /\b(?:fuck|shit|damn|ass|bitch|bastard|crap|dick|piss|cock|cunt|whore|slut)\b/i,
+  /\b(?:wtf|stfu|lmao|lmfao)\b/i,
+  /\b(?:goddamn|motherfuck|bullshit|horseshit|dipshit|dumbass|jackass|asshole|arsehole)\b/i,
+
+  // Variants with character substitution (l33t speak)
+  /\b(?:f[u*@]ck|sh[i!1]t|b[i!1]tch|a[s$]{2})\b/i,
+
+  // Sexual content
+  /\b(?:sex(?:ual|y)|porn|nude|naked|erotic|orgasm|genital)\b/i,
+
+  // Violence
+  /\b(?:kill\s+(?:you|him|her|them)|murder|assault|rape|stab|shoot)\b/i,
+
+  // Discriminatory language
+  /\b(?:racist|sexist|homophob|transphob|bigot|supremac)\b/i,
+  /\b(?:fag(?:got)?|dyke|tranny|retard(?:ed)?|spic|chink|kike|nigger|wetback)\b/i,
+
+  // Threats
+  /\b(?:threat(?:en)?|i'?ll\s+(?:hurt|harm|destroy|ruin))\b/i,
+
+  // Drug references (inappropriate for business messages)
+  /\b(?:cocaine|heroin|meth(?:amphetamine)?|marijuana|weed|drugs?)\b/i,
+]
+
 // Unresolved token patterns (template variables that weren't filled)
 const UNRESOLVED_TOKEN_PATTERNS: RegExp[] = [
   /\{\{[^}]+\}\}/,  // {{variable}}
@@ -175,7 +204,14 @@ export function validateOutput(
     }
   }
 
-  // 7. No unresolved template tokens
+  // 7. No profanity or inappropriate content (LLM-08 requirement)
+  for (const pattern of PROFANITY_PATTERNS) {
+    if (pattern.test(output)) {
+      return { valid: false, reason: 'contains_profanity' }
+    }
+  }
+
+  // 8. No unresolved template tokens
   for (const pattern of UNRESOLVED_TOKEN_PATTERNS) {
     if (pattern.test(output)) {
       return { valid: false, reason: 'contains_unresolved_token' }
