@@ -3,12 +3,13 @@
 ## Current Position
 
 **Milestone:** v2.0 Review Follow-Up System
-**Phase:** 28 of 10 (Onboarding Redesign)
-**Plan:** 6 of 8 in Phase 28
+**Phase:** QA-AUDIT (Dashboard QA Test & UX Audit)
+**Plan:** 1 of 9 in Phase QA-AUDIT
 **Status:** In progress
-**Last activity:** 2026-02-05 - Completed 28-05-PLAN.md (Step Components 1-4) and 28-06-PLAN.md (Step Components 5-7)
+**Last activity:** 2026-02-05 - Completed QA-AUDIT-01-PLAN.md (Login & Onboarding Wizard Audit)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/10 phases complete or nearly complete)
+**QA Progress:** █░░░░░░░░ (1/9 audit plans complete)
 
 ## v2.0 Phase Status
 
@@ -224,14 +225,16 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 **Current blockers:**
 - Phase 21-08: Twilio A2P campaign approval required for production SMS testing
 - Phase 21-08: Webhook URLs must be configured in Twilio console after deployment
+- **QA-AUDIT C01:** Onboarding Step 1 fails with "phone column not in schema cache" - Phase 28 migration not applied to database. Blocks all new user onboarding.
 
 **Next actions:**
-- Phase 27 (Dashboard Redesign) -- can add unresolved feedback badge
+- Continue QA-AUDIT plans 02-08 (dashboard page audits)
+- Apply Phase 28 database migration to resolve C01
 - Wait for A2P approval before Phase 21-08 execution
-- Phase 28-29 after earlier phases complete
 
 ## Session Continuity
 
-**Last session:** 2026-02-05T05:09:40Z
-**Stopped at:** Completed 28-05-PLAN.md (Step Components 1-4)
+**Last session:** 2026-02-05T06:27:30Z
+**Stopped at:** Completed QA-AUDIT-01-PLAN.md (Login & Onboarding Wizard Audit)
 **Resume file:** None
+**QA test account:** audit-test@avisloop.com / AuditTest123!
