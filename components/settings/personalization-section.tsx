@@ -7,6 +7,13 @@ interface PersonalizationSectionProps {
   summary: PersonalizationSummary
 }
 
+/** Format a USD cost value for display. */
+function formatCost(cost: number): string {
+  if (cost < 0.01) return '<$0.01'
+  if (cost < 1) return `$${cost.toFixed(2)}`
+  return `$${cost.toFixed(2)}`
+}
+
 /**
  * Personalization stats section for the settings page.
  * Displays personalization rate, campaign sends, and LLM usage capacity.
@@ -23,7 +30,7 @@ export function PersonalizationSection({ summary }: PersonalizationSectionProps)
       </div>
 
       {/* Stats grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Personalization Rate */}
         <div className="rounded-lg border border-border p-4 bg-muted/30">
           <div className="text-sm font-medium text-muted-foreground mb-1">
@@ -63,6 +70,23 @@ export function PersonalizationSection({ summary }: PersonalizationSectionProps)
             )}
           </div>
         </div>
+
+        {/* Estimated Monthly Cost */}
+        <div className="rounded-lg border border-border p-4 bg-muted/30">
+          <div className="text-sm font-medium text-muted-foreground mb-1">
+            Est. Monthly Cost
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-2xl font-bold">
+              {summary.costEstimate.weeklyVolume > 0
+                ? formatCost(summary.costEstimate.estimatedMonthlyCost)
+                : '--'}
+            </span>
+            {summary.costEstimate.isProjection && summary.costEstimate.weeklyVolume > 0 && (
+              <span className="text-xs text-muted-foreground">(projected)</span>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Usage capacity bar (only if rate limiting is configured) */}
@@ -84,6 +108,14 @@ export function PersonalizationSection({ summary }: PersonalizationSectionProps)
             {usage.remaining} calls remaining
             {usage.resetAt && ` \u00b7 resets ${formatResetTime(usage.resetAt)}`}
           </div>
+          {summary.costEstimate.weeklyVolume > 0 && (
+            <div className="text-xs text-muted-foreground">
+              AI personalization cost is included in your plan — no additional charges.
+              {summary.costEstimate.costPerCall > 0 && (
+                <span> (~{formatCost(summary.costEstimate.costPerCall * 1000)}/1K messages)</span>
+              )}
+            </div>
+          )}
         </div>
       )}
 
