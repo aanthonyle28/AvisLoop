@@ -6,7 +6,7 @@
 **Phase:** 28 of 10 (Onboarding Redesign)
 **Plan:** 4 of 8 in Phase 28
 **Status:** In progress
-**Last activity:** 2026-02-05 - Completed 28-03-PLAN.md (Onboarding Server Actions)
+**Last activity:** 2026-02-05 - Completed 28-04-PLAN.md (7-Step Wizard Shell)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/10 phases complete or nearly complete)
 
@@ -91,6 +91,9 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | Step 3 sets both columns | 28-03 | saveServicesOffered sets service_types_enabled AND service_type_timing | Prevents incomplete state for campaign enrollment |
 | Wrapper for campaign duplication | 28-03 | createCampaignFromPreset wraps duplicateCampaign | Single source of truth, consistent API shape |
 | Zod issues array for errors | 28-03 | Use parsed.error.issues[0] not .errors[0] | Correct TypeScript API for ZodError |
+| Placeholder step components | 28-04 | PlaceholderStep for steps 3-7 during shell build | Enables parallel work on wizard shell vs step components |
+| Step 2 navigates forward | 28-04 | GoogleReviewLinkStep calls onGoToNext not onComplete | Mid-flow step behavior in 7-step wizard |
+| Existing client for presets | 28-04 | Use authenticated supabase client for preset fetch | RLS allows SELECT for system presets, no service role needed |
 
 ### Phase 27
 
