@@ -1,0 +1,218 @@
+'use client'
+
+import Link from 'next/link'
+import { Star, ChartBar, Target, TrendUp, TrendDown } from '@phosphor-icons/react'
+import { Card, InteractiveCard } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+import { cn } from '@/lib/utils'
+import type { DashboardKPIs } from '@/lib/types/dashboard'
+
+interface TrendIndicatorProps {
+  value: number
+  period: string
+  size?: 'default' | 'sm'
+}
+
+function TrendIndicator({ value, period, size = 'default' }: TrendIndicatorProps) {
+  // If value is zero, show muted dash for no meaningful data
+  if (value === 0) {
+    return (
+      <span className={cn(
+        "text-muted-foreground",
+        size === 'sm' ? 'text-xs' : 'text-sm'
+      )}>
+        —
+      </span>
+    )
+  }
+
+  const isPositive = value >= 0
+  const Icon = isPositive ? TrendUp : TrendDown
+  const colorClass = isPositive
+    ? 'text-green-600 dark:text-green-400'
+    : 'text-red-600 dark:text-red-400'
+
+  return (
+    <span className={cn(
+      'flex items-center gap-1',
+      colorClass,
+      size === 'sm' ? 'text-xs' : 'text-sm'
+    )}>
+      <Icon size={size === 'sm' ? 12 : 14} weight="bold" />
+      <span>{Math.abs(value)}% {period}</span>
+    </span>
+  )
+}
+
+interface KPIWidgetsProps {
+  data: DashboardKPIs
+}
+
+export function KPIWidgets({ data }: KPIWidgetsProps) {
+  return (
+    <div className="space-y-4 mb-6">
+      {/* Top row: Outcome metrics (large) */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Reviews This Month */}
+        <Link href="/history?status=reviewed" className="block">
+          <InteractiveCard className="p-6">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-medium text-muted-foreground">
+                Reviews This Month
+              </h3>
+              <Star size={20} weight="regular" className="text-muted-foreground" />
+            </div>
+            <div className="flex items-baseline gap-2 mb-1">
+              <span className="text-4xl font-bold">
+                {data.reviewsThisMonth.value}
+              </span>
+              <TrendIndicator
+                value={data.reviewsThisMonth.trend}
+                period="vs last month"
+              />
+            </div>
+          </InteractiveCard>
+        </Link>
+
+        {/* Average Rating */}
+        <Link href="/feedback" className="block">
+          <InteractiveCard className="p-6">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-medium text-muted-foreground">
+                Average Rating
+              </h3>
+              <ChartBar size={20} weight="regular" className="text-muted-foreground" />
+            </div>
+            <div className="flex items-baseline gap-2 mb-1">
+              <span className="text-4xl font-bold">
+                {data.averageRating.value.toFixed(1)}
+              </span>
+              <TrendIndicator
+                value={data.averageRating.trend}
+                period="vs last month"
+              />
+            </div>
+          </InteractiveCard>
+        </Link>
+
+        {/* Conversion Rate */}
+        <Link href="/history" className="block">
+          <InteractiveCard className="p-6">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-medium text-muted-foreground">
+                Conversion Rate
+              </h3>
+              <Target size={20} weight="regular" className="text-muted-foreground" />
+            </div>
+            <div className="flex items-baseline gap-2 mb-1">
+              <span className="text-4xl font-bold">
+                {data.conversionRate.value}%
+              </span>
+              <TrendIndicator
+                value={data.conversionRate.trend}
+                period="vs last month"
+              />
+            </div>
+          </InteractiveCard>
+        </Link>
+      </div>
+
+      {/* Bottom row: Pipeline metrics (smaller) */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {/* Requests Sent This Week */}
+        <Card className="p-4">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-xs font-medium text-muted-foreground">
+              Requests Sent This Week
+            </h3>
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-2xl font-bold">
+              {data.requestsSentThisWeek.value}
+            </span>
+            <TrendIndicator
+              value={data.requestsSentThisWeek.trend}
+              period="vs last week"
+              size="sm"
+            />
+          </div>
+        </Card>
+
+        {/* Active Sequences */}
+        <Card className="p-4">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-xs font-medium text-muted-foreground">
+              Active Sequences
+            </h3>
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-2xl font-bold">
+              {data.activeSequences.value}
+            </span>
+            <TrendIndicator
+              value={data.activeSequences.trend}
+              period="vs last week"
+              size="sm"
+            />
+          </div>
+        </Card>
+
+        {/* Pending / Queued */}
+        <Card className="p-4">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-xs font-medium text-muted-foreground">
+              Pending / Queued
+            </h3>
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-2xl font-bold">
+              {data.pendingQueued.value}
+            </span>
+            <TrendIndicator
+              value={data.pendingQueued.trend}
+              period="vs last week"
+              size="sm"
+            />
+          </div>
+        </Card>
+      </div>
+    </div>
+  )
+}
+
+export function KPIWidgetsSkeleton() {
+  return (
+    <div className="space-y-4 mb-6">
+      {/* Top row: Outcome metrics skeleton */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[1, 2, 3].map((i) => (
+          <Card key={i} className="p-6">
+            <div className="flex items-center justify-between mb-3">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-5 w-5 rounded-full" />
+            </div>
+            <div className="flex items-baseline gap-2 mb-1">
+              <Skeleton className="h-10 w-20" />
+              <Skeleton className="h-3 w-16" />
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      {/* Bottom row: Pipeline metrics skeleton */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {[1, 2, 3].map((i) => (
+          <Card key={i} className="p-4">
+            <div className="flex items-center justify-between mb-2">
+              <Skeleton className="h-3 w-28" />
+            </div>
+            <div className="flex items-baseline gap-2">
+              <Skeleton className="h-8 w-16" />
+              <Skeleton className="h-2 w-12" />
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  )
+}
