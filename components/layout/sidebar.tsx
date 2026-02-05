@@ -16,6 +16,8 @@ import {
   Briefcase,
   Megaphone,
   ChatCircleText,
+  House,
+  Plus,
 } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { AccountMenu } from './account-menu'
@@ -24,18 +26,20 @@ interface NavItem {
   icon: React.ElementType
   label: string
   href: string
+  badge?: number
 }
 
 const mainNav: NavItem[] = [
+  { icon: House, label: 'Dashboard', href: '/dashboard' },
   { icon: PaperPlaneTilt, label: 'Send', href: '/send' },
   { icon: AddressBook, label: 'Customers', href: '/customers' },
   { icon: Briefcase, label: 'Jobs', href: '/jobs' },
   { icon: Megaphone, label: 'Campaigns', href: '/campaigns' },
-  { icon: ClockCounterClockwise, label: 'Requests', href: '/history' },
+  { icon: ClockCounterClockwise, label: 'Activity', href: '/history' },
   { icon: ChatCircleText, label: 'Feedback', href: '/feedback' },
 ]
 
-export function Sidebar() {
+export function Sidebar({ dashboardBadge }: { dashboardBadge?: number } = {}) {
   const pathname = usePathname()
   const [isCollapsed, setIsCollapsed] = useLocalStorage('sidebarCollapsed', false)
 
@@ -73,7 +77,8 @@ export function Sidebar() {
           isActive
             ? "bg-[#F2F2F2] dark:bg-muted text-foreground"
             : "text-foreground/70 dark:text-muted-foreground hover:bg-[#F2F2F2]/70 dark:hover:bg-muted/70",
-          collapsed && "justify-center px-2"
+          collapsed && "justify-center px-2",
+          item.badge && "relative"
         )}
         title={collapsed ? item.label : undefined}
       >
@@ -86,6 +91,14 @@ export function Sidebar() {
           )}
         />
         {!collapsed && <span className="flex-1">{item.label}</span>}
+        {!collapsed && item.badge && item.badge > 0 && (
+          <span className="ml-auto bg-red-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5 min-w-[20px] text-center">
+            {item.badge > 99 ? '99+' : item.badge}
+          </span>
+        )}
+        {collapsed && item.badge && item.badge > 0 && (
+          <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full" />
+        )}
       </Link>
     )
   }
@@ -126,9 +139,31 @@ export function Sidebar() {
       {/* Main navigation */}
       <nav className="flex-1 p-3 space-y-1">
         {mainNav.map((item) => (
-          <NavLink key={item.href} item={item} />
+          <NavLink
+            key={item.href}
+            item={{
+              ...item,
+              badge: item.label === 'Dashboard' ? dashboardBadge : undefined,
+            }}
+          />
         ))}
       </nav>
+
+      {/* Add Job button */}
+      <div className="p-3 border-t border-[#E2E2E2] dark:border-border">
+        <Link href="/jobs?action=add">
+          <Button
+            variant="outline"
+            className={cn(
+              "w-full justify-start gap-2 text-sm",
+              collapsed && "justify-center px-2"
+            )}
+          >
+            <Plus size={16} weight="bold" />
+            {!collapsed && "Add Job"}
+          </Button>
+        </Link>
+      </div>
 
       {/* Footer with account dropdown */}
       <div className="p-3 border-t border-[#E2E2E2] dark:border-border">

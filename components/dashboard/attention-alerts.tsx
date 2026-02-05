@@ -19,7 +19,6 @@ import type { AttentionAlert } from '@/lib/types/dashboard'
 
 interface AttentionAlertsProps {
   alerts: AttentionAlert[]
-  feedbackCount: number
 }
 
 function SeverityIcon({ severity }: { severity: AttentionAlert['severity'] }) {
@@ -123,7 +122,7 @@ function AlertRow({ alert }: { alert: AttentionAlert }) {
   )
 }
 
-export function AttentionAlerts({ alerts, feedbackCount }: AttentionAlertsProps) {
+export function AttentionAlerts({ alerts }: AttentionAlertsProps) {
   const [expanded, setExpanded] = useState(false)
 
   const displayedAlerts = expanded ? alerts : alerts.slice(0, 3)

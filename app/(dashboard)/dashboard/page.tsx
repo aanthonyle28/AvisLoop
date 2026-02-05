@@ -5,7 +5,6 @@ import {
   getReadyToSendJobs,
   getAttentionAlerts,
 } from '@/lib/data/dashboard'
-import { getUnresolvedFeedbackCount } from '@/lib/data/feedback'
 import { getJobCounts } from '@/lib/data/jobs'
 import { redirect } from 'next/navigation'
 
@@ -39,11 +38,10 @@ export default async function DashboardPage() {
   }
 
   // Fetch all dashboard data in parallel
-  const [kpiData, readyJobs, alerts, feedbackCount, jobCounts] = await Promise.all([
+  const [kpiData, readyJobs, alerts, jobCounts] = await Promise.all([
     getDashboardKPIs(business.id),
     getReadyToSendJobs(business.id, serviceTypeTiming),
     getAttentionAlerts(business.id),
-    getUnresolvedFeedbackCount(business.id),
     getJobCounts(),
   ])
 
@@ -59,10 +57,7 @@ export default async function DashboardPage() {
         jobs={readyJobs}
         hasJobHistory={jobCounts.total > 0}
       />
-      <AttentionAlerts
-        alerts={alerts}
-        feedbackCount={feedbackCount}
-      />
+      <AttentionAlerts alerts={alerts} />
     </div>
   )
 }

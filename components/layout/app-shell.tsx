@@ -15,16 +15,17 @@ interface AppShellProps {
     contactCount: number
     isAllComplete: boolean
   } | null
+  dashboardBadge?: number
 }
 
-export function AppShell({ children, pageTitle, setupProgress }: AppShellProps) {
+export function AppShell({ children, pageTitle, setupProgress, dashboardBadge }: AppShellProps) {
   return (
     <div className="flex min-h-screen bg-[#F9F9F9] dark:bg-background">
       {/* Navigation progress bar */}
       <NavigationProgressBar />
 
       {/* Desktop sidebar */}
-      <Sidebar />
+      <Sidebar dashboardBadge={dashboardBadge} />
 
       {/* Main content area */}
       <main className="flex-1 overflow-auto">
