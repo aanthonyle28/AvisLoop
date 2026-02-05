@@ -4,9 +4,9 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** 27 of 10 (Dashboard Redesign)
-**Plan:** 1 of 7 in Phase 27
+**Plan:** 2 of 7 in Phase 27
 **Status:** In progress
-**Last activity:** 2026-02-04 - Completed 27-01-PLAN.md (Dashboard Data Layer)
+**Last activity:** 2026-02-04 - Completed 27-02-PLAN.md (Action Summary Banner and KPI Widgets)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/10 phases complete or nearly complete)
 
@@ -21,7 +21,7 @@
 | 24 | Multi-Touch Campaign Engine | Complete (11/11 plans) |
 | 25 | LLM Personalization | Complete (11/11 plans) |
 | 26 | Review Funnel | Complete (7/7 plans) |
-| 27 | Dashboard Redesign | In progress (1/7 plans) |
+| 27 | Dashboard Redesign | In progress (2/7 plans) |
 | 28 | Onboarding Redesign | Not started |
 | 29 | Agency-Mode Readiness & Landing Page | Not started |
 
@@ -82,6 +82,11 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | Internal auth for counts | 27-01 | getDashboardCounts takes no businessId parameter | Matches getMonthlyUsage pattern for nav badge |
 | Parallel KPI queries | 27-01 | All KPI queries wrapped in Promise.all | Eliminates waterfalls, ~11x performance improvement |
 | Context-aware trend periods | 27-01 | Activity metrics weekly, outcome metrics monthly | Matches CONTEXT.md decision for meaningful trends |
+| All-clear banner state | 27-02 | Green banner with CheckCircle when no items | Non-interactive, communicates system health |
+| Items-pending banner state | 27-02 | Yellow banner with WarningCircle, clickable | Scrolls to ready-to-send or alerts section |
+| Two-tier KPI sizing | 27-02 | Outcome text-4xl, pipeline text-2xl | Emphasizes business outcomes over pipeline activity |
+| Clickable outcome cards only | 27-02 | Outcome cards wrapped in Link, pipeline cards static | Outcomes have meaningful detail pages |
+| Zero trend display | 27-02 | Show muted dash instead of 0% | Cleaner UI, avoids implying data when no change |
 
 ### Phase 26
 
@@ -183,6 +188,6 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 
 ## Session Continuity
 
-**Last session:** 2026-02-04T00:30:00Z
-**Stopped at:** Completed 27-01-PLAN.md (Dashboard Data Layer)
+**Last session:** 2026-02-04T21:20:00Z
+**Stopped at:** Completed 27-02-PLAN.md (Action Summary Banner and KPI Widgets)
 **Resume file:** None
