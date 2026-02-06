@@ -4,12 +4,12 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** QA-AUDIT (Dashboard QA Test & UX Audit)
-**Plan:** 7 of 9 in Phase QA-AUDIT
+**Plan:** 8 of 9 in Phase QA-AUDIT
 **Status:** In progress
-**Last activity:** 2026-02-06 - Completed QA-AUDIT-07-PLAN.md (History, Billing, Settings Page Audit)
+**Last activity:** 2026-02-06 - Completed QA-AUDIT-08-PLAN.md (Cross-Cutting Concerns Audit)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/10 phases complete or nearly complete)
-**QA Progress:** ███████░░ (7/9 audit plans complete)
+**QA Progress:** ████████░ (8/9 audit plans complete)
 
 ## v2.0 Phase Status
 
@@ -244,18 +244,30 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 - **VERIFIED OK:** Settings section "Message Templates" naming is correct
 - **VERIFIED OK:** Billing accessible via Account menu
 
+**QA-AUDIT findings (Plan 08):**
+- **M08-01:** /scheduled route is orphaned (not linked from nav, V1 feature)
+- **M08-02:** Navigation order not V2-aligned (Send too prominent, Jobs/Campaigns too buried)
+- **M08-03:** 47 user-facing "contact" terminology instances across codebase
+- **M08-04:** 41 files use lucide-react instead of Phosphor icons
+- **M08-05:** /components/contacts/ folder is legacy duplicate (10 files)
+- **VERIFIED OK:** /contacts redirect works correctly (keep for backward compat)
+- **VERIFIED OK:** Theme toggle works from any page, persists correctly
+- **VERIFIED OK:** Hardcoded colors all have dark mode variants
+
 **Next actions:**
-- Continue QA-AUDIT plans 08-09 (remaining audits)
+- Complete QA-AUDIT-09 (Final Report compilation)
 - Apply Phase 28 database migration to resolve C01
 - Create analytics RPC migration to resolve C02
-- Fix legacy terminology (14+ user-facing changes across files)
-- Migrate all lucide-react components to Phosphor icons
-- Delete /components/contacts/ folder
+- Remove /scheduled route and related files
+- Reorder navigation for V2 alignment
+- Fix legacy terminology (47+ user-facing changes)
+- Migrate all lucide-react components to Phosphor icons (41 files)
+- Delete /components/contacts/ folder (10 files)
 - Wait for A2P approval before Phase 21-08 execution
 
 ## Session Continuity
 
-**Last session:** 2026-02-06T01:06:00Z
-**Stopped at:** Completed QA-AUDIT-07-PLAN.md (History, Billing, Settings Page Audit)
+**Last session:** 2026-02-06T01:05:00Z
+**Stopped at:** Completed QA-AUDIT-08-PLAN.md (Cross-Cutting Concerns Audit)
 **Resume file:** None
 **QA test account:** audit-test@avisloop.com / AuditTest123!
