@@ -4,12 +4,12 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** QA-AUDIT (Dashboard QA Test & UX Audit)
-**Plan:** 5 of 9 in Phase QA-AUDIT
+**Plan:** 6 of 9 in Phase QA-AUDIT
 **Status:** In progress
-**Last activity:** 2026-02-06 - Completed QA-AUDIT-05-PLAN.md (Send Page Audit)
+**Last activity:** 2026-02-06 - Completed QA-AUDIT-06-PLAN.md (Customers + Feedback Page Audit)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/10 phases complete or nearly complete)
-**QA Progress:** █████░░░░ (5/9 audit plans complete)
+**QA Progress:** ██████░░░ (6/9 audit plans complete)
 
 ## v2.0 Phase Status
 
@@ -228,15 +228,24 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 - **QA-AUDIT C01:** Onboarding Step 1 fails with "phone column not in schema cache" - Phase 28 migration not applied to database. Blocks all new user onboarding.
 - **QA-AUDIT C02:** Analytics page missing `get_service_type_analytics` RPC function - Migration file never created. Analytics displays empty data.
 
+**QA-AUDIT findings (Plan 06):**
+- **C06-01 to C06-06:** Customers page has 7+ legacy "contact" terminology issues (user-facing text)
+- **C06-07:** Feedback page uses lucide-react icons instead of Phosphor
+- **M06-01:** Legacy /components/contacts/ folder exists (10 duplicate files)
+- **M06-02 to M06-03:** 11 files use lucide-react instead of Phosphor
+
 **Next actions:**
-- Continue QA-AUDIT plans 05-09 (remaining page audits)
+- Continue QA-AUDIT plans 07-09 (remaining page audits)
 - Apply Phase 28 database migration to resolve C01
 - Create analytics RPC migration to resolve C02
+- Fix legacy terminology (6 user-facing changes in 4 files)
+- Migrate feedback components to Phosphor icons
+- Delete /components/contacts/ folder
 - Wait for A2P approval before Phase 21-08 execution
 
 ## Session Continuity
 
-**Last session:** 2026-02-06T00:50:00Z
-**Stopped at:** Completed QA-AUDIT-05-PLAN.md (Send Page Audit)
+**Last session:** 2026-02-06T00:55:00Z
+**Stopped at:** Completed QA-AUDIT-06-PLAN.md (Customers + Feedback Page Audit)
 **Resume file:** None
 **QA test account:** audit-test@avisloop.com / AuditTest123!
