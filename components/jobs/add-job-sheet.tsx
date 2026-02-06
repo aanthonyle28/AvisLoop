@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Loader2 } from 'lucide-react'
+import { CircleNotch } from '@phosphor-icons/react'
 import {
   Sheet,
   SheetContent,
@@ -11,14 +11,22 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
-import { CustomerSelector } from './customer-selector'
+import { CustomerAutocomplete } from './customer-autocomplete'
 import { ServiceTypeSelect } from './service-type-select'
 import { createJob, type JobActionState } from '@/lib/actions/job'
-import { JOB_STATUSES, JOB_STATUS_LABELS } from '@/lib/validations/job'
-import type { Customer, ServiceType, JobStatus } from '@/lib/types/database'
+import { JOB_STATUSES, JOB_STATUS_LABELS, JOB_STATUS_DESCRIPTIONS } from '@/lib/validations/job'
+import type { ServiceType, JobStatus } from '@/lib/types/database'
+
+interface Customer {
+  id: string
+  name: string
+  email: string
+  phone?: string | null
+}
 
 interface AddJobSheetProps {
   open: boolean
@@ -32,19 +40,33 @@ export function AddJobSheet({ open, onOpenChange, customers }: AddJobSheetProps)
     null
   )
 
-  // Local state for controlled components
-  const [customerId, setCustomerId] = useState<string | null>(null)
+  // Mode: 'search' for autocomplete, 'create' for inline customer creation
+  const [mode, setMode] = useState<'search' | 'create'>('search')
+
+  // Selected existing customer (null if creating new)
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
+
+  // New customer fields (used in 'create' mode)
+  const [customerName, setCustomerName] = useState('')
+  const [customerEmail, setCustomerEmail] = useState('')
+  const [customerPhone, setCustomerPhone] = useState('')
+
+  // Job fields
   const [serviceType, setServiceType] = useState<ServiceType | ''>('')
-  const [status, setStatus] = useState<JobStatus>('completed')
+  const [status, setStatus] = useState<JobStatus>('scheduled')
   const [notes, setNotes] = useState('')
   const [enrollInCampaign, setEnrollInCampaign] = useState(true)
 
   // Reset form when sheet closes
   useEffect(() => {
     if (!open) {
-      setCustomerId(null)
+      setMode('search')
+      setSelectedCustomer(null)
+      setCustomerName('')
+      setCustomerEmail('')
+      setCustomerPhone('')
       setServiceType('')
-      setStatus('completed')
+      setStatus('scheduled')
       setNotes('')
       setEnrollInCampaign(true)
     }
@@ -60,17 +82,48 @@ export function AddJobSheet({ open, onOpenChange, customers }: AddJobSheetProps)
     }
   }, [state, onOpenChange])
 
+  const handleSelectCustomer = (customer: Customer | null) => {
+    setSelectedCustomer(customer)
+    if (customer) {
+      setMode('search')
+    }
+  }
+
+  const handleCreateNew = (name: string) => {
+    setMode('create')
+    setCustomerName(name)
+    setSelectedCustomer(null)
+  }
+
+  const handleBackToSearch = () => {
+    setMode('search')
+    setCustomerName('')
+    setCustomerEmail('')
+    setCustomerPhone('')
+  }
+
   const handleSubmit = (formData: FormData) => {
-    // Add controlled values to formData
-    if (customerId) formData.set('customerId', customerId)
-    if (serviceType) formData.set('serviceType', serviceType)
+    // Add form values to FormData
+    if (selectedCustomer) {
+      formData.set('customerId', selectedCustomer.id)
+    } else if (mode === 'create') {
+      formData.set('customerName', customerName)
+      formData.set('customerEmail', customerEmail)
+      formData.set('customerPhone', customerPhone)
+    }
+
+    formData.set('serviceType', serviceType)
     formData.set('status', status)
     formData.set('notes', notes)
+
     if (status === 'completed') {
       formData.set('enrollInCampaign', enrollInCampaign.toString())
     }
+
     formAction(formData)
   }
+
+  const isCustomerValid = selectedCustomer || (mode === 'create' && customerName && customerEmail)
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -78,23 +131,78 @@ export function AddJobSheet({ open, onOpenChange, customers }: AddJobSheetProps)
         <SheetHeader>
           <SheetTitle>Add Job</SheetTitle>
           <SheetDescription>
-            Create a new job for a customer. Completed jobs will be enrolled in campaigns.
+            Create a new job. {status === 'scheduled' ? 'Mark complete later when work is done.' : 'Completed jobs are enrolled in campaigns.'}
           </SheetDescription>
         </SheetHeader>
 
         <form action={handleSubmit} className="mt-6 space-y-4">
-          {/* Customer selector */}
+          {/* Customer Section - Autocomplete or Inline Create */}
           <div className="space-y-2">
             <Label>Customer *</Label>
-            <CustomerSelector
-              customers={customers}
-              value={customerId}
-              onChange={setCustomerId}
-              error={state?.fieldErrors?.customerId?.[0]}
-            />
+
+            {mode === 'search' ? (
+              <CustomerAutocomplete
+                customers={customers}
+                value={selectedCustomer}
+                onChange={handleSelectCustomer}
+                onCreateNew={handleCreateNew}
+                error={state?.fieldErrors?.customerId?.[0]}
+              />
+            ) : (
+              <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
+                <p className="text-sm font-medium">New Customer</p>
+
+                <div className="space-y-2">
+                  <Label htmlFor="customerName">Name *</Label>
+                  <Input
+                    id="customerName"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    placeholder="Customer name"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="customerEmail">Email *</Label>
+                  <Input
+                    id="customerEmail"
+                    type="email"
+                    value={customerEmail}
+                    onChange={(e) => setCustomerEmail(e.target.value)}
+                    placeholder="customer@email.com"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="customerPhone">Phone (optional)</Label>
+                  <Input
+                    id="customerPhone"
+                    type="tel"
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    placeholder="+1 (555) 123-4567"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Required for SMS review requests
+                  </p>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleBackToSearch}
+                  className="mt-2"
+                >
+                  Or select existing customer
+                </Button>
+              </div>
+            )}
           </div>
 
-          {/* Service type */}
+          {/* Service Type */}
           <div className="space-y-2">
             <Label>Service Type *</Label>
             <ServiceTypeSelect
@@ -119,9 +227,7 @@ export function AddJobSheet({ open, onOpenChange, customers }: AddJobSheetProps)
               ))}
             </select>
             <p className="text-xs text-muted-foreground">
-              {status === 'completed'
-                ? 'Completed jobs will be enrolled in campaigns automatically.'
-                : 'Do Not Send jobs will not trigger review requests.'}
+              {JOB_STATUS_DESCRIPTIONS[status]}
             </p>
           </div>
 
@@ -167,8 +273,8 @@ export function AddJobSheet({ open, onOpenChange, customers }: AddJobSheetProps)
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending || !customerId || !serviceType}>
-              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Button type="submit" disabled={isPending || !isCustomerValid || !serviceType}>
+              {isPending && <CircleNotch className="mr-2 h-4 w-4 animate-spin" />}
               Create Job
             </Button>
           </div>

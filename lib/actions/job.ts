@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { jobSchema } from '@/lib/validations/job'
 import { enrollJobInCampaign } from '@/lib/actions/enrollment'
+import { parseAndValidatePhone } from '@/lib/utils/phone'
 
 export type JobActionState = {
   error?: string
@@ -14,8 +15,9 @@ export type JobActionState = {
 
 /**
  * Create a new job for the user's business.
- * Validates customer belongs to same business.
- * V2: Default status is 'scheduled' (work not yet done)
+ * V2: Supports two modes:
+ * 1. Existing customer (customerId provided)
+ * 2. New customer inline (customerName + customerEmail + optional customerPhone)
  */
 export async function createJob(
   _prevState: JobActionState | null,
@@ -40,27 +42,86 @@ export async function createJob(
     return { error: 'Please create a business profile first' }
   }
 
-  // Parse and validate input
-  // V2: Default status is 'scheduled' if not provided
+  // Extract form data
+  const customerId = formData.get('customerId') as string | null
+  const customerName = formData.get('customerName') as string | null
+  const customerEmail = formData.get('customerEmail') as string | null
+  const customerPhone = formData.get('customerPhone') as string | null
+  const serviceType = formData.get('serviceType') as string
+  const status = formData.get('status') as string || 'scheduled'
+  const notes = formData.get('notes') as string || ''
+  const enrollInCampaignValue = formData.get('enrollInCampaign')
+  const enrollInCampaign = enrollInCampaignValue === 'true' || enrollInCampaignValue === null
+
+  // Determine customer ID - either existing or create new
+  let finalCustomerId = customerId
+
+  if (!customerId && customerName && customerEmail) {
+    // Check if customer already exists with this email
+    const { data: existingCustomer } = await supabase
+      .from('customers')
+      .select('id')
+      .eq('business_id', business.id)
+      .eq('email', customerEmail.toLowerCase().trim())
+      .single()
+
+    if (existingCustomer) {
+      // Customer already exists with this email - use existing
+      finalCustomerId = existingCustomer.id
+    } else {
+      // Create new customer as side effect
+      const phoneResult = customerPhone ? parseAndValidatePhone(customerPhone) : null
+
+      const { data: newCustomer, error: customerError } = await supabase
+        .from('customers')
+        .insert({
+          business_id: business.id,
+          name: customerName.trim(),
+          email: customerEmail.toLowerCase().trim(),
+          phone: phoneResult?.e164 || customerPhone || null,
+          phone_status: phoneResult?.status || 'missing',
+          status: 'active',
+          opted_out: false,
+          sms_consent_status: 'unknown',
+          tags: [],
+        })
+        .select('id')
+        .single()
+
+      if (customerError || !newCustomer) {
+        console.error('Error creating customer:', customerError)
+        return { error: 'Failed to create customer' }
+      }
+
+      finalCustomerId = newCustomer.id
+    }
+  }
+
+  if (!finalCustomerId) {
+    return {
+      error: 'Customer is required',
+      fieldErrors: { customerId: ['Please select or create a customer'] }
+    }
+  }
+
+  // Validate job fields
   const parsed = jobSchema.safeParse({
-    customerId: formData.get('customerId'),
-    serviceType: formData.get('serviceType'),
-    status: formData.get('status') || 'scheduled',
-    notes: formData.get('notes') || '',
-    enrollInCampaign: formData.get('enrollInCampaign') === 'true' || formData.get('enrollInCampaign') === null,
+    customerId: finalCustomerId,
+    serviceType,
+    status,
+    notes,
+    enrollInCampaign,
   })
 
   if (!parsed.success) {
     return { fieldErrors: parsed.error.flatten().fieldErrors }
   }
 
-  const { customerId, serviceType, status, notes, enrollInCampaign } = parsed.data
-
   // Validate customer belongs to this business (prevent cross-tenant data leak)
   const { data: customer, error: customerError } = await supabase
     .from('customers')
     .select('id')
-    .eq('id', customerId)
+    .eq('id', finalCustomerId)
     .eq('business_id', business.id)
     .single()
 
@@ -73,11 +134,11 @@ export async function createJob(
     .from('jobs')
     .insert({
       business_id: business.id,
-      customer_id: customerId,
-      service_type: serviceType,
-      status,
-      notes: notes || null,
-      completed_at: status === 'completed' ? new Date().toISOString() : null,
+      customer_id: finalCustomerId,
+      service_type: parsed.data.serviceType,
+      status: parsed.data.status,
+      notes: parsed.data.notes || null,
+      completed_at: parsed.data.status === 'completed' ? new Date().toISOString() : null,
     })
     .select('id')
     .single()
@@ -87,22 +148,16 @@ export async function createJob(
   }
 
   // Enroll in campaign if status is 'completed' and enrollInCampaign is true
-  if (status === 'completed' && enrollInCampaign !== false) {
-    // enrollInCampaign defaults to true if not specified
-    // enrollJobInCampaign handles:
-    // - Finding matching campaign (service-type specific or "all services")
-    // - Checking 30-day cooldown
-    // - Canceling existing enrollments (repeat job)
-    // - Calculating touch 1 timing from business's service_type_timing (SVCT-03)
+  if (parsed.data.status === 'completed' && parsed.data.enrollInCampaign !== false) {
     const enrollResult = await enrollJobInCampaign(newJob.id)
-
-    // Don't fail the job creation if enrollment fails - just log
     if (!enrollResult.success && !enrollResult.skipped) {
       console.warn('Enrollment failed:', enrollResult.error)
     }
   }
 
   revalidatePath('/jobs')
+  revalidatePath('/customers')
+  revalidatePath('/dashboard')
   return { success: true, data: { id: newJob.id } }
 }
 
@@ -201,15 +256,7 @@ export async function updateJob(
 
   // Enroll in campaign if status changed to 'completed' and enrollInCampaign is true
   if (status === 'completed' && currentJob?.status !== 'completed' && enrollInCampaign !== false) {
-    // enrollInCampaign defaults to true if not specified
-    // enrollJobInCampaign handles:
-    // - Finding matching campaign (service-type specific or "all services")
-    // - Checking 30-day cooldown
-    // - Canceling existing enrollments (repeat job)
-    // - Calculating touch 1 timing from business's service_type_timing (SVCT-03)
     const enrollResult = await enrollJobInCampaign(jobId)
-
-    // Don't fail the job update if enrollment fails - just log
     if (!enrollResult.success && !enrollResult.skipped) {
       console.warn('Enrollment failed:', enrollResult.error)
     }
