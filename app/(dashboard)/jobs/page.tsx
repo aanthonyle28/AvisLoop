@@ -1,7 +1,9 @@
 import { Suspense } from 'react'
 import { getJobs } from '@/lib/data/jobs'
 import { getCustomers } from '@/lib/actions/customer'
+import { getMatchingCampaignsForJobs } from '@/lib/data/campaign'
 import { JobsClient } from '@/components/jobs/jobs-client'
+import type { ServiceType } from '@/lib/types/database'
 
 export const metadata = {
   title: 'Jobs',
@@ -9,11 +11,27 @@ export const metadata = {
 }
 
 async function JobsContent() {
-  const [{ jobs, total }, { customers }] = await Promise.all([
+  const [{ jobs, total, businessId }, { customers }] = await Promise.all([
     getJobs(),
     getCustomers({ limit: 200 }), // For customer selector in add/edit forms
   ])
-  return <JobsClient initialJobs={jobs} totalJobs={total} customers={customers} />
+
+  // Get unique service types from jobs for campaign preview
+  const serviceTypes = [...new Set(jobs.map(j => j.service_type))] as ServiceType[]
+
+  // Fetch matching campaigns for enrollment preview (only if we have businessId and jobs)
+  const campaignMap = businessId && serviceTypes.length > 0
+    ? await getMatchingCampaignsForJobs(businessId, serviceTypes)
+    : new Map<string, { campaignName: string; firstTouchDelay: number }>()
+
+  return (
+    <JobsClient
+      initialJobs={jobs}
+      totalJobs={total}
+      customers={customers}
+      campaignMap={campaignMap}
+    />
+  )
 }
 
 export default function JobsPage() {
