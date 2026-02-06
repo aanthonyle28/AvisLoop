@@ -4,13 +4,13 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** 30.1 - Audit Gap Remediation
-**Plan:** 2 of 8
+**Plan:** 3 of 8
 **Status:** **IN PROGRESS**
-**Last activity:** 2026-02-06 - Completed 30.1-01-PLAN.md (Table skeleton loaders) and 30.1-02-PLAN.md (Send -> Manual Request)
+**Last activity:** 2026-02-06 - Completed 30.1-03-PLAN.md (Campaign enrollment preview)
 
 **v2.0 Progress:** █████████████████████░░░ (9/11 phases complete)
 **Phase 30 Progress:** ██████████ (10/10 plans) COMPLETE
-**Phase 30.1 Progress:** ██░░░░░░░░ (2/8 plans)
+**Phase 30.1 Progress:** ███░░░░░░░ (3/8 plans)
 
 ## v2.0 Phase Status
 
@@ -373,12 +373,14 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | Send page friction banner | 30.1-02 | Warning message discourages manual sends | V2 philosophy: campaigns preferred |
 | "Manual Request" rename | 30.1-02 | Clear messaging that this is escape hatch | Sidebar + bottom nav labels |
 | Enrollment preview on jobs | 30.1-03 | Shows "Will enroll in X in Y hours" | V2 feedback loop for automation |
+| Batch campaign lookup | 30.1-03 | getMatchingCampaignsForJobs fetches all active campaigns once | Efficiency for multiple service types |
+| Timing display threshold | 30.1-03 | Hours if < 24h, days if >= 24h (rounded) | Clear time expectations |
 | Server-side pagination | 30.1-04 | Campaign enrollments can be large | Cursor-based pagination |
 
 ## Session Continuity
 
 **Last session:** 2026-02-06
-**Stopped at:** Completed 30.1-01-PLAN.md (Table skeleton loaders) and 30.1-02-PLAN.md (Send -> Manual Request)
+**Stopped at:** Completed 30.1-03-PLAN.md (Campaign enrollment preview)
 **Resume file:** None
 **QA test account:** audit-test@avisloop.com / AuditTest123!
 **QA Report:** docs/QA-AUDIT.md
