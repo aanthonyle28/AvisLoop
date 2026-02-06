@@ -34,14 +34,14 @@ interface BulkSendTabProps {
   templates: MessageTemplate[]
   monthlyUsage: { count: number; limit: number; tier: string }
   hasReviewLink: boolean
-  resendReadyContactIds: string[]
+  resendReadyCustomerIds: string[]
 }
 
 export function BulkSendTab({
   customers,
   templates,
   hasReviewLink,
-  resendReadyContactIds,
+  resendReadyCustomerIds,
 }: BulkSendTabProps) {
   // Template + Schedule state
   const [selectedTemplateId, setSelectedTemplateId] = useState(
@@ -125,8 +125,8 @@ export function BulkSendTab({
 
   // Create columns with resend ready IDs
   const resendReadySet = useMemo(
-    () => new Set(resendReadyContactIds),
-    [resendReadyContactIds]
+    () => new Set(resendReadyCustomerIds),
+    [resendReadyCustomerIds]
   )
 
   const columns = useMemo(

@@ -21,7 +21,7 @@ interface SendPageClientProps {
   hasReviewLink: boolean
   recentActivity: RecentActivity[]
   recentActivityFull: SendLogWithCustomer[]
-  resendReadyContactIds: string[]
+  resendReadyCustomerIds: string[]
   displayName: string
   showStats: boolean
   usage: { count: number; limit: number; tier: string }
@@ -37,7 +37,7 @@ export function SendPageClient({
   hasReviewLink,
   recentActivity,
   recentActivityFull,
-  resendReadyContactIds,
+  resendReadyCustomerIds,
   displayName,
   showStats,
   usage,
@@ -142,7 +142,7 @@ export function SendPageClient({
           templates={templates}
           monthlyUsage={monthlyUsage}
           hasReviewLink={hasReviewLink}
-          resendReadyContactIds={resendReadyContactIds}
+          resendReadyCustomerIds={resendReadyCustomerIds}
         />
       </TabsContent>
 

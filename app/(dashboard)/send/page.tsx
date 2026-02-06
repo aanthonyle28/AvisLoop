@@ -1,9 +1,13 @@
 import { getBusiness } from '@/lib/actions/business'
 import { getCustomers } from '@/lib/actions/customer'
-import { getMonthlyUsage, getResponseRate, getNeedsAttentionCount, getRecentActivity, getRecentActivityFull, getResendReadyContacts } from '@/lib/data/send-logs'
+import { getMonthlyUsage, getResponseRate, getNeedsAttentionCount, getRecentActivity, getRecentActivityFull, getResendReadyCustomers } from '@/lib/data/send-logs'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { SendPageClient } from '@/components/send/send-page-client'
+
+export const metadata = {
+  title: 'Send',
+}
 
 export default async function SendPage() {
   const business = await getBusiness()
@@ -22,7 +26,7 @@ export default async function SendPage() {
     needsAttention,
     recentActivity,
     recentActivityFull,
-    resendReadyContacts,
+    resendReadyCustomers,
   ] = await Promise.all([
     getCustomers({ limit: 200 }),
     getMonthlyUsage(),
@@ -30,13 +34,13 @@ export default async function SendPage() {
     getNeedsAttentionCount(),
     getRecentActivity(5),
     getRecentActivityFull(5),
-    getResendReadyContacts(supabase, business.id),
+    getResendReadyCustomers(supabase, business.id),
   ])
 
   const hasReviewLink = !!business.google_review_link
   // Filter for email templates only (SMS in Phase 21)
   const templates = (business.message_templates || []).filter((t: { channel: string }) => t.channel === 'email')
-  const resendReadyContactIds = resendReadyContacts.map((c: { id: string }) => c.id)
+  const resendReadyCustomerIds = resendReadyCustomers.map((c: { id: string }) => c.id)
 
   const displayName = business.default_sender_name || business.name || 'there'
 
@@ -50,7 +54,7 @@ export default async function SendPage() {
         hasReviewLink={hasReviewLink}
         recentActivity={recentActivity}
         recentActivityFull={recentActivityFull}
-        resendReadyContactIds={resendReadyContactIds}
+        resendReadyCustomerIds={resendReadyCustomerIds}
         displayName={displayName}
         showStats={true}
         usage={monthlyUsage}

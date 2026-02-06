@@ -226,15 +226,15 @@ export async function getResponseRate(): Promise<{
 }
 
 /**
- * Get contacts whose cooldown has expired and are ready to re-send.
- * Returns contacts that:
+ * Get customers whose cooldown has expired and are ready to re-send.
+ * Returns customers that:
  * - Belong to the specified business
  * - Are active (not archived)
  * - Have not opted out
  * - Have been sent to before (last_sent_at is not null)
  * - Cooldown period has expired (last_sent_at < now - COOLDOWN_DAYS)
  */
-export async function getResendReadyContacts(
+export async function getResendReadyCustomers(
   supabase: Awaited<ReturnType<typeof createClient>>,
   businessId: string
 ): Promise<Array<{
