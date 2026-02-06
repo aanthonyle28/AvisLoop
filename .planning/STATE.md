@@ -3,13 +3,13 @@
 ## Current Position
 
 **Milestone:** v2.0 Review Follow-Up System
-**Phase:** 31 - Landing Page V2 Rewrite
-**Plan:** 04 of 7 (Wave 1 in progress)
-**Status:** **EXECUTING**
-**Last activity:** 2026-02-06 - Completed 31-04-PLAN.md (FAQ, testimonials, CTA, pricing V2 update)
+**Phase:** 30 - V2 Alignment & Audit Remediation
+**Plan:** 08 of 10
+**Status:** **COMPLETE**
+**Last activity:** 2026-02-06 - Completed 30-08-PLAN.md (Mobile FAB for job creation)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/11 phases complete)
-**Phase 31 Progress:** ████░░░░ (4/7 plans)
+**Phase 30 Progress:** ████████░░ (8/10 plans)
 
 ## v2.0 Phase Status
 
@@ -22,11 +22,11 @@
 | 24 | Multi-Touch Campaign Engine | Complete (11/11 plans) |
 | 25 | LLM Personalization | Complete (11/11 plans) |
 | 26 | Review Funnel | Complete (7/7 plans) |
-| 27 | Dashboard Redesign | Planned (0/7 plans) |
-| 28 | Onboarding Redesign | Planned (0/8 plans) |
+| 27 | Dashboard Redesign | Complete |
+| 28 | Onboarding Redesign | Complete |
 | 29 | Agency-Mode Readiness & Landing Page | Not started |
-| 30 | V2 Alignment & Audit Remediation | Ready to plan (0/8 plans) |
-| **31** | **Landing Page V2 Rewrite** | **IN PROGRESS** (1/7 plans) |
+| **30** | **V2 Alignment & Audit Remediation** | **IN PROGRESS** (8/10 plans) |
+| 31 | Landing Page V2 Rewrite | IN PROGRESS (4/7 plans) |
 | QA-AUDIT | Dashboard QA Test & UX Audit | Complete (9/9 plans) |
 | QA-FIX | Audit Remediation | Complete (5/5 plans) |
 
@@ -336,6 +336,15 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | Customer type consistency | QA-FIX-05 | Contact -> Customer in Send components | Completes Phase 20 type migration |
 | Function rename | QA-FIX-05 | getResendReadyContacts -> getResendReadyCustomers | Matches Customer type naming |
 
+### Phase 30
+
+| Decision | Phase | Impact | Constraint |
+|----------|-------|--------|------------|
+| 56x56px FAB size | 30-08 | iOS standard, exceeds 44px WCAG minimum | Optimal touch target for mobile |
+| bottom-20 FAB positioning | 30-08 | 80px from bottom (72px nav + 8px margin) | FAB doesn't overlap bottom navigation |
+| Hide FAB on Jobs page | 30-08 | Jobs page has Add Job header button | Prevents duplicate CTAs on same page |
+| md:hidden responsive | 30-08 | Desktop has sidebar Add Job button | Single Add Job CTA per viewport size |
+
 ### Phase 31
 
 | Decision | Phase | Impact | Constraint |
@@ -353,8 +362,8 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 
 ## Session Continuity
 
-**Last session:** 2026-02-06T06:10:00Z
-**Stopped at:** Completed 31-04-PLAN.md
+**Last session:** 2026-02-06T09:22:14Z
+**Stopped at:** Completed 30-08-PLAN.md (Mobile FAB for job creation)
 **Resume file:** None
 **QA test account:** audit-test@avisloop.com / AuditTest123!
 **QA Report:** docs/QA-AUDIT.md
