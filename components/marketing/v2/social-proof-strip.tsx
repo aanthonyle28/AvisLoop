@@ -2,7 +2,7 @@ import { FadeIn } from "@/components/ui/fade-in";
 import { GeometricMarker } from "@/components/ui/geometric-marker";
 
 export function SocialProofStrip() {
-  const industries = ["Dentists", "Salons", "Contractors", "Gyms", "Restaurants", "Clinics"];
+  const industries = ["HVAC", "Plumbing", "Electrical", "Roofing", "Cleaning", "Painting"];
   const colors: Array<"lime" | "coral" | "primary"> = ["lime", "coral", "primary"];
 
   return (
@@ -11,7 +11,7 @@ export function SocialProofStrip() {
         <FadeIn direction="up">
           <div className="text-center space-y-6">
             <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-              Trusted by 500+ businesses
+              Trusted by home service pros
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4">
               {industries.map((industry, i) => (
