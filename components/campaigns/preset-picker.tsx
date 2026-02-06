@@ -4,13 +4,23 @@ import { useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { EnvelopeSimple, ChatCircle } from '@phosphor-icons/react'
+import { EnvelopeSimple, ChatCircle, Clock } from '@phosphor-icons/react'
 import { duplicateCampaign } from '@/lib/actions/campaign'
 import { CAMPAIGN_PRESETS } from '@/lib/constants/campaigns'
 import { toast } from 'sonner'
 import type { CampaignWithTouches } from '@/lib/types/database'
 import { cn } from '@/lib/utils'
+
+/**
+ * Format delay hours into human-readable format.
+ * Under 24h: show hours (e.g., "4h")
+ * 24h and above: show days (e.g., "1d", "3d", "7d")
+ */
+function formatDelay(hours: number): string {
+  if (hours < 24) return `${hours}h`
+  const days = Math.round(hours / 24)
+  return `${days}d`
+}
 
 interface PresetPickerProps {
   presets: CampaignWithTouches[]
@@ -69,33 +79,25 @@ export function PresetPicker({ presets, compact = false }: PresetPickerProps) {
             )}
           </CardHeader>
 
-          <CardContent>
-            {/* Touch visualization */}
-            <div className={cn('flex items-center gap-2', compact && 'flex-wrap')}>
-              {preset.campaign_touches.map((touch, idx) => (
-                <div key={touch.id} className="flex items-center gap-1">
-                  {idx > 0 && (
-                    <span className="text-xs text-muted-foreground mx-1">→</span>
-                  )}
-                  <Badge
-                    variant={touch.channel === 'email' ? 'secondary' : 'default'}
-                    className="gap-1"
-                  >
+          <CardContent className={compact ? 'pt-0' : undefined}>
+            {/* Timing summary line with clock icon - always visible */}
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Clock className="h-3.5 w-3.5 shrink-0" />
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {preset.campaign_touches.map((touch, idx) => (
+                  <span key={touch.id} className="flex items-center gap-0.5">
                     {touch.channel === 'email' ? (
                       <EnvelopeSimple className="h-3 w-3" />
                     ) : (
                       <ChatCircle className="h-3 w-3" />
                     )}
-                    {!compact && (
-                      <span className="text-xs">
-                        {touch.delay_hours < 24
-                          ? `${touch.delay_hours}h`
-                          : `${Math.round(touch.delay_hours / 24)}d`}
-                      </span>
+                    <span>{formatDelay(touch.delay_hours)}</span>
+                    {idx < preset.campaign_touches.length - 1 && (
+                      <span className="mx-1">→</span>
                     )}
-                  </Badge>
-                </div>
-              ))}
+                  </span>
+                ))}
+              </div>
             </div>
 
             {!compact && (

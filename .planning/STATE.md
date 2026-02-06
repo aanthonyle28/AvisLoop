@@ -4,13 +4,13 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** 30.1 - Audit Gap Remediation
-**Plan:** 4 of 8
+**Plan:** 5 of 8
 **Status:** **IN PROGRESS**
-**Last activity:** 2026-02-06 - Completed 30.1-04-PLAN.md (Enrollment pagination)
+**Last activity:** 2026-02-06 - Completed 30.1-05-PLAN.md (Preset guidance callout)
 
 **v2.0 Progress:** █████████████████████░░░ (9/11 phases complete)
 **Phase 30 Progress:** ██████████ (10/10 plans) COMPLETE
-**Phase 30.1 Progress:** ████░░░░░░ (4/8 plans)
+**Phase 30.1 Progress:** █████░░░░░ (5/8 plans)
 
 ## v2.0 Phase Status
 
@@ -378,11 +378,13 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | URL-based pagination | 30.1-04 | Page state via searchParams | SEO-friendly, shareable, back button works |
 | Page size 20 enrollments | 30.1-04 | Balance performance and UX | Show reasonable amount per page |
 | Total count in title | 30.1-04 | Always show enrollment count | Helpful UX feedback regardless of pagination |
+| Blue informational callout | 30.1-05 | Guides users toward presets | Non-blocking guidance pattern |
+| Anchor link to presets | 30.1-05 | Link to /campaigns#presets | Presets shown on campaigns page |
 
 ## Session Continuity
 
 **Last session:** 2026-02-06
-**Stopped at:** Completed 30.1-04-PLAN.md (Enrollment pagination)
+**Stopped at:** Completed 30.1-05-PLAN.md (Preset guidance callout)
 **Resume file:** None
 **QA test account:** audit-test@avisloop.com / AuditTest123!
 **QA Report:** docs/QA-AUDIT.md
