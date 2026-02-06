@@ -10,7 +10,7 @@ import { toast } from 'sonner'
  * Auto-dismisses after 6 seconds.
  */
 export function toastSendSuccess(contactName: string, onViewDetails: () => void) {
-  toast.success(`Review request sent to ${contactName}`, {
+  toast.success(`Message sent to ${contactName}`, {
     duration: 6000,
     action: {
       label: 'View details',
@@ -24,7 +24,7 @@ export function toastSendSuccess(contactName: string, onViewDetails: () => void)
  * Auto-dismisses after 6 seconds.
  */
 export function toastScheduleSuccess(contactName: string, scheduledFor: string) {
-  toast.success(`Review request scheduled for ${contactName}`, {
+  toast.success(`Message scheduled for ${contactName}`, {
     description: `Will send ${scheduledFor}`,
     duration: 6000,
   })

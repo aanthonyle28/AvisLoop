@@ -195,7 +195,7 @@ export function RequestDetailDrawer({
           {/* Resend Section */}
           {canResend && (
             <div className="border-t pt-6">
-              <h3 className="text-sm font-medium mb-3">Resend Request</h3>
+              <h3 className="text-sm font-medium mb-3">Resend Message</h3>
               <div className="space-y-3">
                 <div className="space-y-2">
                   <Label htmlFor="template-select">Template</Label>
@@ -230,7 +230,7 @@ export function RequestDetailDrawer({
                   className="w-full"
                 >
                   <ArrowClockwise className={`h-4 w-4 mr-2 ${isResending ? 'animate-spin' : ''}`} />
-                  {isResending ? 'Resending...' : 'Resend Request'}
+                  {isResending ? 'Resending...' : 'Resend Message'}
                 </Button>
               </div>
             </div>
@@ -253,9 +253,9 @@ export function RequestDetailDrawer({
           {/* Cancel Section for Pending */}
           {canCancel && (
             <div className="border-t pt-6">
-              <h3 className="text-sm font-medium mb-3 text-destructive">Cancel Request</h3>
+              <h3 className="text-sm font-medium mb-3 text-destructive">Cancel Message</h3>
               <p className="text-sm text-muted-foreground mb-3">
-                This request is still pending. You can cancel it before it&apos;s sent.
+                This message is still pending. You can cancel it before it&apos;s sent.
               </p>
               <Button
                 onClick={handleCancel}
@@ -264,7 +264,7 @@ export function RequestDetailDrawer({
                 className="w-full"
               >
                 <X className="h-4 w-4 mr-2" />
-                {isCanceling ? 'Canceling...' : 'Cancel Request'}
+                {isCanceling ? 'Canceling...' : 'Cancel Message'}
               </Button>
             </div>
           )}

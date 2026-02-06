@@ -114,7 +114,7 @@ export function AnimatedProductDemo() {
           >
             <div className="flex flex-col items-center justify-center py-8">
               <CheckCircle size={64} className="text-green-500 mb-4" />
-              <h3 className="text-xl font-semibold text-foreground mb-2">Request Sent!</h3>
+              <h3 className="text-xl font-semibold text-foreground mb-2">Message Sent!</h3>
               <div className="inline-flex items-center gap-2 rounded-full bg-green-500/10 px-4 py-1.5 border border-green-500/20">
                 <div className="h-2 w-2 rounded-full bg-green-500" />
                 <span className="text-sm font-medium text-green-600 dark:text-green-400">

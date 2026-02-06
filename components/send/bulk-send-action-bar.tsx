@@ -87,7 +87,7 @@ export function BulkSendActionBar({
                 disabled={!hasReviewLink}
                 title={!hasReviewLink ? 'Add Google Review Link first' : undefined}
               >
-                Send request
+                Send message
               </Button>
             </div>
           </div>

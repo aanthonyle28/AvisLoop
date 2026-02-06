@@ -286,7 +286,7 @@ export function QuickSendTab({
             toast.error(result.error)
           } else if (result.data) {
             if (result.data.sent > 0) {
-              toast.success('Review request sent successfully')
+              toast.success('Message sent successfully')
             } else if (result.data.skipped > 0) {
               const detail = result.data.details?.[0]
               const reason = detail?.reason || 'unknown'
@@ -529,7 +529,7 @@ export function QuickSendTab({
               ) : (
                 <>
                   <PaperPlaneTilt size={16} weight="bold" />
-                  Send Request
+                  Send Message
                 </>
               )}
             </button>

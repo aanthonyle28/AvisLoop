@@ -119,7 +119,7 @@ export function Hero() {
                 <div className="flex gap-2">
                   <div className="flex-1 bg-foreground text-background rounded-lg py-2.5 text-center text-sm font-medium flex items-center justify-center gap-2">
                     <Send className="h-4 w-4" />
-                    Send Request
+                    Send Message
                   </div>
                 </div>
               </div>

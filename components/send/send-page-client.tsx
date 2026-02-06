@@ -69,7 +69,7 @@ export function SendPageClient({
     const result = await sendReviewRequest(null, formData)
 
     if (result.success) {
-      toast.success('Review request sent successfully!', {
+      toast.success('Message sent successfully!', {
         description: 'The recipient will receive your message shortly.',
         duration: 6000,
       })

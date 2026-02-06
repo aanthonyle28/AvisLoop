@@ -265,7 +265,7 @@ export function CustomerDetailDrawer({
               className='w-full justify-start'
             >
               <PaperPlaneRight className='mr-2 h-4 w-4' />
-              Send Request
+              Send Message
             </Button>
             <Button
               onClick={() => onEdit(customer)}
