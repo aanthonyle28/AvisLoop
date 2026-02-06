@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Check } from "lucide-react";
+import { Check } from "@phosphor-icons/react";
 import {
   InteractiveCard,
   CardHeader,
@@ -29,10 +29,10 @@ const tiers: Tier[] = [
     period: "25 sends",
     description: "Try before you commit",
     features: [
-      "25 free review requests",
+      "25 free campaign touches",
       "All features included",
-      "Contact management",
-      "Email delivery tracking",
+      "Multi-touch campaigns",
+      "Email + SMS support",
       "No credit card required",
     ],
     cta: "Start Free Trial",
@@ -44,10 +44,10 @@ const tiers: Tier[] = [
     period: "/month",
     description: "For small businesses",
     features: [
-      "200 sends per month",
-      "200 contacts",
-      "Custom email templates",
-      "Send history & analytics",
+      "200 campaign touches per month",
+      "Unlimited customers",
+      "Custom message templates",
+      "Campaign analytics",
       "Email support",
     ],
     cta: "Get Started",
@@ -60,8 +60,8 @@ const tiers: Tier[] = [
     period: "/month",
     description: "For growing businesses",
     features: [
-      "500 sends per month",
-      "Unlimited contacts",
+      "500 campaign touches per month",
+      "Unlimited customers",
       "Everything in Basic",
       "Priority support",
       "Advanced analytics",
@@ -106,7 +106,7 @@ export function PricingTable() {
             <ul className="space-y-3">
               {tier.features.map((feature) => (
                 <li key={feature} className="flex items-start gap-2">
-                  <Check className="size-5 text-primary shrink-0 mt-0.5" />
+                  <Check size={20} weight="bold" className="text-primary shrink-0 mt-0.5" />
                   <span className="text-sm">{feature}</span>
                 </li>
               ))}
