@@ -208,7 +208,7 @@ export function QuickSendTab({
 
         if (!contactId) {
           if (!name.trim()) {
-            toast.error('Please enter a name for this new contact')
+            toast.error('Please enter a name for this new customer')
             return
           }
 
@@ -227,7 +227,7 @@ export function QuickSendTab({
         }
 
         if (!contactId) {
-          toast.error('Failed to create or find contact')
+          toast.error('Failed to create or find customer')
           return
         }
 
@@ -339,7 +339,7 @@ export function QuickSendTab({
         {/* Contact search with autocomplete */}
         <div className="space-y-2">
           <label htmlFor="email-input" className="block text-sm font-medium">
-            Contact
+            Customer
           </label>
           <div className="relative">
             <MagnifyingGlass
@@ -351,7 +351,7 @@ export function QuickSendTab({
               ref={inputRef}
               id="email-input"
               type="text"
-              placeholder="Search Through Contacts..."
+              placeholder="Search customers..."
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value)
@@ -410,7 +410,7 @@ export function QuickSendTab({
           {/* Existing contact chip */}
           {matchedCustomer && (
             <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">Existing contact:</span>
+              <span className="text-muted-foreground">Existing customer:</span>
               <span className="px-2 py-1 bg-primary/10 text-primary rounded-md font-medium">
                 {matchedCustomer.name}
               </span>
@@ -421,12 +421,12 @@ export function QuickSendTab({
           {email && !matchedCustomer && (
             <div className="space-y-1">
               <label htmlFor="name-input" className="block text-sm font-medium">
-                Contact Name
+                Customer Name
               </label>
               <input
                 id="name-input"
                 type="text"
-                placeholder="Enter name for new contact"
+                placeholder="Enter name for new customer"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
@@ -494,7 +494,7 @@ export function QuickSendTab({
             Preview
           </label>
           <MessagePreview
-            contact={previewCustomer}
+            customer={previewCustomer}
             business={business}
             template={selectedTemplate}
             onViewFull={() => setShowFullPreview(true)}
@@ -540,7 +540,7 @@ export function QuickSendTab({
       <EmailPreviewModal
         open={showFullPreview}
         onOpenChange={setShowFullPreview}
-        contact={previewCustomer}
+        customer={previewCustomer}
         business={business}
         template={selectedTemplate}
       />

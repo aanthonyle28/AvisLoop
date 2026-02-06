@@ -155,10 +155,10 @@ export function BulkSendTab({
     },
   })
 
-  // Get selected contacts
+  // Get selected customers
   const selectedRows = table.getFilteredSelectedRowModel().rows
-  const selectedContacts = selectedRows.map(row => row.original)
-  const selectedCount = selectedContacts.length
+  const selectedCustomers = selectedRows.map(row => row.original)
+  const selectedCount = selectedCustomers.length
   const filteredCount = filteredCustomers.length
 
   return (
@@ -263,7 +263,7 @@ export function BulkSendTab({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No contacts found.
+                  No customers found.
                 </TableCell>
               </TableRow>
             )}
@@ -298,8 +298,8 @@ export function BulkSendTab({
         <BulkSendActionBar
           selectedCount={selectedCount}
           filteredCount={filteredCount}
-          selectedContacts={selectedContacts}
-          allFilteredContacts={filteredCustomers}
+          selectedCustomers={selectedCustomers}
+          allFilteredCustomers={filteredCustomers}
           template={templates.find(t => t.id === selectedTemplateId)!}
           schedulePreset={schedulePreset}
           customDateTime={customDateTime}
