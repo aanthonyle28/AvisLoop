@@ -33,14 +33,14 @@ export function UsageWarningBanner({
         <div className="flex items-start gap-3">
           <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
           <div className="space-y-1">
-            <p className="font-medium text-destructive">Contact limit exceeded</p>
+            <p className="font-medium text-destructive">Customer limit exceeded</p>
             <p className="text-sm text-destructive/80">
-              You have {contactCount} contacts but your Basic plan allows{' '}
+              You have {contactCount} customers but your Basic plan allows{' '}
               {contactLimit}.{' '}
               <Link href="/billing" className="underline font-medium">
                 Upgrade to Pro
               </Link>{' '}
-              for unlimited contacts, or remove some contacts to send.
+              for unlimited customers, or remove some customers to send.
             </p>
           </div>
         </div>
@@ -66,7 +66,7 @@ export function UsageWarningBanner({
               <Link href="/billing" className="underline font-medium">
                 {tier === 'trial' ? 'Start a plan' : 'Upgrade your plan'}
               </Link>{' '}
-              to keep sending review requests.
+              to keep sending messages.
             </p>
           </div>
         </div>

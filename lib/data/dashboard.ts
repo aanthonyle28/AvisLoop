@@ -368,7 +368,7 @@ export async function getAttentionAlerts(businessId: string): Promise<AttentionA
           description: `Bounced email for ${customerName}`,
           timestamp: send.created_at,
           contextualAction: {
-            label: 'Update contact',
+            label: 'Update customer',
             href: `/customers/${send.customer_id}`,
           },
           sendLogId: send.id,
