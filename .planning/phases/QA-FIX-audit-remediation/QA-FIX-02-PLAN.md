@@ -128,21 +128,26 @@ Run `pnpm typecheck` to ensure no TypeScript errors.
   <action>
 Delete the orphaned /scheduled route and all related files. This is a V1 feature made obsolete by V2 campaigns.
 
-Files to delete:
+**PRE-DELETION CHECK (MUST DO FIRST):**
+Before deleting ANY files, verify no active code imports them:
+```bash
+grep -r "from '@/components/scheduled" app/ components/ lib/ --include="*.ts" --include="*.tsx"
+grep -r "from '@/lib/data/scheduled" app/ components/ lib/ --include="*.ts" --include="*.tsx"
+```
+If any matches are found in non-.planning files, DO NOT delete. Report the blocking imports instead.
+
+Files to delete (only if pre-check passes):
 1. app/(dashboard)/scheduled/page.tsx - Route page
 2. components/scheduled/ - Entire folder (6 files)
 3. lib/data/scheduled.ts - Data functions
 
 Steps:
-1. Delete app/(dashboard)/scheduled/ directory
-2. Delete components/scheduled/ directory
-3. Delete lib/data/scheduled.ts file
+1. Run pre-deletion import check (grep commands above)
+2. If no active imports found, delete app/(dashboard)/scheduled/ directory
+3. Delete components/scheduled/ directory
+4. Delete lib/data/scheduled.ts file
 
 Note: The /scheduled route is not linked from any navigation. It was a V1 feature for manual scheduling that is superseded by V2 campaigns.
-
-Verify no imports reference these files:
-- grep for "from '@/components/scheduled" in app/ and components/
-- grep for "from '@/lib/data/scheduled" in app/ and components/
   </action>
   <verify>
 Run: `ls app/(dashboard)/scheduled 2>/dev/null || echo "Directory deleted"`
@@ -170,7 +175,14 @@ Run: `pnpm typecheck` to ensure no broken imports.
   <action>
 Delete the legacy /components/contacts/ folder. This is a duplicate of /components/customers/ from before the Phase 20 rename.
 
-Files to delete (10 files total):
+**PRE-DELETION CHECK (MUST DO FIRST):**
+Before deleting ANY files, verify no active code imports them:
+```bash
+grep -r "from '@/components/contacts" app/ components/ lib/ --include="*.ts" --include="*.tsx"
+```
+If any matches are found in non-.planning files, DO NOT delete. Report the blocking imports instead.
+
+Files to delete (10 files total, only if pre-check passes):
 1. components/contacts/add-contact-sheet.tsx
 2. components/contacts/contact-columns.tsx
 3. components/contacts/contact-detail-drawer.tsx
@@ -183,8 +195,8 @@ Files to delete (10 files total):
 10. components/contacts/empty-state.tsx
 
 Steps:
-1. Verify no imports reference these files (already confirmed - only .planning/ docs reference them)
-2. Delete components/contacts/ directory
+1. Run pre-deletion import check (grep command above)
+2. If no active imports found, delete components/contacts/ directory
 
 Note: These files are duplicates of the /components/customers/ folder. The customers/ folder is the active, maintained version.
   </action>

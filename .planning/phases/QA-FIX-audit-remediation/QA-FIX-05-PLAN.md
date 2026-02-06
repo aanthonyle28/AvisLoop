@@ -12,7 +12,9 @@ files_modified:
   - components/send/message-preview.tsx
   - components/send/bulk-send-tab.tsx
   - components/send/quick-send-tab.tsx
-  - lib/data/customers.ts
+  - components/send/send-page-client.tsx
+  - app/(dashboard)/send/page.tsx
+  - lib/data/send-logs.ts
 autonomous: true
 
 must_haves:
@@ -24,8 +26,8 @@ must_haves:
     - path: "components/send/bulk-send-tab.tsx"
       provides: "Bulk send tab with Customer type"
       contains: "import.*Customer.*from"
-    - path: "lib/data/customers.ts"
-      provides: "Customer data functions"
+    - path: "lib/data/send-logs.ts"
+      provides: "Send logs data functions with customer lookup"
       contains: "getResendReadyCustomers"
   key_links:
     - from: "components/send/*.tsx"
@@ -62,6 +64,7 @@ Output: All Send components use Customer type consistently.
     - components/send/bulk-send-columns.tsx
     - components/send/email-preview-modal.tsx
     - components/send/message-preview.tsx
+    - components/send/send-page-client.tsx
   </files>
   <action>
 Update all Contact type references to Customer in Send page components.
@@ -78,10 +81,10 @@ Import should come from: `@/lib/types/customer` (or wherever Customer type is de
 Note: Be careful to maintain functionality. The Customer type should have the same shape as the old Contact type (they were renamed in Phase 20).
   </action>
   <verify>
-Run: `grep -n "Contact" components/send/bulk-send-confirm-dialog.tsx components/send/bulk-send-action-bar.tsx components/send/bulk-send-columns.tsx components/send/email-preview-modal.tsx components/send/message-preview.tsx` should not return Contact type references.
+Run: `grep -n "Contact" components/send/bulk-send-confirm-dialog.tsx components/send/bulk-send-action-bar.tsx components/send/bulk-send-columns.tsx components/send/email-preview-modal.tsx components/send/message-preview.tsx components/send/send-page-client.tsx` should not return Contact type references.
 Run: `grep -n "Customer" components/send/bulk-send-confirm-dialog.tsx` should find Customer type usage.
   </verify>
-  <done>5 Send component files updated to use Customer type.</done>
+  <done>6 Send component files updated to use Customer type.</done>
 </task>
 
 <task type="auto">
@@ -115,27 +118,26 @@ Run: `pnpm typecheck` to ensure type consistency.
 
 <task type="auto">
   <name>Task 3: Rename getResendReadyContacts function</name>
-  <files>lib/data/customers.ts</files>
+  <files>lib/data/send-logs.ts</files>
   <action>
 Rename the getResendReadyContacts function to getResendReadyCustomers.
 
 Steps:
-1. Find getResendReadyContacts in lib/data/customers.ts (or lib/data/contacts.ts if still named that)
+1. Find getResendReadyContacts in lib/data/send-logs.ts (this is where the function is defined)
 2. Rename function to getResendReadyCustomers
 3. Update any JSDoc or comments
 4. Search for all callers of getResendReadyContacts and update them
 
 Callers to update:
-- components/send/quick-send-tab.tsx
-- components/send/bulk-send-tab.tsx
-- Any other files that import this function
+- app/(dashboard)/send/page.tsx (imports and calls the function on line 3 and 37)
+- Any other files that import this function (verify with grep)
 
 Use grep to find all usages:
 `grep -r "getResendReadyContacts" app/ components/ lib/`
   </action>
   <verify>
 Run: `grep -r "getResendReadyContacts" app/ components/ lib/` should return no results.
-Run: `grep -r "getResendReadyCustomers" lib/data/` should find the function definition.
+Run: `grep -r "getResendReadyCustomers" lib/data/send-logs.ts` should find the function definition.
 Run: `pnpm typecheck` to ensure all callers are updated.
   </verify>
   <done>Function renamed and all callers updated.</done>
@@ -153,7 +155,7 @@ Run: `pnpm typecheck` to ensure all callers are updated.
 </verification>
 
 <success_criteria>
-- [ ] 5 Send component files updated to Customer type (Task 1)
+- [ ] 6 Send component files updated to Customer type (Task 1)
 - [ ] bulk-send-tab.tsx and quick-send-tab.tsx updated (Task 2)
 - [ ] getResendReadyContacts renamed to getResendReadyCustomers (Task 3)
 - [ ] All callers of renamed function updated
