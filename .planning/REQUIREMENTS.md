@@ -134,6 +134,36 @@ Requirements for Review Follow-Up System Redesign. Each maps to roadmap phases.
 - [ ] **LAND-01**: Landing page copy updated for home services positioning (follow-up system, not single-send tool)
 - [ ] **LAND-02**: Existing sections (hero, problem/solution, how it works, stats, outcome cards) updated with v2.0 messaging
 
+### V2 Alignment (Phase 30)
+
+**V2 Core Flow:**
+- [ ] **V2FL-01**: Add Job form includes inline customer creation with smart autocomplete (type name → suggest matches → create new if no match)
+- [ ] **V2FL-02**: Add Job form no longer requires pre-existing customer selection
+- [ ] **V2FL-03**: Remove "Add Customer" button from Customers page header
+- [ ] **V2FL-04**: Remove "Add Customer" CTA from Customers empty state
+- [ ] **V2FL-05**: CSV import redesigned for jobs (customer_name, email, phone, service_type, completion_date) — creates customers as side effect
+- [ ] **V2FL-06**: Onboarding Step 6 converted from customer import to job import with V2 format
+- [ ] **V2FL-07**: "Add Job" sidebar button uses primary variant (not outline)
+- [ ] **V2FL-08**: Mobile floating action button (FAB) for "Add Job" on all dashboard pages
+- [ ] **V2FL-09**: Job status expanded to three states: scheduled → completed → do_not_send (scheduled is pre-completion, completed triggers campaign enrollment)
+- [ ] **V2FL-10**: Add Job form defaults to "scheduled" status (not completed) — supports dispatch workflow where jobs are created before work is done
+- [ ] **V2FL-11**: Job Table includes "Mark Complete" action button for scheduled jobs — one-click completion triggers campaign enrollment
+- [ ] **V2FL-12**: Mobile job list supports one-tap "Complete" from job card for technician workflow
+
+**Empty States & Copy:**
+- [ ] **V2UX-01**: Customers page empty state updated: "Customers appear here as you complete jobs. Ready to add your first job?"
+- [ ] **V2UX-02**: Customers page description updated to reflect V2 model (customers are job side effects)
+- [ ] **V2UX-03**: History page empty state includes guidance CTA to Jobs page
+
+**Icon Consistency:**
+- [ ] **ICON-01**: All 27 lucide-react files migrated to @phosphor-icons/react (UI primitives, customer components, marketing, other)
+
+**Accessibility:**
+- [ ] **A11Y-01**: Checkbox component touch target increased to 44px minimum (via padding wrapper or size increase)
+- [ ] **A11Y-02**: Icon button xs/sm sizes include 44px touch target wrapper
+- [ ] **A11Y-03**: All icon-only buttons include aria-label attribute
+- [ ] **A11Y-04**: Skip link added to root layout ("Skip to main content")
+
 ## Future Requirements
 
 Deferred to later milestones. Captured for traceability.
@@ -259,11 +289,31 @@ Deferred to later milestones. Captured for traceability.
 | AGCY-03 | Phase 29 | Pending |
 | LAND-01 | Phase 29 | Pending |
 | LAND-02 | Phase 29 | Pending |
+| V2FL-01 | Phase 30 | Pending |
+| V2FL-02 | Phase 30 | Pending |
+| V2FL-03 | Phase 30 | Pending |
+| V2FL-04 | Phase 30 | Pending |
+| V2FL-05 | Phase 30 | Pending |
+| V2FL-06 | Phase 30 | Pending |
+| V2FL-07 | Phase 30 | Pending |
+| V2FL-08 | Phase 30 | Pending |
+| V2FL-09 | Phase 30 | Pending |
+| V2FL-10 | Phase 30 | Pending |
+| V2FL-11 | Phase 30 | Pending |
+| V2FL-12 | Phase 30 | Pending |
+| V2UX-01 | Phase 30 | Pending |
+| V2UX-02 | Phase 30 | Pending |
+| V2UX-03 | Phase 30 | Pending |
+| ICON-01 | Phase 30 | Pending |
+| A11Y-01 | Phase 30 | Pending |
+| A11Y-02 | Phase 30 | Pending |
+| A11Y-03 | Phase 30 | Pending |
+| A11Y-04 | Phase 30 | Pending |
 
 **Coverage:**
-- v2.0 requirements: 76 total across 14 categories
-- Mapped: 76/76 (100% coverage)
-- Phases: 20-29 (10 phases)
+- v2.0 requirements: 96 total across 18 categories
+- Mapped: 96/96 (100% coverage)
+- Phases: 20-30 (11 phases)
 
 **Coverage validation:**
 - Phase 20: 7 requirements (CUST-01, CUST-02, CUST-03, CUST-04, SMS-02, SMS-03, COMP-01)
@@ -276,8 +326,9 @@ Deferred to later milestones. Captured for traceability.
 - Phase 27: 9 requirements (DASH-01 to DASH-05, NAV-01, NAV-02, OPS-01, OPS-02)
 - Phase 28: 9 requirements (ONBD-01 to ONBD-07, DLVR-01, DLVR-03)
 - Phase 29: 5 requirements (AGCY-01 to AGCY-03, LAND-01, LAND-02)
-- Total: 76 requirements (no orphans, no duplicates)
+- Phase 30: 20 requirements (V2FL-01 to V2FL-12, V2UX-01 to V2UX-03, ICON-01, A11Y-01 to A11Y-04)
+- Total: 96 requirements (no orphans, no duplicates)
 
 ---
 *Requirements defined: 2026-02-02*
-*Last updated: 2026-02-02 (traceability mapped to v2.0 phases 20-29)*
+*Last updated: 2026-02-06 (Phase 30 V2 Alignment + scheduled job status requirements added)*

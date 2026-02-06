@@ -338,6 +338,39 @@ Plans:
 **Future consideration**: Operator admin dashboard — aggregate LLM spend across all tenants, margin analysis, cost-per-tenant breakdown. Currently business owners see their estimated cost in Settings; operator monitors actual spend via API provider dashboards (Google AI, OpenAI, OpenRouter).
 **Plans**: TBD
 
+### Phase 30: V2 Alignment & Audit Remediation
+**Goal**: Complete V2 philosophy transformation where jobs are the primary entry point and customers are created as side effects. Add scheduled job status for dispatch workflow. Fix remaining audit issues: icon consistency, accessibility, empty states.
+**Depends on**: Phase 22 (Jobs exist), Phase 20 (Customers exist), QA-AUDIT (issues identified)
+**Requirements**: V2FL-01 to V2FL-12, V2UX-01 to V2UX-03, ICON-01, A11Y-01 to A11Y-04
+**Success Criteria** (what must be TRUE):
+  1. Add Job form includes inline customer creation with smart autocomplete (type name → suggest existing → create new if no match)
+  2. Add Job form no longer requires selecting pre-existing customer — customer fields inline (name, email, phone)
+  3. "Add Customer" button removed from Customers page header and empty state
+  4. CSV import redesigned for jobs format (customer_name, email, phone, service_type, completion_date) — creates customers as side effect
+  5. Onboarding Step 6 converted from customer import to job import
+  6. "Add Job" sidebar button uses primary variant (bg-primary, not outline)
+  7. Mobile floating action button (FAB) for "Add Job" visible on dashboard pages
+  8. Customers page empty state says "Customers appear here as you complete jobs"
+  9. All 27 lucide-react files migrated to @phosphor-icons/react
+  10. Checkbox and icon button touch targets increased to 44px minimum
+  11. All icon-only buttons have aria-label attributes
+  12. Skip link added to root layout for accessibility
+  13. Job status supports three states: scheduled → completed → do_not_send (campaign enrollment only on completed)
+  14. Add Job form defaults to "scheduled" status (dispatch workflow: create job before work, mark complete after)
+  15. Job Table shows "Mark Complete" button for scheduled jobs (one-click triggers campaign enrollment)
+  16. Mobile job list supports one-tap complete from job card for technician in-field workflow
+**Plans**: 9 plans in 4 waves
+Plans:
+- [ ] 30-01-PLAN.md — Smart customer autocomplete component with create-new fallback
+- [ ] 30-02-PLAN.md — Add Job form redesign with inline customer creation (defaults to scheduled)
+- [ ] 30-03-PLAN.md — Scheduled job status and Mark Complete workflow (DB + actions + table UI)
+- [ ] 30-04-PLAN.md — Remove "Add Customer" CTAs and update empty states
+- [ ] 30-05-PLAN.md — CSV job import (replaces customer import)
+- [ ] 30-06-PLAN.md — Onboarding Step 6 conversion to job import
+- [ ] 30-07-PLAN.md — Add Job CTA updates (primary variant + mobile FAB + one-tap complete)
+- [ ] 30-08-PLAN.md — Icon migration (27 lucide-react files to Phosphor)
+- [ ] 30-09-PLAN.md — Accessibility fixes (touch targets, aria-labels, skip link)
+
 ### Phase QA-AUDIT: Dashboard QA Test & UX Audit
 **Goal**: Systematically test every page, button, and feature in the authenticated dashboard using Playwright MCP. Verify v2.0 campaign-first model coherence. Cross-check data against database. Identify UX gaps, broken flows, legacy references, orphaned features, and design inconsistencies.
 **Depends on**: Phases 20-28 (dashboard features built)
@@ -408,15 +441,22 @@ See individual phase sections above for requirements, success criteria, and depe
 | 27 (v2.0) | Review Follow-Up | 0/7 | Planned | - |
 | 28 (v2.0) | Review Follow-Up | 0/8 | In progress | - |
 | 29 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
+| 30 (v2.0) | V2 Alignment | 0/9 | **Ready to plan** | - |
 | **QA-AUDIT** | **Dashboard Audit** | **9/9** | **Complete** | **2026-02-05** |
 | **QA-FIX** | **Audit Remediation** | **5/5** | **Complete** | **2026-02-06** |
 
-**Total:** 143 plans complete across shipped phases, 2 v2.0 phases remaining after Phase 27.
+**Total:** 143 plans complete across shipped phases. Phase 30 ready to execute.
 
 ## What's Next
 
-**Current milestone:** v2.0 Review Follow-Up System (Phases 20-29)
-**Next action:** Execute Phase 27 (Dashboard Redesign) or continue Phase 28
+**Current milestone:** v2.0 Review Follow-Up System (Phases 20-30)
+**Next action:** Execute Phase 30 (V2 Alignment) — completes the V2 transformation
+
+**Recommended execution order:**
+1. **Phase 30** (V2 Alignment) — Core flow fix, enables true V2 usage
+2. **Phase 27** (Dashboard Redesign) — Can run in parallel with 30
+3. **Phase 28** (Onboarding) — Depends on Phase 30 (job import)
+4. **Phase 29** (Agency + Landing) — After core V2 complete
 
 **Blockers:**
 - Twilio A2P 10DLC registration required before Phase 21-08 execution (webhook verification)
@@ -428,5 +468,5 @@ After v2.0:
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 
 ---
-*Last updated: 2026-02-06 after QA-FIX phase complete (Audit Remediation verified)*
+*Last updated: 2026-02-06 after Phase 30 planning (V2 Alignment defined)*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
