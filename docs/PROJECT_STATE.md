@@ -10,15 +10,15 @@
 - Phase 24 (Multi-Touch Campaign Engine) complete
 - Phase 25 (LLM Personalization) context captured, ready for research/planning
 - Phase 26 (Review Funnel) 6/7 plans complete
+- Phase 27 (Dashboard Redesign) complete
+- Phase 28 (Onboarding Redesign) complete
 - Twilio A2P: Brand approved, campaign pending
 
-## Last session summary (Phase 25 context)
-- **Phase 25 context captured**: LLM personalization implementation decisions documented
-- **Personalization behavior**: Moderate rewrite, tiered context fields, always-on by default
-- **Preview flow**: 3 curated samples, first 10 messages require approval, then auto
-- **Fallback handling**: Severity-based (retry transient, fallback quality, block critical)
-- **Model routing**: Gemini Flash 70%, GPT-4o-mini 25%, DeepSeek 5% via OpenRouter
-- **Cost visibility**: Hidden from users, absorbed into subscription tiers
+## Last session summary (Phase 28-07 verification)
+- **Phase 28 complete**: All 8 plans executed, 7-step onboarding wizard verified end-to-end
+- **Bugs fixed**: Checkbox infinite loop in services-offered-step, missing sms_consent_acknowledged DB column
+- **Settings verified**: Email Authentication checklist and Branded Review Link sections visible
+- **Migration applied**: Added sms_consent_acknowledged columns to businesses table
 
 ## What's been built
 - **Auth**: Sign up, sign in, sign out, password reset, session persistence
@@ -31,7 +31,7 @@
 - **Sending**: Contact selector, message preview, Resend integration, cooldown, quotas
 - **History**: Send history with date filtering, search, status badges
 - **Billing**: Stripe integration, tier enforcement, usage tracking
-- **Onboarding**: Setup wizard, dashboard checklist, completion redirect
+- **Onboarding**: 7-step setup wizard (business basics, review destination, services, software, campaign preset, customer import, SMS consent), dashboard checklist, completion redirect, Email Auth checklist, Branded Review Link settings
 - **Marketing**: Landing page, pricing page, responsive design, mobile nav menu
 - **Polish**: Design system, loading states, micro-interactions, accessibility, branded titles, dark/light/system theme toggle, full dark mode support
 
@@ -39,7 +39,7 @@
 1. Complete Phase 26-07 (Feedback dashboard)
 2. Research/plan Phase 25 (LLM Personalization)
 3. Wait for Twilio A2P approval for Phase 21-08
-4. Phases 27-29 after 25/26 complete
+4. Phase 29 after 25/26 complete
 
 ## Open questions / decisions needed
 - Twilio A2P campaign approval (blocker for Phase 21-08 verification)
