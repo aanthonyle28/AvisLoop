@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { formatDistanceToNow } from 'date-fns'
-import { Star, Check, RotateCcw, Mail } from 'lucide-react'
+import { Star, Check, ArrowCounterClockwise, Envelope } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import type { FeedbackWithCustomer } from '@/lib/types/feedback'
@@ -43,10 +43,11 @@ export function FeedbackCard({ feedback }: FeedbackCardProps) {
           {[1, 2, 3, 4, 5].map((star) => (
             <Star
               key={star}
+              size={16}
+              weight={star <= feedback.rating ? 'fill' : 'regular'}
               className={cn(
-                'w-4 h-4',
                 star <= feedback.rating
-                  ? 'text-yellow-400 fill-yellow-400'
+                  ? 'text-yellow-400'
                   : 'text-muted-foreground/30'
               )}
             />
@@ -77,7 +78,7 @@ export function FeedbackCard({ feedback }: FeedbackCardProps) {
           {/* Email customer button */}
           <Button variant="ghost" size="sm" asChild>
             <a href={`mailto:${feedback.customer.email}`}>
-              <Mail className="w-4 h-4 mr-1" />
+              <Envelope size={16} weight="regular" className="mr-1" />
               Email
             </a>
           </Button>
@@ -89,7 +90,7 @@ export function FeedbackCard({ feedback }: FeedbackCardProps) {
               onClick={handleUnresolve}
               disabled={isLoading}
             >
-              <RotateCcw className="w-4 h-4 mr-1" />
+              <ArrowCounterClockwise size={16} weight="regular" className="mr-1" />
               Reopen
             </Button>
           ) : (
@@ -98,7 +99,7 @@ export function FeedbackCard({ feedback }: FeedbackCardProps) {
               size="sm"
               onClick={() => setIsResolveOpen(true)}
             >
-              <Check className="w-4 h-4 mr-1" />
+              <Check size={16} weight="regular" className="mr-1" />
               Mark Resolved
             </Button>
           )}
