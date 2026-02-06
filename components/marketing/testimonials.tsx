@@ -1,18 +1,18 @@
 const testimonials = [
   {
-    quote: "Our Google reviews tripled in 3 months. This thing actually works.",
-    author: "Dr. Sarah Chen",
-    role: "Dental Care Plus",
-  },
-  {
-    quote: "Finally something that doesn't require a PhD to use.",
+    quote: "I complete jobs on my phone between calls. AvisLoop handles the rest. Went from 12 to 47 Google reviews in two months.",
     author: "Mike Rodriguez",
-    role: "AutoFix Pro",
+    role: "Rodriguez HVAC, Phoenix AZ",
   },
   {
-    quote: "My team actually uses this because it's so simple.",
-    author: "Lisa Thompson",
-    role: "Bloom Salon",
+    quote: "The review funnel is genius. Bad experiences go to private feedback, good ones to Google. My rating went from 4.1 to 4.8.",
+    author: "Sarah Chen",
+    role: "Premier Plumbing Solutions",
+  },
+  {
+    quote: "Finally something that doesn't require me to remember to follow up. System just runs. I just do my job.",
+    author: "James Thompson",
+    role: "Thompson Electric",
   },
 ];
 
