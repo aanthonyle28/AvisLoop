@@ -15,6 +15,7 @@ export type JobActionState = {
 /**
  * Create a new job for the user's business.
  * Validates customer belongs to same business.
+ * V2: Default status is 'scheduled' (work not yet done)
  */
 export async function createJob(
   _prevState: JobActionState | null,
@@ -40,10 +41,11 @@ export async function createJob(
   }
 
   // Parse and validate input
+  // V2: Default status is 'scheduled' if not provided
   const parsed = jobSchema.safeParse({
     customerId: formData.get('customerId'),
     serviceType: formData.get('serviceType'),
-    status: formData.get('status') || 'completed',
+    status: formData.get('status') || 'scheduled',
     notes: formData.get('notes') || '',
     enrollInCampaign: formData.get('enrollInCampaign') === 'true' || formData.get('enrollInCampaign') === null,
   })
@@ -106,6 +108,7 @@ export async function createJob(
 
 /**
  * Update an existing job.
+ * V2: Handles status transitions including 'scheduled' -> 'completed'
  */
 export async function updateJob(
   _prevState: JobActionState | null,
@@ -140,7 +143,7 @@ export async function updateJob(
   const parsed = jobSchema.safeParse({
     customerId: formData.get('customerId'),
     serviceType: formData.get('serviceType'),
-    status: formData.get('status') || 'completed',
+    status: formData.get('status') || 'scheduled',
     notes: formData.get('notes') || '',
     enrollInCampaign: formData.get('enrollInCampaign') === 'true' || formData.get('enrollInCampaign') === null,
   })
@@ -170,13 +173,13 @@ export async function updateJob(
     .eq('id', jobId)
     .single()
 
-  // Determine completed_at value
+  // Determine completed_at value based on status transition
   let completedAt: string | null = currentJob?.completed_at || null
   if (status === 'completed' && currentJob?.status !== 'completed') {
-    // Status changing to completed - set timestamp
+    // Status changing to completed (from scheduled or do_not_send) - set timestamp
     completedAt = new Date().toISOString()
-  } else if (status === 'do_not_send') {
-    // Status is do_not_send - clear timestamp
+  } else if (status === 'scheduled' || status === 'do_not_send') {
+    // Status is not completed - clear timestamp
     completedAt = null
   }
 
@@ -245,8 +248,9 @@ export async function deleteJob(jobId: string): Promise<JobActionState> {
 /**
  * Mark job as completed (sets status and completed_at).
  * Also enrolls job in campaign by default.
+ * V2: This is THE trigger for campaign automation.
  */
-export async function markJobCompleted(
+export async function markJobComplete(
   jobId: string,
   enrollInCampaign: boolean = true
 ): Promise<JobActionState> {
@@ -282,6 +286,9 @@ export async function markJobCompleted(
   revalidatePath('/jobs')
   return { success: true }
 }
+
+// Keep old name for backward compatibility
+export const markJobCompleted = markJobComplete
 
 /**
  * Mark job as do-not-send.
