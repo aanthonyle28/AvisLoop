@@ -4,13 +4,13 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** 30.1 - Audit Gap Remediation
-**Plan:** 5 of 8
+**Plan:** 7 of 8
 **Status:** **IN PROGRESS**
-**Last activity:** 2026-02-06 - Completed 30.1-05-PLAN.md (Preset guidance callout)
+**Last activity:** 2026-02-06 - Completed 30.1-07-PLAN.md (Preset timing display)
 
 **v2.0 Progress:** █████████████████████░░░ (9/11 phases complete)
 **Phase 30 Progress:** ██████████ (10/10 plans) COMPLETE
-**Phase 30.1 Progress:** █████░░░░░ (5/8 plans)
+**Phase 30.1 Progress:** ███████░░░ (6/8 plans)
 
 ## v2.0 Phase Status
 
@@ -27,7 +27,7 @@
 | 28 | Onboarding Redesign | Complete |
 | 29 | Agency-Mode Readiness & Landing Page | Not started |
 | **30** | **V2 Alignment & Audit Remediation** | **Complete** (10/10 plans) |
-| **30.1** | **Audit Gap Remediation** | **IN PROGRESS** (4/8 plans) |
+| **30.1** | **Audit Gap Remediation** | **IN PROGRESS** (6/8 plans) |
 | 31 | Landing Page V2 Rewrite | IN PROGRESS (4/7 plans) |
 | QA-AUDIT | Dashboard QA Test & UX Audit | Complete (9/9 plans) |
 | QA-FIX | Audit Remediation | Complete (5/5 plans) |
