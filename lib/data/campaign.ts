@@ -224,6 +224,89 @@ export async function getActiveCampaignForJob(
 /**
  * Get campaign analytics: touch performance, stop reasons, and send stats.
  */
+/**
+ * Get the campaign that would match a job based on service type.
+ * Returns matching campaign with timing info, or null if no active campaign.
+ */
+export async function getMatchingCampaignForJob(
+  businessId: string,
+  serviceType: ServiceType
+): Promise<{
+  campaign: { id: string; name: string; service_type: ServiceType | null }
+  firstTouchDelay: number
+} | null> {
+  const supabase = await createClient()
+
+  // First try to find campaign matching service type, then fall back to default (null service_type)
+  const { data: campaigns } = await supabase
+    .from('campaigns')
+    .select('id, name, service_type, campaign_touches(delay_hours)')
+    .eq('business_id', businessId)
+    .eq('status', 'active')
+    .or(`service_type.eq.${serviceType},service_type.is.null`)
+    .order('service_type', { ascending: false, nullsFirst: false }) // Specific service type first
+    .limit(1)
+
+  if (!campaigns || campaigns.length === 0) {
+    return null
+  }
+
+  const campaign = campaigns[0]
+  const firstTouch = campaign.campaign_touches?.[0]
+  const firstTouchDelay = firstTouch?.delay_hours || 24
+
+  return {
+    campaign: {
+      id: campaign.id,
+      name: campaign.name,
+      service_type: campaign.service_type as ServiceType | null,
+    },
+    firstTouchDelay,
+  }
+}
+
+/**
+ * Get matching campaigns for multiple jobs in one query.
+ * Returns a map of service_type -> campaign info.
+ */
+export async function getMatchingCampaignsForJobs(
+  businessId: string,
+  serviceTypes: ServiceType[]
+): Promise<Map<string, { campaignName: string; firstTouchDelay: number }>> {
+  const supabase = await createClient()
+
+  // Get all active campaigns for the business
+  const { data: campaigns } = await supabase
+    .from('campaigns')
+    .select('id, name, service_type, campaign_touches(delay_hours)')
+    .eq('business_id', businessId)
+    .eq('status', 'active')
+
+  if (!campaigns) return new Map()
+
+  // Build map: serviceType -> campaign info
+  const result = new Map<string, { campaignName: string; firstTouchDelay: number }>()
+
+  // Find default campaign (null service_type)
+  const defaultCampaign = campaigns.find(c => c.service_type === null)
+
+  for (const st of serviceTypes) {
+    // Try specific campaign first, then default
+    const specific = campaigns.find(c => c.service_type === st)
+    const campaign = specific || defaultCampaign
+
+    if (campaign) {
+      const firstTouch = campaign.campaign_touches?.[0]
+      result.set(st, {
+        campaignName: campaign.name,
+        firstTouchDelay: firstTouch?.delay_hours || 24,
+      })
+    }
+  }
+
+  return result
+}
+
 export async function getCampaignAnalytics(campaignId: string): Promise<{
   touchStats: Array<{
     touchNumber: number
