@@ -351,15 +351,15 @@ Plans:
   7. Complete report at docs/QA-AUDIT.md with actionable fix suggestions for every finding
 **Plans**: 9 plans in 2 waves
 Plans:
-- [ ] QA-AUDIT-01-PLAN.md — Login flow and onboarding wizard audit
-- [ ] QA-AUDIT-02-PLAN.md — Dashboard and analytics pages audit
-- [ ] QA-AUDIT-03-PLAN.md — Jobs and campaigns list pages audit
-- [ ] QA-AUDIT-04-PLAN.md — Campaign detail, edit, and new pages audit
-- [ ] QA-AUDIT-05-PLAN.md — Send page (Quick Send + Bulk Send) audit
-- [ ] QA-AUDIT-06-PLAN.md — Customers and feedback pages audit
-- [ ] QA-AUDIT-07-PLAN.md — History, billing, and settings pages audit
-- [ ] QA-AUDIT-08-PLAN.md — Orphaned routes, navigation, and cross-cutting checks
-- [ ] QA-AUDIT-09-PLAN.md — Compile final docs/QA-AUDIT.md report
+- [x] QA-AUDIT-01-PLAN.md — Login flow and onboarding wizard audit
+- [x] QA-AUDIT-02-PLAN.md — Dashboard and analytics pages audit
+- [x] QA-AUDIT-03-PLAN.md — Jobs and campaigns list pages audit
+- [x] QA-AUDIT-04-PLAN.md — Campaign detail, edit, and new pages audit
+- [x] QA-AUDIT-05-PLAN.md — Send page (Quick Send + Bulk Send) audit
+- [x] QA-AUDIT-06-PLAN.md — Customers and feedback pages audit
+- [x] QA-AUDIT-07-PLAN.md — History, billing, and settings pages audit
+- [x] QA-AUDIT-08-PLAN.md — Orphaned routes, navigation, and cross-cutting checks
+- [x] QA-AUDIT-09-PLAN.md — Compile final docs/QA-AUDIT.md report
 
 ## Phase Details
 
@@ -388,7 +388,7 @@ See individual phase sections above for requirements, success criteria, and depe
 | 27 (v2.0) | Review Follow-Up | 0/7 | Planned | - |
 | 28 (v2.0) | Review Follow-Up | 0/8 | In progress | - |
 | 29 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
-| QA-AUDIT | Dashboard Audit | 0/9 | Planned | - |
+| **QA-AUDIT** | **Dashboard Audit** | **9/9** | **Complete** | **2026-02-05** |
 
 **Total:** 138 plans complete across shipped phases, 2 v2.0 phases remaining after Phase 27.
 
