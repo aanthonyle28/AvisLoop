@@ -1,12 +1,23 @@
+import { Skeleton } from '@/components/ui/skeleton'
+import { TableSkeleton } from '@/components/skeletons/table-skeleton'
+
 export default function JobsLoading() {
   return (
-    <div className="container py-6">
-      <div className="flex items-center justify-center py-16">
-        <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
-          <p className="mt-4 text-muted-foreground">Loading jobs...</p>
-        </div>
+    <div className="container py-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <Skeleton className="h-8 w-24" />
+        <Skeleton className="h-10 w-28" />
       </div>
+
+      {/* Filters */}
+      <div className="flex gap-4">
+        <Skeleton className="h-10 w-32" />
+        <Skeleton className="h-10 w-40" />
+      </div>
+
+      {/* Table - 6 columns for jobs: customer, service, status, campaign, completed, actions */}
+      <TableSkeleton rows={8} columns={6} showCheckbox={false} />
     </div>
   )
 }
