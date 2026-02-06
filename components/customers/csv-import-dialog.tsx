@@ -241,7 +241,7 @@ export function CSVImportDialog() {
         {step === 'importing' && (
           <div className='flex flex-col items-center justify-center py-12 space-y-4'>
             <Loader2 className='h-12 w-12 animate-spin text-primary' />
-            <p className='text-lg font-medium'>Importing contacts...</p>
+            <p className='text-lg font-medium'>Importing customers...</p>
           </div>
         )}
 

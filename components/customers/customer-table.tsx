@@ -151,7 +151,7 @@ export function CustomerTable({
       {hasSelection && (
         <div className='flex items-center gap-2 rounded-lg border bg-muted/50 p-3'>
           <span className='text-sm font-medium'>
-            {selectedIds.length} {selectedIds.length === 1 ? 'customer' : 'contacts'} selected
+            {selectedIds.length} {selectedIds.length === 1 ? 'customer' : 'customers'} selected
           </span>
           <div className='ml-auto flex gap-2'>
             <Button
@@ -215,7 +215,7 @@ export function CustomerTable({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className='h-24 text-center'>
-                  No contacts found.
+                  No customers found.
                 </TableCell>
               </TableRow>
             )}

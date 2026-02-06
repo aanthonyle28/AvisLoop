@@ -50,7 +50,7 @@ export function AddCustomerSheet({ open, onOpenChange }: AddCustomerSheetProps) 
         if (addAnother) {
           // Clear form and show success message, keep sheet open
           formRef.current?.reset()
-          setSuccessMessage('Contact added! Add another below.')
+          setSuccessMessage('Customer added! Add another below.')
           setTimeout(() => setSuccessMessage(null), 3000)
           setAddAnother(false)
         } else {
@@ -77,7 +77,7 @@ export function AddCustomerSheet({ open, onOpenChange }: AddCustomerSheetProps) 
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetContent side='right' className='w-[400px] sm:w-[540px] overflow-y-auto'>
         <SheetHeader>
-          <SheetTitle>Add New Contact</SheetTitle>
+          <SheetTitle>Add New Customer</SheetTitle>
           <SheetDescription>
             Add a new customer to your list. They will be available for review requests.
           </SheetDescription>
