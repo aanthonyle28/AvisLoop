@@ -4,12 +4,12 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** QA-FIX-audit-remediation (Audit Remediation)
-**Plan:** 3 of 5 in Phase QA-FIX
+**Plan:** 4 of 5 in Phase QA-FIX
 **Status:** In progress
-**Last activity:** 2026-02-06 - Completed QA-FIX-03-PLAN.md (Terminology Fixes)
+**Last activity:** 2026-02-06 - Completed QA-FIX-04-PLAN.md (Icon Consistency)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/10 phases complete or nearly complete)
-**QA-FIX Progress:** ███░░ (3/5 remediation plans complete)
+**QA-FIX Progress:** ████░ (4/5 remediation plans complete)
 
 ## v2.0 Phase Status
 
@@ -37,7 +37,7 @@
 | 01 | Critical Blocker Fixes | **COMPLETE** |
 | 02 | Navigation Reorder | **COMPLETE** |
 | 03 | Terminology Fixes | **COMPLETE** |
-| 04 | Icon Consistency | Not started |
+| 04 | Icon Consistency | **COMPLETE** |
 | 05 | Legacy Code Cleanup | Not started |
 
 ### QA-FIX-01 Summary
@@ -60,6 +60,14 @@
 - Replaced 'contact' with 'customer' in user-facing strings
 - Replaced 'review request' with 'message' for V2 consistency
 - Updated component prop API (onAddContact -> onAddCustomer)
+- Both lint and typecheck pass
+
+### QA-FIX-04 Summary
+
+- Migrated 11 high-priority user-facing files from lucide-react to Phosphor icons
+- Dashboard pages: history/error.tsx, billing/page.tsx, feedback/page.tsx
+- Components: feedback-card.tsx, feedback-list.tsx, empty-state.tsx (2), csv-import-dialog.tsx, history-filters.tsx, usage-warning-banner.tsx, integrations-section.tsx
+- All icon imports now from @phosphor-icons/react
 - Both lint and typecheck pass
 
 ## QA-AUDIT Summary
@@ -294,14 +302,14 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 
 **QA-AUDIT findings summary:**
 - ~~47 user-facing "contact" terminology issues~~ **FIXED** (QA-FIX-03) - 17 instances across 9 files
-- 41 files use lucide-react instead of Phosphor icons
+- ~~41 files use lucide-react~~ **PARTIAL** (QA-FIX-04) - 11 high-priority files migrated, ~30 remaining
 - ~~10 legacy files in /components/contacts/ folder~~ **FIXED** (QA-FIX-02)
 - ~~Navigation order not V2-aligned~~ **FIXED** (QA-FIX-02)
 - ~~/scheduled route orphaned~~ **FIXED** (QA-FIX-01)
 
 **Next actions:**
 - Start Docker and run `supabase db reset` to apply C01/C02 migrations
-- Execute remaining QA-FIX plans (04-05) for icons and legacy cleanup
+- Execute QA-FIX-05 (Legacy Code Cleanup) for remaining remediation
 - Wait for A2P approval before Phase 21-08 execution
 
 ### QA-FIX
@@ -313,11 +321,13 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | V2 navigation order | QA-FIX-02 | Jobs at 2, Campaigns at 3, Send at 6 | Emphasizes V2 workflow over manual sending |
 | V2 terminology: customer | QA-FIX-03 | Replace 'contact' with 'customer' | User-facing strings only, not code references |
 | V2 terminology: message | QA-FIX-03 | Replace 'review request' with 'message' | Aligns with multi-channel V2 model |
+| Phosphor icon mappings | QA-FIX-04 | AlertCircle->WarningCircle, History->ClockCounterClockwise, etc. | Lucide to Phosphor equivalents established |
+| Icon size props pattern | QA-FIX-04 | size={16} for h-4 w-4, size={20} for h-5 w-5, etc. | Phosphor uses size/weight props not className |
 
 ## Session Continuity
 
-**Last session:** 2026-02-06T01:22:00Z
-**Stopped at:** Completed QA-FIX-03-PLAN.md (Terminology Fixes)
+**Last session:** 2026-02-06T01:23:00Z
+**Stopped at:** Completed QA-FIX-04-PLAN.md (Icon Consistency)
 **Resume file:** None
 **QA test account:** audit-test@avisloop.com / AuditTest123!
 **QA Report:** docs/QA-AUDIT.md
