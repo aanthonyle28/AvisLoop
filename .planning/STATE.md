@@ -4,12 +4,12 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** 31 - Landing Page V2 Rewrite
-**Plan:** 03 of 7 (Wave 1 in progress)
+**Plan:** 04 of 7 (Wave 1 in progress)
 **Status:** **EXECUTING**
-**Last activity:** 2026-02-06 - Completed 31-03-PLAN.md (V2 benefits, stats, social proof)
+**Last activity:** 2026-02-06 - Completed 31-04-PLAN.md (FAQ, testimonials, CTA, pricing V2 update)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/11 phases complete)
-**Phase 31 Progress:** ██░░░░░░ (2/7 plans)
+**Phase 31 Progress:** ████░░░░ (4/7 plans)
 
 ## v2.0 Phase Status
 
@@ -346,11 +346,15 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | V2 outcome messaging | 31-03 | Automation-focused benefits (multi-touch, funnel, job-centric) | Replaces V1 "30 seconds" speed claims |
 | Home services positioning | 31-03 | Target HVAC, Plumbing, Electrical, Roofing, Cleaning, Painting | Matches codebase service types |
 | Job entry stat | 31-03 | "10s Per Job Entry" replaces hours saved | V2 job-centric efficiency messaging |
+| V2 FAQ content | 31-04 | 6 questions explaining campaigns, job completion, review funnel | Replaces V1 manual send questions |
+| Home service testimonials | 31-04 | HVAC, Plumbing, Electric businesses | Fictional but realistic for target market |
+| First-person CTA button | 31-04 | "Start My Free Trial" per research | +90% CTR improvement pattern |
+| V2 pricing terminology | 31-04 | "campaign touches" and "customers" not V1 terms | Consistent with automation model |
 
 ## Session Continuity
 
-**Last session:** 2026-02-06T04:00:00Z
-**Stopped at:** Completed 31-03-PLAN.md
+**Last session:** 2026-02-06T06:10:00Z
+**Stopped at:** Completed 31-04-PLAN.md
 **Resume file:** None
 **QA test account:** audit-test@avisloop.com / AuditTest123!
 **QA Report:** docs/QA-AUDIT.md
