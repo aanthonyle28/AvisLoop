@@ -16,6 +16,7 @@ import {
   Briefcase,
   Megaphone,
   ChatCircleText,
+  ChartBar,
   House,
   Plus,
 } from '@phosphor-icons/react'
@@ -31,10 +32,11 @@ interface NavItem {
 
 const mainNav: NavItem[] = [
   { icon: House, label: 'Dashboard', href: '/dashboard' },
-  { icon: PaperPlaneTilt, label: 'Send', href: '/send' },
-  { icon: AddressBook, label: 'Customers', href: '/customers' },
   { icon: Briefcase, label: 'Jobs', href: '/jobs' },
   { icon: Megaphone, label: 'Campaigns', href: '/campaigns' },
+  { icon: ChartBar, label: 'Analytics', href: '/analytics' },
+  { icon: AddressBook, label: 'Customers', href: '/customers' },
+  { icon: PaperPlaneTilt, label: 'Send', href: '/send' },
   { icon: ClockCounterClockwise, label: 'Activity', href: '/history' },
   { icon: ChatCircleText, label: 'Feedback', href: '/feedback' },
 ]
@@ -116,7 +118,7 @@ export function Sidebar({ dashboardBadge }: { dashboardBadge?: number } = {}) {
         collapsed ? "justify-center" : "justify-between"
       )}>
         {!collapsed && (
-          <Link href="/send" className="flex items-center gap-2">
+          <Link href="/dashboard" className="flex items-center gap-2">
             <ArrowsClockwise size={24} weight="regular" className="text-primary" />
             <span className="font-bold text-lg">AvisLoop</span>
           </Link>
