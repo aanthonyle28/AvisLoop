@@ -1,6 +1,29 @@
 // Database table types for businesses and message_templates
 // These types match the schema in supabase/migrations
 
+/**
+ * Onboarding checklist state stored in businesses.onboarding_checklist
+ * V2-aligned: tracks jobs and campaigns, NOT customers or manual sends
+ */
+export interface OnboardingChecklist {
+  /** User has added at least one job */
+  first_job_added: boolean
+  /** User has reviewed their campaign settings */
+  campaign_reviewed: boolean
+  /** User has completed (not just added) at least one job */
+  job_completed: boolean
+  /** A customer has clicked through to leave a review (funnel success) */
+  first_review_click: boolean
+  /** User has dismissed the Getting Started checklist */
+  dismissed: boolean
+  /** Timestamp when checklist was dismissed */
+  dismissed_at: string | null
+  /** Checklist is collapsed (header only) - auto after 3 days */
+  collapsed: boolean
+  /** Timestamp when user first saw the checklist (for auto-collapse) */
+  first_seen_at: string | null
+}
+
 export interface Business {
   id: string
   user_id: string
@@ -14,6 +37,7 @@ export interface Business {
   sms_consent_acknowledged_at: string | null
   tier: 'basic' | 'pro' | 'trial'
   stripe_customer_id: string | null
+  onboarding_checklist: OnboardingChecklist | null
   created_at: string
   updated_at: string
 }
