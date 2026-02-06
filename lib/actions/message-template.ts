@@ -13,6 +13,10 @@ export type MessageTemplateActionState = {
 
 /**
  * Create a new message template for the user's business.
+ *
+ * @param _prevState - Previous action state. Required by React's useActionState
+ *   progressive enhancement pattern but not used in this action.
+ * @param formData - Form data containing template fields
  */
 export async function createMessageTemplate(
   _prevState: MessageTemplateActionState | null,
@@ -79,6 +83,11 @@ export async function createMessageTemplate(
 
 /**
  * Update an existing message template.
+ *
+ * @param templateId - The ID of the template to update
+ * @param _prevState - Previous action state. Required by React's useActionState
+ *   progressive enhancement pattern but not used in this action.
+ * @param formData - Form data containing updated template fields
  */
 export async function updateMessageTemplate(
   templateId: string,

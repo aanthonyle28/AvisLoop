@@ -5,6 +5,13 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { updateCustomerSmsConsent } from '@/lib/actions/customer'
 import { toast } from 'sonner'
 import { CaretDown, CaretUp, Info } from '@phosphor-icons/react'
@@ -122,19 +129,18 @@ export function SmsConsentForm({
         <div className="pl-6 space-y-4 border-l-2 border-muted ml-2">
           <div className="space-y-2">
             <Label htmlFor="consent-method">Consent method</Label>
-            <select
-              id="consent-method"
-              value={method}
-              onChange={(e) => handleMethodChange(e.target.value)}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            >
-              <option value="">How was consent given?</option>
-              {CONSENT_METHODS.map(m => (
-                <option key={m.value} value={m.value}>
-                  {m.label}
-                </option>
-              ))}
-            </select>
+            <Select value={method || undefined} onValueChange={handleMethodChange}>
+              <SelectTrigger id="consent-method" className="w-full">
+                <SelectValue placeholder="How was consent given?" />
+              </SelectTrigger>
+              <SelectContent>
+                {CONSENT_METHODS.map(m => (
+                  <SelectItem key={m.value} value={m.value}>
+                    {m.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">

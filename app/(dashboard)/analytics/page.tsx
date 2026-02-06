@@ -5,7 +5,7 @@ import { ServiceTypeBreakdown } from '@/components/dashboard/analytics-service-b
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Analytics | AvisLoop',
+  title: 'Analytics',
 }
 
 export default async function AnalyticsPage() {

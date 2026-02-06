@@ -1,18 +1,36 @@
 # CLAUDE.md — Review SaaS (Next.js + Supabase + Vercel)
 
 ## Project context
-We are building a multi-tenant Review SaaS:
-- Businesses (orgs) onboard
-- Send review requests (email/SMS later)
-- Ingest/store reviews + sources
-- Render a public widget/embed + optional public page
-- Analytics dashboard for org admins
+We are building AvisLoop V2 — an automation-first reputation platform for home service businesses.
 
-If present, load:
+**V2 Core Philosophy (IMPORTANT):**
+- Jobs are the primary object, NOT customers
+- Customers are created as a side effect of completing jobs
+- There is no "Add Customer" in normal workflow
+- The ONLY recurring user action is "Complete Job" (~10 seconds)
+- Campaigns handle all messaging automatically
+- Users set up once, system runs forever
+
+**What AvisLoop does:**
+- Businesses complete jobs → system auto-enrolls in campaigns
+- Multi-touch email/SMS sequences sent automatically
+- Review funnel routes 4-5 stars to Google, 1-3 stars to private feedback
+- Analytics dashboard for insights
+
+**Reference documents (load these):**
+- **V2 Philosophy (CRITICAL):** @.planning/V1-TO-V2-PHILOSOPHY.md
 - Current baton-pass: @docs/PROJECT_STATE.md
 - Data model / RLS notes: @docs/DATA_MODEL.md
 - Product decisions / ADRs: @docs/DECISIONS.md
+- UX Audit: @.planning/UX-AUDIT.md
 - Scripts: @package.json
+
+## V2 Philosophy Maintenance
+When making changes that affect core product direction, UPDATE `.planning/V1-TO-V2-PHILOSOPHY.md`:
+- New features: Add to appropriate section, verify V2 alignment
+- UI changes: Ensure they don't reintroduce V1 patterns
+- Terminology: Keep consistent with V2 language
+- If a decision contradicts V2, document WHY in the philosophy doc
 
 ## Stack
 - Next.js (App Router) + TypeScript
@@ -67,19 +85,25 @@ Server-only:
 - (optional) RESEND_API_KEY / POSTMARK_SERVER_TOKEN
 
 ## Definition of Done (DoD)
-Before considering a change “done”:
+Before considering a change "done":
 - Lint + typecheck pass
 - Any schema change includes RLS + policies
+- **V2 alignment check:**
+  - Does NOT require recurring manual user action (except job completion)
+  - Does NOT treat customers as primary object
+  - Does NOT encourage manual sending over campaigns
+  - If introducing V1 patterns, document justification
 - Smoke test:
   - sign up / login
-  - create org
-  - create a “review request”
-  - create/store a review (or simulated ingest)
-  - widget/public page renders for org
+  - create business
+  - complete a job (creates customer automatically)
+  - job enrolls in campaign
+  - review funnel works (rating → Google or feedback)
 - Update docs/PROJECT_STATE.md with:
   - what changed
   - current state
   - next step + open questions
+- If core product changes: update .planning/V1-TO-V2-PHILOSOPHY.md
 
 ## Workflow shortcut: qwrap
 

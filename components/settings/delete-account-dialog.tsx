@@ -65,7 +65,7 @@ export function DeleteAccountDialog() {
           <DialogTitle>Delete Account</DialogTitle>
           <DialogDescription>
             This action is permanent and cannot be undone. All your business
-            data, contacts, templates, send history, and billing information
+            data, customers, templates, send history, and billing information
             will be permanently deleted.
           </DialogDescription>
         </DialogHeader>

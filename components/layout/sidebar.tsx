@@ -151,11 +151,11 @@ export function Sidebar({ dashboardBadge }: { dashboardBadge?: number } = {}) {
         ))}
       </nav>
 
-      {/* Add Job button */}
+      {/* Add Job button - V2: Primary variant to emphasize core action */}
       <div className="p-3 border-t border-[#E2E2E2] dark:border-border">
         <Link href="/jobs?action=add">
           <Button
-            variant="outline"
+            variant="default"
             className={cn(
               "w-full justify-start gap-2 text-sm",
               collapsed && "justify-center px-2"

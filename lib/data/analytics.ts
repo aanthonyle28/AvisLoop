@@ -42,159 +42,54 @@ export async function getServiceTypeAnalytics(
   const supabase = await createClient()
 
   try {
-    // 1. Fetch all campaign enrollments with job service types
-    const { data: enrollments, error: enrollmentsError } = await supabase
-      .from('campaign_enrollments')
-      .select('id, job_id, jobs!inner(service_type)')
-      .eq('business_id', businessId)
+    const { data, error } = await supabase.rpc('get_service_type_analytics', {
+      p_business_id: businessId,
+    })
 
-    if (enrollmentsError) {
-      console.error('Error fetching enrollments:', enrollmentsError)
+    if (error) {
+      console.error('Error fetching service type analytics:', error)
       return emptyAnalytics()
     }
 
-    if (!enrollments || enrollments.length === 0) {
+    if (!data || data.length === 0) {
       return emptyAnalytics()
     }
 
-    // 2. Fetch all campaign send logs for this business
-    const { data: sendLogs, error: sendLogsError } = await supabase
-      .from('send_logs')
-      .select('campaign_enrollment_id, status, reviewed_at')
-      .eq('business_id', businessId)
-      .not('campaign_enrollment_id', 'is', null)
-
-    if (sendLogsError) {
-      console.error('Error fetching send logs:', sendLogsError)
-      return emptyAnalytics()
-    }
-
-    // 3. Fetch all customer feedback with enrollment IDs
-    const { data: feedback, error: feedbackError } = await supabase
-      .from('customer_feedback')
-      .select('enrollment_id')
-      .eq('business_id', businessId)
-      .not('enrollment_id', 'is', null)
-
-    if (feedbackError) {
-      console.error('Error fetching feedback:', feedbackError)
-      return emptyAnalytics()
-    }
-
-    // Map enrollments to service types
-    const enrollmentToServiceType = new Map<string, string>()
-    enrollments.forEach((enrollment) => {
-      const jobs = enrollment.jobs as unknown as { service_type: string } | null
-      const serviceType = jobs?.service_type
-      if (serviceType) {
-        enrollmentToServiceType.set(enrollment.id, serviceType)
-      }
-    })
-
-    // Count feedback per enrollment
-    const feedbackCountByEnrollment = new Map<string, number>()
-    feedback?.forEach((fb) => {
-      if (fb.enrollment_id) {
-        feedbackCountByEnrollment.set(
-          fb.enrollment_id,
-          (feedbackCountByEnrollment.get(fb.enrollment_id) || 0) + 1
-        )
-      }
-    })
-
-    // Group send logs by service type
-    const metricsByServiceType = new Map<
-      string,
-      {
-        totalSent: number
-        delivered: number
-        reviewed: number
-        feedbackCount: number
-      }
-    >()
-
-    sendLogs?.forEach((log) => {
-      if (!log.campaign_enrollment_id) return
-
-      const serviceType = enrollmentToServiceType.get(log.campaign_enrollment_id)
-      if (!serviceType) return
-
-      const metrics = metricsByServiceType.get(serviceType) || {
-        totalSent: 0,
-        delivered: 0,
-        reviewed: 0,
-        feedbackCount: 0,
-      }
-
-      metrics.totalSent++
-
-      if (log.status === 'delivered') {
-        metrics.delivered++
-      }
-
-      if (log.reviewed_at) {
-        metrics.reviewed++
-      }
-
-      // Count feedback for this enrollment only once per service type
-      // (We'll handle this separately to avoid double-counting)
-      metricsByServiceType.set(serviceType, metrics)
-    })
-
-    // Count feedback per service type
-    feedback?.forEach((fb) => {
-      if (!fb.enrollment_id) return
-
-      const serviceType = enrollmentToServiceType.get(fb.enrollment_id)
-      if (!serviceType) return
-
-      const metrics = metricsByServiceType.get(serviceType)
-      if (metrics) {
-        metrics.feedbackCount++
-      }
-    })
-
-    // Calculate rates and build result array
-    const byServiceType: ServiceTypeMetrics[] = []
+    // Calculate rates from DB-aggregated counts
     let totalSent = 0
     let totalDelivered = 0
     let totalReviewed = 0
     let totalFeedback = 0
 
-    metricsByServiceType.forEach((metrics, serviceType) => {
-      const responseRate =
-        metrics.delivered > 0
-          ? Math.round(
-              ((metrics.reviewed + metrics.feedbackCount) / metrics.delivered) * 100
-            )
-          : 0
+    const byServiceType: ServiceTypeMetrics[] = data.map((row: {
+      service_type: string
+      total_sent: number
+      delivered: number
+      reviewed: number
+      feedback_count: number
+    }) => {
+      const sent = Number(row.total_sent)
+      const del = Number(row.delivered)
+      const rev = Number(row.reviewed)
+      const fb = Number(row.feedback_count)
 
-      const reviewRate =
-        metrics.delivered > 0
-          ? Math.round((metrics.reviewed / metrics.delivered) * 100)
-          : 0
+      totalSent += sent
+      totalDelivered += del
+      totalReviewed += rev
+      totalFeedback += fb
 
-      byServiceType.push({
-        serviceType,
-        displayName: SERVICE_TYPE_NAMES[serviceType] || serviceType,
-        totalSent: metrics.totalSent,
-        delivered: metrics.delivered,
-        reviewed: metrics.reviewed,
-        feedbackCount: metrics.feedbackCount,
-        responseRate,
-        reviewRate,
-      })
-
-      totalSent += metrics.totalSent
-      totalDelivered += metrics.delivered
-      totalReviewed += metrics.reviewed
-      totalFeedback += metrics.feedbackCount
+      return {
+        serviceType: row.service_type,
+        displayName: SERVICE_TYPE_NAMES[row.service_type] || row.service_type,
+        totalSent: sent,
+        delivered: del,
+        reviewed: rev,
+        feedbackCount: fb,
+        responseRate: del > 0 ? Math.round(((rev + fb) / del) * 100) : 0,
+        reviewRate: del > 0 ? Math.round((rev / del) * 100) : 0,
+      }
     })
 
-    // Sort by total sent descending (most active first)
-    byServiceType.sort((a, b) => b.totalSent - a.totalSent)
-
-    // Calculate overall rates
     const overallResponseRate =
       totalDelivered > 0
         ? Math.round(((totalReviewed + totalFeedback) / totalDelivered) * 100)

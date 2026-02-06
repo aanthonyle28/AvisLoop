@@ -6,7 +6,6 @@ import { useDropzone } from 'react-dropzone'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
-  Upload,
   FileXls,
   CheckCircle,
   CircleNotch,

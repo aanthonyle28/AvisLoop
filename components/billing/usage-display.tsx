@@ -48,7 +48,7 @@ export function UsageDisplay({ sendCount, sendLimit, contactCount, contactLimit,
       {tier === 'basic' && contactCount !== undefined && contactLimit !== undefined && (
         <div className="space-y-3">
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Contacts</span>
+            <span className="text-muted-foreground">Customers</span>
             <span className="font-medium">{contactCount} / {contactLimit}</span>
           </div>
           {(() => {
@@ -68,12 +68,12 @@ export function UsageDisplay({ sendCount, sendLimit, contactCount, contactLimit,
                 </div>
                 {contactPercentage >= 80 && contactPercentage < 100 && (
                   <p className="text-sm text-amber-600">
-                    {contactRemaining} contacts remaining
+                    {contactRemaining} customers remaining
                   </p>
                 )}
                 {contactPercentage >= 100 && (
                   <p className="text-sm text-destructive">
-                    Contact limit reached. You can add more contacts, but cannot send until you{' '}
+                    Customer limit reached. You can add more customers, but cannot send until you{' '}
                     <Link href="#plans" className="underline">upgrade</Link>.
                   </p>
                 )}

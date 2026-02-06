@@ -6,7 +6,7 @@ import { Plus } from '@phosphor-icons/react/dist/ssr'
 import Link from 'next/link'
 
 export const metadata = {
-  title: 'Campaigns | AvisLoop',
+  title: 'Campaigns',
 }
 
 export default async function CampaignsPage() {

@@ -138,20 +138,18 @@ export async function updateCampaign(
     return { error: `Failed to update campaign: ${campaignError.message}` }
   }
 
-  // Replace touches (delete all, insert new)
-  await supabase.from('campaign_touches').delete().eq('campaign_id', campaignId)
-
-  const touchInserts = touches.map(touch => ({
-    campaign_id: campaignId,
+  // Replace touches atomically using transaction-safe RPC
+  const touchesJson = touches.map(touch => ({
     touch_number: touch.touch_number,
     channel: touch.channel,
     delay_hours: touch.delay_hours,
-    template_id: touch.template_id,
+    template_id: touch.template_id || null,
   }))
 
-  const { error: touchError } = await supabase
-    .from('campaign_touches')
-    .insert(touchInserts)
+  const { error: touchError } = await supabase.rpc('replace_campaign_touches', {
+    p_campaign_id: campaignId,
+    p_touches: touchesJson,
+  })
 
   if (touchError) {
     return { error: `Failed to update touches: ${touchError.message}` }

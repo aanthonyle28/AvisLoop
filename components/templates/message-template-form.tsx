@@ -100,7 +100,7 @@ export function MessageTemplateForm({ onSuccess }: MessageTemplateFormProps) {
                   <p className="text-sm text-destructive">{state.fieldErrors.body[0]}</p>
                 )}
                 <p className="text-sm text-muted-foreground">
-                  Available variables: {'{'}{'{'}{'}'}CUSTOMER_NAME{'}'}{'}'}, {'{'}{'{'}{'}'}BUSINESS_NAME{'}'}{'}'}, {'{'}{'{'}{'}'}REVIEW_LINK{'}'}{'}'}, {'{'}{'{'}{'}'}OPT_OUT_LINK{'}'}{'}'}, {'{'}{'{'}{'}'}CONTACT_PHONE{'}'}{'}'}, {'{'}{'{'}{'}'}BUSINESS_PHONE{'}'}{'}'}, {'{'}{'{'}{'}'}BUSINESS_EMAIL{'}'}{'}'}, {'{'}{'{'}{'}'}BUSINESS_ADDRESS{'}'}{'}'}, {'{'}{'{'}{'}'}BUSINESS_CITY{'}'}{'}'}, {'{'}{'{'}{'}'}BUSINESS_STATE{'}'}{'}'}, {'{'}{'{'}{'}'}BUSINESS_ZIP{'}'}{'}'}, {'{'}{'{'}{'}'}BUSINESS_WEBSITE{'}'}{'}'}, {'{'}{'{'}{'}'}SERVICE_TYPE{'}'}{'}'}, {'{'}{'{'}{'}'}COMPLETED_AT{'}'}{'}'}, {'{'}{'{'}{'}'}DAYS_SINCE_SERVICE{'}'}{'}'}, {'{'}{'{'}{'}'}NOTES{'}'}{'}'}, {'{'}{'{'}{'}'}SENDER_NAME{'}'}{'}'}, {'{'}{'{'}{'}'}UNSUBSCRIBE{'}'}{'}'}, {'{'}{'{'}{'}'}CURRENT_YEAR{'}'}{'}'}, {'{'}{'{'}{'}'}SUPPORT_EMAIL{'}'}{'}'}, {'{'}{'{'}{'}'}SUPPORT_PHONE{'}'}{'}'}, {'{'}{'{'}{'}'}LOGO_URL{'}'}{'}'}, {'{'}{'{'}{'}'}HEADER_IMAGE_URL{'}'}{'}'}, {'{'}{'{'}{'}'}FOOTER_TEXT{'}'}{'}'}, {'{'}{'{'}{'}'}SOCIAL_LINKS{'}'}{'}'}, {'{'}{'{'}{'}'}TRACKING_PIXEL{'}'}{'}'}, {'{'}{'{'}{'}'}SENTIMENT{'}'}{'}'}, {'{'}{'{'}{'}'}RATING{'}'}{'}'}, {'{'}{'{'}{'}'}TESTIMONIAL{'}'}{'}'}, {'{'}{'{'}{'}'}CUSTOM_1{'}'}{'}'}, {'{'}{'{'}{'}'}CUSTOM_2{'}'}{'}'}, {'{'}{'{'}{'}'}CUSTOM_3{'}'}{'}'}, {'{'}{'{'}{'}'}CUSTOM_4{'}'}{'}'}, {'{'}{'{'}{'}'}CUSTOM_5{'}'}{'}'}, {'{'}{'{'}{'}'}CUSTOM_6{'}'}{'}'}, {'{'}{'{'}{'}'}CUSTOM_7{'}'}{'}'}, {'{'}{'{'}{'}'}CUSTOM_8{'}'}{'}'}, {'{'}{'{'}{'}'}CUSTOM_9{'}'}{'}'}, {'{'}{'{'}{'}'}CUSTOM_10{'}'}{'}'}
+                  Available variables: {'{{'}CUSTOMER_NAME{'}}'}, {'{{'}BUSINESS_NAME{'}}'}, {'{{'}REVIEW_LINK{'}}'}, {'{{'}SENDER_NAME{'}}'}
                 </p>
               </div>
             </TabsContent>
@@ -167,7 +167,7 @@ export function MessageTemplateForm({ onSuccess }: MessageTemplateFormProps) {
                 </div>
 
                 <p className="text-sm text-muted-foreground">
-                  Available variables: {'{'}{'{'}{'}'}CUSTOMER_NAME{'}'}{'}'}, {'{'}{'{'}{'}'}BUSINESS_NAME{'}'}{'}'}, {'{'}{'{'}{'}'}CONTACT_PHONE{'}'}{'}'}, {'{'}{'{'}{'}'}BUSINESS_PHONE{'}'}{'}'}, {'{'}{'{'}{'}'}SERVICE_TYPE{'}'}{'}'} (Note: {'{'}{'{'}{'}'}REVIEW_LINK{'}'}{'}'}  not available for SMS)
+                  Available variables: {'{{'}CUSTOMER_NAME{'}}'}, {'{{'}BUSINESS_NAME{'}}'}, {'{{'}SENDER_NAME{'}}'}
                 </p>
               </div>
 

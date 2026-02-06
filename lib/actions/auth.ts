@@ -154,7 +154,7 @@ export async function deleteAccount(): Promise<AuthActionState> {
 
   const admin = createServiceRoleClient()
 
-  // Delete business (cascades to email_templates, contacts, send_logs, subscriptions, scheduled_sends)
+  // Delete business (cascades to message_templates, customers, send_logs, subscriptions, scheduled_sends)
   const { error: deleteBusinessError } = await admin
     .from('businesses')
     .delete()

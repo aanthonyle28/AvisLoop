@@ -4,7 +4,7 @@ import { CampaignForm } from '@/components/campaigns/campaign-form'
 import { ArrowLeft } from '@phosphor-icons/react/dist/ssr'
 
 export const metadata = {
-  title: 'New Campaign | AvisLoop',
+  title: 'New Campaign',
 }
 
 export default async function NewCampaignPage() {

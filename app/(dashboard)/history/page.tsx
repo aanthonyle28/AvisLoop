@@ -5,7 +5,7 @@ import { HistoryClient } from '@/components/history/history-client'
 import { redirect } from 'next/navigation'
 
 export const metadata = {
-  title: 'Requests',
+  title: 'Activity',
   description: 'View and manage all your review requests',
 }
 

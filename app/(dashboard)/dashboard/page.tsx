@@ -14,7 +14,7 @@ import { ReadyToSendQueue } from '@/components/dashboard/ready-to-send-queue'
 import { AttentionAlerts } from '@/components/dashboard/attention-alerts'
 
 export const metadata = {
-  title: 'Dashboard | AvisLoop',
+  title: 'Dashboard',
 }
 
 export default async function DashboardPage() {

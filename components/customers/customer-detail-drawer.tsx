@@ -131,7 +131,7 @@ export function CustomerDetailDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side='right' className='sm:max-w-lg overflow-y-auto'>
         <SheetHeader>
-          <SheetTitle>Contact Details</SheetTitle>
+          <SheetTitle>Customer Details</SheetTitle>
           <SheetDescription>
             View customer information, add notes, and take actions
           </SheetDescription>

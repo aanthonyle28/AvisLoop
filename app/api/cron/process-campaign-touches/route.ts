@@ -361,13 +361,10 @@ async function sendEmailTouch(
   await updateEnrollmentAfterSend(supabase, touch)
 
   // Update customer tracking - use atomic increment to avoid race conditions
-  await supabase
-    .from('customers')
-    .update({
-      last_sent_at: new Date().toISOString(),
-      send_count: (customer.send_count || 0) + 1,
-    })
-    .eq('id', touch.customer_id)
+  await supabase.rpc('increment_customer_send_count', {
+    p_customer_id: touch.customer_id,
+    p_sent_at: new Date().toISOString(),
+  })
 
   return { success: true }
 }
