@@ -4,12 +4,12 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** QA-AUDIT (Dashboard QA Test & UX Audit)
-**Plan:** 1 of 9 in Phase QA-AUDIT
+**Plan:** 2 of 9 in Phase QA-AUDIT
 **Status:** In progress
-**Last activity:** 2026-02-05 - Completed QA-AUDIT-01-PLAN.md (Login & Onboarding Wizard Audit)
+**Last activity:** 2026-02-05 - Completed QA-AUDIT-02-PLAN.md (Dashboard & Analytics Audit)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/10 phases complete or nearly complete)
-**QA Progress:** █░░░░░░░░ (1/9 audit plans complete)
+**QA Progress:** ██░░░░░░░ (2/9 audit plans complete)
 
 ## v2.0 Phase Status
 
@@ -226,15 +226,17 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 - Phase 21-08: Twilio A2P campaign approval required for production SMS testing
 - Phase 21-08: Webhook URLs must be configured in Twilio console after deployment
 - **QA-AUDIT C01:** Onboarding Step 1 fails with "phone column not in schema cache" - Phase 28 migration not applied to database. Blocks all new user onboarding.
+- **QA-AUDIT C02:** Analytics page missing `get_service_type_analytics` RPC function - Migration file never created. Analytics displays empty data.
 
 **Next actions:**
-- Continue QA-AUDIT plans 02-08 (dashboard page audits)
+- Continue QA-AUDIT plans 03-09 (remaining page audits)
 - Apply Phase 28 database migration to resolve C01
+- Create analytics RPC migration to resolve C02
 - Wait for A2P approval before Phase 21-08 execution
 
 ## Session Continuity
 
-**Last session:** 2026-02-05T06:27:30Z
-**Stopped at:** Completed QA-AUDIT-01-PLAN.md (Login & Onboarding Wizard Audit)
+**Last session:** 2026-02-05T23:57:55Z
+**Stopped at:** Completed QA-AUDIT-02-PLAN.md (Dashboard & Analytics Audit)
 **Resume file:** None
 **QA test account:** audit-test@avisloop.com / AuditTest123!
