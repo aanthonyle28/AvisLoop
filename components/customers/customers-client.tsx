@@ -3,12 +3,12 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { CustomerTable } from './customer-table'
-import { AddCustomerSheet } from './add-customer-sheet'
 import { EditCustomerSheet } from './edit-customer-sheet'
 import { CSVImportDialog } from './csv-import-dialog'
 import { CustomerDetailDrawer } from './customer-detail-drawer'
-import { Button } from '@/components/ui/button'
-import { Plus, Users } from 'lucide-react'
+import { DeleteCustomerDialog } from './delete-customer-dialog'
+import { CustomersEmptyState } from './empty-state'
+import { CircleNotch } from '@phosphor-icons/react'
 import {
   archiveCustomer,
   restoreCustomer,
@@ -25,9 +25,6 @@ interface CustomersClientProps {
 export function CustomersClient({ initialCustomers }: CustomersClientProps) {
   const router = useRouter()
 
-  // State for add customer sheet
-  const [addSheetOpen, setAddSheetOpen] = useState(false)
-
   // State for editing customer
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null)
   const [editSheetOpen, setEditSheetOpen] = useState(false)
@@ -36,8 +33,13 @@ export function CustomersClient({ initialCustomers }: CustomersClientProps) {
   const [detailCustomer, setDetailCustomer] = useState<Customer | null>(null)
   const [detailDrawerOpen, setDetailDrawerOpen] = useState(false)
 
-  // Transition for action feedback
-  const [, startTransition] = useTransition()
+  // State for delete confirmation dialog
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [customerToDelete, setCustomerToDelete] = useState<string | null>(null)
+  const [customersToDelete, setCustomersToDelete] = useState<string[]>([])
+
+  // Transition for action feedback with loading state
+  const [isPending, startTransition] = useTransition()
 
   // Action handlers
   const handleEdit = (customer: Customer) => {
@@ -58,12 +60,10 @@ export function CustomersClient({ initialCustomers }: CustomersClientProps) {
   }
 
   const handleDelete = (id: string) => {
-    // Show confirmation dialog for destructive action
-    if (window.confirm('Are you sure you want to delete this customer? This action cannot be undone.')) {
-      startTransition(async () => {
-        await deleteCustomer(id)
-      })
-    }
+    // Open confirmation dialog for destructive action
+    setCustomerToDelete(id)
+    setCustomersToDelete([])
+    setDeleteDialogOpen(true)
   }
 
   const handleBulkArchive = (ids: string[]) => {
@@ -73,10 +73,23 @@ export function CustomersClient({ initialCustomers }: CustomersClientProps) {
   }
 
   const handleBulkDelete = (ids: string[]) => {
-    // Show confirmation dialog for destructive action
-    if (window.confirm(`Are you sure you want to delete ${ids.length} customer${ids.length !== 1 ? 's' : ''}? This action cannot be undone.`)) {
+    // Open confirmation dialog for destructive action
+    setCustomerToDelete(null)
+    setCustomersToDelete(ids)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleConfirmDelete = () => {
+    setDeleteDialogOpen(false)
+    if (customerToDelete) {
       startTransition(async () => {
-        await bulkDeleteCustomers(ids)
+        await deleteCustomer(customerToDelete)
+        setCustomerToDelete(null)
+      })
+    } else if (customersToDelete.length > 0) {
+      startTransition(async () => {
+        await bulkDeleteCustomers(customersToDelete)
+        setCustomersToDelete([])
       })
     }
   }
@@ -114,21 +127,24 @@ export function CustomersClient({ initialCustomers }: CustomersClientProps) {
 
   return (
     <div className='space-y-6'>
+      {/* Loading overlay */}
+      {isPending && (
+        <div className="fixed inset-0 bg-background/50 z-50 flex items-center justify-center">
+          <CircleNotch className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      )}
+
       {/* Header */}
       <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
         <div>
           <h1 className='text-3xl font-bold tracking-tight'>Customers</h1>
           <p className='text-muted-foreground mt-1'>
-            Manage your customers for review requests
+            Customers are created automatically when you complete jobs
           </p>
         </div>
 
         {hasCustomers && (
           <div className='flex gap-2'>
-            <Button variant='outline' onClick={() => setAddSheetOpen(true)}>
-              <Plus className='mr-2 h-4 w-4' />
-              Add Customer
-            </Button>
             <CSVImportDialog />
           </div>
         )}
@@ -147,34 +163,8 @@ export function CustomersClient({ initialCustomers }: CustomersClientProps) {
           onRowClick={handleRowClick}
         />
       ) : (
-        <div className='flex flex-col items-center justify-center py-16 px-4 text-center'>
-          <div className='rounded-full bg-muted p-6 mb-6'>
-            <Users className='h-12 w-12 text-muted-foreground' />
-          </div>
-
-          <h2 className='text-2xl font-semibold tracking-tight mb-2'>
-            No customers yet
-          </h2>
-
-          <p className='text-muted-foreground mb-8 max-w-md'>
-            Add your first customer to start sending review requests and building your reputation
-          </p>
-
-          <div className='flex flex-col sm:flex-row gap-3'>
-            <Button onClick={() => setAddSheetOpen(true)}>
-              <Users className='mr-2 h-4 w-4' />
-              Add Customer
-            </Button>
-            <CSVImportDialog />
-          </div>
-        </div>
+        <CustomersEmptyState />
       )}
-
-      {/* Add Customer Sheet */}
-      <AddCustomerSheet
-        open={addSheetOpen}
-        onOpenChange={setAddSheetOpen}
-      />
 
       {/* Edit Customer Sheet */}
       <EditCustomerSheet
@@ -202,6 +192,15 @@ export function CustomersClient({ initialCustomers }: CustomersClientProps) {
         onEdit={handleEditFromDrawer}
         onArchive={handleArchiveFromDrawer}
         onViewHistory={handleViewHistoryFromDrawer}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteCustomerDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        customerCount={customerToDelete ? 1 : customersToDelete.length}
+        onConfirm={handleConfirmDelete}
+        isDeleting={isPending}
       />
     </div>
   )
