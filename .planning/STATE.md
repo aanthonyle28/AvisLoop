@@ -4,13 +4,13 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** 30.1 - Audit Gap Remediation
-**Plan:** 3 of 8
+**Plan:** 4 of 8
 **Status:** **IN PROGRESS**
-**Last activity:** 2026-02-06 - Completed 30.1-03-PLAN.md (Campaign enrollment preview)
+**Last activity:** 2026-02-06 - Completed 30.1-04-PLAN.md (Enrollment pagination)
 
 **v2.0 Progress:** █████████████████████░░░ (9/11 phases complete)
 **Phase 30 Progress:** ██████████ (10/10 plans) COMPLETE
-**Phase 30.1 Progress:** ███░░░░░░░ (3/8 plans)
+**Phase 30.1 Progress:** ████░░░░░░ (4/8 plans)
 
 ## v2.0 Phase Status
 
@@ -27,7 +27,7 @@
 | 28 | Onboarding Redesign | Complete |
 | 29 | Agency-Mode Readiness & Landing Page | Not started |
 | **30** | **V2 Alignment & Audit Remediation** | **Complete** (10/10 plans) |
-| **30.1** | **Audit Gap Remediation** | **IN PROGRESS** (2/8 plans) |
+| **30.1** | **Audit Gap Remediation** | **IN PROGRESS** (4/8 plans) |
 | 31 | Landing Page V2 Rewrite | IN PROGRESS (4/7 plans) |
 | QA-AUDIT | Dashboard QA Test & UX Audit | Complete (9/9 plans) |
 | QA-FIX | Audit Remediation | Complete (5/5 plans) |
@@ -375,12 +375,14 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | Enrollment preview on jobs | 30.1-03 | Shows "Will enroll in X in Y hours" | V2 feedback loop for automation |
 | Batch campaign lookup | 30.1-03 | getMatchingCampaignsForJobs fetches all active campaigns once | Efficiency for multiple service types |
 | Timing display threshold | 30.1-03 | Hours if < 24h, days if >= 24h (rounded) | Clear time expectations |
-| Server-side pagination | 30.1-04 | Campaign enrollments can be large | Cursor-based pagination |
+| URL-based pagination | 30.1-04 | Page state via searchParams | SEO-friendly, shareable, back button works |
+| Page size 20 enrollments | 30.1-04 | Balance performance and UX | Show reasonable amount per page |
+| Total count in title | 30.1-04 | Always show enrollment count | Helpful UX feedback regardless of pagination |
 
 ## Session Continuity
 
 **Last session:** 2026-02-06
-**Stopped at:** Completed 30.1-03-PLAN.md (Campaign enrollment preview)
+**Stopped at:** Completed 30.1-04-PLAN.md (Enrollment pagination)
 **Resume file:** None
 **QA test account:** audit-test@avisloop.com / AuditTest123!
 **QA Report:** docs/QA-AUDIT.md
