@@ -1,5 +1,6 @@
 import { Sidebar } from './sidebar'
 import { BottomNav } from './bottom-nav'
+import { MobileFAB } from './mobile-fab'
 import { PageHeader } from './page-header'
 import { NavigationProgressBar } from '@/components/ui/progress-bar'
 import { SetupProgress } from '@/components/onboarding/setup-progress'
@@ -54,6 +55,9 @@ export function AppShell({ children, pageTitle, setupProgress, dashboardBadge }:
 
       {/* Mobile bottom nav */}
       <BottomNav />
+
+      {/* Mobile FAB for Add Job */}
+      <MobileFAB />
     </div>
   )
 }
