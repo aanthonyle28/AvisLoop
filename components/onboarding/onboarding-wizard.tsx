@@ -25,7 +25,7 @@ const STEPS: StepConfig[] = [
   { id: 3, title: 'Services Offered', skippable: false },
   { id: 4, title: 'Software Used', skippable: true },
   { id: 5, title: 'Campaign Preset', skippable: false },
-  { id: 6, title: 'Import Customers', skippable: true },
+  { id: 6, title: 'Import Jobs', skippable: true },  // V2: Import jobs, not customers
   { id: 7, title: 'SMS Consent', skippable: false },
 ]
 
