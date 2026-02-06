@@ -23,20 +23,20 @@ export function HeroV2() {
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
                 </span>
-                Trusted by 500+ local businesses
+                Built for home service businesses
               </div>
 
               {/* Headline */}
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-balance text-foreground">
                 3× More Reviews
                 <br />
-                in 2 Minutes
+                Without Lifting a Finger
               </h1>
 
               {/* Subheadline */}
               <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-xl mx-auto lg:mx-0">
-                Send review requests instantly. No complex campaigns, no forgotten
-                follow-ups. Just results that grow your business.
+                Complete jobs in 10 seconds. AvisLoop handles multi-touch follow-ups,
+                timing, and review funnels automatically.
               </p>
 
               {/* CTA buttons */}
@@ -46,7 +46,7 @@ export function HeroV2() {
                   size="lg"
                   className="text-base px-8 bg-foreground text-background hover:bg-foreground/90"
                 >
-                  <Link href="/auth/sign-up">Start Free Trial</Link>
+                  <Link href="/auth/sign-up">Start My Free Trial</Link>
                 </Button>
                 <Button
                   asChild
@@ -60,7 +60,7 @@ export function HeroV2() {
 
               {/* Trust indicators */}
               <p className="mt-6 text-sm text-muted-foreground">
-                25 free sends • 2-min setup • Cancel anytime
+                10-second job entry • Automated follow-ups • Cancel anytime
               </p>
             </div>
           </FadeIn>
