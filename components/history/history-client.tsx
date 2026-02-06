@@ -113,7 +113,7 @@ export function HistoryClient({ initialLogs, total, currentPage, pageSize, busin
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Activity</h1>
         <p className="text-muted-foreground mt-1">
-          View and manage your message history
+          View your sent messages and their delivery status
         </p>
       </div>
 
