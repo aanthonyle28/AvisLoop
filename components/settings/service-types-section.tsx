@@ -2,8 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
-import { Check, Clock } from '@phosphor-icons/react'
-import { Loader2 } from 'lucide-react'
+import { Check, Clock, CircleNotch } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -99,14 +98,14 @@ export function ServiceTypesSection({
                       : 'border border-input bg-background'
                   }`}
                 >
-                  {isEnabled && <Check className="h-3 w-3" weight="bold" />}
+                  {isEnabled && <Check size={12} weight="bold" />}
                 </div>
               </button>
 
               {/* Timing input (shown when enabled) */}
               {isEnabled && (
                 <div className="mt-3 flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <Clock size={16} className="text-muted-foreground" />
                   <Label className="sr-only">Hours until first message</Label>
                   <Input
                     type="number"
@@ -133,7 +132,7 @@ export function ServiceTypesSection({
             Reset
           </Button>
           <Button onClick={handleSave} disabled={isPending}>
-            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isPending && <CircleNotch size={16} className="mr-2 animate-spin" />}
             Save Changes
           </Button>
         </div>

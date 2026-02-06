@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Loader2 } from 'lucide-react'
+import { CircleNotch } from '@phosphor-icons/react'
 import {
   Sheet,
   SheetContent,
@@ -182,7 +182,7 @@ export function EditJobSheet({ open, onOpenChange, job, customers }: EditJobShee
               Cancel
             </Button>
             <Button type="submit" disabled={isPending || !customerId || !serviceType}>
-              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isPending && <CircleNotch size={16} className="mr-2 animate-spin" />}
               Save Changes
             </Button>
           </div>

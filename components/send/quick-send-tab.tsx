@@ -13,7 +13,7 @@ import { EmailPreviewModal } from './email-preview-modal'
 import { ChannelSelector } from './channel-selector'
 import { SmsCharacterCounter, SmsCharacterNotice } from './sms-character-counter'
 import type { Customer, Business, MessageTemplate } from '@/lib/types/database'
-import { Loader2 } from 'lucide-react'
+import { CircleNotch } from '@phosphor-icons/react'
 
 type Channel = 'email' | 'sms'
 
@@ -523,7 +523,7 @@ export function QuickSendTab({
             >
               {isPending ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <CircleNotch size={16} className="animate-spin" />
                   {schedulePreset === 'immediately' ? 'Sending...' : 'Scheduling...'}
                 </>
               ) : (
