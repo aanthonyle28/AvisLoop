@@ -1,34 +1,34 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { CaretDown } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 
 const faqs = [
   {
     question: "How is AvisLoop different from other review platforms?",
     answer:
-      "Most review platforms are built for marketing teams with time to spare. AvisLoop is built for busy business owners who need to request reviews quickly and move on. One contact, one click, done.",
+      "Other platforms require you to manually send each review request. AvisLoop is automation-first: complete a job, and the system handles everything—multi-touch follow-ups, timing optimization, review funnels. You spend 10 seconds per job, not 10 minutes per customer.",
   },
   {
-    question: "What's included in the free tier?",
+    question: "What happens after I complete a job?",
     answer:
-      "You get 25 review request emails per month, contact management, a customizable email template, and full delivery tracking. No credit card required to start.",
+      "AvisLoop automatically creates a customer record (if new) or links to existing customer, finds the campaign matching your service type (HVAC, plumbing, etc.), and schedules 2-3 follow-up touches over 3-5 days. The first message sends 24-72 hours after job completion (varies by service). You don't do anything else.",
   },
   {
-    question: "Can I customize the review request email?",
+    question: "What's a campaign and do I need to set one up?",
     answer:
-      "Yes! You can personalize the email subject, body text, and include your business name. The email is sent from our professional infrastructure to ensure high deliverability.",
+      "Campaigns are pre-built multi-touch sequences. During onboarding, you choose a preset (Fast, Standard, or Slow) and AvisLoop creates campaigns for each service type you offer. These run automatically—you never manually trigger a campaign. Just complete jobs.",
   },
   {
-    question: "Which review platforms can I link to?",
+    question: "What's the review funnel and why does it matter?",
     answer:
-      "You can link to any review platform — Google Business, Yelp, Facebook, TripAdvisor, industry-specific sites, or even your own website. Just add your review URL in settings.",
+      "The review funnel protects your Google rating. When a customer clicks your review link, they rate their experience 1-5 stars privately first. 4-5 stars redirects to Google for a public review. 1-3 stars shows a private feedback form so you can fix the issue before it goes public.",
   },
   {
-    question: "How do you prevent customers from being spammed?",
+    question: "Do I need to import my customer list?",
     answer:
-      "We have built-in cooldown periods. Once you send a review request to a customer, you can't send another one for a set number of days. This protects your customer relationships.",
+      "No. AvisLoop creates customers automatically when you complete jobs. Most businesses start with zero customers and build their list organically as they work. Customer import is optional—not the primary workflow.",
   },
   {
     question: "Is my customer data safe?",
@@ -56,9 +56,11 @@ function FAQItem({
         aria-expanded={isOpen}
       >
         <span className="font-medium pr-4">{question}</span>
-        <ChevronDown
+        <CaretDown
+          size={20}
+          weight="bold"
           className={cn(
-            "h-5 w-5 flex-shrink-0 text-muted-foreground transition-transform duration-200",
+            "flex-shrink-0 text-muted-foreground transition-transform duration-200",
             isOpen && "rotate-180"
           )}
           aria-hidden="true"
