@@ -4,7 +4,15 @@ import { ColumnDef } from '@tanstack/react-table'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { MoreHorizontal, Archive, RotateCcw, Trash2, Pencil } from 'lucide-react'
+import {
+  DotsThree,
+  Archive,
+  ArrowCounterClockwise,
+  Trash,
+  PencilSimple,
+  Copy,
+  Envelope
+} from '@phosphor-icons/react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +23,6 @@ import { format } from 'date-fns'
 import type { Customer } from '@/lib/types/database'
 import { formatPhoneDisplay } from '@/lib/utils/phone'
 import { TagList } from '@/components/ui/tag-badge'
-import { Copy, Envelope } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
 interface ColumnHandlers {
@@ -77,7 +84,7 @@ export const createColumns = (handlers: ColumnHandlers): ColumnDef<Customer>[] =
       if (!phone || phoneStatus === 'missing') {
         return (
           <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-            <Envelope className="h-3 w-3" />
+            <Envelope size={12} />
             Email-only
           </span>
         )
@@ -98,7 +105,7 @@ export const createColumns = (handlers: ColumnHandlers): ColumnDef<Customer>[] =
             className="p-1 hover:bg-muted rounded opacity-0 group-hover:opacity-100 transition-opacity"
             title="Copy phone number"
           >
-            <Copy className="h-3 w-3 text-muted-foreground" />
+            <Copy size={12} className="text-muted-foreground" />
           </button>
         </div>
       )
@@ -171,23 +178,23 @@ export const createColumns = (handlers: ColumnHandlers): ColumnDef<Customer>[] =
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant='ghost' size='icon'>
-                <MoreHorizontal />
+                <DotsThree size={20} />
                 <span className='sr-only'>Open menu</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align='end'>
               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handlers.onEdit(customer); }}>
-                <Pencil className='mr-2 h-4 w-4' />
+                <PencilSimple size={16} className='mr-2' />
                 Edit
               </DropdownMenuItem>
               {isArchived ? (
                 <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handlers.onRestore(customer.id); }}>
-                  <RotateCcw className='mr-2 h-4 w-4' />
+                  <ArrowCounterClockwise size={16} className='mr-2' />
                   Restore
                 </DropdownMenuItem>
               ) : (
                 <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handlers.onArchive(customer.id); }}>
-                  <Archive className='mr-2 h-4 w-4' />
+                  <Archive size={16} className='mr-2' />
                   Archive
                 </DropdownMenuItem>
               )}
@@ -195,7 +202,7 @@ export const createColumns = (handlers: ColumnHandlers): ColumnDef<Customer>[] =
                 onClick={(e) => { e.stopPropagation(); handlers.onDelete(customer.id); }}
                 className='text-destructive'
               >
-                <Trash2 className='mr-2 h-4 w-4' />
+                <Trash size={16} className='mr-2' />
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>

@@ -2,6 +2,7 @@ import { Sidebar } from './sidebar'
 import { BottomNav } from './bottom-nav'
 import { MobileFAB } from './mobile-fab'
 import { PageHeader } from './page-header'
+import { SkipLink } from './skip-link'
 import { NavigationProgressBar } from '@/components/ui/progress-bar'
 import { SetupProgress } from '@/components/onboarding/setup-progress'
 
@@ -22,6 +23,9 @@ interface AppShellProps {
 export function AppShell({ children, pageTitle, setupProgress, dashboardBadge }: AppShellProps) {
   return (
     <div className="flex min-h-screen bg-[#F9F9F9] dark:bg-background">
+      {/* Skip link for keyboard navigation - must be first focusable element */}
+      <SkipLink />
+
       {/* Navigation progress bar */}
       <NavigationProgressBar />
 
@@ -29,7 +33,7 @@ export function AppShell({ children, pageTitle, setupProgress, dashboardBadge }:
       <Sidebar dashboardBadge={dashboardBadge} />
 
       {/* Main content area */}
-      <main className="flex-1 overflow-auto">
+      <main id="main-content" className="flex-1 overflow-auto">
         {/* Mobile page header */}
         <PageHeader title={pageTitle} setupProgress={setupProgress} />
 
