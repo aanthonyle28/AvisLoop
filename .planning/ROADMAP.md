@@ -369,6 +369,30 @@ Plans:
 - [ ] 30-09-PLAN.md — Accessibility fixes (touch targets, aria-labels, skip link)
 - [ ] 30-10-PLAN.md — Icon migration (remaining lucide-react files to Phosphor)
 
+### Phase 30.1: Audit Gap Remediation
+**Goal**: Address remaining gaps from UX-AUDIT.md and QA-AUDIT.md not covered by Phase 30. Excludes landing page changes.
+**Depends on**: Phase 30 (V2 Alignment complete)
+**Requirements**: Table skeletons, Send page friction, enrollment preview, campaign pagination, terminology fixes
+**Success Criteria** (what must be TRUE):
+  1. All data tables (Customers, Jobs, History) show skeleton loader during data fetch
+  2. Send page renamed to "Manual Request" in sidebar and bottom nav
+  3. Send page shows friction warning banner ("Campaigns handle this automatically")
+  4. Jobs show campaign enrollment preview ("Will enroll in HVAC Campaign in 24h")
+  5. Campaign detail page has pagination for enrollment list
+  6. New campaign page shows guidance to use presets
+  7. "Send Request" buttons changed to "Send Message"
+  8. "email template" changed to "message template" in marketing
+**Plans**: 8 plans in 3 waves
+Plans:
+- [ ] 30.1-01-PLAN.md — Table skeleton loaders (Customers, Jobs, History)
+- [ ] 30.1-02-PLAN.md — Rename Send → "Manual Request" + friction warning
+- [ ] 30.1-03-PLAN.md — Campaign enrollment preview on jobs
+- [ ] 30.1-04-PLAN.md — Campaign enrollment pagination
+- [ ] 30.1-05-PLAN.md — New campaign preset guidance
+- [ ] 30.1-06-PLAN.md — Add Job sidebar auto-open + Send→Message terminology
+- [ ] 30.1-07-PLAN.md — Campaign preset timing info display
+- [ ] 30.1-08-PLAN.md — History route vs Activity label alignment
+
 ### Phase 31: Landing Page V2 Rewrite
 **Goal**: Landing page copy updated for V2 automation-first philosophy, replacing V1 manual-send messaging with job-completion workflow and home services positioning.
 **Depends on**: None (copy-only changes, independent of dashboard features)
@@ -463,24 +487,28 @@ See individual phase sections above for requirements, success criteria, and depe
 | 27 (v2.0) | Review Follow-Up | 0/7 | Planned | - |
 | 28 (v2.0) | Review Follow-Up | 0/8 | In progress | - |
 | 29 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
-| **30 (v2.0)** | **V2 Alignment** | **0/10** | **Ready to execute** | - |
-| 31 (v2.0) | Landing Page V2 | 0/5 | Ready to execute | - |
+| **30 (v2.0)** | **V2 Alignment** | **10/10** | **Complete** | **2026-02-06** |
+| **30.1 (v2.0)** | **Audit Gap Remediation** | **0/8** | **Ready to execute** | - |
+| 31 (v2.0) | Landing Page V2 | 4/5 | In progress | - |
 | **QA-AUDIT** | **Dashboard Audit** | **9/9** | **Complete** | **2026-02-05** |
 | **QA-FIX** | **Audit Remediation** | **5/5** | **Complete** | **2026-02-06** |
 
-**Total:** 143 plans complete across shipped phases. Phase 30 ready to execute.
+**Total:** 153 plans complete across shipped phases. Phase 30.1 ready to execute.
 
 ## What's Next
 
 **Current milestone:** v2.0 Review Follow-Up System (Phases 20-31)
-**Next action:** Execute Phase 30 (V2 Alignment) — core flow fix, enables true V2 usage
+**Next action:** Execute Phase 30.1 (Audit Gap Remediation) — fixes remaining UX/QA audit items
 
 **Recommended execution order:**
-1. **Phase 30** (V2 Alignment) — Core V2 transformation, highest priority
-2. **Phase 31** (Landing Page V2) — Copy-only, can run in parallel
-3. **Phase 27** (Dashboard Redesign) — Can run after 30-05 completes
-4. **Phase 28** (Onboarding) — Depends on Phase 30 (job import in step 6)
-5. **Phase 29** (Agency Mode) — After core V2 complete
+1. **Phase 30.1** (Audit Gap Remediation) — Table skeletons, Send friction, enrollment preview (8 plans)
+2. **Phase 31** (Landing Page V2) — Remaining plans (copy-only)
+3. **Phase 29** (Agency Mode) — After core V2 complete
+
+**Completed recently:**
+- Phase 30 (V2 Alignment) — 10/10 plans complete
+- Phase 27 (Dashboard Redesign) — Complete
+- Phase 28 (Onboarding Redesign) — Complete
 
 **Blockers:**
 - Twilio A2P 10DLC registration required before Phase 21-08 execution (webhook verification)
@@ -492,5 +520,5 @@ After v2.0:
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 
 ---
-*Last updated: 2026-02-06 after Phase 30 planning (V2 Alignment, 10 plans in 4 waves)*
+*Last updated: 2026-02-06 after Phase 30.1 planning (Audit Gap Remediation, 8 plans in 3 waves)*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
