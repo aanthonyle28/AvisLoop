@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { CheckCircle, Plus } from 'lucide-react'
+import { CheckCircle, Plus } from '@phosphor-icons/react'
 import { createCustomer, type CustomerActionState } from '@/lib/actions/customer'
 import { SmsConsentForm } from './sms-consent-form'
 
@@ -87,7 +87,7 @@ export function AddCustomerSheet({ open, onOpenChange }: AddCustomerSheetProps) 
           {/* Success Message */}
           {successMessage && (
             <div className='mb-4 flex items-center gap-2 rounded-md bg-green-50 p-3 text-sm text-green-700 dark:bg-green-950 dark:text-green-300'>
-              <CheckCircle className='h-4 w-4' />
+              <CheckCircle size={16} />
               {successMessage}
             </div>
           )}
@@ -170,7 +170,7 @@ export function AddCustomerSheet({ open, onOpenChange }: AddCustomerSheetProps) 
                 disabled={isPending}
                 onClick={() => setAddAnother(true)}
               >
-                <Plus className='mr-2 h-4 w-4' />
+                <Plus size={16} className='mr-2' />
                 {isPending ? 'Adding...' : 'Save & Add Another'}
               </Button>
             </div>

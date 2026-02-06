@@ -2,7 +2,7 @@
 
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { X, Search } from 'lucide-react'
+import { X, MagnifyingGlass } from '@phosphor-icons/react'
 import { TagBadge, PRESET_TAGS } from '@/components/ui/tag-badge'
 
 interface CustomerFiltersProps {
@@ -40,7 +40,7 @@ export function CustomerFilters({
     <div className='space-y-3'>
       {/* Search input */}
       <div className='relative'>
-        <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
+        <MagnifyingGlass size={16} className='absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground' />
         <Input
           placeholder='Search by name or email...'
           value={searchQuery}
@@ -86,7 +86,7 @@ export function CustomerFilters({
             }}
             className='ml-auto'
           >
-            <X className='mr-1 h-3 w-3' />
+            <X size={12} className='mr-1' />
             Clear filters
           </Button>
         )}

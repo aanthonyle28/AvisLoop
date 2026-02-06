@@ -9,7 +9,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { CheckCircle, XCircle, AlertTriangle } from 'lucide-react'
+import { CheckCircle, XCircle, Warning } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 
 interface CSVPreviewRow {
@@ -54,13 +54,13 @@ export function CSVPreviewTable({ rows }: CSVPreviewTableProps) {
               let rowClassName = ''
 
               if (!row.isValid) {
-                statusIcon = <XCircle className='h-4 w-4 text-destructive' />
+                statusIcon = <XCircle size={16} className=' text-destructive' />
                 rowClassName = 'bg-destructive/10'
               } else if (row.isDuplicate) {
-                statusIcon = <AlertTriangle className='h-4 w-4 text-yellow-600' />
+                statusIcon = <Warning size={16} className=' text-yellow-600' />
                 rowClassName = 'bg-yellow-50 dark:bg-yellow-950/20'
               } else {
-                statusIcon = <CheckCircle className='h-4 w-4 text-green-600' />
+                statusIcon = <CheckCircle size={16} className=' text-green-600' />
               }
 
               return (
@@ -92,17 +92,17 @@ export function CSVPreviewTable({ rows }: CSVPreviewTableProps) {
           <span className='font-medium'>{totalRows}</span>
         </div>
         <div className='flex items-center gap-2'>
-          <CheckCircle className='h-4 w-4 text-green-600' />
+          <CheckCircle size={16} className=' text-green-600' />
           <span className='text-muted-foreground'>Valid:</span>
           <span className='font-medium text-green-600'>{validRows}</span>
         </div>
         <div className='flex items-center gap-2'>
-          <XCircle className='h-4 w-4 text-destructive' />
+          <XCircle size={16} className=' text-destructive' />
           <span className='text-muted-foreground'>Invalid:</span>
           <span className='font-medium text-destructive'>{invalidRows}</span>
         </div>
         <div className='flex items-center gap-2'>
-          <AlertTriangle className='h-4 w-4 text-yellow-600' />
+          <Warning size={16} className=' text-yellow-600' />
           <span className='text-muted-foreground'>Duplicates:</span>
           <span className='font-medium text-yellow-600'>{duplicateRows}</span>
         </div>

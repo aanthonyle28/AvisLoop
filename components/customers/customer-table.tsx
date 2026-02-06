@@ -21,7 +21,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
-import { Archive, Trash2 } from 'lucide-react'
+import { Archive, Trash } from '@phosphor-icons/react'
 import type { Customer } from '@/lib/types/database'
 import { createColumns } from './customer-columns'
 import { CustomerFilters } from './customer-filters'
@@ -162,7 +162,7 @@ export function CustomerTable({
                 setRowSelection({})
               }}
             >
-              <Archive className='mr-1 h-4 w-4' />
+              <Archive size={16} className='mr-1' />
               Archive
             </Button>
             <Button
@@ -173,7 +173,7 @@ export function CustomerTable({
                 setRowSelection({})
               }}
             >
-              <Trash2 className='mr-1 h-4 w-4' />
+              <Trash size={16} className='mr-1' />
               Delete
             </Button>
           </div>
