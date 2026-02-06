@@ -4,14 +4,14 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** 32 - Post-Onboarding Guidance
-**Plan:** 1 of 4
+**Plan:** 2 of 4
 **Status:** In progress
-**Last activity:** 2026-02-06 - Completed 32-01-PLAN.md (Onboarding Checklist Schema)
+**Last activity:** 2026-02-06 - Completed 32-02-PLAN.md (Checklist Data & Component)
 
 **v2.0 Progress:** █████████████████████░░░ (9/11 phases complete)
 **Phase 30 Progress:** ██████████ (10/10 plans) COMPLETE
 **Phase 30.1 Progress:** ██████████ (8/8 plans) COMPLETE
-**Phase 32 Progress:** ██░░░░░░░░ (1/4 plans)
+**Phase 32 Progress:** █████░░░░░ (2/4 plans)
 
 ## v2.0 Phase Status
 
@@ -30,7 +30,7 @@
 | **30** | **V2 Alignment & Audit Remediation** | **Complete** (10/10 plans) |
 | **30.1** | **Audit Gap Remediation** | **Complete** (8/8 plans) |
 | 31 | Landing Page V2 Rewrite | IN PROGRESS (4/7 plans) |
-| **32** | **Post-Onboarding Guidance** | **IN PROGRESS** (1/4 plans) |
+| **32** | **Post-Onboarding Guidance** | **IN PROGRESS** (2/4 plans) |
 | QA-AUDIT | Dashboard QA Test & UX Audit | Complete (9/9 plans) |
 | QA-FIX | Audit Remediation | Complete (5/5 plans) |
 
@@ -386,10 +386,20 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | "Send Message" terminology | 30.1-06 | "Send Request" -> "Send Message" everywhere | V2 alignment: messages not requests |
 | Route-label alignment | 30.1-08 | Route /history kept for compatibility, user-facing text says "Activity" | No URL break, consistent terminology |
 
+### Phase 32
+
+| Decision | Phase | Impact | Constraint |
+|----------|-------|--------|------------|
+| Data-driven checklist | 32-02 | Completion computed from actual data counts | More reliable than manual flags |
+| V2-aligned checklist items | 32-02 | 4 items: add job, review campaign, complete job, get review click | No customer-related items (V1 pattern) |
+| Review click via stop_reason | 32-02 | Track campaign_enrollments.stop_reason='review_clicked' | Actual funnel success metric |
+| Auto-collapse after 3 days | 32-02 | Checklist auto-collapses based on first_seen_at | Reduces friction for returning users |
+| JSONB merge pattern | 32-02 | Spread existing object before updating keys | Preserves other checklist data |
+
 ## Session Continuity
 
 **Last session:** 2026-02-06
-**Stopped at:** Completed 32-01-PLAN.md (Onboarding Checklist Schema)
+**Stopped at:** Completed 32-02-PLAN.md (Checklist Data & Component)
 **Resume file:** None
 **QA test account:** audit-test@avisloop.com / AuditTest123!
 **QA Report:** docs/QA-AUDIT.md
