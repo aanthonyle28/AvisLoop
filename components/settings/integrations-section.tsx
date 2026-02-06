@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Key, Copy, Check, RefreshCw } from 'lucide-react'
+import { Key, Copy, Check, ArrowsClockwise } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { generateApiKeyAction } from '@/lib/actions/api-key'
@@ -81,9 +81,9 @@ export function IntegrationsSection({ hasExistingKey }: IntegrationsSectionProps
             onClick={() => handleCopy(webhookUrl, 'url')}
           >
             {copied === 'url' ? (
-              <Check className="h-4 w-4" />
+              <Check size={16} weight="regular" />
             ) : (
-              <Copy className="h-4 w-4" />
+              <Copy size={16} weight="regular" />
             )}
           </Button>
         </div>
@@ -105,12 +105,12 @@ export function IntegrationsSection({ hasExistingKey }: IntegrationsSectionProps
             >
               {isGenerating ? (
                 <>
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  <ArrowsClockwise size={16} weight="regular" className="mr-2 animate-spin" />
                   Generating...
                 </>
               ) : (
                 <>
-                  <Key className="h-4 w-4 mr-2" />
+                  <Key size={16} weight="regular" className="mr-2" />
                   {hasExistingKey ? 'Regenerate API Key' : 'Generate API Key'}
                 </>
               )}
@@ -140,9 +140,9 @@ export function IntegrationsSection({ hasExistingKey }: IntegrationsSectionProps
                   onClick={() => handleCopy(apiKey, 'key')}
                 >
                   {copied === 'key' ? (
-                    <Check className="h-4 w-4" />
+                    <Check size={16} weight="regular" />
                   ) : (
-                    <Copy className="h-4 w-4" />
+                    <Copy size={16} weight="regular" />
                   )}
                 </Button>
               </div>
@@ -156,7 +156,7 @@ export function IntegrationsSection({ hasExistingKey }: IntegrationsSectionProps
               disabled={isGenerating}
               size="sm"
             >
-              <RefreshCw className="h-4 w-4 mr-2" />
+              <ArrowsClockwise size={16} weight="regular" className="mr-2" />
               Generate New Key
             </Button>
           </div>
@@ -171,7 +171,7 @@ export function IntegrationsSection({ hasExistingKey }: IntegrationsSectionProps
 
         <div className="space-y-4 text-sm text-muted-foreground">
           <p>
-            Send a POST request with the <code className="px-1.5 py-0.5 bg-muted rounded text-xs font-mono">x-api-key</code> header to create or update contacts:
+            Send a POST request with the <code className="px-1.5 py-0.5 bg-muted rounded text-xs font-mono">x-api-key</code> header to create or update customers:
           </p>
 
           <div className="bg-muted rounded-lg p-4 overflow-x-auto">
@@ -191,9 +191,9 @@ export function IntegrationsSection({ hasExistingKey }: IntegrationsSectionProps
           <div>
             <p className="font-medium text-foreground mb-2">Request body fields:</p>
             <ul className="list-disc list-inside space-y-1 ml-2">
-              <li><code className="text-xs">name</code> (required): Contact&apos;s full name</li>
-              <li><code className="text-xs">email</code> (required): Contact&apos;s email address</li>
-              <li><code className="text-xs">phone</code> (optional): Contact&apos;s phone number</li>
+              <li><code className="text-xs">name</code> (required): Customer&apos;s full name</li>
+              <li><code className="text-xs">email</code> (required): Customer&apos;s email address</li>
+              <li><code className="text-xs">phone</code> (optional): Customer&apos;s phone number</li>
             </ul>
           </div>
 

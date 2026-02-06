@@ -5,7 +5,7 @@ import { useTransition, useRef, useEffect } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { X, Search, Loader2 } from 'lucide-react'
+import { X, MagnifyingGlass, CircleNotch } from '@phosphor-icons/react'
 
 const STATUS_OPTIONS: { value: string; label: string }[] = [
   { value: 'all', label: 'All statuses' },
@@ -80,7 +80,7 @@ export function HistoryFilters() {
       <div className="flex flex-col sm:flex-row gap-4">
         {/* Search input */}
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <MagnifyingGlass size={16} weight="regular" className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search by name or email..."
             defaultValue={query}
@@ -131,11 +131,11 @@ export function HistoryFilters() {
         {/* Clear filters / Loading indicator */}
         <div className="flex items-center gap-2">
           {isPending && (
-            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            <CircleNotch size={16} weight="regular" className="animate-spin text-muted-foreground" />
           )}
           {hasActiveFilters && (
             <Button variant="ghost" size="sm" onClick={clearFilters}>
-              <X className="mr-1 h-3 w-3" />
+              <X size={12} weight="regular" className="mr-1" />
               Clear filters
             </Button>
           )}

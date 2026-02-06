@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { AlertTriangle } from 'lucide-react'
+import { Warning } from '@phosphor-icons/react'
 
 interface UsageWarningBannerProps {
   count: number
@@ -31,7 +31,7 @@ export function UsageWarningBanner({
     return (
       <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-6">
         <div className="flex items-start gap-3">
-          <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+          <Warning size={20} weight="regular" className="text-destructive shrink-0 mt-0.5" />
           <div className="space-y-1">
             <p className="font-medium text-destructive">Customer limit exceeded</p>
             <p className="text-sm text-destructive/80">
@@ -56,7 +56,7 @@ export function UsageWarningBanner({
     return (
       <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-6">
         <div className="flex items-start gap-3">
-          <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+          <Warning size={20} weight="regular" className="text-destructive shrink-0 mt-0.5" />
           <div className="space-y-1">
             <p className="font-medium text-destructive">
               {tier === 'trial' ? 'Trial' : 'Monthly'} limit reached
@@ -78,7 +78,7 @@ export function UsageWarningBanner({
   return (
     <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
       <div className="flex items-start gap-3">
-        <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+        <Warning size={20} weight="regular" className="text-amber-600 shrink-0 mt-0.5" />
         <div className="space-y-1">
           <p className="font-medium text-amber-800">
             {sendRemaining} sends remaining this month
