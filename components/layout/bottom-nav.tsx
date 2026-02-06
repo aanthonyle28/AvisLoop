@@ -9,10 +9,10 @@ const NAV_HEIGHT = 72 // 4.5rem in pixels
 
 const items = [
   { icon: House, label: 'Dashboard', href: '/dashboard' },
-  { icon: PaperPlaneTilt, label: 'Send', href: '/send' },
   { icon: Briefcase, label: 'Jobs', href: '/jobs' },
   { icon: Megaphone, label: 'Campaigns', href: '/campaigns' },
   { icon: ClockCounterClockwise, label: 'Activity', href: '/history' },
+  { icon: PaperPlaneTilt, label: 'Manual', href: '/send' },
 ]
 
 export function BottomNav() {
