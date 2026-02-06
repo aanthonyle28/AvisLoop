@@ -6,20 +6,20 @@ import { GeometricMarker } from '@/components/ui/geometric-marker';
 const steps = [
   {
     number: 1,
-    title: 'Add Contact',
-    description: 'Import your customer list or add one contact. Takes 10 seconds.',
+    title: 'Complete a Job',
+    description: 'Enter customer name, phone, and service type. Takes 10 seconds—do it right after the call.',
     color: 'lime' as const,
   },
   {
     number: 2,
-    title: 'Write Message',
-    description: 'Use our template or write your own. We pre-fill the contact\'s name.',
+    title: 'System Auto-Enrolls',
+    description: 'AvisLoop creates the customer record, finds the matching campaign for that service type, and schedules 3 follow-up touches.',
     color: 'coral' as const,
   },
   {
     number: 3,
-    title: 'Send',
-    description: 'Click send. That\'s it. We track delivery, opens, and clicks for you.',
+    title: 'Automation Runs',
+    description: 'Multi-touch sequence sends over 3-5 days. Customer rates experience. 4-5 stars go to Google. 1-3 stars go to private feedback. Campaign stops automatically.',
     color: 'lime' as const,
   },
 ];
@@ -34,7 +34,7 @@ export function HowItWorksSection() {
             How It Works
           </h2>
           <p className="text-lg text-muted-foreground text-center">
-            Three steps. Two minutes. Zero complexity.
+            One action. Complete automation. More reviews.
           </p>
         </FadeIn>
 

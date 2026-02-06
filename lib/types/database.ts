@@ -86,8 +86,8 @@ export type ContactUpdate = CustomerUpdate
 // Service type literal union
 export type ServiceType = 'hvac' | 'plumbing' | 'electrical' | 'cleaning' | 'roofing' | 'painting' | 'handyman' | 'other'
 
-// Job status literal union
-export type JobStatus = 'completed' | 'do_not_send'
+// Job status literal union - V2 three-state workflow
+export type JobStatus = 'scheduled' | 'completed' | 'do_not_send'
 
 // Job interface matching database schema
 export interface Job {
