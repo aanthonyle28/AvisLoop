@@ -15,7 +15,7 @@ const stats = [
   {
     end: 500,
     suffix: '+',
-    label: 'Businesses Using AvisLoop',
+    label: 'Home Service Businesses',
     color: 'coral' as const,
     duration: 2,
   },
@@ -27,9 +27,9 @@ const stats = [
     duration: 2.2,
   },
   {
-    end: 127,
-    suffix: '',
-    label: 'Hours Saved Per Business',
+    end: 10,
+    suffix: 's',
+    label: 'Per Job Entry',
     color: 'coral' as const,
     duration: 2.3,
   },
@@ -42,7 +42,7 @@ export function AnimatedStatsSection() {
         {/* Header */}
         <FadeIn direction="up">
           <h2 className="text-3xl md:text-4xl font-bold text-balance text-center mb-12">
-            Trusted by Businesses Like Yours
+            Built for Home Service Businesses
           </h2>
         </FadeIn>
 
