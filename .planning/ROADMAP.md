@@ -13,7 +13,7 @@ AvisLoop is a review follow-up system for home service businesses. v1.0 through 
 - **Phase 19 UX/UI Redesign** - Phase 19 (shipped 2026-02-01)
 - **v1.3 Dashboard UX Overhaul** - Phases 20-22 (shipped 2026-02-02)
 - **v1.4 Landing Page Redesign** - Phase 25 (shipped 2026-02-02)
-- **v2.0 Review Follow-Up System** - Phases 20-29 (in progress)
+- **v2.0 Review Follow-Up System** - Phases 20-31 (in progress)
 
 ## Phases
 
@@ -92,7 +92,7 @@ AvisLoop is a review follow-up system for home service businesses. v1.0 through 
 
 </details>
 
-### v2.0 Review Follow-Up System (Phases 20-29)
+### v2.0 Review Follow-Up System (Phases 20-31)
 
 **Milestone Goal:** Transform AvisLoop from a single-send review request tool into a multi-touch follow-up system for home service businesses — with SMS, campaigns/sequences, jobs, LLM personalization, and redesigned dashboard/onboarding/landing page.
 
@@ -324,17 +324,14 @@ Plans:
 - [ ] 28-07-PLAN.md — Build verification and visual checkpoint
 - [ ] 28-08-PLAN.md — Branded short links in settings (DLVR-03, Bitly integration)
 
-### Phase 29: Agency-Mode Readiness & Landing Page
-**Goal**: Multi-location data model schema added (no UI yet), weekly performance reports auto-generated, campaign playbooks exportable, landing page copy updated for v2.0.
+### Phase 29: Agency-Mode Readiness
+**Goal**: Multi-location data model schema added (no UI yet), weekly performance reports auto-generated, campaign playbooks exportable.
 **Depends on**: Phase 27 (analytics exist), Phase 24 (campaigns exist)
-**Requirements**: AGCY-01, AGCY-02, AGCY-03, LAND-01, LAND-02
+**Requirements**: AGCY-01, AGCY-02, AGCY-03
 **Success Criteria** (what must be TRUE):
   1. Multi-location data model schema added (business has location_id column, queries scoped by location_id) — no UI yet, schema-only
   2. Weekly performance report auto-generated every Monday (sends count, opens count, reviews count, response rate) and emailed to business owner
   3. Campaign playbooks exportable (download campaign config as JSON template, shareable across businesses)
-  4. Landing page copy updated for home services positioning ("Turn job completions into Google reviews automatically")
-  5. Existing homepage sections (hero, problem/solution, how it works, stats, outcome cards) updated with v2.0 messaging (multi-touch sequences, SMS, jobs workflow)
-  6. Landing page mentions SMS channel, multi-touch sequences, and job-centric workflow (not single-send contacts)
 **Future consideration**: Operator admin dashboard — aggregate LLM spend across all tenants, margin analysis, cost-per-tenant breakdown. Currently business owners see their estimated cost in Settings; operator monitors actual spend via API provider dashboards (Google AI, OpenAI, OpenRouter).
 **Plans**: TBD
 
@@ -370,6 +367,30 @@ Plans:
 - [ ] 30-07-PLAN.md — Add Job CTA updates (primary variant + mobile FAB + one-tap complete)
 - [ ] 30-08-PLAN.md — Icon migration (27 lucide-react files to Phosphor)
 - [ ] 30-09-PLAN.md — Accessibility fixes (touch targets, aria-labels, skip link)
+
+### Phase 31: Landing Page V2 Rewrite
+**Goal**: Landing page copy updated for V2 automation-first philosophy, replacing V1 manual-send messaging with job-completion workflow and home services positioning.
+**Depends on**: None (copy-only changes, independent of dashboard features)
+**Requirements**: LAND-01, LAND-02
+**Success Criteria** (what must be TRUE):
+  1. Hero headline emphasizes automation outcome ("3x More Reviews Without Lifting a Finger")
+  2. Hero subheadline mentions job completion and automated follow-ups
+  3. How It Works section shows V2 workflow: Complete a Job -> System Auto-Enrolls -> Automation Runs
+  4. Problem section addresses lack of follow-up system (not "complex tools" which contradicts V2)
+  5. Outcome cards emphasize automation benefits and review funnel protection
+  6. Social proof strip lists home service industries (HVAC, Plumbing, Electrical, not generic)
+  7. FAQ explains V2 concepts (campaigns, job completion, review funnel)
+  8. Testimonials reflect home service businesses
+  9. CTAs use first-person language ("Start My Free Trial")
+  10. Pricing features mention campaigns and automation (not "review requests" or "contacts")
+  11. No V1 language visible (no "Send review requests", "Add Contact", "Write Message")
+**Plans**: 5 plans in 2 waves
+Plans:
+- [ ] 31-01-PLAN.md — Hero and page metadata V2 update
+- [ ] 31-02-PLAN.md — Problem/Solution and How It Works V2 rewrite
+- [ ] 31-03-PLAN.md — Outcome cards, stats, and social proof V2 update
+- [ ] 31-04-PLAN.md — FAQ, testimonials, CTA, and pricing V2 update
+- [ ] 31-05-PLAN.md — Visual verification checkpoint
 
 ### Phase QA-AUDIT: Dashboard QA Test & UX Audit
 **Goal**: Systematically test every page, button, and feature in the authenticated dashboard using Playwright MCP. Verify v2.0 campaign-first model coherence. Cross-check data against database. Identify UX gaps, broken flows, legacy references, orphaned features, and design inconsistencies.
@@ -408,11 +429,11 @@ Plans:
   8. Send page components use Customer type (not Contact)
 **Plans**: 5 plans in 3 waves
 Plans:
-- [ ] QA-FIX-01-PLAN.md — Critical blockers (database migrations for C01 + C02)
-- [ ] QA-FIX-02-PLAN.md — Navigation reorder and orphaned route/folder cleanup
-- [ ] QA-FIX-03-PLAN.md — Terminology cleanup (47 user-facing issues)
-- [ ] QA-FIX-04-PLAN.md — Icon migration (11 high-priority files)
-- [ ] QA-FIX-05-PLAN.md — Code cleanup (Send page Contact -> Customer)
+- [x] QA-FIX-01-PLAN.md — Critical blockers (database migrations for C01 + C02)
+- [x] QA-FIX-02-PLAN.md — Navigation reorder and orphaned route/folder cleanup
+- [x] QA-FIX-03-PLAN.md — Terminology cleanup (47 user-facing issues)
+- [x] QA-FIX-04-PLAN.md — Icon migration (11 high-priority files)
+- [x] QA-FIX-05-PLAN.md — Code cleanup (Send page Contact -> Customer)
 
 ## Phase Details
 
@@ -441,22 +462,24 @@ See individual phase sections above for requirements, success criteria, and depe
 | 27 (v2.0) | Review Follow-Up | 0/7 | Planned | - |
 | 28 (v2.0) | Review Follow-Up | 0/8 | In progress | - |
 | 29 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
-| 30 (v2.0) | V2 Alignment | 0/9 | **Ready to plan** | - |
+| 30 (v2.0) | V2 Alignment | 0/9 | Ready to plan | - |
+| **31 (v2.0)** | **Landing Page V2** | **0/5** | **Ready to execute** | - |
 | **QA-AUDIT** | **Dashboard Audit** | **9/9** | **Complete** | **2026-02-05** |
 | **QA-FIX** | **Audit Remediation** | **5/5** | **Complete** | **2026-02-06** |
 
-**Total:** 143 plans complete across shipped phases. Phase 30 ready to execute.
+**Total:** 143 plans complete across shipped phases. Phase 31 ready to execute.
 
 ## What's Next
 
-**Current milestone:** v2.0 Review Follow-Up System (Phases 20-30)
-**Next action:** Execute Phase 30 (V2 Alignment) — completes the V2 transformation
+**Current milestone:** v2.0 Review Follow-Up System (Phases 20-31)
+**Next action:** Execute Phase 31 (Landing Page V2 Rewrite) — can run in parallel with Phase 30
 
 **Recommended execution order:**
-1. **Phase 30** (V2 Alignment) — Core flow fix, enables true V2 usage
-2. **Phase 27** (Dashboard Redesign) — Can run in parallel with 30
-3. **Phase 28** (Onboarding) — Depends on Phase 30 (job import)
-4. **Phase 29** (Agency + Landing) — After core V2 complete
+1. **Phase 31** (Landing Page V2) — Copy-only, independent, can run NOW
+2. **Phase 30** (V2 Alignment) — Core flow fix, enables true V2 usage
+3. **Phase 27** (Dashboard Redesign) — Can run in parallel with 30
+4. **Phase 28** (Onboarding) — Depends on Phase 30 (job import)
+5. **Phase 29** (Agency Mode) — After core V2 complete
 
 **Blockers:**
 - Twilio A2P 10DLC registration required before Phase 21-08 execution (webhook verification)
@@ -468,5 +491,5 @@ After v2.0:
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 
 ---
-*Last updated: 2026-02-06 after Phase 30 planning (V2 Alignment defined)*
+*Last updated: 2026-02-06 after Phase 31 planning (Landing Page V2 Rewrite)*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
