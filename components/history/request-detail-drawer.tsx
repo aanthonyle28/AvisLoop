@@ -63,8 +63,8 @@ export function RequestDetailDrawer({
   const canResend = !isOnCooldown && !isOptedOut && request.status !== 'pending'
   const canCancel = request.status === 'pending'
 
-  // Mock contact object for MessagePreview
-  const mockContact = {
+  // Mock customer object for MessagePreview
+  const mockCustomer = {
     id: request.customer_id,
     business_id: request.business_id,
     name: request.customers.name,
@@ -186,7 +186,7 @@ export function RequestDetailDrawer({
           <div>
             <h3 className="text-sm font-medium mb-3">Email Preview</h3>
             <MessagePreview
-              contact={mockContact}
+              customer={mockCustomer}
               business={business}
               template={usedTemplate}
             />

@@ -6,26 +6,26 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import type { Contact, Business, MessageTemplate } from '@/lib/types/database'
+import type { Customer, Business, MessageTemplate } from '@/lib/types/database'
 
 interface EmailPreviewModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  contact: Contact | null
+  customer: Customer | null
   business: Business
   template: MessageTemplate | null
 }
 
 function resolveTemplate(
   text: string,
-  contact: Contact | null,
+  customer: Customer | null,
   business: Business
 ): string {
-  if (!contact) return text
+  if (!customer) return text
 
   const senderName = business.default_sender_name || business.name
   return text
-    .replace(/{{CUSTOMER_NAME}}/g, contact.name)
+    .replace(/{{CUSTOMER_NAME}}/g, customer.name)
     .replace(/{{BUSINESS_NAME}}/g, business.name)
     .replace(/{{SENDER_NAME}}/g, senderName)
 }
@@ -33,7 +33,7 @@ function resolveTemplate(
 export function EmailPreviewModal({
   open,
   onOpenChange,
-  contact,
+  customer,
   business,
   template,
 }: EmailPreviewModalProps) {
@@ -41,8 +41,8 @@ export function EmailPreviewModal({
   const defaultBody = template?.body || `Thank you for choosing ${business.name}! We'd really appreciate it if you could take a moment to share your experience.`
   const senderName = business.default_sender_name || business.name
 
-  const resolvedSubject = resolveTemplate(defaultSubject, contact, business)
-  const resolvedBody = resolveTemplate(defaultBody, contact, business)
+  const resolvedSubject = resolveTemplate(defaultSubject, customer, business)
+  const resolvedBody = resolveTemplate(defaultBody, customer, business)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -51,16 +51,16 @@ export function EmailPreviewModal({
           <DialogTitle>Email Preview</DialogTitle>
         </DialogHeader>
 
-        {!contact ? (
+        {!customer ? (
           <div className="py-8 text-center text-muted-foreground">
-            Select a contact to see the full preview
+            Select a customer to see the full preview
           </div>
         ) : (
           <>
             {/* From/To header */}
             <div className="text-xs text-muted-foreground space-y-1">
               <div>From: {senderName}</div>
-              <div>To: {contact.email}</div>
+              <div>To: {customer.email}</div>
             </div>
 
             {/* Subject */}
@@ -69,7 +69,7 @@ export function EmailPreviewModal({
             {/* Email body styled like actual email */}
             <div className="bg-muted/30 p-6 rounded-lg">
               <div className="bg-card p-6 rounded shadow-sm max-w-lg mx-auto">
-                <h2 className="text-xl font-semibold mb-4">Hi {contact.name},</h2>
+                <h2 className="text-xl font-semibold mb-4">Hi {customer.name},</h2>
 
                 <p className="text-muted-foreground mb-6 whitespace-pre-wrap">
                   {resolvedBody}

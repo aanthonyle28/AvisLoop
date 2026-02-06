@@ -3,15 +3,15 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { BulkSendConfirmDialog } from './bulk-send-confirm-dialog'
-import type { Contact, MessageTemplate } from '@/lib/types/database'
+import type { Customer, MessageTemplate } from '@/lib/types/database'
 
 type SchedulePreset = 'immediately' | '1hour' | 'morning' | 'custom'
 
 interface BulkSendActionBarProps {
   selectedCount: number
   filteredCount: number
-  selectedContacts: Contact[]
-  allFilteredContacts: Contact[]
+  selectedCustomers: Customer[]
+  allFilteredCustomers: Customer[]
   template: MessageTemplate
   schedulePreset: SchedulePreset
   customDateTime: string
@@ -23,8 +23,8 @@ interface BulkSendActionBarProps {
 export function BulkSendActionBar({
   selectedCount,
   filteredCount,
-  selectedContacts,
-  allFilteredContacts,
+  selectedCustomers,
+  allFilteredCustomers,
   template,
   schedulePreset,
   customDateTime,
@@ -45,7 +45,7 @@ export function BulkSendActionBar({
     setDialogOpen(true)
   }
 
-  const contactsToSend = dialogMode === 'selected' ? selectedContacts : allFilteredContacts
+  const customersToSend = dialogMode === 'selected' ? selectedCustomers : allFilteredCustomers
   const showSendAllButton = filteredCount > selectedCount
 
   return (
@@ -98,7 +98,7 @@ export function BulkSendActionBar({
       <BulkSendConfirmDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        contacts={contactsToSend}
+        customers={customersToSend}
         template={template}
         schedulePreset={schedulePreset}
         customDateTime={customDateTime}

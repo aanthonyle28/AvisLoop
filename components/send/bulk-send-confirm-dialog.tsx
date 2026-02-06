@@ -16,7 +16,7 @@ import { scheduleReviewRequest } from '@/lib/actions/schedule'
 import { toastError } from '@/lib/utils/toast'
 import { toast } from 'sonner'
 import { COOLDOWN_DAYS } from '@/lib/constants/billing'
-import type { Contact, MessageTemplate } from '@/lib/types/database'
+import type { Customer, MessageTemplate } from '@/lib/types/database'
 import { format } from 'date-fns'
 
 type SchedulePreset = 'immediately' | '1hour' | 'morning' | 'custom'
@@ -24,7 +24,7 @@ type SchedulePreset = 'immediately' | '1hour' | 'morning' | 'custom'
 interface BulkSendConfirmDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  contacts: Contact[]
+  customers: Customer[]
   template: MessageTemplate
   schedulePreset: SchedulePreset
   customDateTime: string
@@ -35,7 +35,7 @@ interface BulkSendConfirmDialogProps {
 export function BulkSendConfirmDialog({
   open,
   onOpenChange,
-  contacts,
+  customers,
   template,
   schedulePreset,
   customDateTime,
@@ -50,43 +50,43 @@ export function BulkSendConfirmDialog({
   const categorized = useMemo(() => {
     const cooldownDate = new Date(Date.now() - COOLDOWN_DAYS * 24 * 60 * 60 * 1000)
 
-    const eligible: Contact[] = []
-    const onCooldown: Contact[] = []
-    const optedOut: Contact[] = []
+    const eligible: Customer[] = []
+    const onCooldown: Customer[] = []
+    const optedOut: Customer[] = []
 
-    for (const contact of contacts) {
+    for (const customer of customers) {
       // Opted out
-      if (contact.opted_out) {
-        optedOut.push(contact)
+      if (customer.opted_out) {
+        optedOut.push(customer)
         continue
       }
 
       // Archived
-      if (contact.status === 'archived') {
-        optedOut.push(contact)
+      if (customer.status === 'archived') {
+        optedOut.push(customer)
         continue
       }
 
       // Never sent or resend ready
-      if (!contact.last_sent_at || resendReadyIds.has(contact.id)) {
-        eligible.push(contact)
+      if (!customer.last_sent_at || resendReadyIds.has(customer.id)) {
+        eligible.push(customer)
         continue
       }
 
       // On cooldown
-      if (new Date(contact.last_sent_at) > cooldownDate) {
-        onCooldown.push(contact)
+      if (new Date(customer.last_sent_at) > cooldownDate) {
+        onCooldown.push(customer)
         continue
       }
 
       // Default to eligible
-      eligible.push(contact)
+      eligible.push(customer)
     }
 
     return { eligible, onCooldown, optedOut }
-  }, [contacts, resendReadyIds])
+  }, [customers, resendReadyIds])
 
-  const totalCount = contacts.length
+  const totalCount = customers.length
   const eligibleCount = categorized.eligible.length
   const skippedCount = categorized.onCooldown.length
   const optedOutCount = categorized.optedOut.length
@@ -121,7 +121,7 @@ export function BulkSendConfirmDialog({
 
   const handleConfirm = () => {
     if (eligibleCount === 0) {
-      toastError('No eligible contacts', 'All contacts are either opted out or on cooldown')
+      toastError('No eligible customers', 'All customers are either opted out or on cooldown')
       return
     }
 
@@ -147,7 +147,7 @@ export function BulkSendConfirmDialog({
 
           if (result.success && result.data) {
             const timeStr = format(new Date(result.data.scheduledFor), 'MMM d, h:mm a')
-            toast.success(`Scheduled for ${eligibleCount} contacts`, {
+            toast.success(`Scheduled for ${eligibleCount} customers`, {
               description: `Will send ${timeStr}`,
               duration: 6000,
             })
@@ -166,7 +166,7 @@ export function BulkSendConfirmDialog({
           }
 
           if (result.success && result.data) {
-            toast.success(`Sent to ${result.data.sent} contacts`, {
+            toast.success(`Sent to ${result.data.sent} customers`, {
               description: result.data.failed > 0
                 ? `${result.data.failed} failed, ${result.data.skipped} skipped`
                 : `${result.data.skipped} skipped`,
@@ -205,7 +205,7 @@ export function BulkSendConfirmDialog({
           {/* Summary section */}
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Total contacts:</span>
+              <span className="text-muted-foreground">Total customers:</span>
               <span className="font-medium">{totalCount}</span>
             </div>
             <div className="flex justify-between">
@@ -249,7 +249,7 @@ export function BulkSendConfirmDialog({
           {/* Warning if all skipped */}
           {eligibleCount === 0 && (
             <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
-              All contacts are either opted out or on cooldown. Cannot proceed.
+              All customers are either opted out or on cooldown. Cannot proceed.
             </div>
           )}
 
@@ -276,8 +276,8 @@ export function BulkSendConfirmDialog({
             {isPending
               ? isScheduling ? 'Scheduling...' : 'Sending...'
               : isScheduling
-                ? `Schedule for ${eligibleCount} contacts`
-                : `Send to ${eligibleCount} contacts`}
+                ? `Schedule for ${eligibleCount} customers`
+                : `Send to ${eligibleCount} customers`}
           </Button>
         </DialogFooter>
       </DialogContent>

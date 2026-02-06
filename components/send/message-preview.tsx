@@ -1,9 +1,9 @@
 'use client'
 
-import type { Contact, Business, MessageTemplate } from '@/lib/types/database'
+import type { Customer, Business, MessageTemplate } from '@/lib/types/database'
 
 interface MessagePreviewProps {
-  contact: Contact | null
+  customer: Customer | null
   business: Business
   template: MessageTemplate | null
   onViewFull?: () => void
@@ -11,20 +11,20 @@ interface MessagePreviewProps {
 
 function resolveTemplate(
   text: string,
-  contact: Contact | null,
+  customer: Customer | null,
   business: Business
 ): string {
-  if (!contact) return text
+  if (!customer) return text
 
   const senderName = business.default_sender_name || business.name
   return text
-    .replace(/{{CUSTOMER_NAME}}/g, contact.name)
+    .replace(/{{CUSTOMER_NAME}}/g, customer.name)
     .replace(/{{BUSINESS_NAME}}/g, business.name)
     .replace(/{{SENDER_NAME}}/g, senderName)
 }
 
 export function MessagePreview({
-  contact,
+  customer,
   business,
   template,
   onViewFull,
@@ -32,7 +32,7 @@ export function MessagePreview({
   const defaultSubject = template?.subject || `${business.name} would love your feedback!`
   const defaultBody = template?.body || `Thank you for choosing ${business.name}! We'd really appreciate it if you could take a moment to share your experience.`
 
-  if (!contact) {
+  if (!customer) {
     return (
       <div className="rounded-lg border border-dashed p-6 text-center text-muted-foreground">
         Enter an email to preview the message
@@ -40,8 +40,8 @@ export function MessagePreview({
     )
   }
 
-  const resolvedSubject = resolveTemplate(defaultSubject, contact, business)
-  const resolvedBody = resolveTemplate(defaultBody, contact, business)
+  const resolvedSubject = resolveTemplate(defaultSubject, customer, business)
+  const resolvedBody = resolveTemplate(defaultBody, customer, business)
 
   return (
     <div className="rounded-lg border bg-card p-4">

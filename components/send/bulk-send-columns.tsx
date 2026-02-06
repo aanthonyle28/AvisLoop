@@ -3,13 +3,13 @@
 import { ColumnDef } from '@tanstack/react-table'
 import { Checkbox } from '@/components/ui/checkbox'
 import { formatDistanceToNow } from 'date-fns'
-import type { Contact } from '@/lib/types/database'
+import type { Customer } from '@/lib/types/database'
 
 interface ColumnHandlers {
   resendReadyIds: Set<string>
 }
 
-export const createBulkSendColumns = (handlers: ColumnHandlers): ColumnDef<Contact>[] => [
+export const createBulkSendColumns = (handlers: ColumnHandlers): ColumnDef<Customer>[] => [
   // Selection column
   {
     id: 'select',
@@ -24,8 +24,8 @@ export const createBulkSendColumns = (handlers: ColumnHandlers): ColumnDef<Conta
       />
     ),
     cell: ({ row }) => {
-      const contact = row.original
-      const isOptedOut = contact.opted_out
+      const customer = row.original
+      const isOptedOut = customer.opted_out
 
       return (
         <Checkbox
@@ -45,8 +45,8 @@ export const createBulkSendColumns = (handlers: ColumnHandlers): ColumnDef<Conta
     accessorKey: 'name',
     header: 'Name',
     cell: ({ row }) => {
-      const contact = row.original
-      const isOptedOut = contact.opted_out
+      const customer = row.original
+      const isOptedOut = customer.opted_out
 
       return (
         <div className={`font-medium ${isOptedOut ? 'text-muted-foreground' : ''}`}>
@@ -61,8 +61,8 @@ export const createBulkSendColumns = (handlers: ColumnHandlers): ColumnDef<Conta
     accessorKey: 'email',
     header: 'Email',
     cell: ({ row }) => {
-      const contact = row.original
-      const isOptedOut = contact.opted_out
+      const customer = row.original
+      const isOptedOut = customer.opted_out
 
       return (
         <div className={`text-sm ${isOptedOut ? 'text-muted-foreground' : 'text-muted-foreground'}`}>
@@ -92,9 +92,9 @@ export const createBulkSendColumns = (handlers: ColumnHandlers): ColumnDef<Conta
     id: 'status',
     header: 'Status',
     cell: ({ row }) => {
-      const contact = row.original
-      const isOptedOut = contact.opted_out
-      const isReady = handlers.resendReadyIds.has(contact.id)
+      const customer = row.original
+      const isOptedOut = customer.opted_out
+      const isReady = handlers.resendReadyIds.has(customer.id)
 
       if (isOptedOut) {
         return (
@@ -105,7 +105,7 @@ export const createBulkSendColumns = (handlers: ColumnHandlers): ColumnDef<Conta
         )
       }
 
-      if (!contact.last_sent_at) {
+      if (!customer.last_sent_at) {
         return (
           <div className="flex items-center gap-2">
             <div className="h-2 w-2 rounded-full bg-green-500" />
