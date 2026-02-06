@@ -6,7 +6,7 @@ import { X, Check, Circle, ArrowRight, CaretDown, CaretUp } from '@phosphor-icon
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { updateChecklistState } from '@/lib/actions/checklist'
-import { CHECKLIST_ITEMS, type ChecklistItemId } from '@/lib/data/checklist'
+import { CHECKLIST_ITEMS, type ChecklistItemId } from '@/lib/constants/checklist'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 
