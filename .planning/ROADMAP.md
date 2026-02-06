@@ -340,7 +340,7 @@ Plans:
 **Depends on**: Phase 22 (Jobs exist), Phase 20 (Customers exist), QA-AUDIT (issues identified)
 **Requirements**: V2FL-01 to V2FL-12, V2UX-01 to V2UX-03, ICON-01, A11Y-01 to A11Y-04
 **Success Criteria** (what must be TRUE):
-  1. Add Job form includes inline customer creation with smart autocomplete (type name → suggest existing → create new if no match)
+  1. Add Job form includes inline customer creation with smart autocomplete (type name -> suggest existing -> create new if no match)
   2. Add Job form no longer requires selecting pre-existing customer — customer fields inline (name, email, phone)
   3. "Add Customer" button removed from Customers page header and empty state
   4. CSV import redesigned for jobs format (customer_name, email, phone, service_type, completion_date) — creates customers as side effect
@@ -352,21 +352,22 @@ Plans:
   10. Checkbox and icon button touch targets increased to 44px minimum
   11. All icon-only buttons have aria-label attributes
   12. Skip link added to root layout for accessibility
-  13. Job status supports three states: scheduled → completed → do_not_send (campaign enrollment only on completed)
+  13. Job status supports three states: scheduled -> completed -> do_not_send (campaign enrollment only on completed)
   14. Add Job form defaults to "scheduled" status (dispatch workflow: create job before work, mark complete after)
   15. Job Table shows "Mark Complete" button for scheduled jobs (one-click triggers campaign enrollment)
   16. Mobile job list supports one-tap complete from job card for technician in-field workflow
-**Plans**: 9 plans in 4 waves
+**Plans**: 10 plans in 4 waves
 Plans:
 - [ ] 30-01-PLAN.md — Smart customer autocomplete component with create-new fallback
-- [ ] 30-02-PLAN.md — Add Job form redesign with inline customer creation (defaults to scheduled)
-- [ ] 30-03-PLAN.md — Scheduled job status and Mark Complete workflow (DB + actions + table UI)
-- [ ] 30-04-PLAN.md — Remove "Add Customer" CTAs and update empty states
-- [ ] 30-05-PLAN.md — CSV job import (replaces customer import)
-- [ ] 30-06-PLAN.md — Onboarding Step 6 conversion to job import
-- [ ] 30-07-PLAN.md — Add Job CTA updates (primary variant + mobile FAB + one-tap complete)
-- [ ] 30-08-PLAN.md — Icon migration (27 lucide-react files to Phosphor)
+- [ ] 30-02-PLAN.md — Scheduled job status database migration and validations
+- [ ] 30-03-PLAN.md — Add Job form redesign with inline customer creation
+- [ ] 30-04-PLAN.md — Job Table Mark Complete button and status badges
+- [ ] 30-05-PLAN.md — Remove "Add Customer" CTAs and update empty states
+- [ ] 30-06-PLAN.md — CSV job import (replaces customer import)
+- [ ] 30-07-PLAN.md — Onboarding Step 6 conversion to job import
+- [ ] 30-08-PLAN.md — Add Job CTA updates (primary variant + mobile FAB)
 - [ ] 30-09-PLAN.md — Accessibility fixes (touch targets, aria-labels, skip link)
+- [ ] 30-10-PLAN.md — Icon migration (remaining lucide-react files to Phosphor)
 
 ### Phase 31: Landing Page V2 Rewrite
 **Goal**: Landing page copy updated for V2 automation-first philosophy, replacing V1 manual-send messaging with job-completion workflow and home services positioning.
@@ -462,23 +463,23 @@ See individual phase sections above for requirements, success criteria, and depe
 | 27 (v2.0) | Review Follow-Up | 0/7 | Planned | - |
 | 28 (v2.0) | Review Follow-Up | 0/8 | In progress | - |
 | 29 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
-| 30 (v2.0) | V2 Alignment | 0/9 | Ready to plan | - |
-| **31 (v2.0)** | **Landing Page V2** | **0/5** | **Ready to execute** | - |
+| **30 (v2.0)** | **V2 Alignment** | **0/10** | **Ready to execute** | - |
+| 31 (v2.0) | Landing Page V2 | 0/5 | Ready to execute | - |
 | **QA-AUDIT** | **Dashboard Audit** | **9/9** | **Complete** | **2026-02-05** |
 | **QA-FIX** | **Audit Remediation** | **5/5** | **Complete** | **2026-02-06** |
 
-**Total:** 143 plans complete across shipped phases. Phase 31 ready to execute.
+**Total:** 143 plans complete across shipped phases. Phase 30 ready to execute.
 
 ## What's Next
 
 **Current milestone:** v2.0 Review Follow-Up System (Phases 20-31)
-**Next action:** Execute Phase 31 (Landing Page V2 Rewrite) — can run in parallel with Phase 30
+**Next action:** Execute Phase 30 (V2 Alignment) — core flow fix, enables true V2 usage
 
 **Recommended execution order:**
-1. **Phase 31** (Landing Page V2) — Copy-only, independent, can run NOW
-2. **Phase 30** (V2 Alignment) — Core flow fix, enables true V2 usage
-3. **Phase 27** (Dashboard Redesign) — Can run in parallel with 30
-4. **Phase 28** (Onboarding) — Depends on Phase 30 (job import)
+1. **Phase 30** (V2 Alignment) — Core V2 transformation, highest priority
+2. **Phase 31** (Landing Page V2) — Copy-only, can run in parallel
+3. **Phase 27** (Dashboard Redesign) — Can run after 30-05 completes
+4. **Phase 28** (Onboarding) — Depends on Phase 30 (job import in step 6)
 5. **Phase 29** (Agency Mode) — After core V2 complete
 
 **Blockers:**
@@ -491,5 +492,5 @@ After v2.0:
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 
 ---
-*Last updated: 2026-02-06 after Phase 31 planning (Landing Page V2 Rewrite)*
+*Last updated: 2026-02-06 after Phase 30 planning (V2 Alignment, 10 plans in 4 waves)*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
