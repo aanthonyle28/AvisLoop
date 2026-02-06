@@ -4,13 +4,13 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** 30.1 - Audit Gap Remediation
-**Plan:** 7 of 8
-**Status:** **IN PROGRESS**
-**Last activity:** 2026-02-06 - Completed 30.1-06-PLAN.md (Add Job auto-open + terminology)
+**Plan:** 8 of 8
+**Status:** **COMPLETE**
+**Last activity:** 2026-02-06 - Completed 30.1-08-PLAN.md (History/Activity alignment)
 
 **v2.0 Progress:** █████████████████████░░░ (9/11 phases complete)
 **Phase 30 Progress:** ██████████ (10/10 plans) COMPLETE
-**Phase 30.1 Progress:** ████████░░ (7/8 plans)
+**Phase 30.1 Progress:** ██████████ (8/8 plans) COMPLETE
 
 ## v2.0 Phase Status
 
@@ -27,7 +27,7 @@
 | 28 | Onboarding Redesign | Complete |
 | 29 | Agency-Mode Readiness & Landing Page | Not started |
 | **30** | **V2 Alignment & Audit Remediation** | **Complete** (10/10 plans) |
-| **30.1** | **Audit Gap Remediation** | **IN PROGRESS** (7/8 plans) |
+| **30.1** | **Audit Gap Remediation** | **Complete** (8/8 plans) |
 | 31 | Landing Page V2 Rewrite | IN PROGRESS (4/7 plans) |
 | QA-AUDIT | Dashboard QA Test & UX Audit | Complete (9/9 plans) |
 | QA-FIX | Audit Remediation | Complete (5/5 plans) |
@@ -382,11 +382,12 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | Anchor link to presets | 30.1-05 | Link to /campaigns#presets | Presets shown on campaigns page |
 | URL param sheet auto-open | 30.1-06 | ?action=add opens Add Job sheet | Clean URL after open prevents re-trigger |
 | "Send Message" terminology | 30.1-06 | "Send Request" -> "Send Message" everywhere | V2 alignment: messages not requests |
+| Route-label alignment | 30.1-08 | Route /history kept for compatibility, user-facing text says "Activity" | No URL break, consistent terminology |
 
 ## Session Continuity
 
 **Last session:** 2026-02-06
-**Stopped at:** Completed 30.1-06-PLAN.md (Add Job auto-open + terminology)
+**Stopped at:** Completed 30.1-08-PLAN.md (History/Activity alignment) - Phase 30.1 COMPLETE
 **Resume file:** None
 **QA test account:** audit-test@avisloop.com / AuditTest123!
 **QA Report:** docs/QA-AUDIT.md
