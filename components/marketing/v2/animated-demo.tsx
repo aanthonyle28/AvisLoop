@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { CheckCircle, Star } from 'lucide-react';
+import { CheckCircle, Star } from '@phosphor-icons/react';
 import { GeometricMarker } from '@/components/ui/geometric-marker';
 
 const STEPS = [
@@ -113,7 +113,7 @@ export function AnimatedProductDemo() {
             }`}
           >
             <div className="flex flex-col items-center justify-center py-8">
-              <CheckCircle className="h-16 w-16 text-green-500 mb-4" />
+              <CheckCircle size={64} className="text-green-500 mb-4" />
               <h3 className="text-xl font-semibold text-foreground mb-2">Request Sent!</h3>
               <div className="inline-flex items-center gap-2 rounded-full bg-green-500/10 px-4 py-1.5 border border-green-500/20">
                 <div className="h-2 w-2 rounded-full bg-green-500" />
@@ -153,7 +153,7 @@ export function AnimatedProductDemo() {
       <div className="absolute -bottom-4 -left-4 md:left-0 motion-safe:transform motion-safe:rotate-2 motion-safe:hover:rotate-0 motion-safe:transition-transform motion-safe:duration-300 rounded-xl border border-border/50 bg-card shadow-lg p-4">
         <div className="flex gap-1 mb-2">
           {[1, 2, 3, 4, 5].map((star) => (
-            <Star key={star} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+            <Star key={star} size={16} weight="fill" className="text-yellow-400" />
           ))}
         </div>
         <p className="text-sm font-medium text-foreground mb-1">Excellent service!</p>
