@@ -4,12 +4,12 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** QA-AUDIT (Dashboard QA Test & UX Audit)
-**Plan:** 6 of 9 in Phase QA-AUDIT
+**Plan:** 7 of 9 in Phase QA-AUDIT
 **Status:** In progress
-**Last activity:** 2026-02-06 - Completed QA-AUDIT-06-PLAN.md (Customers + Feedback Page Audit)
+**Last activity:** 2026-02-06 - Completed QA-AUDIT-07-PLAN.md (History, Billing, Settings Page Audit)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/10 phases complete or nearly complete)
-**QA Progress:** ██████░░░ (6/9 audit plans complete)
+**QA Progress:** ███████░░ (7/9 audit plans complete)
 
 ## v2.0 Phase Status
 
@@ -234,18 +234,28 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 - **M06-01:** Legacy /components/contacts/ folder exists (10 duplicate files)
 - **M06-02 to M06-03:** 11 files use lucide-react instead of Phosphor
 
+**QA-AUDIT findings (Plan 07):**
+- **M07-01 to M07-08:** History page has 8 legacy terminology issues ("review request" and "contact")
+- **M07-09 to M07-11:** History page uses lucide-react icons (error.tsx, history-filters.tsx, empty-state.tsx)
+- **M07-12 to M07-13:** Billing page uses lucide-react icons (page.tsx, usage-warning-banner.tsx)
+- **M07-14:** Billing page has 1 "review requests" terminology issue
+- **M07-15 to M07-16:** Settings components use lucide-react (integrations-section.tsx, service-types-section.tsx)
+- **VERIFIED OK:** Billing user-facing text correctly uses "customers" (not "contacts")
+- **VERIFIED OK:** Settings section "Message Templates" naming is correct
+- **VERIFIED OK:** Billing accessible via Account menu
+
 **Next actions:**
-- Continue QA-AUDIT plans 07-09 (remaining page audits)
+- Continue QA-AUDIT plans 08-09 (remaining audits)
 - Apply Phase 28 database migration to resolve C01
 - Create analytics RPC migration to resolve C02
-- Fix legacy terminology (6 user-facing changes in 4 files)
-- Migrate feedback components to Phosphor icons
+- Fix legacy terminology (14+ user-facing changes across files)
+- Migrate all lucide-react components to Phosphor icons
 - Delete /components/contacts/ folder
 - Wait for A2P approval before Phase 21-08 execution
 
 ## Session Continuity
 
-**Last session:** 2026-02-06T00:55:00Z
-**Stopped at:** Completed QA-AUDIT-06-PLAN.md (Customers + Feedback Page Audit)
+**Last session:** 2026-02-06T01:06:00Z
+**Stopped at:** Completed QA-AUDIT-07-PLAN.md (History, Billing, Settings Page Audit)
 **Resume file:** None
 **QA test account:** audit-test@avisloop.com / AuditTest123!
