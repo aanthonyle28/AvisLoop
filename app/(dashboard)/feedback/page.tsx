@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getFeedbackForBusiness, getFeedbackStats } from '@/lib/data/feedback'
 import { FeedbackList } from '@/components/feedback/feedback-list'
-import { ChatCircle } from '@phosphor-icons/react'
+import { ChatCircle } from '@phosphor-icons/react/dist/ssr'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {

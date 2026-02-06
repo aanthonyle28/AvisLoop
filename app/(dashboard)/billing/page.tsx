@@ -4,7 +4,7 @@ import { PlanCard } from '@/components/billing/plan-card'
 import { UsageDisplay } from '@/components/billing/usage-display'
 import { SubscriptionStatus } from '@/components/billing/subscription-status'
 import { CONTACT_LIMITS } from '@/lib/constants/billing'
-import { CheckCircle } from '@phosphor-icons/react'
+import { CheckCircle } from '@phosphor-icons/react/dist/ssr'
 
 export const metadata = {
   title: 'Billing',

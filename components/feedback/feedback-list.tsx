@@ -1,6 +1,6 @@
 import type { FeedbackWithCustomer } from '@/lib/types/feedback'
 import { FeedbackCard } from './feedback-card'
-import { ChatCircle } from '@phosphor-icons/react'
+import { ChatCircle } from '@phosphor-icons/react/dist/ssr'
 
 interface FeedbackListProps {
   feedback: FeedbackWithCustomer[]
