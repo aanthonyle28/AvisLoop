@@ -115,17 +115,50 @@ export async function getCampaignPresets(): Promise<CampaignWithTouches[]> {
 }
 
 /**
+ * Options for getCampaignEnrollments pagination.
+ */
+interface GetCampaignEnrollmentsOptions {
+  status?: 'active' | 'completed' | 'stopped'
+  limit?: number
+  offset?: number
+}
+
+/**
+ * Result from getCampaignEnrollments with total count for pagination.
+ */
+interface CampaignEnrollmentsResult {
+  enrollments: CampaignEnrollmentWithDetails[]
+  total: number
+}
+
+/**
  * Get enrollments for a campaign with customer and job details.
+ * Supports pagination with offset and returns total count.
  */
 export async function getCampaignEnrollments(
   campaignId: string,
-  options?: { status?: 'active' | 'completed' | 'stopped'; limit?: number }
-): Promise<CampaignEnrollmentWithDetails[]> {
+  options?: GetCampaignEnrollmentsOptions
+): Promise<CampaignEnrollmentsResult> {
   const supabase = await createClient()
+  const { limit = 20, offset = 0, status } = options || {}
 
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return []
+  if (!user) return { enrollments: [], total: 0 }
 
+  // Build base query for count
+  let countQuery = supabase
+    .from('campaign_enrollments')
+    .select('*', { count: 'exact', head: true })
+    .eq('campaign_id', campaignId)
+
+  if (status) {
+    countQuery = countQuery.eq('status', status)
+  }
+
+  // Get total count
+  const { count } = await countQuery
+
+  // Build query for paginated enrollments
   let query = supabase
     .from('campaign_enrollments')
     .select(`
@@ -137,17 +170,19 @@ export async function getCampaignEnrollments(
     .eq('campaign_id', campaignId)
     .order('enrolled_at', { ascending: false })
 
-  if (options?.status) {
-    query = query.eq('status', options.status)
+  if (status) {
+    query = query.eq('status', status)
   }
 
-  if (options?.limit) {
-    query = query.limit(options.limit)
-  }
+  // Apply pagination with range
+  query = query.range(offset, offset + limit - 1)
 
   const { data } = await query
 
-  return (data || []) as CampaignEnrollmentWithDetails[]
+  return {
+    enrollments: (data || []) as CampaignEnrollmentWithDetails[],
+    total: count || 0,
+  }
 }
 
 /**
