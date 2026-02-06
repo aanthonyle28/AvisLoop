@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
-import { jobSchema } from '@/lib/validations/job'
+import { jobSchema, type CSVJobRow } from '@/lib/validations/job'
 import { enrollJobInCampaign } from '@/lib/actions/enrollment'
 import { parseAndValidatePhone } from '@/lib/utils/phone'
 
@@ -11,6 +11,17 @@ export type JobActionState = {
   fieldErrors?: Record<string, string[]>
   success?: boolean
   data?: { id: string }
+}
+
+export interface BulkJobCreateResult {
+  success: boolean
+  error?: string
+  data?: {
+    jobsCreated: number
+    customersCreated: number
+    customersLinked: number
+    skipped: number
+  }
 }
 
 /**
@@ -362,4 +373,132 @@ export async function markJobDoNotSend(jobId: string): Promise<JobActionState> {
 
   revalidatePath('/jobs')
   return { success: true }
+}
+
+/**
+ * Bulk create jobs with customers (for CSV import).
+ * Creates customers as side effect if they don't exist (by email).
+ * Jobs are created with 'completed' status (historical import).
+ * Campaign enrollment is SKIPPED for bulk imports.
+ */
+export async function bulkCreateJobsWithCustomers(
+  rows: CSVJobRow[]
+): Promise<BulkJobCreateResult> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { success: false, error: 'Unauthorized' }
+  }
+
+  // Get user's business
+  const { data: business } = await supabase
+    .from('businesses')
+    .select('id')
+    .eq('user_id', user.id)
+    .single()
+
+  if (!business) {
+    return { success: false, error: 'Business not found' }
+  }
+
+  // Fetch existing customers by email for deduplication
+  const { data: existingCustomers } = await supabase
+    .from('customers')
+    .select('id, email')
+    .eq('business_id', business.id)
+
+  const existingEmailMap = new Map(
+    (existingCustomers || []).map(c => [c.email.toLowerCase(), c.id])
+  )
+
+  let jobsCreated = 0
+  let customersCreated = 0
+  let customersLinked = 0
+  let skipped = 0
+
+  for (const row of rows) {
+    try {
+      const emailLower = row.customerEmail.toLowerCase()
+      let customerId = existingEmailMap.get(emailLower)
+
+      if (customerId) {
+        // Link to existing customer
+        customersLinked++
+      } else {
+        // Create new customer
+        const phoneResult = row.customerPhone ? parseAndValidatePhone(row.customerPhone) : null
+
+        const { data: newCustomer, error: customerError } = await supabase
+          .from('customers')
+          .insert({
+            business_id: business.id,
+            name: row.customerName.trim(),
+            email: emailLower.trim(),
+            phone: phoneResult?.e164 || row.customerPhone || null,
+            phone_status: phoneResult?.status || 'missing',
+            status: 'active',
+            opted_out: false,
+            sms_consent_status: 'unknown',
+            tags: [],
+          })
+          .select('id')
+          .single()
+
+        if (customerError || !newCustomer) {
+          console.error('Error creating customer:', customerError)
+          skipped++
+          continue
+        }
+
+        customerId = newCustomer.id
+        existingEmailMap.set(emailLower, customerId)
+        customersCreated++
+      }
+
+      // Parse completion date (default to now if not provided)
+      const completionDate = row.completionDate
+        ? new Date(row.completionDate)
+        : new Date()
+
+      // Create job with completed status (historical import)
+      const { error: jobError } = await supabase
+        .from('jobs')
+        .insert({
+          business_id: business.id,
+          customer_id: customerId,
+          service_type: row.serviceType,
+          status: 'completed',  // Historical jobs are completed
+          completed_at: completionDate.toISOString(),
+          notes: row.notes || null,
+        })
+
+      if (jobError) {
+        console.error('Error creating job:', jobError)
+        skipped++
+        continue
+      }
+
+      jobsCreated++
+
+      // Note: Campaign enrollment skipped for historical imports
+      // Add optional enrollInCampaign parameter if needed later
+    } catch (err) {
+      console.error('Error processing row:', err)
+      skipped++
+    }
+  }
+
+  revalidatePath('/jobs')
+  revalidatePath('/customers')
+
+  return {
+    success: true,
+    data: {
+      jobsCreated,
+      customersCreated,
+      customersLinked,
+      skipped,
+    },
+  }
 }

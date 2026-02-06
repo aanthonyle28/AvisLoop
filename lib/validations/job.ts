@@ -77,3 +77,60 @@ export const jobSchema = z.object({
 export type JobInput = z.infer<typeof jobSchema>
 export type ServiceTypeValue = typeof SERVICE_TYPES[number]
 export type JobStatusValue = typeof JOB_STATUSES[number]
+
+// CSV Job import schema
+export const csvJobRowSchema = z.object({
+  customerName: z.string().min(1, 'Customer name is required'),
+  customerEmail: z.string().email('Invalid email address'),
+  customerPhone: z.string().optional().nullable(),
+  serviceType: z.enum(SERVICE_TYPES),
+  completionDate: z.string().optional().nullable(),  // YYYY-MM-DD or empty for today
+  notes: z.string().optional().nullable(),
+})
+
+export type CSVJobRow = z.infer<typeof csvJobRowSchema>
+
+// Header mappings for CSV parsing
+export const JOB_CSV_HEADER_MAPPINGS: Record<string, keyof CSVJobRow> = {
+  // Customer name variants
+  'customer_name': 'customerName',
+  'Customer Name': 'customerName',
+  'name': 'customerName',
+  'Name': 'customerName',
+  'customer': 'customerName',
+  'Customer': 'customerName',
+
+  // Email variants
+  'email': 'customerEmail',
+  'Email': 'customerEmail',
+  'customer_email': 'customerEmail',
+  'Customer Email': 'customerEmail',
+
+  // Phone variants
+  'phone': 'customerPhone',
+  'Phone': 'customerPhone',
+  'customer_phone': 'customerPhone',
+  'Customer Phone': 'customerPhone',
+  'mobile': 'customerPhone',
+
+  // Service type variants
+  'service_type': 'serviceType',
+  'Service Type': 'serviceType',
+  'service': 'serviceType',
+  'Service': 'serviceType',
+  'type': 'serviceType',
+
+  // Completion date variants
+  'completion_date': 'completionDate',
+  'Completion Date': 'completionDate',
+  'completed_at': 'completionDate',
+  'date': 'completionDate',
+  'Date': 'completionDate',
+  'completed': 'completionDate',
+
+  // Notes variants
+  'notes': 'notes',
+  'Notes': 'notes',
+  'description': 'notes',
+  'Description': 'notes',
+}
