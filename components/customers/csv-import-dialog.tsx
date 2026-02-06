@@ -12,7 +12,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Upload, FileSpreadsheet, AlertCircle, CheckCircle, Loader2 } from 'lucide-react'
+import { Upload, FileXls, WarningCircle, CheckCircle, CircleNotch } from '@phosphor-icons/react'
 import { CSVPreviewTable } from './csv-preview-table'
 import { bulkCreateCustomers, getCustomers, type BulkCreateResult } from '@/lib/actions/customer'
 import { customerSchema } from '@/lib/validations/customer'
@@ -180,7 +180,7 @@ export function CSVImportDialog() {
     }}>
       <DialogTrigger asChild>
         <Button>
-          <Upload className='mr-2 h-4 w-4' />
+          <Upload size={16} weight="regular" className="mr-2" />
           Import CSV
         </Button>
       </DialogTrigger>
@@ -200,7 +200,7 @@ export function CSVImportDialog() {
               )}
             >
               <input {...getInputProps()} />
-              <FileSpreadsheet className='h-12 w-12 mx-auto mb-4 text-muted-foreground' />
+              <FileXls size={48} weight="regular" className="mx-auto mb-4 text-muted-foreground" />
               {isDragActive ? (
                 <p className='text-lg font-medium'>Drop CSV file here...</p>
               ) : (
@@ -214,7 +214,7 @@ export function CSVImportDialog() {
             </div>
             {file && (
               <div className='flex items-center gap-2 text-sm'>
-                <FileSpreadsheet className='h-4 w-4' />
+                <FileXls size={16} weight="regular" />
                 <span className='font-medium'>{file.name}</span>
                 <span className='text-muted-foreground'>({(file.size / 1024).toFixed(1)} KB)</span>
               </div>
@@ -240,7 +240,7 @@ export function CSVImportDialog() {
         {/* Step 3: Importing */}
         {step === 'importing' && (
           <div className='flex flex-col items-center justify-center py-12 space-y-4'>
-            <Loader2 className='h-12 w-12 animate-spin text-primary' />
+            <CircleNotch size={48} weight="regular" className="animate-spin text-primary" />
             <p className='text-lg font-medium'>Importing customers...</p>
           </div>
         )}
@@ -251,7 +251,7 @@ export function CSVImportDialog() {
             {importResult?.success ? (
               <>
                 <div className='flex flex-col items-center justify-center py-8 space-y-4'>
-                  <CheckCircle className='h-16 w-16 text-green-600' />
+                  <CheckCircle size={64} weight="regular" className="text-green-600" />
                   <div className='text-center space-y-2'>
                     <h3 className='text-lg font-semibold'>Import Complete</h3>
                     <div className='text-sm text-muted-foreground space-y-1'>
@@ -299,7 +299,7 @@ export function CSVImportDialog() {
               </>
             ) : (
               <div className='flex flex-col items-center justify-center py-8 space-y-4'>
-                <AlertCircle className='h-16 w-16 text-destructive' />
+                <WarningCircle size={64} weight="regular" className="text-destructive" />
                 <div className='text-center space-y-2'>
                   <h3 className='text-lg font-semibold'>Import Failed</h3>
                   <p className='text-sm text-destructive'>{importResult?.error || 'Unknown error'}</p>

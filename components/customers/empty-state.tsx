@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { Users, Upload, Plus } from 'lucide-react'
+import { Users, Upload, Plus } from '@phosphor-icons/react'
 
 interface CustomersEmptyStateProps {
   onAddCustomer?: () => void
@@ -10,7 +10,7 @@ export function CustomersEmptyState({ onAddCustomer, onImportCSV }: CustomersEmp
   return (
     <div className='flex flex-col items-center justify-center py-16 px-4 text-center'>
       <div className='rounded-full bg-muted p-4 mb-4'>
-        <Users className='h-8 w-8 text-muted-foreground' />
+        <Users size={32} weight="regular" className="text-muted-foreground" />
       </div>
       <h3 className='text-lg font-semibold mb-2'>No customers yet</h3>
       <p className='text-muted-foreground max-w-sm mb-6'>
@@ -19,13 +19,13 @@ export function CustomersEmptyState({ onAddCustomer, onImportCSV }: CustomersEmp
       <div className='flex flex-col sm:flex-row gap-3'>
         {onAddCustomer && (
           <Button onClick={onAddCustomer}>
-            <Plus className='h-4 w-4' />
+            <Plus size={16} weight="regular" />
             Add Customer
           </Button>
         )}
         {onImportCSV && (
           <Button variant='outline' onClick={onImportCSV}>
-            <Upload className='h-4 w-4' />
+            <Upload size={16} weight="regular" />
             Import CSV
           </Button>
         )}
@@ -39,7 +39,7 @@ export function CustomersFilteredEmptyState() {
   return (
     <div className='flex flex-col items-center justify-center py-16 px-4 text-center'>
       <div className='rounded-full bg-muted p-4 mb-4'>
-        <Users className='h-8 w-8 text-muted-foreground' />
+        <Users size={32} weight="regular" className="text-muted-foreground" />
       </div>
       <h3 className='text-lg font-semibold mb-2'>No customers found</h3>
       <p className='text-muted-foreground max-w-sm'>
