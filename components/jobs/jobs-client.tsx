@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Plus } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
+import { FirstVisitHint } from '@/components/onboarding/first-visit-hint'
 import { JobTable } from './job-table'
 import { JobFilters, type JobFiltersState } from './job-filters'
 import { EmptyState } from './empty-state'
@@ -59,10 +60,17 @@ export function JobsClient({ initialJobs, totalJobs, customers, campaignMap, def
             {totalJobs} {totalJobs === 1 ? 'job' : 'jobs'} total
           </p>
         </div>
-        <Button onClick={() => setShowAddSheet(true)}>
-          <Plus className="mr-2 h-4 w-4" weight="bold" />
-          Add Job
-        </Button>
+        <FirstVisitHint
+          hintId="jobs-add-button"
+          title="Add your first job here"
+          description="Log completed jobs to start collecting reviews automatically. This is the main action in AvisLoop."
+          side="bottom"
+        >
+          <Button onClick={() => setShowAddSheet(true)}>
+            <Plus className="mr-2 h-4 w-4" weight="bold" />
+            Add Job
+          </Button>
+        </FirstVisitHint>
       </div>
 
       {/* Filters */}
