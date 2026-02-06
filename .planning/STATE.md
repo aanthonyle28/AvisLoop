@@ -3,13 +3,13 @@
 ## Current Position
 
 **Milestone:** v2.0 Review Follow-Up System
-**Phase:** QA-FIX-audit-remediation (Audit Remediation)
-**Plan:** 5 of 5 in Phase QA-FIX
-**Status:** **COMPLETE**
-**Last activity:** 2026-02-06 - Completed QA-FIX-05-PLAN.md (Legacy Code Cleanup)
+**Phase:** 31 - Landing Page V2 Rewrite
+**Plan:** 01 of 7 (Wave 1 in progress)
+**Status:** **EXECUTING**
+**Last activity:** 2026-02-06 - Completed 31-01-PLAN.md (Hero and metadata V2 update)
 
-**v2.0 Progress:** ████████████████████░░░░ (8/10 phases complete or nearly complete)
-**QA-FIX Progress:** █████ (5/5 remediation plans complete)
+**v2.0 Progress:** ████████████████████░░░░ (8/11 phases complete)
+**Phase 31 Progress:** █░░░░░░░ (1/7 plans)
 
 ## v2.0 Phase Status
 
@@ -22,11 +22,13 @@
 | 24 | Multi-Touch Campaign Engine | Complete (11/11 plans) |
 | 25 | LLM Personalization | Complete (11/11 plans) |
 | 26 | Review Funnel | Complete (7/7 plans) |
-| 27 | Dashboard Redesign | In progress (6/7 plans) |
-| 28 | Onboarding Redesign | In progress (6/8 plans) |
+| 27 | Dashboard Redesign | Planned (0/7 plans) |
+| 28 | Onboarding Redesign | Planned (0/8 plans) |
 | 29 | Agency-Mode Readiness & Landing Page | Not started |
-| QA-AUDIT | Dashboard QA Test & UX Audit | **COMPLETE** (9/9 plans) |
-| QA-FIX | Audit Remediation | **COMPLETE** (5/5 plans) |
+| 30 | V2 Alignment & Audit Remediation | Ready to plan (0/8 plans) |
+| **31** | **Landing Page V2 Rewrite** | **IN PROGRESS** (1/7 plans) |
+| QA-AUDIT | Dashboard QA Test & UX Audit | Complete (9/9 plans) |
+| QA-FIX | Audit Remediation | Complete (5/5 plans) |
 
 ## QA-FIX Status
 
@@ -334,10 +336,18 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | Customer type consistency | QA-FIX-05 | Contact -> Customer in Send components | Completes Phase 20 type migration |
 | Function rename | QA-FIX-05 | getResendReadyContacts -> getResendReadyCustomers | Matches Customer type naming |
 
+### Phase 31
+
+| Decision | Phase | Impact | Constraint |
+|----------|-------|--------|------------|
+| First-person CTA | 31-01 | "Start My Free Trial" over "Start Free Trial" | +90% CTR per research |
+| Trust badge specificity | 31-01 | "Built for home service businesses" over unverified claims | Avoid unverifiable "500+ businesses" |
+| 10-second job entry messaging | 31-01 | Core V2 speed metric in subheadline and trust indicators | Emphasizes automation value |
+
 ## Session Continuity
 
-**Last session:** 2026-02-06T03:00:00Z
-**Stopped at:** QA-FIX phase verified and complete
+**Last session:** 2026-02-06T03:35:00Z
+**Stopped at:** Completed 31-01-PLAN.md
 **Resume file:** None
 **QA test account:** audit-test@avisloop.com / AuditTest123!
 **QA Report:** docs/QA-AUDIT.md
