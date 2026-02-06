@@ -19,15 +19,18 @@ import {
 } from '@/components/ui/table'
 import { createColumns } from './history-columns'
 import type { SendLogWithContact } from '@/lib/types/database'
+import { TableSkeleton } from '@/components/ui/table-skeleton'
 
 interface HistoryTableProps {
   data: SendLogWithContact[]
+  /** Show skeleton loading state */
+  loading?: boolean
   onRowClick?: (request: SendLogWithContact) => void
   onResend?: (request: SendLogWithContact) => void
   onCancel?: (request: SendLogWithContact) => void
 }
 
-export function HistoryTable({ data, onRowClick, onResend, onCancel }: HistoryTableProps) {
+export function HistoryTable({ data, loading, onRowClick, onResend, onCancel }: HistoryTableProps) {
   const columns = useMemo(() => createColumns({ onResend, onCancel }), [onResend, onCancel])
   const [sorting, setSorting] = useState<SortingState>([])
 
@@ -41,6 +44,11 @@ export function HistoryTable({ data, onRowClick, onResend, onCancel }: HistoryTa
       sorting,
     },
   })
+
+  // Show skeleton when loading
+  if (loading) {
+    return <TableSkeleton columns={5} rows={5} />
+  }
 
   return (
     <div className="rounded-md border">

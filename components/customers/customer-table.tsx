@@ -51,17 +51,7 @@ export function CustomerTable({
   onBulkDelete,
   onRowClick,
 }: CustomerTableProps) {
-  // Show skeleton when loading
-  if (loading) {
-    return (
-      <TableSkeleton
-        columns={8}
-        rows={5}
-        hasCheckbox={true}
-      />
-    )
-  }
-  // Table state
+  // Table state - all hooks must be declared before any early return
   const [sorting, setSorting] = useState<SortingState>([
     { id: 'last_sent_at', desc: true }, // Default sort: most recent first
   ])
@@ -143,6 +133,17 @@ export function CustomerTable({
   const selectedRows = table.getFilteredSelectedRowModel().rows
   const selectedIds = selectedRows.map((row) => row.original.id)
   const hasSelection = selectedIds.length > 0
+
+  // Show skeleton when loading
+  if (loading) {
+    return (
+      <TableSkeleton
+        columns={8}
+        rows={5}
+        hasCheckbox={true}
+      />
+    )
+  }
 
   return (
     <div className='space-y-4'>
