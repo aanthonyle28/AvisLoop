@@ -7,15 +7,17 @@ import { JobTable } from './job-table'
 import { JobFilters, type JobFiltersState } from './job-filters'
 import { EmptyState } from './empty-state'
 import { AddJobSheet } from './add-job-sheet'
-import type { JobWithCustomer, Customer } from '@/lib/types/database'
+import type { JobWithEnrollment, Customer } from '@/lib/types/database'
 
 interface JobsClientProps {
-  initialJobs: JobWithCustomer[]
+  initialJobs: JobWithEnrollment[]
   totalJobs: number
   customers: Customer[]
+  /** Map of service type to matching campaign info for enrollment preview */
+  campaignMap?: Map<string, { campaignName: string; firstTouchDelay: number }>
 }
 
-export function JobsClient({ initialJobs, totalJobs, customers }: JobsClientProps) {
+export function JobsClient({ initialJobs, totalJobs, customers, campaignMap }: JobsClientProps) {
   const [filters, setFilters] = useState<JobFiltersState>({
     status: null,
     serviceType: null,
@@ -63,7 +65,7 @@ export function JobsClient({ initialJobs, totalJobs, customers }: JobsClientProp
           onAddJob={() => setShowAddSheet(true)}
         />
       ) : (
-        <JobTable jobs={filteredJobs} customers={customers} />
+        <JobTable jobs={filteredJobs} customers={customers} campaignMap={campaignMap} />
       )}
 
       {/* Add Job Sheet */}

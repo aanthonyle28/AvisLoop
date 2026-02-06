@@ -107,6 +107,17 @@ export interface JobWithCustomer extends Job {
   customers: Pick<Customer, 'id' | 'name' | 'email' | 'phone'>
 }
 
+// Job with customer and enrollment data for jobs list with campaign preview
+export interface JobWithEnrollment extends JobWithCustomer {
+  campaign_enrollments: Array<{
+    id: string
+    status: EnrollmentStatus
+    campaigns: Pick<Campaign, 'id' | 'name'> | null
+  }>
+  // Added client-side for scheduled jobs without enrollment
+  matchingCampaign?: { campaignName: string; firstTouchDelay: number } | null
+}
+
 // Insert type (omit auto-generated fields)
 export type JobInsert = Omit<Job, 'id' | 'created_at' | 'updated_at'>
 

@@ -1,20 +1,21 @@
 import { createClient } from '@/lib/supabase/server'
-import type { JobWithCustomer } from '@/lib/types/database'
+import type { JobWithCustomer, JobWithEnrollment } from '@/lib/types/database'
 
 /**
  * Fetch jobs for the current user's business with pagination and filters.
+ * Includes enrollment data for campaign preview.
  */
 export async function getJobs(options?: {
   limit?: number
   offset?: number
   serviceType?: string
   status?: string
-}): Promise<{ jobs: JobWithCustomer[]; total: number }> {
+}): Promise<{ jobs: JobWithEnrollment[]; total: number; businessId: string | null }> {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
-    return { jobs: [], total: 0 }
+    return { jobs: [], total: 0, businessId: null }
   }
 
   // Get user's business
@@ -25,16 +26,20 @@ export async function getJobs(options?: {
     .single()
 
   if (!business) {
-    return { jobs: [], total: 0 }
+    return { jobs: [], total: 0, businessId: null }
   }
 
   const limit = options?.limit ?? 50
   const offset = options?.offset ?? 0
 
-  // Build query with customer join
+  // Build query with customer and enrollment joins
   let query = supabase
     .from('jobs')
-    .select('*, customers!inner(id, name, email, phone)', { count: 'exact' })
+    .select(`
+      *,
+      customers!inner(id, name, email, phone),
+      campaign_enrollments(id, status, campaigns:campaign_id(id, name))
+    `, { count: 'exact' })
     .eq('business_id', business.id)
     .order('created_at', { ascending: false })
 
@@ -55,12 +60,13 @@ export async function getJobs(options?: {
 
   if (error) {
     console.error('Error fetching jobs:', error)
-    return { jobs: [], total: 0 }
+    return { jobs: [], total: 0, businessId: business.id }
   }
 
   return {
-    jobs: data as JobWithCustomer[],
+    jobs: data as JobWithEnrollment[],
     total: count || 0,
+    businessId: business.id,
   }
 }
 

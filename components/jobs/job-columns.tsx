@@ -2,20 +2,20 @@
 
 import { type ColumnDef } from '@tanstack/react-table'
 import { format, formatDistanceToNow } from 'date-fns'
-import { PencilSimple, Trash } from '@phosphor-icons/react'
+import { PencilSimple, Trash, Clock, CheckCircle, XCircle, Minus } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { SERVICE_TYPE_LABELS } from '@/lib/validations/job'
 import { deleteJob } from '@/lib/actions/job'
 import { toast } from 'sonner'
 import { MarkCompleteButton } from './mark-complete-button'
-import type { JobWithCustomer } from '@/lib/types/database'
+import type { JobWithEnrollment } from '@/lib/types/database'
 
 interface ColumnsOptions {
-  onEdit: (job: JobWithCustomer) => void
+  onEdit: (job: JobWithEnrollment) => void
 }
 
-export function columns({ onEdit }: ColumnsOptions): ColumnDef<JobWithCustomer>[] {
+export function columns({ onEdit }: ColumnsOptions): ColumnDef<JobWithEnrollment>[] {
   return [
     {
       accessorKey: 'customers.name',
@@ -90,6 +90,85 @@ export function columns({ onEdit }: ColumnsOptions): ColumnDef<JobWithCustomer>[
           >
             Do Not Send
           </Badge>
+        )
+      },
+    },
+    {
+      id: 'campaign',
+      header: 'Campaign',
+      cell: ({ row }) => {
+        const job = row.original
+        const activeEnrollment = job.campaign_enrollments?.find(e => e.status === 'active')
+        const anyEnrollment = job.campaign_enrollments?.[0]
+        const matchingCampaign = job.matchingCampaign
+
+        // do_not_send jobs are not enrolled
+        if (job.status === 'do_not_send') {
+          return (
+            <span className="text-xs text-muted-foreground flex items-center gap-1">
+              <XCircle size={14} weight="fill" className="text-muted-foreground/70" />
+              Not enrolled
+            </span>
+          )
+        }
+
+        // Already has active enrollment
+        if (activeEnrollment) {
+          return (
+            <span className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+              <CheckCircle size={14} weight="fill" />
+              {activeEnrollment.campaigns?.name || 'Enrolled'}
+            </span>
+          )
+        }
+
+        // Completed enrollment (all touches sent)
+        if (anyEnrollment && anyEnrollment.status === 'completed') {
+          return (
+            <span className="text-xs text-muted-foreground flex items-center gap-1">
+              <CheckCircle size={14} weight="fill" className="text-muted-foreground/70" />
+              {anyEnrollment.campaigns?.name || 'Completed'}
+            </span>
+          )
+        }
+
+        // Stopped enrollment
+        if (anyEnrollment && anyEnrollment.status === 'stopped') {
+          return (
+            <span className="text-xs text-muted-foreground flex items-center gap-1">
+              <Minus size={14} weight="bold" className="text-muted-foreground/70" />
+              Stopped
+            </span>
+          )
+        }
+
+        // Scheduled job with matching campaign - show preview
+        if (matchingCampaign && job.status === 'scheduled') {
+          const hours = matchingCampaign.firstTouchDelay
+          const timeStr = hours < 24 ? `${hours}h` : `${Math.round(hours / 24)}d`
+          return (
+            <span className="text-xs text-muted-foreground flex items-center gap-1">
+              <Clock size={14} weight="fill" className="text-primary/70" />
+              {matchingCampaign.campaignName} in {timeStr}
+            </span>
+          )
+        }
+
+        // Completed job should be enrolled but isn't (edge case)
+        if (matchingCampaign && job.status === 'completed') {
+          return (
+            <span className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
+              <Clock size={14} weight="fill" />
+              Pending enrollment
+            </span>
+          )
+        }
+
+        // No matching campaign
+        return (
+          <span className="text-xs text-muted-foreground">
+            No campaign
+          </span>
         )
       },
     },
