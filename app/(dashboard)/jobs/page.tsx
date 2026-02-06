@@ -10,7 +10,11 @@ export const metadata = {
   description: 'Manage your service jobs',
 }
 
-async function JobsContent() {
+interface JobsPageProps {
+  searchParams: Promise<{ action?: string }>
+}
+
+async function JobsContent({ defaultAddJobOpen }: { defaultAddJobOpen: boolean }) {
   const [{ jobs, total, businessId }, { customers }] = await Promise.all([
     getJobs(),
     getCustomers({ limit: 200 }), // For customer selector in add/edit forms
@@ -30,11 +34,15 @@ async function JobsContent() {
       totalJobs={total}
       customers={customers}
       campaignMap={campaignMap}
+      defaultAddJobOpen={defaultAddJobOpen}
     />
   )
 }
 
-export default function JobsPage() {
+export default async function JobsPage({ searchParams }: JobsPageProps) {
+  const { action } = await searchParams
+  const shouldOpenAddJob = action === 'add'
+
   return (
     <div className="container py-6">
       <Suspense fallback={
@@ -45,7 +53,7 @@ export default function JobsPage() {
           </div>
         </div>
       }>
-        <JobsContent />
+        <JobsContent defaultAddJobOpen={shouldOpenAddJob} />
       </Suspense>
     </div>
   )

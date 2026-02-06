@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { JobTable } from './job-table'
@@ -15,15 +15,26 @@ interface JobsClientProps {
   customers: Customer[]
   /** Map of service type to matching campaign info for enrollment preview */
   campaignMap?: Map<string, { campaignName: string; firstTouchDelay: number }>
+  /** Whether to auto-open the Add Job sheet (from URL param) */
+  defaultAddJobOpen?: boolean
 }
 
-export function JobsClient({ initialJobs, totalJobs, customers, campaignMap }: JobsClientProps) {
+export function JobsClient({ initialJobs, totalJobs, customers, campaignMap, defaultAddJobOpen = false }: JobsClientProps) {
   const [filters, setFilters] = useState<JobFiltersState>({
     status: null,
     serviceType: null,
     search: '',
   })
   const [showAddSheet, setShowAddSheet] = useState(false)
+
+  // Handle auto-open from URL param and clean URL
+  useEffect(() => {
+    if (defaultAddJobOpen) {
+      setShowAddSheet(true)
+      // Clean URL to prevent re-opening on refresh
+      window.history.replaceState({}, '', '/jobs')
+    }
+  }, [defaultAddJobOpen])
 
   // Filter jobs client-side (for initial load, server-side filtering for large datasets)
   const filteredJobs = initialJobs.filter(job => {
