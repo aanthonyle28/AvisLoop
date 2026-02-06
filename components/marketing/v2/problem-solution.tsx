@@ -6,20 +6,20 @@ import { CalendarX, Megaphone, Wrench } from '@phosphor-icons/react';
 const painPoints = [
   {
     icon: CalendarX,
-    problem: 'Forgetting to Ask',
-    agitation: 'You finish a great service, the customer leaves happy, and then... nothing. You meant to follow up but got busy. Another review opportunity lost.',
+    problem: 'Forgotten Follow-Ups',
+    agitation: 'You finish a great service, customer leaves happy, and then... nothing. You meant to follow up but got busy with the next call. Another 5-star review lost forever.',
     color: 'lime' as const,
   },
   {
     icon: Megaphone,
-    problem: 'Awkward Asks',
-    agitation: 'Asking for reviews in person feels pushy. You don\'t want to pressure customers, so you say nothing and hope they remember on their own.',
+    problem: 'No Follow-Up System',
+    agitation: 'You ask once, move on to the next job. No reminders, no second chances. Most customers ignore the first request—they need 2-3 touches to actually leave a review.',
     color: 'coral' as const,
   },
   {
     icon: Wrench,
-    problem: 'Complex Tools',
-    agitation: 'Marketing platforms promise automation but require campaigns, workflows, and hours of setup. You just want to send one message.',
+    problem: 'Bad Review Risk',
+    agitation: 'What if they leave 1 star? One public negative review can cost thousands in lost leads. You avoid asking because you can\'t control where feedback goes.',
     color: 'lime' as const,
   },
 ];
@@ -34,7 +34,7 @@ export function ProblemSolutionSection() {
             Stop Losing Reviews to Forgotten Follow-Ups
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-center">
-            You&apos;re not alone. Every business struggles with the same review request challenges.
+            Home service owners work 50+ hour weeks. You don&apos;t have time to manually chase reviews. Here&apos;s what happens:
           </p>
         </FadeIn>
 
@@ -78,7 +78,7 @@ export function ProblemSolutionSection() {
             <p className="text-lg font-medium text-foreground mb-2">
               AvisLoop fixes all three problems.
             </p>
-            <p className="text-muted-foreground">Here&apos;s how it works:</p>
+            <p className="text-muted-foreground">Complete jobs in 10 seconds. System handles the rest.</p>
           </div>
         </FadeIn>
       </div>
