@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation'
 import { SendPageClient } from '@/components/send/send-page-client'
 
 export const metadata = {
-  title: 'Send',
+  title: 'Manual Request',
 }
 
 export default async function SendPage() {

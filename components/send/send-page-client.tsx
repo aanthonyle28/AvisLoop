@@ -2,7 +2,9 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { toast } from 'sonner'
+import { Warning } from '@phosphor-icons/react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { QuickSendTab } from './quick-send-tab'
 import { BulkSendTab } from './bulk-send-tab'
@@ -91,11 +93,32 @@ export function SendPageClient({
   }
 
   return (
-    <Tabs
-      defaultValue="quick-send"
-      className="w-full"
-      onValueChange={(value) => setActiveTab(value as 'quick-send' | 'bulk-send')}
-    >
+    <>
+      {/* V2 friction warning banner */}
+      <div
+        className="mb-6 flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/50 dark:bg-amber-950/20"
+        data-testid="friction-warning"
+      >
+        <Warning className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" weight="fill" />
+        <div className="text-sm">
+          <p className="font-medium text-amber-900 dark:text-amber-200">
+            Campaigns handle review requests automatically
+          </p>
+          <p className="mt-1 text-amber-700 dark:text-amber-300">
+            Manual sending is for one-off situations. For ongoing follow-up, set up a{' '}
+            <Link href="/campaigns" className="underline font-medium hover:text-amber-900 dark:hover:text-amber-100">
+              campaign
+            </Link>
+            {' '}instead.
+          </p>
+        </div>
+      </div>
+
+      <Tabs
+        defaultValue="quick-send"
+        className="w-full"
+        onValueChange={(value) => setActiveTab(value as 'quick-send' | 'bulk-send')}
+      >
       {/* Header row: title left, tabs right */}
       <div className="flex items-start justify-between mb-6">
         <div>
@@ -160,5 +183,6 @@ export function SendPageClient({
         onCancel={handleCancel}
       />
     </Tabs>
+    </>
   )
 }
