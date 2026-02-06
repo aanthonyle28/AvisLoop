@@ -4,14 +4,14 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** 32 - Post-Onboarding Guidance
-**Plan:** 2 of 4
+**Plan:** 3 of 4
 **Status:** In progress
-**Last activity:** 2026-02-06 - Completed 32-02-PLAN.md (Checklist Data & Component)
+**Last activity:** 2026-02-06 - Completed 32-03-PLAN.md (Checklist & Hint Integration)
 
 **v2.0 Progress:** █████████████████████░░░ (9/11 phases complete)
 **Phase 30 Progress:** ██████████ (10/10 plans) COMPLETE
 **Phase 30.1 Progress:** ██████████ (8/8 plans) COMPLETE
-**Phase 32 Progress:** █████░░░░░ (2/4 plans)
+**Phase 32 Progress:** ███████░░░ (3/4 plans)
 
 ## v2.0 Phase Status
 
@@ -395,11 +395,14 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | Review click via stop_reason | 32-02 | Track campaign_enrollments.stop_reason='review_clicked' | Actual funnel success metric |
 | Auto-collapse after 3 days | 32-02 | Checklist auto-collapses based on first_seen_at | Reduces friction for returning users |
 | JSONB merge pattern | 32-02 | Spread existing object before updating keys | Preserves other checklist data |
+| Hint storage in localStorage | 32-03 | First-visit hints tracked per device | Less critical than checklist, per-device acceptable |
+| Checklist constants split | 32-03 | lib/constants/checklist.ts for client imports | Client components cannot import from server-only files |
+| Tooltip wrapper component | 32-03 | components/ui/tooltip.tsx with Radix | Standard shadcn/ui pattern for hints |
 
 ## Session Continuity
 
 **Last session:** 2026-02-06
-**Stopped at:** Completed 32-02-PLAN.md (Checklist Data & Component)
+**Stopped at:** Completed 32-03-PLAN.md (Checklist & Hint Integration)
 **Resume file:** None
 **QA test account:** audit-test@avisloop.com / AuditTest123!
 **QA Report:** docs/QA-AUDIT.md
