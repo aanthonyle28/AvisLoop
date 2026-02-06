@@ -417,6 +417,27 @@ Plans:
 - [ ] 31-04-PLAN.md — FAQ, testimonials, CTA, and pricing V2 update
 - [ ] 31-05-PLAN.md — Visual verification checkpoint
 
+### Phase 32: Post-Onboarding Guidance
+**Goal**: Help new users discover key features after onboarding with a persistent dashboard checklist and contextual tooltip hints on first visit to key pages.
+**Depends on**: Phase 28 (onboarding complete), Phase 27 (dashboard)
+**Requirements**: GUIDE-01 to GUIDE-06
+**Success Criteria** (what must be TRUE):
+  1. Dashboard shows "Getting Started" checklist card for new users (dismissible)
+  2. Checklist tracks: Add first job, Set up campaign, Complete a job, Get first review
+  3. Checklist progress persists in database (survives logout/login)
+  4. Checklist items link to relevant pages with clear CTAs
+  5. Checklist auto-hides when all items complete (or user dismisses)
+  6. Jobs page shows tooltip hint on first visit: "Add your first job here" pointing at Add Job button
+  7. Tooltip hints show once per user per page (tracked in localStorage)
+  8. Hints are dismissible and non-blocking
+  9. Checklist and hints reinforce V2 workflow (jobs -> campaigns -> automation)
+**Plans**: 4 plans in 3 waves
+Plans:
+- [ ] 32-01-PLAN.md — Database schema and types for checklist
+- [ ] 32-02-PLAN.md — Checklist data functions and UI component
+- [ ] 32-03-PLAN.md — Tooltip hints hook, component, and integration
+- [ ] 32-04-PLAN.md — Visual verification checkpoint
+
 ### Phase QA-AUDIT: Dashboard QA Test & UX Audit
 **Goal**: Systematically test every page, button, and feature in the authenticated dashboard using Playwright MCP. Verify v2.0 campaign-first model coherence. Cross-check data against database. Identify UX gaps, broken flows, legacy references, orphaned features, and design inconsistencies.
 **Depends on**: Phases 20-28 (dashboard features built)
@@ -490,6 +511,7 @@ See individual phase sections above for requirements, success criteria, and depe
 | **30 (v2.0)** | **V2 Alignment** | **10/10** | **Complete** | **2026-02-06** |
 | **30.1 (v2.0)** | **Audit Gap Remediation** | **8/8** | **Complete** | **2026-02-06** |
 | 31 (v2.0) | Landing Page V2 | 4/5 | In progress | - |
+| 32 (v2.0) | Post-Onboarding Guidance | 0/4 | Planned | - |
 | **QA-AUDIT** | **Dashboard Audit** | **9/9** | **Complete** | **2026-02-05** |
 | **QA-FIX** | **Audit Remediation** | **5/5** | **Complete** | **2026-02-06** |
 
@@ -502,7 +524,8 @@ See individual phase sections above for requirements, success criteria, and depe
 
 **Recommended execution order:**
 1. **Phase 31** (Landing Page V2) — Remaining plan: 31-05 visual verification (1 plan)
-2. **Phase 29** (Agency Mode) — After core V2 complete
+2. **Phase 32** (Post-Onboarding Guidance) — 4 plans ready to execute
+3. **Phase 29** (Agency Mode) — After core V2 complete
 
 **Completed recently:**
 - Phase 30.1 (Audit Gap Remediation) — 8/8 plans complete (2026-02-06)
@@ -520,5 +543,5 @@ After v2.0:
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 
 ---
-*Last updated: 2026-02-06 after Phase 30.1 execution (Audit Gap Remediation, 8/8 plans complete)*
+*Last updated: 2026-02-06 after Phase 32 planning (Post-Onboarding Guidance, 4 plans in 3 waves)*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
