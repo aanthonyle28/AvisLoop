@@ -4,12 +4,12 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** 31 - Landing Page V2 Rewrite
-**Plan:** 01 of 7 (Wave 1 in progress)
+**Plan:** 03 of 7 (Wave 1 in progress)
 **Status:** **EXECUTING**
-**Last activity:** 2026-02-06 - Completed 31-01-PLAN.md (Hero and metadata V2 update)
+**Last activity:** 2026-02-06 - Completed 31-03-PLAN.md (V2 benefits, stats, social proof)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/11 phases complete)
-**Phase 31 Progress:** █░░░░░░░ (1/7 plans)
+**Phase 31 Progress:** ██░░░░░░ (2/7 plans)
 
 ## v2.0 Phase Status
 
@@ -343,11 +343,14 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | First-person CTA | 31-01 | "Start My Free Trial" over "Start Free Trial" | +90% CTR per research |
 | Trust badge specificity | 31-01 | "Built for home service businesses" over unverified claims | Avoid unverifiable "500+ businesses" |
 | 10-second job entry messaging | 31-01 | Core V2 speed metric in subheadline and trust indicators | Emphasizes automation value |
+| V2 outcome messaging | 31-03 | Automation-focused benefits (multi-touch, funnel, job-centric) | Replaces V1 "30 seconds" speed claims |
+| Home services positioning | 31-03 | Target HVAC, Plumbing, Electrical, Roofing, Cleaning, Painting | Matches codebase service types |
+| Job entry stat | 31-03 | "10s Per Job Entry" replaces hours saved | V2 job-centric efficiency messaging |
 
 ## Session Continuity
 
-**Last session:** 2026-02-06T03:35:00Z
-**Stopped at:** Completed 31-01-PLAN.md
+**Last session:** 2026-02-06T04:00:00Z
+**Stopped at:** Completed 31-03-PLAN.md
 **Resume file:** None
 **QA test account:** audit-test@avisloop.com / AuditTest123!
 **QA Report:** docs/QA-AUDIT.md
