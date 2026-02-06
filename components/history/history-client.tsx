@@ -72,7 +72,7 @@ export function HistoryClient({ initialLogs, total, currentPage, pageSize, busin
     const result = await sendReviewRequest(null, formData)
 
     if (result.success) {
-      toast.success('Review request sent successfully!', {
+      toast.success('Message sent successfully!', {
         description: 'The recipient will receive your message shortly.',
         duration: 6000,
       })
@@ -111,9 +111,9 @@ export function HistoryClient({ initialLogs, total, currentPage, pageSize, busin
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Requests</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Activity</h1>
         <p className="text-muted-foreground mt-1">
-          View and manage all your review requests
+          View and manage your message history
         </p>
       </div>
 

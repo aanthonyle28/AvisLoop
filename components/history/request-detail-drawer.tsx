@@ -131,7 +131,7 @@ export function RequestDetailDrawer({
         <SheetHeader>
           <SheetTitle>Request Details</SheetTitle>
           <SheetDescription>
-            View details and take action on this review request
+            View details and take action on this message
           </SheetDescription>
         </SheetHeader>
 
@@ -241,10 +241,10 @@ export function RequestDetailDrawer({
             <div className="border-t pt-6">
               <div className="bg-muted/30 rounded-lg p-4 text-sm text-muted-foreground">
                 {isOnCooldown && (
-                  <p>This contact is on cooldown. You can resend in a few days.</p>
+                  <p>This customer is on cooldown. You can resend in a few days.</p>
                 )}
                 {isOptedOut && (
-                  <p>This contact has opted out of receiving review requests.</p>
+                  <p>This customer has opted out of receiving messages.</p>
                 )}
               </div>
             </div>

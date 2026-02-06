@@ -28,12 +28,12 @@ export function HistoryEmptyState({ hasFilters = false }: HistoryEmptyStateProps
       </div>
       <h3 className="text-lg font-semibold mb-2">No messages sent yet</h3>
       <p className="text-muted-foreground max-w-sm mb-6">
-        Once you send your first review request, it will appear here so you can track its status.
+        Once you send your first message, it will appear here so you can track its status.
       </p>
       <Button asChild>
         <Link href="/send">
           <Send className="h-4 w-4" />
-          Send Review Request
+          Send Message
         </Link>
       </Button>
     </div>
