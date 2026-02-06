@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Check } from 'lucide-react'
+import { Check } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { saveServicesOffered } from '@/lib/actions/onboarding'
 import {
@@ -101,7 +101,7 @@ export function ServicesOfferedStep({
                   `}
                 >
                   {isChecked && (
-                    <Check className="h-4 w-4 text-primary-foreground" />
+                    <Check size={16} className="text-primary-foreground" />
                   )}
                 </div>
                 <div className="flex-1 space-y-1">

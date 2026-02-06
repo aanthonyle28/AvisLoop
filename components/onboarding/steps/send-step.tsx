@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { sendReviewRequest } from '@/lib/actions/send'
 import { markOnboardingComplete } from '@/lib/actions/onboarding'
 import { useRouter } from 'next/navigation'
-import { CheckCircle, Mail, AlertCircle, ArrowLeft } from 'lucide-react'
+import { CheckCircle, Envelope, WarningCircle, ArrowLeft } from '@phosphor-icons/react'
 
 interface SendStepProps {
   contact?: { id: string; name: string; email: string } | null
@@ -66,7 +66,7 @@ export function SendStep({ contact, business, template, onComplete, onGoToStep }
       <div className="space-y-6 text-center py-8">
         <div className="flex justify-center">
           <div className="rounded-full bg-green-100 p-4 dark:bg-green-900">
-            <CheckCircle className="h-12 w-12 text-green-600 dark:text-green-400" />
+            <CheckCircle size={48} className="text-green-600 dark:text-green-400" />
           </div>
         </div>
         <div>
@@ -92,7 +92,7 @@ export function SendStep({ contact, business, template, onComplete, onGoToStep }
 
         <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-900 dark:bg-yellow-950">
           <div className="flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mt-0.5" />
+            <WarningCircle size={20} className=" text-yellow-600 dark:text-yellow-400 mt-0.5" />
             <div>
               <p className="font-medium text-yellow-800 dark:text-yellow-200">
                 Google review link required
@@ -111,7 +111,7 @@ export function SendStep({ contact, business, template, onComplete, onGoToStep }
               variant="outline"
               className="w-full"
             >
-              <ArrowLeft className="mr-2 h-4 w-4" />
+              <ArrowLeft size={16} className="mr-2" />
               Go back to add review link
             </Button>
           )}
@@ -141,7 +141,7 @@ export function SendStep({ contact, business, template, onComplete, onGoToStep }
 
         <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-900 dark:bg-yellow-950">
           <div className="flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mt-0.5" />
+            <WarningCircle size={20} className=" text-yellow-600 dark:text-yellow-400 mt-0.5" />
             <div>
               <p className="font-medium text-yellow-800 dark:text-yellow-200">
                 Contact required
@@ -160,7 +160,7 @@ export function SendStep({ contact, business, template, onComplete, onGoToStep }
               variant="outline"
               className="w-full"
             >
-              <ArrowLeft className="mr-2 h-4 w-4" />
+              <ArrowLeft size={16} className="mr-2" />
               Go back to add contact
             </Button>
           )}
@@ -193,7 +193,7 @@ export function SendStep({ contact, business, template, onComplete, onGoToStep }
       <div className="rounded-lg border bg-card p-4 space-y-4">
         <div className="flex items-center gap-3">
           <div className="rounded-full bg-primary/10 p-2">
-            <Mail className="h-5 w-5 text-primary" />
+            <Envelope size={20} className="text-primary" />
           </div>
           <div>
             <p className="font-medium">Email Preview</p>

@@ -1,6 +1,6 @@
 'use client'
 
-import { Star } from 'lucide-react'
+import { Star } from '@phosphor-icons/react'
 import { useState, useCallback } from 'react'
 import { cn } from '@/lib/utils'
 import { getRatingLabel } from '@/lib/review/routing'
@@ -13,9 +13,9 @@ interface SatisfactionRatingProps {
 }
 
 const SIZES = {
-  sm: 'w-8 h-8',
-  md: 'w-12 h-12',
-  lg: 'w-16 h-16',
+  sm: 32,
+  md: 48,
+  lg: 64,
 }
 
 const COLORS = {
@@ -103,8 +103,9 @@ export function SatisfactionRating({
               )}
             >
               <Star
+                size={SIZES[size]}
+                weight={isFilled ? 'fill' : 'regular'}
                 className={cn(
-                  SIZES[size],
                   'transition-colors duration-150',
                   isFilled
                     ? hoverRating > 0
@@ -112,8 +113,6 @@ export function SatisfactionRating({
                       : COLORS.filled
                     : COLORS.empty
                 )}
-                fill={isFilled ? 'currentColor' : 'none'}
-                strokeWidth={1.5}
               />
             </button>
           )

@@ -1,4 +1,4 @@
-import { CheckCircle } from 'lucide-react'
+import { CheckCircle } from '@phosphor-icons/react'
 import { REVIEW_PAGE_COPY } from '@/lib/review/routing'
 
 interface ThankYouCardProps {
@@ -22,7 +22,7 @@ export function ThankYouCard({ destination, businessName }: ThankYouCardProps) {
   return (
     <div className="text-center space-y-6">
       <div className="mx-auto w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-        <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
+        <CheckCircle size={32} className="text-green-600 dark:text-green-400" />
       </div>
 
       <div className="space-y-2">
