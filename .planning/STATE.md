@@ -4,12 +4,12 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** QA-FIX-audit-remediation (Audit Remediation)
-**Plan:** 4 of 5 in Phase QA-FIX
-**Status:** In progress
-**Last activity:** 2026-02-06 - Completed QA-FIX-04-PLAN.md (Icon Consistency)
+**Plan:** 5 of 5 in Phase QA-FIX
+**Status:** **COMPLETE**
+**Last activity:** 2026-02-06 - Completed QA-FIX-05-PLAN.md (Legacy Code Cleanup)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/10 phases complete or nearly complete)
-**QA-FIX Progress:** ████░ (4/5 remediation plans complete)
+**QA-FIX Progress:** █████ (5/5 remediation plans complete)
 
 ## v2.0 Phase Status
 
@@ -26,7 +26,7 @@
 | 28 | Onboarding Redesign | In progress (6/8 plans) |
 | 29 | Agency-Mode Readiness & Landing Page | Not started |
 | QA-AUDIT | Dashboard QA Test & UX Audit | **COMPLETE** (9/9 plans) |
-| QA-FIX | Audit Remediation | In progress (1/5 plans) |
+| QA-FIX | Audit Remediation | **COMPLETE** (5/5 plans) |
 
 ## QA-FIX Status
 
@@ -38,7 +38,7 @@
 | 02 | Navigation Reorder | **COMPLETE** |
 | 03 | Terminology Fixes | **COMPLETE** |
 | 04 | Icon Consistency | **COMPLETE** |
-| 05 | Legacy Code Cleanup | Not started |
+| 05 | Legacy Code Cleanup | **COMPLETE** |
 
 ### QA-FIX-01 Summary
 
@@ -68,6 +68,14 @@
 - Dashboard pages: history/error.tsx, billing/page.tsx, feedback/page.tsx
 - Components: feedback-card.tsx, feedback-list.tsx, empty-state.tsx (2), csv-import-dialog.tsx, history-filters.tsx, usage-warning-banner.tsx, integrations-section.tsx
 - All icon imports now from @phosphor-icons/react
+- Both lint and typecheck pass
+
+### QA-FIX-05 Summary
+
+- Updated Send page components to use Customer type instead of Contact
+- Renamed getResendReadyContacts to getResendReadyCustomers
+- Updated all prop names: resendReadyContactIds -> resendReadyCustomerIds
+- Fixed history/request-detail-drawer.tsx (additional file)
 - Both lint and typecheck pass
 
 ## QA-AUDIT Summary
@@ -309,8 +317,8 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 
 **Next actions:**
 - Start Docker and run `supabase db reset` to apply C01/C02 migrations
-- Execute QA-FIX-05 (Legacy Code Cleanup) for remaining remediation
 - Wait for A2P approval before Phase 21-08 execution
+- Continue with remaining phases (27, 28, 29)
 
 ### QA-FIX
 
@@ -323,11 +331,13 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | V2 terminology: message | QA-FIX-03 | Replace 'review request' with 'message' | Aligns with multi-channel V2 model |
 | Phosphor icon mappings | QA-FIX-04 | AlertCircle->WarningCircle, History->ClockCounterClockwise, etc. | Lucide to Phosphor equivalents established |
 | Icon size props pattern | QA-FIX-04 | size={16} for h-4 w-4, size={20} for h-5 w-5, etc. | Phosphor uses size/weight props not className |
+| Customer type consistency | QA-FIX-05 | Contact -> Customer in Send components | Completes Phase 20 type migration |
+| Function rename | QA-FIX-05 | getResendReadyContacts -> getResendReadyCustomers | Matches Customer type naming |
 
 ## Session Continuity
 
-**Last session:** 2026-02-06T01:23:00Z
-**Stopped at:** Completed QA-FIX-04-PLAN.md (Icon Consistency)
+**Last session:** 2026-02-06T02:15:00Z
+**Stopped at:** Completed QA-FIX-05-PLAN.md (Legacy Code Cleanup) - **Phase Complete**
 **Resume file:** None
 **QA test account:** audit-test@avisloop.com / AuditTest123!
 **QA Report:** docs/QA-AUDIT.md
