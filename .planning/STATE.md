@@ -4,12 +4,12 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** QA-FIX-audit-remediation (Audit Remediation)
-**Plan:** 2 of 5 in Phase QA-FIX
+**Plan:** 3 of 5 in Phase QA-FIX
 **Status:** In progress
-**Last activity:** 2026-02-06 - Completed QA-FIX-02-PLAN.md (Navigation Reorder)
+**Last activity:** 2026-02-06 - Completed QA-FIX-03-PLAN.md (Terminology Fixes)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/10 phases complete or nearly complete)
-**QA-FIX Progress:** ██░░░ (2/5 remediation plans complete)
+**QA-FIX Progress:** ███░░ (3/5 remediation plans complete)
 
 ## v2.0 Phase Status
 
@@ -36,7 +36,7 @@
 |------|------|--------|
 | 01 | Critical Blocker Fixes | **COMPLETE** |
 | 02 | Navigation Reorder | **COMPLETE** |
-| 03 | Terminology Fixes | Not started |
+| 03 | Terminology Fixes | **COMPLETE** |
 | 04 | Icon Consistency | Not started |
 | 05 | Legacy Code Cleanup | Not started |
 
@@ -52,6 +52,14 @@
 - Sidebar navigation reordered for V2 workflow (Jobs/Campaigns prominent)
 - Legacy /components/contacts/ folder deleted (10 duplicate files)
 - /scheduled route already deleted in QA-FIX-01
+- Both lint and typecheck pass
+
+### QA-FIX-03 Summary
+
+- Fixed 17 terminology issues across 9 files
+- Replaced 'contact' with 'customer' in user-facing strings
+- Replaced 'review request' with 'message' for V2 consistency
+- Updated component prop API (onAddContact -> onAddCustomer)
 - Both lint and typecheck pass
 
 ## QA-AUDIT Summary
@@ -285,7 +293,7 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 - ~~QA-AUDIT C02~~ FIXED: RPC migration created, pending `supabase db reset`
 
 **QA-AUDIT findings summary:**
-- 47 user-facing "contact" terminology issues
+- ~~47 user-facing "contact" terminology issues~~ **FIXED** (QA-FIX-03) - 17 instances across 9 files
 - 41 files use lucide-react instead of Phosphor icons
 - ~~10 legacy files in /components/contacts/ folder~~ **FIXED** (QA-FIX-02)
 - ~~Navigation order not V2-aligned~~ **FIXED** (QA-FIX-02)
@@ -293,7 +301,7 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 
 **Next actions:**
 - Start Docker and run `supabase db reset` to apply C01/C02 migrations
-- Execute remaining QA-FIX plans (02-05) for navigation, terminology, icons, cleanup
+- Execute remaining QA-FIX plans (04-05) for icons and legacy cleanup
 - Wait for A2P approval before Phase 21-08 execution
 
 ### QA-FIX
@@ -303,11 +311,13 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | Idempotent phone migration | QA-FIX-01 | Uses IF NOT EXISTS for safety | Column may already exist from Phase 28 migration |
 | Correct RPC join path | QA-FIX-01 | Join jobs->enrollments->send_logs | send_logs lacks job_id column |
 | V2 navigation order | QA-FIX-02 | Jobs at 2, Campaigns at 3, Send at 6 | Emphasizes V2 workflow over manual sending |
+| V2 terminology: customer | QA-FIX-03 | Replace 'contact' with 'customer' | User-facing strings only, not code references |
+| V2 terminology: message | QA-FIX-03 | Replace 'review request' with 'message' | Aligns with multi-channel V2 model |
 
 ## Session Continuity
 
-**Last session:** 2026-02-06T01:17:00Z
-**Stopped at:** Completed QA-FIX-02-PLAN.md (Navigation Reorder)
+**Last session:** 2026-02-06T01:22:00Z
+**Stopped at:** Completed QA-FIX-03-PLAN.md (Terminology Fixes)
 **Resume file:** None
 **QA test account:** audit-test@avisloop.com / AuditTest123!
 **QA Report:** docs/QA-AUDIT.md
