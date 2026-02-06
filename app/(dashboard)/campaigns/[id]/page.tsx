@@ -5,13 +5,14 @@ import { CampaignStats } from '@/components/campaigns/campaign-stats'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { PencilSimple, EnvelopeSimple, ChatCircle, ArrowLeft, Sparkle } from '@phosphor-icons/react/dist/ssr'
+import { PencilSimple, EnvelopeSimple, ChatCircle, ArrowLeft, Sparkle, CaretLeft, CaretRight } from '@phosphor-icons/react/dist/ssr'
 import { SERVICE_TYPE_LABELS } from '@/lib/validations/job'
 import { ENROLLMENT_STATUS_LABELS, STOP_REASON_LABELS } from '@/lib/constants/campaigns'
 import { formatDistanceToNow } from 'date-fns'
 
 interface CampaignDetailPageProps {
   params: Promise<{ id: string }>
+  searchParams: Promise<{ page?: string }>
 }
 
 export async function generateMetadata({ params }: CampaignDetailPageProps) {
@@ -22,14 +23,23 @@ export async function generateMetadata({ params }: CampaignDetailPageProps) {
   }
 }
 
-export default async function CampaignDetailPage({ params }: CampaignDetailPageProps) {
+export default async function CampaignDetailPage({ params, searchParams }: CampaignDetailPageProps) {
   const { id } = await params
-  const [campaign, enrollments, counts, analytics] = await Promise.all([
+  const { page: pageParam } = await searchParams
+
+  const currentPage = Math.max(1, parseInt(pageParam || '1', 10))
+  const pageSize = 20
+  const offset = (currentPage - 1) * pageSize
+
+  const [campaign, enrollmentsResult, counts, analytics] = await Promise.all([
     getCampaign(id),
-    getCampaignEnrollments(id, { limit: 20 }),
+    getCampaignEnrollments(id, { limit: pageSize, offset }),
     getCampaignEnrollmentCounts(id),
     getCampaignAnalytics(id),
   ])
+
+  const { enrollments, total } = enrollmentsResult
+  const totalPages = Math.ceil(total / pageSize)
 
   if (!campaign) {
     notFound()
@@ -157,7 +167,7 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
       {/* Enrollments list */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Enrollments</CardTitle>
+          <CardTitle>Recent Enrollments ({total})</CardTitle>
         </CardHeader>
         <CardContent>
           {enrollments.length === 0 ? (
@@ -200,6 +210,38 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
                   </div>
                 </div>
               ))}
+
+              {/* Pagination controls */}
+              {total > pageSize && (
+                <div className="flex items-center justify-between pt-4 border-t mt-4">
+                  <p className="text-sm text-muted-foreground">
+                    Showing {offset + 1}-{Math.min(offset + pageSize, total)} of {total} enrollments
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href={`/campaigns/${id}?page=${currentPage - 1}`}
+                      className={currentPage <= 1 ? 'pointer-events-none' : ''}
+                    >
+                      <Button variant="outline" size="sm" disabled={currentPage <= 1}>
+                        <CaretLeft className="h-4 w-4 mr-1" />
+                        Previous
+                      </Button>
+                    </Link>
+                    <span className="text-sm text-muted-foreground">
+                      Page {currentPage} of {totalPages}
+                    </span>
+                    <Link
+                      href={`/campaigns/${id}?page=${currentPage + 1}`}
+                      className={currentPage >= totalPages ? 'pointer-events-none' : ''}
+                    >
+                      <Button variant="outline" size="sm" disabled={currentPage >= totalPages}>
+                        Next
+                        <CaretRight className="h-4 w-4 ml-1" />
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </CardContent>
