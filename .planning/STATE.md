@@ -3,13 +3,13 @@
 ## Current Position
 
 **Milestone:** v2.0 Review Follow-Up System
-**Phase:** QA-AUDIT (Dashboard QA Test & UX Audit)
-**Plan:** 8 of 9 in Phase QA-AUDIT
-**Status:** In progress
-**Last activity:** 2026-02-06 - Completed QA-AUDIT-08-PLAN.md (Cross-Cutting Concerns Audit)
+**Phase:** QA-AUDIT (Dashboard QA Test & UX Audit) - COMPLETE
+**Plan:** 9 of 9 in Phase QA-AUDIT
+**Status:** Complete
+**Last activity:** 2026-02-06 - Completed QA-AUDIT-09-PLAN.md (Final Report Compilation)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/10 phases complete or nearly complete)
-**QA Progress:** ████████░ (8/9 audit plans complete)
+**QA Progress:** █████████ (9/9 audit plans complete)
 
 ## v2.0 Phase Status
 
@@ -25,6 +25,26 @@
 | 27 | Dashboard Redesign | In progress (6/7 plans) |
 | 28 | Onboarding Redesign | In progress (6/8 plans) |
 | 29 | Agency-Mode Readiness & Landing Page | Not started |
+| QA-AUDIT | Dashboard QA Test & UX Audit | **COMPLETE** (9/9 plans) |
+
+## QA-AUDIT Summary
+
+**Final report:** `docs/QA-AUDIT.md`
+
+| Metric | Value |
+|--------|-------|
+| Total pages audited | 15 |
+| Critical findings | 2 |
+| Medium findings | 26 |
+| Low findings | 10 |
+| Pages passing | 7 |
+| Pages needing work | 6 |
+| Pages failing | 2 |
+
+### Critical Blockers
+
+1. **C01: Onboarding Step 1** - Missing `phone` column on businesses table (Phase 28 migration not applied)
+2. **C02: Analytics Page** - Missing `get_service_type_analytics` RPC function
 
 ## Blocker
 
@@ -128,7 +148,7 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | Badge shows total attention | 27-05 | Badge displays readyToSend + attentionAlerts | Single number for items needing action |
 | getDashboardCounts in layout | 27-05 | Called in app/(dashboard)/layout.tsx | Badge updates on every page navigation |
 | Add Job persistent button | 27-05 | Button always visible in sidebar | Global action not buried in Jobs page |
-| Activity rename | 27-05 | "Requests" → "Activity" in navigation | More intuitive label per CONTEXT.md |
+| Activity rename | 27-05 | "Requests" -> "Activity" in navigation | More intuitive label per CONTEXT.md |
 | JS aggregation for analytics | 27-06 | Fetch separately and aggregate in JS | Supabase client doesn't support complex GROUP BY |
 | Two-rate display | 27-06 | Response rate (reviews + feedback) and review rate (reviews only) | Shows both engagement and public outcome |
 | Volume-based sorting | 27-06 | Sort service types by total sent descending | Most active service types appear first |
@@ -220,6 +240,13 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | SMS body auto-populate | 21-05 | Review link auto-populated when SMS selected | UX convenience |
 | Channel reset on change | 21-05 | Resets to email when customer changes and SMS unavailable | Prevents stuck state |
 
+### QA-AUDIT
+
+| Decision | Phase | Impact | Constraint |
+|----------|-------|--------|------------|
+| Grading criteria | QA-09 | PASS (0 crit, 0-2 med), NEEDS WORK (0 crit, 3+ med), FAIL (1+ crit) | Consistent page assessment |
+| 5-phase remediation | QA-09 | Prioritized fix order: Critical -> Nav -> Terminology -> Icons -> Code | Clear execution path |
+
 ## Known Blockers / Concerns
 
 **Current blockers:**
@@ -228,46 +255,23 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 - **QA-AUDIT C01:** Onboarding Step 1 fails with "phone column not in schema cache" - Phase 28 migration not applied to database. Blocks all new user onboarding.
 - **QA-AUDIT C02:** Analytics page missing `get_service_type_analytics` RPC function - Migration file never created. Analytics displays empty data.
 
-**QA-AUDIT findings (Plan 06):**
-- **C06-01 to C06-06:** Customers page has 7+ legacy "contact" terminology issues (user-facing text)
-- **C06-07:** Feedback page uses lucide-react icons instead of Phosphor
-- **M06-01:** Legacy /components/contacts/ folder exists (10 duplicate files)
-- **M06-02 to M06-03:** 11 files use lucide-react instead of Phosphor
-
-**QA-AUDIT findings (Plan 07):**
-- **M07-01 to M07-08:** History page has 8 legacy terminology issues ("review request" and "contact")
-- **M07-09 to M07-11:** History page uses lucide-react icons (error.tsx, history-filters.tsx, empty-state.tsx)
-- **M07-12 to M07-13:** Billing page uses lucide-react icons (page.tsx, usage-warning-banner.tsx)
-- **M07-14:** Billing page has 1 "review requests" terminology issue
-- **M07-15 to M07-16:** Settings components use lucide-react (integrations-section.tsx, service-types-section.tsx)
-- **VERIFIED OK:** Billing user-facing text correctly uses "customers" (not "contacts")
-- **VERIFIED OK:** Settings section "Message Templates" naming is correct
-- **VERIFIED OK:** Billing accessible via Account menu
-
-**QA-AUDIT findings (Plan 08):**
-- **M08-01:** /scheduled route is orphaned (not linked from nav, V1 feature)
-- **M08-02:** Navigation order not V2-aligned (Send too prominent, Jobs/Campaigns too buried)
-- **M08-03:** 47 user-facing "contact" terminology instances across codebase
-- **M08-04:** 41 files use lucide-react instead of Phosphor icons
-- **M08-05:** /components/contacts/ folder is legacy duplicate (10 files)
-- **VERIFIED OK:** /contacts redirect works correctly (keep for backward compat)
-- **VERIFIED OK:** Theme toggle works from any page, persists correctly
-- **VERIFIED OK:** Hardcoded colors all have dark mode variants
+**QA-AUDIT findings summary:**
+- 47 user-facing "contact" terminology issues
+- 41 files use lucide-react instead of Phosphor icons
+- 10 legacy files in /components/contacts/ folder
+- Navigation order not V2-aligned
+- /scheduled route orphaned (should be removed)
 
 **Next actions:**
-- Complete QA-AUDIT-09 (Final Report compilation)
 - Apply Phase 28 database migration to resolve C01
 - Create analytics RPC migration to resolve C02
-- Remove /scheduled route and related files
-- Reorder navigation for V2 alignment
-- Fix legacy terminology (47+ user-facing changes)
-- Migrate all lucide-react components to Phosphor icons (41 files)
-- Delete /components/contacts/ folder (10 files)
+- Execute 5-phase remediation plan from docs/QA-AUDIT.md
 - Wait for A2P approval before Phase 21-08 execution
 
 ## Session Continuity
 
-**Last session:** 2026-02-06T01:05:00Z
-**Stopped at:** Completed QA-AUDIT-08-PLAN.md (Cross-Cutting Concerns Audit)
+**Last session:** 2026-02-06T01:00:00Z
+**Stopped at:** Completed QA-AUDIT-09-PLAN.md (Final Report Compilation)
 **Resume file:** None
 **QA test account:** audit-test@avisloop.com / AuditTest123!
+**QA Report:** docs/QA-AUDIT.md
