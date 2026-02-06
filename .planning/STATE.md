@@ -6,11 +6,11 @@
 **Phase:** 30.1 - Audit Gap Remediation
 **Plan:** 7 of 8
 **Status:** **IN PROGRESS**
-**Last activity:** 2026-02-06 - Completed 30.1-07-PLAN.md (Preset timing display)
+**Last activity:** 2026-02-06 - Completed 30.1-06-PLAN.md (Add Job auto-open + terminology)
 
 **v2.0 Progress:** █████████████████████░░░ (9/11 phases complete)
 **Phase 30 Progress:** ██████████ (10/10 plans) COMPLETE
-**Phase 30.1 Progress:** ███████░░░ (6/8 plans)
+**Phase 30.1 Progress:** ████████░░ (7/8 plans)
 
 ## v2.0 Phase Status
 
@@ -27,7 +27,7 @@
 | 28 | Onboarding Redesign | Complete |
 | 29 | Agency-Mode Readiness & Landing Page | Not started |
 | **30** | **V2 Alignment & Audit Remediation** | **Complete** (10/10 plans) |
-| **30.1** | **Audit Gap Remediation** | **IN PROGRESS** (6/8 plans) |
+| **30.1** | **Audit Gap Remediation** | **IN PROGRESS** (7/8 plans) |
 | 31 | Landing Page V2 Rewrite | IN PROGRESS (4/7 plans) |
 | QA-AUDIT | Dashboard QA Test & UX Audit | Complete (9/9 plans) |
 | QA-FIX | Audit Remediation | Complete (5/5 plans) |
@@ -380,11 +380,13 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | Total count in title | 30.1-04 | Always show enrollment count | Helpful UX feedback regardless of pagination |
 | Blue informational callout | 30.1-05 | Guides users toward presets | Non-blocking guidance pattern |
 | Anchor link to presets | 30.1-05 | Link to /campaigns#presets | Presets shown on campaigns page |
+| URL param sheet auto-open | 30.1-06 | ?action=add opens Add Job sheet | Clean URL after open prevents re-trigger |
+| "Send Message" terminology | 30.1-06 | "Send Request" -> "Send Message" everywhere | V2 alignment: messages not requests |
 
 ## Session Continuity
 
 **Last session:** 2026-02-06
-**Stopped at:** Completed 30.1-05-PLAN.md (Preset guidance callout)
+**Stopped at:** Completed 30.1-06-PLAN.md (Add Job auto-open + terminology)
 **Resume file:** None
 **QA test account:** audit-test@avisloop.com / AuditTest123!
 **QA Report:** docs/QA-AUDIT.md
