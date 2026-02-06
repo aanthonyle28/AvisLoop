@@ -361,6 +361,26 @@ Plans:
 - [x] QA-AUDIT-08-PLAN.md — Orphaned routes, navigation, and cross-cutting checks
 - [x] QA-AUDIT-09-PLAN.md — Compile final docs/QA-AUDIT.md report
 
+### Phase QA-FIX: Audit Remediation
+**Goal**: Fix all QA-AUDIT findings from docs/QA-AUDIT.md: 2 critical blockers, navigation order, orphaned routes, legacy terminology, icon inconsistencies, and code cleanup.
+**Depends on**: QA-AUDIT (findings identified)
+**Success Criteria** (what must be TRUE):
+  1. C01 resolved: Onboarding Step 1 saves with phone number (phone column exists on businesses table)
+  2. C02 resolved: Analytics page displays service type breakdown (get_service_type_analytics RPC exists)
+  3. Sidebar navigation reordered for V2 (Jobs, Campaigns positions 2-3)
+  4. /scheduled route removed (orphaned V1 feature)
+  5. /components/contacts/ folder deleted (legacy duplicate)
+  6. 47 user-facing terminology issues fixed (contact -> customer, review request -> message)
+  7. 11 high-priority files migrated from lucide-react to Phosphor icons
+  8. Send page components use Customer type (not Contact)
+**Plans**: 5 plans in 3 waves
+Plans:
+- [ ] QA-FIX-01-PLAN.md — Critical blockers (database migrations for C01 + C02)
+- [ ] QA-FIX-02-PLAN.md — Navigation reorder and orphaned route/folder cleanup
+- [ ] QA-FIX-03-PLAN.md — Terminology cleanup (47 user-facing issues)
+- [ ] QA-FIX-04-PLAN.md — Icon migration (11 high-priority files)
+- [ ] QA-FIX-05-PLAN.md — Code cleanup (Send page Contact -> Customer)
+
 ## Phase Details
 
 See individual phase sections above for requirements, success criteria, and dependencies.
@@ -389,13 +409,14 @@ See individual phase sections above for requirements, success criteria, and depe
 | 28 (v2.0) | Review Follow-Up | 0/8 | In progress | - |
 | 29 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 | **QA-AUDIT** | **Dashboard Audit** | **9/9** | **Complete** | **2026-02-05** |
+| **QA-FIX** | **Audit Remediation** | **0/5** | **Ready** | - |
 
 **Total:** 138 plans complete across shipped phases, 2 v2.0 phases remaining after Phase 27.
 
 ## What's Next
 
 **Current milestone:** v2.0 Review Follow-Up System (Phases 20-29)
-**Next action:** Execute QA-AUDIT phase (Dashboard QA Test & UX Audit)
+**Next action:** Execute QA-FIX phase (Audit Remediation)
 
 **Blockers:**
 - Twilio A2P 10DLC registration required before Phase 21-08 execution (webhook verification)
@@ -407,5 +428,5 @@ After v2.0:
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 
 ---
-*Last updated: 2026-02-05 after QA-AUDIT phase planning complete (Dashboard QA Test & UX Audit)*
+*Last updated: 2026-02-06 after QA-FIX phase planning complete (Audit Remediation)*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
