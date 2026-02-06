@@ -1,9 +1,8 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Label } from '@/components/ui/label'
 import { saveServicesOffered } from '@/lib/actions/onboarding'
 import {
   SERVICE_TYPES,
@@ -86,32 +85,34 @@ export function ServicesOfferedStep({
             const label = SERVICE_TYPE_LABELS[serviceType]
 
             return (
-              <div
+              <button
+                type="button"
                 key={serviceType}
                 className={`
-                  relative flex items-start gap-3 p-4 border rounded-lg cursor-pointer transition-colors
+                  relative flex items-start gap-3 p-4 border rounded-lg cursor-pointer transition-colors text-left
                   ${isChecked ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}
                 `}
                 onClick={() => handleToggle(serviceType)}
               >
-                <Checkbox
-                  id={`service-${serviceType}`}
-                  checked={isChecked}
-                  onCheckedChange={() => handleToggle(serviceType)}
-                  className="mt-0.5"
-                />
+                <div
+                  className={`
+                    mt-0.5 h-4 w-4 shrink-0 rounded-sm border shadow transition-colors
+                    ${isChecked ? 'bg-primary border-primary' : 'border-primary'}
+                  `}
+                >
+                  {isChecked && (
+                    <Check className="h-4 w-4 text-primary-foreground" />
+                  )}
+                </div>
                 <div className="flex-1 space-y-1">
-                  <Label
-                    htmlFor={`service-${serviceType}`}
-                    className="text-base font-medium cursor-pointer"
-                  >
+                  <div className="text-base font-medium">
                     {label}
-                  </Label>
+                  </div>
                   <p className="text-sm text-muted-foreground">
                     Review request: {timingHours}h after job
                   </p>
                 </div>
-              </div>
+              </button>
             )
           })}
         </div>
