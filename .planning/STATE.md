@@ -3,13 +3,13 @@
 ## Current Position
 
 **Milestone:** v2.0 Review Follow-Up System
-**Phase:** QA-AUDIT (Dashboard QA Test & UX Audit) - COMPLETE
-**Plan:** 9 of 9 in Phase QA-AUDIT
-**Status:** Complete
-**Last activity:** 2026-02-06 - Completed QA-AUDIT-09-PLAN.md (Final Report Compilation)
+**Phase:** QA-FIX-audit-remediation (Audit Remediation)
+**Plan:** 1 of 5 in Phase QA-FIX
+**Status:** In progress
+**Last activity:** 2026-02-06 - Completed QA-FIX-01-PLAN.md (Critical Blocker Fixes)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/10 phases complete or nearly complete)
-**QA Progress:** █████████ (9/9 audit plans complete)
+**QA-FIX Progress:** █░░░░ (1/5 remediation plans complete)
 
 ## v2.0 Phase Status
 
@@ -26,6 +26,26 @@
 | 28 | Onboarding Redesign | In progress (6/8 plans) |
 | 29 | Agency-Mode Readiness & Landing Page | Not started |
 | QA-AUDIT | Dashboard QA Test & UX Audit | **COMPLETE** (9/9 plans) |
+| QA-FIX | Audit Remediation | In progress (1/5 plans) |
+
+## QA-FIX Status
+
+**Phase purpose:** Resolve issues identified in QA-AUDIT
+
+| Plan | Name | Status |
+|------|------|--------|
+| 01 | Critical Blocker Fixes | **COMPLETE** |
+| 02 | Navigation Reorder | Not started |
+| 03 | Terminology Fixes | Not started |
+| 04 | Icon Consistency | Not started |
+| 05 | Legacy Code Cleanup | Not started |
+
+### QA-FIX-01 Summary
+
+- Created migration `20260206_add_business_phone_column.sql` for C01
+- Created migration `20260206_add_service_type_analytics_rpc.sql` for C02
+- Migrations ready to apply (Docker not running during execution)
+- Typecheck passes
 
 ## QA-AUDIT Summary
 
@@ -43,8 +63,10 @@
 
 ### Critical Blockers
 
-1. **C01: Onboarding Step 1** - Missing `phone` column on businesses table (Phase 28 migration not applied)
-2. **C02: Analytics Page** - Missing `get_service_type_analytics` RPC function
+1. ~~**C01: Onboarding Step 1** - Missing `phone` column on businesses table~~ **FIXED** (QA-FIX-01)
+2. ~~**C02: Analytics Page** - Missing `get_service_type_analytics` RPC function~~ **FIXED** (QA-FIX-01)
+
+*Migrations created, pending database application.*
 
 ## Blocker
 
@@ -252,8 +274,8 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 **Current blockers:**
 - Phase 21-08: Twilio A2P campaign approval required for production SMS testing
 - Phase 21-08: Webhook URLs must be configured in Twilio console after deployment
-- **QA-AUDIT C01:** Onboarding Step 1 fails with "phone column not in schema cache" - Phase 28 migration not applied to database. Blocks all new user onboarding.
-- **QA-AUDIT C02:** Analytics page missing `get_service_type_analytics` RPC function - Migration file never created. Analytics displays empty data.
+- ~~QA-AUDIT C01~~ FIXED: Migration created, pending `supabase db reset`
+- ~~QA-AUDIT C02~~ FIXED: RPC migration created, pending `supabase db reset`
 
 **QA-AUDIT findings summary:**
 - 47 user-facing "contact" terminology issues
@@ -263,15 +285,21 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 - /scheduled route orphaned (should be removed)
 
 **Next actions:**
-- Apply Phase 28 database migration to resolve C01
-- Create analytics RPC migration to resolve C02
-- Execute 5-phase remediation plan from docs/QA-AUDIT.md
+- Start Docker and run `supabase db reset` to apply C01/C02 migrations
+- Execute remaining QA-FIX plans (02-05) for navigation, terminology, icons, cleanup
 - Wait for A2P approval before Phase 21-08 execution
+
+### QA-FIX
+
+| Decision | Phase | Impact | Constraint |
+|----------|-------|--------|------------|
+| Idempotent phone migration | QA-FIX-01 | Uses IF NOT EXISTS for safety | Column may already exist from Phase 28 migration |
+| Correct RPC join path | QA-FIX-01 | Join jobs->enrollments->send_logs | send_logs lacks job_id column |
 
 ## Session Continuity
 
-**Last session:** 2026-02-06T01:00:00Z
-**Stopped at:** Completed QA-AUDIT-09-PLAN.md (Final Report Compilation)
+**Last session:** 2026-02-06T01:15:00Z
+**Stopped at:** Completed QA-FIX-01-PLAN.md (Critical Blocker Fixes)
 **Resume file:** None
 **QA test account:** audit-test@avisloop.com / AuditTest123!
 **QA Report:** docs/QA-AUDIT.md
