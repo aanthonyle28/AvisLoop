@@ -25,9 +25,12 @@ import { Archive, Trash } from '@phosphor-icons/react'
 import type { Customer } from '@/lib/types/database'
 import { createColumns } from './customer-columns'
 import { CustomerFilters } from './customer-filters'
+import { TableSkeleton } from '@/components/ui/table-skeleton'
 
 interface CustomerTableProps {
   data: Customer[]
+  /** Show skeleton loading state */
+  loading?: boolean
   onEdit: (customer: Customer) => void
   onArchive: (id: string) => void
   onRestore: (id: string) => void
@@ -39,6 +42,7 @@ interface CustomerTableProps {
 
 export function CustomerTable({
   data,
+  loading,
   onEdit,
   onArchive,
   onRestore,
@@ -47,6 +51,16 @@ export function CustomerTable({
   onBulkDelete,
   onRowClick,
 }: CustomerTableProps) {
+  // Show skeleton when loading
+  if (loading) {
+    return (
+      <TableSkeleton
+        columns={8}
+        rows={5}
+        hasCheckbox={true}
+      />
+    )
+  }
   // Table state
   const [sorting, setSorting] = useState<SortingState>([
     { id: 'last_sent_at', desc: true }, // Default sort: most recent first
