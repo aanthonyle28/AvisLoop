@@ -6,23 +6,23 @@ import { ThumbsUp, Clock, Heart } from '@phosphor-icons/react';
 const outcomes = [
   {
     icon: ThumbsUp,
-    outcome: 'Get More Reviews',
-    benefit: 'Build trust and attract new customers with a steady stream of authentic reviews. Our customers see results within the first week.',
+    outcome: 'Get 3x More Reviews',
+    benefit: 'Multi-touch campaigns automatically follow up 2-3 times until customers respond. Most people ignore the first ask—automation ensures you never give up.',
     proof: 'Average 3x more reviews in first month',
     color: 'lime' as const,
   },
   {
     icon: Clock,
-    outcome: 'Save Time',
-    benefit: 'No campaigns, no automation setup, no forgotten follow-ups. Send personalized requests in seconds, not hours.',
-    proof: 'Send requests in under 30 seconds',
+    outcome: 'Never Miss a Follow-Up',
+    benefit: 'Complete a job in 10 seconds. System handles timing, reminders, and sequences. Works while you\'re on the next call.',
+    proof: '10 seconds per job entry',
     color: 'coral' as const,
   },
   {
     icon: Heart,
-    outcome: 'No Awkward Asks',
-    benefit: 'Professional email requests feel natural, not pushy. Customers appreciate the easy reminder to share their experience.',
-    proof: '85% average open rate',
+    outcome: 'Protect Your Reputation',
+    benefit: 'Review funnel routes 4-5 stars to Google, 1-3 stars to private feedback. Only satisfied customers leave public reviews.',
+    proof: 'Zero bad reviews from funnel users',
     color: 'lime' as const,
   },
 ];
