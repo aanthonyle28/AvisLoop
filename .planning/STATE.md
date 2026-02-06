@@ -4,12 +4,12 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** QA-FIX-audit-remediation (Audit Remediation)
-**Plan:** 1 of 5 in Phase QA-FIX
+**Plan:** 2 of 5 in Phase QA-FIX
 **Status:** In progress
-**Last activity:** 2026-02-06 - Completed QA-FIX-01-PLAN.md (Critical Blocker Fixes)
+**Last activity:** 2026-02-06 - Completed QA-FIX-02-PLAN.md (Navigation Reorder)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/10 phases complete or nearly complete)
-**QA-FIX Progress:** █░░░░ (1/5 remediation plans complete)
+**QA-FIX Progress:** ██░░░ (2/5 remediation plans complete)
 
 ## v2.0 Phase Status
 
@@ -35,7 +35,7 @@
 | Plan | Name | Status |
 |------|------|--------|
 | 01 | Critical Blocker Fixes | **COMPLETE** |
-| 02 | Navigation Reorder | Not started |
+| 02 | Navigation Reorder | **COMPLETE** |
 | 03 | Terminology Fixes | Not started |
 | 04 | Icon Consistency | Not started |
 | 05 | Legacy Code Cleanup | Not started |
@@ -46,6 +46,13 @@
 - Created migration `20260206_add_service_type_analytics_rpc.sql` for C02
 - Migrations ready to apply (Docker not running during execution)
 - Typecheck passes
+
+### QA-FIX-02 Summary
+
+- Sidebar navigation reordered for V2 workflow (Jobs/Campaigns prominent)
+- Legacy /components/contacts/ folder deleted (10 duplicate files)
+- /scheduled route already deleted in QA-FIX-01
+- Both lint and typecheck pass
 
 ## QA-AUDIT Summary
 
@@ -280,9 +287,9 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 **QA-AUDIT findings summary:**
 - 47 user-facing "contact" terminology issues
 - 41 files use lucide-react instead of Phosphor icons
-- 10 legacy files in /components/contacts/ folder
-- Navigation order not V2-aligned
-- /scheduled route orphaned (should be removed)
+- ~~10 legacy files in /components/contacts/ folder~~ **FIXED** (QA-FIX-02)
+- ~~Navigation order not V2-aligned~~ **FIXED** (QA-FIX-02)
+- ~~/scheduled route orphaned~~ **FIXED** (QA-FIX-01)
 
 **Next actions:**
 - Start Docker and run `supabase db reset` to apply C01/C02 migrations
@@ -295,11 +302,12 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 |----------|-------|--------|------------|
 | Idempotent phone migration | QA-FIX-01 | Uses IF NOT EXISTS for safety | Column may already exist from Phase 28 migration |
 | Correct RPC join path | QA-FIX-01 | Join jobs->enrollments->send_logs | send_logs lacks job_id column |
+| V2 navigation order | QA-FIX-02 | Jobs at 2, Campaigns at 3, Send at 6 | Emphasizes V2 workflow over manual sending |
 
 ## Session Continuity
 
-**Last session:** 2026-02-06T01:15:00Z
-**Stopped at:** Completed QA-FIX-01-PLAN.md (Critical Blocker Fixes)
+**Last session:** 2026-02-06T01:17:00Z
+**Stopped at:** Completed QA-FIX-02-PLAN.md (Navigation Reorder)
 **Resume file:** None
 **QA test account:** audit-test@avisloop.com / AuditTest123!
 **QA Report:** docs/QA-AUDIT.md
