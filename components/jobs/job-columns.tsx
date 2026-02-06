@@ -1,13 +1,14 @@
 'use client'
 
 import { type ColumnDef } from '@tanstack/react-table'
-import { format } from 'date-fns'
+import { format, formatDistanceToNow } from 'date-fns'
 import { PencilSimple, Trash } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { SERVICE_TYPE_LABELS } from '@/lib/validations/job'
 import { deleteJob } from '@/lib/actions/job'
 import { toast } from 'sonner'
+import { MarkCompleteButton } from './mark-complete-button'
 import type { JobWithCustomer } from '@/lib/types/database'
 
 interface ColumnsOptions {
@@ -46,26 +47,50 @@ export function columns({ onEdit }: ColumnsOptions): ColumnDef<JobWithCustomer>[
       header: 'Status',
       cell: ({ row }) => {
         const status = row.original.status
+        const completedAt = row.original.completed_at
+
+        // Three-state workflow: scheduled -> completed -> do_not_send
+        if (status === 'scheduled') {
+          return (
+            <div className="flex items-center gap-2">
+              <Badge
+                variant="secondary"
+                className="bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400"
+              >
+                Scheduled
+              </Badge>
+              <MarkCompleteButton jobId={row.original.id} size="xs" />
+            </div>
+          )
+        }
+
+        if (status === 'completed') {
+          return (
+            <div className="flex flex-col gap-0.5">
+              <Badge
+                variant="default"
+                className="w-fit bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
+              >
+                Completed
+              </Badge>
+              {completedAt && (
+                <span className="text-xs text-muted-foreground">
+                  {formatDistanceToNow(new Date(completedAt), { addSuffix: true })}
+                </span>
+              )}
+            </div>
+          )
+        }
+
+        // do_not_send
         return (
           <Badge
-            variant={status === 'completed' ? 'default' : 'secondary'}
-            className={status === 'completed'
-              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400'
-              : 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
-            }
+            variant="secondary"
+            className="bg-muted text-muted-foreground"
           >
-            {status === 'completed' ? 'Completed' : 'Do Not Send'}
+            Do Not Send
           </Badge>
         )
-      },
-    },
-    {
-      accessorKey: 'completed_at',
-      header: 'Completed',
-      cell: ({ row }) => {
-        const completedAt = row.original.completed_at
-        if (!completedAt) return <span className="text-muted-foreground">-</span>
-        return format(new Date(completedAt), 'MMM d, yyyy')
       },
     },
     {
