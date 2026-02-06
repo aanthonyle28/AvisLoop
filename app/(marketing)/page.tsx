@@ -14,22 +14,22 @@ const baseUrl = process.env.VERCEL_URL
   : "http://localhost:3000";
 
 export const metadata: Metadata = {
-  title: "AvisLoop - Get 3× More Reviews Without Chasing Customers",
+  title: "AvisLoop - Turn Completed Jobs Into Google Reviews Automatically",
   description:
-    "Send review requests in under 30 seconds. No complex campaigns, no forgotten follow-ups. Just simple requests that actually get sent. Start free today.",
+    "Complete a job in 10 seconds. AvisLoop handles multi-touch follow-ups, review funnels, and timing optimization automatically. 3x more reviews for home service businesses.",
   openGraph: {
-    title: "AvisLoop - Get 3× More Reviews Without Chasing Customers",
+    title: "AvisLoop - Turn Completed Jobs Into Google Reviews Automatically",
     description:
-      "Send review requests in under 30 seconds. No complex campaigns, no forgotten follow-ups. Just simple requests that actually get sent.",
+      "Complete a job in 10 seconds. AvisLoop handles multi-touch follow-ups, review funnels, and timing automatically. Built for HVAC, plumbing, electrical, and home services.",
     url: baseUrl,
     siteName: "AvisLoop",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "AvisLoop - Get 3× More Reviews Without Chasing Customers",
+    title: "AvisLoop - Turn Completed Jobs Into Google Reviews Automatically",
     description:
-      "Send review requests in under 30 seconds. No complex campaigns, no forgotten follow-ups. Just simple requests that actually get sent.",
+      "Complete a job in 10 seconds. AvisLoop handles multi-touch follow-ups, review funnels, and timing automatically. Built for HVAC, plumbing, electrical, and home services.",
   },
 };
 
