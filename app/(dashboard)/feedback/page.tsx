@@ -2,11 +2,11 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getFeedbackForBusiness, getFeedbackStats } from '@/lib/data/feedback'
 import { FeedbackList } from '@/components/feedback/feedback-list'
-import { MessageSquare } from 'lucide-react'
+import { ChatCircle } from '@phosphor-icons/react'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Feedback | AvisLoop',
+  title: 'Feedback',
 }
 
 export default async function FeedbackPage() {
@@ -43,7 +43,7 @@ export default async function FeedbackPage() {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <MessageSquare className="w-6 h-6" />
+          <ChatCircle size={24} weight="regular" />
           <h1 className="text-2xl font-bold">Customer Feedback</h1>
         </div>
         <p className="text-muted-foreground">

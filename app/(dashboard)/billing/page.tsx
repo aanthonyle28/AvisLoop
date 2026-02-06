@@ -4,7 +4,11 @@ import { PlanCard } from '@/components/billing/plan-card'
 import { UsageDisplay } from '@/components/billing/usage-display'
 import { SubscriptionStatus } from '@/components/billing/subscription-status'
 import { CONTACT_LIMITS } from '@/lib/constants/billing'
-import { CheckCircle2 } from 'lucide-react'
+import { CheckCircle } from '@phosphor-icons/react'
+
+export const metadata = {
+  title: 'Billing',
+}
 
 // Validate env vars at module load (SEC-03)
 const basicPriceId = process.env.STRIPE_BASIC_PRICE_ID
@@ -23,7 +27,7 @@ const PLANS = [
     tier: 'basic',
     features: [
       '200 review requests/month',
-      '200 contacts',
+      '200 customers',
       'Email support',
     ],
   },
@@ -35,7 +39,7 @@ const PLANS = [
     recommended: true,
     features: [
       '500 review requests/month',
-      'Unlimited contacts',
+      'Unlimited customers',
       'Priority support',
     ],
   },
@@ -64,7 +68,7 @@ export default async function BillingPage({
       {/* Success message after checkout */}
       {showSuccess && (
         <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
-          <CheckCircle2 className="h-5 w-5 text-green-600" />
+          <CheckCircle size={20} weight="regular" className="text-green-600" />
           <div>
             <p className="font-medium text-green-800">Subscription activated!</p>
             <p className="text-sm text-green-700">
