@@ -4,12 +4,12 @@
 
 **Milestone:** v2.0 Review Follow-Up System
 **Phase:** 30 - V2 Alignment & Audit Remediation
-**Plan:** 08 of 10
+**Plan:** 09 of 10
 **Status:** **COMPLETE**
-**Last activity:** 2026-02-06 - Completed 30-08-PLAN.md (Mobile FAB for job creation)
+**Last activity:** 2026-02-06 - Completed 30-09-PLAN.md (Accessibility improvements)
 
 **v2.0 Progress:** ████████████████████░░░░ (8/11 phases complete)
-**Phase 30 Progress:** ████████░░ (8/10 plans)
+**Phase 30 Progress:** █████████░ (9/10 plans)
 
 ## v2.0 Phase Status
 
@@ -344,6 +344,9 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 | bottom-20 FAB positioning | 30-08 | 80px from bottom (72px nav + 8px margin) | FAB doesn't overlap bottom navigation |
 | Hide FAB on Jobs page | 30-08 | Jobs page has Add Job header button | Prevents duplicate CTAs on same page |
 | md:hidden responsive | 30-08 | Desktop has sidebar Add Job button | Single Add Job CTA per viewport size |
+| Wrapper pattern for touch targets | 30-09 | 44x44px wrapper around 16x16px checkbox | WCAG 2.5.5 compliance without visual changes |
+| Skip link first in DOM | 30-09 | SkipLink component before all other focusable elements | Proper keyboard navigation order |
+| Skip link transition | 30-09 | -translate-y-full off-screen, focus:translate-y-0 visible | Screen reader accessible, visually hidden until focus |
 
 ### Phase 31
 
@@ -362,8 +365,8 @@ Phase 21 nearly complete (7/8 plans). Only 21-08 (integration verification) rema
 
 ## Session Continuity
 
-**Last session:** 2026-02-06T09:22:14Z
-**Stopped at:** Completed 30-08-PLAN.md (Mobile FAB for job creation)
+**Last session:** 2026-02-06T09:28:06Z
+**Stopped at:** Completed 30-09-PLAN.md (Accessibility improvements)
 **Resume file:** None
 **QA test account:** audit-test@avisloop.com / AuditTest123!
 **QA Report:** docs/QA-AUDIT.md
