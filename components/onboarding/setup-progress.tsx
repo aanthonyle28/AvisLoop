@@ -1,48 +1,69 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useTransition } from 'react'
 import { SetupProgressPill } from './setup-progress-pill'
 import { SetupProgressDrawer } from './setup-progress-drawer'
+import { updateChecklistState } from '@/lib/actions/checklist'
+import { CHECKLIST_ITEMS, type ChecklistItemId } from '@/lib/constants/checklist'
 
 interface SetupProgressProps {
-  contactCount: number
-  hasReviewLink: boolean
-  hasTemplate: boolean
-  hasContact: boolean
-  hasSent: boolean
+  items: Record<ChecklistItemId, boolean>
+  completedCount: number
+  allComplete: boolean
+  dismissed: boolean
+  firstSeenAt: string | null
 }
 
 export function SetupProgress({
-  contactCount,
-  hasReviewLink,
-  hasTemplate,
-  hasContact,
-  hasSent,
+  items,
+  completedCount,
+  allComplete,
+  dismissed: initialDismissed,
+  firstSeenAt,
 }: SetupProgressProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [isDismissed, setIsDismissed] = useState(initialDismissed)
+  const [isPending, startTransition] = useTransition()
 
-  // Calculate completion
-  const steps = [hasContact, hasReviewLink, hasTemplate, hasSent]
-  const completedCount = steps.filter(Boolean).length
-  const totalCount = steps.length
-  const isAllComplete = completedCount === totalCount
+  // Mark as seen on first render
+  useEffect(() => {
+    if (!firstSeenAt) {
+      startTransition(async () => {
+        await updateChecklistState('markSeen')
+      })
+    }
+  }, [firstSeenAt])
+
+  const handleDismiss = () => {
+    startTransition(async () => {
+      const result = await updateChecklistState('dismiss')
+      if (result.success) {
+        setIsDismissed(true)
+      }
+    })
+  }
+
+  // Don't render if dismissed
+  if (isDismissed) {
+    return null
+  }
 
   return (
     <>
       <SetupProgressPill
-        completedSteps={completedCount}
-        totalSteps={totalCount}
-        isAllComplete={isAllComplete}
+        completedCount={completedCount}
+        totalCount={CHECKLIST_ITEMS.length}
+        isAllComplete={allComplete}
         onOpenDrawer={() => setDrawerOpen(true)}
+        onDismiss={handleDismiss}
+        isPending={isPending}
       />
       <SetupProgressDrawer
         open={drawerOpen}
         onOpenChange={setDrawerOpen}
-        contactCount={contactCount}
-        hasReviewLink={hasReviewLink}
-        hasTemplate={hasTemplate}
-        hasContact={hasContact}
-        hasSent={hasSent}
+        items={items}
+        completedCount={completedCount}
+        allComplete={allComplete}
       />
     </>
   )

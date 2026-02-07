@@ -1,54 +1,40 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { CheckCircle, X } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 
 interface SetupProgressPillProps {
-  completedSteps: number
-  totalSteps: number
+  completedCount: number
+  totalCount: number
   isAllComplete: boolean
   onOpenDrawer: () => void
+  onDismiss: () => void
+  isPending?: boolean
 }
 
-const DISMISS_KEY = 'avisloop_setupDismissed'
-
 export function SetupProgressPill({
-  completedSteps,
-  totalSteps,
+  completedCount,
+  totalCount,
   isAllComplete,
   onOpenDrawer,
+  onDismiss,
+  isPending,
 }: SetupProgressPillProps) {
-  const [isDismissed, setIsDismissed] = useState(false)
-
-  // Load dismiss state from localStorage on mount
-  useEffect(() => {
-    const dismissed = localStorage.getItem(DISMISS_KEY)
-    if (dismissed === 'true') {
-      setIsDismissed(true)
-    }
-  }, [])
-
   const handleDismiss = (e: React.MouseEvent) => {
     e.stopPropagation()
-    localStorage.setItem(DISMISS_KEY, 'true')
-    setIsDismissed(true)
-  }
-
-  // Don't render if dismissed
-  if (isDismissed) {
-    return null
+    onDismiss()
   }
 
   // All complete state
   if (isAllComplete) {
     return (
-      <div className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium bg-green-50 text-green-700 border border-green-200">
+      <div className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800">
         <CheckCircle weight="fill" className="h-4 w-4" />
         <span>Setup complete</span>
         <button
           onClick={handleDismiss}
-          className="ml-1 hover:bg-green-100 rounded-full p-0.5 transition-colors"
+          disabled={isPending}
+          className="ml-1 hover:bg-green-100 dark:hover:bg-green-900 rounded-full p-0.5 transition-colors disabled:opacity-50"
           aria-label="Dismiss"
         >
           <X weight="bold" className="h-3 w-3" />
@@ -67,7 +53,7 @@ export function SetupProgressPill({
         'hover:bg-primary/20 transition-colors'
       )}
     >
-      <span>Complete Setup: {completedSteps}/{totalSteps}</span>
+      <span>Getting Started: {completedCount}/{totalCount}</span>
       <span className="text-[10px]">&gt;</span>
     </button>
   )

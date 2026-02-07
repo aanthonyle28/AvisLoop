@@ -168,70 +168,27 @@ export function areAllCardsComplete(status: OnboardingCardStatus): boolean {
 
 /**
  * Get setup progress for the setup pill/drawer UI.
- * Returns step completion status and counts.
+ * Uses V2 checklist data (jobs-centric, not contacts-centric).
  */
 export async function getSetupProgress() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    return {
-      hasContact: false,
-      hasReviewLink: false,
-      hasTemplate: false,
-      hasSent: false,
-      contactCount: 0,
-      completedCount: 0,
-      totalCount: 4,
-      isAllComplete: false,
-    }
+    return null
   }
 
   const { data: business } = await supabase
     .from('businesses')
-    .select('id, google_review_link')
+    .select('id, onboarding_checklist')
     .eq('user_id', user.id)
     .single()
 
   if (!business) {
-    return {
-      hasContact: false,
-      hasReviewLink: false,
-      hasTemplate: false,
-      hasSent: false,
-      contactCount: 0,
-      completedCount: 0,
-      totalCount: 4,
-      isAllComplete: false,
-    }
+    return null
   }
 
-  // Check all conditions in parallel
-  const [contactResult, templateResult, sendResult] = await Promise.all([
-    supabase.from('contacts').select('id', { count: 'exact', head: true }).eq('business_id', business.id).eq('status', 'active'),
-    supabase.from('message_templates').select('id', { count: 'exact', head: true }).eq('business_id', business.id).eq('channel', 'email'),
-    supabase.from('send_logs').select('id', { count: 'exact', head: true }).eq('business_id', business.id),
-  ])
-
-  const hasContact = (contactResult.count ?? 0) > 0
-  const hasReviewLink = !!business.google_review_link
-  const hasTemplate = (templateResult.count ?? 0) > 0
-  const hasSent = (sendResult.count ?? 0) > 0
-  const contactCount = contactResult.count ?? 0
-
-  const steps = [hasContact, hasReviewLink, hasTemplate, hasSent]
-  const completedCount = steps.filter(Boolean).length
-  const totalCount = 4
-  const isAllComplete = completedCount === totalCount
-
-  return {
-    hasContact,
-    hasReviewLink,
-    hasTemplate,
-    hasSent,
-    contactCount,
-    completedCount,
-    totalCount,
-    isAllComplete,
-  }
+  // Import checklist data function
+  const { getChecklistState } = await import('./checklist')
+  return getChecklistState(business.id)
 }

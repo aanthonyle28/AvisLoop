@@ -5,22 +5,29 @@ import { PageHeader } from './page-header'
 import { SkipLink } from './skip-link'
 import { NavigationProgressBar } from '@/components/ui/progress-bar'
 import { SetupProgress } from '@/components/onboarding/setup-progress'
+import type { ChecklistItemId } from '@/lib/constants/checklist'
 
 interface AppShellProps {
   children: React.ReactNode
   pageTitle?: string
   setupProgress?: {
-    hasContact: boolean
-    hasReviewLink: boolean
-    hasTemplate: boolean
-    hasSent: boolean
-    contactCount: number
-    isAllComplete: boolean
+    items: Record<ChecklistItemId, boolean>
+    completedCount: number
+    allComplete: boolean
+    dismissed: boolean
+    firstSeenAt: string | null
   } | null
   dashboardBadge?: number
+  notificationCounts?: {
+    readyToSend: number
+    attentionAlerts: number
+  }
 }
 
-export function AppShell({ children, pageTitle, setupProgress, dashboardBadge }: AppShellProps) {
+export function AppShell({ children, pageTitle, setupProgress, dashboardBadge, notificationCounts }: AppShellProps) {
+  // Don't show setup progress if dismissed or all complete
+  const showSetupProgress = setupProgress && !setupProgress.dismissed
+
   return (
     <div className="flex min-h-screen bg-[#F9F9F9] dark:bg-background">
       {/* Skip link for keyboard navigation - must be first focusable element */}
@@ -30,25 +37,29 @@ export function AppShell({ children, pageTitle, setupProgress, dashboardBadge }:
       <NavigationProgressBar />
 
       {/* Desktop sidebar */}
-      <Sidebar dashboardBadge={dashboardBadge} />
+      <Sidebar dashboardBadge={dashboardBadge} notificationCounts={notificationCounts} />
 
       {/* Main content area */}
       <main id="main-content" className="flex-1 overflow-auto">
         {/* Mobile page header */}
-        <PageHeader title={pageTitle} setupProgress={setupProgress} />
+        <PageHeader
+          title={pageTitle}
+          setupProgress={showSetupProgress ? setupProgress : null}
+          notificationCounts={notificationCounts}
+        />
 
         {/* Add bottom padding on mobile for bottom nav, remove on desktop */}
         <div className="pb-[72px] md:pb-0">
           {/* Setup progress pill - desktop only, top-right of content */}
-          {setupProgress && !setupProgress.isAllComplete && (
+          {showSetupProgress && (
             <div className="hidden md:block sticky top-4 z-10 pr-4 sm:pr-6 lg:pr-8">
               <div className="flex justify-end">
                 <SetupProgress
-                  contactCount={setupProgress.contactCount}
-                  hasReviewLink={setupProgress.hasReviewLink}
-                  hasTemplate={setupProgress.hasTemplate}
-                  hasContact={setupProgress.hasContact}
-                  hasSent={setupProgress.hasSent}
+                  items={setupProgress.items}
+                  completedCount={setupProgress.completedCount}
+                  allComplete={setupProgress.allComplete}
+                  dismissed={setupProgress.dismissed}
+                  firstSeenAt={setupProgress.firstSeenAt}
                 />
               </div>
             </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { AddressBook, Gear, NotePencil, PaperPlaneTilt, SquaresFour, CheckCircle } from '@phosphor-icons/react'
+import { Check, Circle, ArrowRight } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import {
@@ -10,98 +10,38 @@ import {
   SheetTitle,
   SheetDescription,
 } from '@/components/ui/sheet'
-
-interface SetupStep {
-  id: string
-  title: string
-  description: string
-  icon: React.ComponentType<{ className?: string; weight?: 'regular' | 'fill' }>
-  href: string
-  completed: boolean
-  isBonus?: boolean
-}
+import { CHECKLIST_ITEMS, type ChecklistItemId } from '@/lib/constants/checklist'
 
 interface SetupProgressDrawerProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  contactCount: number
-  hasReviewLink: boolean
-  hasTemplate: boolean
-  hasContact: boolean
-  hasSent: boolean
+  items: Record<ChecklistItemId, boolean>
+  completedCount: number
+  allComplete: boolean
 }
 
 export function SetupProgressDrawer({
   open,
   onOpenChange,
-  contactCount,
-  hasReviewLink,
-  hasTemplate,
-  hasContact,
-  hasSent,
+  items,
+  completedCount,
+  allComplete,
 }: SetupProgressDrawerProps) {
-  const coreSteps: SetupStep[] = [
-    {
-      id: 'contact',
-      title: 'Add first contact',
-      description: 'Create or import a customer',
-      icon: AddressBook,
-      href: '/contacts',
-      completed: hasContact,
-    },
-    {
-      id: 'review-link',
-      title: 'Set review link',
-      description: 'Connect your Google Business Profile',
-      icon: Gear,
-      href: '/dashboard/settings',
-      completed: hasReviewLink,
-    },
-    {
-      id: 'message',
-      title: 'Choose a message',
-      description: 'Customize your review request email',
-      icon: NotePencil,
-      href: '/dashboard/settings',
-      completed: hasTemplate,
-    },
-    {
-      id: 'send',
-      title: 'Send your first request',
-      description: 'Start collecting reviews',
-      icon: PaperPlaneTilt,
-      href: '/send',
-      completed: hasSent,
-    },
-  ]
-
-  const bonusStep: SetupStep = {
-    id: 'bulk',
-    title: 'Try Bulk Send',
-    description: 'Send to multiple contacts at once',
-    icon: SquaresFour,
-    href: '/send',
-    completed: false,
-    isBonus: true,
-  }
-
-  const steps = contactCount >= 3 ? [...coreSteps, bonusStep] : coreSteps
-  const completedCount = coreSteps.filter(s => s.completed).length
-  const totalCount = coreSteps.length
+  const totalCount = CHECKLIST_ITEMS.length
   const progress = totalCount > 0 ? (completedCount / totalCount) * 100 : 0
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="sm:max-w-md">
         <SheetHeader>
-          <SheetTitle>Setup Your Account</SheetTitle>
+          <SheetTitle>Getting Started</SheetTitle>
           <SheetDescription>
-            Complete these steps to get started
+            Complete these steps to start collecting reviews
           </SheetDescription>
         </SheetHeader>
 
         {/* Progress bar */}
-        <div className="px-4">
+        <div className="px-4 mt-4">
           <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
             <span>{completedCount} of {totalCount} complete</span>
             <span>{Math.round(progress)}%</span>
@@ -115,85 +55,66 @@ export function SetupProgressDrawer({
         </div>
 
         {/* Steps list */}
-        <div className="flex-1 overflow-y-auto px-4 space-y-3">
-          {steps.map((step, index) => {
-            const Icon = step.icon
-            const isComplete = step.completed
+        <div className="flex-1 overflow-y-auto px-4 mt-6 space-y-2">
+          {CHECKLIST_ITEMS.map((item) => {
+            const isComplete = items[item.id]
 
             return (
-              <div
-                key={step.id}
+              <Link
+                key={item.id}
+                href={item.href}
+                onClick={() => onOpenChange(false)}
                 className={cn(
-                  'relative flex items-start gap-3 p-4 rounded-lg border transition-colors',
-                  isComplete && 'bg-muted/50 border-muted',
-                  !isComplete && 'border-border hover:border-primary/50',
-                  step.isBonus && 'border-dashed'
+                  'flex items-start gap-3 p-3 rounded-lg transition-colors',
+                  isComplete
+                    ? 'bg-muted/50'
+                    : 'hover:bg-muted/50 group'
                 )}
               >
-                {/* Number or checkmark */}
-                <div className="flex-shrink-0 mt-0.5">
+                {/* Checkmark or empty circle */}
+                <div className={cn(
+                  'mt-0.5 h-5 w-5 rounded-full flex items-center justify-center shrink-0',
+                  isComplete
+                    ? 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400'
+                    : 'border-2 border-muted-foreground/30 text-transparent'
+                )}>
                   {isComplete ? (
-                    <CheckCircle weight="fill" className="h-6 w-6 text-green-600" />
+                    <Check size={14} weight="bold" />
                   ) : (
-                    <div className="h-6 w-6 rounded-full border-2 border-primary flex items-center justify-center text-xs font-semibold text-primary">
-                      {index + 1}
-                    </div>
+                    <Circle size={14} />
                   )}
                 </div>
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-start gap-2 mb-1">
-                    <Icon
-                      weight={isComplete ? 'fill' : 'regular'}
-                      className={cn(
-                        'h-5 w-5 flex-shrink-0 mt-0.5',
-                        isComplete ? 'text-muted-foreground' : 'text-primary'
-                      )}
-                    />
-                    <div className="flex-1">
-                      <h4
-                        className={cn(
-                          'font-semibold text-sm',
-                          isComplete && 'text-muted-foreground line-through'
-                        )}
-                      >
-                        {step.title}
-                        {step.isBonus && (
-                          <span className="ml-2 text-xs font-normal text-amber-600">Bonus</span>
-                        )}
-                      </h4>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {step.description}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* CTA button for incomplete steps */}
-                  {!isComplete && (
-                    <Link
-                      href={step.href}
-                      onClick={() => onOpenChange(false)}
-                      className="inline-flex items-center text-xs font-medium text-primary hover:underline mt-2"
-                    >
-                      {step.id === 'send' ? 'Go to Send' :
-                       step.id === 'contact' ? 'Add Contact' :
-                       step.id === 'bulk' ? 'Try Bulk Send' :
-                       'Open Settings'}
-                      <span className="ml-1">&rarr;</span>
-                    </Link>
-                  )}
+                  <p className={cn(
+                    'font-medium text-sm',
+                    isComplete && 'line-through text-muted-foreground'
+                  )}>
+                    {item.title}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {item.description}
+                  </p>
                 </div>
-              </div>
+
+                {/* Arrow for incomplete items */}
+                {!isComplete && (
+                  <ArrowRight
+                    size={16}
+                    className="mt-1 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                  />
+                )}
+              </Link>
             )
           })}
         </div>
 
-        {/* Footer note */}
-        {completedCount === totalCount && (
-          <div className="px-4 py-3 bg-green-50 rounded-lg mx-4">
-            <p className="text-xs text-green-700">
-              All done! You can dismiss the setup reminder from the header.
+        {/* Footer note when complete */}
+        {allComplete && (
+          <div className="px-4 py-3 bg-green-50 dark:bg-green-950 rounded-lg mx-4 mt-4">
+            <p className="text-xs text-green-700 dark:text-green-300">
+              Great job! You&apos;re all set up. AvisLoop is now working for you.
             </p>
           </div>
         )}
