@@ -22,6 +22,7 @@ import {
 } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { AccountMenu } from './account-menu'
+import { NotificationBell } from './notification-bell'
 
 interface NavItem {
   icon: React.ElementType
@@ -41,7 +42,15 @@ const mainNav: NavItem[] = [
   { icon: ChatCircleText, label: 'Feedback', href: '/feedback' },
 ]
 
-export function Sidebar({ dashboardBadge }: { dashboardBadge?: number } = {}) {
+interface SidebarProps {
+  dashboardBadge?: number
+  notificationCounts?: {
+    readyToSend: number
+    attentionAlerts: number
+  }
+}
+
+export function Sidebar({ dashboardBadge, notificationCounts }: SidebarProps = {}) {
   const pathname = usePathname()
   const [isCollapsed, setIsCollapsed] = useLocalStorage('sidebarCollapsed', false)
 
@@ -167,11 +176,18 @@ export function Sidebar({ dashboardBadge }: { dashboardBadge?: number } = {}) {
         </Link>
       </div>
 
-      {/* Footer with account dropdown */}
-      <div className="p-3 border-t border-[#E2E2E2] dark:border-border">
+      {/* Footer with notifications and account */}
+      <div className="p-3 border-t border-[#E2E2E2] dark:border-border space-y-1">
+        {notificationCounts && (
+          <NotificationBell
+            readyToSend={notificationCounts.readyToSend}
+            attentionAlerts={notificationCounts.attentionAlerts}
+            collapsed={collapsed}
+          />
+        )}
         <AccountMenu
           side="top"
-          align="start"
+          align={collapsed ? "center" : "start"}
           trigger={
             <Button
               variant="ghost"
@@ -180,7 +196,9 @@ export function Sidebar({ dashboardBadge }: { dashboardBadge?: number } = {}) {
                 collapsed && "justify-center px-2"
               )}
             >
-              <UserCircle size={20} weight="regular" className="shrink-0" />
+              <span className="shrink-0 w-5 h-5 flex items-center justify-center">
+                <UserCircle size={22} weight="regular" />
+              </span>
               {!collapsed && <span>Account</span>}
             </Button>
           }
