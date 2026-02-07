@@ -8,7 +8,7 @@ import { revalidatePath } from 'next/cache'
  * Sets dismissed=true or collapsed=true in onboarding_checklist JSONB
  */
 export async function updateChecklistState(
-  action: 'dismiss' | 'collapse' | 'expand' | 'markSeen'
+  action: 'dismiss' | 'collapse' | 'expand' | 'markSeen' | 'reset'
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await createClient()
@@ -50,6 +50,12 @@ export async function updateChecklistState(
         if (!updatedChecklist.first_seen_at) {
           updatedChecklist.first_seen_at = now
         }
+        break
+      case 'reset':
+        // Reset dismissed state to show checklist again
+        updatedChecklist.dismissed = false
+        updatedChecklist.dismissed_at = null
+        updatedChecklist.collapsed = false
         break
     }
 
