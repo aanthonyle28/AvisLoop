@@ -54,7 +54,7 @@ export default async function BillingPage({
   const params = await searchParams
 
   if (!business) {
-    redirect('/dashboard/settings')
+    redirect('/settings')
   }
 
   const showSuccess = params.success === '1'

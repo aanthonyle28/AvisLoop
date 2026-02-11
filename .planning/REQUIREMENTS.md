@@ -164,6 +164,15 @@ Requirements for Review Follow-Up System Redesign. Each maps to roadmap phases.
 - [ ] **A11Y-03**: All icon-only buttons include aria-label attribute
 - [ ] **A11Y-04**: Skip link added to root layout ("Skip to main content")
 
+### Post-Onboarding Guidance (Phase 32)
+
+- [ ] **GUIDE-01**: Dashboard "Getting Started" checklist card visible for new users after onboarding
+- [ ] **GUIDE-02**: Checklist tracks key milestones: Add first job, Set up campaign, Complete a job, Get first review
+- [ ] **GUIDE-03**: Checklist progress persisted in database (user_metadata or dedicated table)
+- [ ] **GUIDE-04**: Checklist dismissible by user, auto-hides when complete
+- [ ] **GUIDE-05**: Jobs page tooltip hint on first visit ("Add your first job here") pointing at Add Job button
+- [ ] **GUIDE-06**: Tooltip hints tracked in localStorage (show once per user per page)
+
 ## Future Requirements
 
 Deferred to later milestones. Captured for traceability.

@@ -62,7 +62,7 @@ export async function generateApiKeyAction(): Promise<ApiKeyActionState> {
     }
 
     // Revalidate settings page
-    revalidatePath('/dashboard/settings')
+    revalidatePath('/settings')
 
     // Return plaintext key (shown ONCE)
     return { success: true, key }

@@ -92,6 +92,7 @@ export async function getDefaultMessageTemplates(
 /**
  * Get templates available for sending.
  * Includes both user-created and default templates.
+ * System templates are filtered to only include those matching the business's enabled service types.
  * Useful for template selectors in send forms.
  */
 export async function getAvailableTemplates(
@@ -106,7 +107,7 @@ export async function getAvailableTemplates(
 
   const { data: business } = await supabase
     .from('businesses')
-    .select('id')
+    .select('id, service_types_enabled')
     .eq('user_id', user.id)
     .single()
 
@@ -127,5 +128,18 @@ export async function getAvailableTemplates(
   }
 
   const { data } = await query
+
+  // Filter system templates to only include enabled service types
+  const enabledTypes = business.service_types_enabled as string[] | null
+  if (enabledTypes && enabledTypes.length > 0) {
+    return (data || []).filter(template => {
+      // User-created templates always show
+      if (!template.is_default) return true
+      // System templates: show if service_type matches enabled types
+      return template.service_type && enabledTypes.includes(template.service_type)
+    })
+  }
+
+  // If no service types enabled, show all templates
   return data || []
 }

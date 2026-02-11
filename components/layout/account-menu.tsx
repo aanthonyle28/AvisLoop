@@ -46,13 +46,13 @@ export function AccountMenu({ trigger, side = 'top', align = 'start' }: AccountM
       </DropdownMenuTrigger>
       <DropdownMenuContent side={side} align={align} className="w-56">
         <DropdownMenuItem asChild>
-          <Link href="/dashboard/settings" className="flex items-center gap-2 cursor-pointer">
+          <Link href="/settings" className="flex items-center gap-2 cursor-pointer">
             <AppWindow size={16} weight="regular" />
             <span>Apps / Integrations</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/dashboard/settings" className="flex items-center gap-2 cursor-pointer">
+          <Link href="/settings" className="flex items-center gap-2 cursor-pointer">
             <GearSix size={16} weight="regular" />
             <span>Settings</span>
           </Link>

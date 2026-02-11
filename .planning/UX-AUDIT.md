@@ -833,6 +833,8 @@ This entire page contradicts V2. V2 states:
 
 ## Priority Recommendations
 
+> **Status Update (2026-02-06):** Phase 30 (V2 Alignment) addressed items 1-2, 4-7, 9, 14. Phase 30.1 (Audit Gap Remediation) will cover items 3, 8, and remaining medium/low items (excluding landing page). See `.planning/phases/30.1-audit-gaps/CONTEXT.md` for full scope.
+
 ### Critical (This Week)
 
 | # | Issue | Location | Impact |

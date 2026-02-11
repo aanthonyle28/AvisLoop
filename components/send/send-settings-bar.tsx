@@ -46,7 +46,7 @@ export function SendSettingsBar({
   const handleTemplateChange = (templateId: string) => {
     // Navigate to settings if "Create Template" is selected
     if (templateId === 'create-new') {
-      router.push('/dashboard/settings#templates')
+      router.push('/settings#templates')
       return
     }
 

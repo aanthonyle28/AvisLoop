@@ -44,3 +44,6 @@ test-*.csv
 
 # Scratch notes
 docs/notes
+
+.vercel
+.env*.local

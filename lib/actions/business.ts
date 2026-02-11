@@ -82,7 +82,7 @@ export async function updateBusiness(
     }
   }
 
-  revalidatePath('/dashboard/settings')
+  revalidatePath('/settings')
   revalidatePath('/dashboard')
   return { success: true }
 }
@@ -133,7 +133,7 @@ export async function saveReviewLink(
   }
 
   revalidatePath('/dashboard')
-  revalidatePath('/dashboard/settings')
+  revalidatePath('/settings')
   return { success: true }
 }
 

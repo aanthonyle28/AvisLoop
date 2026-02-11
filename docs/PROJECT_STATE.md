@@ -13,15 +13,18 @@
 - Phase 27 (Dashboard Redesign) complete
 - Phase 28 (Onboarding Redesign) complete
 - Phase 30 (V2 Alignment) 10/10 plans complete
-- Phase 30.1 (Audit Gap Remediation) ready to execute — 8 plans in 3 waves (table skeletons, V2 terminology, enrollment preview)
+- Phase 30.1 (Audit Gap Remediation) complete — 8/8 verified
 - Twilio A2P: Brand approved, campaign pending
 
-## Last session summary (Phase 30.1 validation)
-- **Phase 30.1 planning validated**: 8 plans in 3 waves
-- **Wave 1** (parallel): Table skeletons (01), Send→Manual Request (02), Campaign enrollment preview (03)
-- **Wave 2** (parallel): Enrollment pagination (04), Preset guidance (05), Add Job auto-open + terminology (06), Preset timing (07)
-- **Wave 3**: History/Activity alignment (08)
-- **Model profile**: balanced (executor=sonnet, verifier=sonnet)
+## Last session summary (QA audit — login & onboarding)
+- Comprehensive QA audit started across all pages
+- Login page checklist: ~90 test cases (auth flow, validation, OAuth, middleware, a11y, edge cases)
+- Onboarding wizard checklist: ~170 test cases across 15 categories
+  - All 7 steps covered: business basics, review destination, services, software, campaign preset, job import, SMS consent
+  - Post-onboarding checklist (pill + drawer) covered
+  - Draft persistence, dark mode, responsive, accessibility, security edge cases
+- Planning docs and phase 32 research updated
+- Misc cleanup: removed action-summary-banner, updated billing/send/account components
 
 ## What's been built
 - **Auth**: Sign up, sign in, sign out, password reset, session persistence
@@ -39,14 +42,11 @@
 - **Polish**: Design system, loading states, micro-interactions, accessibility, branded titles, dark/light/system theme toggle, full dark mode support
 
 ## Next steps
-1. Execute Phase 30.1 (Audit Gap Remediation) — 8 plans
-   - 30.1-01: Table skeleton loaders (Critical)
-   - 30.1-02: Rename Send → "Manual Request" + friction (High)
-   - 30.1-03: Campaign enrollment preview on jobs (High)
-   - 30.1-04 to 30.1-08: Medium/Low priority fixes
-2. Wait for Twilio A2P approval for Phase 21-08
-3. Phase 29 (Agency-Mode Readiness) after 30.1 complete
-4. Landing page improvements (deferred to marketing phase)
+1. Continue QA audit — remaining pages (dashboard, jobs, campaigns, customers, send, etc.)
+2. Phase 32 (Post-Onboarding Guidance) — research complete, planning needed
+3. Wait for Twilio A2P approval for Phase 21-08
+4. Phase 29 (Agency-Mode Readiness) — multi-tenant support
+5. Phase 31 (Landing Page V2 Rewrite) — marketing improvements
 
 ## Open questions / decisions needed
 - Twilio A2P campaign approval (blocker for Phase 21-08 verification)

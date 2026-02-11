@@ -533,12 +533,20 @@ Duplicate folder existed alongside `/components/customers/` with 10 legacy files
 
 ## Remaining Work (Post QA-FIX)
 
-| Priority | Item | Status |
-|----------|------|--------|
-| Low | Migrate remaining 27 lucide-react files | Backlog |
-| Low | Update "review request" → "message" in marketing | Deferred |
-| Low | Add demo video to landing page | Backlog |
-| Low | Improve empty states with better CTAs | Backlog |
+> **Status Update (2026-02-06):** Phase 30 addressed icon migration (27→0 files), accessibility, and V2 core flow. Phase 30.1 (Audit Gap Remediation) will cover remaining items below. See `.planning/phases/30.1-audit-gaps/CONTEXT.md`.
+
+| Priority | Item | Status | Phase |
+|----------|------|--------|-------|
+| High | Table skeleton loaders | Planned | 30.1-01 |
+| High | Rename Send → "Manual Request" | Planned | 30.1-02 |
+| High | Campaign enrollment preview | Planned | 30.1-03 |
+| Medium | Enrollment list pagination | Planned | 30.1-04 |
+| Medium | Preset guidance on new campaign | Planned | 30.1-05 |
+| Low | Add Job sidebar auto-open | Planned | 30.1-06 |
+| Low | Campaign preset timing display | Planned | 30.1-07 |
+| Low | History route/Activity label | Planned | 30.1-08 |
+| Deferred | Demo video on landing page | Marketing phase | — |
+| Deferred | "review request" → "message" in marketing | Marketing phase | — |
 
 See `.planning/UX-AUDIT.md` for V2 philosophy alignment recommendations.
 

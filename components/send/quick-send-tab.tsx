@@ -509,7 +509,7 @@ export function QuickSendTab({
                 Add your Google review link in settings before sending
               </p>
               <a
-                href="/dashboard/settings"
+                href="/settings"
                 className="inline-flex items-center px-4 py-2 rounded-md border text-sm font-medium hover:bg-muted"
               >
                 Go to Settings
