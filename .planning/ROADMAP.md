@@ -487,10 +487,11 @@ Plans:
   3. `app-shell.tsx` and `page-header.tsx` background colors use token utilities (`bg-card`, `bg-background`, `border-border`)
   4. Inline semantic colors (e.g., `bg-amber-50`, `bg-blue-50` in billing, campaigns, notification-bell) are replaced with token-based equivalents or documented for Phase 35 cleanup
   5. Lint and typecheck pass with zero errors
-**Plans**: TBD
+**Plans**: 2 plans in 1 wave
 
 Plans:
-- [ ] 33-01-PLAN.md — Grep audit and hardcoded hex replacement (sidebar, app-shell, page-header, notification-bell)
+- [ ] 33-01-PLAN.md — Replace hardcoded hex values and raw color utilities in layout chrome + delete-account-dialog Button migration
+- [ ] 33-02-PLAN.md — Tier 2 inline color-scale class audit and Phase 35 documentation
 
 ### Phase 34: Warm Palette Token Replacement
 **Goal**: The entire app renders with a warm amber/gold accent palette — cream backgrounds, warm borders, soft blue interactive primary — with WCAG AA contrast verified in both light and dark modes.
