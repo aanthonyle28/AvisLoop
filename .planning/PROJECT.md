@@ -116,21 +116,26 @@ Turn job completions into Google reviews automatically — multi-touch follow-up
 | Dashboard test step cards | Guided walkthrough instead of checklist | Good — auto-detection of completion |
 | Test sends excluded from quota | Fair for users learning the product | Good — is_test flag in database |
 
-## Current Milestone: v2.0 Review Follow-Up System
+## Current Milestone: v2.5 UI/UX Redesign
 
-**Goal:** Transform AvisLoop from a single-send review request tool into a multi-touch follow-up system for home service businesses — with SMS, campaigns/sequences, jobs, LLM personalization, and a redesigned dashboard/onboarding/landing page.
+**Goal:** Full warm design system overhaul (Stratify-inspired amber/gold palette) with all-page UX fixes, onboarding consolidation, manual request elimination, and dashboard redesign.
 
 **Target features:**
-- Customers (renamed from Contacts) with phone, service history, tags
-- Jobs with basic CRUD, service type, status, customer link
-- Campaigns: preset sequences + duplicate & customize, multi-touch with timing/channel per touch
-- SMS via Twilio with quiet hours, STOP compliance, fallback to email
-- LLM personalization (Vercel AI SDK, GPT-4o-mini + Haiku fallback)
-- Dashboard: pipeline KPIs, ready-to-send queue, needs attention, quick actions
-- Onboarding: services offered, software used, review destination, default campaign
-- Navigation overhaul: Send/Queue, Customers, Jobs, Campaigns, History
-- Landing page redesigned for home services positioning
-- Remove old/unused code as new features replace them; reuse working components (badges, drawers, preview)
+- Design system: warm color palette (amber/gold accents, soft blue interactive, cream backgrounds), new card styles, updated spacing
+- Login page: split-screen image, logo, password visibility toggle, requirements checklist, Google OAuth fix
+- Onboarding: consolidate from 7 to ~5 steps, horizontal services, text input software, plain English campaign presets
+- Dashboard: welcome greeting, arrow hover on stat cards, redesigned getting started pill, differentiated lower cards, color
+- Jobs: smart field (name vs email detection), filtered services per user selection, filter differentiation, padding fixes
+- Campaigns: standard preset centered, edit as modal/panel, full card clickable, back button hit area fix
+- Analytics: empty state prompts and guidance
+- Customers/Feedback: padding and UI consistency fixes
+- Manual Request: eliminate dedicated page — add "send one-off" toggle in Add Job + fallback modal on campaigns page
+- Navigation: remove notification count from dashboard nav, global Add Job panel
+
+**Key decisions:**
+- Manual Request approach: Toggle in Add Job sheet (primary path) + "Send one-off" modal on campaigns page (edge case fallback). Remove dedicated page and nav entry.
+- Color direction: Full warm palette like Stratify — amber/gold accents, soft blue interactive, cream-tinted backgrounds
+- Scope: All pages in one push, design system first so changes cascade
 
 ---
-*Last updated: 2026-02-02 after v2.0 milestone started*
+*Last updated: 2026-02-18 after v2.5 milestone started*
