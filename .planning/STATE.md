@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 35 of 39 in v2.5 milestone (Phase 3 of 7 in this milestone)
-Plan: 2 of 5 complete
+Plan: 3 of 5 complete
 Status: In progress
-Last activity: 2026-02-19 — Completed 35-02-PLAN.md (Semantic token infrastructure: 13 CSS vars + Tailwind mappings)
+Last activity: 2026-02-18 — Completed 35-03-PLAN.md (Dashboard quick wins: greeting, card hierarchy, badge removal, analytics empty state)
 
-Progress: [████░░░░░░] ~34% (v2.5 milestone)
+Progress: [████░░░░░░] ~38% (v2.5 milestone)
 
 ## Performance Metrics
 
@@ -47,6 +47,8 @@ Progress: [████░░░░░░] ~34% (v2.5 milestone)
 - Primary color shifted: 224 75% 43% → 213 60% 42% (softer, less saturated blue)
 - Card variants use Tailwind color scale (not semantic tokens) — card tints are decorative, not semantic status; low-opacity (/60 bg, /50 border) keeps them whisper-quiet
 - InteractiveCard: translate-y lift replaced by hover:shadow-sm + always-visible ArrowRight (muted-foreground/30 → /70 on hover)
+- Server-timezone greeting (UTC on Vercel) is acceptable — client-side hydration adds complexity for minimal UX gain
+- Dashboard badge removed from sidebar nav item — dashboardBadge still in SidebarProps interface/AppShell prop chain but destructured param removed
 
 ### Pending Todos
 
@@ -60,7 +62,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-19
-Stopped at: Completed Phase 35 Plan 02 — Semantic token infrastructure (13 CSS vars + Tailwind mappings). Next: Phase 35 Plan 03
+Last session: 2026-02-18
+Stopped at: Completed Phase 35 Plan 03 — Dashboard quick wins (greeting, card hierarchy, badge removal, analytics empty state). Next: Phase 35 Plan 04
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
