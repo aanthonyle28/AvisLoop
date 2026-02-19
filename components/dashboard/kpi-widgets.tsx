@@ -55,7 +55,7 @@ export function KPIWidgets({ data }: KPIWidgetsProps) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Reviews This Month */}
         <Link href="/history?status=reviewed" className="block">
-          <InteractiveCard className="p-6">
+          <InteractiveCard variant="amber" className="p-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-medium text-muted-foreground">
                 Reviews This Month
@@ -76,7 +76,7 @@ export function KPIWidgets({ data }: KPIWidgetsProps) {
 
         {/* Average Rating */}
         <Link href="/feedback" className="block">
-          <InteractiveCard className="p-6">
+          <InteractiveCard variant="amber" className="p-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-medium text-muted-foreground">
                 Average Rating
@@ -97,7 +97,7 @@ export function KPIWidgets({ data }: KPIWidgetsProps) {
 
         {/* Conversion Rate */}
         <Link href="/history" className="block">
-          <InteractiveCard className="p-6">
+          <InteractiveCard variant="amber" className="p-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-medium text-muted-foreground">
                 Conversion Rate
@@ -120,7 +120,7 @@ export function KPIWidgets({ data }: KPIWidgetsProps) {
       {/* Bottom row: Pipeline metrics (smaller) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {/* Requests Sent This Week */}
-        <Card className="p-4">
+        <Card variant="subtle" className="p-4">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-xs font-medium text-muted-foreground">
               Requests Sent This Week
@@ -139,7 +139,7 @@ export function KPIWidgets({ data }: KPIWidgetsProps) {
         </Card>
 
         {/* Active Sequences */}
-        <Card className="p-4">
+        <Card variant="subtle" className="p-4">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-xs font-medium text-muted-foreground">
               Active Sequences
@@ -158,7 +158,7 @@ export function KPIWidgets({ data }: KPIWidgetsProps) {
         </Card>
 
         {/* Pending / Queued */}
-        <Card className="p-4">
+        <Card variant="subtle" className="p-4">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-xs font-medium text-muted-foreground">
               Pending / Queued

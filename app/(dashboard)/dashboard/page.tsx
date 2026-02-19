@@ -7,6 +7,7 @@ import {
 } from '@/lib/data/dashboard'
 import { getJobCounts } from '@/lib/data/jobs'
 import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
 
 import { KPIWidgets } from '@/components/dashboard/kpi-widgets'
 import { ReadyToSendQueue } from '@/components/dashboard/ready-to-send-queue'
@@ -16,12 +17,25 @@ export const metadata = {
   title: 'Dashboard',
 }
 
+function getGreeting(): string {
+  const hour = new Date().getHours()
+  if (hour < 12) return 'Good morning'
+  if (hour < 17) return 'Good afternoon'
+  return 'Good evening'
+}
+
 export default async function DashboardPage() {
   const business = await getBusiness()
 
   if (!business) {
     redirect('/onboarding')
   }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  const fullName = (user?.user_metadata?.full_name as string | undefined) ?? ''
+  const firstName = fullName.split(' ')[0] || ''
 
   // Get service type settings for urgency calculation
   const serviceSettings = await getServiceTypeSettings()
@@ -46,7 +60,12 @@ export default async function DashboardPage() {
 
   return (
     <div className="container mx-auto py-6 px-4 space-y-6">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
+      <div>
+        <h1 className="text-2xl font-bold">
+          {firstName ? `${getGreeting()}, ${firstName}` : getGreeting()}
+        </h1>
+        <p className="text-sm text-muted-foreground mt-1">Here&apos;s your overview for today</p>
+      </div>
 
       <KPIWidgets data={kpiData} />
       <ReadyToSendQueue
