@@ -9,10 +9,10 @@
 ## Design System
 
 - [x] **DS-01**: Warm palette migration — replace all CSS custom properties in `globals.css` (light + dark mode) with warm amber/gold accents, cream backgrounds, warm borders, warm-tinted darks
-- [ ] **DS-02**: Card variants — add CVA variants (highlight, surface, muted, ghost, outlined) to Card component for colored background differentiation
+- [x] **DS-02**: Card variants — add CVA variants (highlight, surface, muted, ghost, outlined) to Card component for colored background differentiation
 - [x] **DS-03**: New semantic tokens — add `--highlight`, `--highlight-foreground`, `--surface`, `--surface-foreground` to globals.css and tailwind.config.ts
 - [x] **DS-04**: Hardcoded color audit — replace all hardcoded hex values (`bg-white`, `border-[#E2E2E2]`, `bg-[#F9F9F9]`, `bg-[#F2F2F2]`) with semantic tokens across sidebar, page-header, app-shell, notification-bell
-- [ ] **DS-05**: Consistent page padding — normalize padding/spacing across all dashboard pages (dashboard, jobs, campaigns, analytics, customers, send, history, feedback, billing, settings) to use consistent values
+- [x] **DS-05**: Consistent page padding — normalize padding/spacing across all dashboard pages (dashboard, jobs, campaigns, analytics, customers, send, history, feedback, billing, settings) to use consistent values
 
 ## Login & Auth
 
@@ -22,10 +22,10 @@
 
 ## Dashboard
 
-- [ ] **DASH-01**: Welcome greeting — add "Welcome back, [Name]" with current date at top of dashboard page
-- [ ] **DASH-02**: Arrow hover affordance — replace translate-y lift on InteractiveCard with arrow indicator on hover to signal clickability
-- [ ] **DASH-03**: Remove notification badge — remove number badge from Dashboard nav item in sidebar
-- [ ] **DASH-04**: Differentiate lower cards — make the 3 bottom dashboard metric cards visually distinct from the top 3 KPI cards (different card variant, sizing, or layout)
+- [x] **DASH-01**: Welcome greeting — add "Welcome back, [Name]" with current date at top of dashboard page
+- [x] **DASH-02**: Arrow hover affordance — replace translate-y lift on InteractiveCard with arrow indicator on hover to signal clickability
+- [x] **DASH-03**: Remove notification badge — remove number badge from Dashboard nav item in sidebar
+- [x] **DASH-04**: Differentiate lower cards — make the 3 bottom dashboard metric cards visually distinct from the top 3 KPI cards (different card variant, sizing, or layout)
 
 ## Onboarding
 
@@ -52,10 +52,10 @@
 
 ## Other Pages
 
-- [ ] **PG-01**: Analytics empty state — add guidance prompts and suggested actions when analytics page has no data yet
-- [ ] **PG-02**: Customers padding — fix inconsistent padding and spacing on Customers page
-- [ ] **PG-03**: Feedback UI consistency — fix padding and visual consistency on Feedback page to match other dashboard pages
-- [ ] **PG-04**: All-page padding normalization — audit and normalize padding on all pages to use consistent spacing values (p-6 cards, space-y-6 sections, consistent header spacing)
+- [x] **PG-01**: Analytics empty state — add guidance prompts and suggested actions when analytics page has no data yet
+- [x] **PG-02**: Customers padding — fix inconsistent padding and spacing on Customers page
+- [x] **PG-03**: Feedback UI consistency — fix padding and visual consistency on Feedback page to match other dashboard pages
+- [x] **PG-04**: All-page padding normalization — audit and normalize padding on all pages to use consistent spacing values (p-6 cards, space-y-6 sections, consistent header spacing)
 
 ---
 
@@ -82,17 +82,17 @@
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
 | DS-01 | Phase 34 | Complete |
-| DS-02 | Phase 35 | Pending |
+| DS-02 | Phase 35 | Complete |
 | DS-03 | Phase 34 | Complete |
 | DS-04 | Phase 33 | Complete |
-| DS-05 | Phase 35 | Pending |
+| DS-05 | Phase 35 | Complete |
 | AUTH-01 | Phase 36 | Pending |
 | AUTH-02 | Phase 36 | Pending |
 | AUTH-03 | Phase 36 | Pending |
-| DASH-01 | Phase 35 | Pending |
-| DASH-02 | Phase 35 | Pending |
-| DASH-03 | Phase 35 | Pending |
-| DASH-04 | Phase 35 | Pending |
+| DASH-01 | Phase 35 | Complete |
+| DASH-02 | Phase 35 | Complete |
+| DASH-03 | Phase 35 | Complete |
+| DASH-04 | Phase 35 | Complete |
 | ONB-01 | Phase 38 | Pending |
 | ONB-02 | Phase 38 | Pending |
 | ONB-03 | Phase 38 | Pending |
@@ -107,7 +107,7 @@
 | JC-07 | Phase 37 | Pending |
 | NAV-01 | Phase 39 | Pending |
 | NAV-02 | Phase 39 | Pending |
-| PG-01 | Phase 35 | Pending |
-| PG-02 | Phase 35 | Pending |
-| PG-03 | Phase 35 | Pending |
-| PG-04 | Phase 35 | Pending |
+| PG-01 | Phase 35 | Complete |
+| PG-02 | Phase 35 | Complete |
+| PG-03 | Phase 35 | Complete |
+| PG-04 | Phase 35 | Complete |

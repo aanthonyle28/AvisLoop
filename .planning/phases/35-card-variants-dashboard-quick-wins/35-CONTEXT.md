@@ -21,9 +21,13 @@ Visually cohesive dashboard with amber-accented card CVA variants, personalized 
 - `subtle` variant = bg-muted with faint border — one step above invisible
 - Default card behavior (no variant specified): Claude's discretion on whether existing white cards stay as-is or shift
 
-### KPI card differentiation
-- Top row (outcome KPIs) uses **amber tinted variant AND larger size** — maximum visual hierarchy
-- Bottom row (pipeline KPIs) uses **default card style AND compact size** — subdued, informational
+### KPI card differentiation (REVISED 2026-02-19)
+- All cards use **white background** (default variant) — clean, minimal rest state
+- Top row (outcome KPIs) differentiated by **per-card colored icons** (filled weight) and **matching hover accents** (border + arrow color):
+  - Reviews: amber Star icon, amber hover
+  - Average Rating: green (#008236) ChartBar icon, green hover
+  - Conversion Rate: blue (#2C879F) Target icon, blue hover
+- Bottom row (pipeline KPIs) uses **default card style AND compact size** — white, no icons
 - Pipeline card clickability: Claude's discretion based on whether useful navigation destinations exist
 - Pipeline card trends: Claude's discretion based on available space in compact layout
 

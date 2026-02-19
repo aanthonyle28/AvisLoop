@@ -11,6 +11,7 @@ requires:
 provides:
   - CVA-backed Card component with 7 variants (default, amber, blue, green, red, ghost, subtle)
   - CVA-backed InteractiveCard with always-visible ArrowRight affordance replacing translate-y lift
+  - InteractiveCard hoverAccent prop (amber, green, blue) for per-card colored hover borders + arrow
   - Exported cardVariants for downstream use by other components/phases
 affects:
   - 35-02 and later plans that consume card variants
@@ -36,10 +37,13 @@ key-decisions:
   - "ArrowRight always visible (muted-foreground/30) with group-hover to /70 — never hidden, signals clickability without dominating"
   - "Replace translate-y lift with hover:shadow-sm — subtler, less jarring, consistent with flat design direction"
   - "defaultVariants: { variant: 'default' } — full backward compatibility, no existing usage breaks"
+  - "hoverAccent prop added post-completion: allows per-card colored hover borders + arrow colors without changing card background"
+  - "Custom brand colors: green=#008236 (dark:#00B84B), blue=#2C879F (dark:#38A9C5) — user-specified, used via Tailwind arbitrary values"
 
 patterns-established:
   - "Card variant pattern: cardVariants CVA + CardProps interface extending VariantProps — mirror for future compound components"
   - "InteractiveCard arrow: absolute bottom-3 right-3, group on parent, group-hover on icon"
+  - "InteractiveCard hoverAccent: named accent → { card hover border class, arrow hover text class } lookup — extends without modifying CVA variants"
 
 # Metrics
 duration: 1min
@@ -64,6 +68,7 @@ completed: 2026-02-19
 - Added 6 named color variants (amber, blue, green, red, ghost, subtle) plus default — all backward-compatible via `defaultVariants`
 - Replaced InteractiveCard's `motion-safe:hover:-translate-y-1` lift with always-visible ArrowRight indicator at bottom-right corner, transitioning from `muted-foreground/30` to `/70` on group-hover
 - Exported `cardVariants` for downstream consumption by other components
+- **Post-completion revision:** Added `hoverAccent` prop to InteractiveCard (amber/green/blue) — enables per-card colored hover borders and arrow colors while keeping white card backgrounds. Green=#008236, blue=#2C879F (user-specified brand colors)
 
 ## Task Commits
 

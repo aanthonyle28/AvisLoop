@@ -5,22 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** Phase 35 — Card Variants & Dashboard Quick Wins
+**Current focus:** Phase 36 — Auth Form Enhancements
 
 ## Current Position
 
 Phase: 35 of 39 in v2.5 milestone (Phase 3 of 7 in this milestone)
 Plan: 5 of 5 complete
 Status: Phase complete
-Last activity: 2026-02-19 — Completed 35-05-PLAN.md (~75 hardcoded colors replaced Cat C/D/F/L/N/P + all 11 dashboard pages normalized to container py-6 space-y-6)
+Last activity: 2026-02-18 — Completed Phase 35 (Card Variants & Dashboard Quick Wins), all 5 plans verified
 
 Progress: [██████░░░░] ~52% (v2.5 milestone)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 176
-- v2.5 plans completed: 7
+- Total plans completed (project): 179
+- v2.5 plans completed: 9
 
 *Updated after each plan completion*
 
@@ -46,7 +46,8 @@ Progress: [██████░░░░] ~52% (v2.5 milestone)
 - Status badge text contrast adjusted post-verification: delivered 25%, failed 33%, reviewed 20% (light); clicked 62%, failed 70% (dark) — all pass WCAG AA
 - Primary color shifted: 224 75% 43% → 213 60% 42% (softer, less saturated blue)
 - Card variants use Tailwind color scale (not semantic tokens) — card tints are decorative, not semantic status; low-opacity (/60 bg, /50 border) keeps them whisper-quiet
-- InteractiveCard: translate-y lift replaced by hover:shadow-sm + always-visible ArrowRight (muted-foreground/30 → /70 on hover)
+- InteractiveCard: translate-y lift replaced by hover:shadow-sm + always-visible ArrowRight (muted-foreground/30 → /70 on hover); hoverAccent prop adds colored border+arrow on hover (amber/green/blue)
+- KPI top row: each card gets distinct hoverAccent + filled colored icon (amber star, green chart, blue target); bottom row uses variant="default" for cleaner visual separation
 - Server-timezone greeting (UTC on Vercel) is acceptable — client-side hydration adds complexity for minimal UX gain
 - Dashboard badge removed from sidebar nav item — dashboardBadge still in SidebarProps interface/AppShell prop chain but destructured param removed
 - text-error-text for form validation (not text-destructive) — --error-text is darker shade for small inline text readability
@@ -70,7 +71,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-19
-Stopped at: Completed Phase 35 Plan 05 — Phase 35 complete. All 5 plans done. 210 Tier 2 audit occurrences resolved. Design system fully token-driven. Next: Phase 36 (Settings tabs + template UX)
+Last session: 2026-02-18
+Stopped at: Completed Phase 35 — Card variants, semantic tokens, batch replacement, dashboard quick wins, page padding. Next: Phase 36 (Auth Form Enhancements)
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!

@@ -525,11 +525,11 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 35-01-PLAN.md — Card CVA variants and InteractiveCard arrow affordance
-- [ ] 35-02-PLAN.md — Semantic token infrastructure (warning, success, info, error-text)
-- [ ] 35-03-PLAN.md — Dashboard greeting, KPI card differentiation, badge removal, analytics empty state
-- [ ] 35-04-PLAN.md — Batch token replacement: warning banners, form validation, danger zone, AI indicators, SMS counters
-- [ ] 35-05-PLAN.md — Batch token replacement: status badges, consent, success/info callouts, CSV results, page padding normalization
+- [x] 35-01-PLAN.md — Card CVA variants and InteractiveCard arrow affordance
+- [x] 35-02-PLAN.md — Semantic token infrastructure (warning, success, info, error-text)
+- [x] 35-03-PLAN.md — Dashboard greeting, KPI card differentiation, badge removal, analytics empty state
+- [x] 35-04-PLAN.md — Batch token replacement: warning banners, form validation, danger zone, AI indicators, SMS counters
+- [x] 35-05-PLAN.md — Batch token replacement: status badges, consent, success/info callouts, CSV results, page padding normalization
 
 ### Phase 36: Auth Form Enhancements
 **Goal**: Users can see what they are typing in password fields, get live feedback on password strength while signing up, and rely on Google OAuth working correctly.
@@ -636,19 +636,19 @@ See individual phase sections above for requirements, success criteria, and depe
 | **QA-FIX** | **Audit Remediation** | **5/5** | **Complete** | **2026-02-06** |
 | **33** | **v2.5 UI/UX Redesign** | **2/2** | **Complete** | **2026-02-18** |
 | **34** | **v2.5 UI/UX Redesign** | **2/2** | **Complete** | **2026-02-19** |
-| **35** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
+| **35** | **v2.5 UI/UX Redesign** | **5/5** | **Complete** | **2026-02-18** |
 | **36** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
 | **37** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
 | **38** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
 | **39** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
 
-**Total:** 172 plans complete across shipped phases.
+**Total:** 179 plans complete across shipped phases.
 
 ## What's Next
 
 **v2.0 milestone is COMPLETE** (Phases 20-32 all verified, excluding Phase 21 SMS blocked on A2P).
 
-**v2.5 milestone is starting:** Phase 33 (Hardcoded Color Audit) is the first phase — prerequisite for all palette changes.
+**v2.5 milestone in progress:** Phases 33-35 complete. Next: Phase 36 (Auth Form Enhancements).
 
 **Blockers:**
 - Twilio A2P 10DLC registration required before Phase 21-08 execution (webhook verification)
@@ -660,5 +660,5 @@ After v2.5:
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 
 ---
-*Last updated: 2026-02-18 — v2.0 milestone complete (Phases 20-32 verified), v2.5 UI/UX Redesign in progress (Phases 33-39)*
+*Last updated: 2026-02-18 — v2.0 milestone complete (Phases 20-32 verified), v2.5 UI/UX Redesign in progress (Phases 33-35 complete, 36-39 remaining)*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*

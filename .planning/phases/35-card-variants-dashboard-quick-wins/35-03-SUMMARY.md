@@ -10,8 +10,8 @@ requires:
     provides: Card component with CVA variants (amber, subtle, default, blue, green, red, ghost) and InteractiveCard with ArrowRight indicator
 provides:
   - Personalized time-of-day greeting with first name on dashboard (DASH-01)
-  - Top 3 KPI cards use amber variant for visual emphasis (DASH-02)
-  - Bottom 3 pipeline cards use subtle variant for visual de-emphasis (DASH-02)
+  - Top 3 KPI cards use white background with per-card colored icons + hoverAccent hover borders (DASH-02, revised)
+  - Bottom 3 pipeline cards use default (white) variant (DASH-02, revised)
   - Dashboard nav badge removed from sidebar (DASH-03)
   - Analytics empty state upgraded to project-standard pattern with icon, heading, CTA (DASH-04)
 affects:
@@ -38,9 +38,11 @@ key-files:
 key-decisions:
   - "dashboardBadge removed from Sidebar destructured params (fixes lint) but kept in SidebarProps interface and AppShell prop chain — zero breaking changes"
   - "Server-timezone greeting acceptable — UTC difference is at most a few hours, not worth client-side hydration complexity"
+  - "KPI cards revised: white backgrounds with per-card colored icons (amber star, green=#008236 chart, blue=#2C879F target) and matching hover borders — replaces uniform amber tint"
+  - "Pipeline cards revised: default (white) variant instead of subtle — all dashboard cards now share white rest state"
 
 patterns-established:
-  - "Visual hierarchy via card variants: amber for primary outcome metrics, subtle for secondary pipeline metrics"
+  - "Visual hierarchy via icon color + hover accent: each KPI card differentiated by icon color, hover border matches icon"
   - "Standard empty state: icon in muted rounded circle, xl semibold heading, muted-foreground description, Button CTA linking to action"
 
 # Metrics
@@ -50,7 +52,7 @@ completed: 2026-02-18
 
 # Phase 35 Plan 03: Dashboard Quick Wins Summary
 
-**Personalized time-of-day greeting + amber/subtle card hierarchy on dashboard KPIs + badge removal + standard analytics empty state**
+**Personalized time-of-day greeting + white KPI cards with per-card colored icons and hover accents + badge removal + standard analytics empty state**
 
 ## Performance
 
@@ -63,7 +65,8 @@ completed: 2026-02-18
 ## Accomplishments
 
 - Dashboard now greets user by first name with time-appropriate salutation (Good morning/afternoon/evening)
-- Clear visual hierarchy between top outcome KPIs (amber tint + ArrowRight indicator) and bottom pipeline KPIs (subtle muted background)
+- Top KPI cards: white background with per-card colored icons (amber Star, green #008236 ChartBar, blue #2C879F Target) and matching hover accents (border + arrow color)
+- Bottom pipeline cards: white background (default variant)
 - Dashboard nav item no longer shows a distracting badge number in the sidebar
 - Analytics empty state follows project-standard pattern: icon, heading, descriptive text, and "Add your first job" CTA
 
@@ -79,7 +82,7 @@ Each task was committed atomically:
 ## Files Created/Modified
 
 - `app/(dashboard)/dashboard/page.tsx` - Added `getGreeting()` function, Supabase user fetch for first name, greeting heading with subtitle replacing bare `<h1>Dashboard</h1>`
-- `components/dashboard/kpi-widgets.tsx` - Applied `variant="amber"` to 3 top InteractiveCards; `variant="subtle"` to 3 bottom Cards
+- `components/dashboard/kpi-widgets.tsx` - Applied `hoverAccent` (amber/green/blue) to 3 top InteractiveCards with per-card colored icons (weight="fill"); changed 3 bottom Cards from `variant="subtle"` to `variant="default"` (white)
 - `components/layout/sidebar.tsx` - Changed Dashboard nav badge from `dashboardBadge` to `undefined`; removed `dashboardBadge` from destructured params (kept in interface)
 - `components/dashboard/analytics-service-breakdown.tsx` - Replaced bare `<p>` empty state with standard icon+heading+description+CTA pattern using ChartBar icon and Link to /jobs?action=add
 
