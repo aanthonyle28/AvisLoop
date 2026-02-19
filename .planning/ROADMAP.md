@@ -504,11 +504,11 @@ Plans:
   4. All five status badges remain visually distinguishable when displayed side-by-side on the new warm background
   5. Primary button text passes WCAG AA contrast (4.5:1) on the new primary color value
   6. All 8 dashboard pages reviewed in both light and dark mode with no muddy, illegible, or cold-blue-looking areas
-**Plans**: TBD
+**Plans**: 2 plans in 2 waves
 
 Plans:
-- [ ] 34-01-PLAN.md — CSS variable replacement in globals.css (light + dark mode) and tailwind.config.ts token additions
-- [ ] 34-02-PLAN.md — WCAG contrast verification and dark mode visual review across all dashboard pages
+- [ ] 34-01-PLAN.md — CSS variable replacement (light + dark mode), tailwind.config.ts new tokens, status-badge.tsx migration, UI primitive accent-to-muted cleanup
+- [ ] 34-02-PLAN.md — Production build verification, WCAG contrast spot-checks, visual review checkpoint across all dashboard pages
 
 ### Phase 35: Card Variants & Dashboard Quick Wins
 **Goal**: Users see a visually cohesive dashboard with amber-accented card styles, a personalized welcome greeting, improved stat card clickability affordance, and consistent spacing across all pages.
