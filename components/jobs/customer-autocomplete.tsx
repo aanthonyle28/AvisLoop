@@ -150,8 +150,8 @@ export function CustomerAutocomplete({
               type="button"
               onClick={() => handleSelect(customer)}
               className={cn(
-                'w-full px-3 py-2 text-left hover:bg-accent cursor-pointer',
-                highlightedIndex === index && 'bg-accent'
+                'w-full px-3 py-2 text-left hover:bg-muted cursor-pointer',
+                highlightedIndex === index && 'bg-muted'
               )}
             >
               <div className="font-medium">{customer.name}</div>
@@ -164,7 +164,7 @@ export function CustomerAutocomplete({
             <button
               type="button"
               onClick={handleCreateNewClick}
-              className="w-full px-3 py-2 text-left border-t hover:bg-accent cursor-pointer"
+              className="w-full px-3 py-2 text-left border-t hover:bg-muted cursor-pointer"
             >
               <div className="font-medium text-primary">
                 + Create new customer &ldquo;{query}&rdquo;

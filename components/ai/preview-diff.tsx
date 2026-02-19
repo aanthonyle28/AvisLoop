@@ -125,7 +125,7 @@ export function PreviewDiff({
             return (
               <span
                 key={index}
-                className="bg-primary/15 text-primary rounded px-0.5 dark:bg-primary/25"
+                className="bg-highlight text-highlight-foreground rounded px-0.5"
               >
                 {segment.text}
               </span>
