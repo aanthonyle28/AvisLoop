@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 35 of 39 in v2.5 milestone (Phase 3 of 7 in this milestone)
-Plan: 3 of 5 complete
+Plan: 4 of 5 complete
 Status: In progress
-Last activity: 2026-02-18 — Completed 35-03-PLAN.md (Dashboard quick wins: greeting, card hierarchy, badge removal, analytics empty state)
+Last activity: 2026-02-19 — Completed 35-04-PLAN.md (~100 hardcoded amber/red classes replaced with semantic tokens across 24 files: Cat A/B/J/K/O)
 
-Progress: [████░░░░░░] ~38% (v2.5 milestone)
+Progress: [█████░░░░░] ~42% (v2.5 milestone)
 
 ## Performance Metrics
 
@@ -49,6 +49,11 @@ Progress: [████░░░░░░] ~38% (v2.5 milestone)
 - InteractiveCard: translate-y lift replaced by hover:shadow-sm + always-visible ArrowRight (muted-foreground/30 → /70 on hover)
 - Server-timezone greeting (UTC on Vercel) is acceptable — client-side hydration adds complexity for minimal UX gain
 - Dashboard badge removed from sidebar nav item — dashboardBadge still in SidebarProps interface/AppShell prop chain but destructured param removed
+- text-error-text for form validation (not text-destructive) — --error-text is darker shade for small inline text readability
+- SMS counter uses two-level threshold: text-warning (soft, >160 chars) → text-destructive (hard, >320 chars)
+- Danger zone section pattern: border-destructive/30 + text-destructive (not hardcoded red-200/red-600)
+- Warning banner pattern: bg-warning-bg + border-warning-border + text-warning (icon/body) + text-warning-foreground (heading)
+- Data-viz stars (text-yellow-400) and positive trend percentages (text-green-600) remain inline — exempt per Phase 33 audit
 
 ### Pending Todos
 
@@ -62,7 +67,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-18
-Stopped at: Completed Phase 35 Plan 03 — Dashboard quick wins (greeting, card hierarchy, badge removal, analytics empty state). Next: Phase 35 Plan 04
+Last session: 2026-02-19
+Stopped at: Completed Phase 35 Plan 04 — Semantic token replacement Cat A/B/J/K/O (~100 occurrences across 24 files). Next: Phase 35 Plan 05
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
