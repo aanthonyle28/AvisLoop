@@ -4,13 +4,13 @@
 
 @layer base {
   :root {
-    --background: 36 20% 96%;
+    --background: 0 20% 98%;
     --foreground: 24 10% 10%;
     --card: 36 15% 99%;
     --card-foreground: 24 10% 10%;
     --popover: 36 15% 99%;
     --popover-foreground: 24 10% 10%;
-    --primary: 213 60% 42%;
+    --primary: 21 58% 53%;
     --primary-foreground: 0 0% 98%;
     --secondary: 36 15% 92%;
     --secondary-foreground: 24 10% 10%;
@@ -24,7 +24,7 @@
     --destructive-foreground: 0 0% 98%;
     --border: 36 12% 87%;
     --input: 36 12% 87%;
-    --ring: 213 60% 42%;
+    --ring: 21 58% 53%;
     --highlight: 38 85% 90%;
     --highlight-foreground: 24 10% 10%;
     --surface: 36 12% 97%;
@@ -44,6 +44,23 @@
     --status-failed-text: 358 100% 33%;
     --status-reviewed-bg: 138 68% 86%;
     --status-reviewed-text: 149 100% 20%;
+    /* Warning (amber — warm hue family) */
+    --warning-bg: 45 100% 96%;
+    --warning: 32 95% 44%;
+    --warning-border: 43 96% 77%;
+    --warning-foreground: 26 83% 14%;
+    /* Success (green) */
+    --success-bg: 138 76% 97%;
+    --success: 142 71% 45%;
+    --success-border: 141 84% 85%;
+    --success-foreground: 140 84% 10%;
+    /* Info (blue — distinct from --primary which is H=213) */
+    --info-bg: 214 100% 97%;
+    --info: 217 91% 60%;
+    --info-border: 213 97% 87%;
+    --info-foreground: 224 64% 33%;
+    /* Error text (form validation — slightly darker than --destructive for text readability) */
+    --error-text: 0 72% 51%;
     --radius: 0.5rem;
   }
   .dark {
@@ -53,8 +70,8 @@
     --card-foreground: 36 15% 96%;
     --popover: 24 8% 13%;
     --popover-foreground: 36 15% 96%;
-    --primary: 213 60% 58%;
-    --primary-foreground: 24 8% 10%;
+    --primary: 21 58% 63%;
+    --primary-foreground: 0 0% 98%;
     --secondary: 24 6% 16%;
     --secondary-foreground: 36 15% 96%;
     --muted: 24 6% 16%;
@@ -67,7 +84,7 @@
     --destructive-foreground: 36 15% 96%;
     --border: 24 6% 20%;
     --input: 24 6% 20%;
-    --ring: 213 60% 58%;
+    --ring: 21 58% 63%;
     --highlight: 38 85% 30%;
     --highlight-foreground: 36 15% 96%;
     --surface: 24 8% 15%;
@@ -87,6 +104,23 @@
     --status-failed-text: 358 80% 70%;
     --status-reviewed-bg: 149 30% 20%;
     --status-reviewed-text: 149 80% 45%;
+    /* Warning (amber) */
+    --warning-bg: 38 40% 14%;
+    --warning: 38 90% 56%;
+    --warning-border: 38 50% 25%;
+    --warning-foreground: 45 80% 85%;
+    /* Success (green) */
+    --success-bg: 142 30% 14%;
+    --success: 142 60% 50%;
+    --success-border: 142 40% 22%;
+    --success-foreground: 142 60% 85%;
+    /* Info (blue) */
+    --info-bg: 217 30% 14%;
+    --info: 217 80% 65%;
+    --info-border: 217 40% 25%;
+    --info-foreground: 217 60% 85%;
+    /* Error text */
+    --error-text: 0 80% 65%;
   }
 }
 
