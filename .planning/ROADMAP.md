@@ -534,11 +534,12 @@ Plans:
 ### Phase 36: Auth Form Enhancements
 **Goal**: Users can see what they are typing in password fields, get live feedback on password strength while signing up, and rely on Google OAuth working correctly.
 **Depends on**: Phase 34 (warm palette stable, so forms render correctly)
-**Requirements**: AUTH-01, AUTH-02, AUTH-03
+**Requirements**: AUTH-01, AUTH-02, AUTH-03, AUTH-04
 **Success Criteria** (what must be TRUE):
   1. Login, signup, and password reset forms each have a show/hide toggle on the password field using Phosphor Eye/EyeSlash icons, with `tabIndex={-1}` on the toggle button so Tab skips it
   2. Signup and password reset forms show a live checklist beneath the password field tracking: minimum length, uppercase letter, number, and special character — updating as the user types
   3. Google OAuth sign-in completes successfully: clicking "Continue with Google" opens the Google consent screen and returns an authenticated session
+  4. Email and password fields show clear required-field validation with inline error messages and visual indicators (red border, helper text) — not just browser-default validation
 **Plans**: TBD
 
 Plans:
@@ -549,7 +550,7 @@ Plans:
 ### Phase 37: Jobs & Campaigns UX Fixes
 **Goal**: The Jobs page service filter matches the business's configured services, the Add Job form intelligently handles name vs. email input, the known job creation bug is resolved, and campaign cards are fully interactive with correct layout details.
 **Depends on**: Phase 35 (card variants available for campaign card updates)
-**Requirements**: JC-01, JC-02, JC-03, JC-04, JC-05, JC-06, JC-07
+**Requirements**: JC-01, JC-02, JC-03, JC-04, JC-05, JC-06, JC-07, JC-08, JC-09
 **Success Criteria** (what must be TRUE):
   1. Jobs page service type filter only shows service types the business enabled during onboarding (from `service_types_enabled`) — an HVAC-only business sees only HVAC, not all 8 types
   2. Add Job form detects whether the user is typing a name or email address (via `@` detection) and adjusts the field label and input type accordingly
@@ -558,11 +559,13 @@ Plans:
   5. Clicking anywhere on a campaign card opens the campaign detail — internal controls (status toggle, menu) use `stopPropagation` to avoid triggering navigation
   6. The back button on campaign detail/edit pages has a normal-sized hit area (not oversized)
   7. The Standard campaign preset card is centered in the preset picker layout
+  8. Saving changes to a campaign via the edit form persists correctly — the known save bug is identified, fixed, and verified with a successful edit round-trip
+  9. Jobs page service type filter is visually distinct from the status filter (e.g., different styling, grouping, or chip treatment) so users can tell them apart at a glance
 **Plans**: TBD
 
 Plans:
-- [ ] 37-01-PLAN.md — Job creation bug fix and Jobs page service type filter scoping
-- [ ] 37-02-PLAN.md — Smart name/email field in Add Job form
+- [ ] 37-01-PLAN.md — Job creation bug fix, campaign edit save bug fix, and Jobs page service type filter scoping
+- [ ] 37-02-PLAN.md — Smart name/email field in Add Job form and filter visual distinction
 - [ ] 37-03-PLAN.md — Campaign card full-click, edit as panel, back button, and Standard preset centering
 
 ### Phase 38: Onboarding Consolidation
@@ -571,7 +574,7 @@ Plans:
 **Requirements**: ONB-01, ONB-02, ONB-03, ONB-04, ONB-05
 **Success Criteria** (what must be TRUE):
   1. Onboarding wizard has exactly 5 steps — the Google Review Destination step (duplicate of Step 1 field) and the Software Used step are removed; existing in-progress drafts are cleanly abandoned via a versioned localStorage key (`onboarding-draft-v2`)
-  2. The Services step displays service options as horizontal selectable tiles or chips, not a vertical checkbox list
+  2. The Services step displays service options as horizontal selectable tiles or chips, not a vertical checkbox list — selecting "Other" reveals a text input for the user to type a custom service name
   3. Campaign preset options use plain-English names and descriptions — no "Fast/Standard/Slow" labels, no mention of "multi-touch sequence" or "touch #1/2/3"
   4. The Getting Started checklist pill uses warm amber accent styling consistent with the new palette (not cold blue)
   5. The "Review your campaign" checklist item only marks complete when the user actually navigates to and views their campaign page — it does not auto-complete on wizard finish
