@@ -45,7 +45,7 @@ export default async function SendPage() {
   const displayName = business.default_sender_name || business.name || 'there'
 
   return (
-    <div className="container mx-auto py-6 px-4">
+    <div className="container py-6 space-y-6">
       <SendPageClient
         customers={customers}
         business={business}

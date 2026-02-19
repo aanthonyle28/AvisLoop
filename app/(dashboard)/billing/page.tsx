@@ -62,16 +62,16 @@ export default async function BillingPage({
   const contactLimit = CONTACT_LIMITS[business.tier]
 
   return (
-    <div className="container mx-auto py-6 px-4 max-w-4xl">
+    <div className="container max-w-4xl py-6 space-y-6">
       <h1 className="text-2xl font-bold mb-6">Billing</h1>
 
       {/* Success message after checkout */}
       {showSuccess && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
-          <CheckCircle size={20} weight="regular" className="text-green-600" />
+        <div className="mb-6 p-4 bg-success-bg border border-success-border rounded-lg flex items-center gap-3">
+          <CheckCircle size={20} weight="regular" className="text-success" />
           <div>
-            <p className="font-medium text-green-800">Subscription activated!</p>
-            <p className="text-sm text-green-700">
+            <p className="font-medium text-success-foreground">Subscription activated!</p>
+            <p className="text-sm text-success">
               You&apos;re now on the {business.tier === 'pro' ? 'Pro' : 'Basic'} plan.
             </p>
           </div>

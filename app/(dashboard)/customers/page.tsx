@@ -14,7 +14,7 @@ async function CustomersContent() {
 
 export default function CustomersPage() {
   return (
-    <div className="container py-6">
+    <div className="container py-6 space-y-6">
       <Suspense fallback={
         <div className="flex items-center justify-center py-16">
           <div className="text-center">

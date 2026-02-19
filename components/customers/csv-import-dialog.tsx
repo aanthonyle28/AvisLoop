@@ -251,14 +251,14 @@ export function CSVImportDialog() {
             {importResult?.success ? (
               <>
                 <div className='flex flex-col items-center justify-center py-8 space-y-4'>
-                  <CheckCircle size={64} weight="regular" className="text-green-600" />
+                  <CheckCircle size={64} weight="regular" className="text-success" />
                   <div className='text-center space-y-2'>
                     <h3 className='text-lg font-semibold'>Import Complete</h3>
                     <div className='text-sm text-muted-foreground space-y-1'>
-                      <p>Created: <span className='font-medium text-green-600'>{importResult.data?.created || 0}</span></p>
-                      <p>Skipped (duplicates): <span className='font-medium text-yellow-600'>{importResult.data?.skipped || 0}</span></p>
+                      <p>Created: <span className='font-medium text-success'>{importResult.data?.created || 0}</span></p>
+                      <p>Skipped (duplicates): <span className='font-medium text-warning'>{importResult.data?.skipped || 0}</span></p>
                       {importResult.data?.phoneNeedsReview !== undefined && importResult.data.phoneNeedsReview > 0 && (
-                        <p>Phone needs review: <span className='font-medium text-amber-600'>{importResult.data.phoneNeedsReview}</span></p>
+                        <p>Phone needs review: <span className='font-medium text-warning'>{importResult.data.phoneNeedsReview}</span></p>
                       )}
                     </div>
                   </div>
@@ -266,13 +266,13 @@ export function CSVImportDialog() {
 
                 {/* Phone review prompt */}
                 {phoneIssues.length > 0 && !showPhoneReview && (
-                  <div className='p-4 bg-amber-50 dark:bg-amber-950 rounded-lg'>
+                  <div className='p-4 bg-warning-bg border border-warning-border rounded-lg'>
                     <div className='flex items-center justify-between'>
                       <div>
-                        <p className='font-medium text-amber-700 dark:text-amber-300'>
+                        <p className='font-medium text-warning-foreground'>
                           {phoneIssues.length} phone number{phoneIssues.length !== 1 ? 's' : ''} need review
                         </p>
-                        <p className='text-sm text-amber-600 dark:text-amber-400'>
+                        <p className='text-sm text-warning'>
                           These customers were imported but have invalid phone formats
                         </p>
                       </div>

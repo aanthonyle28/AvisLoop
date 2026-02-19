@@ -57,10 +57,10 @@ export function CSVPreviewTable({ rows }: CSVPreviewTableProps) {
                 statusIcon = <XCircle size={16} className=' text-destructive' />
                 rowClassName = 'bg-destructive/10'
               } else if (row.isDuplicate) {
-                statusIcon = <Warning size={16} className=' text-yellow-600' />
-                rowClassName = 'bg-yellow-50 dark:bg-yellow-950/20'
+                statusIcon = <Warning size={16} className=' text-warning' />
+                rowClassName = 'bg-warning-bg'
               } else {
-                statusIcon = <CheckCircle size={16} className=' text-green-600' />
+                statusIcon = <CheckCircle size={16} className=' text-success' />
               }
 
               return (
@@ -71,7 +71,7 @@ export function CSVPreviewTable({ rows }: CSVPreviewTableProps) {
                   <TableCell>{row.phone || '-'}</TableCell>
                   <TableCell>
                     {row.isDuplicate && row.isValid ? (
-                      <Badge variant='outline' className='bg-yellow-50 text-yellow-800 border-yellow-300'>
+                      <Badge variant='outline' className='bg-warning-bg text-warning-foreground border-warning-border'>
                         Duplicate
                       </Badge>
                     ) : row.errors.length > 0 ? (
@@ -92,9 +92,9 @@ export function CSVPreviewTable({ rows }: CSVPreviewTableProps) {
           <span className='font-medium'>{totalRows}</span>
         </div>
         <div className='flex items-center gap-2'>
-          <CheckCircle size={16} className=' text-green-600' />
+          <CheckCircle size={16} className=' text-success' />
           <span className='text-muted-foreground'>Valid:</span>
-          <span className='font-medium text-green-600'>{validRows}</span>
+          <span className='font-medium text-success'>{validRows}</span>
         </div>
         <div className='flex items-center gap-2'>
           <XCircle size={16} className=' text-destructive' />
@@ -102,9 +102,9 @@ export function CSVPreviewTable({ rows }: CSVPreviewTableProps) {
           <span className='font-medium text-destructive'>{invalidRows}</span>
         </div>
         <div className='flex items-center gap-2'>
-          <Warning size={16} className=' text-yellow-600' />
+          <Warning size={16} className=' text-warning' />
           <span className='text-muted-foreground'>Duplicates:</span>
-          <span className='font-medium text-yellow-600'>{duplicateRows}</span>
+          <span className='font-medium text-warning'>{duplicateRows}</span>
         </div>
       </div>
     </div>

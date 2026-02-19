@@ -66,8 +66,8 @@ export function TemplateListItem({ template, onUpdate }: TemplateListItemProps) 
           <div
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium ${
               isEmail
-                ? 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300'
-                : 'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300'
+                ? 'bg-info/10 text-info'
+                : 'bg-success/10 text-success'
             }`}
           >
             {isEmail ? (

@@ -181,11 +181,11 @@ export function CSVJobImportDialog() {
         {step === 'preview' && (
           <div className="space-y-4">
             <div className="flex items-center gap-4 text-sm">
-              <Badge variant="outline" className="text-green-600">
+              <Badge variant="outline" className="text-success">
                 {validCount} valid
               </Badge>
               {invalidCount > 0 && (
-                <Badge variant="outline" className="text-red-600">
+                <Badge variant="outline" className="text-destructive">
                   {invalidCount} invalid
                 </Badge>
               )}
@@ -204,16 +204,16 @@ export function CSVJobImportDialog() {
                 </thead>
                 <tbody>
                   {parsedRows.slice(0, 20).map((row, i) => (
-                    <tr key={i} className={cn(!row.isValid && 'bg-red-50 dark:bg-red-950/20')}>
+                    <tr key={i} className={cn(!row.isValid && 'bg-destructive/10')}>
                       <td className="px-3 py-2">{row.customerName}</td>
                       <td className="px-3 py-2">{row.customerEmail}</td>
                       <td className="px-3 py-2">{SERVICE_TYPE_LABELS[row.serviceType] || row.serviceType}</td>
                       <td className="px-3 py-2">{row.completionDate || 'Today'}</td>
                       <td className="px-3 py-2">
                         {row.isValid ? (
-                          <CheckCircle size={16} className="text-green-600" />
+                          <CheckCircle size={16} className="text-success" />
                         ) : (
-                          <span className="text-red-600 text-xs">{row.errors.join(', ')}</span>
+                          <span className="text-destructive text-xs">{row.errors.join(', ')}</span>
                         )}
                       </td>
                     </tr>
@@ -257,15 +257,15 @@ export function CSVJobImportDialog() {
           <div className="space-y-4">
             {importResult?.success ? (
               <div className="flex flex-col items-center justify-center py-8 space-y-4">
-                <CheckCircle size={64} weight="regular" className="text-green-600" />
+                <CheckCircle size={64} weight="regular" className="text-success" />
                 <div className="text-center space-y-2">
                   <h3 className="text-lg font-semibold">Import Complete</h3>
                   <div className="text-sm text-muted-foreground space-y-1">
-                    <p>Jobs created: <span className="font-medium text-green-600">{importResult.data?.jobsCreated || 0}</span></p>
-                    <p>New customers: <span className="font-medium text-blue-600">{importResult.data?.customersCreated || 0}</span></p>
+                    <p>Jobs created: <span className="font-medium text-success">{importResult.data?.jobsCreated || 0}</span></p>
+                    <p>New customers: <span className="font-medium text-info">{importResult.data?.customersCreated || 0}</span></p>
                     <p>Linked to existing: <span className="font-medium">{importResult.data?.customersLinked || 0}</span></p>
                     {(importResult.data?.skipped || 0) > 0 && (
-                      <p>Skipped: <span className="font-medium text-amber-600">{importResult.data?.skipped}</span></p>
+                      <p>Skipped: <span className="font-medium text-warning">{importResult.data?.skipped}</span></p>
                     )}
                   </div>
                 </div>

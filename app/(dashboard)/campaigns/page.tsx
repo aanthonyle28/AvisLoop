@@ -18,7 +18,7 @@ export default async function CampaignsPage() {
   const hasCustomCampaigns = campaigns.length > 0
 
   return (
-    <div className="container py-6 space-y-8">
+    <div className="container py-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Campaigns</h1>

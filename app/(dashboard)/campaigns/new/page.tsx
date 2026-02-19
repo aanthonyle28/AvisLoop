@@ -11,7 +11,7 @@ export default async function NewCampaignPage() {
   const templates = await getAvailableTemplates()
 
   return (
-    <div className="container py-6 max-w-3xl">
+    <div className="container max-w-3xl py-6 space-y-6">
       <Link
         href="/campaigns"
         className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 mb-4"
@@ -28,20 +28,20 @@ export default async function NewCampaignPage() {
       </div>
 
       {/* Preset guidance callout */}
-      <div className="mb-8 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-900/50 dark:bg-blue-950/20">
+      <div className="mb-8 rounded-lg border border-info-border bg-info-bg p-4">
         <div className="flex items-start gap-3">
-          <Lightbulb className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" weight="fill" />
+          <Lightbulb className="h-5 w-5 text-info shrink-0 mt-0.5" weight="fill" />
           <div className="flex-1">
-            <p className="font-medium text-blue-900 dark:text-blue-200">
+            <p className="font-medium text-info-foreground">
               New to campaigns? Start with a preset
             </p>
-            <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
+            <p className="mt-1 text-sm text-info">
               Campaign presets are pre-configured sequences optimized for different follow-up styles.
               Choose Conservative, Standard, or Aggressive based on your preference.
             </p>
             <Link
               href="/campaigns#presets"
-              className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-blue-700 dark:text-blue-300 hover:text-blue-900 dark:hover:text-blue-100"
+              className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-info hover:text-info-foreground"
             >
               View presets
               <ArrowRight className="h-4 w-4" />

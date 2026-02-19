@@ -39,7 +39,7 @@ export default async function FeedbackPage() {
   ])
 
   return (
-    <div className="container py-8 max-w-4xl">
+    <div className="container max-w-4xl py-6 space-y-6">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
