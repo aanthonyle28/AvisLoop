@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 
 ## Current Position
 
-Phase: 34 of 39 in v2.5 milestone (Phase 2 of 7 in this milestone)
-Plan: 2 of 2 complete — phase complete
-Status: Phase complete
-Last activity: 2026-02-19 — Completed 34-02-PLAN.md (Visual verification, user approved warm palette)
+Phase: 35 of 39 in v2.5 milestone (Phase 3 of 7 in this milestone)
+Plan: 1 of 5 complete
+Status: In progress
+Last activity: 2026-02-19 — Completed 35-01-PLAN.md (Card CVA variants + InteractiveCard arrow affordance)
 
-Progress: [███░░░░░░░] ~29% (v2.5 milestone)
+Progress: [████░░░░░░] ~34% (v2.5 milestone)
 
 ## Performance Metrics
 
@@ -45,6 +45,8 @@ Progress: [███░░░░░░░] ~29% (v2.5 milestone)
 - Accent = decorative only: bg-secondary for outline button hover, bg-muted for ghost/dropdown/select/dialog states
 - Status badge text contrast adjusted post-verification: delivered 25%, failed 33%, reviewed 20% (light); clicked 62%, failed 70% (dark) — all pass WCAG AA
 - Primary color shifted: 224 75% 43% → 213 60% 42% (softer, less saturated blue)
+- Card variants use Tailwind color scale (not semantic tokens) — card tints are decorative, not semantic status; low-opacity (/60 bg, /50 border) keeps them whisper-quiet
+- InteractiveCard: translate-y lift replaced by hover:shadow-sm + always-visible ArrowRight (muted-foreground/30 → /70 on hover)
 
 ### Pending Todos
 
@@ -59,6 +61,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed Phase 34 — Warm palette token replacement, visual verification approved, contrast fixes applied. Next: Phase 35 (Card Variants & Dashboard Quick Wins)
+Stopped at: Completed Phase 35 Plan 01 — Card CVA variants + InteractiveCard arrow affordance. Next: Phase 35 Plan 02
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
