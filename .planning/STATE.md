@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** Phase 33 — Hardcoded Color Audit (v2.5 start)
+**Current focus:** Phase 34 — Warm Palette Token Replacement
 
 ## Current Position
 

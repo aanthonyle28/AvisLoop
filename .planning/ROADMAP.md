@@ -490,8 +490,8 @@ Plans:
 **Plans**: 2 plans in 1 wave
 
 Plans:
-- [ ] 33-01-PLAN.md — Replace hardcoded hex values and raw color utilities in layout chrome + delete-account-dialog Button migration
-- [ ] 33-02-PLAN.md — Tier 2 inline color-scale class audit and Phase 35 documentation
+- [x] 33-01-PLAN.md — Replace hardcoded hex values and raw color utilities in layout chrome + delete-account-dialog Button migration
+- [x] 33-02-PLAN.md — Tier 2 inline color-scale class audit and Phase 35 documentation
 
 ### Phase 34: Warm Palette Token Replacement
 **Goal**: The entire app renders with a warm amber/gold accent palette — cream backgrounds, warm borders, soft blue interactive primary — with WCAG AA contrast verified in both light and dark modes.
@@ -632,7 +632,7 @@ See individual phase sections above for requirements, success criteria, and depe
 | **32 (v2.0)** | **Post-Onboarding Guidance** | **4/4** | **Complete** | **2026-02-18** |
 | **QA-AUDIT** | **Dashboard Audit** | **9/9** | **Complete** | **2026-02-05** |
 | **QA-FIX** | **Audit Remediation** | **5/5** | **Complete** | **2026-02-06** |
-| **33** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
+| **33** | **v2.5 UI/UX Redesign** | **2/2** | **Complete** | **2026-02-18** |
 | **34** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
 | **35** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
 | **36** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
@@ -640,7 +640,7 @@ See individual phase sections above for requirements, success criteria, and depe
 | **38** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
 | **39** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
 
-**Total:** 170 plans complete across shipped phases.
+**Total:** 172 plans complete across shipped phases.
 
 ## What's Next
 
