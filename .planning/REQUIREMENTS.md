@@ -81,33 +81,33 @@
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| DS-01 | TBD | Pending |
-| DS-02 | TBD | Pending |
-| DS-03 | TBD | Pending |
-| DS-04 | TBD | Pending |
-| DS-05 | TBD | Pending |
-| AUTH-01 | TBD | Pending |
-| AUTH-02 | TBD | Pending |
-| AUTH-03 | TBD | Pending |
-| DASH-01 | TBD | Pending |
-| DASH-02 | TBD | Pending |
-| DASH-03 | TBD | Pending |
-| DASH-04 | TBD | Pending |
-| ONB-01 | TBD | Pending |
-| ONB-02 | TBD | Pending |
-| ONB-03 | TBD | Pending |
-| ONB-04 | TBD | Pending |
-| ONB-05 | TBD | Pending |
-| JC-01 | TBD | Pending |
-| JC-02 | TBD | Pending |
-| JC-03 | TBD | Pending |
-| JC-04 | TBD | Pending |
-| JC-05 | TBD | Pending |
-| JC-06 | TBD | Pending |
-| JC-07 | TBD | Pending |
-| NAV-01 | TBD | Pending |
-| NAV-02 | TBD | Pending |
-| PG-01 | TBD | Pending |
-| PG-02 | TBD | Pending |
-| PG-03 | TBD | Pending |
-| PG-04 | TBD | Pending |
+| DS-01 | Phase 34 | Pending |
+| DS-02 | Phase 35 | Pending |
+| DS-03 | Phase 34 | Pending |
+| DS-04 | Phase 33 | Pending |
+| DS-05 | Phase 35 | Pending |
+| AUTH-01 | Phase 36 | Pending |
+| AUTH-02 | Phase 36 | Pending |
+| AUTH-03 | Phase 36 | Pending |
+| DASH-01 | Phase 35 | Pending |
+| DASH-02 | Phase 35 | Pending |
+| DASH-03 | Phase 35 | Pending |
+| DASH-04 | Phase 35 | Pending |
+| ONB-01 | Phase 38 | Pending |
+| ONB-02 | Phase 38 | Pending |
+| ONB-03 | Phase 38 | Pending |
+| ONB-04 | Phase 38 | Pending |
+| ONB-05 | Phase 38 | Pending |
+| JC-01 | Phase 37 | Pending |
+| JC-02 | Phase 37 | Pending |
+| JC-03 | Phase 37 | Pending |
+| JC-04 | Phase 37 | Pending |
+| JC-05 | Phase 37 | Pending |
+| JC-06 | Phase 37 | Pending |
+| JC-07 | Phase 37 | Pending |
+| NAV-01 | Phase 39 | Pending |
+| NAV-02 | Phase 39 | Pending |
+| PG-01 | Phase 35 | Pending |
+| PG-02 | Phase 35 | Pending |
+| PG-03 | Phase 35 | Pending |
+| PG-04 | Phase 35 | Pending |

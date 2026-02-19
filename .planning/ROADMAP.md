@@ -13,7 +13,8 @@ AvisLoop is a review follow-up system for home service businesses. v1.0 through 
 - **Phase 19 UX/UI Redesign** - Phase 19 (shipped 2026-02-01)
 - **v1.3 Dashboard UX Overhaul** - Phases 20-22 (shipped 2026-02-02)
 - **v1.4 Landing Page Redesign** - Phase 25 (shipped 2026-02-02)
-- **v2.0 Review Follow-Up System** - Phases 20-31 (in progress)
+- **v2.0 Review Follow-Up System** - Phases 20-32 (complete 2026-02-18)
+- **v2.5 UI/UX Redesign** - Phases 33-39 (in progress)
 
 ## Phases
 
@@ -92,22 +93,8 @@ AvisLoop is a review follow-up system for home service businesses. v1.0 through 
 
 </details>
 
-### v2.0 Review Follow-Up System (Phases 20-31)
-
-**Milestone Goal:** Transform AvisLoop from a single-send review request tool into a multi-touch follow-up system for home service businesses — with SMS, campaigns/sequences, jobs, LLM personalization, and redesigned dashboard/onboarding/landing page.
-
-**Replaces:** Old v1.3/v1.4 phases 20-26 (new v2.0 milestone starts fresh from Phase 20)
-
-**Reusable from v1.0-v1.4:**
-- StatusBadge component (Phase 20)
-- Request/contact detail drawers (Phase 22)
-- Email preview components (Phase 21)
-- Template selector patterns
-- Design system (CSS variables, dark mode, Phosphor icons, Kumbh Sans)
-
-**Coverage:** 76 requirements across 14 categories
-
----
+<details>
+<summary>v2.0 Review Follow-Up System (Phases 20-32) - COMPLETE 2026-02-18</summary>
 
 ### Phase 20: Database Migration & Customer Enhancement
 **Goal**: Contacts table renamed to Customers, SMS opt-in fields added, A2P 10DLC registration complete, timezone support enabled.
@@ -158,7 +145,6 @@ Plans:
 **Goal**: Users can create jobs linked to customers with service type and completion status, enabling job-centric workflow and service-specific analytics.
 **Depends on**: Phase 20 (customers table exists)
 **Requirements**: JOBS-01, JOBS-02, JOBS-03, JOBS-04, JOBS-05, JOBS-06, SVCT-01, SVCT-02
-**Deferred to later phases**: SVCT-03 (timing consumed during campaign creation - Phase 24), SVCT-04 (analytics by service type - Phase 27)
 **Success Criteria** (what must be TRUE):
   1. User can view /jobs page with list of all jobs (customer name, service type, status, completion date)
   2. User can create job with customer selector (dropdown search), service type (HVAC/plumbing/electrical/cleaning/roofing/painting/handyman/other), and status (completed/do-not-send)
@@ -167,7 +153,6 @@ Plans:
   5. Job completion (status changed to completed) triggers campaign enrollment (when campaign exists for that service type) — enrollment logic implemented in Phase 24
   6. Service taxonomy saved as business setting in /settings page (multi-select: "Which services do you offer?") — onboarding integration deferred to Phase 28
   7. Each service type has default timing rules (HVAC: 24h, plumbing: 48h, electrical: 24h, cleaning: 4h, roofing: 72h) configurable in settings — stored in DB, consumed by Phase 24 campaign creation
-**Note**: Phase 22 adds schema columns and settings UI for service type timing. Phase 24 consumes timing when creating campaigns. Phase 27 adds analytics by service type. Phase 28 integrates service type selection into onboarding wizard.
 **Plans**: 5 plans in 3 waves
 Plans:
 - [x] 22-01-PLAN.md — Database schema (jobs table + business service type settings)
@@ -332,7 +317,6 @@ Plans:
   1. Multi-location data model schema added (business has location_id column, queries scoped by location_id) — no UI yet, schema-only
   2. Weekly performance report auto-generated every Monday (sends count, opens count, reviews count, response rate) and emailed to business owner
   3. Campaign playbooks exportable (download campaign config as JSON template, shareable across businesses)
-**Future consideration**: Operator admin dashboard — aggregate LLM spend across all tenants, margin analysis, cost-per-tenant breakdown. Currently business owners see their estimated cost in Settings; operator monitors actual spend via API provider dashboards (Google AI, OpenAI, OpenRouter).
 **Plans**: TBD
 
 ### Phase 30: V2 Alignment & Audit Remediation
@@ -411,11 +395,11 @@ Plans:
   11. No V1 language visible (no "Send review requests", "Add Contact", "Write Message")
 **Plans**: 5 plans in 2 waves
 Plans:
-- [ ] 31-01-PLAN.md — Hero and page metadata V2 update
-- [ ] 31-02-PLAN.md — Problem/Solution and How It Works V2 rewrite
-- [ ] 31-03-PLAN.md — Outcome cards, stats, and social proof V2 update
-- [ ] 31-04-PLAN.md — FAQ, testimonials, CTA, and pricing V2 update
-- [ ] 31-05-PLAN.md — Visual verification checkpoint
+- [x] 31-01-PLAN.md — Hero and page metadata V2 update
+- [x] 31-02-PLAN.md — Problem/Solution and How It Works V2 rewrite
+- [x] 31-03-PLAN.md — Outcome cards, stats, and social proof V2 update
+- [x] 31-04-PLAN.md — FAQ, testimonials, CTA, and pricing V2 update
+- [x] 31-05-PLAN.md — Visual verification checkpoint
 
 ### Phase 32: Post-Onboarding Guidance
 **Goal**: Help new users discover key features after onboarding with a persistent dashboard checklist and contextual tooltip hints on first visit to key pages.
@@ -433,10 +417,10 @@ Plans:
   9. Checklist and hints reinforce V2 workflow (jobs -> campaigns -> automation)
 **Plans**: 4 plans in 3 waves
 Plans:
-- [ ] 32-01-PLAN.md — Database schema and types for checklist
-- [ ] 32-02-PLAN.md — Checklist data functions and UI component
-- [ ] 32-03-PLAN.md — Tooltip hints hook, component, and integration
-- [ ] 32-04-PLAN.md — Visual verification checkpoint
+- [x] 32-01-PLAN.md — Database schema and types for checklist
+- [x] 32-02-PLAN.md — Checklist data functions and UI component
+- [x] 32-03-PLAN.md — Tooltip hints hook, component, and integration
+- [x] 32-04-PLAN.md — Visual verification checkpoint
 
 ### Phase QA-AUDIT: Dashboard QA Test & UX Audit
 **Goal**: Systematically test every page, button, and feature in the authenticated dashboard using Playwright MCP. Verify v2.0 campaign-first model coherence. Cross-check data against database. Identify UX gaps, broken flows, legacy references, orphaned features, and design inconsistencies.
@@ -481,6 +465,139 @@ Plans:
 - [x] QA-FIX-04-PLAN.md — Icon migration (11 high-priority files)
 - [x] QA-FIX-05-PLAN.md — Code cleanup (Send page Contact -> Customer)
 
+</details>
+
+### v2.5 UI/UX Redesign (Phases 33-39)
+
+**Milestone Goal:** Full warm design system overhaul (Stratify-inspired amber/gold palette with blue interactive primary) plus all-page UX fixes, onboarding consolidation from 7 to 5 steps, and Manual Request page elimination.
+
+**Coverage:** 30 requirements across 7 categories (DS, AUTH, DASH, ONB, JC, NAV, PG)
+
+**Build order rationale:** Hardcoded color audit must complete before palette swap (Phase 33 before 34). Palette must be stable before card variants (34 before 35). Auth forms and Jobs/Campaigns UX are independent and parallel with Phase 35. Onboarding consolidation depends on warm form styling being stable (after 36). Manual Request elimination is highest structural risk — last.
+
+---
+
+### Phase 33: Hardcoded Color Audit
+**Goal**: Every component uses semantic color tokens — no raw hex values remain — so the warm palette change in Phase 34 propagates cleanly to every component.
+**Depends on**: Phase 32 (v2.0 complete)
+**Requirements**: DS-04
+**Success Criteria** (what must be TRUE):
+  1. Running `grep -rn "bg-\[#\|text-\[#\|border-\[#" components/` returns zero hits
+  2. `sidebar.tsx` active/hover state uses `bg-muted` instead of `bg-[#F2F2F2]`
+  3. `app-shell.tsx` and `page-header.tsx` background colors use token utilities (`bg-card`, `bg-background`, `border-border`)
+  4. Inline semantic colors (e.g., `bg-amber-50`, `bg-blue-50` in billing, campaigns, notification-bell) are replaced with token-based equivalents or documented for Phase 35 cleanup
+  5. Lint and typecheck pass with zero errors
+**Plans**: TBD
+
+Plans:
+- [ ] 33-01-PLAN.md — Grep audit and hardcoded hex replacement (sidebar, app-shell, page-header, notification-bell)
+
+### Phase 34: Warm Palette Token Replacement
+**Goal**: The entire app renders with a warm amber/gold accent palette — cream backgrounds, warm borders, soft blue interactive primary — with WCAG AA contrast verified in both light and dark modes.
+**Depends on**: Phase 33 (hardcoded colors removed)
+**Requirements**: DS-01, DS-03
+**Success Criteria** (what must be TRUE):
+  1. `app/globals.css` `:root` block uses warm cream background (`36 20% 96%`), warm near-black foreground (`24 10% 10%`), soft blue primary (`213 60% 42%`), and amber accent (`38 92% 50%`)
+  2. `.dark` block uses independently calibrated warm dark values — not lightness-inverted light mode values
+  3. Two new semantic tokens (`--highlight`, `--highlight-foreground`, `--surface`, `--surface-foreground`) exist in `globals.css` and `tailwind.config.ts`
+  4. All five status badges remain visually distinguishable when displayed side-by-side on the new warm background
+  5. Primary button text passes WCAG AA contrast (4.5:1) on the new primary color value
+  6. All 8 dashboard pages reviewed in both light and dark mode with no muddy, illegible, or cold-blue-looking areas
+**Plans**: TBD
+
+Plans:
+- [ ] 34-01-PLAN.md — CSS variable replacement in globals.css (light + dark mode) and tailwind.config.ts token additions
+- [ ] 34-02-PLAN.md — WCAG contrast verification and dark mode visual review across all dashboard pages
+
+### Phase 35: Card Variants & Dashboard Quick Wins
+**Goal**: Users see a visually cohesive dashboard with amber-accented card styles, a personalized welcome greeting, improved stat card clickability affordance, and consistent spacing across all pages.
+**Depends on**: Phase 34 (warm palette stable)
+**Requirements**: DS-02, DS-05, DASH-01, DASH-02, DASH-03, DASH-04, PG-01, PG-02, PG-03, PG-04
+**Success Criteria** (what must be TRUE):
+  1. `card.tsx` has CVA variants (`amber`, `blue`, `green`, `red`, `ghost`, `subtle`) that can be applied without breaking any existing card usage
+  2. `InteractiveCard` shows a right-arrow indicator on hover instead of a vertical translate lift, signaling navigability
+  3. Dashboard top line shows "Good morning/afternoon, [First Name]" greeting from the user's session
+  4. The 3 bottom pipeline metric cards are visually distinct from the 3 top outcome KPI cards (different variant, sizing, or layout treatment)
+  5. Dashboard notification badge is removed from the sidebar Dashboard nav item
+  6. Analytics page empty state shows an icon, heading, and suggested action (not a bare text line)
+  7. All dashboard pages (dashboard, jobs, campaigns, analytics, customers, send, history, feedback, billing, settings) use consistent card padding (`p-6`) and section spacing (`space-y-6`)
+**Plans**: TBD
+
+Plans:
+- [ ] 35-01-PLAN.md — Card CVA variants and InteractiveCard arrow affordance
+- [ ] 35-02-PLAN.md — Dashboard welcome greeting and lower card differentiation
+- [ ] 35-03-PLAN.md — Remove notification badge, analytics empty state, and all-page padding normalization
+
+### Phase 36: Auth Form Enhancements
+**Goal**: Users can see what they are typing in password fields, get live feedback on password strength while signing up, and rely on Google OAuth working correctly.
+**Depends on**: Phase 34 (warm palette stable, so forms render correctly)
+**Requirements**: AUTH-01, AUTH-02, AUTH-03
+**Success Criteria** (what must be TRUE):
+  1. Login, signup, and password reset forms each have a show/hide toggle on the password field using Phosphor Eye/EyeSlash icons, with `tabIndex={-1}` on the toggle button so Tab skips it
+  2. Signup and password reset forms show a live checklist beneath the password field tracking: minimum length, uppercase letter, number, and special character — updating as the user types
+  3. Google OAuth sign-in completes successfully: clicking "Continue with Google" opens the Google consent screen and returns an authenticated session
+**Plans**: TBD
+
+Plans:
+- [ ] 36-01-PLAN.md — PasswordInput component and auth form integration
+- [ ] 36-02-PLAN.md — Password requirements checklist component
+- [ ] 36-03-PLAN.md — Google OAuth verification and fix
+
+### Phase 37: Jobs & Campaigns UX Fixes
+**Goal**: The Jobs page service filter matches the business's configured services, the Add Job form intelligently handles name vs. email input, the known job creation bug is resolved, and campaign cards are fully interactive with correct layout details.
+**Depends on**: Phase 35 (card variants available for campaign card updates)
+**Requirements**: JC-01, JC-02, JC-03, JC-04, JC-05, JC-06, JC-07
+**Success Criteria** (what must be TRUE):
+  1. Jobs page service type filter only shows service types the business enabled during onboarding (from `service_types_enabled`) — an HVAC-only business sees only HVAC, not all 8 types
+  2. Add Job form detects whether the user is typing a name or email address (via `@` detection) and adjusts the field label and input type accordingly
+  3. Creating a new job succeeds end-to-end — the bug preventing job creation is identified, fixed, and verified with a successful create
+  4. Campaign editor opens as a side panel or modal — users do not navigate to a separate full page to edit a campaign
+  5. Clicking anywhere on a campaign card opens the campaign detail — internal controls (status toggle, menu) use `stopPropagation` to avoid triggering navigation
+  6. The back button on campaign detail/edit pages has a normal-sized hit area (not oversized)
+  7. The Standard campaign preset card is centered in the preset picker layout
+**Plans**: TBD
+
+Plans:
+- [ ] 37-01-PLAN.md — Job creation bug fix and Jobs page service type filter scoping
+- [ ] 37-02-PLAN.md — Smart name/email field in Add Job form
+- [ ] 37-03-PLAN.md — Campaign card full-click, edit as panel, back button, and Standard preset centering
+
+### Phase 38: Onboarding Consolidation
+**Goal**: New users complete a 5-step onboarding wizard (down from 7) with horizontal service tiles, plain-English campaign preset names, and a correctly-gated "Review campaign" checklist step.
+**Depends on**: Phase 36 (auth form patterns stable, warm form styling in place)
+**Requirements**: ONB-01, ONB-02, ONB-03, ONB-04, ONB-05
+**Success Criteria** (what must be TRUE):
+  1. Onboarding wizard has exactly 5 steps — the Google Review Destination step (duplicate of Step 1 field) and the Software Used step are removed; existing in-progress drafts are cleanly abandoned via a versioned localStorage key (`onboarding-draft-v2`)
+  2. The Services step displays service options as horizontal selectable tiles or chips, not a vertical checkbox list
+  3. Campaign preset options use plain-English names and descriptions — no "Fast/Standard/Slow" labels, no mention of "multi-touch sequence" or "touch #1/2/3"
+  4. The Getting Started checklist pill uses warm amber accent styling consistent with the new palette (not cold blue)
+  5. The "Review your campaign" checklist item only marks complete when the user actually navigates to and views their campaign page — it does not auto-complete on wizard finish
+**Plans**: TBD
+
+Plans:
+- [ ] 38-01-PLAN.md — Wizard step reduction (7 to 5) with localStorage key versioning
+- [ ] 38-02-PLAN.md — Horizontal service tiles and plain-English campaign preset copy
+- [ ] 38-03-PLAN.md — Getting started pill warm styling and campaign review step fix
+
+### Phase 39: Manual Request Elimination
+**Goal**: The dedicated Manual Request page and nav entry are removed — users can still trigger a one-off send via a modal on the Campaigns page or from the Customer detail drawer, and the Add Job flow offers a one-off send option for edge cases.
+**Depends on**: Phase 37 (Campaigns page UX stable, Add Job form updated)
+**Requirements**: NAV-01, NAV-02
+**Success Criteria** (what must be TRUE):
+  1. "Manual Request" / "Send" no longer appears in sidebar navigation or mobile bottom nav
+  2. Navigating to `/send` redirects to `/campaigns` (bookmarks and crawlers are handled — page is not 404'd)
+  3. A "Send one-off" button on the Campaigns page opens a `QuickSendModal` with a friction warning — the form is pre-filled when opened from a Customer detail drawer
+  4. The Add Job flow includes an option to trigger an immediate one-off send for edge-case situations where no campaign is appropriate
+  5. All five server queries previously on the `/send` page are confirmed to have new homes before the redirect is added — no dashboard data is lost
+**Plans**: TBD
+
+Plans:
+- [ ] 39-01-PLAN.md — Server query migration audit and QuickSendForm extraction
+- [ ] 39-02-PLAN.md — QuickSendModal component and Campaigns page integration
+- [ ] 39-03-PLAN.md — Add Job one-off send toggle and /send redirect
+
+---
+
 ## Phase Details
 
 See individual phase sections above for requirements, success criteria, and dependencies.
@@ -506,7 +623,7 @@ See individual phase sections above for requirements, success criteria, and depe
 | **25 (v2.0)** | **Review Follow-Up** | **11/11** | **Complete** | **2026-02-04** |
 | **26 (v2.0)** | **Review Follow-Up** | **7/7** | **Complete** | **2026-02-04** |
 | 27 (v2.0) | Review Follow-Up | 0/7 | Planned | - |
-| 28 (v2.0) | Review Follow-Up | 0/8 | In progress | - |
+| 28 (v2.0) | Review Follow-Up | 0/8 | Planned | - |
 | 29 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 | **30 (v2.0)** | **V2 Alignment** | **10/10** | **Complete** | **2026-02-06** |
 | **30.1 (v2.0)** | **Audit Gap Remediation** | **8/8** | **Complete** | **2026-02-06** |
@@ -514,6 +631,13 @@ See individual phase sections above for requirements, success criteria, and depe
 | **32 (v2.0)** | **Post-Onboarding Guidance** | **4/4** | **Complete** | **2026-02-18** |
 | **QA-AUDIT** | **Dashboard Audit** | **9/9** | **Complete** | **2026-02-05** |
 | **QA-FIX** | **Audit Remediation** | **5/5** | **Complete** | **2026-02-06** |
+| **33** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
+| **34** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
+| **35** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
+| **36** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
+| **37** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
+| **38** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
+| **39** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
 
 **Total:** 170 plans complete across shipped phases.
 
@@ -521,26 +645,17 @@ See individual phase sections above for requirements, success criteria, and depe
 
 **v2.0 milestone is COMPLETE** (Phases 20-32 all verified, excluding Phase 21 SMS blocked on A2P).
 
-**Recommended next steps:**
-1. **Phase 29** (Agency Mode) — Multi-location schema, weekly reports, campaign playbooks
-2. **Phase 21-08** (SMS Verification) — Blocked on Twilio A2P approval
-3. **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe for production
-
-**Completed recently:**
-- Phase 32 (Post-Onboarding Guidance) — 4/4 plans complete (2026-02-18)
-- Phase 31 (Landing Page V2) — 5/5 plans complete (2026-02-18)
-- Phase 30.1 (Audit Gap Remediation) — 8/8 plans complete (2026-02-06)
-- Phase 30 (V2 Alignment) — 10/10 plans complete (2026-02-06)
+**v2.5 milestone is starting:** Phase 33 (Hardcoded Color Audit) is the first phase — prerequisite for all palette changes.
 
 **Blockers:**
 - Twilio A2P 10DLC registration required before Phase 21-08 execution (webhook verification)
 
-After v2.0:
+After v2.5:
 - **v2.1 Integrations** — ServiceTitan/Jobber/Housecall Pro API integrations for auto job import
 - **v2.2 Review Inbox** — Ingest reviews from Google Business Profile, AI reply suggestions
 - **v3.0 Agency Mode** — Multi-business management UI, white-label option, client reporting portal
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 
 ---
-*Last updated: 2026-02-18 after Phase 31+32 verification (v2.0 milestone complete)*
+*Last updated: 2026-02-18 — v2.5 UI/UX Redesign roadmap added (Phases 33-39, 30 requirements)*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
