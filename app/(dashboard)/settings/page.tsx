@@ -1,18 +1,11 @@
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
-import { BusinessSettingsForm } from '@/components/business-settings-form'
-import { MessageTemplateForm } from '@/components/templates/message-template-form'
-import { TemplateList } from '@/components/template-list'
-import { IntegrationsSection } from '@/components/settings/integrations-section'
-import { ServiceTypesSection } from '@/components/settings/service-types-section'
-import { DeleteAccountDialog } from '@/components/settings/delete-account-dialog'
-import { PersonalizationSection } from '@/components/settings/personalization-section'
-import { EmailAuthChecklist } from '@/components/settings/email-auth-checklist'
-import { BrandedLinksSection } from '@/components/settings/branded-links-section'
+import { SettingsTabs } from '@/components/settings/settings-tabs'
 import { getServiceTypeSettings } from '@/lib/data/business'
 import { getAvailableTemplates } from '@/lib/data/message-template'
 import { getPersonalizationSummary } from '@/lib/data/personalization'
+import { hasApiKey } from '@/lib/actions/api-key'
 import type { MessageTemplate } from '@/lib/types/database'
 
 export const metadata = {
@@ -28,6 +21,7 @@ function SettingsLoadingSkeleton() {
         <div className="h-5 w-80 bg-muted rounded" />
       </div>
       <div className="p-6 space-y-8 animate-pulse">
+        <div className="h-10 w-full bg-muted rounded-md" />
         <div className="border rounded-lg p-6 bg-card shadow-sm">
           <div className="h-6 w-40 bg-muted rounded mb-4" />
           <div className="space-y-4">
@@ -58,11 +52,12 @@ async function SettingsContent() {
     .eq('user_id', user.id)
     .single()
 
-  // Get message templates, service types, and personalization stats in parallel
-  const [templates, serviceTypeSettings, personalizationSummary] = await Promise.all([
+  // Get message templates, service types, personalization stats, and API key status in parallel
+  const [templates, serviceTypeSettings, personalizationSummary, hasKey] = await Promise.all([
     business ? getAvailableTemplates() : Promise.resolve([] as MessageTemplate[]),
     getServiceTypeSettings(),
     getPersonalizationSummary(),
+    hasApiKey(),
   ])
 
   return (
@@ -74,100 +69,14 @@ async function SettingsContent() {
         </p>
       </div>
 
-      <div className="p-6 space-y-8">
-        {/* Section 1: Business Profile */}
-        <section className="border border-border rounded-lg p-6 bg-card shadow-sm">
-          <h2 className="text-xl font-semibold mb-4">Business Profile</h2>
-          <BusinessSettingsForm initialData={business} templates={templates} />
-        </section>
-
-        {/* Section 2: Message Templates */}
-        <section className="border border-border rounded-lg p-6 bg-card shadow-sm">
-          <h2 className="text-xl font-semibold mb-4">Message Templates</h2>
-          <p className="text-muted-foreground mb-4">
-            Create templates for email and SMS review requests. Use variables like
-            {' '}{'{{CUSTOMER_NAME}}'}, {'{{BUSINESS_NAME}}'}, {'{{REVIEW_LINK}}'}.
-          </p>
-
-          {/* Show existing templates */}
-          <TemplateList templates={templates} />
-
-          {/* Only show template form if business exists */}
-          {business && (
-            <div className="mt-6 pt-6 border-t border-border">
-              <h3 className="text-lg font-medium mb-4">Create New Template</h3>
-              <MessageTemplateForm />
-            </div>
-          )}
-
-          {!business && (
-            <p className="text-amber-600 dark:text-amber-500 text-sm mt-4">
-              Save your business profile above before creating custom templates.
-            </p>
-          )}
-        </section>
-
-        {/* Section 3: Service Types */}
-        <section className="border border-border rounded-lg p-6 bg-card shadow-sm">
-          <h2 className="text-xl font-semibold mb-4">Service Types</h2>
-          <ServiceTypesSection
-            initialEnabled={serviceTypeSettings?.serviceTypesEnabled || []}
-            initialTiming={serviceTypeSettings?.serviceTypeTiming || {
-              hvac: 24, plumbing: 48, electrical: 24, cleaning: 4,
-              roofing: 72, painting: 48, handyman: 24, other: 24
-            }}
-          />
-        </section>
-
-        {/* Section 4: AI Personalization */}
-        <section className="border border-border rounded-lg p-6 bg-card shadow-sm">
-          <h2 className="text-xl font-semibold mb-4">AI Personalization</h2>
-          <p className="text-muted-foreground mb-4">
-            Messages are automatically personalized using AI before sending. View
-            performance stats and LLM usage for your account.
-          </p>
-          <PersonalizationSection summary={personalizationSummary} />
-        </section>
-
-        {/* Section 4.5: Email Authentication */}
-        <section className="border border-border rounded-lg p-6 bg-card shadow-sm">
-          <h2 className="text-xl font-semibold mb-4">Email Authentication</h2>
-          <p className="text-muted-foreground mb-4">
-            Improve email deliverability by setting up DNS authentication records.
-            These are configured through your Resend dashboard.
-          </p>
-          <EmailAuthChecklist />
-        </section>
-
-        {/* Section 4.75: Branded Review Link */}
-        <section className="border border-border rounded-lg p-6 bg-card shadow-sm">
-          <h2 className="text-xl font-semibold mb-4">Branded Review Link</h2>
-          <p className="text-muted-foreground mb-4">
-            Create a short, branded link for your Google review page. This appears more trustworthy in messages.
-          </p>
-          <BrandedLinksSection
-            googleReviewLink={business?.google_review_link}
-            brandedReviewLink={business?.branded_review_link}
-          />
-        </section>
-
-        {/* Section 5: Integrations */}
-        <section className="border border-border rounded-lg p-6 bg-card shadow-sm">
-          <h2 className="text-xl font-semibold mb-4">Integrations</h2>
-          <p className="text-muted-foreground mb-4">
-            Connect external tools like Zapier or Make to automatically add customers.
-          </p>
-          <IntegrationsSection hasExistingKey={!!business?.api_key_hash} />
-        </section>
-
-        {/* Section 6: Danger Zone */}
-        <section className="border border-red-200 dark:border-red-800 rounded-lg p-6 bg-card shadow-sm">
-          <h2 className="text-xl font-semibold mb-2 text-red-600 dark:text-red-400">Danger Zone</h2>
-          <p className="text-muted-foreground mb-4">
-            Permanently delete your account and all associated data. This action cannot be undone.
-          </p>
-          <DeleteAccountDialog />
-        </section>
+      <div className="p-6">
+        <SettingsTabs
+          business={business}
+          templates={templates}
+          serviceTypeSettings={serviceTypeSettings}
+          personalizationSummary={personalizationSummary}
+          hasApiKey={hasKey}
+        />
       </div>
     </div>
   )
