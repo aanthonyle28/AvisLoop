@@ -9,44 +9,37 @@ export type SendStatus = 'pending' | 'delivered' | 'clicked' | 'failed' | 'revie
 
 const statusConfig: Record<SendStatus, {
   label: string
-  bg: string
-  text: string
+  className: string
   Icon: typeof CircleNotch
 }> = {
   pending: {
     label: 'Pending',
-    bg: '#F3F4F6',
-    text: '#101828',
+    className: 'bg-status-pending-bg text-status-pending-text border border-status-pending-text/20',
     Icon: CircleNotch
   },
   delivered: {
     label: 'Delivered',
-    bg: '#EAF3F6',
-    text: '#2C879F',
+    className: 'bg-status-delivered-bg text-status-delivered-text border border-status-delivered-text/20',
     Icon: CheckCircle
   },
   clicked: {
     label: 'Clicked',
-    bg: '#FEF9C2',
-    text: '#894B00',
+    className: 'bg-status-clicked-bg text-status-clicked-text border border-status-clicked-text/20',
     Icon: Cursor
   },
   failed: {
     label: 'Failed',
-    bg: '#FFE2E2',
-    text: '#C10007',
+    className: 'bg-status-failed-bg text-status-failed-text border border-status-failed-text/20',
     Icon: WarningCircle
   },
   reviewed: {
     label: 'Reviewed',
-    bg: '#DCFCE7',
-    text: '#008236',
+    className: 'bg-status-reviewed-bg text-status-reviewed-text border border-status-reviewed-text/20',
     Icon: Star
   },
   scheduled: {
     label: 'Scheduled',
-    bg: 'rgba(159, 44, 134, 0.1)',
-    text: '#9F2C86',
+    className: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border border-purple-200 dark:border-purple-800',
     Icon: CheckCircle
   }
 }
@@ -84,12 +77,9 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
 
   return (
     <Badge
-      style={{
-        backgroundColor: config.bg,
-        color: config.text
-      }}
       className={cn(
-        'inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold border-0 rounded-full',
+        config.className,
+        'inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold rounded-full',
         className
       )}
     >
