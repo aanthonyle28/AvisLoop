@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 35 of 39 in v2.5 milestone (Phase 3 of 7 in this milestone)
-Plan: 1 of 5 complete
+Plan: 2 of 5 complete
 Status: In progress
-Last activity: 2026-02-19 — Completed 35-01-PLAN.md (Card CVA variants + InteractiveCard arrow affordance)
+Last activity: 2026-02-19 — Completed 35-02-PLAN.md (Semantic token infrastructure: 13 CSS vars + Tailwind mappings)
 
 Progress: [████░░░░░░] ~34% (v2.5 milestone)
 
@@ -20,7 +20,7 @@ Progress: [████░░░░░░] ~34% (v2.5 milestone)
 
 **Velocity:**
 - Total plans completed (project): 174
-- v2.5 plans completed: 4
+- v2.5 plans completed: 5
 
 *Updated after each plan completion*
 
@@ -39,7 +39,7 @@ Progress: [████░░░░░░] ~34% (v2.5 milestone)
 - Button component for all interactive elements — raw button elements replaced with Button primitive for consistency and future theming
 - Tier 2 audit: 210 occurrences / 51 files / 16 categories — data-viz dots, stars, marketing stay inline; everything else Phase 35
 - --error-text is distinct from --destructive — form validation text needs darker shade than button-calibrated destructive token
-- Phase 35 token spec finalized: 9 new CSS vars (--warning-*, --success-*, --info-*, --error-text) needed before batch replacement
+- Phase 35 token spec implemented: 13 CSS vars (--warning-bg/DEFAULT/border/foreground, --success-bg/DEFAULT/border/foreground, --info-bg/DEFAULT/border/foreground, --error-text) + 4 Tailwind color groups in tailwind.config.ts
 - Warm palette anchored at H=36 (cream light bg), H=24 (charcoal dark bg), H=38 (amber accent), H=213 (blue primary) — all live in globals.css
 - Status badge pattern: className field in config (not bg/text), no style prop, border-status-*-text/20 for warm-bg contrast
 - Accent = decorative only: bg-secondary for outline button hover, bg-muted for ghost/dropdown/select/dialog states
@@ -61,6 +61,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed Phase 35 Plan 01 — Card CVA variants + InteractiveCard arrow affordance. Next: Phase 35 Plan 02
+Stopped at: Completed Phase 35 Plan 02 — Semantic token infrastructure (13 CSS vars + Tailwind mappings). Next: Phase 35 Plan 03
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
