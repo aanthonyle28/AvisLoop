@@ -36,7 +36,7 @@ export function NotificationBell({
         <Button
           variant="ghost"
           className={cn(
-            "w-full justify-start gap-3 text-foreground/70 dark:text-muted-foreground hover:text-foreground hover:bg-[#F2F2F2]/70 dark:hover:bg-muted/70",
+            "w-full justify-start gap-3 text-foreground/70 dark:text-muted-foreground hover:text-foreground hover:bg-secondary/70 dark:hover:bg-muted/70",
             collapsed && "justify-center px-2",
             className
           )}
@@ -49,7 +49,7 @@ export function NotificationBell({
           <div className="relative shrink-0 w-5 h-5 flex items-center justify-center">
             <Bell size={20} weight="regular" />
             {hasNotifications && (
-              <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+              <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
                 {total > 9 ? '9+' : total}
               </span>
             )}

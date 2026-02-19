@@ -86,8 +86,8 @@ export function Sidebar({ dashboardBadge, notificationCounts }: SidebarProps = {
         className={cn(
           "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
           isActive
-            ? "bg-[#F2F2F2] dark:bg-muted text-foreground"
-            : "text-foreground/70 dark:text-muted-foreground hover:bg-[#F2F2F2]/70 dark:hover:bg-muted/70",
+            ? "bg-secondary dark:bg-muted text-foreground"
+            : "text-foreground/70 dark:text-muted-foreground hover:bg-secondary/70 dark:hover:bg-muted/70",
           collapsed && "justify-center px-2",
           item.badge && "relative"
         )}
@@ -103,12 +103,12 @@ export function Sidebar({ dashboardBadge, notificationCounts }: SidebarProps = {
         />
         {!collapsed && <span className="flex-1">{item.label}</span>}
         {!collapsed && item.badge && item.badge > 0 && (
-          <span className="ml-auto bg-red-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5 min-w-[20px] text-center">
+          <span className="ml-auto bg-destructive text-destructive-foreground text-xs font-bold rounded-full px-1.5 py-0.5 min-w-[20px] text-center">
             {item.badge > 99 ? '99+' : item.badge}
           </span>
         )}
         {collapsed && item.badge && item.badge > 0 && (
-          <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full" />
+          <span className="absolute top-0 right-0 w-2 h-2 bg-destructive rounded-full" />
         )}
       </Link>
     )
@@ -117,13 +117,13 @@ export function Sidebar({ dashboardBadge, notificationCounts }: SidebarProps = {
   return (
     <aside
       className={cn(
-        "hidden md:flex flex-col h-screen bg-white dark:bg-card border-r border-[#E2E2E2] dark:border-border transition-all duration-300",
+        "hidden md:flex flex-col h-screen bg-card border-r border-border transition-all duration-300",
         collapsed ? "w-16" : "w-64"
       )}
     >
       {/* Header */}
       <div className={cn(
-        "flex items-center h-16 px-4 border-b border-[#E2E2E2] dark:border-border",
+        "flex items-center h-16 px-4 border-b border-border",
         collapsed ? "justify-center" : "justify-between"
       )}>
         {!collapsed && (
@@ -161,7 +161,7 @@ export function Sidebar({ dashboardBadge, notificationCounts }: SidebarProps = {
       </nav>
 
       {/* Add Job button - V2: Primary variant to emphasize core action */}
-      <div className="p-3 border-t border-[#E2E2E2] dark:border-border">
+      <div className="p-3 border-t border-border">
         <Link href="/jobs?action=add">
           <Button
             variant="default"
@@ -177,7 +177,7 @@ export function Sidebar({ dashboardBadge, notificationCounts }: SidebarProps = {
       </div>
 
       {/* Footer with notifications and account */}
-      <div className="p-3 border-t border-[#E2E2E2] dark:border-border space-y-1">
+      <div className="p-3 border-t border-border space-y-1">
         {notificationCounts && (
           <NotificationBell
             readyToSend={notificationCounts.readyToSend}
@@ -192,7 +192,7 @@ export function Sidebar({ dashboardBadge, notificationCounts }: SidebarProps = {
             <Button
               variant="ghost"
               className={cn(
-                "w-full justify-start gap-3 text-foreground/70 dark:text-muted-foreground hover:text-foreground hover:bg-[#F2F2F2]/70 dark:hover:bg-muted/70",
+                "w-full justify-start gap-3 text-foreground/70 dark:text-muted-foreground hover:text-foreground hover:bg-secondary/70 dark:hover:bg-muted/70",
                 collapsed && "justify-center px-2"
               )}
             >

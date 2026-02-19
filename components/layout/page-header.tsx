@@ -25,7 +25,7 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, setupProgress, notificationCounts }: PageHeaderProps) {
   return (
-    <header className="md:hidden bg-white dark:bg-card border-b border-[#E2E2E2] dark:border-border">
+    <header className="md:hidden bg-card border-b border-border">
       <div className="h-16 px-4 flex items-center justify-between">
         {/* Left side: Page title or logo */}
         <div className="flex items-center gap-2">
