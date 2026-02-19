@@ -522,12 +522,14 @@ Plans:
   5. Dashboard notification badge is removed from the sidebar Dashboard nav item
   6. Analytics page empty state shows an icon, heading, and suggested action (not a bare text line)
   7. All dashboard pages (dashboard, jobs, campaigns, analytics, customers, send, history, feedback, billing, settings) use consistent card padding (`p-6`) and section spacing (`space-y-6`)
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
 - [ ] 35-01-PLAN.md — Card CVA variants and InteractiveCard arrow affordance
-- [ ] 35-02-PLAN.md — Dashboard welcome greeting and lower card differentiation
-- [ ] 35-03-PLAN.md — Remove notification badge, analytics empty state, and all-page padding normalization
+- [ ] 35-02-PLAN.md — Semantic token infrastructure (warning, success, info, error-text)
+- [ ] 35-03-PLAN.md — Dashboard greeting, KPI card differentiation, badge removal, analytics empty state
+- [ ] 35-04-PLAN.md — Batch token replacement: warning banners, form validation, danger zone, AI indicators, SMS counters
+- [ ] 35-05-PLAN.md — Batch token replacement: status badges, consent, success/info callouts, CSV results, page padding normalization
 
 ### Phase 36: Auth Form Enhancements
 **Goal**: Users can see what they are typing in password fields, get live feedback on password strength while signing up, and rely on Google OAuth working correctly.
