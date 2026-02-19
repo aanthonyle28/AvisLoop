@@ -80,6 +80,27 @@ export default {
           "reviewed-bg": "hsl(var(--status-reviewed-bg))",
           "reviewed-text": "hsl(var(--status-reviewed-text))",
         },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          bg: "hsl(var(--warning-bg))",
+          border: "hsl(var(--warning-border))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          bg: "hsl(var(--success-bg))",
+          border: "hsl(var(--success-border))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        info: {
+          DEFAULT: "hsl(var(--info))",
+          bg: "hsl(var(--info-bg))",
+          border: "hsl(var(--info-border))",
+          foreground: "hsl(var(--info-foreground))",
+        },
+        error: {
+          text: "hsl(var(--error-text))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
