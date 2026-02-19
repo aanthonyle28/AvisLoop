@@ -65,8 +65,8 @@ export function SendStep({ contact, business, template, onComplete, onGoToStep }
     return (
       <div className="space-y-6 text-center py-8">
         <div className="flex justify-center">
-          <div className="rounded-full bg-green-100 p-4 dark:bg-green-900">
-            <CheckCircle size={48} className="text-green-600 dark:text-green-400" />
+          <div className="rounded-full bg-success/10 p-4">
+            <CheckCircle size={48} className="text-success" />
           </div>
         </div>
         <div>
@@ -90,14 +90,14 @@ export function SendStep({ contact, business, template, onComplete, onGoToStep }
           </p>
         </div>
 
-        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-900 dark:bg-yellow-950">
+        <div className="rounded-lg border border-warning-border bg-warning-bg p-4">
           <div className="flex items-start gap-3">
-            <WarningCircle size={20} className=" text-yellow-600 dark:text-yellow-400 mt-0.5" />
+            <WarningCircle size={20} className="text-warning mt-0.5" />
             <div>
-              <p className="font-medium text-yellow-800 dark:text-yellow-200">
+              <p className="font-medium text-warning-foreground">
                 Google review link required
               </p>
-              <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
+              <p className="text-sm text-warning mt-1">
                 Please go back to the first step and add your Google review link.
               </p>
             </div>
@@ -139,14 +139,14 @@ export function SendStep({ contact, business, template, onComplete, onGoToStep }
           </p>
         </div>
 
-        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-900 dark:bg-yellow-950">
+        <div className="rounded-lg border border-warning-border bg-warning-bg p-4">
           <div className="flex items-start gap-3">
-            <WarningCircle size={20} className=" text-yellow-600 dark:text-yellow-400 mt-0.5" />
+            <WarningCircle size={20} className="text-warning mt-0.5" />
             <div>
-              <p className="font-medium text-yellow-800 dark:text-yellow-200">
+              <p className="font-medium text-warning-foreground">
                 Contact required
               </p>
-              <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
+              <p className="text-sm text-warning mt-1">
                 Please go back to the previous step and add a contact.
               </p>
             </div>
@@ -218,8 +218,8 @@ export function SendStep({ contact, business, template, onComplete, onGoToStep }
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-900 dark:bg-red-950">
-          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-4">
+          <p className="text-sm text-destructive">{error}</p>
         </div>
       )}
 

@@ -68,7 +68,7 @@ export function NotificationBell({
             <CheckCircle
               size={32}
               weight="regular"
-              className="mx-auto mb-2 text-green-500"
+              className="mx-auto mb-2 text-success"
             />
             <p className="text-sm font-medium text-foreground">All caught up</p>
             <p className="text-xs text-muted-foreground mt-0.5">
@@ -83,11 +83,11 @@ export function NotificationBell({
                   href="/dashboard#ready-to-send-queue"
                   className="flex items-start gap-3 py-3 cursor-pointer"
                 >
-                  <div className="rounded-full bg-blue-100 dark:bg-blue-900/30 p-1.5 mt-0.5">
+                  <div className="rounded-full bg-info/10 p-1.5 mt-0.5">
                     <Briefcase
                       size={14}
                       weight="fill"
-                      className="text-blue-600 dark:text-blue-400"
+                      className="text-info"
                     />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -108,11 +108,11 @@ export function NotificationBell({
                   href="/dashboard#attention-alerts"
                   className="flex items-start gap-3 py-3 cursor-pointer"
                 >
-                  <div className="rounded-full bg-amber-100 dark:bg-amber-900/30 p-1.5 mt-0.5">
+                  <div className="rounded-full bg-warning-bg p-1.5 mt-0.5">
                     <WarningCircle
                       size={14}
                       weight="fill"
-                      className="text-amber-600 dark:text-amber-400"
+                      className="text-warning"
                     />
                   </div>
                   <div className="flex-1 min-w-0">

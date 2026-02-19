@@ -85,7 +85,7 @@ export function EditCustomerSheet({ customer, open, onOpenChange }: EditCustomer
                 disabled={isPending}
               />
               {state?.fieldErrors?.name && (
-                <p className='text-sm text-red-500'>{state.fieldErrors.name[0]}</p>
+                <p className='text-sm text-error-text'>{state.fieldErrors.name[0]}</p>
               )}
             </div>
 
@@ -101,7 +101,7 @@ export function EditCustomerSheet({ customer, open, onOpenChange }: EditCustomer
                 disabled={isPending}
               />
               {state?.fieldErrors?.email && (
-                <p className='text-sm text-red-500'>{state.fieldErrors.email[0]}</p>
+                <p className='text-sm text-error-text'>{state.fieldErrors.email[0]}</p>
               )}
             </div>
 
@@ -116,12 +116,12 @@ export function EditCustomerSheet({ customer, open, onOpenChange }: EditCustomer
                 disabled={isPending}
               />
               {state?.fieldErrors?.phone && (
-                <p className='text-sm text-red-500'>{state.fieldErrors.phone[0]}</p>
+                <p className='text-sm text-error-text'>{state.fieldErrors.phone[0]}</p>
               )}
             </div>
 
             {state?.error && (
-              <p className='text-sm text-red-500'>{state.error}</p>
+              <p className='text-sm text-error-text'>{state.error}</p>
             )}
 
             <Button type='submit' className='w-full' disabled={isPending}>
@@ -136,7 +136,7 @@ export function EditCustomerSheet({ customer, open, onOpenChange }: EditCustomer
             <h3 className='font-medium mb-3'>SMS Consent</h3>
             {customer.sms_consent_status === 'opted_in' && (
               <div className='space-y-2'>
-                <div className='flex items-center gap-2 text-sm text-green-600 dark:text-green-400'>
+                <div className='flex items-center gap-2 text-sm text-success'>
                   <CheckCircle className='h-4 w-4' />
                   <span>Consented</span>
                   {customer.sms_consent_at && (
@@ -154,13 +154,13 @@ export function EditCustomerSheet({ customer, open, onOpenChange }: EditCustomer
               </div>
             )}
             {customer.sms_consent_status === 'opted_out' && (
-              <div className='flex items-center gap-2 text-sm text-red-600 dark:text-red-400'>
+              <div className='flex items-center gap-2 text-sm text-destructive'>
                 <Warning className='h-4 w-4' />
                 <span>Opted out</span>
               </div>
             )}
             {customer.sms_consent_status === 'unknown' && (
-              <div className='flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400'>
+              <div className='flex items-center gap-2 text-sm text-warning'>
                 <Question className='h-4 w-4' />
                 <span>SMS: Consent needed</span>
               </div>

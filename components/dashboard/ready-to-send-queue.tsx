@@ -73,7 +73,7 @@ export function ReadyToSendQueue({ jobs, hasJobHistory }: ReadyToSendQueueProps)
         {/* Empty states */}
         {jobs.length === 0 && hasJobHistory && (
           <div className="flex flex-col items-center justify-center py-8 text-center">
-            <CheckCircle className="h-12 w-12 text-green-500 mb-3" weight="fill" />
+            <CheckCircle className="h-12 w-12 text-success mb-3" weight="fill" />
             <p className="text-sm text-muted-foreground">
               All caught up — no jobs waiting for enrollment
             </p>
@@ -117,7 +117,7 @@ export function ReadyToSendQueue({ jobs, hasJobHistory }: ReadyToSendQueueProps)
                         title={`${serviceTypeName} jobs typically send within ${job.threshold}h`}
                       >
                         <WarningCircle
-                          className="h-5 w-5 text-yellow-500"
+                          className="h-5 w-5 text-warning"
                           weight="fill"
                         />
                       </div>

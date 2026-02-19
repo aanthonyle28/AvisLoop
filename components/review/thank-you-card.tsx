@@ -21,8 +21,8 @@ export function ThankYouCard({ destination, businessName }: ThankYouCardProps) {
 
   return (
     <div className="text-center space-y-6">
-      <div className="mx-auto w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-        <CheckCircle size={32} className="text-green-600 dark:text-green-400" />
+      <div className="mx-auto w-16 h-16 rounded-full bg-success/10 flex items-center justify-center">
+        <CheckCircle size={32} className="text-success" />
       </div>
 
       <div className="space-y-2">

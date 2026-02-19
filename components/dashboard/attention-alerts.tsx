@@ -24,11 +24,11 @@ interface AttentionAlertsProps {
 function SeverityIcon({ severity }: { severity: AttentionAlert['severity'] }) {
   switch (severity) {
     case 'critical':
-      return <XCircle weight="fill" className="size-5 text-red-600 dark:text-red-400 shrink-0" />
+      return <XCircle weight="fill" className="size-5 text-destructive shrink-0" />
     case 'warning':
-      return <WarningCircle weight="fill" className="size-5 text-yellow-600 dark:text-yellow-400 shrink-0" />
+      return <WarningCircle weight="fill" className="size-5 text-warning shrink-0" />
     case 'info':
-      return <Info weight="fill" className="size-5 text-blue-600 dark:text-blue-400 shrink-0" />
+      return <Info weight="fill" className="size-5 text-info shrink-0" />
   }
 }
 
@@ -139,7 +139,7 @@ export function AttentionAlerts({ alerts }: AttentionAlertsProps) {
       <CardContent>
         {alerts.length === 0 ? (
           <div className="flex items-center gap-3 py-8 text-center justify-center">
-            <CheckCircle weight="fill" className="size-6 text-green-600 dark:text-green-400" />
+            <CheckCircle weight="fill" className="size-6 text-success" />
             <p className="text-sm text-muted-foreground">
               No issues — everything is running smoothly
             </p>

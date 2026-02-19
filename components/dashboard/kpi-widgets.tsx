@@ -29,8 +29,8 @@ function TrendIndicator({ value, period, size = 'default' }: TrendIndicatorProps
   const isPositive = value >= 0
   const Icon = isPositive ? TrendUp : TrendDown
   const colorClass = isPositive
-    ? 'text-green-600 dark:text-green-400'
-    : 'text-red-600 dark:text-red-400'
+    ? 'text-success'
+    : 'text-destructive'
 
   return (
     <span className={cn(

@@ -86,7 +86,7 @@ export function AddCustomerSheet({ open, onOpenChange }: AddCustomerSheetProps) 
         <div className='mt-6'>
           {/* Success Message */}
           {successMessage && (
-            <div className='mb-4 flex items-center gap-2 rounded-md bg-green-50 p-3 text-sm text-green-700 dark:bg-green-950 dark:text-green-300'>
+            <div className='mb-4 flex items-center gap-2 rounded-md bg-success-bg p-3 text-sm text-success-foreground'>
               <CheckCircle size={16} />
               {successMessage}
             </div>
@@ -105,7 +105,7 @@ export function AddCustomerSheet({ open, onOpenChange }: AddCustomerSheetProps) 
                 disabled={isPending}
               />
               {state?.fieldErrors?.name && (
-                <p className='text-sm text-red-500'>{state.fieldErrors.name[0]}</p>
+                <p className='text-sm text-error-text'>{state.fieldErrors.name[0]}</p>
               )}
             </div>
 
@@ -120,7 +120,7 @@ export function AddCustomerSheet({ open, onOpenChange }: AddCustomerSheetProps) 
                 disabled={isPending}
               />
               {state?.fieldErrors?.email && (
-                <p className='text-sm text-red-500'>{state.fieldErrors.email[0]}</p>
+                <p className='text-sm text-error-text'>{state.fieldErrors.email[0]}</p>
               )}
             </div>
 
@@ -134,7 +134,7 @@ export function AddCustomerSheet({ open, onOpenChange }: AddCustomerSheetProps) 
                 disabled={isPending}
               />
               {state?.fieldErrors?.phone && (
-                <p className='text-sm text-red-500'>{state.fieldErrors.phone[0]}</p>
+                <p className='text-sm text-error-text'>{state.fieldErrors.phone[0]}</p>
               )}
             </div>
 
@@ -155,7 +155,7 @@ export function AddCustomerSheet({ open, onOpenChange }: AddCustomerSheetProps) 
             <input type='hidden' name='smsConsentNotes' value={smsConsent.notes} />
 
             {state?.error && (
-              <p className='text-sm text-red-500'>{state.error}</p>
+              <p className='text-sm text-error-text'>{state.error}</p>
             )}
 
             {/* Action Buttons */}

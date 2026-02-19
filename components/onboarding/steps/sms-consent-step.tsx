@@ -80,7 +80,7 @@ export function SMSConsentStep({
         </div>
 
         {/* Acknowledgment checkbox */}
-        <div className="border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/30 rounded-lg p-4">
+        <div className="border border-info-border bg-info-bg rounded-lg p-4">
           <div className="flex items-start gap-3">
             <Checkbox
               id="sms-consent-acknowledgment"

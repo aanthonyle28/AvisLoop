@@ -177,7 +177,7 @@ export function CustomerImportStep({
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">Preview</h2>
-          <Badge variant="outline" className="text-green-600">{validCount} valid jobs</Badge>
+          <Badge variant="outline" className="text-success">{validCount} valid jobs</Badge>
         </div>
 
         <div className="border rounded-lg overflow-x-auto max-h-48 text-sm">
@@ -191,11 +191,11 @@ export function CustomerImportStep({
             </thead>
             <tbody>
               {parsedRows.slice(0, 10).map((row, i) => (
-                <tr key={i} className={cn(!row.isValid && 'bg-red-50 dark:bg-red-950/20')}>
+                <tr key={i} className={cn(!row.isValid && 'bg-destructive/10')}>
                   <td className="px-3 py-2">{row.customerName}</td>
                   <td className="px-3 py-2">{row.serviceType}</td>
                   <td className="px-3 py-2">
-                    {row.isValid ? <CheckCircle size={16} className="text-green-600" /> : 'Invalid'}
+                    {row.isValid ? <CheckCircle size={16} className="text-success" /> : 'Invalid'}
                   </td>
                 </tr>
               ))}
@@ -236,7 +236,7 @@ export function CustomerImportStep({
   // Complete step
   return (
     <div className="space-y-8 text-center">
-      <CheckCircle size={64} weight="regular" className="mx-auto text-green-600" />
+      <CheckCircle size={64} weight="regular" className="mx-auto text-success" />
       <div>
         <h2 className="text-2xl font-semibold mb-2">Import Complete!</h2>
         <p className="text-muted-foreground">

@@ -192,7 +192,7 @@ export function CustomerDetailDrawer({
 
             {customer.sms_consent_status === 'opted_in' && (
               <div className='space-y-2'>
-                <div className='flex items-center gap-2 text-sm text-green-600 dark:text-green-400'>
+                <div className='flex items-center gap-2 text-sm text-success'>
                   <CheckCircle className='h-4 w-4' />
                   <span>Consented</span>
                   {customer.sms_consent_at && (
@@ -211,7 +211,7 @@ export function CustomerDetailDrawer({
             )}
 
             {customer.sms_consent_status === 'opted_out' && (
-              <div className='flex items-center gap-2 text-sm text-red-600 dark:text-red-400'>
+              <div className='flex items-center gap-2 text-sm text-destructive'>
                 <Warning className='h-4 w-4' />
                 <span>Opted out</span>
               </div>
@@ -219,7 +219,7 @@ export function CustomerDetailDrawer({
 
             {customer.sms_consent_status === 'unknown' && (
               <div className='space-y-3'>
-                <div className='flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400'>
+                <div className='flex items-center gap-2 text-sm text-warning'>
                   <Question className='h-4 w-4' />
                   <span>SMS: Consent needed</span>
                 </div>

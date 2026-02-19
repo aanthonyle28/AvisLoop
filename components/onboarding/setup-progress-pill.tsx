@@ -28,13 +28,13 @@ export function SetupProgressPill({
   // All complete state
   if (isAllComplete) {
     return (
-      <div className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800">
+      <div className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium bg-success-bg text-success-foreground border border-success-border">
         <CheckCircle weight="fill" className="h-4 w-4" />
         <span>Setup complete</span>
         <button
           onClick={handleDismiss}
           disabled={isPending}
-          className="ml-1 hover:bg-green-100 dark:hover:bg-green-900 rounded-full p-0.5 transition-colors disabled:opacity-50"
+          className="ml-1 hover:bg-success/10 rounded-full p-0.5 transition-colors disabled:opacity-50"
           aria-label="Dismiss"
         >
           <X weight="bold" className="h-3 w-3" />

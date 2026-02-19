@@ -62,9 +62,9 @@ export function SoftwareUsedStep({
       </div>
 
       {/* Info banner */}
-      <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 rounded-lg">
-        <Info size={20} className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-        <p className="text-sm text-blue-900 dark:text-blue-100">
+      <div className="flex items-start gap-3 p-4 bg-info-bg border border-info-border rounded-lg">
+        <Info size={20} className="text-info mt-0.5 flex-shrink-0" />
+        <p className="text-sm text-info-foreground">
           This is for our roadmap planning only. No integration will be set up now.
         </p>
       </div>

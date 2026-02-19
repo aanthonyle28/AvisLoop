@@ -75,7 +75,7 @@ export function SetupProgressDrawer({
                 <div className={cn(
                   'mt-0.5 h-5 w-5 rounded-full flex items-center justify-center shrink-0',
                   isComplete
-                    ? 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400'
+                    ? 'bg-success/10 text-success'
                     : 'border-2 border-muted-foreground/30 text-transparent'
                 )}>
                   {isComplete ? (
@@ -112,8 +112,8 @@ export function SetupProgressDrawer({
 
         {/* Footer note when complete */}
         {allComplete && (
-          <div className="px-4 py-3 bg-green-50 dark:bg-green-950 rounded-lg mx-4 mt-4">
-            <p className="text-xs text-green-700 dark:text-green-300">
+          <div className="px-4 py-3 bg-success-bg rounded-lg mx-4 mt-4">
+            <p className="text-xs text-success-foreground">
               Great job! You&apos;re all set up. AvisLoop is now working for you.
             </p>
           </div>

@@ -114,7 +114,7 @@ export function ReviewDestinationStep({
             autoFocus
             className="text-lg h-12"
           />
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-error-text">{error}</p>}
         </div>
 
         {/* Test button */}
@@ -130,7 +130,7 @@ export function ReviewDestinationStep({
 
         {/* Success indicator */}
         {tested && !error && (
-          <div className="flex items-center gap-2 text-green-600 text-sm">
+          <div className="flex items-center gap-2 text-success text-sm">
             <CheckCircle size={20} weight="fill" />
             <span>Link opens correctly</span>
           </div>

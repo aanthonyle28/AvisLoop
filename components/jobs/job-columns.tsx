@@ -55,7 +55,7 @@ export function columns({ onEdit }: ColumnsOptions): ColumnDef<JobWithEnrollment
             <div className="flex items-center gap-2">
               <Badge
                 variant="secondary"
-                className="bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400"
+                className="bg-warning-bg text-warning-foreground"
               >
                 Scheduled
               </Badge>
@@ -69,7 +69,7 @@ export function columns({ onEdit }: ColumnsOptions): ColumnDef<JobWithEnrollment
             <div className="flex flex-col gap-0.5">
               <Badge
                 variant="default"
-                className="w-fit bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
+                className="w-fit bg-success-bg text-success-foreground"
               >
                 Completed
               </Badge>
@@ -115,7 +115,7 @@ export function columns({ onEdit }: ColumnsOptions): ColumnDef<JobWithEnrollment
         // Already has active enrollment
         if (activeEnrollment) {
           return (
-            <span className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+            <span className="text-xs text-success flex items-center gap-1">
               <CheckCircle size={14} weight="fill" />
               {activeEnrollment.campaigns?.name || 'Enrolled'}
             </span>
@@ -157,7 +157,7 @@ export function columns({ onEdit }: ColumnsOptions): ColumnDef<JobWithEnrollment
         // Completed job should be enrolled but isn't (edge case)
         if (matchingCampaign && job.status === 'completed') {
           return (
-            <span className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
+            <span className="text-xs text-warning flex items-center gap-1">
               <Clock size={14} weight="fill" />
               Pending enrollment
             </span>
