@@ -45,9 +45,9 @@ export function SmsCharacterCounter({ text, className }: SmsCharacterCounterProp
         className={cn(
           'tabular-nums',
           isOverSoft
-            ? 'text-red-600 dark:text-red-400 font-medium'
+            ? 'text-destructive font-medium'
             : isOverSingle
-              ? 'text-amber-600 dark:text-amber-400'
+              ? 'text-warning'
               : 'text-muted-foreground'
         )}
       >
@@ -59,7 +59,7 @@ export function SmsCharacterCounter({ text, className }: SmsCharacterCounterProp
           <span className="text-muted-foreground">|</span>
           <span
             className={cn(
-              isOverSoft ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-400'
+              isOverSoft ? 'text-destructive' : 'text-warning'
             )}
           >
             {segments} segment{segments > 1 ? 's' : ''}
@@ -88,7 +88,7 @@ export function SmsCharacterNotice({ length }: { length: number }) {
     <p
       className={cn(
         'text-sm mt-1',
-        isOverSoft ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-400'
+        isOverSoft ? 'text-destructive' : 'text-warning'
       )}
     >
       {isOverSoft

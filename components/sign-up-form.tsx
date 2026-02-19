@@ -37,7 +37,7 @@ export function SignUpForm({
               placeholder="John Doe"
             />
             {state?.fieldErrors?.fullName && (
-              <p className="text-sm text-red-500">{state.fieldErrors.fullName[0]}</p>
+              <p className="text-sm text-error-text">{state.fieldErrors.fullName[0]}</p>
             )}
           </div>
           <div className="space-y-2">
@@ -51,7 +51,7 @@ export function SignUpForm({
               required
             />
             {state?.fieldErrors?.email && (
-              <p className="text-sm text-red-500">{state.fieldErrors.email[0]}</p>
+              <p className="text-sm text-error-text">{state.fieldErrors.email[0]}</p>
             )}
           </div>
           <div className="space-y-2">
@@ -63,10 +63,10 @@ export function SignUpForm({
               required
             />
             {state?.fieldErrors?.password && (
-              <p className="text-sm text-red-500">{state.fieldErrors.password[0]}</p>
+              <p className="text-sm text-error-text">{state.fieldErrors.password[0]}</p>
             )}
           </div>
-          {state?.error && <p className="text-sm text-red-500">{state.error}</p>}
+          {state?.error && <p className="text-sm text-error-text">{state.error}</p>}
         </div>
         <Button type="submit" className="w-full" disabled={pending}>
           {pending ? "Creating an account..." : "Sign up"}

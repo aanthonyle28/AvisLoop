@@ -40,7 +40,7 @@ export function StatStrip({ usage, responseRate, needsAttention }: StatStripProp
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-sm font-medium text-muted-foreground">Monthly Usage</h3>
           {isAtLimit ? (
-            <WarningCircle size={16} weight="bold" className="text-red-600" />
+            <WarningCircle size={16} weight="bold" className="text-destructive" />
           ) : (
             <ArrowSquareOut size={16} weight="regular" className="text-muted-foreground" />
           )}
@@ -56,14 +56,14 @@ export function StatStrip({ usage, responseRate, needsAttention }: StatStripProp
         <div className="mb-2">
           <div className="bg-muted rounded-full h-1.5 overflow-hidden">
             <div
-              className={`${isAtLimit ? 'bg-red-600' : 'bg-primary'} rounded-full h-1.5 transition-all duration-300`}
+              className={`${isAtLimit ? 'bg-destructive' : 'bg-primary'} rounded-full h-1.5 transition-all duration-300`}
               style={{ width: `${percentage}%` }}
             />
           </div>
         </div>
 
         {isAtLimit ? (
-          <Link href="/billing" className="text-xs text-red-600 hover:underline font-medium">
+          <Link href="/billing" className="text-xs text-destructive hover:underline font-medium">
             Limit reached — Upgrade now
           </Link>
         ) : isNearLimit ? (
@@ -125,13 +125,13 @@ export function StatStrip({ usage, responseRate, needsAttention }: StatStripProp
         {needsAttention.total > 0 ? (
           <Link href="/history?status=failed" className="flex items-center gap-2">
             {needsAttention.pending > 0 && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-destructive/10 text-destructive border border-destructive/20">
                 {needsAttention.pending} Pending
                 <ArrowRight size={10} weight="bold" />
               </span>
             )}
             {needsAttention.failed > 0 && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-destructive/10 text-destructive border border-destructive/20">
                 {needsAttention.failed} Failed
                 <ArrowRight size={10} weight="bold" />
               </span>

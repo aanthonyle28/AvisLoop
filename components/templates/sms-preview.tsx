@@ -91,8 +91,8 @@ export function SMSPreview({ body, business }: SMSPreviewProps) {
       <div className="mt-4 text-center space-y-1">
         <div className={cn(
           'text-sm font-medium',
-          charInfo.warning === 'error' && 'text-red-600',
-          charInfo.warning === 'warning' && 'text-yellow-600',
+          charInfo.warning === 'error' && 'text-destructive',
+          charInfo.warning === 'warning' && 'text-warning',
           charInfo.warning === 'none' && 'text-muted-foreground'
         )}>
           {charInfo.length} / {charInfo.limit} characters
@@ -100,7 +100,7 @@ export function SMSPreview({ body, business }: SMSPreviewProps) {
         <div className="text-xs text-muted-foreground">
           {charInfo.encoding} encoding
           {charInfo.segments > 1 && (
-            <span className="text-yellow-600 ml-1">
+            <span className="text-warning ml-1">
               ({charInfo.segments} SMS segments)
             </span>
           )}
@@ -108,7 +108,7 @@ export function SMSPreview({ body, business }: SMSPreviewProps) {
         {charInfo.warningMessage && (
           <div className={cn(
             'text-xs',
-            charInfo.warning === 'error' ? 'text-red-600' : 'text-yellow-600'
+            charInfo.warning === 'error' ? 'text-destructive' : 'text-warning'
           )}>
             {charInfo.warningMessage}
           </div>

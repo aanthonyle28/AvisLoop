@@ -67,7 +67,7 @@ export function SettingsTabs({
           )}
 
           {!business && (
-            <p className="text-amber-600 dark:text-amber-500 text-sm mt-4">
+            <p className="text-warning text-sm mt-4">
               Save your business profile first (in General tab) before creating custom templates.
             </p>
           )}
@@ -113,8 +113,8 @@ export function SettingsTabs({
 
       {/* Account — Danger Zone */}
       <TabsContent value="account">
-        <section className="border border-red-200 dark:border-red-800 rounded-lg p-6 bg-card shadow-sm">
-          <h2 className="text-xl font-semibold mb-2 text-red-600 dark:text-red-400">Danger Zone</h2>
+        <section className="border border-destructive/30 rounded-lg p-6 bg-card shadow-sm">
+          <h2 className="text-xl font-semibold mb-2 text-destructive">Danger Zone</h2>
           <p className="text-muted-foreground mb-4">
             Permanently delete your account and all associated data. This action cannot be undone.
           </p>

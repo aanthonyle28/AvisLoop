@@ -42,7 +42,7 @@ export function UpdatePasswordForm({
                   required
                 />
                 {state?.fieldErrors?.password && (
-                  <p className="text-sm text-red-500">{state.fieldErrors.password[0]}</p>
+                  <p className="text-sm text-error-text">{state.fieldErrors.password[0]}</p>
                 )}
               </div>
               <div className="grid gap-2">
@@ -55,10 +55,10 @@ export function UpdatePasswordForm({
                   required
                 />
                 {state?.fieldErrors?.confirmPassword && (
-                  <p className="text-sm text-red-500">{state.fieldErrors.confirmPassword[0]}</p>
+                  <p className="text-sm text-error-text">{state.fieldErrors.confirmPassword[0]}</p>
                 )}
               </div>
-              {state?.error && <p className="text-sm text-red-500">{state.error}</p>}
+              {state?.error && <p className="text-sm text-error-text">{state.error}</p>}
               <Button type="submit" className="w-full" disabled={pending}>
                 {pending ? "Saving..." : "Save new password"}
               </Button>

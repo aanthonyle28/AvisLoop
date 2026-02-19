@@ -143,7 +143,7 @@ export function MessageTemplateForm({ onSuccess }: MessageTemplateFormProps) {
                         smsCounter.warning === 'error'
                           ? 'text-destructive'
                           : smsCounter.warning === 'warning'
-                          ? 'text-yellow-600 dark:text-yellow-500'
+                          ? 'text-warning'
                           : 'text-muted-foreground'
                       }
                     >
@@ -158,7 +158,7 @@ export function MessageTemplateForm({ onSuccess }: MessageTemplateFormProps) {
                       className={
                         smsCounter.warning === 'error'
                           ? 'text-sm text-destructive'
-                          : 'text-sm text-yellow-600 dark:text-yellow-500'
+                          : 'text-sm text-warning'
                       }
                     >
                       {smsCounter.warningMessage}

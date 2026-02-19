@@ -79,7 +79,7 @@ export function CustomerStep({ onComplete, onSkip }: CustomerStepProps) {
       <form ref={formRef} onSubmit={onSubmit} className="space-y-4">
         <div className="grid gap-2">
           <Label htmlFor="customer-name">
-            Name <span className="text-red-500">*</span>
+            Name <span className="text-error-text">*</span>
           </Label>
           <Input
             id="customer-name"
@@ -88,13 +88,13 @@ export function CustomerStep({ onComplete, onSkip }: CustomerStepProps) {
             disabled={isPending}
           />
           {errors.name && (
-            <p className="text-sm text-red-600">{errors.name.message}</p>
+            <p className="text-sm text-error-text">{errors.name.message}</p>
           )}
         </div>
 
         <div className="grid gap-2">
           <Label htmlFor="customer-email">
-            Email <span className="text-red-500">*</span>
+            Email <span className="text-error-text">*</span>
           </Label>
           <Input
             id="customer-email"
@@ -104,7 +104,7 @@ export function CustomerStep({ onComplete, onSkip }: CustomerStepProps) {
             disabled={isPending}
           />
           {errors.email && (
-            <p className="text-sm text-red-600">{errors.email.message}</p>
+            <p className="text-sm text-error-text">{errors.email.message}</p>
           )}
         </div>
 
@@ -120,12 +120,12 @@ export function CustomerStep({ onComplete, onSkip }: CustomerStepProps) {
             disabled={isPending}
           />
           {errors.phone && (
-            <p className="text-sm text-red-600">{errors.phone.message}</p>
+            <p className="text-sm text-error-text">{errors.phone.message}</p>
           )}
         </div>
 
         {serverError && (
-          <p className="text-sm text-red-600">{serverError}</p>
+          <p className="text-sm text-error-text">{serverError}</p>
         )}
 
         <div className="flex flex-col gap-3 pt-2">

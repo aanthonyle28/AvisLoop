@@ -47,7 +47,7 @@ export function LoginForm({
               required
             />
             {state?.fieldErrors?.email && (
-              <p className="text-sm text-red-500">{state.fieldErrors.email[0]}</p>
+              <p className="text-sm text-error-text">{state.fieldErrors.email[0]}</p>
             )}
           </div>
           <div className="space-y-2">
@@ -67,13 +67,13 @@ export function LoginForm({
               required
             />
             {state?.fieldErrors?.password && (
-              <p className="text-sm text-red-500">{state.fieldErrors.password[0]}</p>
+              <p className="text-sm text-error-text">{state.fieldErrors.password[0]}</p>
             )}
           </div>
           {showError && (
             <button
               type="button"
-              className="text-sm text-red-500 hover:text-red-700 text-left"
+              className="text-sm text-error-text hover:text-destructive text-left"
               onClick={() => setDismissed(true)}
               aria-label="Dismiss error"
             >

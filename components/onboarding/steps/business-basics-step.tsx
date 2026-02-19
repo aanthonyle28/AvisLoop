@@ -110,7 +110,7 @@ export function BusinessBasicsStep({
           />
         </div>
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm text-error-text">{error}</p>}
 
         <Button type="submit" className="w-full h-12 text-base" disabled={isPending}>
           {isPending ? 'Saving...' : 'Continue'}

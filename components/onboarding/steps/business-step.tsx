@@ -73,7 +73,7 @@ export function BusinessStep({ onComplete, defaultValues }: BusinessStepProps) {
       <form ref={formRef} onSubmit={onSubmit} className="space-y-4">
         <div className="grid gap-2">
           <Label htmlFor="business-name">
-            Business Name <span className="text-red-500">*</span>
+            Business Name <span className="text-error-text">*</span>
           </Label>
           <Input
             id="business-name"
@@ -82,7 +82,7 @@ export function BusinessStep({ onComplete, defaultValues }: BusinessStepProps) {
             disabled={isPending}
           />
           {errors.name && (
-            <p className="text-sm text-red-600">{errors.name.message}</p>
+            <p className="text-sm text-error-text">{errors.name.message}</p>
           )}
           <p className="text-sm text-muted-foreground">
             Your business name will appear in review request emails.
@@ -100,7 +100,7 @@ export function BusinessStep({ onComplete, defaultValues }: BusinessStepProps) {
             disabled={isPending}
           />
           {errors.googleReviewLink && (
-            <p className="text-sm text-red-600">{errors.googleReviewLink.message}</p>
+            <p className="text-sm text-error-text">{errors.googleReviewLink.message}</p>
           )}
           <p className="text-sm text-muted-foreground">
             Add your Google review link so customers know where to leave reviews.
@@ -109,7 +109,7 @@ export function BusinessStep({ onComplete, defaultValues }: BusinessStepProps) {
         </div>
 
         {serverError && (
-          <p className="text-sm text-red-600">{serverError}</p>
+          <p className="text-sm text-error-text">{serverError}</p>
         )}
 
         <Button type="submit" className="w-full" disabled={isPending}>

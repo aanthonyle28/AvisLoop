@@ -20,14 +20,14 @@ export function BusinessSettingsForm({ initialData, templates }: BusinessSetting
     <form action={formAction} className="space-y-6">
       {/* General error */}
       {state?.error && (
-        <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-300 px-4 py-3 rounded">
+        <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded">
           {state.error}
         </div>
       )}
 
       {/* Success message */}
       {state?.success && (
-        <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-300 px-4 py-3 rounded">
+        <div className="bg-success-bg border border-success-border text-success-foreground px-4 py-3 rounded">
           Settings saved successfully!
         </div>
       )}
@@ -35,7 +35,7 @@ export function BusinessSettingsForm({ initialData, templates }: BusinessSetting
       {/* Business Name */}
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-foreground mb-1">
-          Business Name <span className="text-red-500">*</span>
+          Business Name <span className="text-error-text">*</span>
         </label>
         <input
           type="text"
@@ -47,7 +47,7 @@ export function BusinessSettingsForm({ initialData, templates }: BusinessSetting
           placeholder="Your Business Name"
         />
         {state?.fieldErrors?.name && (
-          <p className="text-red-600 text-sm mt-1">{state.fieldErrors.name[0]}</p>
+          <p className="text-error-text text-sm mt-1">{state.fieldErrors.name[0]}</p>
         )}
       </div>
 
@@ -65,7 +65,7 @@ export function BusinessSettingsForm({ initialData, templates }: BusinessSetting
           placeholder="https://search.google.com/local/writereview?placeid=..."
         />
         {state?.fieldErrors?.googleReviewLink && (
-          <p className="text-red-600 text-sm mt-1">{state.fieldErrors.googleReviewLink[0]}</p>
+          <p className="text-error-text text-sm mt-1">{state.fieldErrors.googleReviewLink[0]}</p>
         )}
         <p className="text-sm text-muted-foreground mt-1">
           Find your Google Business Profile and copy the &quot;Write a review&quot; link
@@ -86,7 +86,7 @@ export function BusinessSettingsForm({ initialData, templates }: BusinessSetting
           placeholder="Your Name or Business Name"
         />
         {state?.fieldErrors?.defaultSenderName && (
-          <p className="text-red-600 text-sm mt-1">{state.fieldErrors.defaultSenderName[0]}</p>
+          <p className="text-error-text text-sm mt-1">{state.fieldErrors.defaultSenderName[0]}</p>
         )}
         <p className="text-sm text-muted-foreground mt-1">
           This name will appear in your review request emails
@@ -112,7 +112,7 @@ export function BusinessSettingsForm({ initialData, templates }: BusinessSetting
           ))}
         </select>
         {state?.fieldErrors?.defaultTemplateId && (
-          <p className="text-red-600 text-sm mt-1">{state.fieldErrors.defaultTemplateId[0]}</p>
+          <p className="text-error-text text-sm mt-1">{state.fieldErrors.defaultTemplateId[0]}</p>
         )}
       </div>
 
