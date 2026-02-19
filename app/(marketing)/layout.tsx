@@ -96,7 +96,7 @@ export default function MarketingLayout({
                 <span>AvisLoop</span>
               </Link>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Simple review requests for busy businesses. Get more reviews without the hassle.
+                Automated review follow-ups for home service businesses. More reviews, less work.
               </p>
             </div>
 

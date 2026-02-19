@@ -45,7 +45,7 @@ export default function PricingPage() {
             <h3 className="font-semibold">What happens when my trial ends?</h3>
             <p className="text-sm text-muted-foreground">
               Your account remains active with all your data intact. You just
-              cannot send more review requests until you subscribe.
+              cannot send more campaign touches until you subscribe.
             </p>
           </div>
           <div className="space-y-2">

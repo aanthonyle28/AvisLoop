@@ -510,28 +510,27 @@ See individual phase sections above for requirements, success criteria, and depe
 | 29 (v2.0) | Review Follow-Up | 0/TBD | Not started | - |
 | **30 (v2.0)** | **V2 Alignment** | **10/10** | **Complete** | **2026-02-06** |
 | **30.1 (v2.0)** | **Audit Gap Remediation** | **8/8** | **Complete** | **2026-02-06** |
-| 31 (v2.0) | Landing Page V2 | 4/5 | In progress | - |
-| 32 (v2.0) | Post-Onboarding Guidance | 0/4 | Planned | - |
+| **31 (v2.0)** | **Landing Page V2** | **5/5** | **Complete** | **2026-02-18** |
+| **32 (v2.0)** | **Post-Onboarding Guidance** | **4/4** | **Complete** | **2026-02-18** |
 | **QA-AUDIT** | **Dashboard Audit** | **9/9** | **Complete** | **2026-02-05** |
 | **QA-FIX** | **Audit Remediation** | **5/5** | **Complete** | **2026-02-06** |
 
-**Total:** 161 plans complete across shipped phases.
+**Total:** 170 plans complete across shipped phases.
 
 ## What's Next
 
-**Current milestone:** v2.0 Review Follow-Up System (Phases 20-31)
-**Next action:** Execute Phase 31 (Landing Page V2) — remaining plans
+**v2.0 milestone is COMPLETE** (Phases 20-32 all verified, excluding Phase 21 SMS blocked on A2P).
 
-**Recommended execution order:**
-1. **Phase 31** (Landing Page V2) — Remaining plan: 31-05 visual verification (1 plan)
-2. **Phase 32** (Post-Onboarding Guidance) — 4 plans ready to execute
-3. **Phase 29** (Agency Mode) — After core V2 complete
+**Recommended next steps:**
+1. **Phase 29** (Agency Mode) — Multi-location schema, weekly reports, campaign playbooks
+2. **Phase 21-08** (SMS Verification) — Blocked on Twilio A2P approval
+3. **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe for production
 
 **Completed recently:**
+- Phase 32 (Post-Onboarding Guidance) — 4/4 plans complete (2026-02-18)
+- Phase 31 (Landing Page V2) — 5/5 plans complete (2026-02-18)
 - Phase 30.1 (Audit Gap Remediation) — 8/8 plans complete (2026-02-06)
 - Phase 30 (V2 Alignment) — 10/10 plans complete (2026-02-06)
-- Phase 27 (Dashboard Redesign) — Complete
-- Phase 28 (Onboarding Redesign) — Complete
 
 **Blockers:**
 - Twilio A2P 10DLC registration required before Phase 21-08 execution (webhook verification)
@@ -543,5 +542,5 @@ After v2.0:
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 
 ---
-*Last updated: 2026-02-06 after Phase 32 planning (Post-Onboarding Guidance, 4 plans in 3 waves)*
+*Last updated: 2026-02-18 after Phase 31+32 verification (v2.0 milestone complete)*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*

@@ -5,9 +5,9 @@ import { CheckCircle, Star } from '@phosphor-icons/react';
 import { GeometricMarker } from '@/components/ui/geometric-marker';
 
 const STEPS = [
-  { id: 1, label: 'Select Contact' },
-  { id: 2, label: 'Compose Message' },
-  { id: 3, label: 'Send & Done!' },
+  { id: 1, label: 'Complete Job' },
+  { id: 2, label: 'Auto-Enroll' },
+  { id: 3, label: 'Reviews Roll In' },
 ];
 
 export function AnimatedProductDemo() {
@@ -44,69 +44,69 @@ export function AnimatedProductDemo() {
 
         {/* Step content area */}
         <div className="relative min-h-[200px]">
-          {/* Step 1: Select Contact */}
+          {/* Step 1: Complete Job */}
           <div
             className={`motion-safe:transition-opacity motion-safe:duration-300 ${
               currentStep === 0 ? 'opacity-100' : 'absolute opacity-0'
             }`}
           >
             <div className="space-y-3">
-              <div className="flex items-center gap-3 rounded-lg border border-border/50 bg-muted p-3">
-                <div className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-muted-foreground" />
-                <div>
-                  <p className="text-sm font-medium text-foreground">Sarah Mitchell</p>
-                  <p className="text-xs text-muted-foreground">sarah@example.com</p>
-                </div>
-              </div>
               <div className="flex items-center gap-3 rounded-lg border border-primary bg-primary/10 p-3">
                 <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary">
                   <div className="h-2 w-2 rounded-full bg-primary-foreground" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-foreground">James Cooper</p>
-                  <p className="text-xs text-muted-foreground">james@example.com</p>
+                  <p className="text-sm font-medium text-foreground">James Cooper — AC Repair</p>
+                  <p className="text-xs text-muted-foreground">HVAC • Completed just now</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 rounded-lg border border-border/50 bg-muted p-3">
                 <div className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-muted-foreground" />
                 <div>
-                  <p className="text-sm font-medium text-foreground">Maria Garcia</p>
-                  <p className="text-xs text-muted-foreground">maria@example.com</p>
+                  <p className="text-sm font-medium text-foreground">Maria Garcia — Drain Repair</p>
+                  <p className="text-xs text-muted-foreground">Plumbing • Scheduled</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 rounded-lg border border-border/50 bg-muted p-3">
+                <div className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-muted-foreground" />
+                <div>
+                  <p className="text-sm font-medium text-foreground">Sarah Mitchell — Panel Upgrade</p>
+                  <p className="text-xs text-muted-foreground">Electrical • Scheduled</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Step 2: Compose Message */}
+          {/* Step 2: Auto-Enroll */}
           <div
             className={`motion-safe:transition-opacity motion-safe:duration-300 ${
               currentStep === 1 ? 'opacity-100' : 'absolute opacity-0'
             }`}
           >
             <div className="space-y-4">
-              <div>
-                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-                  Subject
-                </label>
-                <div className="rounded-lg border border-border bg-background px-3 py-2">
-                  <p className="text-sm text-foreground">How was your visit?</p>
-                </div>
+              <div className="rounded-lg border border-green-500/30 bg-green-500/5 p-3">
+                <p className="text-xs font-medium text-green-600 dark:text-green-400 mb-1">Campaign Enrolled</p>
+                <p className="text-sm text-foreground font-medium">HVAC Follow-Up Campaign</p>
+                <p className="text-xs text-muted-foreground mt-1">3 touches over 5 days</p>
               </div>
-              <div>
-                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-                  Message
-                </label>
-                <div className="rounded-lg border border-border bg-background px-3 py-3 min-h-[100px]">
-                  <p className="text-sm text-foreground">
-                    Hi Sarah, we&apos;d love to hear about your experience with our
-                    service. Would you mind sharing a quick review?
-                  </p>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm">
+                  <div className="h-2 w-2 rounded-full bg-primary" />
+                  <span className="text-muted-foreground">Touch 1: Email in 24 hours</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <div className="h-2 w-2 rounded-full bg-muted-foreground/30" />
+                  <span className="text-muted-foreground">Touch 2: SMS in 3 days</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <div className="h-2 w-2 rounded-full bg-muted-foreground/30" />
+                  <span className="text-muted-foreground">Touch 3: Email in 5 days</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Step 3: Send & Done! */}
+          {/* Step 3: Reviews Roll In */}
           <div
             className={`motion-safe:transition-opacity motion-safe:duration-300 ${
               currentStep === 2 ? 'opacity-100' : 'absolute opacity-0'
@@ -114,11 +114,16 @@ export function AnimatedProductDemo() {
           >
             <div className="flex flex-col items-center justify-center py-8">
               <CheckCircle size={64} className="text-green-500 mb-4" />
-              <h3 className="text-xl font-semibold text-foreground mb-2">Message Sent!</h3>
+              <h3 className="text-xl font-semibold text-foreground mb-2">New Google Review!</h3>
+              <div className="flex gap-1 mb-2">
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <Star key={s} size={16} weight="fill" className="text-yellow-400" />
+                ))}
+              </div>
               <div className="inline-flex items-center gap-2 rounded-full bg-green-500/10 px-4 py-1.5 border border-green-500/20">
                 <div className="h-2 w-2 rounded-full bg-green-500" />
                 <span className="text-sm font-medium text-green-600 dark:text-green-400">
-                  Delivered
+                  5-star review posted
                 </span>
               </div>
             </div>
