@@ -1,343 +1,113 @@
-# Requirements: AvisLoop v2.0
+# Requirements: v2.5 UI/UX Redesign
 
-**Defined:** 2026-02-02
-**Core Value:** Turn job completions into Google reviews automatically -- multi-touch follow-up sequences that send the right message at the right time.
+**Milestone:** v2.5 — Warm Design System Overhaul + All-Page UX Fixes
+**Created:** 2026-02-18
+**Status:** Scoped
 
-## v2.0 Requirements
+---
 
-Requirements for Review Follow-Up System Redesign. Each maps to roadmap phases.
+## Design System
 
-### Customers
+- [ ] **DS-01**: Warm palette migration — replace all CSS custom properties in `globals.css` (light + dark mode) with warm amber/gold accents, cream backgrounds, warm borders, warm-tinted darks
+- [ ] **DS-02**: Card variants — add CVA variants (highlight, surface, muted, ghost, outlined) to Card component for colored background differentiation
+- [ ] **DS-03**: New semantic tokens — add `--highlight`, `--highlight-foreground`, `--surface`, `--surface-foreground` to globals.css and tailwind.config.ts
+- [ ] **DS-04**: Hardcoded color audit — replace all hardcoded hex values (`bg-white`, `border-[#E2E2E2]`, `bg-[#F9F9F9]`, `bg-[#F2F2F2]`) with semantic tokens across sidebar, page-header, app-shell, notification-bell
+- [ ] **DS-05**: Consistent page padding — normalize padding/spacing across all dashboard pages (dashboard, jobs, campaigns, analytics, customers, send, history, feedback, billing, settings) to use consistent values
 
-- [ ] **CUST-01**: Contacts table renamed to Customers across codebase (DB, UI, routes, actions)
-- [ ] **CUST-02**: Customer records include phone number field with validation
-- [ ] **CUST-03**: Customers support taggable labels (VIP, repeat/recurring, commercial/residential, plus custom tags)
-- [ ] **CUST-04**: Customer list page updated with new fields (phone, tags) and filtering
+## Login & Auth
 
-### Jobs
+- [ ] **AUTH-01**: Password visibility toggle — create `PasswordInput` component with show/hide eye icon (Phosphor) wrapping existing Input, use in login, signup, and password reset forms
+- [ ] **AUTH-02**: Password requirements checklist — add live validation checklist (length, uppercase, number, special character) visible while typing on signup and password reset forms
+- [ ] **AUTH-03**: Google OAuth fix — verify and fix Google OAuth provider configuration in Supabase dashboard and auth flow
 
-- [ ] **JOBS-01**: Jobs table with CRUD (list, add, edit, delete) and RLS policies
-- [ ] **JOBS-02**: Each job has service type (HVAC, plumbing, electrical, cleaning, roofing, painting, handyman, other)
-- [ ] **JOBS-03**: Each job has status (completed, do-not-send) with completion timestamp — no scheduled/in-progress workflow in v2.0
-- [ ] **JOBS-04**: Each job is linked to exactly one customer (foreign key)
-- [ ] **JOBS-05**: Job completion triggers campaign enrollment (when status → completed)
-- [ ] **JOBS-06**: Jobs UI page with list view, add/edit forms, status management
+## Dashboard
 
-### SMS & Messaging
+- [ ] **DASH-01**: Welcome greeting — add "Welcome back, [Name]" with current date at top of dashboard page
+- [ ] **DASH-02**: Arrow hover affordance — replace translate-y lift on InteractiveCard with arrow indicator on hover to signal clickability
+- [ ] **DASH-03**: Remove notification badge — remove number badge from Dashboard nav item in sidebar
+- [ ] **DASH-04**: Differentiate lower cards — make the 3 bottom dashboard metric cards visually distinct from the top 3 KPI cards (different card variant, sizing, or layout)
 
-- [ ] **SMS-01**: SMS sending via Twilio with delivery status tracking
-- [ ] **SMS-02**: A2P 10DLC brand and campaign registration (pre-development blocker)
-- [ ] **SMS-03**: TCPA-compliant opt-in tracking (separate sms_opt_in field, date, method, IP)
-- [ ] **SMS-04**: STOP keyword webhook handling (STOP/STOPALL/UNSUBSCRIBE/CANCEL/END/QUIT) with database update and confirmation message within 5 minutes
-- [ ] **SMS-05**: Quiet hours enforcement (8am-9pm local time) using customer timezone with date-fns-tz
-- [ ] **SMS-06**: Twilio webhook signature verification on all inbound requests
-- [ ] **SMS-07**: Channel fallback logic (no phone → email only, no email → SMS only)
-- [ ] **SMS-08**: SMS character counter in compose UI (160 char GSM-7 limit)
-- [ ] **SMS-09**: send_logs extended with channel column (email/sms) and provider-specific IDs
+## Onboarding
 
-### Campaigns & Sequences
+- [ ] **ONB-01**: Consolidate wizard steps — reduce from 7 to 5 steps: remove duplicate Google review link step (merge into Business Basics), remove Software Used step
+- [ ] **ONB-02**: Horizontal service tiles — change services offered step from vertical list to horizontal selectable tiles/chips layout
+- [ ] **ONB-03**: Plain English campaign presets — rename Fast/Standard/Slow presets to user-friendly names with clear, plain-language descriptions of what each does
+- [ ] **ONB-04**: Getting started pill warm color — update getting started pill styling to use warm palette colors (amber accent) instead of cold blue tint
+- [ ] **ONB-05**: Campaign review step fix — getting started checklist "Review campaign" step should only complete when user actually navigates to and reviews their campaign, not auto-complete
 
-- [ ] **CAMP-01**: Campaign presets (conservative: 2 emails; standard: 2 emails + 1 SMS; aggressive: 2 emails + 2 SMS) available out of the box
-- [ ] **CAMP-02**: Duplicate & customize any preset campaign (edit touches, timing, channels)
-- [ ] **CAMP-03**: Each campaign touch specifies channel (email/SMS), timing delay (hours/days after completion only), and template — max 4 touches per campaign
-- [ ] **CAMP-04**: Automatic stop conditions: review completed, customer opted out, campaign paused by owner
-- [ ] **CAMP-05**: Campaign enrollment tracking per job and per touch (active, paused, completed, stopped)
-- [ ] **CAMP-06**: Campaign processing via extended cron with claim_due_campaign_touches() RPC using FOR UPDATE SKIP LOCKED
-- [ ] **CAMP-07**: Campaign performance analytics (open/click/conversion rates per touch, per campaign)
-- [ ] **CAMP-08**: Service-type rules on campaigns (e.g., "only enroll HVAC jobs" or "all service types")
+## Jobs & Campaigns
 
-### LLM Personalization
+- [ ] **JC-01**: Filter services to user selection — Jobs page service type filter only shows services the user selected during onboarding (from `service_types_enabled`)
+- [ ] **JC-02**: Smart name/email field — auto-detect whether user is typing a name or email in Add Job form and adjust label/input type accordingly
+- [ ] **JC-03**: Fix job creation bug — investigate and fix the bug preventing new job creation
+- [ ] **JC-04**: Campaign edit as panel — open campaign editor as side panel or modal instead of full-page navigation
+- [ ] **JC-05**: Campaign card full-click — make entire campaign card clickable to open details, not just action buttons (with stopPropagation on internal controls)
+- [ ] **JC-06**: Back button hit area — fix oversized back button on campaigns detail/edit pages
+- [ ] **JC-07**: Standard preset centered — center the "Standard" campaign preset card in the preset picker layout
 
-- [ ] **LLM-01**: Vercel AI SDK integration with GPT-4o-mini primary, Claude Haiku fallback on constraint violations
-- [ ] **LLM-02**: personalizeMessage() function with structured variable injection (customer name, service type, technician name, business name)
-- [ ] **LLM-03**: Personalization level fixed at "Medium" (rewrite for tone/warmth, no invented details)
-- [ ] **LLM-04**: Input sanitization before LLM (prevent prompt injection from customer data)
-- [ ] **LLM-05**: Output validation (length limits, no HTML/script tags, no invented URLs, placeholder verification)
-- [ ] **LLM-06**: Graceful fallback to raw template on any LLM failure (never blocks sends)
-- [ ] **LLM-07**: Rewrite contract: LLM may adjust tone/phrasing but must preserve all factual content, review link, and opt-out language
-- [ ] **LLM-11**: Hard constraint: LLM may only rewrite approved templates using provided fields — cannot introduce new claims, discounts, promises, or invented job details
-- [ ] **LLM-08**: Auto-fallback triggers: timeout >3s, output >2x template length, missing required placeholders, profanity/inappropriate content
-- [ ] **LLM-09**: Preview at scale: batch preview of personalized messages before campaign launch (show 3-5 sample outputs)
-- [ ] **LLM-10**: Rate limiting per business (100 LLM calls/hour) with cost tracking
+## Navigation & Manual Request
 
-### Review Funnel
+- [ ] **NAV-01**: Eliminate Manual Request page — remove /send page from navigation, extract QuickSendForm, create QuickSendModal accessible from campaigns page and customer detail drawer
+- [ ] **NAV-02**: Add Job toggle for one-off send — add option in Add Job flow to trigger immediate manual send for one-off situations
 
-- [ ] **REVW-01**: Pre-qualification page (1-5 star satisfaction rating) before review redirect
-- [ ] **REVW-02**: Conditional routing: 4-5 stars → Google review link, 1-3 stars → private feedback form
-- [ ] **REVW-03**: Internal feedback storage with business owner notification on negative feedback
-- [ ] **REVW-04**: No review gating language — page frames as "share your experience" not "leave a review if happy"
+## Other Pages
 
-### Dashboard
+- [ ] **PG-01**: Analytics empty state — add guidance prompts and suggested actions when analytics page has no data yet
+- [ ] **PG-02**: Customers padding — fix inconsistent padding and spacing on Customers page
+- [ ] **PG-03**: Feedback UI consistency — fix padding and visual consistency on Feedback page to match other dashboard pages
+- [ ] **PG-04**: All-page padding normalization — audit and normalize padding on all pages to use consistent spacing values (p-6 cards, space-y-6 sections, consistent header spacing)
 
-- [ ] **DASH-01**: Pipeline KPIs widget (jobs ready to send, active campaigns, reviews this month, response rate)
-- [ ] **DASH-02**: Ready-to-send queue (completed jobs not yet enrolled in campaign)
-- [ ] **DASH-03**: Needs attention alerts (failed sends, STOP requests, campaign issues, budget warnings)
-- [ ] **DASH-04**: Quick actions (add job, enroll in campaign, send manual request)
-- [ ] **DASH-05**: Daily to-do list: prioritized action items (jobs to close out, follow-ups due, issues to resolve)
+---
 
-### Onboarding
+## Future Requirements (Deferred)
 
-- [ ] **ONBD-01**: Step 1 — Business basics (name, Google review link, phone number)
-- [ ] **ONBD-02**: Step 2 — Review destination setup (Google review link verification)
-- [ ] **ONBD-03**: Step 3 — Services offered selection (multi-select from service taxonomy, sets timing defaults)
-- [ ] **ONBD-04**: Step 4 — Software used (ServiceTitan/Jobber/HCP/none — captured for future integrations)
-- [ ] **ONBD-05**: Step 5 — Default campaign selection (pick preset, auto-creates campaign)
-- [ ] **ONBD-06**: Step 6 — Import customers (CSV upload or manual add, with phone number collection)
-- [ ] **ONBD-07**: SMS opt-in explanation during onboarding with consent capture
-
-### Navigation
-
-- [ ] **NAV-01**: Navigation restructured: Send/Queue, Customers, Jobs, Campaigns, Activity/History
-- [ ] **NAV-02**: Navigation badges show pending counts (queued sends, attention items)
-
-### Templates
-
-- [x] **TMPL-01**: Unified message_templates table supporting both email and SMS channels *(Phase 23 - 2026-02-04)*
-- [x] **TMPL-02**: Template CRUD with channel selector (email/SMS) and character limit enforcement *(Phase 23 - 2026-02-04)*
-- [x] **TMPL-03**: Default templates per service category (HVAC, plumbing, electrical, etc.) *(Phase 23 - 2026-02-04)*
-- [x] **TMPL-04**: Migration from existing email_templates to message_templates (backward compatible) *(Phase 23 - 2026-02-04)*
-
-### Service-Type Timing
-
-- [ ] **SVCT-01**: Service taxonomy as first-class setting (selected during onboarding, used in jobs, campaigns, analytics)
-- [ ] **SVCT-02**: Default timing per service type (HVAC: 24h, plumbing: 48h, electrical: 24h, cleaning: 4h, roofing: 72h — configurable)
-- [ ] **SVCT-03**: Timing defaults auto-applied when creating campaigns for specific service types
-- [ ] **SVCT-04**: Analytics breakdowns by service type (response rate, review rate per service)
-
-### Deliverability & Trust
-
-- [ ] **DLVR-01**: SPF/DKIM/DMARC setup guidance in onboarding/settings (checklist with verification status)
-- [ ] **DLVR-02**: Branded sender identity (business name in From field for email, business name in SMS sender)
-- [ ] **DLVR-03**: Branded short links for review URLs (trust signal, not raw Google URL)
-
-### Compliance & Reputation
-
-- [ ] **COMP-01**: SMS consent audit trail (opt-in date, method, IP address stored per customer)
-- [ ] **COMP-02**: No review gating — satisfaction filter frames as "share experience" not conditional review request
-- [ ] **COMP-03**: Throttling and pacing: spread sends across time windows to avoid spam flags (max N sends/hour per business)
-- [ ] **COMP-04**: Exception handling: graceful degradation on provider failures (Twilio down → queue for retry, Resend down → queue for retry)
-
-### Operational
-
-- [ ] **OPS-01**: Daily to-do list on dashboard: prioritized action items for business owner
-- [ ] **OPS-02**: Exception handling dashboard: failed sends, webhook errors, budget warnings with suggested actions
-- [ ] **OPS-03**: Send throttling/pacing controls per business (configurable max sends per hour)
-
-### Agency-Mode Readiness
-
-- [ ] **AGCY-01**: Multi-location data model (business has location_id, queries scoped by location) — schema only, no UI yet
-- [ ] **AGCY-02**: Weekly performance report (auto-generated summary: sends, opens, reviews, response rate) — email to business owner
-- [ ] **AGCY-03**: Exportable campaign playbooks (download campaign config as shareable template)
-
-### Landing Page
-
-- [ ] **LAND-01**: Landing page copy updated for home services positioning (follow-up system, not single-send tool)
-- [ ] **LAND-02**: Existing sections (hero, problem/solution, how it works, stats, outcome cards) updated with v2.0 messaging
-
-### V2 Alignment (Phase 30)
-
-**V2 Core Flow:**
-- [ ] **V2FL-01**: Add Job form includes inline customer creation with smart autocomplete (type name → suggest matches → create new if no match)
-- [ ] **V2FL-02**: Add Job form no longer requires pre-existing customer selection
-- [ ] **V2FL-03**: Remove "Add Customer" button from Customers page header
-- [ ] **V2FL-04**: Remove "Add Customer" CTA from Customers empty state
-- [ ] **V2FL-05**: CSV import redesigned for jobs (customer_name, email, phone, service_type, completion_date) — creates customers as side effect
-- [ ] **V2FL-06**: Onboarding Step 6 converted from customer import to job import with V2 format
-- [ ] **V2FL-07**: "Add Job" sidebar button uses primary variant (not outline)
-- [ ] **V2FL-08**: Mobile floating action button (FAB) for "Add Job" on all dashboard pages
-- [ ] **V2FL-09**: Job status expanded to three states: scheduled → completed → do_not_send (scheduled is pre-completion, completed triggers campaign enrollment)
-- [ ] **V2FL-10**: Add Job form defaults to "scheduled" status (not completed) — supports dispatch workflow where jobs are created before work is done
-- [ ] **V2FL-11**: Job Table includes "Mark Complete" action button for scheduled jobs — one-click completion triggers campaign enrollment
-- [ ] **V2FL-12**: Mobile job list supports one-tap "Complete" from job card for technician workflow
-
-**Empty States & Copy:**
-- [ ] **V2UX-01**: Customers page empty state updated: "Customers appear here as you complete jobs. Ready to add your first job?"
-- [ ] **V2UX-02**: Customers page description updated to reflect V2 model (customers are job side effects)
-- [ ] **V2UX-03**: History page empty state includes guidance CTA to Jobs page
-
-**Icon Consistency:**
-- [ ] **ICON-01**: All 27 lucide-react files migrated to @phosphor-icons/react (UI primitives, customer components, marketing, other)
-
-**Accessibility:**
-- [ ] **A11Y-01**: Checkbox component touch target increased to 44px minimum (via padding wrapper or size increase)
-- [ ] **A11Y-02**: Icon button xs/sm sizes include 44px touch target wrapper
-- [ ] **A11Y-03**: All icon-only buttons include aria-label attribute
-- [ ] **A11Y-04**: Skip link added to root layout ("Skip to main content")
-
-### Post-Onboarding Guidance (Phase 32)
-
-- [ ] **GUIDE-01**: Dashboard "Getting Started" checklist card visible for new users after onboarding
-- [ ] **GUIDE-02**: Checklist tracks key milestones: Add first job, Set up campaign, Complete a job, Get first review
-- [ ] **GUIDE-03**: Checklist progress persisted in database (user_metadata or dedicated table)
-- [ ] **GUIDE-04**: Checklist dismissible by user, auto-hides when complete
-- [ ] **GUIDE-05**: Jobs page tooltip hint on first visit ("Add your first job here") pointing at Add Job button
-- [ ] **GUIDE-06**: Tooltip hints tracked in localStorage (show once per user per page)
-
-## Future Requirements
-
-Deferred to later milestones. Captured for traceability.
-
-### Integrations
-- **INTG-01**: ServiceTitan API integration (auto-create jobs from completed work orders)
-- **INTG-02**: Jobber API integration (sync customers and jobs)
-- **INTG-03**: Housecall Pro API integration (sync customers and jobs)
-
-### Review Inbox
-- **RINB-01**: Ingest reviews from Google Business Profile
-- **RINB-02**: Review inbox dashboard (all reviews in one place)
-- **RINB-03**: AI-generated review reply suggestions
-
-### Advanced Features
-- **ADV-01**: Multi-language SMS/email templates
-- **ADV-02**: Two-way SMS conversations
-- **ADV-03**: Video testimonial collection
-- **ADV-04**: QR codes and NFC cards for review requests
-- **ADV-05**: Visual workflow builder for campaigns
-- **ADV-06**: Team roles and permissions
-
-### Agency Features
-- **AGCY-04**: Agency dashboard (multi-business management UI)
-- **AGCY-05**: White-label option
-- **AGCY-06**: Client reporting portal
+- Login split-screen image/illustration (deferred — need design asset)
+- Increased border radius (keep current 8px)
+- Colored KPI card backgrounds (keep current white cards)
+- Getting started pill position change (keep in current location)
 
 ## Out of Scope
 
-| Feature | Reason |
-|---------|--------|
-| 200+ review platform integrations | Google only for MVP, others later |
-| Multi-language support | English-first for home services market |
-| Two-way SMS conversations | STOP handling only, no chat |
-| FSM software integrations | Capture software used, build integrations later |
-| Visual workflow builder | Overkill for 3-touch sequences |
-| White-label widget | Brand visibility is a trust signal |
-| AI review response automation | Risky for public-facing responses |
-| LLM personalization slider UI | Fixed at Medium, simplifies UX |
-| Industry-specific landing pages | Single page with home services copy |
-| Service history view per customer | Deferred, jobs list sufficient for now |
+- Dark mode redesign beyond warm-tinting (no new dark mode features)
+- New component library (stay with shadcn/ui + CVA)
+- Performance optimization (not in scope for this milestone)
+- Data model changes (pure UI milestone)
+- Landing page redesign (separate Phase 31)
+- Agency-mode/multi-tenant (separate Phase 29)
+
+---
 
 ## Traceability
 
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| CUST-01 | Phase 20 | Pending |
-| CUST-02 | Phase 20 | Pending |
-| CUST-03 | Phase 20 | Pending |
-| CUST-04 | Phase 20 | Pending |
-| SMS-02 | Phase 20 | Pending |
-| SMS-03 | Phase 20 | Pending |
-| COMP-01 | Phase 20 | Pending |
-| SMS-01 | Phase 21 | Pending |
-| SMS-04 | Phase 21 | Pending |
-| SMS-05 | Phase 21 | Pending |
-| SMS-06 | Phase 21 | Pending |
-| SMS-07 | Phase 21 | Pending |
-| SMS-08 | Phase 21 | Pending |
-| SMS-09 | Phase 21 | Pending |
-| COMP-04 | Phase 21 | Pending |
-| DLVR-02 | Phase 21 | Pending |
-| JOBS-01 | Phase 22 | Pending |
-| JOBS-02 | Phase 22 | Pending |
-| JOBS-03 | Phase 22 | Pending |
-| JOBS-04 | Phase 22 | Pending |
-| JOBS-05 | Phase 22 | Pending |
-| JOBS-06 | Phase 22 | Pending |
-| SVCT-01 | Phase 22 | Pending |
-| SVCT-02 | Phase 22 | Pending |
-| SVCT-03 | Phase 22 | Pending |
-| SVCT-04 | Phase 22 | Pending |
-| TMPL-01 | Phase 23 | Pending |
-| TMPL-02 | Phase 23 | Pending |
-| TMPL-03 | Phase 23 | Pending |
-| TMPL-04 | Phase 23 | Pending |
-| CAMP-01 | Phase 24 | Pending |
-| CAMP-02 | Phase 24 | Pending |
-| CAMP-03 | Phase 24 | Pending |
-| CAMP-04 | Phase 24 | Pending |
-| CAMP-05 | Phase 24 | Pending |
-| CAMP-06 | Phase 24 | Pending |
-| CAMP-07 | Phase 24 | Pending |
-| CAMP-08 | Phase 24 | Pending |
-| OPS-03 | Phase 24 | Pending |
-| COMP-03 | Phase 24 | Pending |
-| LLM-01 | Phase 25 | Pending |
-| LLM-02 | Phase 25 | Pending |
-| LLM-03 | Phase 25 | Pending |
-| LLM-04 | Phase 25 | Pending |
-| LLM-05 | Phase 25 | Pending |
-| LLM-06 | Phase 25 | Pending |
-| LLM-07 | Phase 25 | Pending |
-| LLM-08 | Phase 25 | Pending |
-| LLM-09 | Phase 25 | Pending |
-| LLM-10 | Phase 25 | Pending |
-| LLM-11 | Phase 25 | Pending |
-| REVW-01 | Phase 26 | Pending |
-| REVW-02 | Phase 26 | Pending |
-| REVW-03 | Phase 26 | Pending |
-| REVW-04 | Phase 26 | Pending |
-| COMP-02 | Phase 26 | Pending |
-| DASH-01 | Phase 27 | Pending |
-| DASH-02 | Phase 27 | Pending |
-| DASH-03 | Phase 27 | Pending |
-| DASH-04 | Phase 27 | Pending |
-| DASH-05 | Phase 27 | Pending |
-| NAV-01 | Phase 27 | Pending |
-| NAV-02 | Phase 27 | Pending |
-| OPS-01 | Phase 27 | Pending |
-| OPS-02 | Phase 27 | Pending |
-| ONBD-01 | Phase 28 | Pending |
-| ONBD-02 | Phase 28 | Pending |
-| ONBD-03 | Phase 28 | Pending |
-| ONBD-04 | Phase 28 | Pending |
-| ONBD-05 | Phase 28 | Pending |
-| ONBD-06 | Phase 28 | Pending |
-| ONBD-07 | Phase 28 | Pending |
-| DLVR-01 | Phase 28 | Pending |
-| DLVR-03 | Phase 28 | Pending |
-| AGCY-01 | Phase 29 | Pending |
-| AGCY-02 | Phase 29 | Pending |
-| AGCY-03 | Phase 29 | Pending |
-| LAND-01 | Phase 29 | Pending |
-| LAND-02 | Phase 29 | Pending |
-| V2FL-01 | Phase 30 | Pending |
-| V2FL-02 | Phase 30 | Pending |
-| V2FL-03 | Phase 30 | Pending |
-| V2FL-04 | Phase 30 | Pending |
-| V2FL-05 | Phase 30 | Pending |
-| V2FL-06 | Phase 30 | Pending |
-| V2FL-07 | Phase 30 | Pending |
-| V2FL-08 | Phase 30 | Pending |
-| V2FL-09 | Phase 30 | Pending |
-| V2FL-10 | Phase 30 | Pending |
-| V2FL-11 | Phase 30 | Pending |
-| V2FL-12 | Phase 30 | Pending |
-| V2UX-01 | Phase 30 | Pending |
-| V2UX-02 | Phase 30 | Pending |
-| V2UX-03 | Phase 30 | Pending |
-| ICON-01 | Phase 30 | Pending |
-| A11Y-01 | Phase 30 | Pending |
-| A11Y-02 | Phase 30 | Pending |
-| A11Y-03 | Phase 30 | Pending |
-| A11Y-04 | Phase 30 | Pending |
-
-**Coverage:**
-- v2.0 requirements: 96 total across 18 categories
-- Mapped: 96/96 (100% coverage)
-- Phases: 20-30 (11 phases)
-
-**Coverage validation:**
-- Phase 20: 7 requirements (CUST-01, CUST-02, CUST-03, CUST-04, SMS-02, SMS-03, COMP-01)
-- Phase 21: 9 requirements (SMS-01, SMS-04, SMS-05, SMS-06, SMS-07, SMS-08, SMS-09, COMP-04, DLVR-02)
-- Phase 22: 10 requirements (JOBS-01 to JOBS-06, SVCT-01 to SVCT-04)
-- Phase 23: 4 requirements (TMPL-01 to TMPL-04)
-- Phase 24: 10 requirements (CAMP-01 to CAMP-08, OPS-03, COMP-03)
-- Phase 25: 11 requirements (LLM-01 to LLM-11)
-- Phase 26: 5 requirements (REVW-01 to REVW-04, COMP-02)
-- Phase 27: 9 requirements (DASH-01 to DASH-05, NAV-01, NAV-02, OPS-01, OPS-02)
-- Phase 28: 9 requirements (ONBD-01 to ONBD-07, DLVR-01, DLVR-03)
-- Phase 29: 5 requirements (AGCY-01 to AGCY-03, LAND-01, LAND-02)
-- Phase 30: 20 requirements (V2FL-01 to V2FL-12, V2UX-01 to V2UX-03, ICON-01, A11Y-01 to A11Y-04)
-- Total: 96 requirements (no orphans, no duplicates)
-
----
-*Requirements defined: 2026-02-02*
-*Last updated: 2026-02-06 (Phase 30 V2 Alignment + scheduled job status requirements added)*
+| REQ-ID | Phase | Status |
+|--------|-------|--------|
+| DS-01 | TBD | Pending |
+| DS-02 | TBD | Pending |
+| DS-03 | TBD | Pending |
+| DS-04 | TBD | Pending |
+| DS-05 | TBD | Pending |
+| AUTH-01 | TBD | Pending |
+| AUTH-02 | TBD | Pending |
+| AUTH-03 | TBD | Pending |
+| DASH-01 | TBD | Pending |
+| DASH-02 | TBD | Pending |
+| DASH-03 | TBD | Pending |
+| DASH-04 | TBD | Pending |
+| ONB-01 | TBD | Pending |
+| ONB-02 | TBD | Pending |
+| ONB-03 | TBD | Pending |
+| ONB-04 | TBD | Pending |
+| ONB-05 | TBD | Pending |
+| JC-01 | TBD | Pending |
+| JC-02 | TBD | Pending |
+| JC-03 | TBD | Pending |
+| JC-04 | TBD | Pending |
+| JC-05 | TBD | Pending |
+| JC-06 | TBD | Pending |
+| JC-07 | TBD | Pending |
+| NAV-01 | TBD | Pending |
+| NAV-02 | TBD | Pending |
+| PG-01 | TBD | Pending |
+| PG-02 | TBD | Pending |
+| PG-03 | TBD | Pending |
+| PG-04 | TBD | Pending |
