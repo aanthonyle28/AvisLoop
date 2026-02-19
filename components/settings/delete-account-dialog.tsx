@@ -10,6 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
 import { deleteAccount } from '@/lib/actions/auth'
 
 export function DeleteAccountDialog() {
@@ -53,12 +54,7 @@ export function DeleteAccountDialog() {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <button
-          type="button"
-          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium disabled:opacity-50"
-        >
-          Delete Account
-        </button>
+        <Button variant="destructive">Delete Account</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -84,34 +80,32 @@ export function DeleteAccountDialog() {
               value={confirmText}
               onChange={(e) => setConfirmText(e.target.value)}
               placeholder="Type DELETE here"
-              className="border border-border bg-background text-foreground rounded-md px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              className="border border-border bg-background text-foreground rounded-md px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-destructive/50 focus:border-destructive"
               disabled={isDeleting}
               autoComplete="off"
             />
           </div>
 
           {error && (
-            <p className="text-sm text-red-600">{error}</p>
+            <p className="text-sm text-destructive">{error}</p>
           )}
         </div>
 
         <DialogFooter>
-          <button
-            type="button"
+          <Button
+            variant="outline"
             onClick={() => handleOpenChange(false)}
             disabled={isDeleting}
-            className="px-4 py-2 rounded-md text-sm font-medium border border-border hover:bg-muted disabled:opacity-50"
           >
             Cancel
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant="destructive"
             onClick={handleDelete}
             disabled={!isConfirmed || isDeleting}
-            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isDeleting ? 'Deleting...' : 'Delete My Account'}
-          </button>
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
