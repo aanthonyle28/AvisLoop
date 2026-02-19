@@ -8,9 +8,9 @@
 
 ## Design System
 
-- [ ] **DS-01**: Warm palette migration — replace all CSS custom properties in `globals.css` (light + dark mode) with warm amber/gold accents, cream backgrounds, warm borders, warm-tinted darks
+- [x] **DS-01**: Warm palette migration — replace all CSS custom properties in `globals.css` (light + dark mode) with warm amber/gold accents, cream backgrounds, warm borders, warm-tinted darks
 - [ ] **DS-02**: Card variants — add CVA variants (highlight, surface, muted, ghost, outlined) to Card component for colored background differentiation
-- [ ] **DS-03**: New semantic tokens — add `--highlight`, `--highlight-foreground`, `--surface`, `--surface-foreground` to globals.css and tailwind.config.ts
+- [x] **DS-03**: New semantic tokens — add `--highlight`, `--highlight-foreground`, `--surface`, `--surface-foreground` to globals.css and tailwind.config.ts
 - [x] **DS-04**: Hardcoded color audit — replace all hardcoded hex values (`bg-white`, `border-[#E2E2E2]`, `bg-[#F9F9F9]`, `bg-[#F2F2F2]`) with semantic tokens across sidebar, page-header, app-shell, notification-bell
 - [ ] **DS-05**: Consistent page padding — normalize padding/spacing across all dashboard pages (dashboard, jobs, campaigns, analytics, customers, send, history, feedback, billing, settings) to use consistent values
 
@@ -81,9 +81,9 @@
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| DS-01 | Phase 34 | Pending |
+| DS-01 | Phase 34 | Complete |
 | DS-02 | Phase 35 | Pending |
-| DS-03 | Phase 34 | Pending |
+| DS-03 | Phase 34 | Complete |
 | DS-04 | Phase 33 | Complete |
 | DS-05 | Phase 35 | Pending |
 | AUTH-01 | Phase 36 | Pending |

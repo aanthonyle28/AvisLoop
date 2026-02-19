@@ -507,8 +507,8 @@ Plans:
 **Plans**: 2 plans in 2 waves
 
 Plans:
-- [ ] 34-01-PLAN.md — CSS variable replacement (light + dark mode), tailwind.config.ts new tokens, status-badge.tsx migration, UI primitive accent-to-muted cleanup
-- [ ] 34-02-PLAN.md — Production build verification, WCAG contrast spot-checks, visual review checkpoint across all dashboard pages
+- [x] 34-01-PLAN.md — CSS variable replacement (light + dark mode), tailwind.config.ts new tokens, status-badge.tsx migration, UI primitive accent-to-muted cleanup
+- [x] 34-02-PLAN.md — Production build verification, WCAG contrast spot-checks, visual review checkpoint across all dashboard pages
 
 ### Phase 35: Card Variants & Dashboard Quick Wins
 **Goal**: Users see a visually cohesive dashboard with amber-accented card styles, a personalized welcome greeting, improved stat card clickability affordance, and consistent spacing across all pages.
@@ -633,7 +633,7 @@ See individual phase sections above for requirements, success criteria, and depe
 | **QA-AUDIT** | **Dashboard Audit** | **9/9** | **Complete** | **2026-02-05** |
 | **QA-FIX** | **Audit Remediation** | **5/5** | **Complete** | **2026-02-06** |
 | **33** | **v2.5 UI/UX Redesign** | **2/2** | **Complete** | **2026-02-18** |
-| **34** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
+| **34** | **v2.5 UI/UX Redesign** | **2/2** | **Complete** | **2026-02-19** |
 | **35** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
 | **36** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
 | **37** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |

@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** Phase 35 — Semantic Token Batch Replacement
+**Current focus:** Phase 35 — Card Variants & Dashboard Quick Wins
 
 ## Current Position
 
@@ -43,6 +43,8 @@ Progress: [███░░░░░░░] ~29% (v2.5 milestone)
 - Warm palette anchored at H=36 (cream light bg), H=24 (charcoal dark bg), H=38 (amber accent), H=213 (blue primary) — all live in globals.css
 - Status badge pattern: className field in config (not bg/text), no style prop, border-status-*-text/20 for warm-bg contrast
 - Accent = decorative only: bg-secondary for outline button hover, bg-muted for ghost/dropdown/select/dialog states
+- Status badge text contrast adjusted post-verification: delivered 25%, failed 33%, reviewed 20% (light); clicked 62%, failed 70% (dark) — all pass WCAG AA
+- Primary color shifted: 224 75% 43% → 213 60% 42% (softer, less saturated blue)
 
 ### Pending Todos
 
@@ -57,6 +59,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 34-02-PLAN.md — Visual verification of warm palette across all 10 dashboard pages; user approved. Phase 34 complete. Next: Phase 35 (Semantic Token Batch Replacement)
+Stopped at: Completed Phase 34 — Warm palette token replacement, visual verification approved, contrast fixes applied. Next: Phase 35 (Card Variants & Dashboard Quick Wins)
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
