@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 35 of 39 in v2.5 milestone (Phase 3 of 7 in this milestone)
-Plan: 4 of 5 complete
-Status: In progress
-Last activity: 2026-02-19 — Completed 35-04-PLAN.md (~100 hardcoded amber/red classes replaced with semantic tokens across 24 files: Cat A/B/J/K/O)
+Plan: 5 of 5 complete
+Status: Phase complete
+Last activity: 2026-02-19 — Completed 35-05-PLAN.md (~75 hardcoded colors replaced Cat C/D/F/L/N/P + all 11 dashboard pages normalized to container py-6 space-y-6)
 
-Progress: [█████░░░░░] ~42% (v2.5 milestone)
+Progress: [██████░░░░] ~52% (v2.5 milestone)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 174
-- v2.5 plans completed: 5
+- Total plans completed (project): 176
+- v2.5 plans completed: 7
 
 *Updated after each plan completion*
 
@@ -54,6 +54,9 @@ Progress: [█████░░░░░] ~42% (v2.5 milestone)
 - Danger zone section pattern: border-destructive/30 + text-destructive (not hardcoded red-200/red-600)
 - Warning banner pattern: bg-warning-bg + border-warning-border + text-warning (icon/body) + text-warning-foreground (heading)
 - Data-viz stars (text-yellow-400) and positive trend percentages (text-green-600) remain inline — exempt per Phase 33 audit
+- Page container standard: container py-6 space-y-6 (full-width), container max-w-{N} py-6 space-y-6 (constrained) — mx-auto and px-4 are redundant with Tailwind container class
+- SMS consent 3-state display: text-success (opted_in) / text-destructive (opted_out) / text-warning (unknown) — consistent across detail drawer and edit sheet
+- Template channel badge: bg-info/10 text-info (email), bg-success/10 text-success (SMS) — distinct channels via semantic color not arbitrary blue/green
 
 ### Pending Todos
 
@@ -68,6 +71,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed Phase 35 Plan 04 — Semantic token replacement Cat A/B/J/K/O (~100 occurrences across 24 files). Next: Phase 35 Plan 05
+Stopped at: Completed Phase 35 Plan 05 — Phase 35 complete. All 5 plans done. 210 Tier 2 audit occurrences resolved. Design system fully token-driven. Next: Phase 36 (Settings tabs + template UX)
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
