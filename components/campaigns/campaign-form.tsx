@@ -164,7 +164,7 @@ export function CampaignForm({ campaign, templates }: CampaignFormProps) {
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <Sparkle weight="fill" className="h-4 w-4 text-amber-500" />
+                <Sparkle weight="fill" className="h-4 w-4 text-warning" />
                 <Label htmlFor="personalization" className="text-sm font-medium">
                   AI Personalization
                 </Label>
@@ -173,7 +173,7 @@ export function CampaignForm({ campaign, templates }: CampaignFormProps) {
                 Automatically customize messages for each customer using AI
               </p>
               {!personalizationEnabled && (
-                <p className="text-sm text-amber-600 dark:text-amber-400">
+                <p className="text-sm text-warning">
                   All recipients will receive the exact template text without customization
                 </p>
               )}

@@ -56,7 +56,7 @@ export function SubscriptionStatus({ subscription, tier }: SubscriptionStatusPro
       </CardHeader>
       <CardContent className="space-y-4">
         {subscription.status === 'past_due' && (
-          <div className="text-sm text-amber-600 bg-amber-50 p-3 rounded-lg">
+          <div className="text-sm text-warning bg-warning-bg p-3 rounded-lg">
             Payment failed. Please update your payment method to avoid service interruption.
           </div>
         )}

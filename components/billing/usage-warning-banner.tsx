@@ -76,14 +76,14 @@ export function UsageWarningBanner({
 
   // Warning at 80%+
   return (
-    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+    <div className="bg-warning-bg border border-warning-border rounded-lg p-4 mb-6">
       <div className="flex items-start gap-3">
-        <Warning size={20} weight="regular" className="text-amber-600 shrink-0 mt-0.5" />
+        <Warning size={20} weight="regular" className="text-warning shrink-0 mt-0.5" />
         <div className="space-y-1">
-          <p className="font-medium text-amber-800">
+          <p className="font-medium text-warning-foreground">
             {sendRemaining} sends remaining this month
           </p>
-          <p className="text-sm text-amber-700">
+          <p className="text-sm text-warning">
             You&apos;ve used {count} of {limit} sends.{' '}
             <Link href="/billing" className="underline">
               View billing

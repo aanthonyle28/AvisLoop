@@ -25,7 +25,7 @@ export function PersonalizationSection({ summary }: PersonalizationSectionProps)
     <div className="space-y-5">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <Sparkle weight="fill" className="h-5 w-5 text-amber-500" />
+        <Sparkle weight="fill" className="h-5 w-5 text-warning" />
         <h3 className="text-lg font-medium">AI Personalization</h3>
       </div>
 
@@ -130,33 +130,33 @@ export function PersonalizationSection({ summary }: PersonalizationSectionProps)
 
 /** Color for personalization rate text based on percentage. */
 function getRateColor(rate: number): string {
-  if (rate >= 95) return 'text-green-600 dark:text-green-400'
-  if (rate >= 80) return 'text-amber-600 dark:text-amber-400'
-  return 'text-red-600 dark:text-red-400'
+  if (rate >= 95) return 'text-success'
+  if (rate >= 80) return 'text-warning'
+  return 'text-destructive'
 }
 
 /** Color for the usage capacity bar based on percentage. */
 function getBarColor(percent: number): string {
-  if (percent >= 90) return 'bg-red-500'
-  if (percent >= 70) return 'bg-amber-500'
-  return 'bg-green-500'
+  if (percent >= 90) return 'bg-destructive'
+  if (percent >= 70) return 'bg-warning'
+  return 'bg-success'
 }
 
 /** Color for the health status dot. */
 function getHealthDotColor(health: 'great' | 'good' | 'degraded'): string {
   switch (health) {
-    case 'great': return 'bg-green-500'
-    case 'good': return 'bg-amber-500'
-    case 'degraded': return 'bg-red-500'
+    case 'great': return 'bg-success'
+    case 'good': return 'bg-warning'
+    case 'degraded': return 'bg-destructive'
   }
 }
 
 /** Color for the health status text. */
 function getHealthTextColor(health: 'great' | 'good' | 'degraded'): string {
   switch (health) {
-    case 'great': return 'text-green-600 dark:text-green-400'
+    case 'great': return 'text-success'
     case 'good': return 'text-muted-foreground'
-    case 'degraded': return 'text-amber-600 dark:text-amber-400'
+    case 'degraded': return 'text-warning'
   }
 }
 

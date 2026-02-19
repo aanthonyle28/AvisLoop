@@ -96,17 +96,17 @@ export function SendPageClient({
     <>
       {/* V2 friction warning banner */}
       <div
-        className="mb-6 flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/50 dark:bg-amber-950/20"
+        className="mb-6 flex items-start gap-3 rounded-lg border border-warning-border bg-warning-bg p-4"
         data-testid="friction-warning"
       >
-        <Warning className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" weight="fill" />
+        <Warning className="h-5 w-5 text-warning shrink-0 mt-0.5" weight="fill" />
         <div className="text-sm">
-          <p className="font-medium text-amber-900 dark:text-amber-200">
+          <p className="font-medium text-warning-foreground">
             Campaigns handle review requests automatically
           </p>
-          <p className="mt-1 text-amber-700 dark:text-amber-300">
+          <p className="mt-1 text-warning">
             Manual sending is for one-off situations. For ongoing follow-up, set up a{' '}
-            <Link href="/campaigns" className="underline font-medium hover:text-amber-900 dark:hover:text-amber-100">
+            <Link href="/campaigns" className="underline font-medium hover:text-warning-foreground">
               campaign
             </Link>
             {' '}instead.

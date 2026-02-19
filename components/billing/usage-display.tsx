@@ -15,7 +15,7 @@ export function UsageDisplay({ sendCount, sendLimit, contactCount, contactLimit,
   // Color based on usage level
   let sendBarColor = 'bg-primary'
   if (sendPercentage >= 100) sendBarColor = 'bg-destructive'
-  else if (sendPercentage >= 80) sendBarColor = 'bg-amber-500'
+  else if (sendPercentage >= 80) sendBarColor = 'bg-warning'
 
   return (
     <div className="space-y-6">
@@ -32,7 +32,7 @@ export function UsageDisplay({ sendCount, sendLimit, contactCount, contactLimit,
           />
         </div>
         {sendPercentage >= 80 && sendPercentage < 100 && (
-          <p className="text-sm text-amber-600">
+          <p className="text-sm text-warning">
             {sendRemaining} sends remaining this month
           </p>
         )}
@@ -56,7 +56,7 @@ export function UsageDisplay({ sendCount, sendLimit, contactCount, contactLimit,
             const contactRemaining = contactLimit - contactCount
             let contactBarColor = 'bg-primary'
             if (contactPercentage >= 100) contactBarColor = 'bg-destructive'
-            else if (contactPercentage >= 80) contactBarColor = 'bg-amber-500'
+            else if (contactPercentage >= 80) contactBarColor = 'bg-warning'
 
             return (
               <>
@@ -67,7 +67,7 @@ export function UsageDisplay({ sendCount, sendLimit, contactCount, contactLimit,
                   />
                 </div>
                 {contactPercentage >= 80 && contactPercentage < 100 && (
-                  <p className="text-sm text-amber-600">
+                  <p className="text-sm text-warning">
                     {contactRemaining} customers remaining
                   </p>
                 )}

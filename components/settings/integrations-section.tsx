@@ -117,7 +117,7 @@ export function IntegrationsSection({ hasExistingKey }: IntegrationsSectionProps
             </Button>
 
             {hasExistingKey && (
-              <p className="text-sm text-amber-600">
+              <p className="text-sm text-warning">
                 Warning: Regenerating will invalidate your current key.
               </p>
             )}
@@ -125,12 +125,12 @@ export function IntegrationsSection({ hasExistingKey }: IntegrationsSectionProps
         ) : (
           <div className="space-y-3">
             {/* Show generated key */}
-            <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
-              <p className="text-sm font-medium text-amber-800 dark:text-amber-300 mb-2">
+            <div className="bg-warning-bg border border-warning-border rounded-lg p-4">
+              <p className="text-sm font-medium text-warning-foreground mb-2">
                 Copy this key now. It won&apos;t be shown again.
               </p>
               <div className="flex items-center gap-2">
-                <code className="flex-1 px-3 py-2 bg-card border border-amber-300 dark:border-amber-700 rounded-md text-sm font-mono break-all">
+                <code className="flex-1 px-3 py-2 bg-card border border-warning-border rounded-md text-sm font-mono break-all">
                   {apiKey}
                 </code>
                 <Button
