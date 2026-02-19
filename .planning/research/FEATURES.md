@@ -1,499 +1,426 @@
-# Feature Landscape: SMS Campaigns, Multi-Touch Sequences, LLM Personalization, Job Tracking
+# Feature Research: UI/UX Redesign (v2.5)
 
-**Domain:** Home Service Review Management SaaS (HVAC, plumbing, electrical, cleaning, roofing, painting, handyman)
-**Researched:** 2026-02-02
-**Confidence:** MEDIUM (WebSearch findings verified across multiple sources, but lacking Context7/official documentation for specific libraries)
-
-## Executive Summary
-
-Home service review management in 2026 is characterized by multi-channel (email+SMS) automation, 3-touch campaign sequences timed around job completion, LLM-powered personalization within guardrails, and tight integration with field service management software. The competitive landscape (Podium at $399-$899/mo, Birdeye at $299-$499/mo) offers comprehensive solutions with 200+ review platforms, but AvisLoop's "stupid simple" positioning targets underserved small operators (under 10 technicians) who find existing solutions too complex and expensive.
-
-Key differentiator opportunity: Simpler, faster onboarding with opinionated defaults vs. enterprise feature bloat.
+**Domain:** Home Service SaaS Dashboard — Warm, Friendly B2B Interface Redesign
+**Researched:** 2026-02-18
+**Confidence:** HIGH (based on direct codebase analysis, established design system patterns, and user-supplied UX notes)
 
 ---
 
-## Table Stakes Features
+## Context
 
-Features users expect in a modern home service review request system. Missing these = product feels incomplete.
+This is a redesign research document, not a greenfield feature survey. All backend functionality exists.
+The question is: **Which UI/UX changes to make, in what form, at what complexity level.**
 
-### SMS Review Requests
+User's reference: Stratify-style dashboards — warm amber/gold accents, large welcome text, colored card backgrounds, rounded elements, spacious layout. Home service tools (Jobber, Housecall Pro, ServiceTitan lite) — utility-forward but approachable.
 
-| Feature | Why Expected | Complexity | Dependencies | Notes |
-|---------|--------------|------------|--------------|-------|
-| **SMS sending capability** | 98% open rate vs email's ~20%; industry standard for field service | Medium | SMS provider (Twilio/Telnyx), A2P 10DLC registration | SMS costs $0.0075-$0.0083/msg; requires TCR registration |
-| **A2P 10DLC compliance** | Required by all US carriers as of Aug 2023; unregistered = blocked | Medium | Business EIN, Brand registration, Campaign registration | Trust Score affects deliverability (0-100 scale) |
-| **TCPA compliance (opt-in/opt-out)** | Legal requirement; $500-$1,500 per violation | Medium | Opt-in tracking, STOP keyword handling, consent records | Must honor "reasonable means" (STOP, QUIT, END, CANCEL, UNSUBSCRIBE) as of April 2026 |
-| **Quiet hours enforcement** | TCPA requirement: 8 AM - 9 PM local time only | Low | Timezone detection, send scheduling | Email sending via Resend (existing) |
-| **160-character SMS optimization** | GSM-7 encoding = 160 chars; exceeding = segmentation + higher cost | Low | Character counter, URL shortener | Messages <100 chars have 2-5x higher response rate |
-| **Opt-out management** | Legal requirement + customer experience | Low | Contact table flag, campaign filtering | Extends existing email opt-out (already built) |
-
-**Source confidence:**
-- SMS compliance: HIGH ([Telnyx SMS Compliance](https://telnyx.com/resources/sms-compliance), [TCPA 2026 guide](https://www.textmymainnumber.com/blog/sms-compliance-in-2025-your-tcpa-text-message-compliance-checklist))
-- A2P 10DLC: HIGH ([Twilio 10DLC](https://help.twilio.com/articles/4408675845019-SMS-Compliance-and-A2P-10DLC-in-the-US), [Trust Score guide](https://support.twilio.com/hc/en-us/articles/1260803225669-Message-throughput-MPS-and-Trust-Scores-for-A2P-10DLC-in-the-US))
-- TCPA: HIGH ([TCPA text message rules 2026](https://activeprospect.com/blog/tcpa-text-messages/))
-- Character limits: HIGH ([SMS character limit guide](https://mailchimp.com/resources/sms-character-limit/))
-- Best practices: MEDIUM (WebSearch consensus across [GatherUp](https://gatherup.com/blog/sms-vs-email-review-requests/), [Regal.ai](https://www.regal.ai/blog/sms-campaigns-for-home-services))
+Source of user requirements: Direct UX notes provided in the research brief, cross-referenced against
+the current codebase (`/components`, `/app`) and existing UX audit (`.planning/UX-AUDIT.md`).
 
 ---
 
-### Multi-Touch Campaign Sequences
+## Feature Landscape
 
-| Feature | Why Expected | Complexity | Dependencies | Notes |
-|---------|--------------|------------|--------------|-------|
-| **3-touch sequence (email → email → SMS)** | Industry standard; boosts response from 5-8% to 12-18% | Medium | Campaign state machine, timing engine | Touch #1 (Day 0-1), Touch #2 (Day 3-5), Touch #3 (Day 7-10) |
-| **Automatic stop conditions** | Prevents spam; required for good UX | Medium | Review detection, opt-out tracking, campaign state | Stop if: reviewed, opted out, manually paused |
-| **Job completion trigger** | Review requests sent automatically after job marked complete | Medium | Job status webhook or polling, campaign creation | Timing: 0-24 hours post-completion for field service |
-| **Campaign pause/resume** | Manual override for customer service issues | Low | Campaign state flags | Extends existing send history |
-| **Per-contact campaign history** | Avoid duplicate campaigns for same job | Medium | Campaign-to-job linking | Prevent sending multiple campaigns for single job |
+### Table Stakes (Users Expect These)
 
-**Timing patterns (data-backed):**
-- **Touch #1 (Email):** Day 0-1 after job completion (5-8% response rate)
-- **Touch #2 (Email):** Day 3-5 if no response (adds 2-4% incremental)
-- **Touch #3 (SMS):** Day 7-10 if no response (adds 3-5% incremental)
-- **Stop after 3 touches:** 4+ touches increase opt-outs by 34% without meaningful gain
+Features users assume exist in a polished SaaS dashboard. Missing these makes the product feel unfinished.
 
-**Source confidence:**
-- Timing patterns: MEDIUM ([Best time to request reviews](https://smartsmssolutions.com/resources/blog/business/best-time-to-request-reviews), WebSearch consensus)
-- 3-touch effectiveness: LOW (claimed by multiple sources but no primary data found)
-- Stop conditions: MEDIUM ([Yotpo FAQ](https://support.yotpo.com/docs/automatic-review-requests-faq), [Amazon automation](https://www.ecomengine.com/blog/automate-amazon-request-review))
-- Field service timing: HIGH ([Field service automation 2026](https://colobbo.com/blog/field-service-automation/), [FieldCamp workflows](https://fieldcamp.ai/workflow-templates/real-time-customer-service-updates/))
-
----
-
-### Job Tracking & Status Management
-
-| Feature | Why Expected | Complexity | Dependencies | Notes |
-|---------|--------------|------------|--------------|-------|
-| **Job status tracking** | Central entity for campaign triggers; standard in FSM software | Medium | New `jobs` table, status enum | Statuses: scheduled, in_progress, completed, cancelled |
-| **Job completion timestamp** | Determines campaign start time | Low | Jobs table field | Used for "send X hours after completion" logic |
-| **Job-to-contact linking** | Know who to send review request to | Low | Foreign key: job → contact | One job = one primary contact (for MVP) |
-| **Job notes/description** | Context for personalization (service type, technician) | Low | Text field on jobs table | Used in LLM personalization |
-| **Integration with scheduling** | Auto-create jobs from existing workflow | High | API with ServiceTitan/Jobber/Housecall Pro OR manual entry | Defer to post-MVP unless strong user signal |
-
-**Source confidence:**
-- Job status patterns: HIGH ([FSM software comparison](https://www.workyard.com/compare/plumbing-software), [Field service features 2026](https://www.housecallpro.com/field-service-management-software/))
-- Integration landscape: HIGH ([ServiceTitan vs Jobber vs Housecall Pro](https://fieldservicesoftware.io/housecall-pro-vs-jobber-vs-servicetitan/))
+| Feature | Why Expected | Complexity | Affected Files |
+|---------|--------------|------------|----------------|
+| **Password visibility toggle on login** | Standard on every modern auth form; missing = feel unpolished | LOW | `components/login-form.tsx` |
+| **Required field indicators (`*`)** | Users cannot tell what's required at a glance; causes form abandonment | LOW | `components/login-form.tsx`, all form components |
+| **Login page illustration/image** | Split-layout login (left form, right visual) is the SaaS standard; right panel currently shows only a faded "A" letter | LOW | `components/auth/auth-split-layout.tsx` |
+| **Welcome greeting on dashboard** | Every SaaS dashboard greets the user by name (Jobber: "Good morning, Mike", Stripe: "Hey, Dan"); plain "Dashboard" h1 feels cold | LOW | `app/(dashboard)/dashboard/page.tsx` |
+| **Clickable stat cards with visible affordance** | Cards that link somewhere must look clickable; arrow icon on hover is standard (not translate-up effect which signals "animation" not "link") | LOW | `components/dashboard/kpi-widgets.tsx` |
+| **Differentiated card hierarchy** | Top 3 KPI cards vs bottom 3 pipeline cards currently look nearly identical; visual hierarchy is expected | LOW | `components/dashboard/kpi-widgets.tsx` |
+| **Empty states with actionable prompts** | Every empty data view needs context + a next step; current analytics empty state is a single line of plain text | LOW | `components/dashboard/analytics-service-breakdown.tsx`, `components/feedback/feedback-list.tsx` |
+| **Campaign cards that open on click** | Cards with edit affordance should be fully clickable, not require hitting a small menu item | LOW | `components/campaigns/campaign-card.tsx` |
+| **Filter visual differentiation (status vs type)** | Status filters and service type filters in Jobs page look identical; users cannot tell the groups apart | LOW | `components/jobs/job-filters.tsx` |
+| **Consistent page padding** | Customers page and Jobs page have inconsistent internal padding vs other pages | LOW | `components/customers/customers-client.tsx`, `components/jobs/jobs-client.tsx` |
+| **Feedback page UI consistency** | Feedback cards have different visual treatment than other list pages; looks like a different product | LOW | `components/feedback/feedback-card.tsx`, `components/feedback/feedback-list.tsx` |
+| **Smart customer name field** | The customer field in Add Job accepts names OR emails but gives no affordance that it does; users try typing email and see "no results" | LOW | `components/jobs/customer-autocomplete.tsx` |
+| **Service type filter shows only user's types** | Jobs filter bar shows all 8 service types regardless of what the business offers; HVAC business sees Roofing filter | LOW | `components/jobs/job-filters.tsx` |
+| **Campaign edit opens in-context (panel/modal)** | Navigating away to `/campaigns/[id]/edit` breaks flow; inline editing panel is the modern SaaS pattern | MEDIUM | `app/(dashboard)/campaigns/[id]/edit/page.tsx`, `components/campaigns/campaign-card.tsx` |
 
 ---
 
-### LLM Message Personalization
+### Differentiators (Competitive Advantage)
 
-| Feature | Why Expected | Complexity | Dependencies | Notes |
-|---------|--------------|------------|--------------|-------|
-| **Dynamic field insertion** | Personalized greetings increase engagement by 26% | Low | Existing variable system ({CustomerName}, etc.) | Already built for email templates |
-| **Service-specific personalization** | Reference actual service performed (e.g., "your HVAC tune-up") | Medium | Job service_type field, template variables | {ServiceType}, {TechnicianName}, {JobDate} |
-| **LLM tone/style adjustment** | Generate friendlier, more natural messages | Medium | OpenAI/Anthropic API, prompt engineering | Optional enhancement over static templates |
-| **AI-powered subject lines** | Boost email open rates | Low | LLM API call pre-send | Subject line generation only (low risk) |
-| **Photo inclusion capability** | Visual personalization: attach job completion photo | Medium | Image upload, storage, MMS support | MMS costs 3x more than SMS; defer to post-MVP |
+Features that make AvisLoop feel premium relative to its price point and competitor complexity.
 
-**Guardrails (required to prevent risks):**
-
-| Guardrail | Why Critical | Implementation | Complexity |
-|-----------|--------------|----------------|------------|
-| **Content filter (PII leakage)** | Prevent accidental exposure of customer data | Pre-send scan for phone numbers, addresses, emails | Medium |
-| **Brand voice constraints** | Keep tone professional, not overly casual | System prompt with company voice guidelines | Low |
-| **Length limits** | Ensure SMS stays under 160 chars, email concise | Token limit on LLM output, character validation | Low |
-| **Fallback to static template** | If LLM fails, don't block send | Try-catch with template fallback | Low |
-| **Human review flag** | Mark AI-generated for optional review before send | UI indicator + optional approval workflow | Medium |
-| **No promotional content** | Review requests are transactional, not marketing | Prompt constraint + content filter | Low |
-
-**Source confidence:**
-- Personalization effectiveness: MEDIUM ([RightResponse AI](https://www.rightresponseai.com/products/review-requester), [ResponseScribe AI tips](https://www.responsescribe.com/blogs/ai-personalization))
-- LLM risks: HIGH ([LLM guardrails best practices](https://www.datadoghq.com/blog/llm-guardrails-best-practices/), [LLM security guide](https://www.confident-ai.com/blog/llm-guardrails-the-ultimate-guide-to-safeguard-llm-systems))
-- Content safety: HIGH ([Comparing LLM guardrails](https://unit42.paloaltonetworks.com/comparing-llm-guardrails-across-genai-platforms/))
+| Feature | Value Proposition | Complexity | Affected Files |
+|---------|-------------------|------------|----------------|
+| **Warm color palette with accent color** | Current palette is pure corporate blue + grey. Adding amber/warm accent (a la Stratify) makes the product feel approachable and memorable for home service owners who respond better to warmth than corporate B2B coldness | LOW | `app/globals.css`, Tailwind config |
+| **Getting started checklist as inline dashboard section** | Current setup progress is a floating pill + drawer — discoverable but disconnected. An inline dashboard section (visible, contextual) increases completion rate and teaches the V2 mental model in-context | MEDIUM | `components/dashboard/` (new section), `components/onboarding/setup-progress*.tsx` |
+| **"Review your campaign" links to the actual campaign** | Checklist item "Review your campaign" currently links to `/campaigns` (list). It should detect the user's only campaign and deep-link directly to it. Specificity signals intelligence | LOW | `lib/constants/checklist.ts`, `app/(dashboard)/layout.tsx` |
+| **Add Job from anywhere panel** | Dashboard should have a quick-add panel for completing a job without navigating to Jobs page — the core V2 action should be available without page-switching | MEDIUM | `app/(dashboard)/dashboard/page.tsx`, reuses `components/jobs/add-job-sheet.tsx` |
+| **Color on stat cards** | Monochrome cards with a number and label feel like spreadsheet data. Light colored backgrounds (green-tinted for reviews, amber for ratings) make the numbers emotionally resonant | LOW | `components/dashboard/kpi-widgets.tsx` |
+| **Onboarding consolidation (fewer steps)** | 7 steps is cognitively heavy. Merging "Review Destination" into "Business Basics" (Step 1, since it's one field), removing customer import, and merging SMS consent into the campaign step reduces wizard from 7 to 4 steps. Shorter = higher completion | MEDIUM | `components/onboarding/onboarding-wizard.tsx`, `components/onboarding/onboarding-steps.tsx`, step files |
+| **Plain-English campaign description** | Campaign preset step uses technical language ("multi-touch sequence", "touch #1/2/3"). Rewrite in plain English: "We'll send 3 friendly messages — first email the next day, reminder 3 days later, SMS a week after that" | LOW | `components/onboarding/steps/campaign-preset-step.tsx` |
+| **Software field as text input** | Step 4 (Software Used) forces choice from preset options; users can't continue without selecting. Making it a free-text optional field removes the blocker and captures more data | LOW | `components/onboarding/steps/software-used-step.tsx` |
+| **Horizontal service tile selection** | Step 3 (Services Offered) should be horizontal icon tiles, not a vertical list or checkboxes. Visual service tiles (wrench icon for plumbing, flame for HVAC, etc.) are faster to scan and more engaging | LOW-MEDIUM | `components/onboarding/steps/services-offered-step.tsx` |
+| **"Do not enroll" toggle in Add Job** | Instead of the Manual Request page, the V2 escape hatch for "don't send a review request for this job" lives directly in Add Job as a "do not enroll in campaign" checkbox. Already partially implemented; needs to be the primary surface | LOW | `components/jobs/add-job-sheet.tsx` (enrollInCampaign checkbox exists, improve visibility) |
+| **Fallback modal for manual request** | After removing Manual Request nav item, edge case (send to a one-off contact) is handled via a modal accessible from the Campaigns page or a help tooltip. Not hidden, just de-emphasized | MEDIUM | New `components/campaigns/manual-request-modal.tsx`, `app/(dashboard)/campaigns/page.tsx` |
+| **Name vs email smart detection in job field** | Customer autocomplete field should detect `@` in input and switch search mode from "name search" to "email search" with a visual indicator of which mode is active | LOW | `components/jobs/customer-autocomplete.tsx` |
 
 ---
 
-## Differentiators
+### Anti-Features (Commonly Requested, Often Problematic)
 
-Features that set AvisLoop apart from Podium/Birdeye. Not expected, but highly valued for "stupid simple" positioning.
+Features that seem like good UX but create complexity or contradict the V2 philosophy.
 
-### Simplified Campaign Builder
-
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| **Opinionated defaults** | No setup paralysis: pre-configured 3-touch sequence | Low | Default timing: Day 0 (email), Day 3 (email), Day 7 (SMS) |
-| **One-click enable** | Toggle campaigns ON globally vs. per-job configuration | Low | Podium/Birdeye require per-campaign setup |
-| **Smart timing recommendations** | "Most customers send Touch #1 within 4 hours" | Medium | Analytics on aggregate send timing |
-| **Template library** | 5-10 pre-written templates per service type | Medium | HVAC, plumbing, electrical, cleaning, etc. |
-| **Visual campaign preview** | Show exactly what customer receives (email + SMS side-by-side) | Low | Existing message preview (already built) |
-
-**Competitive gap:**
-- Podium: Automation in expensive plans only; basic review requests in lower tiers
-- Birdeye: 200+ review platforms = complexity; small operators only use Google
-- AvisLoop opportunity: Opinionated simplicity over configurability
+| Feature | Why Requested | Why Problematic | Alternative |
+|---------|---------------|-----------------|-------------|
+| **Notification count badge on nav items** | "Users should see how many things need attention" | Creates anxiety, trains users to check app constantly (V1 behavior), clutters nav | Remove nav badge. Dashboard's "Needs Attention" card is the right surface — users see it when they visit |
+| **Translate-up hover on clickable cards** | "Makes cards feel interactive" | `-translate-y-1` signals "card lifts" (decorative), not "card navigates." Arrow chevron on hover is the correct affordance for navigable cards | Replace with `→` arrow icon appearing on hover |
+| **Manual Request as primary nav item** | "Users need to be able to send manually" | V2 philosophy: manual sends should be de-emphasized. Keeping it in nav trains V1 behavior | Move to overflow/settings or remove; provide escape hatch via Add Job's "do not enroll" + fallback modal |
+| **Google Review Link field on BOTH Business Basics and Review Destination steps** | "Make sure user enters it" | Currently duplicated — Step 1 (business basics) includes it AND Step 2 is dedicated to it. Causes confusion and "did I already enter this?" | Keep in Step 1 only; remove Step 2 entirely (merge content) |
+| **All 8 service types always shown in Jobs filter** | "Let users filter by any type" | An HVAC business will never filter by Roofing; irrelevant options add cognitive noise | Filter the available chips to only the business's `service_types_enabled` list |
+| **Floating pill as only setup progress surface** | "It's discoverable when they need it" | The pill is easy to ignore; new users miss it and never complete setup | Inline dashboard section that disappears when complete (both surfaces: inline + pill) |
+| **Page-level navigation for campaign editing** | "Full page gives more space" | Breaking context (leaving campaign list, going to `/edit` page) fragments the editing flow | Sheet or side panel that slides over the campaign list |
+| **Customers page as prominent nav item** | "Users need to see their customer list" | Keeps V1 CRM mental model alive; customers are a side effect in V2 | De-emphasize (move lower in nav, consider icon-only or removal post-v2.5) |
+| **Complex password requirements list on login** | "Users forget password requirements" | Password requirements belong on the Sign Up page, not Login. Showing them on login creates confusion (user is logging in, not choosing a new password) | Show requirements on Sign Up only; on Login, just show "Incorrect password" error |
 
 ---
 
-### Review Funnel (Two-Step Satisfaction Filter)
-
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| **Pre-qualification question** | "How satisfied were you? (1-5)" before public review | Low | Internal feedback form |
-| **Conditional routing** | 4-5 stars → Google review; 1-3 stars → private feedback | Medium | Logic branching based on rating |
-| **Internal feedback capture** | Save negative feedback for improvement without public harm | Low | Store in database, show in dashboard |
-| **"Fix it first" workflow** | Notify business owner of negative feedback for resolution | Medium | Email alert on low rating |
-| **Prevent review bombing** | Only send satisfied customers to public platforms | Low | Reputation management benefit |
-
-**Ethical considerations:**
-- Transparent to customer: "Share feedback privately or publicly"
-- Not deceptive: Don't hide that we route based on rating
-- Valuable to business: Catch issues before they become public reviews
-
-**Source confidence:**
-- Review funnel pattern: HIGH ([Review funnel guide](https://userpilot.com/blog/review-funnel/), [How to build review funnel](https://www.involve.me/blog/how-to-build-a-review-funnel-a-step-by-step-tutorial))
-- Effectiveness: MEDIUM (claimed "accumulate more 5-star reviews" but no hard data)
-
----
-
-### Job-Type Campaign Templates
-
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| **Service category presets** | HVAC, plumbing, electrical, cleaning, roofing, painting, handyman | Low | Onboarding asks "What services do you offer?" |
-| **Category-specific timing** | HVAC (send 24h later), plumbing (send 4h later), cleaning (send 1h later) | Low | Different urgency levels |
-| **Category-specific messaging** | "Your AC is running smoothly" vs "Your pipes are fixed" | Medium | Template variables per category |
-| **Seasonal messaging** | HVAC summer/winter variations | Medium | Date-based template selection |
-
-**Timing by service type (recommended defaults):**
-- **Emergency services** (plumbing leak, electrical issue): 2-4 hours post-completion
-- **Routine maintenance** (HVAC tune-up, cleaning): 12-24 hours post-completion
-- **Project work** (painting, roofing): 48 hours post-completion (let work settle)
-
-**Source confidence:**
-- Service-specific patterns: LOW (inferred from general field service practices, not verified)
-- Timing urgency: MEDIUM (consensus across [home service SMS](https://www.regal.ai/blog/sms-campaigns-for-home-services))
-
----
-
-### Campaign Analytics & Insights
-
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| **Campaign performance dashboard** | See open rates, click rates, review conversion by touch | Medium | Per-campaign metrics |
-| **A/B test framework** | Test subject lines, send timing, message content | High | Defer to post-MVP |
-| **Best time to send (per contact)** | Learn optimal send times per customer | High | ML-based; defer to post-MVP |
-| **Review source attribution** | Track which campaign touch drove the review | Medium | UTM parameters on review links |
-| **ROI calculator** | "This campaign generated X reviews worth $Y in revenue" | Medium | Review value estimation (avg customer LTV) |
-
----
-
-## Anti-Features
-
-Features to explicitly NOT build. Common mistakes in this domain or feature bloat that hurts "stupid simple" positioning.
-
-| Anti-Feature | Why Avoid | What to Do Instead |
-|--------------|-----------|-------------------|
-| **200+ review platform integrations** | Complexity; small operators only care about Google | Support Google only (MVP), add Facebook/Yelp if requested |
-| **Multi-language support** | Scope creep; US home services = English-first | English only (MVP); add Spanish if strong signal |
-| **Advanced workflow builder** | Visual drag-and-drop is overkill for 3-touch sequence | Opinionated presets with simple overrides |
-| **White-label widget** | Enterprise feature; increases complexity | Branded AvisLoop widget (build trust, not hide it) |
-| **Two-way SMS conversations** | Support burden; review requests are one-way | STOP keyword only; no chat support |
-| **Review response automation** | Risky: AI-generated responses to public reviews | Manual response only (business owner writes) |
-| **Sentiment analysis of reviews** | Over-engineering; star rating is sufficient | Simple 1-5 star rating in pre-qualification |
-| **Scheduled send per contact** | Per-contact timing = complexity | Global timing rules (e.g., "send at 10 AM local time") |
-| **Multi-step approval workflows** | Slows down sending; trust users | Optional preview, no mandatory approval |
-| **Custom SMS sender IDs** | Not supported in US (10DLC only) | Standard 10DLC number with business name in message |
-
-**Reasoning:**
-- **Podium/Birdeye weakness:** Feature bloat for enterprise customers; confusing for small operators
-- **AvisLoop strength:** Opinionated simplicity; 80/20 rule (20% of features drive 80% of value)
-
----
-
-## Feature Dependencies & Build Order
-
-### Phase 1: SMS Foundation
-**Goal:** Send individual SMS review requests manually
-
-1. SMS provider integration (Twilio recommended)
-2. A2P 10DLC registration workflow (brand + campaign)
-3. Opt-in/opt-out management (extend existing email system)
-4. Quiet hours enforcement
-5. Character counter + URL shortener
-6. Manual SMS send (quick send tab)
-
-**Dependencies:** Extends existing contact management, send history
-
----
-
-### Phase 2: Job Tracking
-**Goal:** Link review requests to jobs, not just contacts
-
-1. `jobs` table (id, contact_id, service_type, status, completion_timestamp, notes)
-2. Job CRUD UI (create, view, update status)
-3. Job completion → campaign trigger (manual first)
-4. Job-to-contact linking (single contact per job)
-
-**Dependencies:** Contact table (existing)
-
----
-
-### Phase 3: Multi-Touch Campaigns
-**Goal:** Automated 3-touch sequences
-
-1. Campaign state machine (pending, in_progress, completed, paused)
-2. Campaign-to-job linking (one campaign per job)
-3. Touch scheduling (Day 0, 3, 7 default)
-4. Stop conditions (reviewed, opted out, cancelled)
-5. Campaign history per contact (avoid duplicates)
-
-**Dependencies:** Job tracking (Phase 2), existing email + new SMS sending
-
----
-
-### Phase 4: LLM Personalization
-**Goal:** Generate natural, personalized messages
-
-1. LLM API integration (OpenAI recommended for speed)
-2. Prompt engineering (system prompt + user variables)
-3. Guardrails (content filter, length limit, fallback)
-4. Optional: Human review flag
-5. A/B test LLM vs static templates
-
-**Dependencies:** Email templates (existing), job data (Phase 2)
-
----
-
-### Phase 5: Review Funnel
-**Goal:** Filter negative reviews privately
-
-1. Pre-qualification form (1-5 star rating)
-2. Conditional routing (4-5 → Google, 1-3 → internal)
-3. Internal feedback storage + dashboard
-4. Email alert on negative feedback
-5. "Fix it first" workflow
-
-**Dependencies:** Campaign system (Phase 3), existing dashboard
-
----
-
-### Phase 6: Service-Specific Templates & Analytics
-**Goal:** Onboarding flow + performance insights
-
-1. Service category selection (onboarding)
-2. Category-specific templates (HVAC, plumbing, etc.)
-3. Category-specific timing defaults
-4. Campaign performance dashboard
-5. Review source attribution (UTM tracking)
-
-**Dependencies:** Campaign system (Phase 3), analytics infrastructure
-
----
-
-## MVP Recommendation
-
-**For v2.0 milestone (SMS + campaigns + jobs + LLM), prioritize:**
-
-1. **SMS sending (manual)** — Table stakes; must-have
-2. **Job tracking** — Foundation for campaigns
-3. **3-touch campaigns** — Core differentiator
-4. **Review funnel (simple)** — Low-hanging differentiator
-5. **Basic LLM personalization (optional)** — Nice-to-have; can defer if scope creeps
-
-**Defer to post-MVP:**
-- Advanced analytics (A/B testing, best time to send)
-- Multi-platform integrations (Facebook, Yelp beyond Google)
-- FSM software integrations (ServiceTitan, Jobber)
-- MMS support (photo inclusion)
-- AI review response automation
-
-**Rationale:**
-- SMS + campaigns = competitive parity with Podium/Birdeye
-- Review funnel = simple differentiator (1-2 day build)
-- LLM personalization = optional polish (can ship without it)
-- Integrations = scope creep (manual job entry sufficient for MVP)
-
----
-
-## Technical Considerations
-
-### SMS Provider Recommendation
-
-| Provider | Pros | Cons | Cost | Recommendation |
-|----------|------|------|------|----------------|
-| **Twilio** | Industry standard, excellent docs, 10DLC support | Higher cost, complex pricing | $0.0075/SMS + $1/mo per number | **Recommended** (established, reliable) |
-| **Telnyx** | Lower cost, good API | Smaller ecosystem, fewer integrations | $0.006/SMS + $0.40/mo per number | Alternative (cost-sensitive) |
-| **SendGrid (via Twilio)** | Unified email+SMS billing | SMS through Twilio anyway | $0.0083/SMS | Not recommended (just use Twilio directly) |
-
-**Source:** [Twilio vs SendGrid comparison](https://www.softwareadvice.com/email-marketing/sendgrid-profile/vs/twilio/), [SMS provider pricing 2026](https://mobile-text-alerts.com/articles/twilio-alternatives)
-
----
-
-### LLM Provider Recommendation
-
-| Provider | Pros | Cons | Cost | Recommendation |
-|----------|------|------|------|----------------|
-| **OpenAI GPT-4o** | Fast, good at short-form text, simple API | Higher cost | $2.50/1M input tokens, $10/1M output | **Recommended** (speed matters for review requests) |
-| **Anthropic Claude Sonnet** | Better safety, more thoughtful | Slower for short tasks | $3/1M input, $15/1M output | Alternative (if safety is priority) |
-| **OpenAI GPT-4o mini** | Cheapest, fast enough | Lower quality | $0.15/1M input, $0.60/1M output | Budget option (test first) |
-
-**Source:** Current pricing as of Jan 2025; [LLM guardrails guide](https://www.datadoghq.com/blog/llm-guardrails-best-practices/)
-
----
-
-### Campaign State Machine
+## Feature Dependencies
 
 ```
-Job Created (status=scheduled)
-  ↓
-Job Completed (status=completed, completion_timestamp set)
-  ↓
-Campaign Created (status=pending, touch_1_scheduled_at set)
-  ↓
-Touch #1 Sent (email, status=in_progress)
-  ↓
-Wait 3 days OR stop if reviewed/opted out
-  ↓
-Touch #2 Sent (email)
-  ↓
-Wait 4 days OR stop if reviewed/opted out
-  ↓
-Touch #3 Sent (SMS)
-  ↓
-Campaign Completed (status=completed)
+[Dashboard Welcome Greeting]
+    └──requires──> [User name from auth session] (already available via Supabase auth)
+
+[Clickable Stat Cards with Arrow Affordance]
+    └──replaces──> [translate-up hover animation] (simple CSS swap)
+
+[Colored Stat Card Backgrounds]
+    └──enhances──> [Clickable Stat Cards] (combined implementation)
+
+[Differentiated Bottom 3 Cards]
+    └──enhances──> [Card Hierarchy] (visual only, no data changes)
+
+[Inline Getting Started Section on Dashboard]
+    └──requires──> [Existing checklist data + SetupProgress component]
+    └──replaces──> [Floating pill as sole surface] (pill remains, inline added)
+
+["Review Campaign" deep-link]
+    └──requires──> [Campaign ID lookup at layout load time]
+    └──depends-on──> [Existing checklist item href in lib/constants/checklist.ts]
+
+[Add Job from Dashboard Panel]
+    └──reuses──> [AddJobSheet component] (trigger from dashboard)
+    └──requires──> [customers list fetched on dashboard page]
+
+[Onboarding Consolidation to 4 Steps]
+    └──removes──> Step 2 (Review Destination) — merge Google link into Step 1
+    └──removes──> Step 6 (Import Jobs) — remove entirely (V2 anti-pattern)
+    └──modifies──> Step 4 (Software) — text input, optional, skippable
+    └──depends-on──> [OnboardingWizard step config array]
+
+[Service Type Tiles in Onboarding Step 3]
+    └──replaces──> [Checkbox list in services-offered-step.tsx]
+
+[Plain English Campaign Language]
+    └──modifies──> [campaign-preset-step.tsx text only]
+
+[Smart Name/Email Detection in Customer Field]
+    └──modifies──> [CustomerAutocomplete component] (detect @ symbol, switch search mode)
+
+[Service Types in Job Filter (business-scoped)]
+    └──requires──> [business.service_types_enabled passed as prop to JobFilters]
+    └──modifies──> [job-filters.tsx, jobs-client.tsx, jobs/page.tsx data fetch]
+
+[Campaign Card Fully Clickable]
+    └──replaces──> [Link wrapping name only in campaign-card.tsx]
+    └──adds──> [onClick or Link wrapper on entire card div]
+
+[Campaign Edit as Side Panel]
+    └──refactors──> [/campaigns/[id]/edit/page.tsx] (move to sheet component)
+    └──requires──> [New CampaignEditSheet component]
+
+[Manual Request Removal + Fallback Modal]
+    └──removes──> ["/send" from sidebar mainNav array]
+    └──adds──> [ManualRequestModal accessible from Campaigns page]
+    └──enhances──> [Add Job's enrollInCampaign checkbox visibility]
+
+[Remove Notification Count from Nav]
+    └──removes──> [dashboardBadge prop threading through AppShell → Sidebar]
+    └──simplifies──> [app/(dashboard)/layout.tsx data fetching]
+
+[Login Page Illustration]
+    └──replaces──> [Right panel gradient + faded "A" in auth-split-layout.tsx]
+
+[Password Visibility Toggle]
+    └──adds──> [Eye/EyeSlash button to password input in login-form.tsx]
+
+[Analytics Empty State with Action Prompt]
+    └──replaces──> [single plain text line in analytics-service-breakdown.tsx]
+
+[Feedback UI Consistency]
+    └──modifies──> [feedback-card.tsx styling to match Jobs/Customers card patterns]
 ```
 
-**Stop conditions (check before each touch):**
-1. Contact reviewed (check if review exists for this job)
-2. Contact opted out (global opt-out flag)
-3. Campaign manually paused (admin override)
-4. Job cancelled (status changed to cancelled)
+### Dependency Notes
+
+- **Dashboard welcome greeting requires no new data:** Auth user's email/name is available from Supabase session in the server component. First name extraction from email or profile is sufficient.
+- **Onboarding consolidation is the highest-risk item:** Removing steps changes the step index throughout the wizard shell, step navigation logic, and URL params. Must be done carefully. Estimated 4-6 hours.
+- **Campaign card clickability conflicts with Switch toggle:** The entire card cannot be a `<Link>` if it contains an interactive Switch. Pattern: onClick on the card div opens the edit panel; Switch and dropdown menu have `e.stopPropagation()`.
+- **Service type scoping in Jobs filter requires data plumbing:** `service_types_enabled` must travel from `jobs/page.tsx` (server, already fetches business data) down to `JobFilters`. Low complexity, but touches 3 files.
+- **Manual Request removal:** The `/send` route should not be deleted — it handles edge cases and may be linked from existing emails. Just remove from nav and add friction via a warning banner on the page.
 
 ---
 
-## Compliance Checklist
+## MVP Definition (for v2.5 Redesign Milestone)
 
-### SMS (TCPA + A2P 10DLC)
+### Launch With (Redesign Phase 1 — Visual & Quick Wins)
 
-- [ ] A2P 10DLC brand registration (business EIN, address, phone)
-- [ ] A2P 10DLC campaign registration (use case: "Customer care")
-- [ ] Trust Score optimization (accurate business info)
-- [ ] Express written consent (opt-in checkbox at job booking or post-service)
-- [ ] Opt-out keyword handling (STOP, QUIT, END, CANCEL, UNSUBSCRIBE)
-- [ ] Quiet hours enforcement (8 AM - 9 PM local time)
-- [ ] Consent record retention (timestamp, method, IP address)
-- [ ] Business identification in message (company name in every SMS)
-- [ ] Character limit enforcement (160 GSM-7, 70 UCS-2)
-- [ ] Opt-out confirmation message ("You've been unsubscribed")
+Changes that are purely presentational or low-risk, no data model changes.
 
-**Source:** [TCPA compliance checklist](https://www.textmymainnumber.com/blog/sms-compliance-in-2025-your-tcpa-text-message-compliance-checklist), [Twilio opt-in guide](https://www.twilio.com/en-us/blog/insights/compliance/opt-in-opt-out-text-messages)
+- [ ] **Login page illustration** — Replace faded "A" with a real image or styled visual panel
+- [ ] **Password visibility toggle** — Eye icon in password field
+- [ ] **Required field indicators** — `*` labels on required form fields
+- [ ] **Dashboard welcome greeting** — "Good morning, [First Name]" with time-based salutation
+- [ ] **Clickable stat card affordance** — Replace translate-up with arrow chevron on hover
+- [ ] **Colored stat card backgrounds** — Light tinted backgrounds per card (green/amber/blue)
+- [ ] **Differentiated bottom 3 cards** — Visual treatment to separate pipeline cards from outcome cards
+- [ ] **Remove nav notification badge** — Remove dashboardBadge prop threading
+- [ ] **Analytics empty state with action** — Replace plain text with icon + heading + CTA
+- [ ] **Feedback UI consistency** — Match feedback-card.tsx to jobs/customers visual patterns
+- [ ] **Consistent padding on Customers + Jobs pages** — Normalize to `container mx-auto py-6 px-4`
+- [ ] **Campaign card fully clickable** — Entire card div triggers edit (with stopPropagation on controls)
+- [ ] **Filter group visual differentiation** — Separator + label between Status and Service Type filters
 
-### Email (Existing, Extends to Campaigns)
+### Add After Quick Wins (Redesign Phase 2 — Interaction & Flow)
 
-- [ ] CAN-SPAM compliance (already implemented via Resend)
-- [ ] Unsubscribe link in every email (existing)
-- [ ] Opt-out honoring (existing)
+Higher effort, require component refactors or data plumbing.
 
-### LLM Guardrails
+- [ ] **Campaign edit as slide-in panel** — New CampaignEditSheet, remove separate edit page navigation
+- [ ] **Service type filter scoped to business** — Pass `service_types_enabled` to JobFilters
+- [ ] **Smart name/email detection** — CustomerAutocomplete detects `@` and switches search mode
+- [ ] **"Review your campaign" deep-link** — Look up first campaign ID, deep-link to it in checklist
+- [ ] **Inline getting started section on dashboard** — Dashboard section above KPIs for new users
+- [ ] **Add Job from dashboard panel** — Quick-add trigger on dashboard page
+- [ ] **Manual Request removal + fallback** — Remove from nav, add modal escape hatch on Campaigns page
+- [ ] **Plain English campaign language** — Rewrite campaign-preset-step.tsx copy
 
-- [ ] PII leakage filter (scan for phone, email, address in generated text)
-- [ ] Content filter (no promotional language in transactional messages)
-- [ ] Length limits (160 chars for SMS, 500 chars for email)
-- [ ] Fallback to static template on LLM failure
-- [ ] Optional human review flag (UI indicator)
+### Future Consideration (Redesign Phase 3 — Onboarding)
 
----
+Higher risk due to step restructuring, deferred to validate Phase 1-2 first.
 
-## Open Questions / Validation Needed
-
-1. **Double opt-in for SMS?**
-   - TCPA requires single opt-in (express written consent)
-   - Double opt-in recommended but not legally required
-   - Decision: Start with single opt-in (job booking checkbox), add double opt-in if spam complaints
-
-2. **Campaign timing: Fixed delays vs. time-of-day optimization?**
-   - Fixed: "Send 3 days after Touch #1" (simple)
-   - Time-optimized: "Send 3 days after Touch #1 at 10 AM local time" (better engagement)
-   - Decision: Start fixed, add time-of-day in Phase 6
-
-3. **Job creation: Manual vs. integrated?**
-   - Manual: Users create jobs in AvisLoop (simple, no dependencies)
-   - Integrated: Sync from ServiceTitan/Jobber/Housecall Pro (complex, higher value)
-   - Decision: Manual for MVP, integrations post-MVP if strong demand
-
-4. **Review funnel: Transparent vs. opaque routing?**
-   - Transparent: "Share privately (1-3 stars) or publicly (4-5 stars)" (ethical, clear)
-   - Opaque: "Rate your experience" → route without telling (more effective, less transparent)
-   - Decision: Lean transparent (builds trust, aligns with "stupid simple" brand)
-
-5. **LLM personalization: Opt-in or default?**
-   - Default: LLM generates all messages (better quality, potential risk)
-   - Opt-in: Static templates by default, LLM optional (safer, less impressive)
-   - Decision: Start opt-in (A/B test), move to default if safe + effective
+- [ ] **Onboarding consolidation (7 → 4 steps)** — Merge/remove steps, restructure wizard
+- [ ] **Horizontal service type tiles** — Replace checkbox list in services-offered-step.tsx
+- [ ] **Software field as free text** — Replace dropdown with text input, make fully optional
+- [ ] **Warm accent color addition** — Add amber/gold CSS variable to design system
 
 ---
 
-## Sources Summary
+## Feature Prioritization Matrix
 
-### High Confidence (Official Documentation, Context7)
-- TCPA compliance requirements
-- A2P 10DLC registration process
-- SMS character limits and encoding
-- Trust Score mechanics
+| Feature | User Value | Implementation Cost | Priority |
+|---------|------------|---------------------|----------|
+| Dashboard welcome greeting | HIGH | LOW | P1 |
+| Password visibility toggle | HIGH | LOW | P1 |
+| Login illustration | HIGH | LOW | P1 |
+| Required field indicators | HIGH | LOW | P1 |
+| Clickable stat card affordance (arrow) | HIGH | LOW | P1 |
+| Colored stat card backgrounds | HIGH | LOW | P1 |
+| Remove nav notification badge | MEDIUM | LOW | P1 |
+| Analytics empty state with action | MEDIUM | LOW | P1 |
+| Feedback UI consistency | MEDIUM | LOW | P1 |
+| Consistent page padding | LOW | LOW | P1 |
+| Campaign card fully clickable | HIGH | LOW | P1 |
+| Filter group visual differentiation | MEDIUM | LOW | P1 |
+| Differentiated bottom 3 cards | MEDIUM | LOW | P1 |
+| Campaign edit as side panel | HIGH | MEDIUM | P2 |
+| Service type filter scoped to business | HIGH | LOW | P2 |
+| Smart name/email detection | MEDIUM | LOW | P2 |
+| "Review campaign" deep-link | MEDIUM | LOW | P2 |
+| Inline getting started section | HIGH | MEDIUM | P2 |
+| Add Job from dashboard panel | HIGH | MEDIUM | P2 |
+| Manual request removal + fallback modal | MEDIUM | MEDIUM | P2 |
+| Plain English campaign language | MEDIUM | LOW | P2 |
+| Onboarding consolidation (7→4 steps) | HIGH | HIGH | P3 |
+| Horizontal service type tiles | MEDIUM | MEDIUM | P3 |
+| Software field as free text | MEDIUM | LOW | P3 |
+| Warm accent color (amber/gold) | MEDIUM | MEDIUM | P3 |
 
-### Medium Confidence (WebSearch, Multiple Credible Sources)
-- 3-touch campaign timing patterns (Day 0, 3, 7)
-- SMS vs email effectiveness (98% vs 20% open rates)
-- Review funnel pattern (satisfaction filter)
-- Field service automation trends
-- Personalization effectiveness (+26% conversion)
-- LLM guardrail best practices
-
-### Low Confidence (WebSearch, Single/Unverified Sources)
-- Exact response rate improvements (5-8% → 12-18%)
-- 4+ touches = 34% opt-out increase (claimed, not sourced)
-- Service-specific timing recommendations
-- Campaign A/B testing effectiveness
-
----
-
-## Recommendations for Roadmap
-
-1. **Phase structure suggestion:**
-   - Phase 1: SMS foundation (manual sends, compliance, opt-out)
-   - Phase 2: Job tracking (foundation for automation)
-   - Phase 3: Multi-touch campaigns (3-touch sequence, stop conditions)
-   - Phase 4: Review funnel (satisfaction filter, private feedback)
-   - Phase 5: LLM personalization (optional polish)
-   - Phase 6: Analytics & insights (performance dashboard)
-
-2. **Research flags for future phases:**
-   - **Phase 1 (SMS):** Likely needs deeper research on Twilio SDK integration, A2P 10DLC registration UX
-   - **Phase 3 (Campaigns):** Likely needs deeper research on state machine implementation, cron job scheduling
-   - **Phase 4 (Review funnel):** Standard patterns, unlikely to need research
-   - **Phase 5 (LLM):** Likely needs deeper research on prompt engineering, guardrail implementation
-
-3. **Dependencies to watch:**
-   - Job tracking must complete before campaigns (blocker)
-   - SMS sending must complete before campaigns (blocker)
-   - LLM personalization independent of campaigns (can run in parallel)
-
-4. **Complexity hotspots:**
-   - A2P 10DLC registration UX (guide users through TCR process)
-   - Campaign state machine (timing engine, stop conditions)
-   - LLM guardrails (PII detection, content filtering)
-   - Timezone handling (local quiet hours, send time optimization)
+**Priority key:**
+- P1: Must have for launch — quick wins that immediately improve the product feel
+- P2: Should have — meaningful interaction improvements, moderate effort
+- P3: Larger refactors — defer until P1/P2 is stable
 
 ---
 
-## Confidence Assessment
+## Competitor Feature Analysis
 
-| Area | Confidence | Reason |
-|------|------------|--------|
-| SMS compliance | HIGH | Official TCPA/10DLC documentation verified |
-| Campaign timing | MEDIUM | WebSearch consensus, but no primary research data |
-| LLM guardrails | HIGH | Multiple authoritative sources on LLM safety |
-| Review funnel | HIGH | Well-documented pattern with case studies |
-| Job tracking | HIGH | Standard FSM patterns verified |
-| Integration landscape | HIGH | Verified comparisons of ServiceTitan/Jobber/Housecall Pro |
-| Service-specific patterns | LOW | Inferred from general practices, not verified |
+| Feature | Jobber | Housecall Pro | Our Approach |
+|---------|--------|--------------|--------------|
+| Dashboard greeting | "Hi [Name]" with quick stats | "Welcome back, [Name]" banner | Contextual time-based greeting + first name |
+| Stat cards | Colored backgrounds per metric | Flat with border-left accent color | Light tinted backgrounds + arrow affordance |
+| Empty states | Illustration + clear CTA | Icon + heading + single action button | Icon + heading + action CTA matching V2 language |
+| Onboarding | 3-4 steps, skippable | 5 steps with progress dots | Consolidate to 4 steps, remove V1 patterns |
+| Campaign management | Full page editor | Modal/drawer editor | Slide-in panel (keeps context) |
+| Getting started | Persistent sidebar checklist | Dashboard card that fades out | Inline dashboard section + floating pill |
+| Mobile FAB | Prominent "New Job" button | Persistent bottom CTA | Already built; ensure primary styling |
 
-**Overall confidence: MEDIUM**
+---
 
-Most technical requirements (SMS compliance, LLM guardrails, job tracking) are HIGH confidence based on official documentation and authoritative sources. Campaign timing patterns and effectiveness claims are MEDIUM confidence based on WebSearch consensus across multiple credible sources. Service-specific timing recommendations are LOW confidence (inferred, not verified).
+## Page-by-Page Feature Requirements
 
-**Gaps to address in phase-specific research:**
-- Twilio SDK integration best practices (Phase 1)
-- Campaign state machine implementation patterns (Phase 3)
-- LLM prompt engineering for review requests (Phase 5)
+### Login / Auth Pages
+
+**Problems:** No visual personality on right panel, no password eye, no clear field requirements.
+
+**Required changes:**
+1. Right panel: Replace gradient + faded "A" with product screenshot, illustration, or testimonial card
+2. Password field: Add eye/eye-slash toggle button (right side of input)
+3. Required fields: Asterisk `*` on email and password labels
+4. Error messaging: Use destructive banner, not inline text (for consistency with rest of app)
+
+**What NOT to add here:** Password requirements checklist. That belongs on Sign Up only.
+
+---
+
+### Dashboard Page
+
+**Problems:** Cold "Dashboard" heading, no greeting, identical-looking cards, translate-up hover is confusing, no color, bottom 3 cards not differentiated, no setup progress inline, no quick Add Job.
+
+**Required changes:**
+1. Replace `<h1>Dashboard</h1>` with `<h1>Good morning, {firstName}</h1>` (time-aware)
+2. Top 3 KPI cards: Add light tinted background per card type (green for reviews, amber for rating, blue for conversion)
+3. Top 3 KPI cards: Replace `-translate-y-1` hover with `→` arrow appearing in top-right on hover
+4. Bottom 3 pipeline cards: Visual treatment to distinguish from top 3 (e.g., smaller, no background color, or grouped under a subtle "Pipeline" heading)
+5. Inline "Getting Started" section: Show when `!setupProgress.allComplete && !setupProgress.dismissed`, above KPIs
+6. "Add Job" quick panel: Accessible from dashboard (button that opens AddJobSheet with customers pre-loaded)
+7. Remove attention badge from Dashboard nav item (alerts visible within the page itself)
+
+---
+
+### Getting Started Checklist
+
+**Problems:** "Review your campaign" links to `/campaigns` list, not the actual campaign. Should feel smart.
+
+**Required changes:**
+1. `campaign_reviewed` checklist item: Look up user's first active campaign ID server-side; set `href` to `/campaigns/{id}` dynamically
+2. Progress drawer: When "Review your campaign" is clicked, open campaign detail directly
+3. Consider renaming "Review your campaign" → "Customize your first campaign" (more action-oriented)
+
+**Implementation note:** `lib/constants/checklist.ts` currently has a static `href: '/campaigns'`. The dashboard layout (or a server component) needs to fetch the first campaign ID and inject it.
+
+---
+
+### Jobs Page
+
+**Problems:** Service type filter shows all 8 types (not just enabled), filter groups not visually distinct, padding inconsistency, create job bug (likely related to form submission), can't visually differentiate the field type (name vs email).
+
+**Required changes:**
+1. `job-filters.tsx`: Accept `enabledServiceTypes: ServiceType[]` prop; filter service type chips to only show enabled ones
+2. `job-filters.tsx`: Add visual separator + label between Status group ("Status:") and Service Type group ("Service:")
+3. `jobs-client.tsx` / `jobs/page.tsx`: Pass `business.service_types_enabled` down to JobFilters
+4. `customer-autocomplete.tsx`: Detect `@` in query, switch to email-search mode with `(email)` indicator text
+5. Padding: Standardize to `py-6 px-4` matching dashboard and campaigns pages
+6. Investigate create job bug (form submission state/navigation issue) — separate bug fix
+
+---
+
+### Campaigns Page
+
+**Problems:** Campaign cards are not clickable (only name has a link), edit requires full-page navigation, back button hit area too large (from edit page), can't save changes bug.
+
+**Required changes:**
+1. `campaign-card.tsx`: Make entire card div clickable (opens edit panel); controls (Switch, dropdown) use `e.stopPropagation()`
+2. Create `CampaignEditSheet` component: Slide-in right panel with the campaign form content
+3. `campaigns/[id]/edit/page.tsx`: Redirect to `/campaigns` with panel open, or keep as fallback
+4. Investigate can't save changes bug — likely a Server Action state issue
+
+**Pattern for whole-card-clickable with internal controls:**
+```
+<div onClick={handleOpenEdit} className="cursor-pointer ...">
+  {/* card content */}
+  <Switch onClick={(e) => e.stopPropagation()} ... />
+  <DropdownMenuTrigger onClick={(e) => e.stopPropagation()} ... />
+</div>
+```
+
+---
+
+### Analytics Page
+
+**Problems:** Empty state is a single line of muted text with no icon, heading, or action.
+
+**Required changes:**
+1. `analytics-service-breakdown.tsx`: Replace text-only empty state with full empty state pattern:
+   - Icon (ChartBar from Phosphor, 48px)
+   - Heading: "No data yet"
+   - Description: "Once your campaign sends its first message, your analytics will appear here."
+   - CTA button: "View your campaign" → `/campaigns`
+2. Consider adding a mini-empty-state when specific service types have no data (row-level context)
+
+---
+
+### Customers Page
+
+**Problems:** Padding inconsistency vs other pages. Empty state copy still V1-flavored.
+
+**Required changes:**
+1. Normalize padding to match dashboard/jobs pages
+2. Verify empty state copy is V2-aligned (should be: "Customers appear here as you complete jobs. Add your first job to get started." with CTA to Jobs page)
+
+---
+
+### Manual Request Page (`/send`)
+
+**Decision: Eliminate from navigation, keep the route.**
+
+**Required changes:**
+1. Remove `{ icon: PaperPlaneTilt, label: 'Manual Request', href: '/send' }` from `sidebar.tsx` mainNav
+2. Remove from `bottom-nav.tsx`
+3. Add a "Do Not Enroll in Campaign" prominence in Add Job sheet (already exists as `enrollInCampaign` checkbox — make it more visible, not buried)
+4. Add a minimal "Manual Request" modal accessible from Campaigns page for the edge case (one-off send to a customer who will never return)
+5. Keep `/send` route alive but add a banner: "Campaigns handle this automatically. Use manual requests only for one-off exceptions."
+
+---
+
+### Feedback Page
+
+**Problems:** UI feels like a different product; feedback cards don't match visual language of jobs/customers.
+
+**Required changes:**
+1. `feedback-card.tsx`: Use the same `rounded-lg border bg-card` pattern as campaign-card and job rows
+2. Ensure consistent padding, action button placement (bottom-right), and typography scale
+3. Empty state: Already uses the standard pattern (`ChatCircle` icon + text) — verify it looks correct
+
+---
+
+### Onboarding Wizard
+
+**Problems:** 7 steps too many; Google link duplicated; software field blocks progress; "Import Jobs" is V2-anti-pattern; services should be visual tiles; campaign language is technical.
+
+**Proposed restructure (7 → 4 steps):**
+
+| Old Step | New Step | Change |
+|----------|----------|--------|
+| 1: Business Basics | 1: Business Basics (expanded) | Add Google review link field here |
+| 2: Review Destination | REMOVED | Merged into Step 1 |
+| 3: Services Offered | 2: Services Offered | Redesign as horizontal icon tiles |
+| 4: Software Used | 3: Software (optional) | Change to free-text input, fully skippable, no "must skip" |
+| 5: Campaign Preset | 4: Campaign Setup | Rewrite in plain English |
+| 6: Import Jobs | REMOVED | V2 anti-pattern |
+| 7: SMS Consent | Append to Step 4 | Combine with campaign step (it's about automation, same context) |
+
+**Risk:** Step IDs referenced throughout wizard shell and URL params. Must update all references.
+
+---
+
+## Sources
+
+- Codebase direct analysis (all components and pages surveyed 2026-02-18)
+- UX notes from user (provided in research brief — HIGH confidence, direct requirements)
+- Existing UX Audit at `.planning/UX-AUDIT.md` (2026-02-05, comprehensive component-level analysis)
+- V2 Philosophy at `.planning/V1-TO-V2-PHILOSOPHY.md` (canonical product direction)
+- Jobber and Housecall Pro UI patterns (established home service SaaS dashboard conventions — MEDIUM confidence from training knowledge, architecture knowledge cutoff Aug 2025)
+- Stratify reference (user-supplied — warm dashboard design pattern for emotional tone)
+
+---
+
+*Feature research for: AvisLoop v2.5 UI/UX Redesign*
+*Researched: 2026-02-18*
+*Context: Subsequent milestone. All backend functionality exists. Research focus is on UI/UX changes.*

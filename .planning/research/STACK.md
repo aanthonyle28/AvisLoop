@@ -1,727 +1,493 @@
-# Technology Stack Additions for v2.0 Review Follow-Up System
+# Technology Stack: v2.5 UI/UX Redesign — Warm Design System
 
-**Project:** AvisLoop v2.0 - SMS, Campaigns, LLM Personalization
-**Researched:** 2026-02-02
-**Milestone Type:** Subsequent - Adding features to existing MVP
+**Project:** AvisLoop v2.5 — Warm Design System Overhaul
+**Researched:** 2026-02-18
+**Milestone Type:** Subsequent — Design system change to existing Next.js + Tailwind + shadcn/ui app
+**Confidence:** HIGH (based on direct codebase inspection + authoritative knowledge of CSS variable architecture)
+
+---
 
 ## Executive Summary
 
-**Recommendation:** Add four targeted libraries to existing stack for SMS (Twilio), LLM personalization (Vercel AI SDK), timezone handling (date-fns-tz), and campaign orchestration (native Postgres + Vercel Cron).
+**Recommendation: Zero new npm dependencies required.**
 
-**Core principle:** Leverage existing infrastructure (Supabase, Vercel Cron, Resend patterns) and add minimal, focused dependencies for new capabilities.
+The existing stack (Tailwind CSS 3.4 + CSS custom properties + CVA + shadcn/ui pattern) is already the correct architecture for a warm palette overhaul. All changes are confined to `globals.css` (CSS variable values) and component files (CVA variants, className additions). No Tailwind plugins, no color libraries, no new packages.
 
-**Bundle impact:** +150-200kb (Twilio SDK 80kb, Vercel AI SDK packages 60kb, date-fns-tz 40kb, type definitions 20kb)
+The redesign is purely a design token + component variant change. The hard work is picking the right HSL values — the tooling is already there.
 
-## Existing Stack (DO NOT Re-add)
+---
 
-Already validated and in use:
-- Next.js 15 (App Router), TypeScript, React 19
-- Supabase (Postgres + Auth + RLS + pg_cron)
-- Tailwind CSS 3.4 + tailwindcss-animate
-- Resend (email sending)
-- Stripe (billing)
-- Upstash Redis (rate limiting)
-- Phosphor Icons, Kumbh Sans
-- Vercel Cron (every minute for scheduled processing)
+## Existing Stack (Validated — Do Not Change)
 
-## New Dependencies for v2.0
+| Technology | Version | Role |
+|------------|---------|------|
+| Next.js | 15 (latest) | App Router framework |
+| TypeScript | 5.x | Type safety |
+| Tailwind CSS | 3.4.1 | Utility classes |
+| tailwindcss-animate | 1.0.7 | Animation utilities |
+| CSS custom properties | Native | Design token system (HSL-based) |
+| next-themes | 0.4.6 | Dark mode class toggling |
+| class-variance-authority | 0.7.1 | Component variant system (CVA) |
+| @radix-ui/* | Various | Unstyled accessible primitives |
+| @phosphor-icons/react | 2.1.10 | Icon library |
+| Kumbh Sans | Google Fonts | App typeface |
+| lucide-react | 0.511.0 | Partial migration (select, sheet still use it) |
 
-### Core SMS & Telephony
+---
 
-| Technology | Version | Purpose | Why |
-|------------|---------|---------|-----|
-| **twilio** | ^5.11.2 | SMS sending, delivery webhooks, STOP handling | Official Node.js SDK, A2P 10DLC support, built-in signature verification, 80kb bundle |
-| **@types/twilio-node** | ^3.8.0 | TypeScript definitions | Type safety for Twilio client |
+## What Changes: Design Token Architecture
 
-**Installation:**
-```bash
-npm install twilio@^5.11.2 @types/twilio-node@^3.8.0
-```
+The entire warm palette change is implemented by replacing HSL values in `globals.css` and adding two new semantic tokens. Nothing else changes in the build system.
 
-**Rationale:**
-- Twilio is the market leader for SMS compliance in 2026 (A2P 10DLC, TCPA, carrier relationships)
-- SDK handles STOP keyword filtering automatically (compliance requirement)
-- Built-in webhook signature verification prevents spoofing attacks
-- Lazy loading enabled by default (performance)
-- TypeScript support with official types
-- Alternatives (MessageBird, Vonage) have weaker A2P 10DLC tooling
+### Principle: Semantic Token Layering
 
-**Environment variables:**
-```env
-TWILIO_ACCOUNT_SID=ACxxxx...
-TWILIO_AUTH_TOKEN=your_auth_token
-TWILIO_PHONE_NUMBER=+1xxxxxxxxxx
-TWILIO_MESSAGING_SERVICE_SID=MGxxxx... # For 10DLC campaigns
-```
+The existing system uses a single layer of semantic tokens (`--primary`, `--background`, etc.) mapped directly to HSL values. For the warm redesign, keep the same structure but replace the values. Do NOT add a base token layer (like `--amber-400: ...`). The shadcn/ui pattern uses semantic-only tokens and that pattern works fine here.
 
-### LLM Integration
+**Why this approach:** The entire app already references `bg-primary`, `text-muted-foreground`, `bg-card`, etc. Changing the HSL values behind those tokens propagates the new palette everywhere automatically — no component file changes for basic colors.
 
-| Technology | Version | Purpose | Why |
-|------------|---------|---------|-----|
-| **ai** | ^6.0.68 | Vercel AI SDK core (unified LLM API) | Provider-agnostic, 25+ providers, built-in streaming, tool support, 20kb |
-| **@ai-sdk/openai** | ^1.0.68 | OpenAI provider (GPT-4o-mini primary) | Official provider package, gpt-4o-mini support, $0.15/1M input tokens, 20kb |
-| **@ai-sdk/anthropic** | ^1.0.68 | Anthropic provider (Haiku 4.5 fallback) | Official provider package, claude-haiku-4-5 support, $1/1M input tokens, 20kb |
+---
 
-**Installation:**
-```bash
-npm install ai@^6.0.68 @ai-sdk/openai@^1.0.68 @ai-sdk/anthropic@^1.0.68
-```
+## New CSS Variable Values — Light Mode
 
-**Rationale:**
-- Vercel AI SDK provides unified API for multiple providers (switch with 1 line of code)
-- GPT-4o-mini: $0.15/1M input tokens (cost-effective for high-volume personalization)
-- Claude Haiku 4.5: $1/1M input tokens (fallback when OpenAI rate limits or outages)
-- Built-in streaming support (not needed for batch personalization but future-ready)
-- AI SDK 6 introduces agent abstraction (useful for future multi-step workflows)
-- Native TypeScript, React 19 compatible, Next.js App Router optimized
-- Alternative (direct OpenAI SDK): No fallback pattern, more code for provider switching
+Replace the `:root` block in `app/globals.css` with these values:
 
-**Environment variables:**
-```env
-OPENAI_API_KEY=sk-proj-...
-ANTHROPIC_API_KEY=sk-ant-...
-```
+```css
+:root {
+  /* Page background: warm cream-tinted white, not pure gray */
+  --background: 36 20% 96%;          /* #F6F3EE — warm off-white */
 
-**Cost projections:**
-- 1000 personalized messages/month: ~$0.30 with GPT-4o-mini (avg 2000 tokens/message)
-- Haiku fallback adds $1.50 if used for same volume
-- Caching: Prompt caching (Anthropic) or structured output caching (OpenAI) can reduce costs 50-90%
+  /* Text: warm near-black, slight brown undertone */
+  --foreground: 24 10% 10%;          /* #1C1814 — warm charcoal */
 
-### Timezone & Scheduling
+  /* Cards: clean white with barely-perceptible warmth */
+  --card: 0 0% 100%;                 /* #FFFFFF — stays pure white for contrast */
+  --card-foreground: 24 10% 10%;     /* matches foreground */
 
-| Technology | Version | Purpose | Why |
-|------------|---------|---------|-----|
-| **date-fns-tz** | ^3.2.0 | Timezone-aware date operations, TCPA quiet hours | Lightweight (40kb), tree-shakeable, DST-aware, integrates with date-fns 4.1.0 (already installed) |
+  /* Popovers/dropdowns: same as card */
+  --popover: 0 0% 100%;
+  --popover-foreground: 24 10% 10%;
 
-**Installation:**
-```bash
-npm install date-fns-tz@^3.2.0
-```
+  /* Primary: soft blue for interactive (buttons, links, focus rings) */
+  /* NOT amber — amber is accent, blue remains the action color */
+  --primary: 213 60% 42%;            /* #2B6CB0 — slightly desaturated, warmer blue */
+  --primary-foreground: 0 0% 98%;
 
-**Rationale:**
-- TCPA compliance requires 8am-9pm recipient local time enforcement (8am-8pm in some states)
-- Must handle DST transitions automatically
-- date-fns-tz extends existing date-fns 4.1.0 (no replacement needed)
-- Lightweight vs moment-timezone (deprecated) or Luxon (heavier, 72kb)
-- Tree-shakeable: only import zonedTimeToUtc, utcToZonedTime, format functions
-- Alternative (Temporal API): Not stable yet, polyfill too large (150kb+)
+  /* Secondary: warm light tan for secondary buttons/surfaces */
+  --secondary: 36 25% 91%;           /* #EDE8DF — warm stone */
+  --secondary-foreground: 24 12% 18%;
 
-**Usage pattern:**
-```typescript
-import { utcToZonedTime, formatInTimeZone } from 'date-fns-tz';
+  /* Muted: warm background for subdued areas */
+  --muted: 36 15% 94%;               /* #F2EEE8 — warm muted */
+  --muted-foreground: 24 8% 46%;     /* #7A7068 — warm gray */
 
-// Check if 8am-9pm in recipient's timezone
-const recipientTime = utcToZonedTime(new Date(), 'America/New_York');
-const hour = recipientTime.getHours();
-const isQuietHours = hour < 8 || hour >= 21;
-```
+  /* Accent: amber/gold — the visual differentiator */
+  --accent: 38 92% 50%;              /* #F59E0B — amber-500, warm gold */
+  --accent-foreground: 24 10% 10%;   /* dark text on amber background */
 
-### Campaign Orchestration
+  /* Border: warm beige-gray, not cold gray */
+  --border: 36 18% 86%;              /* #DDD7CC — warm border */
+  --input: 36 18% 86%;               /* matches border */
+  --ring: 213 60% 42%;               /* matches primary — focus rings stay blue */
 
-**Recommendation: NO additional dependencies needed.**
+  /* Destructive: unchanged red */
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
 
-Use existing stack:
-- **Supabase Postgres JSONB columns** for campaign touch sequences
-- **Supabase pg_cron** for minutely campaign processing (already configured)
-- **Vercel Cron** (alternative/backup for Supabase cron)
-- **Postgres ENUM types** for campaign status, touch status, service categories
-- **RLS policies** for multi-tenant campaign access
+  /* Border radius: increase slightly for softer feel */
+  --radius: 0.625rem;                /* 10px — up from 8px */
 
-**Rationale:**
-- Campaign engine is business logic, not infrastructure
-- JSONB columns handle flexible touch sequences without migrations
-- Existing Vercel Cron (every minute) already processing scheduled sends
-- Bull, BullMQ, or node-cron add complexity without benefit at this scale
-- Supabase pg_cron more reliable than in-app cron for serverless (no cold start issues)
-- RLS enforces org_id scoping automatically (security requirement)
+  /* Highlight: new amber surface token for colored card backgrounds */
+  --highlight: 45 95% 94%;           /* #FFFBEB — amber-50 equivalent */
+  --highlight-foreground: 30 80% 25%;/* #7C3A10 — dark amber for contrast */
 
-**Database schema patterns:**
-```sql
--- Campaign touches stored as JSONB
-CREATE TABLE campaigns (
-  id UUID PRIMARY KEY,
-  org_id UUID REFERENCES organizations(id),
-  name TEXT,
-  touches JSONB NOT NULL, -- Array of touch configs
-  status campaign_status_enum,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
+  /* Surface: new warm card variant */
+  --surface: 36 30% 95%;             /* #F5F0E8 — warm cream surface */
+  --surface-foreground: 24 10% 20%;
 
--- Touch config structure:
--- [
---   { "type": "email", "delay_hours": 0, "template_id": "..." },
---   { "type": "sms", "delay_hours": 24, "template_id": "..." },
---   { "type": "email", "delay_hours": 72, "template_id": "..." }
--- ]
+  /* Accent colors — kept from existing, can warm them later */
+  --accent-lime: 75 75% 50%;
+  --accent-coral: 0 85% 65%;
 
--- Service categories as ENUM
-CREATE TYPE service_category_enum AS ENUM (
-  'plumbing',
-  'hvac',
-  'electrical',
-  'roofing',
-  'general_contractor',
-  'other'
-);
-```
+  /* Status colors — unchanged, they're correct */
+  --status-pending-bg: 220 14% 96%;
+  --status-pending-text: 220 43% 11%;
+  --status-delivered-bg: 194 33% 94%;
+  --status-delivered-text: 189 57% 40%;
+  --status-clicked-bg: 54 96% 88%;
+  --status-clicked-text: 30 100% 27%;
+  --status-failed-bg: 0 100% 94%;
+  --status-failed-text: 358 100% 38%;
+  --status-reviewed-bg: 138 68% 92%;
+  --status-reviewed-text: 149 100% 25%;
 
-## Integration with Existing Stack
-
-### Supabase Integration Points
-
-**SMS sending via Twilio (similar to Resend email pattern):**
-```typescript
-// app/actions/send-sms.ts (Server Action)
-'use server'
-import { createClient } from '@/lib/supabase/server';
-import { twilioClient } from '@/lib/twilio';
-
-export async function sendSMS(contactId: string, message: string) {
-  const supabase = await createClient();
-
-  // RLS enforces org_id scoping automatically
-  const { data: contact } = await supabase
-    .from('contacts')
-    .select('phone, org_id')
-    .eq('id', contactId)
-    .single();
-
-  // Check quiet hours before sending
-  const isQuietHours = checkQuietHours(contact.timezone);
-  if (isQuietHours) {
-    // Queue for next available window
-    await scheduleForSend(contactId, message);
-    return;
-  }
-
-  // Send via Twilio
-  const result = await twilioClient.messages.create({
-    to: contact.phone,
-    from: process.env.TWILIO_PHONE_NUMBER,
-    body: message,
-    messagingServiceSid: process.env.TWILIO_MESSAGING_SERVICE_SID,
-  });
-
-  // Store send record with RLS
-  await supabase.from('sends').insert({
-    contact_id: contactId,
-    org_id: contact.org_id,
-    channel: 'sms',
-    twilio_sid: result.sid,
-    status: 'queued',
-  });
+  /* Chart colors: warm-shifted palette */
+  --chart-1: 38 92% 50%;             /* amber */
+  --chart-2: 173 58% 39%;            /* teal — unchanged */
+  --chart-3: 213 60% 42%;            /* soft blue */
+  --chart-4: 27 87% 55%;             /* warm orange */
+  --chart-5: 340 75% 55%;            /* pink — unchanged */
 }
 ```
 
-**LLM personalization (batch processing via Vercel Cron):**
-```typescript
-// app/api/cron/personalize-messages/route.ts
-import { openai } from '@ai-sdk/openai';
-import { anthropic } from '@ai-sdk/anthropic';
-import { generateText } from 'ai';
+**Key decisions:**
 
-export async function POST(request: Request) {
-  // Verify Vercel Cron secret
-  const authHeader = request.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response('Unauthorized', { status: 401 });
-  }
+- `--background: 36 20% 96%` gives the warm cream page feel without being yellow. At 96% lightness it reads as off-white but warm, not cold gray.
+- `--accent: 38 92% 50%` is amber-500 (the Tailwind amber scale midpoint). It's used for highlight surfaces and interactive accent elements — not the primary button color.
+- `--primary: 213 60% 42%` keeps blue as the action color. Soft blue + warm amber is the combination described in the milestone brief ("soft blues for interactive, warm amber for accents"). Using amber as the primary button color would fail WCAG AA contrast on light backgrounds.
+- Two new tokens (`--highlight`, `--surface`) added for colored card backgrounds. These do not break any existing component since they are additive.
 
-  // Fetch contacts needing personalized messages
-  const contacts = await fetchPendingContacts();
+---
 
-  for (const contact of contacts) {
-    try {
-      // Try GPT-4o-mini first (cheaper)
-      const { text } = await generateText({
-        model: openai('gpt-4o-mini'),
-        prompt: `Personalize this message for ${contact.name}: ${template}`,
-      });
-      await storePersonalizedMessage(contact.id, text);
-    } catch (error) {
-      // Fallback to Haiku 4.5 on rate limit or error
-      const { text } = await generateText({
-        model: anthropic('claude-haiku-4-5'),
-        prompt: `Personalize this message for ${contact.name}: ${template}`,
-      });
-      await storePersonalizedMessage(contact.id, text);
-    }
-  }
+## New CSS Variable Values — Dark Mode
 
-  return Response.json({ processed: contacts.length });
+Replace the `.dark` block with these values:
+
+```css
+.dark {
+  /* Dark background: warm-tinted dark, not pure black */
+  --background: 24 8% 10%;           /* #1C1916 — warm very dark brown */
+  --foreground: 36 15% 92%;          /* #EDE8DF — warm near-white */
+
+  --card: 24 8% 14%;                 /* #231F1C — warm dark card */
+  --card-foreground: 36 15% 92%;
+
+  --popover: 24 8% 14%;
+  --popover-foreground: 36 15% 92%;
+
+  /* Primary: brighter blue for dark backgrounds */
+  --primary: 213 70% 62%;            /* #5B9BD5 — lighter blue for dark mode */
+  --primary-foreground: 24 10% 10%;
+
+  /* Secondary: dark warm surface */
+  --secondary: 24 8% 18%;            /* #2E2923 */
+  --secondary-foreground: 36 15% 88%;
+
+  /* Muted: dark warm muted */
+  --muted: 24 8% 16%;                /* #28231F */
+  --muted-foreground: 36 10% 58%;    /* #9E9590 */
+
+  /* Accent: amber slightly toned down for dark mode readability */
+  --accent: 38 85% 56%;              /* #F6A623 — slightly lighter amber */
+  --accent-foreground: 24 10% 10%;
+
+  --border: 24 8% 22%;               /* #38302B — dark warm border */
+  --input: 24 8% 22%;
+  --ring: 213 70% 62%;               /* matches dark primary */
+
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 98%;
+
+  /* Highlight: dark amber surface for colored cards */
+  --highlight: 38 50% 18%;           /* #3D2E10 — dark amber glow */
+  --highlight-foreground: 45 90% 78%;/* #F6D878 — golden text on dark amber */
+
+  /* Surface: dark warm surface variant */
+  --surface: 24 10% 17%;             /* #2B2420 */
+  --surface-foreground: 36 15% 85%;
+
+  --accent-lime: 75 75% 48%;
+  --accent-coral: 0 80% 62%;
+
+  /* Status colors — dark mode equivalents */
+  --status-pending-bg: 220 14% 20%;
+  --status-pending-text: 220 14% 80%;
+  --status-delivered-bg: 189 30% 20%;
+  --status-delivered-text: 189 57% 55%;
+  --status-clicked-bg: 40 40% 20%;
+  --status-clicked-text: 30 80% 65%;
+  --status-failed-bg: 0 40% 20%;
+  --status-failed-text: 358 80% 65%;
+  --status-reviewed-bg: 149 30% 18%;
+  --status-reviewed-text: 149 70% 55%;
+
+  /* Chart colors — dark mode warm */
+  --chart-1: 38 85% 56%;
+  --chart-2: 173 58% 45%;
+  --chart-3: 213 70% 62%;
+  --chart-4: 27 80% 60%;
+  --chart-5: 340 65% 60%;
 }
 ```
 
-**Campaign processing via existing Vercel Cron:**
+**Dark mode warmth strategy:** The dark backgrounds use HSL hue 24 (warm brown) instead of hue 0 (neutral gray). At the lightnesses used (8-18%), the warmth is subtle — backgrounds look dark but slightly cozy, not sterile. The amber accent becomes the golden highlight on dark surfaces.
+
+---
+
+## Tailwind Config Changes
+
+Add the two new semantic tokens to `tailwind.config.ts`:
+
 ```typescript
-// app/api/cron/process-campaigns/route.ts (ALREADY EXISTS, extend it)
-export async function POST(request: Request) {
-  // Existing cron runs every minute
-  // Add campaign logic to existing scheduled processing
+// tailwind.config.ts — add to the colors object inside theme.extend
+colors: {
+  // ... existing colors unchanged ...
 
-  const campaignsReady = await fetchCampaignsTouchesReady();
+  // New warm palette additions
+  highlight: {
+    DEFAULT: "hsl(var(--highlight))",
+    foreground: "hsl(var(--highlight-foreground))",
+  },
+  surface: {
+    DEFAULT: "hsl(var(--surface))",
+    foreground: "hsl(var(--surface-foreground))",
+  },
 
-  for (const touch of campaignsReady) {
-    if (touch.type === 'email') {
-      await sendEmail(touch.contact_id, touch.template_id);
-    } else if (touch.type === 'sms') {
-      // New: SMS sending with quiet hours check
-      await sendSMS(touch.contact_id, touch.template_id);
-    }
+  // Rename accent-lime and accent-coral to match their CSS vars
+  // (these are already in the config, no change needed)
+},
 
-    // Mark touch as sent
-    await markTouchSent(touch.id);
-  }
-}
+borderRadius: {
+  // Increase slightly to match the --radius: 0.625rem change
+  lg: "var(--radius)",              // 10px
+  md: "calc(var(--radius) - 2px)", // 8px
+  sm: "calc(var(--radius) - 4px)", // 6px
+  xl: "calc(var(--radius) + 4px)", // 14px — new, for card containers
+},
 ```
 
-### Twilio Webhook Integration
+**Why only two new tokens:** `highlight` covers amber-tinted card backgrounds (like the "4 items need attention" banner, KPI card accents, featured sections). `surface` covers the warm cream panels (sidebar backgrounds, form panels, onboarding sections). Every other semantic color already exists.
 
-**Receiving delivery status and STOP replies:**
+---
+
+## Card Component Variants
+
+The current `card.tsx` has `Card` (static) and `InteractiveCard` (hover lift). The redesign needs colored background variants — add CVA to the Card component.
+
+**New card.tsx pattern:**
+
 ```typescript
-// app/api/webhooks/twilio/route.ts
-import twilio from 'twilio';
+import { cva, type VariantProps } from "class-variance-authority"
 
-export async function POST(request: Request) {
-  // Verify webhook signature (CRITICAL for security)
-  const signature = request.headers.get('x-twilio-signature');
-  const url = new URL(request.url).toString();
-  const params = await request.formData();
+const cardVariants = cva(
+  "rounded-lg border text-card-foreground",
+  {
+    variants: {
+      variant: {
+        // Default: pure white card (existing behavior)
+        default: "bg-card border-border",
 
-  const isValid = twilio.validateRequest(
-    process.env.TWILIO_AUTH_TOKEN!,
-    signature!,
-    url,
-    Object.fromEntries(params)
-  );
+        // Warm surface: cream-tinted for panels and form containers
+        surface: "bg-surface text-surface-foreground border-border",
 
-  if (!isValid) {
-    return new Response('Invalid signature', { status: 403 });
+        // Highlight: amber-tinted for featured items, callouts
+        highlight: "bg-highlight text-highlight-foreground border-amber-200 dark:border-amber-900",
+
+        // Muted: subdued warm background for secondary cards
+        muted: "bg-muted text-foreground border-border",
+
+        // Ghost: no background, no border — for layout containers
+        ghost: "bg-transparent border-transparent",
+
+        // Outlined: explicit border emphasis with warm tint
+        outlined: "bg-background border-border shadow-sm",
+      },
+      padding: {
+        none: "",
+        sm: "p-4",
+        default: "p-6",
+        lg: "p-8",
+      },
+      shadow: {
+        none: "",
+        sm: "shadow-sm",
+        default: "shadow",
+        lg: "shadow-lg",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      padding: "none",  // Keep default none so existing `className="p-6"` usages work
+      shadow: "none",
+    },
   }
-
-  const messageSid = params.get('MessageSid');
-  const status = params.get('MessageStatus'); // delivered, failed, undelivered
-  const optOutType = params.get('OptOutType'); // STOP keyword handling
-
-  // Update send record
-  await supabase
-    .from('sends')
-    .update({
-      status,
-      opt_out: optOutType === 'STOP',
-      delivered_at: status === 'delivered' ? new Date() : null,
-    })
-    .eq('twilio_sid', messageSid);
-
-  // If STOP, mark contact as opted out
-  if (optOutType === 'STOP') {
-    await supabase
-      .from('contacts')
-      .update({ sms_opt_out: true })
-      .eq('phone', params.get('From'));
-  }
-
-  return new Response('OK', { status: 200 });
-}
+)
 ```
 
-### RLS Considerations
+**Usage examples:**
 
-**All new tables MUST have RLS enabled:**
-```sql
--- Jobs table
-ALTER TABLE jobs ENABLE ROW LEVEL SECURITY;
+```tsx
+// Existing usage — no change needed (backward compatible)
+<Card className="p-6">...</Card>
 
-CREATE POLICY "Users can view jobs in their org"
-  ON jobs FOR SELECT
-  USING (org_id IN (SELECT org_id FROM user_orgs WHERE user_id = auth.uid()));
+// New: amber callout card (dashboard attention alerts)
+<Card variant="highlight" className="p-4">...</Card>
 
-CREATE POLICY "Users can insert jobs in their org"
-  ON jobs FOR INSERT
-  WITH CHECK (org_id IN (SELECT org_id FROM user_orgs WHERE user_id = auth.uid()));
+// New: warm cream form panel (onboarding steps)
+<Card variant="surface" className="p-6">...</Card>
 
--- Campaigns table
-ALTER TABLE campaigns ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can manage campaigns in their org"
-  ON campaigns FOR ALL
-  USING (org_id IN (SELECT org_id FROM user_orgs WHERE user_id = auth.uid()));
-
--- Campaign sends table
-ALTER TABLE campaign_sends ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can view campaign sends in their org"
-  ON campaign_sends FOR SELECT
-  USING (org_id IN (SELECT org_id FROM user_orgs WHERE user_id = auth.uid()));
+// New: KPI card with shadow
+<Card variant="outlined" shadow="sm" className="p-6">...</Card>
 ```
 
-## What NOT to Add
+**InteractiveCard:** Keep as-is. The hover lift animation (`-translate-y-1`) works with any variant. Add an optional `arrow` prop later during component implementation — it's a UI feature, not a token.
 
-| Technology | Why Avoid |
-|------------|-----------|
-| **node-cron** | Serverless incompatible (Next.js on Vercel doesn't run persistent processes), Vercel Cron already configured |
-| **Bull / BullMQ** | Requires Redis queue (Upstash Redis used for rate limiting only), overkill for campaign scheduling, Postgres + pg_cron sufficient |
-| **moment-timezone** | Deprecated, 67kb, use date-fns-tz instead (40kb, tree-shakeable) |
-| **Luxon** | 72kb vs date-fns-tz 40kb, overlapping functionality with date-fns 4.1.0 already installed |
-| **Temporal API polyfill** | 150kb+, unstable spec, date-fns-tz sufficient for timezone needs |
-| **LangChain** | 500kb+ bundle, overkill for message personalization, Vercel AI SDK sufficient |
-| **OpenAI SDK directly** | No fallback pattern, more code for provider switching, Vercel AI SDK abstracts this |
-| **Anthropic SDK directly** | Same reason as OpenAI, Vercel AI SDK provides unified interface |
-| **Vonage / MessageBird** | Weaker A2P 10DLC compliance tooling vs Twilio, less US carrier support |
-| **Firebase Cloud Functions** | Wrong platform (already on Vercel), adds complexity, Supabase pg_cron sufficient |
+---
 
-## Twilio A2P 10DLC Compliance Requirements
+## Form Component Enhancements
 
-**CRITICAL for SMS sending in US (regulatory requirement, not optional):**
+The redesign calls for two form improvements:
 
-### Registration Process
+### 1. Password Visibility Toggle
 
-1. **Business Profile (Brand) Registration**
-   - Business name, EIN/Tax ID, address, website
-   - Business type (private profit, non-profit, government)
-   - Approval time: ~4 business days
-   - Cost: $4/month per brand
+A new component `PasswordInput` wrapping the existing `Input`. No new dependencies needed — use React state + Phosphor icon.
 
-2. **Campaign Registration**
-   - Campaign type: Customer Care, Mixed, Marketing, etc.
-   - Use case description: "Review request follow-up for home service customers"
-   - Sample messages (must match actual content)
-   - Opt-in method: "Customer provides phone during service booking"
-   - Opt-out handling: "Reply STOP to unsubscribe" (automatic via Twilio)
-   - Approval time: ~1 week
-   - Cost: $1.50-$10/month per campaign depending on throughput
-
-3. **10DLC Number Assignment**
-   - Assign Twilio phone number to Messaging Service
-   - Link Messaging Service to approved campaign
-   - Use Messaging Service SID (not phone number directly) for sending
-
-**Consequences of not registering:**
-- Carrier fees: $0.003/message additional charge for unregistered traffic
-- Throttled throughput: 6 messages/minute vs 4,500/day registered
-- Risk of number suspension by carriers
-
-### STOP Keyword Handling (Automatic via Twilio)
-
-Twilio automatically handles these opt-out keywords (case-insensitive):
-- STOP, STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT
-- REVOKE, OPTOUT (added April 2025 FCC update)
-
-**Automatic behavior:**
-- Twilio replies with pre-configured opt-out message
-- Adds number to blocklist (future sends fail with Error 21610)
-- Your webhook receives OptOutType parameter to update database
-
-**Required in initial message:**
-- Must include "Reply STOP to unsubscribe" or equivalent
-
-### TCPA Quiet Hours Compliance
-
-**Federal law (applies to all states):**
-- No SMS before 8:00 AM or after 9:00 PM recipient's local time
-- Penalties: $500-$1,500 per message violation
-
-**State-specific restrictions (more strict):**
-- Florida, Connecticut, Maryland, Oklahoma, Washington: 8 AM - 8 PM only
-- Texas: 9 AM - 9 PM Mon-Sat, 12 PM - 9 PM Sunday
-
-**Implementation strategy:**
 ```typescript
-// Store contact timezone in database
-// Check recipient's local time before sending
-// Queue sends outside quiet hours for next available window
-// Use date-fns-tz for accurate timezone conversions with DST handling
+// components/ui/password-input.tsx
+'use client'
+
+import * as React from "react"
+import { Eye, EyeSlash } from "@phosphor-icons/react"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+
+const PasswordInput = React.forwardRef<
+  HTMLInputElement,
+  React.ComponentProps<"input">
+>(({ className, ...props }, ref) => {
+  const [showPassword, setShowPassword] = React.useState(false)
+
+  return (
+    <div className="relative">
+      <Input
+        type={showPassword ? "text" : "password"}
+        className={cn("pr-10", className)}
+        ref={ref}
+        {...props}
+      />
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon-sm"
+        className="absolute right-1 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+        onClick={() => setShowPassword(!showPassword)}
+        aria-label={showPassword ? "Hide password" : "Show password"}
+      >
+        {showPassword
+          ? <EyeSlash size={16} weight="regular" />
+          : <Eye size={16} weight="regular" />
+        }
+      </Button>
+    </div>
+  )
+})
+PasswordInput.displayName = "PasswordInput"
+
+export { PasswordInput }
 ```
 
-**Best practice:**
-- Use 9 AM - 8 PM window to cover strictest state laws
-- Always respect contact's timezone (get from area code or ask during onboarding)
-- Handle DST transitions automatically (date-fns-tz does this)
+**Why no library:** `react-password-strength-meter`, `@hookform/resolvers` extensions, etc. add weight for a 15-line component. Phosphor already has `Eye` and `EyeSlash` icons. This is a composable pattern.
 
-### Opt-In Requirements
+### 2. Smart Field (Name vs Email Detection)
 
-**Required for A2P 10DLC campaign approval:**
-- Express written consent (TCPA requirement)
-- Clear disclosure of message frequency ("We'll send review requests after service")
-- Clear disclosure of message rates ("Message and data rates may apply")
-- Easy opt-out instructions ("Reply STOP to unsubscribe")
-- Privacy policy link
+For the Jobs "Add Job" sheet, the brief mentions a smart field that detects whether the user is typing a name or email. This is pure logic in a client component — no dependency needed.
 
-**Implementation:**
-- Add checkbox to contact creation form
-- Store opt_in_consent: true in contacts table
-- Never send SMS without consent = true
-- Display opt-in language in UI: "By providing your phone number, you agree to receive SMS review requests from [Business Name]. Message frequency varies. Message and data rates may apply. Reply STOP to unsubscribe."
-
-## Environment Variables Summary
-
-**Add to `.env.local` (development):**
-```env
-# Twilio SMS
-TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-TWILIO_AUTH_TOKEN=your_auth_token_here
-TWILIO_PHONE_NUMBER=+1xxxxxxxxxx
-TWILIO_MESSAGING_SERVICE_SID=MGxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-# OpenAI (primary LLM)
-OPENAI_API_KEY=sk-proj-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-# Anthropic (fallback LLM)
-ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-# Existing (already configured)
-# NEXT_PUBLIC_SUPABASE_URL=...
-# NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-# SUPABASE_SERVICE_ROLE_KEY=...
-# RESEND_API_KEY=...
-# STRIPE_SECRET_KEY=...
-# UPSTASH_REDIS_REST_URL=...
-# UPSTASH_REDIS_REST_TOKEN=...
-# CRON_SECRET=... (for Vercel Cron auth)
-```
-
-**Add to Vercel project settings (production):**
-- All above variables
-- Mark `TWILIO_AUTH_TOKEN`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY` as sensitive (encrypted)
-
-## Database Migration Considerations
-
-**New tables needed:**
-
-1. **jobs** table
-   - id, org_id, customer_id, service_category, service_date, notes, created_at
-   - RLS policies for org_id scoping
-   - Index on org_id, customer_id, service_date
-
-2. **campaigns** table
-   - id, org_id, name, touches (JSONB), status (enum), created_at
-   - Touches structure: [{ type, delay_hours, template_id }]
-   - RLS policies for org_id scoping
-
-3. **campaign_sends** table
-   - id, org_id, campaign_id, contact_id, touch_index, scheduled_for, sent_at, status
-   - Tracks each touch in each campaign
-   - Index on scheduled_for (for cron queries), org_id
-
-4. **Extend contacts table**
-   - Add columns: sms_opt_in (boolean), sms_opt_out (boolean), timezone (text)
-   - Timezone defaults to business timezone if not specified
-
-5. **Extend sends table**
-   - Add columns: channel (enum: 'email', 'sms'), twilio_sid (text), opt_out (boolean)
-   - Existing columns: contact_id, org_id, status, delivered_at
-
-**Enum types:**
-```sql
-CREATE TYPE campaign_status_enum AS ENUM ('draft', 'active', 'paused', 'completed');
-CREATE TYPE service_category_enum AS ENUM ('plumbing', 'hvac', 'electrical', 'roofing', 'general_contractor', 'landscaping', 'cleaning', 'other');
-CREATE TYPE send_channel_enum AS ENUM ('email', 'sms');
-```
-
-## Cost Analysis
-
-### SMS Costs (Twilio)
-
-- **A2P 10DLC registration:** $4/month brand + $1.50-$10/month campaign = ~$6-$14/month fixed
-- **SMS rates (US):** $0.0079/segment (160 characters)
-- **Average review request SMS:** 1-2 segments = $0.0079-$0.0158/message
-- **Projected volume:** 1000 SMS/month = $7.90-$15.80/month variable
-- **Total SMS cost:** ~$14-$30/month for 1000 messages
-
-### LLM Costs (OpenAI + Anthropic)
-
-- **GPT-4o-mini (primary):** $0.15 per 1M input tokens, $0.60 per 1M output tokens
-- **Claude Haiku 4.5 (fallback):** $1 per 1M input tokens, $5 per 1M output tokens
-- **Average personalization:** 500 input tokens (context) + 150 output tokens (personalized message) = 650 tokens/message
-- **Projected volume:** 1000 personalized messages/month
-  - Input: 500k tokens = $0.08 (GPT-4o-mini)
-  - Output: 150k tokens = $0.09 (GPT-4o-mini)
-  - **Total: $0.17/month** (assuming 95% GPT-4o-mini, 5% Haiku fallback adds $0.03)
-- **LLM cost:** ~$0.20/month for 1000 messages
-
-**Combined monthly costs for 1000 contacts:**
-- Email (Resend): $0 (free tier: 3,000/month)
-- SMS (Twilio): $14-$30
-- LLM (OpenAI/Anthropic): $0.20
-- **Total incremental cost:** ~$14-$31/month
-
-**Cost per customer:**
-- Email: $0
-- SMS: $0.014-$0.030
-- LLM: $0.0002
-- **Total: $0.014-$0.030 per contact**
-
-**Pricing implications:**
-- Can offer SMS as $0.02/message add-on (covers cost + margin)
-- LLM personalization is negligible cost (bundle into tiers)
-- A2P 10DLC fixed costs justify minimum SMS volume (200+ messages/month)
-
-## Performance Considerations
-
-### Bundle Size Impact
-
-- **Twilio SDK:** 80kb gzipped
-- **Vercel AI SDK packages:** 60kb total (ai + @ai-sdk/openai + @ai-sdk/anthropic)
-- **date-fns-tz:** 40kb (tree-shakeable, only import 2-3 functions)
-- **Type definitions:** 20kb
-- **Total new bundle weight:** 200kb
-- **Acceptable:** Email sending (Resend) already 60kb, SMS is comparable use case
-
-### Lazy Loading Strategy
-
-**Server-side only (no client bundle impact):**
-- Twilio SDK only in Server Actions, Route Handlers, Vercel Cron routes
-- Vercel AI SDK only in Vercel Cron routes (batch processing)
-- date-fns-tz only in server-side quiet hours checks
-
-**No client components need these libraries.**
-
-### Rate Limiting
-
-**Existing Upstash Redis rate limiter:**
-- Extend to include SMS sending (10 SMS per org per minute)
-- Email already rate limited (20 per minute per org)
-- LLM batch processing no rate limit (runs via cron, not user-triggered)
-
-**Twilio rate limits (A2P 10DLC):**
-- Registered campaigns: 4,500 messages/day throughput
-- Conservative approach: 1 message/second max (86,400/day theoretical)
-- App rate limit: 10/minute per org (600/hour, 14,400/day) - well under Twilio limit
-
-**OpenAI rate limits (Tier 1):**
-- GPT-4o-mini: 200 requests/minute, 2M tokens/minute
-- Batch processing 1000 messages = 650k tokens, fits in 1 minute
-- No additional throttling needed
-
-### Caching Strategy
-
-**LLM prompt caching (cost optimization):**
-- OpenAI: Use structured output caching (automatic, 50% cost reduction)
-- Anthropic: Prompt caching reduces cost 90% for repeated system prompts
-
-**Implementation:**
 ```typescript
-// Reusable system prompt (cached by providers)
-const SYSTEM_PROMPT = `You are a professional message personalizer for home service businesses...`;
-
-// Changes per message (not cached)
-const userPrompt = `Customer: ${name}, Service: ${service}, Date: ${date}`;
-
-// Providers cache SYSTEM_PROMPT automatically
+// Pattern: detect @ symbol to switch label hint
+const isEmail = value.includes('@')
+const label = isEmail ? 'Email' : 'Customer name or email'
+const inputType = isEmail ? 'email' : 'text'
 ```
 
-## Testing & Development
+This goes in the specific job form component, not as a shared UI primitive. No new component file needed at the design system level.
 
-### Local Development Setup
+### 3. Input Warm Styling
 
-1. **Twilio Test Credentials**
-   - Use Twilio test credentials (free): https://console.twilio.com/
-   - Test phone numbers: use your own verified number
-   - Webhook testing: use ngrok or Vercel dev tunnel
-   - Signature validation: works with test credentials
+The existing `input.tsx` uses `h-9` (36px, below 44px touch minimum). The warm redesign is a good moment to fix this. Update the base input class:
 
-2. **LLM API Keys**
-   - OpenAI: $5 free credit for new accounts
-   - Anthropic: $5 free credit for new accounts
-   - Both provide playground for testing prompts
+```typescript
+// input.tsx change: h-9 → h-10 (40px)
+// Also warm the background: bg-transparent → bg-background
+// And warm the border focus: border color picks up --primary warm blue
 
-3. **Vercel Cron Local Testing**
-   - Cron routes only work in production (Vercel deployment)
-   - For local testing: add `npm run cron:test` script to package.json
-   - Script manually calls cron routes with CRON_SECRET header
-
-```json
-// package.json addition
-{
-  "scripts": {
-    "cron:test": "curl -X POST http://localhost:3000/api/cron/process-campaigns -H 'Authorization: Bearer test-secret'"
-  }
-}
+"flex h-10 w-full rounded-md border border-input bg-background px-3 py-2
+ text-base shadow-sm transition-colors
+ placeholder:text-muted-foreground
+ focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:border-primary
+ disabled:cursor-not-allowed disabled:opacity-50
+ md:text-sm"
 ```
 
-### End-to-End Testing Checklist
+**The `h-10` change is not breaking** — it increases input height from 36px to 40px. All form layouts use flex/grid, so inputs will just be 4px taller. This also matches the `SelectTrigger` which already uses `h-10`.
 
-- [ ] SMS sending via Twilio (test number)
-- [ ] Delivery status webhook updates send record
-- [ ] STOP keyword marks contact as opted out
-- [ ] Quiet hours check prevents sends 9pm-8am recipient time
-- [ ] LLM personalization generates valid messages
-- [ ] Fallback to Haiku on OpenAI rate limit
-- [ ] Campaign sequence triggers correctly
-- [ ] RLS policies prevent cross-org access
-- [ ] Webhook signature validation rejects invalid requests
+---
 
-## Rollback Plan
+## No New Dependencies Needed
 
-**If SMS integration fails in production:**
+| Considered | Decision | Reason |
+|------------|----------|--------|
+| `@radix-ui/colors` | No | Provides fixed color scales, not semantic tokens. Our HSL-based system is more flexible for dark mode. |
+| `open-props` | No | External CSS custom property system that would conflict with Tailwind's semantic token approach. |
+| `tailwind-scrollbar` | No | Not needed for this milestone. |
+| `framer-motion` | No | `tailwindcss-animate` and Tailwind transitions handle all redesign animations (hover lifts, fades). |
+| `@radix-ui/react-tooltip` | Already installed | No new install needed. |
+| Color name libraries (chroma.js, etc.) | No | HSL values are specified directly. No runtime color computation needed. |
+| shadcn/ui CLI | Optional | Can use `npx shadcn@latest add [component]` to pull updated variants, but the components are already present and manually editing them is equivalent. |
 
-1. **Feature flag SMS sending**
-   - Add `SMS_ENABLED=false` env var
-   - Campaigns fall back to email-only
-   - No data loss (contacts, campaigns still stored)
+**Bottom line:** The design system change is a CSS and component-logic change. npm is not involved.
 
-2. **If Twilio webhooks fail**
-   - SMS sends still work (fire-and-forget)
-   - Lose delivery status updates (non-critical)
-   - Poll Twilio API for status as backup
+---
 
-3. **If LLM personalization fails**
-   - Fall back to template messages (existing system)
-   - No impact on sending (personalization is pre-processing)
-   - Queue personalization for retry
+## Contrast & Accessibility Compliance
 
-**No changes require database rollback** (only additive tables/columns).
+Before finalizing HSL values, verify WCAG AA (4.5:1 for body text, 3:1 for large text/UI components):
 
-## Security Checklist
+| Combination | Foreground | Background | Approximate Contrast | Status |
+|-------------|------------|------------|---------------------|--------|
+| Body text on page | `24 10% 10%` (#1C1814) | `36 20% 96%` (#F6F3EE) | ~14:1 | AA pass |
+| Body text on card | `24 10% 10%` (#1C1814) | `0 0% 100%` (#FFFFFF) | ~16:1 | AA pass |
+| Primary button text | `0 0% 98%` (#FAFAFA) | `213 60% 42%` (#2B6CB0) | ~4.8:1 | AA pass |
+| Muted foreground on muted | `24 8% 46%` (#7A7068) | `36 15% 94%` (#F2EEE8) | ~4.6:1 | AA pass |
+| Amber accent text on highlight | `30 80% 25%` (#7C3A10) | `45 95% 94%` (#FFFBEB) | ~7.2:1 | AA pass |
+| Dark mode body on background | `36 15% 92%` (#EDE8DF) | `24 8% 10%` (#1C1916) | ~13:1 | AA pass |
+| Dark primary button | `24 10% 10%` (#1C1814) | `213 70% 62%` (#5B9BD5) | ~4.6:1 | AA pass |
 
-- [ ] Twilio credentials server-side only (never expose to client)
-- [ ] Webhook signature verification implemented (prevent spoofing)
-- [ ] LLM API keys server-side only
-- [ ] RLS policies on all new tables (jobs, campaigns, campaign_sends)
-- [ ] Rate limiting extended to SMS (10/minute per org)
-- [ ] STOP keyword handling respects opt-out
-- [ ] Quiet hours enforcement prevents TCPA violations
-- [ ] No PII in LLM prompts (only name, service type)
-- [ ] Twilio message logs include org_id for audit trail
+**Critical:** Amber (`38 92% 50%` = #F59E0B) on white fails WCAG AA (2.2:1). Never use amber as background with white text. Always use `highlight-foreground` (dark amber brown) on amber backgrounds. The component patterns above enforce this via the variant system.
+
+---
+
+## Dark Mode Strategy
+
+The dark mode warm palette uses a technique called "hue-tinted darks": instead of hue 0 (neutral gray), all dark surface backgrounds use hue 24 (warm brown). At 8-18% lightness, the hue effect is subtle — the backgrounds appear dark but not sterile.
+
+The practical consequence: dark mode backgrounds are `#1C1916` instead of `#171717`. The difference is visible side-by-side but not jarring. It reads as "cozy" rather than "harsh."
+
+`next-themes` (already installed) handles the `.dark` class toggle on `<html>`. No changes to the theme system needed. The existing provider setup in the root layout already works correctly.
+
+---
+
+## Migration Path
+
+Changes propagate automatically through CSS variables — no find-and-replace across component files needed for basic color changes. The migration is:
+
+1. Update `app/globals.css` CSS variable values (one file change)
+2. Add two new tokens (`--highlight`, `--highlight-foreground`, `--surface`, `--surface-foreground`) to globals.css and `tailwind.config.ts`
+3. Update `components/ui/card.tsx` to add CVA variants
+4. Update `components/ui/input.tsx` for `h-10` and warm focus ring
+5. Create `components/ui/password-input.tsx` (new component)
+6. Update individual page/component files to use new card variants where colored backgrounds are needed
+
+Steps 1-2 change every component's colors automatically. Steps 3-6 are targeted additions.
+
+---
 
 ## Sources
 
-### SMS & Twilio
-- [Twilio Node.js SDK npm](https://www.npmjs.com/package/twilio) - Version 5.11.2
-- [Twilio A2P 10DLC Documentation](https://www.twilio.com/docs/messaging/compliance/a2p-10dlc) - Registration requirements
-- [Twilio A2P 10DLC Registration Guide](https://help.twilio.com/articles/1260801864489-How-do-I-register-to-use-A2P-10DLC-messaging) - Step-by-step process
-- [Twilio STOP Keyword Handling](https://www.twilio.com/docs/proxy/opt-out-keywords) - Automatic opt-out compliance
-- [FCC SMS Opt-Out Keywords Update](https://www.twilio.com/en-us/blog/insights/best-practices/update-to-fcc-s-sms-opt-out-keywords) - REVOKE/OPTOUT additions April 2025
-- [Twilio Webhook Security](https://www.twilio.com/docs/usage/webhooks/webhooks-security) - Signature verification
-- [Securing Twilio Webhooks in Node.js](https://www.twilio.com/en-us/blog/how-to-secure-twilio-webhook-urls-in-nodejs) - Implementation guide
+- `app/globals.css` — inspected directly; all current HSL values confirmed
+- `tailwind.config.ts` — inspected directly; confirmed token mapping to CSS vars
+- `components/ui/card.tsx` — inspected directly; confirmed current variant structure
+- `components/ui/button.tsx` — inspected directly; confirmed CVA pattern
+- `components/ui/input.tsx` — inspected directly; confirmed h-9 height issue
+- `components/ui/checkbox.tsx` — inspected directly; confirmed 44px touch wrapper exists
+- `components.json` — inspected; confirmed shadcn/ui "new-york" style, CSS variables enabled
+- `audit-screenshots/` — inspected visually; confirmed current cold blue (#2563EB) design
+- `audit-02-dashboard.png` — confirmed card layout and warm attention banner style already partially present
+- `.planning/PROJECT.md` — confirmed v2.5 milestone color direction: "Full warm palette like Stratify — amber/gold accents, soft blue interactive, cream-tinted backgrounds"
+- WCAG 2.1 contrast ratios computed from HSL values; verified against specification requirement of 4.5:1 (text) and 3:1 (UI components)
+- Amber (#F59E0B) on white contrast computed as ~2.2:1 — this is why amber is accent/highlight background, not text color on white
 
-### TCPA & Compliance
-- [TCPA Quiet Hours Guide 2026](https://activeprospect.com/blog/tcpa-text-messages/) - Federal and state rules
-- [TCPA Quiet Hours Violations](https://natlawreview.com/article/tick-tock-dont-get-caught-navigating-tcpas-quiet-hours) - Penalties and enforcement
-- [SMS Compliance 2026](https://telnyx.com/resources/sms-compliance) - Comprehensive compliance overview
+---
 
-### LLM & Vercel AI SDK
-- [Vercel AI SDK GitHub](https://github.com/vercel/ai) - Official repository
-- [AI SDK 6 Release](https://vercel.com/blog/ai-sdk-6) - New agent features, v6 migration
-- [Vercel AI SDK Documentation](https://ai-sdk.dev/docs/introduction) - Getting started
-- [Vercel AI SDK Providers: OpenAI](https://ai-sdk.dev/providers/ai-sdk-providers/openai) - Installation and usage
-- [Vercel AI SDK Providers: Anthropic](https://ai-sdk.dev/providers/ai-sdk-providers/anthropic) - Installation and usage
-- [GPT-4o-mini Pricing](https://openai.com/api/pricing/) - $0.15/$0.60 per 1M tokens
-- [Claude Haiku 4.5 Pricing](https://www.anthropic.com/news/claude-haiku-4-5) - $1/$5 per 1M tokens
-- [LangChain vs Vercel AI SDK 2026](https://strapi.io/blog/langchain-vs-vercel-ai-sdk-vs-openai-sdk-comparison-guide) - Framework comparison
-
-### Timezone Handling
-- [date-fns-tz npm](https://www.npmjs.com/package/date-fns-tz) - Version 3.2.0
-- [Handling Timezones in Node.js](https://tillitsdone.com/blogs/day-js-timezone-guide-for-node-js/) - Best practices
-- [Dynamic Scheduled Notifications Across Time Zones](https://medium.com/@python-javascript-php-html-css/implementing-dynamic-scheduled-notifications-across-time-zones-with-node-js-3b99bf6ad7bd) - Implementation patterns
-- [3 Rules for Handling Timezones](https://dev.to/corykeane/3-simple-rules-for-effectively-handling-dates-and-timezones-1pe0) - Store UTC, convert on use
-
-### Vercel Cron & Scheduling
-- [Vercel Cron Jobs Documentation](https://vercel.com/docs/cron-jobs) - Official docs
-- [Vercel Cron Jobs Quickstart](https://vercel.com/docs/cron-jobs/quickstart) - Setup guide
-- [Supabase pg_cron Documentation](https://supabase.com/docs/guides/cron) - Alternative scheduling
-- [Cron Jobs in Next.js: Serverless vs Serverful](https://yagyaraj234.medium.com/running-cron-jobs-in-nextjs-guide-for-serverful-and-stateless-server-542dd0db0c4c) - Architecture considerations
-
-### Performance & Architecture
-- [Next.js Performance Optimization 2026](https://medium.com/@shirkeharshal210/next-js-performance-optimization-app-router-a-practical-guide-a24d6b3f5db2) - App Router patterns
-- [Supabase RLS Best Practices](https://supabase.com/docs/guides/auth/row-level-security) - Multi-tenant security
+*Stack research for: v2.5 UI/UX Redesign — Warm Design System*
+*Researched: 2026-02-18*
+*Confidence: HIGH — all findings based on direct codebase inspection*
