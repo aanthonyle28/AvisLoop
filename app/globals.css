@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .container {
+    @apply mx-auto;
+  }
+}
+
 @layer base {
   :root {
     --background: 0 20% 98%;
