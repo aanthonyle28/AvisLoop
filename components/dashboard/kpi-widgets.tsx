@@ -55,12 +55,12 @@ export function KPIWidgets({ data }: KPIWidgetsProps) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Reviews This Month */}
         <Link href="/history?status=reviewed" className="block">
-          <InteractiveCard variant="amber" className="p-6">
+          <InteractiveCard hoverAccent="amber" className="p-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-medium text-muted-foreground">
                 Reviews This Month
               </h3>
-              <Star size={20} weight="regular" className="text-muted-foreground" />
+              <Star size={20} weight="fill" className="text-amber-500 dark:text-amber-400" />
             </div>
             <div className="flex items-baseline gap-2 mb-1">
               <span className="text-4xl font-bold">
@@ -76,12 +76,12 @@ export function KPIWidgets({ data }: KPIWidgetsProps) {
 
         {/* Average Rating */}
         <Link href="/feedback" className="block">
-          <InteractiveCard variant="amber" className="p-6">
+          <InteractiveCard hoverAccent="green" className="p-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-medium text-muted-foreground">
                 Average Rating
               </h3>
-              <ChartBar size={20} weight="regular" className="text-muted-foreground" />
+              <ChartBar size={20} weight="fill" className="text-[#008236] dark:text-[#00B84B]" />
             </div>
             <div className="flex items-baseline gap-2 mb-1">
               <span className="text-4xl font-bold">
@@ -97,12 +97,12 @@ export function KPIWidgets({ data }: KPIWidgetsProps) {
 
         {/* Conversion Rate */}
         <Link href="/history" className="block">
-          <InteractiveCard variant="amber" className="p-6">
+          <InteractiveCard hoverAccent="blue" className="p-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-medium text-muted-foreground">
                 Conversion Rate
               </h3>
-              <Target size={20} weight="regular" className="text-muted-foreground" />
+              <Target size={20} weight="fill" className="text-[#2C879F] dark:text-[#38A9C5]" />
             </div>
             <div className="flex items-baseline gap-2 mb-1">
               <span className="text-4xl font-bold">
@@ -120,7 +120,7 @@ export function KPIWidgets({ data }: KPIWidgetsProps) {
       {/* Bottom row: Pipeline metrics (smaller) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {/* Requests Sent This Week */}
-        <Card variant="subtle" className="p-4">
+        <Card variant="default" className="p-4">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-xs font-medium text-muted-foreground">
               Requests Sent This Week
@@ -139,7 +139,7 @@ export function KPIWidgets({ data }: KPIWidgetsProps) {
         </Card>
 
         {/* Active Sequences */}
-        <Card variant="subtle" className="p-4">
+        <Card variant="default" className="p-4">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-xs font-medium text-muted-foreground">
               Active Sequences
@@ -158,7 +158,7 @@ export function KPIWidgets({ data }: KPIWidgetsProps) {
         </Card>
 
         {/* Pending / Queued */}
-        <Card variant="subtle" className="p-4">
+        <Card variant="default" className="p-4">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-xs font-medium text-muted-foreground">
               Pending / Queued

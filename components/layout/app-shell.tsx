@@ -40,7 +40,7 @@ export function AppShell({ children, pageTitle, setupProgress, dashboardBadge, n
       <Sidebar dashboardBadge={dashboardBadge} notificationCounts={notificationCounts} />
 
       {/* Main content area */}
-      <main id="main-content" className="flex-1 overflow-auto">
+      <main id="main-content" className="flex-1 overflow-auto px-4 sm:px-6 lg:px-8">
         {/* Mobile page header */}
         <PageHeader
           title={pageTitle}

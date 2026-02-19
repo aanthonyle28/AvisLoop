@@ -38,26 +38,57 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
 );
 Card.displayName = "Card";
 
-const InteractiveCard = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, variant, children, ...props }, ref) => (
-    <div
-      ref={ref}
-      data-slot="interactive-card"
-      className={cn(
-        cardVariants({ variant }),
-        "relative group transition-all duration-200 cursor-pointer hover:shadow-sm",
-        className,
-      )}
-      {...props}
-    >
-      {children}
-      <ArrowRight
-        size={14}
-        weight="bold"
-        className="absolute bottom-3 right-3 text-muted-foreground/30 transition-colors duration-200 group-hover:text-muted-foreground/70"
-      />
-    </div>
-  ),
+type HoverAccent = "amber" | "green" | "blue";
+
+const hoverAccentStyles: Record<
+  HoverAccent,
+  { card: string; arrow: string }
+> = {
+  amber: {
+    card: "hover:border-amber-300 dark:hover:border-amber-700",
+    arrow: "group-hover:text-amber-500 dark:group-hover:text-amber-400",
+  },
+  green: {
+    card: "hover:border-[#008236] dark:hover:border-[#00B84B]",
+    arrow: "group-hover:text-[#008236] dark:group-hover:text-[#00B84B]",
+  },
+  blue: {
+    card: "hover:border-[#2C879F] dark:hover:border-[#38A9C5]",
+    arrow: "group-hover:text-[#2C879F] dark:group-hover:text-[#38A9C5]",
+  },
+};
+
+type InteractiveCardProps = CardProps & {
+  hoverAccent?: HoverAccent;
+};
+
+const InteractiveCard = React.forwardRef<HTMLDivElement, InteractiveCardProps>(
+  ({ className, variant, hoverAccent, children, ...props }, ref) => {
+    const accent = hoverAccent ? hoverAccentStyles[hoverAccent] : null;
+    return (
+      <div
+        ref={ref}
+        data-slot="interactive-card"
+        className={cn(
+          cardVariants({ variant }),
+          "relative group transition-all duration-200 cursor-pointer hover:shadow-sm",
+          accent?.card,
+          className,
+        )}
+        {...props}
+      >
+        {children}
+        <ArrowRight
+          size={14}
+          weight="bold"
+          className={cn(
+            "absolute bottom-3 right-3 text-muted-foreground/30 transition-colors duration-200",
+            accent?.arrow ?? "group-hover:text-muted-foreground/70",
+          )}
+        />
+      </div>
+    );
+  },
 );
 InteractiveCard.displayName = "InteractiveCard";
 
