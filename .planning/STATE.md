@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 33 of 39 in v2.5 milestone (Phase 1 of 7 in this milestone)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-02-18 — v2.5 roadmap created (Phases 33-39, 30 requirements mapped)
+Plan: 1 of 2 in current phase (33-01 complete)
+Status: In progress
+Last activity: 2026-02-19 — Completed 33-01-PLAN.md (layout chrome tokenization)
 
-Progress: [░░░░░░░░░░] 0% (v2.5 milestone)
+Progress: [█░░░░░░░░░] ~5% (v2.5 milestone)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 170
-- v2.5 plans completed: 0
+- Total plans completed (project): 171
+- v2.5 plans completed: 1
 
 *Updated after each plan completion*
 
@@ -34,6 +34,9 @@ Progress: [░░░░░░░░░░] 0% (v2.5 milestone)
 - Onboarding storage key must version to `'onboarding-draft-v2'` when steps change (Phase 38)
 - Campaign form save bug must be fixed in Phase 37 before any campaign form layout changes
 - Dark mode calibration must be independent of light mode (higher saturation needed for warm hues in dark)
+- bg-secondary for active nav state (replaces bg-[#F2F2F2]) — --secondary is 0 0% 92%, semantically correct for muted interactive surface
+- Redundant dark: overrides removed — bg-card, bg-background, border-border are already mode-aware; dark:bg-X overrides add noise
+- Button component for all interactive elements — raw button elements replaced with Button primitive for consistency and future theming
 
 ### Pending Todos
 
@@ -47,7 +50,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-18
-Stopped at: Roadmap created — v2.5 phases 33-39 written to ROADMAP.md, STATE.md initialized, REQUIREMENTS.md traceability updated
+Last session: 2026-02-19
+Stopped at: Completed 33-01-PLAN.md — layout chrome tokenization, SUMMARY.md created
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
