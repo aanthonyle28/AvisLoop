@@ -50,7 +50,7 @@ interface SidebarProps {
   }
 }
 
-export function Sidebar({ dashboardBadge, notificationCounts }: SidebarProps = {}) {
+export function Sidebar({ notificationCounts }: SidebarProps = {}) {
   const pathname = usePathname()
   const [isCollapsed, setIsCollapsed] = useLocalStorage('sidebarCollapsed', false)
 
@@ -154,7 +154,7 @@ export function Sidebar({ dashboardBadge, notificationCounts }: SidebarProps = {
             key={item.href}
             item={{
               ...item,
-              badge: item.label === 'Dashboard' ? dashboardBadge : undefined,
+              badge: undefined,
             }}
           />
         ))}

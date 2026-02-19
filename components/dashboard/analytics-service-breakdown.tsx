@@ -1,6 +1,9 @@
 'use client'
 
+import Link from 'next/link'
+import { ChartBar } from '@phosphor-icons/react'
 import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import type { ServiceTypeAnalytics } from '@/lib/data/analytics'
 
 interface Props {
@@ -11,8 +14,19 @@ export function ServiceTypeBreakdown({ data }: Props) {
   // Empty state
   if (data.byServiceType.length === 0) {
     return (
-      <div className="text-center py-12 text-muted-foreground">
-        <p>No campaign data yet. Once campaigns start sending, service type breakdowns will appear here.</p>
+      <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+        <div className="rounded-full bg-muted p-6 mb-6">
+          <ChartBar size={32} weight="regular" className="text-muted-foreground" />
+        </div>
+        <h2 className="text-xl font-semibold tracking-tight mb-2">
+          No analytics data yet
+        </h2>
+        <p className="text-muted-foreground mb-6 max-w-sm">
+          Analytics appear once campaigns start sending. Complete a job to kick off your first campaign.
+        </p>
+        <Link href="/jobs?action=add">
+          <Button>Add your first job</Button>
+        </Link>
       </div>
     )
   }
