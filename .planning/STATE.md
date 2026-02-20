@@ -67,6 +67,12 @@ Progress: [█████████░] ~82% (v2.5 milestone)
 
 None.
 
+### New Decisions from 36-03
+
+- Google OAuth PKCE flow works end-to-end in local dev — no code changes needed; code was correct as-built
+- "OAuth state parameter missing" on first test was transient (Supabase server restart mid-flow), not a code bug
+- NEXT_PUBLIC_SITE_URL: `http://localhost:3000` in .env.local, `https://app.avisloop.com` in Vercel production (no trailing slash on either)
+
 ### New Decisions from 37-01
 
 - react-hook-form setValue for complex arrays requires `{ shouldDirty: true, shouldValidate: true }` to ensure dirty tracking and correct form submission
@@ -115,7 +121,7 @@ None.
 - Phase 21-08: Twilio A2P campaign approval required for production SMS testing (brand approved, campaign pending)
 - Phase 37: Campaign form save bug (JC-08) RESOLVED in 37-01 — shouldDirty fix applied to touches setValue
 - Phase 39: Five server queries on /send page must be traced to new homes before redirect is added
-- Google OAuth: Code complete, Supabase dashboard Google provider config pending (enable provider, add Client ID/Secret, allowlist redirect URLs)
+- Google OAuth: VERIFIED WORKING (36-03) — authenticated end-to-end in local dev; NEXT_PUBLIC_SITE_URL must be https://app.avisloop.com in Vercel production env vars
 
 ## Session Continuity
 
