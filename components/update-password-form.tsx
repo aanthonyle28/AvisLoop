@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 
 export function UpdatePasswordForm({
@@ -30,32 +30,36 @@ export function UpdatePasswordForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={formAction}>
+          <form action={formAction} noValidate>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="password">New password</Label>
-                <Input
+                <PasswordInput
                   id="password"
                   name="password"
-                  type="password"
                   placeholder="New password"
                   required
+                  autoComplete="new-password"
+                  aria-invalid={!!state?.fieldErrors?.password}
+                  aria-describedby={state?.fieldErrors?.password ? "password-error" : undefined}
                 />
                 {state?.fieldErrors?.password && (
-                  <p className="text-sm text-error-text">{state.fieldErrors.password[0]}</p>
+                  <p id="password-error" role="alert" className="text-sm text-error-text">{state.fieldErrors.password[0]}</p>
                 )}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="confirmPassword">Confirm password</Label>
-                <Input
+                <PasswordInput
                   id="confirmPassword"
                   name="confirmPassword"
-                  type="password"
                   placeholder="Confirm password"
                   required
+                  autoComplete="off"
+                  aria-invalid={!!state?.fieldErrors?.confirmPassword}
+                  aria-describedby={state?.fieldErrors?.confirmPassword ? "confirmPassword-error" : undefined}
                 />
                 {state?.fieldErrors?.confirmPassword && (
-                  <p className="text-sm text-error-text">{state.fieldErrors.confirmPassword[0]}</p>
+                  <p id="confirmPassword-error" role="alert" className="text-sm text-error-text">{state.fieldErrors.confirmPassword[0]}</p>
                 )}
               </div>
               {state?.error && <p className="text-sm text-error-text">{state.error}</p>}

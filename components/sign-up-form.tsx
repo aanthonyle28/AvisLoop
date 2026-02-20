@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
 import { GoogleOAuthButton } from "@/components/auth/google-oauth-button";
 import Link from "next/link";
 
@@ -26,7 +27,7 @@ export function SignUpForm({
       </div>
 
       {/* Email/Password Form */}
-      <form action={formAction} className="space-y-4">
+      <form action={formAction} noValidate className="space-y-4">
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="signup-fullName">Full Name (optional)</Label>
@@ -49,21 +50,25 @@ export function SignUpForm({
               placeholder="m@example.com"
               aria-label="Email address"
               required
+              aria-invalid={!!state?.fieldErrors?.email}
+              aria-describedby={state?.fieldErrors?.email ? "signup-email-error" : undefined}
             />
             {state?.fieldErrors?.email && (
-              <p className="text-sm text-error-text">{state.fieldErrors.email[0]}</p>
+              <p id="signup-email-error" role="alert" className="text-sm text-error-text">{state.fieldErrors.email[0]}</p>
             )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="signup-password">Password</Label>
-            <Input
+            <PasswordInput
               id="signup-password"
               name="password"
-              type="password"
               required
+              autoComplete="new-password"
+              aria-invalid={!!state?.fieldErrors?.password}
+              aria-describedby={state?.fieldErrors?.password ? "signup-password-error" : undefined}
             />
             {state?.fieldErrors?.password && (
-              <p className="text-sm text-error-text">{state.fieldErrors.password[0]}</p>
+              <p id="signup-password-error" role="alert" className="text-sm text-error-text">{state.fieldErrors.password[0]}</p>
             )}
           </div>
           {state?.error && <p className="text-sm text-error-text">{state.error}</p>}
