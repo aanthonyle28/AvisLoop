@@ -21,7 +21,7 @@ export async function getChecklistState(businessId: string): Promise<{
   const supabase = await createClient()
 
   // Parallel fetch all counts needed
-  const [jobsResult, completedJobsResult, campaignsResult, reviewClicksResult, businessResult] = await Promise.all([
+  const [jobsResult, completedJobsResult, reviewClicksResult, businessResult] = await Promise.all([
     // Count all jobs
     supabase
       .from('jobs')
@@ -35,13 +35,6 @@ export async function getChecklistState(businessId: string): Promise<{
       .eq('business_id', businessId)
       .eq('status', 'completed'),
 
-    // Count active campaigns
-    supabase
-      .from('campaigns')
-      .select('id', { count: 'exact', head: true })
-      .eq('business_id', businessId)
-      .eq('status', 'active'),
-
     // Count review clicks (funnel success - customer clicked through to Google)
     // This tracks campaign_enrollments stopped with 'review_clicked' reason
     supabase
@@ -50,7 +43,7 @@ export async function getChecklistState(businessId: string): Promise<{
       .eq('business_id', businessId)
       .eq('stop_reason', 'review_clicked'),
 
-    // Get stored checklist state (for dismissed/collapsed flags)
+    // Get stored checklist state (for dismissed/collapsed/campaign_reviewed flags)
     supabase
       .from('businesses')
       .select('onboarding_checklist')
@@ -60,7 +53,6 @@ export async function getChecklistState(businessId: string): Promise<{
 
   const jobCount = jobsResult.count ?? 0
   const completedJobCount = completedJobsResult.count ?? 0
-  const campaignCount = campaignsResult.count ?? 0
   const reviewClickCount = reviewClicksResult.count ?? 0
 
   // Parse stored checklist state
@@ -73,7 +65,7 @@ export async function getChecklistState(businessId: string): Promise<{
   // Compute item completion from actual data
   const items: Record<ChecklistItemId, boolean> = {
     first_job_added: jobCount > 0,
-    campaign_reviewed: campaignCount > 0, // Has active campaign (from onboarding preset)
+    campaign_reviewed: storedChecklist?.campaign_reviewed ?? false, // Requires actual /campaigns visit
     job_completed: completedJobCount > 0,
     first_review_click: reviewClickCount > 0, // Actual funnel success
   }

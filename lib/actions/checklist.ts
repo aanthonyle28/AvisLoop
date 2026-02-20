@@ -78,3 +78,48 @@ export async function updateChecklistState(
     return { success: false, error: 'An unexpected error occurred' }
   }
 }
+
+/**
+ * Mark the campaign as reviewed in the Getting Started checklist.
+ * Called from the campaigns page on load so the checklist item
+ * only completes when the user actually visits /campaigns.
+ */
+export async function markCampaignReviewed(): Promise<{ success: boolean }> {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false }
+
+    const { data: business } = await supabase
+      .from('businesses')
+      .select('id, onboarding_checklist')
+      .eq('user_id', user.id)
+      .single()
+
+    if (!business) return { success: false }
+
+    const current = (business.onboarding_checklist || {}) as Record<string, unknown>
+
+    // Short-circuit if already marked — avoids unnecessary DB write
+    if (current.campaign_reviewed === true) return { success: true }
+
+    const { error } = await supabase
+      .from('businesses')
+      .update({
+        onboarding_checklist: { ...current, campaign_reviewed: true }
+      })
+      .eq('id', business.id)
+
+    if (error) {
+      console.error('Failed to mark campaign reviewed:', error)
+      return { success: false }
+    }
+
+    revalidatePath('/dashboard')
+    revalidatePath('/campaigns')
+    return { success: true }
+  } catch (err) {
+    console.error('markCampaignReviewed error:', err)
+    return { success: false }
+  }
+}

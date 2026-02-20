@@ -1,5 +1,6 @@
 import { getCampaigns, getCampaignPresets } from '@/lib/data/campaign'
 import { getAvailableTemplates } from '@/lib/data/message-template'
+import { markCampaignReviewed } from '@/lib/actions/checklist'
 import { CampaignList } from '@/components/campaigns/campaign-list'
 import { PresetPicker } from '@/components/campaigns/preset-picker'
 import { Button } from '@/components/ui/button'
@@ -11,6 +12,10 @@ export const metadata = {
 }
 
 export default async function CampaignsPage() {
+  // Mark campaign as reviewed for Getting Started checklist (ONB-05)
+  // Short-circuits on second+ visit (reads flag, skips write)
+  await markCampaignReviewed()
+
   const [campaigns, presets, templates] = await Promise.all([
     getCampaigns({ includePresets: false }),
     getCampaignPresets(),
