@@ -369,11 +369,11 @@ Plans:
 **Plans**: 8 plans in 3 waves
 Plans:
 - [x] 30.1-01-PLAN.md — Table skeleton loaders (Customers, Jobs, History)
-- [x] 30.1-02-PLAN.md — Rename Send → "Manual Request" + friction warning
+- [x] 30.1-02-PLAN.md — Rename Send -> "Manual Request" + friction warning
 - [x] 30.1-03-PLAN.md — Campaign enrollment preview on jobs
 - [x] 30.1-04-PLAN.md — Campaign enrollment pagination
 - [x] 30.1-05-PLAN.md — New campaign preset guidance
-- [x] 30.1-06-PLAN.md — Add Job sidebar auto-open + Send→Message terminology
+- [x] 30.1-06-PLAN.md — Add Job sidebar auto-open + Send->Message terminology
 - [x] 30.1-07-PLAN.md — Campaign preset timing info display
 - [x] 30.1-08-PLAN.md — History route vs Activity label alignment
 
@@ -540,11 +540,11 @@ Plans:
   2. Signup and password reset forms show a live checklist beneath the password field tracking: minimum length, uppercase letter, number, and special character — updating as the user types
   3. Google OAuth sign-in completes successfully: clicking "Continue with Google" opens the Google consent screen and returns an authenticated session
   4. Email and password fields show clear required-field validation with inline error messages and visual indicators (red border, helper text) — not just browser-default validation
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 36-01-PLAN.md — PasswordInput component and auth form integration
-- [ ] 36-02-PLAN.md — Password requirements checklist component
+- [ ] 36-01-PLAN.md — PasswordInput component, aria-invalid Input styling, and auth form integration
+- [ ] 36-02-PLAN.md — Password requirements checklist component and Zod schema updates
 - [ ] 36-03-PLAN.md — Google OAuth verification and fix
 
 ### Phase 37: Jobs & Campaigns UX Fixes
@@ -640,7 +640,7 @@ See individual phase sections above for requirements, success criteria, and depe
 | **33** | **v2.5 UI/UX Redesign** | **2/2** | **Complete** | **2026-02-18** |
 | **34** | **v2.5 UI/UX Redesign** | **2/2** | **Complete** | **2026-02-19** |
 | **35** | **v2.5 UI/UX Redesign** | **5/5** | **Complete** | **2026-02-18** |
-| **36** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
+| **36** | **v2.5 UI/UX Redesign** | **0/3** | **Not started** | - |
 | **37** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
 | **38** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
 | **39** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
@@ -663,5 +663,5 @@ After v2.5:
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 
 ---
-*Last updated: 2026-02-18 — v2.0 milestone complete (Phases 20-32 verified), v2.5 UI/UX Redesign in progress (Phases 33-35 complete, 36-39 remaining)*
+*Last updated: 2026-02-19 — v2.0 milestone complete (Phases 20-32 verified), v2.5 UI/UX Redesign in progress (Phases 33-35 complete, Phase 36 planned, 37-39 remaining)*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
