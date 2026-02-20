@@ -16,9 +16,9 @@
 
 ## Login & Auth
 
-- [ ] **AUTH-01**: Password visibility toggle — create `PasswordInput` component with show/hide eye icon (Phosphor) wrapping existing Input, use in login, signup, and password reset forms
-- [ ] **AUTH-02**: Password requirements checklist — add live validation checklist (length, uppercase, number, special character) visible while typing on signup and password reset forms
-- [ ] **AUTH-03**: Google OAuth fix — verify and fix Google OAuth provider configuration in Supabase dashboard and auth flow
+- [x] **AUTH-01**: Password visibility toggle — create `PasswordInput` component with show/hide eye icon (Phosphor) wrapping existing Input, use in login, signup, and password reset forms
+- [x] **AUTH-02**: Password requirements checklist — add live validation checklist (length, uppercase, number, special character) visible while typing on signup and password reset forms
+- [x] **AUTH-03**: Google OAuth fix — verify and fix Google OAuth provider configuration in Supabase dashboard and auth flow
 
 ## Dashboard
 
@@ -86,9 +86,9 @@
 | DS-03 | Phase 34 | Complete |
 | DS-04 | Phase 33 | Complete |
 | DS-05 | Phase 35 | Complete |
-| AUTH-01 | Phase 36 | Pending |
-| AUTH-02 | Phase 36 | Pending |
-| AUTH-03 | Phase 36 | Pending |
+| AUTH-01 | Phase 36 | Complete |
+| AUTH-02 | Phase 36 | Complete |
+| AUTH-03 | Phase 36 | Complete |
 | DASH-01 | Phase 35 | Complete |
 | DASH-02 | Phase 35 | Complete |
 | DASH-03 | Phase 35 | Complete |

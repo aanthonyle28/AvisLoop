@@ -5,22 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** Phase 36 — Auth Form Enhancements
+**Current focus:** Phase 39 — Manual Request Elimination
 
 ## Current Position
 
-Phase: 36 of 39 in v2.5 milestone
-Plan: 2 of 3 complete in phase — 36-02 complete
-Status: In progress
-Last activity: 2026-02-20 — Completed 36-02 (PasswordStrengthChecklist component, Zod regex rules, form wiring)
+Phase: 36 of 39 in v2.5 milestone (Phase 4 of 7 in this milestone)
+Plan: 3 of 3 complete
+Status: Phase complete
+Last activity: 2026-02-19 — Completed Phase 36 (Auth Form Enhancements), all 3 plans verified
 
-Progress: [█████████░] ~83% (v2.5 milestone)
+Progress: [████████░░] ~86% (v2.5 milestone — Phases 33-38 complete, Phase 39 remaining)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 185
-- v2.5 plans completed: 15
+- Total plans completed (project): 188
+- v2.5 plans completed: 18
 
 *Updated after each plan completion*
 
@@ -32,7 +32,6 @@ Progress: [█████████░] ~83% (v2.5 milestone)
 - Phase 33 (color audit) MUST run before Phase 34 (palette swap) — hardcoded hex bypasses token system
 - Manual Request elimination (Phase 39) is last — most regression risk; /send becomes redirect not deletion
 - Onboarding storage key versioned to `'onboarding-draft-v2'` (Phase 38 complete) — stale 7-step drafts abandoned via key change, no migration code needed
-- Campaign form save bug must be fixed in Phase 37 before any campaign form layout changes
 - Dark mode calibration must be independent of light mode (higher saturation needed for warm hues in dark)
 - bg-secondary for active nav state (replaces bg-[#F2F2F2]) — --secondary is 0 0% 92%, semantically correct for muted interactive surface
 - Redundant dark: overrides removed — bg-card, bg-background, border-border are already mode-aware; dark:bg-X overrides add noise
@@ -62,77 +61,29 @@ Progress: [█████████░] ~83% (v2.5 milestone)
 - Error message pattern: id={field}-error role=alert on <p>, linked via aria-describedby on the input — screen readers announce error on focus
 - noValidate on all auth forms — suppress browser validation popups; server-side errors render inline with aria-invalid red border styling
 - aria-invalid:border-destructive on Input component — Tailwind arbitrary variant triggers red border/ring when aria-invalid=true is set
+- PasswordStrengthChecklist returns null when password is empty — no checklist flash on page load, appears on first keystroke
+- Confirm password field stays uncontrolled — checklist only on primary password field
+- signInSchema unchanged — login has no strength enforcement (user signs in with existing password)
+- Google OAuth PKCE flow works end-to-end — no code changes needed; code was correct as-built
+- NEXT_PUBLIC_SITE_URL: `http://localhost:3000` in .env.local, `https://app.avisloop.com` in Vercel production (no trailing slash on either)
+- react-hook-form setValue for complex arrays requires `{ shouldDirty: true, shouldValidate: true }` to ensure dirty tracking
+- Sheet-based edit pattern for campaigns: parent component owns open/close state; form uses onSuccess callback instead of router navigation
+- Plain-English campaign preset names: Conservative → Gentle Follow-Up, Standard → Steady Follow-Up, Aggressive → Speedy Follow-Up
+- 5-step onboarding: Business Basics, Services Offered, Campaign Preset, Import Jobs, SMS Consent
 
 ### Pending Todos
 
 None.
 
-### New Decisions from 36-02
-
-- PasswordStrengthChecklist returns null when password is empty — no checklist flash on page load, appears on first keystroke
-- Confirm password field stays uncontrolled — checklist only on primary password field
-- signInSchema unchanged — login has no strength enforcement (user signs in with existing password)
-- getRequirements() exported separately from PasswordStrengthChecklist for potential test/reuse consumers
-
-### New Decisions from 36-03
-
-- Google OAuth PKCE flow works end-to-end in local dev — no code changes needed; code was correct as-built
-- "OAuth state parameter missing" on first test was transient (Supabase server restart mid-flow), not a code bug
-- NEXT_PUBLIC_SITE_URL: `http://localhost:3000` in .env.local, `https://app.avisloop.com` in Vercel production (no trailing slash on either)
-
-### New Decisions from 37-01
-
-- react-hook-form setValue for complex arrays requires `{ shouldDirty: true, shouldValidate: true }` to ensure dirty tracking and correct form submission
-- Server action early-return guard before Zod enum: check `!serviceType` first, return user-friendly error before reaching Zod validation
-- console.error logging in server actions is acceptable in production (server-side, never reaches client, aids diagnosis)
-
-### New Decisions from 37-02
-
-- Keep type=text in customer autocomplete even in email mode — changing input type dynamically causes focus loss in some browsers
-- Email badge only shows at query.length >= 3 — bare @ character alone causes flash with no useful context
-- Shape-based distinction (rounded-full vs rounded-md) + group labels is sufficient filter differentiation — no color change needed
-- Filter fallback pattern: enabledServiceTypes && enabledServiceTypes.length > 0 ? filtered : all — empty array means no config, show all
-
-### New Decisions from 38-03
-
-- campaign_reviewed stored as explicit JSONB flag — not derivable from campaign existence; only set when user visits /campaigns
-- await markCampaignReviewed() (not void) ensures flag is written before page renders; short-circuit on repeat visits keeps latency minimal
-- Page-visit checklist completion pattern: call server action at top of async server component, action reads flag first and returns early if already set
-
-### New Decisions from 38-02
-
-- customServiceLabel state is UX-only — not saved to DB; saveServicesOffered still receives the string[] enum array (future phase can add custom_service_label DB column if needed)
-- Cumulative hours for timing display: sum touches slice(0, idx+1) then format as 'Day N' — shows when customer receives message, not delay from previous touch
-- Sub-24h touches display raw Xh (e.g., '4h') since 'Day 0' would be confusing
-- preset.meta?.name || preset.name fallback is safe: unrecognized DB presets fall back to DB name instead of empty
-- Plain-English campaign preset names: Conservative → Gentle Follow-Up, Standard → Steady Follow-Up, Aggressive → Speedy Follow-Up (IDs unchanged for matching logic)
-
-### New Decisions from 38-01
-
-- Onboarding step removal strategy: delete from STEPS array + remove switch case + remove import — step files stay on disk (no active breakage from unused files)
-- Storage key versioning for wizard drafts: bump key string (v1 → v2) is sufficient to abandon stale drafts; no migration needed since step 1 saves to DB on Continue
-- 5-step onboarding: Business Basics, Services Offered, Campaign Preset, Import Jobs, SMS Consent — Review Destination removed (duplicate of Business Basics), Software Used removed (low-value)
-
-### New Decisions from 37-03
-
-- Sheet-based edit pattern: parent component (CampaignList) owns open/close state; CampaignForm uses onSuccess callback instead of router navigation when inside a sheet
-- CampaignList is the Sheet host (not CampaignsPage) — direct access to campaigns array for editingCampaign lookup avoids prop drilling
-- Templates fetched once at server-component page level, passed to CampaignList, shared with the Sheet-embedded form — no duplicate fetches
-- stopPropagation on entire controls div covers Switch + DropdownMenu with one handler — simpler than per-element handlers
-- inline-flex + w-fit for back links constrains click target to text content width — prevents full-row accidental activation
-- max-w-3xl mx-auto on PresetPicker grid centers 3-column layout without stretching on large viewports
-- PRESET_ORDER constant for deterministic sort ensures Standard always appears center column
-
 ### Blockers/Concerns
 
 - Phase 21-08: Twilio A2P campaign approval required for production SMS testing (brand approved, campaign pending)
-- Phase 37: Campaign form save bug (JC-08) RESOLVED in 37-01 — shouldDirty fix applied to touches setValue
 - Phase 39: Five server queries on /send page must be traced to new homes before redirect is added
-- Google OAuth: VERIFIED WORKING (36-03) — authenticated end-to-end in local dev; NEXT_PUBLIC_SITE_URL must be https://app.avisloop.com in Vercel production env vars
+- Google OAuth: VERIFIED WORKING (36-03) — NEXT_PUBLIC_SITE_URL must be https://app.avisloop.com in Vercel production env vars
 
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Phase 38 verified (5/5 must-haves passed). Phase 36 in progress (2/3 plans complete).
+Stopped at: Completed Phase 36 — Auth Form Enhancements (PasswordInput, strength checklist, Google OAuth verified). Next: Phase 39 (Manual Request Elimination)
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!

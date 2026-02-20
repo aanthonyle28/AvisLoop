@@ -543,9 +543,9 @@ Plans:
 **Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 36-01-PLAN.md — PasswordInput component, aria-invalid Input styling, and auth form integration
-- [ ] 36-02-PLAN.md — Password requirements checklist component and Zod schema updates
-- [ ] 36-03-PLAN.md — Google OAuth verification and fix
+- [x] 36-01-PLAN.md — PasswordInput component, aria-invalid Input styling, and auth form integration
+- [x] 36-02-PLAN.md — Password requirements checklist component and Zod schema updates
+- [x] 36-03-PLAN.md — Google OAuth verification and fix
 
 ### Phase 37: Jobs & Campaigns UX Fixes
 **Goal**: The Jobs page service filter matches the business's configured services, the Add Job form intelligently handles name vs. email input, the known job creation bug is resolved, and campaign cards are fully interactive with correct layout details.
@@ -640,22 +640,21 @@ See individual phase sections above for requirements, success criteria, and depe
 | **33** | **v2.5 UI/UX Redesign** | **2/2** | **Complete** | **2026-02-18** |
 | **34** | **v2.5 UI/UX Redesign** | **2/2** | **Complete** | **2026-02-19** |
 | **35** | **v2.5 UI/UX Redesign** | **5/5** | **Complete** | **2026-02-18** |
-| **36** | **v2.5 UI/UX Redesign** | **0/3** | **Not started** | - |
+| **36** | **v2.5 UI/UX Redesign** | **3/3** | **Complete** | **2026-02-19** |
 | **37** | **v2.5 UI/UX Redesign** | **3/3** | **Complete** | **2026-02-19** |
 | **38** | **v2.5 UI/UX Redesign** | **3/3** | **Complete** | **2026-02-19** |
 | **39** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
 
-**Total:** 185 plans complete across shipped phases.
+**Total:** 188 plans complete across shipped phases.
 
 ## What's Next
 
 **v2.0 milestone is COMPLETE** (Phases 20-32 all verified, excluding Phase 21 SMS blocked on A2P).
 
-**v2.5 milestone in progress:** Phases 33-35, 37-38 complete. Next: Phase 39 (Manual Request Elimination).
+**v2.5 milestone in progress:** Phases 33-38 complete. Next: Phase 39 (Manual Request Elimination).
 
 **Blockers:**
 - Twilio A2P 10DLC registration required before Phase 21-08 execution (webhook verification)
-- Phase 36 (Auth Form Enhancements) skipped for now — plans created but not yet executed
 
 After v2.5:
 - **v2.1 Integrations** — ServiceTitan/Jobber/Housecall Pro API integrations for auto job import
@@ -664,5 +663,5 @@ After v2.5:
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 
 ---
-*Last updated: 2026-02-19 — v2.0 milestone complete (Phases 20-32 verified), v2.5 UI/UX Redesign in progress (Phases 33-35, 37-38 complete, 36, 39 remaining)*
+*Last updated: 2026-02-19 — v2.0 milestone complete (Phases 20-32 verified), v2.5 UI/UX Redesign in progress (Phases 33-38 complete, Phase 39 remaining)*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
