@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 37 of 39 in v2.5 milestone (Phase 5 of 7 in this milestone)
-Plan: 2 of 3 complete
-Status: In progress
-Last activity: 2026-02-20 — Completed 37-02 (service filter scoping, smart autocomplete, filter visual distinction)
+Plan: 3 of 3 complete — Phase 37 DONE
+Status: Phase complete
+Last activity: 2026-02-20 — Completed 37-03 (campaign card full-click, Sheet-based edit, back button fix, preset centering)
 
-Progress: [███████░░░] ~60% (v2.5 milestone)
+Progress: [████████░░] ~70% (v2.5 milestone)
 
 ## Performance Metrics
 
@@ -80,6 +80,16 @@ None.
 - Shape-based distinction (rounded-full vs rounded-md) + group labels is sufficient filter differentiation — no color change needed
 - Filter fallback pattern: enabledServiceTypes && enabledServiceTypes.length > 0 ? filtered : all — empty array means no config, show all
 
+### New Decisions from 37-03
+
+- Sheet-based edit pattern: parent component (CampaignList) owns open/close state; CampaignForm uses onSuccess callback instead of router navigation when inside a sheet
+- CampaignList is the Sheet host (not CampaignsPage) — direct access to campaigns array for editingCampaign lookup avoids prop drilling
+- Templates fetched once at server-component page level, passed to CampaignList, shared with the Sheet-embedded form — no duplicate fetches
+- stopPropagation on entire controls div covers Switch + DropdownMenu with one handler — simpler than per-element handlers
+- inline-flex + w-fit for back links constrains click target to text content width — prevents full-row accidental activation
+- max-w-3xl mx-auto on PresetPicker grid centers 3-column layout without stretching on large viewports
+- PRESET_ORDER constant for deterministic sort ensures Standard always appears center column
+
 ### Blockers/Concerns
 
 - Phase 21-08: Twilio A2P campaign approval required for production SMS testing (brand approved, campaign pending)
@@ -90,6 +100,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 37-02 — service filter scoping (JC-01), smart autocomplete email detection (JC-02), filter visual distinction (JC-09). Next: 37-03.
+Stopped at: Completed 37-03 — campaign card full-click (JC-05), Sheet-based edit panel (JC-04), back button hit area (JC-06), preset centering (JC-07). Phase 37 complete.
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
