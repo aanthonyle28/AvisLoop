@@ -115,6 +115,9 @@ export function CustomerAutocomplete({
     setTimeout(() => setIsOpen(false), 200)
   }
 
+  // Detect when user is typing an email address
+  const isEmailQuery = query.includes('@')
+
   return (
     <div className="relative">
       <Input
@@ -124,13 +127,20 @@ export function CustomerAutocomplete({
         onFocus={() => setIsOpen(true)}
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
-        placeholder={placeholder}
+        placeholder={isEmailQuery ? 'Search by email address...' : placeholder}
+        aria-label={isEmailQuery ? 'Customer email search' : 'Customer name or email search'}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         aria-controls="customer-autocomplete-list"
         aria-activedescendant={highlightedIndex >= 0 ? `customer-option-${highlightedIndex}` : undefined}
         className={cn(error && 'border-destructive')}
       />
+      {/* Email mode indicator — shows when user types @ with at least 3 chars */}
+      {isEmailQuery && query.length >= 3 && (
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">
+          email
+        </span>
+      )}
 
       {/* Dropdown */}
       {isOpen && (filtered.length > 0 || showCreateNew) && (

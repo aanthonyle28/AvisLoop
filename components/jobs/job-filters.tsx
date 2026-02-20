@@ -41,8 +41,13 @@ export function JobFilters({ filters, onFiltersChange, enabledServiceTypes }: Jo
       </div>
 
       {/* Filter chips */}
-      <div className="flex flex-wrap gap-2">
-        {/* Status filters */}
+      <div className="flex flex-wrap items-center gap-2">
+        {/* Status group label */}
+        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider mr-1">
+          Status
+        </span>
+
+        {/* Status filters — pill shape (rounded-full) */}
         {JOB_STATUSES.map(status => (
           <button
             key={status}
@@ -61,9 +66,14 @@ export function JobFilters({ filters, onFiltersChange, enabledServiceTypes }: Jo
         ))}
 
         {/* Separator */}
-        <div className="w-px bg-border" />
+        <div className="w-px h-6 self-center bg-border mx-1" />
 
-        {/* Service type filters */}
+        {/* Service group label */}
+        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider mr-1">
+          Service
+        </span>
+
+        {/* Service type filters — rounded rectangle (rounded-md) */}
         {visibleServiceTypes.map(type => (
           <button
             key={type}
@@ -71,7 +81,7 @@ export function JobFilters({ filters, onFiltersChange, enabledServiceTypes }: Jo
               ...filters,
               serviceType: filters.serviceType === type ? null : type,
             })}
-            className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium transition-colors ${
+            className={`inline-flex items-center rounded-md px-3 py-1 text-sm font-medium transition-colors ${
               filters.serviceType === type
                 ? 'bg-primary text-primary-foreground'
                 : 'bg-muted text-muted-foreground hover:bg-muted/80'
