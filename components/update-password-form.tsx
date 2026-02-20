@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { updatePassword, type AuthActionState } from "@/lib/actions/auth";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { PasswordInput } from "@/components/ui/password-input";
+import { PasswordStrengthChecklist } from "@/components/ui/password-strength";
 import { Label } from "@/components/ui/label";
 
 export function UpdatePasswordForm({
@@ -19,6 +20,7 @@ export function UpdatePasswordForm({
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   const [state, formAction, pending] = useActionState<AuthActionState | null, FormData>(updatePassword, null);
+  const [passwordValue, setPasswordValue] = useState('');
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -40,12 +42,15 @@ export function UpdatePasswordForm({
                   placeholder="New password"
                   required
                   autoComplete="new-password"
+                  value={passwordValue}
+                  onChange={(e) => setPasswordValue(e.target.value)}
                   aria-invalid={!!state?.fieldErrors?.password}
                   aria-describedby={state?.fieldErrors?.password ? "password-error" : undefined}
                 />
                 {state?.fieldErrors?.password && (
                   <p id="password-error" role="alert" className="text-sm text-error-text">{state.fieldErrors.password[0]}</p>
                 )}
+                <PasswordStrengthChecklist password={passwordValue} />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="confirmPassword">Confirm password</Label>

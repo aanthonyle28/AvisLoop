@@ -1,12 +1,13 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { signUp, type AuthActionState } from "@/lib/actions/auth";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
+import { PasswordStrengthChecklist } from "@/components/ui/password-strength";
 import { GoogleOAuthButton } from "@/components/auth/google-oauth-button";
 import Link from "next/link";
 
@@ -15,6 +16,7 @@ export function SignUpForm({
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   const [state, formAction, pending] = useActionState<AuthActionState | null, FormData>(signUp, null);
+  const [passwordValue, setPasswordValue] = useState('');
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -64,12 +66,15 @@ export function SignUpForm({
               name="password"
               required
               autoComplete="new-password"
+              value={passwordValue}
+              onChange={(e) => setPasswordValue(e.target.value)}
               aria-invalid={!!state?.fieldErrors?.password}
               aria-describedby={state?.fieldErrors?.password ? "signup-password-error" : undefined}
             />
             {state?.fieldErrors?.password && (
               <p id="signup-password-error" role="alert" className="text-sm text-error-text">{state.fieldErrors.password[0]}</p>
             )}
+            <PasswordStrengthChecklist password={passwordValue} />
           </div>
           {state?.error && <p className="text-sm text-error-text">{state.error}</p>}
         </div>
