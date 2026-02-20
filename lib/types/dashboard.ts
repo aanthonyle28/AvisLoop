@@ -60,6 +60,28 @@ export interface DashboardCounts {
   total: number              // readyToSend + attentionAlerts
 }
 
+// Campaign activity event for RecentCampaignActivity strip
+export type CampaignEventType = 'touch_sent' | 'review_click' | 'feedback_submitted' | 'enrollment'
+
+export interface CampaignEvent {
+  id: string
+  type: CampaignEventType
+  customerName: string
+  campaignName: string
+  touchNumber?: number
+  channel?: 'email' | 'sms'
+  status?: string
+  rating?: number           // For feedback_submitted events
+  timestamp: string
+}
+
+// Inline pipeline counters for activity strip header
+export interface PipelineSummary {
+  activeSequences: number
+  pending: number
+  requestsSentThisWeek: number
+}
+
 // Quick enroll result for dashboard inline actions
 export type QuickEnrollResult = {
   success: boolean
