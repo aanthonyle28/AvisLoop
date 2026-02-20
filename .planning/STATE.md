@@ -5,22 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** Phase 37 — Jobs & Campaigns UX Fixes
+**Current focus:** Phase 38 — Onboarding Consolidation
 
 ## Current Position
 
-Phase: 37 of 39 in v2.5 milestone (Phase 5 of 7 in this milestone)
-Plan: 3 of 3 complete — Phase 37 DONE
+Phase: 38 of 39 in v2.5 milestone (Phase 6 of 7 in this milestone)
+Plan: 1 of 1 complete — Phase 38 DONE
 Status: Phase complete
-Last activity: 2026-02-20 — Completed 37-03 (campaign card full-click, Sheet-based edit, back button fix, preset centering)
+Last activity: 2026-02-20 — Completed 38-01 (onboarding wizard reduced from 7 to 5 steps, storage key bumped to v2)
 
-Progress: [████████░░] ~70% (v2.5 milestone)
+Progress: [█████████░] ~80% (v2.5 milestone)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 181
-- v2.5 plans completed: 11
+- Total plans completed (project): 182
+- v2.5 plans completed: 12
 
 *Updated after each plan completion*
 
@@ -31,7 +31,7 @@ Progress: [████████░░] ~70% (v2.5 milestone)
 - Amber as accent only, blue stays primary — amber at warm lightness fails WCAG AA on white (2.2:1); blue stays primary for buttons/focus rings
 - Phase 33 (color audit) MUST run before Phase 34 (palette swap) — hardcoded hex bypasses token system
 - Manual Request elimination (Phase 39) is last — most regression risk; /send becomes redirect not deletion
-- Onboarding storage key must version to `'onboarding-draft-v2'` when steps change (Phase 38)
+- Onboarding storage key versioned to `'onboarding-draft-v2'` (Phase 38 complete) — stale 7-step drafts abandoned via key change, no migration code needed
 - Campaign form save bug must be fixed in Phase 37 before any campaign form layout changes
 - Dark mode calibration must be independent of light mode (higher saturation needed for warm hues in dark)
 - bg-secondary for active nav state (replaces bg-[#F2F2F2]) — --secondary is 0 0% 92%, semantically correct for muted interactive surface
@@ -80,6 +80,12 @@ None.
 - Shape-based distinction (rounded-full vs rounded-md) + group labels is sufficient filter differentiation — no color change needed
 - Filter fallback pattern: enabledServiceTypes && enabledServiceTypes.length > 0 ? filtered : all — empty array means no config, show all
 
+### New Decisions from 38-01
+
+- Onboarding step removal strategy: delete from STEPS array + remove switch case + remove import — step files stay on disk (no active breakage from unused files)
+- Storage key versioning for wizard drafts: bump key string (v1 → v2) is sufficient to abandon stale drafts; no migration needed since step 1 saves to DB on Continue
+- 5-step onboarding: Business Basics, Services Offered, Campaign Preset, Import Jobs, SMS Consent — Review Destination removed (duplicate of Business Basics), Software Used removed (low-value)
+
 ### New Decisions from 37-03
 
 - Sheet-based edit pattern: parent component (CampaignList) owns open/close state; CampaignForm uses onSuccess callback instead of router navigation when inside a sheet
@@ -100,6 +106,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 37-03 — campaign card full-click (JC-05), Sheet-based edit panel (JC-04), back button hit area (JC-06), preset centering (JC-07). Phase 37 complete.
+Stopped at: Completed 38-01 — onboarding wizard 7→5 steps (removed Review Destination + Software Used), localStorage key bumped to onboarding-draft-v2, URL clamp updated to step 5. Phase 38 complete.
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
