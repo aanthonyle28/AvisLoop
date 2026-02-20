@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** Phase 39 — Manual Request Elimination
+**Current focus:** v2.5 milestone complete — Phase 39 (Manual Request Elimination) done
 
 ## Current Position
 
 Phase: 39 of 39 in v2.5 milestone (Phase 7 of 7 in this milestone)
-Plan: 3 of 4 complete (39-02 and 39-03 complete; executing out-of-order — 39-02 done after 39-03)
-Status: In progress
-Last activity: 2026-02-20 — Completed 39-02 (RecentCampaignActivity strip + pipeline cards removed from dashboard)
+Plan: 4 of 4 complete
+Status: Phase complete — v2.5 milestone complete
+Last activity: 2026-02-20 — Completed 39-04 (/send eliminated: 308 redirect, nav cleaned, 8 files deleted)
 
-Progress: [█████████░] ~93% (v2.5 milestone — Phases 33-38 complete, Phase 39 in progress 3/4)
+Progress: [██████████] 100% (v2.5 milestone — all 7 phases complete)
 
 ## Performance Metrics
 
@@ -86,13 +86,11 @@ None.
 ### Blockers/Concerns
 
 - Phase 21-08: Twilio A2P campaign approval required for production SMS testing (brand approved, campaign pending)
-- Phase 39: Five server queries on /send page must be traced to new homes before redirect is added
-- Phase 39: Dashboard bottom pipeline cards (Requests Sent, Active Sequences, Pending/Queued) being replaced with RecentCampaignActivity strip — pipeline numbers preserved as inline counters, not removed entirely
 - Google OAuth: VERIFIED WORKING (36-03) — NEXT_PUBLIC_SITE_URL must be https://app.avisloop.com in Vercel production env vars
 
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed Phase 39 Plan 02 — RecentCampaignActivity strip created, pipeline cards removed from dashboard, data wired via Promise.all. Next: 39-04 (/send page redirect)
+Stopped at: Completed Phase 39 Plan 04 — /send eliminated (308 redirect to /campaigns), nav cleaned, 8 obsolete files deleted. v2.5 milestone complete.
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
