@@ -46,7 +46,7 @@ export function PresetPicker({ presets, compact = false }: PresetPickerProps) {
   }
 
   // Match database presets with constant definitions for descriptions
-  // Sort to ensure deterministic order: Conservative → Standard → Aggressive
+  // Sort to ensure deterministic order: Gentle → Steady → Speedy
   const presetsWithMeta = presets
     .map(preset => {
       const meta = CAMPAIGN_PRESETS.find(p =>
@@ -76,10 +76,7 @@ export function PresetPicker({ presets, compact = false }: PresetPickerProps) {
         >
           <CardHeader className={compact ? 'pb-2' : undefined}>
             <CardTitle className={cn(compact && 'text-base')}>
-              {preset.meta?.id === 'conservative' && 'Conservative'}
-              {preset.meta?.id === 'standard' && 'Standard'}
-              {preset.meta?.id === 'aggressive' && 'Aggressive'}
-              {!preset.meta && preset.name}
+              {preset.meta?.name ?? preset.name}
             </CardTitle>
             {!compact && (
               <CardDescription>
