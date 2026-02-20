@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 38 of 39 in v2.5 milestone (Phase 6 of 7 in this milestone)
-Plan: 2 of N in phase — Phase 38 in progress
+Plan: 3 of N in phase — Phase 38 in progress
 Status: In progress
-Last activity: 2026-02-19 — Completed 38-02 (horizontal chip tiles for services step, plain-English preset names)
+Last activity: 2026-02-19 — Completed 38-03 (warm amber Getting Started pill, campaign_reviewed requires /campaigns visit)
 
-Progress: [█████████░] ~80% (v2.5 milestone)
+Progress: [█████████░] ~82% (v2.5 milestone)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 183
-- v2.5 plans completed: 13
+- Total plans completed (project): 184
+- v2.5 plans completed: 14
 
 *Updated after each plan completion*
 
@@ -79,6 +79,12 @@ None.
 - Email badge only shows at query.length >= 3 — bare @ character alone causes flash with no useful context
 - Shape-based distinction (rounded-full vs rounded-md) + group labels is sufficient filter differentiation — no color change needed
 - Filter fallback pattern: enabledServiceTypes && enabledServiceTypes.length > 0 ? filtered : all — empty array means no config, show all
+
+### New Decisions from 38-03
+
+- campaign_reviewed stored as explicit JSONB flag — not derivable from campaign existence; only set when user visits /campaigns
+- await markCampaignReviewed() (not void) ensures flag is written before page renders; short-circuit on repeat visits keeps latency minimal
+- Page-visit checklist completion pattern: call server action at top of async server component, action reads flag first and returns early if already set
 
 ### New Decisions from 38-02
 
