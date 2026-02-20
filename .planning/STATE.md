@@ -5,22 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** Phase 38 — Onboarding Consolidation
+**Current focus:** Phase 36 — Auth Form Enhancements
 
 ## Current Position
 
-Phase: 38 of 39 in v2.5 milestone (Phase 6 of 7 in this milestone)
-Plan: 3 of N in phase — Phase 38 in progress
+Phase: 36 of 39 in v2.5 milestone
+Plan: 2 of 3 complete in phase — 36-02 complete
 Status: In progress
-Last activity: 2026-02-19 — Completed 38-03 (warm amber Getting Started pill, campaign_reviewed requires /campaigns visit)
+Last activity: 2026-02-20 — Completed 36-02 (PasswordStrengthChecklist component, Zod regex rules, form wiring)
 
-Progress: [█████████░] ~82% (v2.5 milestone)
+Progress: [█████████░] ~83% (v2.5 milestone)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 184
-- v2.5 plans completed: 14
+- Total plans completed (project): 185
+- v2.5 plans completed: 15
 
 *Updated after each plan completion*
 
@@ -66,6 +66,13 @@ Progress: [█████████░] ~82% (v2.5 milestone)
 ### Pending Todos
 
 None.
+
+### New Decisions from 36-02
+
+- PasswordStrengthChecklist returns null when password is empty — no checklist flash on page load, appears on first keystroke
+- Confirm password field stays uncontrolled — checklist only on primary password field
+- signInSchema unchanged — login has no strength enforcement (user signs in with existing password)
+- getRequirements() exported separately from PasswordStrengthChecklist for potential test/reuse consumers
 
 ### New Decisions from 36-03
 
@@ -125,7 +132,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-19
-Stopped at: Completed 38-02 — services step horizontal chips, Other text input reveal, plain-English preset names in constants and UI, cumulative Day N timing labels.
+Last session: 2026-02-20
+Stopped at: Completed 36-02 — PasswordStrengthChecklist component, Zod regex rules (uppercase/number/special-char) on signUpSchema and updatePasswordSchema, controlled password state wired into both forms.
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
