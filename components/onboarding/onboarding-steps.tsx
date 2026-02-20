@@ -1,9 +1,7 @@
 'use client'
 
 import { BusinessBasicsStep } from './steps/business-basics-step'
-import { ReviewDestinationStep } from './steps/review-destination-step'
 import { ServicesOfferedStep } from './steps/services-offered-step'
-import { SoftwareUsedStep } from './steps/software-used-step'
 import { CampaignPresetStep } from './steps/campaign-preset-step'
 import { CustomerImportStep } from './steps/customer-import-step'
 import { SMSConsentStep } from './steps/sms-consent-step'
@@ -22,8 +20,7 @@ interface OnboardingStepsProps {
 
 /**
  * Client component that renders the appropriate step component based on currentStep.
- * Steps 1-4: Business basics, review link, services, software
- * Steps 5-7: Campaign preset, customer import, SMS consent
+ * Steps 1-5: Business basics, services, campaign preset, import, SMS consent
  */
 export function OnboardingSteps({
   currentStep,
@@ -49,15 +46,6 @@ export function OnboardingSteps({
 
     case 2:
       return (
-        <ReviewDestinationStep
-          onComplete={onGoToNext}
-          onGoBack={onGoBack}
-          defaultLink={business?.google_review_link || ''}
-        />
-      )
-
-    case 3:
-      return (
         <ServicesOfferedStep
           onComplete={onGoToNext}
           onGoBack={onGoBack}
@@ -65,16 +53,7 @@ export function OnboardingSteps({
         />
       )
 
-    case 4:
-      return (
-        <SoftwareUsedStep
-          onComplete={onGoToNext}
-          onGoBack={onGoBack}
-          defaultValue={business?.software_used || ''}
-        />
-      )
-
-    case 5:
+    case 3:
       return (
         <CampaignPresetStep
           onComplete={onGoToNext}
@@ -83,7 +62,7 @@ export function OnboardingSteps({
         />
       )
 
-    case 6:
+    case 4:
       return (
         <CustomerImportStep
           onComplete={onGoToNext}
@@ -91,7 +70,7 @@ export function OnboardingSteps({
         />
       )
 
-    case 7:
+    case 5:
       return (
         <SMSConsentStep
           onComplete={onComplete}

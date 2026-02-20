@@ -11,15 +11,13 @@ import { OnboardingWizard } from '@/components/onboarding/onboarding-wizard'
  * - Redirects to /login if not authenticated
  * - Redirects to /dashboard if onboarding already complete
  * - Fetches business data and campaign presets for step components
- * - Renders wizard shell with 7-step flow
+ * - Renders wizard shell with 5-step flow
  *
  * Step 1: Business Basics (required)
- * Step 2: Review Destination (optional/skippable)
- * Step 3: Services Offered (required)
- * Step 4: Software Used (optional/skippable)
- * Step 5: Campaign Preset (required)
- * Step 6: Import Customers (optional/skippable)
- * Step 7: SMS Consent (required)
+ * Step 2: Services Offered (required)
+ * Step 3: Campaign Preset (required)
+ * Step 4: Import Jobs (optional/skippable)
+ * Step 5: SMS Consent (required)
  */
 export default async function OnboardingPage({
   searchParams,
@@ -48,13 +46,13 @@ export default async function OnboardingPage({
   const params = await searchParams
   const stepParam = parseInt(params.step || '1', 10)
 
-  // Validate step range (1-7), clamp if out of range
-  const currentStep = Math.min(Math.max(1, stepParam), 7)
+  // Validate step range (1-5), clamp if out of range
+  const currentStep = Math.min(Math.max(1, stepParam), 5)
 
   // Fetch business data for step components
   const business = await getBusiness()
 
-  // Fetch campaign presets for step 5 (system presets available to all users)
+  // Fetch campaign presets for step 3 (system presets available to all users)
   const { data: presets } = await supabase
     .from('campaigns')
     .select('*, campaign_touches (*)')
