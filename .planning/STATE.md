@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 38 of 39 in v2.5 milestone (Phase 6 of 7 in this milestone)
-Plan: 1 of 1 complete — Phase 38 DONE
-Status: Phase complete
-Last activity: 2026-02-20 — Completed 38-01 (onboarding wizard reduced from 7 to 5 steps, storage key bumped to v2)
+Plan: 2 of N in phase — Phase 38 in progress
+Status: In progress
+Last activity: 2026-02-19 — Completed 38-02 (horizontal chip tiles for services step, plain-English preset names)
 
 Progress: [█████████░] ~80% (v2.5 milestone)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 182
-- v2.5 plans completed: 12
+- Total plans completed (project): 183
+- v2.5 plans completed: 13
 
 *Updated after each plan completion*
 
@@ -80,6 +80,14 @@ None.
 - Shape-based distinction (rounded-full vs rounded-md) + group labels is sufficient filter differentiation — no color change needed
 - Filter fallback pattern: enabledServiceTypes && enabledServiceTypes.length > 0 ? filtered : all — empty array means no config, show all
 
+### New Decisions from 38-02
+
+- customServiceLabel state is UX-only — not saved to DB; saveServicesOffered still receives the string[] enum array (future phase can add custom_service_label DB column if needed)
+- Cumulative hours for timing display: sum touches slice(0, idx+1) then format as 'Day N' — shows when customer receives message, not delay from previous touch
+- Sub-24h touches display raw Xh (e.g., '4h') since 'Day 0' would be confusing
+- preset.meta?.name || preset.name fallback is safe: unrecognized DB presets fall back to DB name instead of empty
+- Plain-English campaign preset names: Conservative → Gentle Follow-Up, Standard → Steady Follow-Up, Aggressive → Speedy Follow-Up (IDs unchanged for matching logic)
+
 ### New Decisions from 38-01
 
 - Onboarding step removal strategy: delete from STEPS array + remove switch case + remove import — step files stay on disk (no active breakage from unused files)
@@ -105,7 +113,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-20
-Stopped at: Completed 38-01 — onboarding wizard 7→5 steps (removed Review Destination + Software Used), localStorage key bumped to onboarding-draft-v2, URL clamp updated to step 5. Phase 38 complete.
+Last session: 2026-02-19
+Stopped at: Completed 38-02 — services step horizontal chips, Other text input reveal, plain-English preset names in constants and UI, cumulative Day N timing labels.
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
