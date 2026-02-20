@@ -46,7 +46,7 @@ export function ForgotPasswordForm({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form action={formAction}>
+            <form action={formAction} noValidate>
               <div className="flex flex-col gap-6">
                 <div className="grid gap-2">
                   <Label htmlFor="forgot-email">Email</Label>
@@ -57,9 +57,11 @@ export function ForgotPasswordForm({
                     placeholder="m@example.com"
                     aria-label="Email address"
                     required
+                    aria-invalid={!!state?.fieldErrors?.email}
+                    aria-describedby={state?.fieldErrors?.email ? 'forgot-email-error' : undefined}
                   />
                   {state?.fieldErrors?.email && (
-                    <p className="text-sm text-error-text">{state.fieldErrors.email[0]}</p>
+                    <p id="forgot-email-error" role="alert" className="text-sm text-error-text">{state.fieldErrors.email[0]}</p>
                   )}
                 </div>
                 {state?.error && <p className="text-sm text-error-text">{state.error}</p>}
