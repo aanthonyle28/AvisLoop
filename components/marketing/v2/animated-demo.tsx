@@ -51,9 +51,9 @@ export function AnimatedProductDemo() {
             }`}
           >
             <div className="space-y-3">
-              <div className="flex items-center gap-3 rounded-lg border border-primary bg-primary/10 p-3">
-                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary">
-                  <div className="h-2 w-2 rounded-full bg-primary-foreground" />
+              <div className="flex items-center gap-3 rounded-lg border border-accent bg-accent/10 p-3">
+                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-accent">
+                  <div className="h-2 w-2 rounded-full bg-accent-foreground" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-foreground">James Cooper — AC Repair</p>
@@ -91,7 +91,7 @@ export function AnimatedProductDemo() {
               </div>
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm">
-                  <div className="h-2 w-2 rounded-full bg-primary" />
+                  <div className="h-2 w-2 rounded-full bg-accent" />
                   <span className="text-muted-foreground">Touch 1: Email in 24 hours</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
@@ -136,7 +136,7 @@ export function AnimatedProductDemo() {
             <div
               key={step.id}
               className={`h-1.5 flex-1 rounded-full motion-safe:transition-colors motion-safe:duration-300 ${
-                index === currentStep ? 'bg-primary' : 'bg-muted'
+                index === currentStep ? 'bg-accent' : 'bg-muted'
               }`}
             />
           ))}

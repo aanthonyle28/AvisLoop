@@ -84,8 +84,8 @@ export function Sidebar({ notificationCounts }: SidebarProps = {}) {
         className={cn(
           "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
           isActive
-            ? "bg-secondary dark:bg-muted text-foreground"
-            : "text-foreground/70 dark:text-muted-foreground hover:bg-secondary/70 dark:hover:bg-muted/70",
+            ? "bg-secondary dark:bg-muted text-foreground border-l-2 border-accent"
+            : "text-foreground/70 dark:text-muted-foreground hover:bg-secondary/70 dark:hover:bg-muted/70 border-l-2 border-transparent",
           collapsed && "justify-center px-2",
           item.badge && "relative"
         )}
@@ -96,7 +96,7 @@ export function Sidebar({ notificationCounts }: SidebarProps = {}) {
           weight="regular"
           className={cn(
             "shrink-0",
-            isActive ? "text-primary" : ""
+            isActive ? "text-accent" : ""
           )}
         />
         {!collapsed && <span className="flex-1">{item.label}</span>}
@@ -126,7 +126,7 @@ export function Sidebar({ notificationCounts }: SidebarProps = {}) {
       )}>
         {!collapsed && (
           <Link href="/dashboard" className="flex items-center gap-2">
-            <ArrowsClockwise size={24} weight="regular" className="text-primary" />
+            <ArrowsClockwise size={24} weight="regular" className="text-accent" />
             <span className="font-bold text-lg">AvisLoop</span>
           </Link>
         )}

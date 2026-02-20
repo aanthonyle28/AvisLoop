@@ -30,9 +30,9 @@ export function MobileFAB() {
         // Size: 56x56px (iOS standard, exceeds 44px minimum)
         "h-14 w-14",
         // Styling
-        "rounded-full bg-primary text-primary-foreground shadow-lg",
+        "rounded-full bg-accent text-accent-foreground shadow-lg",
         // States
-        "hover:bg-primary/90 active:scale-95",
+        "hover:bg-accent/90 active:scale-95",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         // Responsive: hide on desktop (sidebar has Add Job button)
         "md:hidden",

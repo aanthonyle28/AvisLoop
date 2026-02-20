@@ -33,7 +33,7 @@ export function PageHeader({ title, setupProgress, notificationCounts }: PageHea
             <h1 className="font-semibold text-lg">{title}</h1>
           ) : (
             <Link href="/dashboard" className="flex items-center gap-2">
-              <ArrowsClockwise size={24} weight="regular" className="text-primary" />
+              <ArrowsClockwise size={24} weight="regular" className="text-accent" />
               <span className="font-bold text-lg">AvisLoop</span>
             </Link>
           )}

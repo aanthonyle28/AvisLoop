@@ -175,7 +175,7 @@ export function ReadyToSendQueue({ jobs, hasJobHistory }: ReadyToSendQueueProps)
           <div className="mt-4 pt-3 border-t">
             <Link
               href="/jobs?status=completed&enrolled=false"
-              className="text-sm text-primary hover:underline"
+              className="text-sm text-accent hover:underline"
             >
               Show all ({jobs.length})
             </Link>

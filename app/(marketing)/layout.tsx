@@ -47,7 +47,7 @@ export default function MarketingLayout({
           {/* Logo and nav links */}
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
                 <Star className="w-4 h-4 text-primary-foreground fill-current" />
               </div>
               <span>AvisLoop</span>
@@ -90,7 +90,7 @@ export default function MarketingLayout({
             {/* Company info */}
             <div className="col-span-2 md:col-span-1">
               <Link href="/" className="flex items-center gap-2 font-bold text-lg mb-4">
-                <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
+                <div className="w-7 h-7 rounded-lg bg-accent flex items-center justify-center">
                   <Star className="w-3.5 h-3.5 text-primary-foreground fill-current" />
                 </div>
                 <span>AvisLoop</span>

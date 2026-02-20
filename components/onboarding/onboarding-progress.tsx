@@ -23,7 +23,7 @@ export function OnboardingProgress({
       <div className="max-w-lg mx-auto flex items-center gap-3">
         <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
           <div
-            className="h-full bg-primary rounded-full transition-all duration-300"
+            className="h-full bg-accent rounded-full transition-all duration-300"
             style={{ width: `${progress}%` }}
           />
         </div>

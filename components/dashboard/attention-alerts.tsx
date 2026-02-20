@@ -156,7 +156,7 @@ export function AttentionAlerts({ alerts }: AttentionAlertsProps) {
               <div className="pt-4">
                 <button
                   onClick={() => setExpanded(!expanded)}
-                  className="text-sm text-primary hover:underline"
+                  className="text-sm text-accent hover:underline"
                 >
                   {expanded ? 'Show less' : `View all (${alerts.length})`}
                 </button>

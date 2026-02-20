@@ -62,7 +62,7 @@ export function MessagePreview({
         <button
           type="button"
           onClick={onViewFull}
-          className="text-sm text-primary hover:underline"
+          className="text-sm text-accent hover:underline"
         >
           View full email
         </button>
