@@ -4,6 +4,7 @@ import {
   getDashboardKPIs,
   getReadyToSendJobs,
   getAttentionAlerts,
+  getRecentCampaignEvents,
 } from '@/lib/data/dashboard'
 import { getJobCounts } from '@/lib/data/jobs'
 import { redirect } from 'next/navigation'
@@ -12,6 +13,8 @@ import { createClient } from '@/lib/supabase/server'
 import { KPIWidgets } from '@/components/dashboard/kpi-widgets'
 import { ReadyToSendQueue } from '@/components/dashboard/ready-to-send-queue'
 import { AttentionAlerts } from '@/components/dashboard/attention-alerts'
+import { RecentCampaignActivity } from '@/components/dashboard/recent-campaign-activity'
+import type { PipelineSummary } from '@/lib/types/dashboard'
 
 export const metadata = {
   title: 'Dashboard',
@@ -51,12 +54,19 @@ export default async function DashboardPage() {
   }
 
   // Fetch all dashboard data in parallel
-  const [kpiData, readyJobs, alerts, jobCounts] = await Promise.all([
+  const [kpiData, readyJobs, alerts, jobCounts, recentEvents] = await Promise.all([
     getDashboardKPIs(business.id),
     getReadyToSendJobs(business.id, serviceTypeTiming),
     getAttentionAlerts(business.id),
     getJobCounts(),
+    getRecentCampaignEvents(business.id),
   ])
+
+  const pipelineSummary: PipelineSummary = {
+    activeSequences: kpiData.activeSequences.value,
+    pending: kpiData.pendingQueued.value,
+    requestsSentThisWeek: kpiData.requestsSentThisWeek.value,
+  }
 
   return (
     <div className="container py-6 space-y-6">
@@ -68,6 +78,7 @@ export default async function DashboardPage() {
       </div>
 
       <KPIWidgets data={kpiData} />
+      <RecentCampaignActivity events={recentEvents} pipelineSummary={pipelineSummary} />
       <ReadyToSendQueue
         jobs={readyJobs}
         hasJobHistory={jobCounts.total > 0}

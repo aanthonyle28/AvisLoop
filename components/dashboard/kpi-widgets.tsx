@@ -116,66 +116,6 @@ export function KPIWidgets({ data }: KPIWidgetsProps) {
           </InteractiveCard>
         </Link>
       </div>
-
-      {/* Bottom row: Pipeline metrics (smaller) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        {/* Requests Sent This Week */}
-        <Card variant="default" className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-xs font-medium text-muted-foreground">
-              Requests Sent This Week
-            </h3>
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-bold">
-              {data.requestsSentThisWeek.value}
-            </span>
-            <TrendIndicator
-              value={data.requestsSentThisWeek.trend}
-              period="vs last week"
-              size="sm"
-            />
-          </div>
-        </Card>
-
-        {/* Active Sequences */}
-        <Card variant="default" className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-xs font-medium text-muted-foreground">
-              Active Sequences
-            </h3>
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-bold">
-              {data.activeSequences.value}
-            </span>
-            <TrendIndicator
-              value={data.activeSequences.trend}
-              period="vs last week"
-              size="sm"
-            />
-          </div>
-        </Card>
-
-        {/* Pending / Queued */}
-        <Card variant="default" className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-xs font-medium text-muted-foreground">
-              Pending / Queued
-            </h3>
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-bold">
-              {data.pendingQueued.value}
-            </span>
-            <TrendIndicator
-              value={data.pendingQueued.trend}
-              period="vs last week"
-              size="sm"
-            />
-          </div>
-        </Card>
-      </div>
     </div>
   )
 }
@@ -194,21 +134,6 @@ export function KPIWidgetsSkeleton() {
             <div className="flex items-baseline gap-2 mb-1">
               <Skeleton className="h-10 w-20" />
               <Skeleton className="h-3 w-16" />
-            </div>
-          </Card>
-        ))}
-      </div>
-
-      {/* Bottom row: Pipeline metrics skeleton */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        {[1, 2, 3].map((i) => (
-          <Card key={i} className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <Skeleton className="h-3 w-28" />
-            </div>
-            <div className="flex items-baseline gap-2">
-              <Skeleton className="h-8 w-16" />
-              <Skeleton className="h-2 w-12" />
             </div>
           </Card>
         ))}
