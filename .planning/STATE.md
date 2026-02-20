@@ -9,18 +9,18 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 
 ## Current Position
 
-Phase: 35 of 39 in v2.5 milestone (Phase 3 of 7 in this milestone)
-Plan: 5 of 5 complete
-Status: Phase complete
-Last activity: 2026-02-18 — Completed Phase 35 (Card Variants & Dashboard Quick Wins), all 5 plans verified
+Phase: 36 of 39 in v2.5 milestone (Phase 4 of 7 in this milestone)
+Plan: 3 of 3 (paused at checkpoint — awaiting human Google OAuth verification)
+Status: In progress — checkpoint:human-verify
+Last activity: 2026-02-20 — Executed 36-03 (Google OAuth verification), paused at checkpoint
 
-Progress: [██████░░░░] ~52% (v2.5 milestone)
+Progress: [██████░░░░] ~54% (v2.5 milestone)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed (project): 179
-- v2.5 plans completed: 9
+- v2.5 plans completed: 9 (36-03 pending checkpoint resolution)
 
 *Updated after each plan completion*
 
@@ -68,10 +68,11 @@ None.
 - Phase 21-08: Twilio A2P campaign approval required for production SMS testing (brand approved, campaign pending)
 - Phase 37: Campaign form save bug (touch sequences not persisting) — scope must be investigated before planning
 - Phase 39: Five server queries on /send page must be traced to new homes before redirect is added
+- Google OAuth: Code complete, Supabase dashboard Google provider config pending (enable provider, add Client ID/Secret, allowlist redirect URLs)
 
 ## Session Continuity
 
-Last session: 2026-02-18
-Stopped at: Completed Phase 35 — Card variants, semantic tokens, batch replacement, dashboard quick wins, page padding. Next: Phase 36 (Auth Form Enhancements)
+Last session: 2026-02-20
+Stopped at: Phase 36-03 checkpoint — Google OAuth code verified correct, awaiting human Supabase dashboard configuration verification
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
