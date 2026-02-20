@@ -564,9 +564,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 37-01-PLAN.md — Fix job creation bug and campaign save bug (touch persistence)
-- [ ] 37-02-PLAN.md — Service type filter scoping, smart name/email field, filter visual distinction
-- [ ] 37-03-PLAN.md — Campaign card full-click, edit as Sheet panel, back button fix, preset centering
+- [x] 37-01-PLAN.md — Fix job creation bug and campaign save bug (touch persistence)
+- [x] 37-02-PLAN.md — Service type filter scoping, smart name/email field, filter visual distinction
+- [x] 37-03-PLAN.md — Campaign card full-click, edit as Sheet panel, back button fix, preset centering
 
 ### Phase 38: Onboarding Consolidation
 **Goal**: New users complete a 5-step onboarding wizard (down from 7) with horizontal service tiles, plain-English campaign preset names, and a correctly-gated "Review campaign" checklist step.
@@ -641,20 +641,21 @@ See individual phase sections above for requirements, success criteria, and depe
 | **34** | **v2.5 UI/UX Redesign** | **2/2** | **Complete** | **2026-02-19** |
 | **35** | **v2.5 UI/UX Redesign** | **5/5** | **Complete** | **2026-02-18** |
 | **36** | **v2.5 UI/UX Redesign** | **0/3** | **Not started** | - |
-| **37** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
+| **37** | **v2.5 UI/UX Redesign** | **3/3** | **Complete** | **2026-02-19** |
 | **38** | **v2.5 UI/UX Redesign** | **0/3** | **Planned** | - |
 | **39** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
 
-**Total:** 179 plans complete across shipped phases.
+**Total:** 182 plans complete across shipped phases.
 
 ## What's Next
 
 **v2.0 milestone is COMPLETE** (Phases 20-32 all verified, excluding Phase 21 SMS blocked on A2P).
 
-**v2.5 milestone in progress:** Phases 33-35 complete. Next: Phase 36 (Auth Form Enhancements).
+**v2.5 milestone in progress:** Phases 33-35, 37 complete. Next: Phase 38 (Onboarding Consolidation).
 
 **Blockers:**
 - Twilio A2P 10DLC registration required before Phase 21-08 execution (webhook verification)
+- Phase 36 (Auth Form Enhancements) skipped for now — plans created but not yet executed
 
 After v2.5:
 - **v2.1 Integrations** — ServiceTitan/Jobber/Housecall Pro API integrations for auto job import
@@ -663,5 +664,5 @@ After v2.5:
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 
 ---
-*Last updated: 2026-02-19 — v2.0 milestone complete (Phases 20-32 verified), v2.5 UI/UX Redesign in progress (Phases 33-35 complete, Phase 36 planned, 37-39 remaining)*
+*Last updated: 2026-02-19 — v2.0 milestone complete (Phases 20-32 verified), v2.5 UI/UX Redesign in progress (Phases 33-35, 37 complete, 36, 38-39 remaining)*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*

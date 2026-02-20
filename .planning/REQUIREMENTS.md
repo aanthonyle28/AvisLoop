@@ -37,13 +37,13 @@
 
 ## Jobs & Campaigns
 
-- [ ] **JC-01**: Filter services to user selection — Jobs page service type filter only shows services the user selected during onboarding (from `service_types_enabled`)
-- [ ] **JC-02**: Smart name/email field — auto-detect whether user is typing a name or email in Add Job form and adjust label/input type accordingly
-- [ ] **JC-03**: Fix job creation bug — investigate and fix the bug preventing new job creation
-- [ ] **JC-04**: Campaign edit as panel — open campaign editor as side panel or modal instead of full-page navigation
-- [ ] **JC-05**: Campaign card full-click — make entire campaign card clickable to open details, not just action buttons (with stopPropagation on internal controls)
-- [ ] **JC-06**: Back button hit area — fix oversized back button on campaigns detail/edit pages
-- [ ] **JC-07**: Standard preset centered — center the "Standard" campaign preset card in the preset picker layout
+- [x] **JC-01**: Filter services to user selection — Jobs page service type filter only shows services the user selected during onboarding (from `service_types_enabled`)
+- [x] **JC-02**: Smart name/email field — auto-detect whether user is typing a name or email in Add Job form and adjust label/input type accordingly
+- [x] **JC-03**: Fix job creation bug — investigate and fix the bug preventing new job creation
+- [x] **JC-04**: Campaign edit as panel — open campaign editor as side panel or modal instead of full-page navigation
+- [x] **JC-05**: Campaign card full-click — make entire campaign card clickable to open details, not just action buttons (with stopPropagation on internal controls)
+- [x] **JC-06**: Back button hit area — fix oversized back button on campaigns detail/edit pages
+- [x] **JC-07**: Standard preset centered — center the "Standard" campaign preset card in the preset picker layout
 
 ## Navigation & Manual Request
 
@@ -98,13 +98,13 @@
 | ONB-03 | Phase 38 | Pending |
 | ONB-04 | Phase 38 | Pending |
 | ONB-05 | Phase 38 | Pending |
-| JC-01 | Phase 37 | Pending |
-| JC-02 | Phase 37 | Pending |
-| JC-03 | Phase 37 | Pending |
-| JC-04 | Phase 37 | Pending |
-| JC-05 | Phase 37 | Pending |
-| JC-06 | Phase 37 | Pending |
-| JC-07 | Phase 37 | Pending |
+| JC-01 | Phase 37 | Complete |
+| JC-02 | Phase 37 | Complete |
+| JC-03 | Phase 37 | Complete |
+| JC-04 | Phase 37 | Complete |
+| JC-05 | Phase 37 | Complete |
+| JC-06 | Phase 37 | Complete |
+| JC-07 | Phase 37 | Complete |
 | NAV-01 | Phase 39 | Pending |
 | NAV-02 | Phase 39 | Pending |
 | PG-01 | Phase 35 | Complete |
