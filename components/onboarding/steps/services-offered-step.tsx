@@ -3,13 +3,15 @@
 import { useState, useTransition } from 'react'
 import { Check } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { saveServicesOffered } from '@/lib/actions/onboarding'
 import {
   SERVICE_TYPES,
   SERVICE_TYPE_LABELS,
-  DEFAULT_TIMING_HOURS,
   type ServiceTypeValue,
 } from '@/lib/validations/job'
+import { cn } from '@/lib/utils'
 
 interface ServicesOfferedStepProps {
   onComplete: () => void
@@ -19,7 +21,8 @@ interface ServicesOfferedStepProps {
 
 /**
  * Step 3: Services Offered
- * Multi-select checkboxes for service types with timing info display.
+ * Multi-select pill chips for service types.
+ * Selecting "Other" reveals a custom service name input.
  * At least one selection is required.
  */
 export function ServicesOfferedStep({
@@ -28,6 +31,7 @@ export function ServicesOfferedStep({
   defaultEnabled,
 }: ServicesOfferedStepProps) {
   const [selected, setSelected] = useState<string[]>(defaultEnabled || [])
+  const [customServiceLabel, setCustomServiceLabel] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
@@ -77,45 +81,42 @@ export function ServicesOfferedStep({
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Service type grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Horizontal chip tiles */}
+        <div className="flex flex-wrap gap-2">
           {SERVICE_TYPES.map((serviceType) => {
-            const isChecked = selected.includes(serviceType)
-            const timingHours = DEFAULT_TIMING_HOURS[serviceType]
+            const isSelected = selected.includes(serviceType)
             const label = SERVICE_TYPE_LABELS[serviceType]
-
             return (
               <button
-                type="button"
                 key={serviceType}
-                className={`
-                  relative flex items-start gap-3 p-4 border rounded-lg cursor-pointer transition-colors text-left
-                  ${isChecked ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}
-                `}
+                type="button"
                 onClick={() => handleToggle(serviceType)}
+                className={cn(
+                  'inline-flex items-center gap-1.5 px-4 py-2 rounded-full border text-sm font-medium transition-colors',
+                  isSelected
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : 'bg-background border-border hover:border-primary/50 text-foreground'
+                )}
               >
-                <div
-                  className={`
-                    mt-0.5 h-4 w-4 shrink-0 rounded-sm border shadow transition-colors
-                    ${isChecked ? 'bg-primary border-primary' : 'border-primary'}
-                  `}
-                >
-                  {isChecked && (
-                    <Check size={16} className="text-primary-foreground" />
-                  )}
-                </div>
-                <div className="flex-1 space-y-1">
-                  <div className="text-base font-medium">
-                    {label}
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Review request: {timingHours}h after job
-                  </p>
-                </div>
+                {isSelected && <Check size={14} weight="bold" />}
+                {label}
               </button>
             )
           })}
         </div>
+
+        {/* "Other" custom service name reveal */}
+        {selected.includes('other') && (
+          <div className="space-y-1.5">
+            <Label htmlFor="custom-service">What type of service? (optional)</Label>
+            <Input
+              id="custom-service"
+              value={customServiceLabel}
+              onChange={(e) => setCustomServiceLabel(e.target.value)}
+              placeholder="e.g. Pest Control, Pool Cleaning..."
+            />
+          </div>
+        )}
 
         {error && <p className="text-sm text-error-text">{error}</p>}
 
