@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 
 ## Current Position
 
-Phase: 36 of 39 in v2.5 milestone (Phase 4 of 7 in this milestone)
-Plan: 3 of 3 complete
-Status: Phase complete
-Last activity: 2026-02-19 — Completed Phase 36 (Auth Form Enhancements), all 3 plans verified
+Phase: 39 of 39 in v2.5 milestone (Phase 7 of 7 in this milestone)
+Plan: 1 of 4 complete
+Status: In progress
+Last activity: 2026-02-20 — Completed 39-01 (Dashboard data layer: CampaignEvent types + getRecentCampaignEvents)
 
-Progress: [████████░░] ~86% (v2.5 milestone — Phases 33-38 complete, Phase 39 remaining)
+Progress: [████████░░] ~88% (v2.5 milestone — Phases 33-38 complete, Phase 39 in progress 1/4)
 
 ## Performance Metrics
 
@@ -70,6 +70,9 @@ Progress: [████████░░] ~86% (v2.5 milestone — Phases 33-38
 - Sheet-based edit pattern for campaigns: parent component owns open/close state; form uses onSuccess callback instead of router navigation
 - Plain-English campaign preset names: Conservative → Gentle Follow-Up, Standard → Steady Follow-Up, Aggressive → Speedy Follow-Up
 - 5-step onboarding: Business Basics, Services Offered, Campaign Preset, Import Jobs, SMS Consent
+- CampaignEvent IDs prefixed by source (touch-/feedback-/enroll-/review-) to guarantee uniqueness when rows from different tables are merged
+- feedback_submitted events use campaignName='Review feedback' — customer_feedback is not always tied to a named campaign
+- Review clicks use reviewed_at as event timestamp (not created_at) — reflects when customer actually clicked
 
 ### Pending Todos
 
@@ -79,11 +82,12 @@ None.
 
 - Phase 21-08: Twilio A2P campaign approval required for production SMS testing (brand approved, campaign pending)
 - Phase 39: Five server queries on /send page must be traced to new homes before redirect is added
+- Phase 39: Dashboard bottom pipeline cards (Requests Sent, Active Sequences, Pending/Queued) being replaced with RecentCampaignActivity strip — pipeline numbers preserved as inline counters, not removed entirely
 - Google OAuth: VERIFIED WORKING (36-03) — NEXT_PUBLIC_SITE_URL must be https://app.avisloop.com in Vercel production env vars
 
 ## Session Continuity
 
-Last session: 2026-02-19
-Stopped at: Completed Phase 36 — Auth Form Enhancements (PasswordInput, strength checklist, Google OAuth verified). Next: Phase 39 (Manual Request Elimination)
+Last session: 2026-02-20
+Stopped at: Completed Phase 39 Plan 01 — Dashboard data layer (CampaignEvent types + getRecentCampaignEvents). Next: 39-02 (Activity Strip UI component)
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
