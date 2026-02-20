@@ -140,7 +140,7 @@ export function CampaignForm({ campaign, templates }: CampaignFormProps) {
         <TouchSequenceEditor
           touches={touches}
           templates={templates}
-          onChange={(newTouches) => setValue('touches', newTouches)}
+          onChange={(newTouches) => setValue('touches', newTouches, { shouldDirty: true, shouldValidate: true })}
         />
 
         {errors.touches && (
