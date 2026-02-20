@@ -1,4 +1,5 @@
 import { getCampaigns, getCampaignPresets } from '@/lib/data/campaign'
+import { getAvailableTemplates } from '@/lib/data/message-template'
 import { CampaignList } from '@/components/campaigns/campaign-list'
 import { PresetPicker } from '@/components/campaigns/preset-picker'
 import { Button } from '@/components/ui/button'
@@ -10,9 +11,10 @@ export const metadata = {
 }
 
 export default async function CampaignsPage() {
-  const [campaigns, presets] = await Promise.all([
+  const [campaigns, presets, templates] = await Promise.all([
     getCampaigns({ includePresets: false }),
     getCampaignPresets(),
+    getAvailableTemplates(),
   ])
 
   const hasCustomCampaigns = campaigns.length > 0
@@ -51,7 +53,7 @@ export default async function CampaignsPage() {
       ) : (
         // Campaign list
         <div className="space-y-6">
-          <CampaignList campaigns={campaigns} />
+          <CampaignList campaigns={campaigns} templates={templates} />
 
           {/* Show preset picker below list for adding more campaigns */}
           <div className="rounded-lg border bg-card p-6">

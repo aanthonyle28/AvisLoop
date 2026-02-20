@@ -27,9 +27,10 @@ import type { CampaignWithTouches, MessageTemplate, ServiceType } from '@/lib/ty
 interface CampaignFormProps {
   campaign?: CampaignWithTouches
   templates: MessageTemplate[]
+  onSuccess?: () => void
 }
 
-export function CampaignForm({ campaign, templates }: CampaignFormProps) {
+export function CampaignForm({ campaign, templates, onSuccess }: CampaignFormProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const isEditing = !!campaign
@@ -82,7 +83,11 @@ export function CampaignForm({ campaign, templates }: CampaignFormProps) {
       }
 
       toast.success(isEditing ? 'Campaign updated' : 'Campaign created')
-      router.push('/campaigns')
+      if (onSuccess) {
+        onSuccess()
+      } else {
+        router.push('/campaigns')
+      }
     })
   }
 
@@ -232,7 +237,7 @@ export function CampaignForm({ campaign, templates }: CampaignFormProps) {
         <Button type="submit" disabled={isPending}>
           {isPending ? 'Saving...' : isEditing ? 'Save Changes' : 'Create Campaign'}
         </Button>
-        <Button type="button" variant="outline" onClick={() => router.back()}>
+        <Button type="button" variant="outline" onClick={() => onSuccess ? onSuccess() : router.back()}>
           Cancel
         </Button>
       </div>
