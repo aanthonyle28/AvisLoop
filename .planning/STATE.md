@@ -19,8 +19,8 @@ Progress: [██████████] 100% (v2.5 milestone — all 7 phases
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 190
-- v2.5 plans completed: 20
+- Total plans completed (project): 192
+- v2.5 plans completed: 22
 
 *Updated after each plan completion*
 

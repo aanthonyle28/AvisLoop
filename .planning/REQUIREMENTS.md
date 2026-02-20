@@ -26,6 +26,7 @@
 - [x] **DASH-02**: Arrow hover affordance — replace translate-y lift on InteractiveCard with arrow indicator on hover to signal clickability
 - [x] **DASH-03**: Remove notification badge — remove number badge from Dashboard nav item in sidebar
 - [x] **DASH-04**: Differentiate lower cards — make the 3 bottom dashboard metric cards visually distinct from the top 3 KPI cards (different card variant, sizing, or layout)
+- [x] **DASH-05**: Replace pipeline cards with activity strip — remove the 3 bottom pipeline metric cards (Requests Sent, Active Sequences, Pending/Queued) and replace with a compact RecentCampaignActivity strip showing concrete campaign events (touch sends, review clicks, enrollments) with clickable items, status badges, and inline pipeline counters
 
 ## Onboarding
 
@@ -47,8 +48,8 @@
 
 ## Navigation & Manual Request
 
-- [ ] **NAV-01**: Eliminate Manual Request page — remove /send page from navigation, extract QuickSendForm, create QuickSendModal accessible from campaigns page and customer detail drawer
-- [ ] **NAV-02**: Add Job toggle for one-off send — add option in Add Job flow to trigger immediate manual send for one-off situations
+- [x] **NAV-01**: Eliminate Manual Request page — remove /send page from navigation, extract QuickSendForm, create QuickSendModal accessible from campaigns page and customer detail drawer
+- [x] **NAV-02**: Add Job toggle for one-off send — add option in Add Job flow to trigger immediate manual send for one-off situations
 
 ## Other Pages
 
@@ -105,8 +106,9 @@
 | JC-05 | Phase 37 | Complete |
 | JC-06 | Phase 37 | Complete |
 | JC-07 | Phase 37 | Complete |
-| NAV-01 | Phase 39 | Pending |
-| NAV-02 | Phase 39 | Pending |
+| DASH-05 | Phase 39 | Complete |
+| NAV-01 | Phase 39 | Complete |
+| NAV-02 | Phase 39 | Complete |
 | PG-01 | Phase 35 | Complete |
 | PG-02 | Phase 35 | Complete |
 | PG-03 | Phase 35 | Complete |

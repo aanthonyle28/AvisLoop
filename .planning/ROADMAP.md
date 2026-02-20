@@ -469,7 +469,7 @@ Plans:
 
 ### v2.5 UI/UX Redesign (Phases 33-39)
 
-**Milestone Goal:** Full warm design system overhaul (Stratify-inspired amber/gold palette with blue interactive primary) plus all-page UX fixes, onboarding consolidation from 7 to 5 steps, and Manual Request page elimination.
+**Milestone Goal:** Full warm design system overhaul (Stratify-inspired amber/gold palette with blue interactive primary) plus all-page UX fixes, onboarding consolidation from 7 to 5 steps, Manual Request page elimination, and dashboard pipeline-to-activity-strip upgrade.
 
 **Coverage:** 30 requirements across 7 categories (DS, AUTH, DASH, ONB, JC, NAV, PG)
 
@@ -585,22 +585,29 @@ Plans:
 - [x] 38-02-PLAN.md — Horizontal service tiles and plain-English campaign preset copy
 - [x] 38-03-PLAN.md — Getting started pill warm styling and campaign review step fix
 
-### Phase 39: Manual Request Elimination
-**Goal**: The dedicated Manual Request page and nav entry are removed — users can still trigger a one-off send via a modal on the Campaigns page or from the Customer detail drawer, and the Add Job flow offers a one-off send option for edge cases.
+### Phase 39: Manual Request Elimination & Dashboard Activity Strip
+**Goal**: The dedicated Manual Request page and nav entry are removed — users can still trigger a one-off send via a modal on the Campaigns page or from the Customer detail drawer, and the Add Job flow offers a one-off send option for edge cases. The dashboard's 3 bottom pipeline metric cards are replaced with a compact Recent Campaign Activity strip showing concrete automation output ("what has the system done for me?").
 **Depends on**: Phase 37 (Campaigns page UX stable, Add Job form updated)
-**Requirements**: NAV-01, NAV-02
+**Requirements**: NAV-01, NAV-02, DASH-05
 **Success Criteria** (what must be TRUE):
   1. "Manual Request" / "Send" no longer appears in sidebar navigation or mobile bottom nav
   2. Navigating to `/send` redirects to `/campaigns` (bookmarks and crawlers are handled — page is not 404'd)
   3. A "Send one-off" button on the Campaigns page opens a `QuickSendModal` with a friction warning — the form is pre-filled when opened from a Customer detail drawer
   4. The Add Job flow includes an option to trigger an immediate one-off send for edge-case situations where no campaign is appropriate
   5. All five server queries previously on the `/send` page are confirmed to have new homes before the redirect is added — no dashboard data is lost
-**Plans**: TBD
+  6. The 3 bottom pipeline metric cards (Requests Sent This Week, Active Sequences, Pending/Queued) are removed from the dashboard
+  7. A `RecentCampaignActivity` strip replaces the bottom pipeline cards — showing the last 3-5 campaign events (touch sends, review clicks, feedback submissions, enrollment events) with clickable items, status badges, and relative timestamps
+  8. The activity strip shows a compact counter summary (e.g., "12 active sequences · 3 pending") inline with the strip header, preserving the pipeline numbers in a non-card format
+  9. The activity strip links to `/history` via a "View All" link and each item is clickable to open a detail drawer
+  10. When no campaign activity exists yet, the strip shows an empty state: "No campaign activity yet — complete a job to get started"
+  11. The `DashboardKPIs` type retains pipeline metrics for the activity strip counter summary but the 3 dedicated Card components are removed from `kpi-widgets.tsx`
+**Plans**: 4 plans in 2 waves
 
 Plans:
-- [ ] 39-01-PLAN.md — Server query migration audit and QuickSendForm extraction
-- [ ] 39-02-PLAN.md — QuickSendModal component and Campaigns page integration
-- [ ] 39-03-PLAN.md — Add Job one-off send toggle and /send redirect
+- [x] 39-01-PLAN.md — Server query migration audit, QuickSendForm extraction, and dashboard activity strip data layer
+- [x] 39-02-PLAN.md — Dashboard pipeline cards → RecentCampaignActivity strip replacement
+- [x] 39-03-PLAN.md — QuickSendModal component and Campaigns page integration
+- [x] 39-04-PLAN.md — Add Job one-off send toggle and /send redirect
 
 ---
 
@@ -643,15 +650,15 @@ See individual phase sections above for requirements, success criteria, and depe
 | **36** | **v2.5 UI/UX Redesign** | **3/3** | **Complete** | **2026-02-19** |
 | **37** | **v2.5 UI/UX Redesign** | **3/3** | **Complete** | **2026-02-19** |
 | **38** | **v2.5 UI/UX Redesign** | **3/3** | **Complete** | **2026-02-19** |
-| **39** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
+| **39** | **v2.5 UI/UX Redesign** | **4/4** | **Complete** | **2026-02-20** |
 
-**Total:** 188 plans complete across shipped phases.
+**Total:** 192 plans complete across shipped phases.
 
 ## What's Next
 
 **v2.0 milestone is COMPLETE** (Phases 20-32 all verified, excluding Phase 21 SMS blocked on A2P).
 
-**v2.5 milestone in progress:** Phases 33-38 complete. Next: Phase 39 (Manual Request Elimination).
+**v2.5 milestone COMPLETE:** Phases 33-39 all verified (2026-02-20).
 
 **Blockers:**
 - Twilio A2P 10DLC registration required before Phase 21-08 execution (webhook verification)
@@ -663,5 +670,5 @@ After v2.5:
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 
 ---
-*Last updated: 2026-02-19 — v2.0 milestone complete (Phases 20-32 verified), v2.5 UI/UX Redesign in progress (Phases 33-38 complete, Phase 39 remaining)*
+*Last updated: 2026-02-20 — v2.0 milestone complete (Phases 20-32 verified), v2.5 UI/UX Redesign COMPLETE (Phases 33-39 all verified)*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
