@@ -58,6 +58,10 @@ Progress: [██████░░░░] ~54% (v2.5 milestone)
 - Page container standard: container py-6 space-y-6 (full-width), container max-w-{N} py-6 space-y-6 (constrained) — mx-auto and px-4 are redundant with Tailwind container class
 - SMS consent 3-state display: text-success (opted_in) / text-destructive (opted_out) / text-warning (unknown) — consistent across detail drawer and edit sheet
 - Template channel badge: bg-info/10 text-info (email), bg-success/10 text-success (SMS) — distinct channels via semantic color not arbitrary blue/green
+- PasswordInput toggle button uses tabIndex={-1} + type="button" — Tab skips eye icon to next form field; type=button prevents accidental form submission
+- Error message pattern: id={field}-error role=alert on <p>, linked via aria-describedby on the input — screen readers announce error on focus
+- noValidate on all auth forms — suppress browser validation popups; server-side errors render inline with aria-invalid red border styling
+- aria-invalid:border-destructive on Input component — Tailwind arbitrary variant triggers red border/ring when aria-invalid=true is set
 
 ### Pending Todos
 
