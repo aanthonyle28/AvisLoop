@@ -1,4 +1,4 @@
-import { ClockCounterClockwise, PaperPlaneTilt } from '@phosphor-icons/react'
+import { ClockCounterClockwise, Briefcase } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
@@ -31,9 +31,9 @@ export function HistoryEmptyState({ hasFilters = false }: HistoryEmptyStateProps
         Once you send your first message, it will appear here so you can track its status.
       </p>
       <Button asChild>
-        <Link href="/send">
-          <PaperPlaneTilt size={16} weight="regular" />
-          Send Message
+        <Link href="/jobs">
+          <Briefcase size={16} weight="regular" />
+          Add a Job
         </Link>
       </Button>
     </div>

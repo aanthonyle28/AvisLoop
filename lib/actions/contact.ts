@@ -77,7 +77,7 @@ export async function findOrCreateContact({
   }
 
   revalidatePath('/dashboard/contacts')
-  revalidatePath('/send')
+  revalidatePath('/campaigns')
   return { success: true, data: { id: newContact.id } }
 }
 

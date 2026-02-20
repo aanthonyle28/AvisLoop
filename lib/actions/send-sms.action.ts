@@ -168,7 +168,7 @@ export async function sendSmsRequest(
     })
 
     revalidatePath('/dashboard')
-    revalidatePath('/dashboard/send')
+    revalidatePath('/campaigns')
 
     return {
       success: true,
@@ -209,7 +209,7 @@ export async function sendSmsRequest(
       .eq('id', customerId)
 
     revalidatePath('/dashboard')
-    revalidatePath('/dashboard/send')
+    revalidatePath('/campaigns')
 
     return { success: true, data: { sendLogId: sendLog.id } }
   }

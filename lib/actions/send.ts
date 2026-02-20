@@ -208,7 +208,7 @@ export async function sendReviewRequest(
 
   revalidatePath('/dashboard')
   revalidatePath('/dashboard/contacts')
-  revalidatePath('/dashboard/send')
+  revalidatePath('/campaigns')
 
   return { success: true, data: { sendLogId: sendLog.id } }
 }
@@ -518,7 +518,7 @@ export async function batchSendReviewRequest(
 
   revalidatePath('/dashboard')
   revalidatePath('/dashboard/contacts')
-  revalidatePath('/dashboard/send')
+  revalidatePath('/campaigns')
 
   return {
     success: true,

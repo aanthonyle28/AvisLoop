@@ -152,7 +152,7 @@ export function ReadyToSendQueue({ jobs, hasJobHistory }: ReadyToSendQueueProps)
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem asChild>
-                          <Link href={`/send?jobId=${job.id}`}>
+                          <Link href="/campaigns">
                             Send one-off
                           </Link>
                         </DropdownMenuItem>

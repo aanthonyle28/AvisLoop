@@ -85,7 +85,7 @@ export async function findOrCreateCustomer({
   }
 
   revalidatePath('/customers')
-  revalidatePath('/send')
+  revalidatePath('/campaigns')
   return { success: true, data: { id: newCustomer.id } }
 }
 

@@ -355,7 +355,7 @@ export async function getAttentionAlerts(businessId: string): Promise<AttentionA
           timestamp: send.created_at,
           contextualAction: {
             label: 'Retry',
-            href: `/send?retry=${send.id}`,
+            href: `/history?retry=${send.id}`,
           },
           retryable: true,
           sendLogId: send.id,

@@ -80,7 +80,7 @@ export async function scheduleReviewRequest(
   }
 
   revalidatePath('/scheduled')
-  revalidatePath('/send')
+  revalidatePath('/campaigns')
 
   return {
     success: true,

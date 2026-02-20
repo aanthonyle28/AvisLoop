@@ -58,6 +58,7 @@ export function AddJobSheet({ open, onOpenChange, customers, enabledServiceTypes
   const [status, setStatus] = useState<JobStatus>('scheduled')
   const [notes, setNotes] = useState('')
   const [enrollInCampaign, setEnrollInCampaign] = useState(true)
+  const [sendOneOff, setSendOneOff] = useState(false)
 
   // Reset form when sheet closes
   useEffect(() => {
@@ -71,6 +72,7 @@ export function AddJobSheet({ open, onOpenChange, customers, enabledServiceTypes
       setStatus('scheduled')
       setNotes('')
       setEnrollInCampaign(true)
+      setSendOneOff(false)
     }
   }, [open])
 
@@ -120,6 +122,9 @@ export function AddJobSheet({ open, onOpenChange, customers, enabledServiceTypes
 
     if (status === 'completed') {
       formData.set('enrollInCampaign', enrollInCampaign.toString())
+      if (!enrollInCampaign && sendOneOff) {
+        formData.set('sendOneOff', 'true')
+      }
     }
 
     formAction(formData)
@@ -249,6 +254,25 @@ export function AddJobSheet({ open, onOpenChange, customers, enabledServiceTypes
               </div>
               <p className="text-xs text-muted-foreground ml-6">
                 Automatically send review requests based on your active campaign
+              </p>
+            </div>
+          )}
+
+          {/* One-off send toggle - shown when completed and not enrolling in campaign */}
+          {status === 'completed' && !enrollInCampaign && (
+            <div className="space-y-2 rounded-lg border border-warning-border bg-warning-bg/30 p-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="sendOneOff"
+                  checked={sendOneOff}
+                  onCheckedChange={(checked) => setSendOneOff(!!checked)}
+                />
+                <Label htmlFor="sendOneOff" className="font-normal cursor-pointer">
+                  Send one-off review request instead
+                </Label>
+              </div>
+              <p className="text-xs text-muted-foreground ml-6">
+                Sends a single manual request. For recurring follow-up, use campaign enrollment above.
               </p>
             </div>
           )}
