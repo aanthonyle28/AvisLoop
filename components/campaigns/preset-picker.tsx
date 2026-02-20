@@ -27,6 +27,8 @@ interface PresetPickerProps {
   compact?: boolean
 }
 
+const PRESET_ORDER = ['conservative', 'standard', 'aggressive']
+
 export function PresetPicker({ presets, compact = false }: PresetPickerProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
@@ -44,16 +46,23 @@ export function PresetPicker({ presets, compact = false }: PresetPickerProps) {
   }
 
   // Match database presets with constant definitions for descriptions
-  const presetsWithMeta = presets.map(preset => {
-    const meta = CAMPAIGN_PRESETS.find(p =>
-      preset.name.toLowerCase().includes(p.id)
-    )
-    return { ...preset, meta }
-  })
+  // Sort to ensure deterministic order: Conservative → Standard → Aggressive
+  const presetsWithMeta = presets
+    .map(preset => {
+      const meta = CAMPAIGN_PRESETS.find(p =>
+        preset.name.toLowerCase().includes(p.id)
+      )
+      return { ...preset, meta }
+    })
+    .sort((a, b) => {
+      const aIdx = PRESET_ORDER.indexOf(a.meta?.id || '')
+      const bIdx = PRESET_ORDER.indexOf(b.meta?.id || '')
+      return (aIdx === -1 ? 99 : aIdx) - (bIdx === -1 ? 99 : bIdx)
+    })
 
   return (
     <div className={cn(
-      'grid gap-4',
+      'grid gap-4 max-w-3xl mx-auto',
       compact ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1 lg:grid-cols-3'
     )}>
       {presetsWithMeta.map((preset) => (

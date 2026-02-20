@@ -38,7 +38,7 @@ export default async function EditCampaignPage({ params }: EditCampaignPageProps
     <div className="container py-6 max-w-3xl">
       <Link
         href={`/campaigns/${id}`}
-        className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 mb-4"
+        className="inline-flex items-center gap-1 mb-4 text-sm text-muted-foreground hover:text-foreground w-fit"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to campaign

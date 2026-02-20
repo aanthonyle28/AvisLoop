@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -19,9 +19,11 @@ import { SERVICE_TYPE_LABELS } from '@/lib/validations/job'
 
 interface CampaignCardProps {
   campaign: CampaignWithTouches
+  onEdit?: (campaignId: string) => void
 }
 
-export function CampaignCard({ campaign }: CampaignCardProps) {
+export function CampaignCard({ campaign, onEdit }: CampaignCardProps) {
+  const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [optimisticStatus, setOptimisticStatus] = useState(campaign.status)
 
@@ -69,16 +71,14 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
   const smsCount = campaign.campaign_touches?.filter(t => t.channel === 'sms').length || 0
 
   return (
-    <div className="rounded-lg border bg-card p-4 hover:shadow-sm transition-shadow">
+    <div
+      className="rounded-lg border bg-card p-4 hover:shadow-sm transition-shadow cursor-pointer"
+      onClick={() => router.push(`/campaigns/${campaign.id}`)}
+    >
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3">
-            <Link
-              href={`/campaigns/${campaign.id}`}
-              className="font-medium hover:underline truncate"
-            >
-              {campaign.name}
-            </Link>
+            <span className="font-medium truncate">{campaign.name}</span>
 
             {campaign.service_type ? (
               <Badge variant="secondary" className="shrink-0">
@@ -100,7 +100,10 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
           </div>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0">
+        <div
+          className="flex items-center gap-3 shrink-0"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">
               {optimisticStatus === 'active' ? 'Active' : 'Paused'}
@@ -119,11 +122,11 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem asChild>
-                <Link href={`/campaigns/${campaign.id}/edit`}>
-                  <PencilSimple className="mr-2 h-4 w-4" />
-                  Edit
-                </Link>
+              <DropdownMenuItem
+                onClick={() => onEdit ? onEdit(campaign.id) : router.push(`/campaigns/${campaign.id}/edit`)}
+              >
+                <PencilSimple className="mr-2 h-4 w-4" />
+                Edit
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleDuplicate}>
                 <Copy className="mr-2 h-4 w-4" />

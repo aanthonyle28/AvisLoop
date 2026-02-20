@@ -52,7 +52,7 @@ export default async function CampaignDetailPage({ params, searchParams }: Campa
         <div>
           <Link
             href="/campaigns"
-            className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 mb-2"
+            className="inline-flex items-center gap-1 mb-2 text-sm text-muted-foreground hover:text-foreground w-fit"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to campaigns
