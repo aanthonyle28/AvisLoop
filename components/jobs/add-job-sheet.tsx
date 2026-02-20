@@ -32,9 +32,11 @@ interface AddJobSheetProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   customers: Customer[]
+  /** Service types enabled for this business (scopes the ServiceTypeSelect options) */
+  enabledServiceTypes?: ServiceType[]
 }
 
-export function AddJobSheet({ open, onOpenChange, customers }: AddJobSheetProps) {
+export function AddJobSheet({ open, onOpenChange, customers, enabledServiceTypes }: AddJobSheetProps) {
   const [state, formAction, isPending] = useActionState<JobActionState | null, FormData>(
     createJob,
     null
@@ -209,6 +211,7 @@ export function AddJobSheet({ open, onOpenChange, customers }: AddJobSheetProps)
               value={serviceType}
               onChange={setServiceType}
               error={state?.fieldErrors?.serviceType?.[0]}
+              enabledTypes={enabledServiceTypes}
             />
           </div>
 

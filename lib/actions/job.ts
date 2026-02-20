@@ -58,11 +58,19 @@ export async function createJob(
   const customerName = formData.get('customerName') as string | null
   const customerEmail = formData.get('customerEmail') as string | null
   const customerPhone = formData.get('customerPhone') as string | null
-  const serviceType = formData.get('serviceType') as string
-  const status = formData.get('status') as string || 'scheduled'
-  const notes = formData.get('notes') as string || ''
+  const serviceType = (formData.get('serviceType') as string) || ''
+  const status = (formData.get('status') as string) || 'scheduled'
+  const notes = (formData.get('notes') as string) || ''
   const enrollInCampaignValue = formData.get('enrollInCampaign')
   const enrollInCampaign = enrollInCampaignValue === 'true' || enrollInCampaignValue === null
+
+  // Defensive check: service type must be provided and valid before Zod validation
+  if (!serviceType) {
+    return {
+      error: 'Service type is required',
+      fieldErrors: { serviceType: ['Please select a service type'] },
+    }
+  }
 
   // Determine customer ID - either existing or create new
   let finalCustomerId = customerId
@@ -125,6 +133,7 @@ export async function createJob(
   })
 
   if (!parsed.success) {
+    console.error('[createJob] validation error:', parsed.error.flatten().fieldErrors)
     return { fieldErrors: parsed.error.flatten().fieldErrors }
   }
 
@@ -155,6 +164,7 @@ export async function createJob(
     .single()
 
   if (error) {
+    console.error('[createJob] insert error:', error.code, error.message)
     return { error: error.message }
   }
 

@@ -15,10 +15,17 @@ export interface JobFiltersState {
 interface JobFiltersProps {
   filters: JobFiltersState
   onFiltersChange: (filters: JobFiltersState) => void
+  /** Service types enabled for this business. If empty/undefined, shows all 8 types. */
+  enabledServiceTypes?: string[]
 }
 
-export function JobFilters({ filters, onFiltersChange }: JobFiltersProps) {
+export function JobFilters({ filters, onFiltersChange, enabledServiceTypes }: JobFiltersProps) {
   const hasActiveFilters = filters.status || filters.serviceType || filters.search
+
+  // Scope to enabled types; fall back to all 8 if none configured
+  const visibleServiceTypes = enabledServiceTypes && enabledServiceTypes.length > 0
+    ? SERVICE_TYPES.filter(t => enabledServiceTypes.includes(t))
+    : SERVICE_TYPES
 
   return (
     <div className="space-y-4">
@@ -57,7 +64,7 @@ export function JobFilters({ filters, onFiltersChange }: JobFiltersProps) {
         <div className="w-px bg-border" />
 
         {/* Service type filters */}
-        {SERVICE_TYPES.map(type => (
+        {visibleServiceTypes.map(type => (
           <button
             key={type}
             onClick={() => onFiltersChange({

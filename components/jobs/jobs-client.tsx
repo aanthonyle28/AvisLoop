@@ -8,7 +8,7 @@ import { JobTable } from './job-table'
 import { JobFilters, type JobFiltersState } from './job-filters'
 import { EmptyState } from './empty-state'
 import { AddJobSheet } from './add-job-sheet'
-import type { JobWithEnrollment, Customer } from '@/lib/types/database'
+import type { JobWithEnrollment, Customer, ServiceType } from '@/lib/types/database'
 
 interface JobsClientProps {
   initialJobs: JobWithEnrollment[]
@@ -18,9 +18,11 @@ interface JobsClientProps {
   campaignMap?: Map<string, { campaignName: string; firstTouchDelay: number }>
   /** Whether to auto-open the Add Job sheet (from URL param) */
   defaultAddJobOpen?: boolean
+  /** Service types enabled for this business (from onboarding settings) */
+  enabledServiceTypes?: ServiceType[]
 }
 
-export function JobsClient({ initialJobs, totalJobs, customers, campaignMap, defaultAddJobOpen = false }: JobsClientProps) {
+export function JobsClient({ initialJobs, totalJobs, customers, campaignMap, defaultAddJobOpen = false, enabledServiceTypes }: JobsClientProps) {
   const [filters, setFilters] = useState<JobFiltersState>({
     status: null,
     serviceType: null,
@@ -74,7 +76,7 @@ export function JobsClient({ initialJobs, totalJobs, customers, campaignMap, def
       </div>
 
       {/* Filters */}
-      <JobFilters filters={filters} onFiltersChange={setFilters} />
+      <JobFilters filters={filters} onFiltersChange={setFilters} enabledServiceTypes={enabledServiceTypes} />
 
       {/* Table or Empty State */}
       {filteredJobs.length === 0 ? (
@@ -92,6 +94,7 @@ export function JobsClient({ initialJobs, totalJobs, customers, campaignMap, def
         open={showAddSheet}
         onOpenChange={setShowAddSheet}
         customers={customers}
+        enabledServiceTypes={enabledServiceTypes}
       />
     </div>
   )
