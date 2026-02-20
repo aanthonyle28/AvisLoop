@@ -578,7 +578,7 @@ Plans:
   3. Campaign preset options use plain-English names and descriptions — no "Fast/Standard/Slow" labels, no mention of "multi-touch sequence" or "touch #1/2/3"
   4. The Getting Started checklist pill uses warm amber accent styling consistent with the new palette (not cold blue)
   5. The "Review your campaign" checklist item only marks complete when the user actually navigates to and views their campaign page — it does not auto-complete on wizard finish
-**Plans**: TBD
+**Plans**: 3 plans in 1 wave
 
 Plans:
 - [ ] 38-01-PLAN.md — Wizard step reduction (7 to 5) with localStorage key versioning
@@ -642,7 +642,7 @@ See individual phase sections above for requirements, success criteria, and depe
 | **35** | **v2.5 UI/UX Redesign** | **5/5** | **Complete** | **2026-02-18** |
 | **36** | **v2.5 UI/UX Redesign** | **0/3** | **Not started** | - |
 | **37** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
-| **38** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
+| **38** | **v2.5 UI/UX Redesign** | **0/3** | **Planned** | - |
 | **39** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
 
 **Total:** 179 plans complete across shipped phases.
