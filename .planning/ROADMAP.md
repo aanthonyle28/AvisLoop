@@ -581,9 +581,9 @@ Plans:
 **Plans**: 3 plans in 1 wave
 
 Plans:
-- [ ] 38-01-PLAN.md — Wizard step reduction (7 to 5) with localStorage key versioning
-- [ ] 38-02-PLAN.md — Horizontal service tiles and plain-English campaign preset copy
-- [ ] 38-03-PLAN.md — Getting started pill warm styling and campaign review step fix
+- [x] 38-01-PLAN.md — Wizard step reduction (7 to 5) with localStorage key versioning
+- [x] 38-02-PLAN.md — Horizontal service tiles and plain-English campaign preset copy
+- [x] 38-03-PLAN.md — Getting started pill warm styling and campaign review step fix
 
 ### Phase 39: Manual Request Elimination
 **Goal**: The dedicated Manual Request page and nav entry are removed — users can still trigger a one-off send via a modal on the Campaigns page or from the Customer detail drawer, and the Add Job flow offers a one-off send option for edge cases.
@@ -642,16 +642,16 @@ See individual phase sections above for requirements, success criteria, and depe
 | **35** | **v2.5 UI/UX Redesign** | **5/5** | **Complete** | **2026-02-18** |
 | **36** | **v2.5 UI/UX Redesign** | **0/3** | **Not started** | - |
 | **37** | **v2.5 UI/UX Redesign** | **3/3** | **Complete** | **2026-02-19** |
-| **38** | **v2.5 UI/UX Redesign** | **0/3** | **Planned** | - |
+| **38** | **v2.5 UI/UX Redesign** | **3/3** | **Complete** | **2026-02-19** |
 | **39** | **v2.5 UI/UX Redesign** | **0/TBD** | **Not started** | - |
 
-**Total:** 182 plans complete across shipped phases.
+**Total:** 185 plans complete across shipped phases.
 
 ## What's Next
 
 **v2.0 milestone is COMPLETE** (Phases 20-32 all verified, excluding Phase 21 SMS blocked on A2P).
 
-**v2.5 milestone in progress:** Phases 33-35, 37 complete. Next: Phase 38 (Onboarding Consolidation).
+**v2.5 milestone in progress:** Phases 33-35, 37-38 complete. Next: Phase 39 (Manual Request Elimination).
 
 **Blockers:**
 - Twilio A2P 10DLC registration required before Phase 21-08 execution (webhook verification)
@@ -664,5 +664,5 @@ After v2.5:
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 
 ---
-*Last updated: 2026-02-19 — v2.0 milestone complete (Phases 20-32 verified), v2.5 UI/UX Redesign in progress (Phases 33-35, 37 complete, 36, 38-39 remaining)*
+*Last updated: 2026-02-19 — v2.0 milestone complete (Phases 20-32 verified), v2.5 UI/UX Redesign in progress (Phases 33-35, 37-38 complete, 36, 39 remaining)*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
