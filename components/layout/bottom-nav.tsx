@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { PaperPlaneTilt, ClockCounterClockwise, House, Briefcase, Megaphone } from '@phosphor-icons/react'
+import { ClockCounterClockwise, House, Briefcase, Megaphone } from '@phosphor-icons/react'
 
 const NAV_HEIGHT = 72 // 4.5rem in pixels
 
@@ -12,7 +12,6 @@ const items = [
   { icon: Briefcase, label: 'Jobs', href: '/jobs' },
   { icon: Megaphone, label: 'Campaigns', href: '/campaigns' },
   { icon: ClockCounterClockwise, label: 'Activity', href: '/history' },
-  { icon: PaperPlaneTilt, label: 'Manual', href: '/send' },
 ]
 
 export function BottomNav() {
@@ -24,7 +23,7 @@ export function BottomNav() {
       style={{ height: `${NAV_HEIGHT}px` }}
       aria-label="Mobile navigation"
     >
-      <div className="grid grid-cols-5 h-full">
+      <div className="grid grid-cols-4 h-full">
         {items.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
           const Icon = item.icon

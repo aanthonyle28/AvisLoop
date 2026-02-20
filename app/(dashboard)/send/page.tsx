@@ -1,66 +1,9 @@
-import { getBusiness } from '@/lib/actions/business'
-import { getCustomers } from '@/lib/actions/customer'
-import { getMonthlyUsage, getResponseRate, getNeedsAttentionCount, getRecentActivity, getRecentActivityFull, getResendReadyCustomers } from '@/lib/data/send-logs'
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
-import { SendPageClient } from '@/components/send/send-page-client'
+import { permanentRedirect } from 'next/navigation'
 
 export const metadata = {
-  title: 'Manual Request',
+  title: 'Redirecting...',
 }
 
-export default async function SendPage() {
-  const business = await getBusiness()
-
-  if (!business) {
-    redirect('/onboarding')
-  }
-
-  const supabase = await createClient()
-
-  // Fetch required data in parallel
-  const [
-    { customers },
-    monthlyUsage,
-    responseRate,
-    needsAttention,
-    recentActivity,
-    recentActivityFull,
-    resendReadyCustomers,
-  ] = await Promise.all([
-    getCustomers({ limit: 200 }),
-    getMonthlyUsage(),
-    getResponseRate(),
-    getNeedsAttentionCount(),
-    getRecentActivity(5),
-    getRecentActivityFull(5),
-    getResendReadyCustomers(supabase, business.id),
-  ])
-
-  const hasReviewLink = !!business.google_review_link
-  // Filter for email templates only (SMS in Phase 21)
-  const templates = (business.message_templates || []).filter((t: { channel: string }) => t.channel === 'email')
-  const resendReadyCustomerIds = resendReadyCustomers.map((c: { id: string }) => c.id)
-
-  const displayName = business.default_sender_name || business.name || 'there'
-
-  return (
-    <div className="container py-6 space-y-6">
-      <SendPageClient
-        customers={customers}
-        business={business}
-        templates={templates}
-        monthlyUsage={monthlyUsage}
-        hasReviewLink={hasReviewLink}
-        recentActivity={recentActivity}
-        recentActivityFull={recentActivityFull}
-        resendReadyCustomerIds={resendReadyCustomerIds}
-        displayName={displayName}
-        showStats={true}
-        usage={monthlyUsage}
-        responseRate={responseRate}
-        needsAttention={needsAttention}
-      />
-    </div>
-  )
+export default function SendPage() {
+  permanentRedirect('/campaigns')
 }

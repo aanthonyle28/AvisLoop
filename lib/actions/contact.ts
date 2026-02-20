@@ -48,7 +48,7 @@ export async function findOrCreateContact({
 
   // Check for existing contact
   const { data: existingContact } = await supabase
-    .from('contacts')
+    .from('customers')
     .select('id')
     .eq('business_id', businessId)
     .eq('email', normalizedEmail)
@@ -60,7 +60,7 @@ export async function findOrCreateContact({
 
   // Create new contact
   const { data: newContact, error } = await supabase
-    .from('contacts')
+    .from('customers')
     .insert({
       business_id: businessId,
       name,
@@ -126,7 +126,7 @@ export async function createContact(
 
   // Check for duplicate email within this business
   const { data: existingContact } = await supabase
-    .from('contacts')
+    .from('customers')
     .select('id')
     .eq('business_id', business.id)
     .eq('email', normalizedEmail)
@@ -142,7 +142,7 @@ export async function createContact(
 
   // Insert new contact
   const { data: newContact, error } = await supabase
-    .from('contacts')
+    .from('customers')
     .insert({
       business_id: business.id,
       name,
@@ -213,7 +213,7 @@ export async function updateContact(
 
   // Check for duplicate email within this business (excluding current contact)
   const { data: existingContact } = await supabase
-    .from('contacts')
+    .from('customers')
     .select('id')
     .eq('business_id', business.id)
     .eq('email', normalizedEmail)
@@ -230,7 +230,7 @@ export async function updateContact(
 
   // Update contact (RLS handles ownership check)
   const { error } = await supabase
-    .from('contacts')
+    .from('customers')
     .update({
       name,
       email: normalizedEmail,
@@ -262,7 +262,7 @@ export async function archiveContact(
 
   // Update contact status (RLS handles ownership check)
   const { error } = await supabase
-    .from('contacts')
+    .from('customers')
     .update({ status: 'archived' })
     .eq('id', contactId)
 
@@ -290,7 +290,7 @@ export async function restoreContact(
 
   // Update contact status (RLS handles ownership check)
   const { error } = await supabase
-    .from('contacts')
+    .from('customers')
     .update({ status: 'active' })
     .eq('id', contactId)
 
@@ -318,7 +318,7 @@ export async function deleteContact(
 
   // Delete contact (RLS handles ownership check)
   const { error } = await supabase
-    .from('contacts')
+    .from('customers')
     .delete()
     .eq('id', contactId)
 
@@ -354,7 +354,7 @@ export async function bulkArchiveContacts(
 
   // Update all contacts to archived (RLS handles ownership check)
   const { error } = await supabase
-    .from('contacts')
+    .from('customers')
     .update({ status: 'archived' })
     .in('id', contactIds)
 
@@ -390,7 +390,7 @@ export async function bulkDeleteContacts(
 
   // Delete all contacts (RLS handles ownership check)
   const { error } = await supabase
-    .from('contacts')
+    .from('customers')
     .delete()
     .in('id', contactIds)
 
@@ -444,7 +444,7 @@ export async function bulkCreateContacts(
 
   // Fetch existing emails for this business
   const { data: existingContacts } = await supabase
-    .from('contacts')
+    .from('customers')
     .select('email')
     .eq('business_id', business.id)
 
@@ -465,7 +465,7 @@ export async function bulkCreateContacts(
   // Insert remaining contacts
   if (contactsToInsert.length > 0) {
     const { error } = await supabase
-      .from('contacts')
+      .from('customers')
       .insert(
         contactsToInsert.map(c => ({
           business_id: business.id,
@@ -524,13 +524,13 @@ export async function getContacts(options?: {
 
   // Get total count first
   const { count } = await supabase
-    .from('contacts')
+    .from('customers')
     .select('*', { count: 'exact', head: true })
     .eq('business_id', business.id)
 
   // Fetch paginated contacts ordered by last_sent_at DESC NULLS LAST, then created_at DESC
   const { data: contacts } = await supabase
-    .from('contacts')
+    .from('customers')
     .select('*')
     .eq('business_id', business.id)
     .order('last_sent_at', { ascending: false, nullsFirst: false })
@@ -564,7 +564,7 @@ export async function updateContactNotes(
 
   // Update notes (RLS handles ownership check)
   const { error } = await supabase
-    .from('contacts')
+    .from('customers')
     .update({ notes })
     .eq('id', contactId)
 
@@ -608,7 +608,7 @@ export async function searchContacts(
 
   // Build query
   let queryBuilder = supabase
-    .from('contacts')
+    .from('customers')
     .select('*')
     .eq('business_id', business.id)
 

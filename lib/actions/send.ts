@@ -80,7 +80,7 @@ export async function sendReviewRequest(
 
   // === Get contact ===
   const { data: contact, error: contactError } = await supabase
-    .from('contacts')
+    .from('customers')
     .select('id, name, email, status, opted_out, last_sent_at, send_count')
     .eq('id', contactId)
     .eq('business_id', business.id) // Security: ensure contact belongs to this business
@@ -199,7 +199,7 @@ export async function sendReviewRequest(
 
   // === 10. Update contact tracking fields ===
   await supabase
-    .from('contacts')
+    .from('customers')
     .update({
       last_sent_at: new Date().toISOString(),
       send_count: (contact.send_count || 0) + 1,
@@ -317,7 +317,7 @@ export async function batchSendReviewRequest(
 
   // === 6. Fetch all requested contacts in ONE query ===
   const { data: contacts, error: contactsError } = await supabase
-    .from('contacts')
+    .from('customers')
     .select('id, name, email, status, opted_out, last_sent_at, send_count')
     .in('id', validatedContactIds)
     .eq('business_id', business.id)
@@ -475,7 +475,7 @@ export async function batchSendReviewRequest(
 
       // Update contact tracking fields
       await supabase
-        .from('contacts')
+        .from('customers')
         .update({
           last_sent_at: new Date().toISOString(),
           send_count: (contact.send_count || 0) + 1,

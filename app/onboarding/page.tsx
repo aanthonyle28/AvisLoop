@@ -44,7 +44,7 @@ export default async function OnboardingPage({
 
   // Parse step from URL params
   const params = await searchParams
-  const stepParam = parseInt(params.step || '1', 10)
+  const stepParam = parseInt(params.step || '1', 10) || 1
 
   // Validate step range (1-5), clamp if out of range
   const currentStep = Math.min(Math.max(1, stepParam), 5)

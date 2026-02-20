@@ -148,7 +148,7 @@ export async function getContactSendStats(contactId: string): Promise<{
   }
 
   const { data: contact } = await supabase
-    .from('contacts')
+    .from('customers')
     .select('last_sent_at, send_count, opted_out, status')
     .eq('id', contactId)
     .single()
@@ -249,7 +249,7 @@ export async function getResendReadyCustomers(
   cooldownDate.setDate(cooldownDate.getDate() - COOLDOWN_DAYS)
 
   const { data, error } = await supabase
-    .from('contacts')
+    .from('customers')
     .select('id, name, email, last_sent_at, send_count')
     .eq('business_id', businessId)
     .eq('status', 'active')

@@ -299,11 +299,23 @@ export async function deleteJob(jobId: string): Promise<JobActionState> {
     return { error: 'You must be logged in to delete jobs' }
   }
 
-  // Delete job (RLS handles ownership check)
+  // Get user's business
+  const { data: business } = await supabase
+    .from('businesses')
+    .select('id')
+    .eq('user_id', user.id)
+    .single()
+
+  if (!business) {
+    return { error: 'Business not found' }
+  }
+
+  // Delete job scoped to business
   const { error } = await supabase
     .from('jobs')
     .delete()
     .eq('id', jobId)
+    .eq('business_id', business.id)
 
   if (error) {
     return { error: error.message }
@@ -329,6 +341,17 @@ export async function markJobComplete(
     return { error: 'You must be logged in' }
   }
 
+  // Get user's business
+  const { data: business } = await supabase
+    .from('businesses')
+    .select('id')
+    .eq('user_id', user.id)
+    .single()
+
+  if (!business) {
+    return { error: 'Business not found' }
+  }
+
   const { error } = await supabase
     .from('jobs')
     .update({
@@ -336,6 +359,7 @@ export async function markJobComplete(
       completed_at: new Date().toISOString(),
     })
     .eq('id', jobId)
+    .eq('business_id', business.id)
 
   if (error) {
     return { error: error.message }
@@ -369,6 +393,17 @@ export async function markJobDoNotSend(jobId: string): Promise<JobActionState> {
     return { error: 'You must be logged in' }
   }
 
+  // Get user's business
+  const { data: business } = await supabase
+    .from('businesses')
+    .select('id')
+    .eq('user_id', user.id)
+    .single()
+
+  if (!business) {
+    return { error: 'Business not found' }
+  }
+
   const { error } = await supabase
     .from('jobs')
     .update({
@@ -376,6 +411,7 @@ export async function markJobDoNotSend(jobId: string): Promise<JobActionState> {
       completed_at: null,
     })
     .eq('id', jobId)
+    .eq('business_id', business.id)
 
   if (error) {
     return { error: error.message }

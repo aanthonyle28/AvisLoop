@@ -66,12 +66,15 @@ export function CampaignPresetStep({
       </div>
 
       {/* Preset cards grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4" role="radiogroup" aria-label="Campaign preset options">
         {presetsWithMeta.map((preset) => {
           const isSelected = selectedPresetId === preset.id
           return (
             <div
               key={preset.id}
+              role="radio"
+              tabIndex={0}
+              aria-checked={isSelected}
               className={cn(
                 'relative border rounded-lg p-4 cursor-pointer transition-all',
                 isSelected
@@ -79,6 +82,12 @@ export function CampaignPresetStep({
                   : 'border-border hover:border-primary/50'
               )}
               onClick={() => handleSelectPreset(preset.id)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  handleSelectPreset(preset.id)
+                }
+              }}
             >
               {/* Title */}
               <div className="mb-3">

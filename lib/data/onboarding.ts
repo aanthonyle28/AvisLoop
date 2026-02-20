@@ -72,7 +72,7 @@ export async function getOnboardingStatus(): Promise<OnboardingStatus | null> {
 
   // Check if any active contacts exist
   const { count: contactCount } = await supabase
-    .from('contacts')
+    .from('customers')
     .select('*', { count: 'exact', head: true })
     .eq('business_id', business.id)
     .eq('status', 'active')
@@ -135,7 +135,7 @@ export async function getOnboardingCardStatus(): Promise<OnboardingCardStatus> {
 
   // Auto-detect contact_created and template_created from database state
   const [contactResult, templateResult] = await Promise.all([
-    supabase.from('contacts').select('id', { count: 'exact', head: true }).eq('business_id', business.id).eq('status', 'active'),
+    supabase.from('customers').select('id', { count: 'exact', head: true }).eq('business_id', business.id).eq('status', 'active'),
     supabase.from('message_templates').select('id', { count: 'exact', head: true }).eq('business_id', business.id).eq('channel', 'email'),
   ])
 

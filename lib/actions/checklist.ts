@@ -10,6 +10,11 @@ import { revalidatePath } from 'next/cache'
 export async function updateChecklistState(
   action: 'dismiss' | 'collapse' | 'expand' | 'markSeen' | 'reset'
 ): Promise<{ success: boolean; error?: string }> {
+  const VALID_ACTIONS = ['dismiss', 'collapse', 'expand', 'markSeen', 'reset'] as const
+  if (!VALID_ACTIONS.includes(action as typeof VALID_ACTIONS[number])) {
+    return { success: false, error: 'Invalid action' }
+  }
+
   try {
     const supabase = await createClient()
 

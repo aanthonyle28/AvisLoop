@@ -7,7 +7,6 @@ import { cn } from '@/lib/utils'
 import { useLocalStorage } from '@/lib/hooks/use-local-storage'
 import {
   AddressBook,
-  PaperPlaneTilt,
   ClockCounterClockwise,
   UserCircle,
   CaretLeft,
@@ -38,7 +37,6 @@ const mainNav: NavItem[] = [
   { icon: ChartBar, label: 'Analytics', href: '/analytics' },
   { icon: AddressBook, label: 'Customers', href: '/customers' },
   { icon: ClockCounterClockwise, label: 'Activity', href: '/history' },
-  { icon: PaperPlaneTilt, label: 'Manual Request', href: '/send' },
   { icon: ChatCircleText, label: 'Feedback', href: '/feedback' },
 ]
 

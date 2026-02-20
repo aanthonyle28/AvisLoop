@@ -91,7 +91,7 @@ export async function getBusinessBillingInfo(): Promise<{
       .single(),
     getMonthlyUsage(),
     supabase
-      .from('contacts')
+      .from('customers')
       .select('*', { count: 'exact', head: true })
       .eq('business_id', business.id)
       .eq('status', 'active'),

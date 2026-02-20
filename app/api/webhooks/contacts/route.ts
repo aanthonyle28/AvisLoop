@@ -101,7 +101,7 @@ export async function POST(request: Request) {
 
     // Step 5: Upsert contact (deduplicates by business_id + email)
     const { data: contact, error: upsertError } = await supabase
-      .from('contacts')
+      .from('customers')
       .upsert(
         {
           business_id: matchedBusinessId,

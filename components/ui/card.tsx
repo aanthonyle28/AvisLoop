@@ -40,6 +40,8 @@ Card.displayName = "Card";
 
 type HoverAccent = "amber" | "green" | "blue";
 
+// Hardcoded hex values — these accent colors don't have semantic tokens.
+// If the palette changes, update these manually.
 const hoverAccentStyles: Record<
   HoverAccent,
   { card: string; arrow: string }

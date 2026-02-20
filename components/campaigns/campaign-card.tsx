@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -71,9 +72,9 @@ export function CampaignCard({ campaign, onEdit }: CampaignCardProps) {
   const smsCount = campaign.campaign_touches?.filter(t => t.channel === 'sms').length || 0
 
   return (
-    <div
-      className="rounded-lg border bg-card p-4 hover:shadow-sm transition-shadow cursor-pointer"
-      onClick={() => router.push(`/campaigns/${campaign.id}`)}
+    <Link
+      href={`/campaigns/${campaign.id}`}
+      className="block rounded-lg border bg-card p-4 hover:shadow-sm transition-shadow"
     >
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
@@ -143,6 +144,6 @@ export function CampaignCard({ campaign, onEdit }: CampaignCardProps) {
           </DropdownMenu>
         </div>
       </div>
-    </div>
+    </Link>
   )
 }

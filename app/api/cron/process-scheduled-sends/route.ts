@@ -111,7 +111,7 @@ export async function GET(request: Request) {
 
         // === 3c. Fetch all contacts in one query ===
         const { data: contacts, error: contactsError } = await supabase
-          .from('contacts')
+          .from('customers')
           .select('id, name, email, status, opted_out, last_sent_at, send_count')
           .in('id', scheduledSend.contact_ids)
           .eq('business_id', scheduledSend.business_id)
@@ -268,7 +268,7 @@ export async function GET(request: Request) {
             } else {
               // Update contact tracking
               await supabase
-                .from('contacts')
+                .from('customers')
                 .update({
                   last_sent_at: new Date().toISOString(),
                   send_count: (contact.send_count || 0) + 1,
