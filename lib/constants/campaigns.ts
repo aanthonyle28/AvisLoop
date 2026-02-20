@@ -19,8 +19,8 @@ export interface CampaignPreset {
 export const CAMPAIGN_PRESETS: CampaignPreset[] = [
   {
     id: 'conservative',
-    name: 'Conservative (Email Only)',
-    description: '2 email touches over 3 days. Best for established relationships.',
+    name: 'Gentle Follow-Up',
+    description: 'Two emails over 3 days. Good for established relationships or high-ticket services.',
     touches: [
       { touch_number: 1, channel: 'email', delay_hours: 24 },
       { touch_number: 2, channel: 'email', delay_hours: 72 },
@@ -29,8 +29,8 @@ export const CAMPAIGN_PRESETS: CampaignPreset[] = [
   },
   {
     id: 'standard',
-    name: 'Standard (Email + SMS)',
-    description: '2 emails + 1 SMS over 7 days. Balanced approach.',
+    name: 'Steady Follow-Up',
+    description: 'Two emails and a text message over 7 days. Works well for most businesses.',
     touches: [
       { touch_number: 1, channel: 'email', delay_hours: 24 },
       { touch_number: 2, channel: 'email', delay_hours: 72 },
@@ -40,8 +40,8 @@ export const CAMPAIGN_PRESETS: CampaignPreset[] = [
   },
   {
     id: 'aggressive',
-    name: 'Aggressive (Multi-Channel)',
-    description: 'SMS first, then alternate channels. Fast follow-up for quick services.',
+    name: 'Speedy Follow-Up',
+    description: 'A text within hours, then email and SMS reminders. Best for quick-turnaround services like cleaning.',
     touches: [
       { touch_number: 1, channel: 'sms', delay_hours: 4 },
       { touch_number: 2, channel: 'email', delay_hours: 24 },

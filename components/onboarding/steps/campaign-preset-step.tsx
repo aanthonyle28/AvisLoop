@@ -83,10 +83,7 @@ export function CampaignPresetStep({
               {/* Title */}
               <div className="mb-3">
                 <h3 className="font-semibold text-lg">
-                  {preset.meta?.id === 'conservative' && 'Conservative'}
-                  {preset.meta?.id === 'standard' && 'Standard'}
-                  {preset.meta?.id === 'aggressive' && 'Aggressive'}
-                  {!preset.meta && preset.name}
+                  {preset.meta?.name || preset.name}
                 </h3>
                 <p className="text-sm text-muted-foreground mt-1">
                   {preset.meta?.description || `${preset.campaign_touches.length} touches`}
@@ -110,9 +107,13 @@ export function CampaignPresetStep({
                         <ChatCircle className="h-3 w-3" />
                       )}
                       <span className="text-xs">
-                        {touch.delay_hours < 24
-                          ? `${touch.delay_hours}h`
-                          : `${Math.round(touch.delay_hours / 24)}d`}
+                        {(() => {
+                          const cumulativeHours = preset.campaign_touches
+                            .slice(0, idx + 1)
+                            .reduce((sum, t) => sum + t.delay_hours, 0)
+                          if (cumulativeHours < 24) return `${cumulativeHours}h`
+                          return `Day ${Math.round(cumulativeHours / 24)}`
+                        })()}
                       </span>
                     </Badge>
                   </div>
