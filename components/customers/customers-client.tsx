@@ -8,6 +8,7 @@ import { CSVImportDialog } from './csv-import-dialog'
 import { CustomerDetailDrawer } from './customer-detail-drawer'
 import { DeleteCustomerDialog } from './delete-customer-dialog'
 import { CustomersEmptyState } from './empty-state'
+import { QuickSendModal } from '@/components/send/quick-send-modal'
 import { CircleNotch } from '@phosphor-icons/react'
 import {
   archiveCustomer,
@@ -16,13 +17,23 @@ import {
   bulkArchiveCustomers,
   bulkDeleteCustomers,
 } from '@/lib/actions/customer'
-import type { Customer } from '@/lib/types/database'
+import type { Customer, Business, MessageTemplate } from '@/lib/types/database'
 
 interface CustomersClientProps {
   initialCustomers: Customer[]
+  business: Business & { message_templates?: MessageTemplate[] }
+  templates: MessageTemplate[]
+  monthlyUsage: { count: number; limit: number; tier: string }
+  hasReviewLink: boolean
 }
 
-export function CustomersClient({ initialCustomers }: CustomersClientProps) {
+export function CustomersClient({
+  initialCustomers,
+  business,
+  templates,
+  monthlyUsage,
+  hasReviewLink,
+}: CustomersClientProps) {
   const router = useRouter()
 
   // State for editing customer
@@ -37,6 +48,10 @@ export function CustomersClient({ initialCustomers }: CustomersClientProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [customerToDelete, setCustomerToDelete] = useState<string | null>(null)
   const [customersToDelete, setCustomersToDelete] = useState<string[]>([])
+
+  // State for quick send modal
+  const [quickSendOpen, setQuickSendOpen] = useState(false)
+  const [quickSendCustomer, setQuickSendCustomer] = useState<Customer | null>(null)
 
   // Transition for action feedback with loading state
   const [isPending, startTransition] = useTransition()
@@ -101,7 +116,10 @@ export function CustomersClient({ initialCustomers }: CustomersClientProps) {
   }
 
   const handleSendFromDrawer = () => {
-    router.push('/send')
+    if (detailCustomer) {
+      setQuickSendCustomer(detailCustomer)
+      setQuickSendOpen(true)
+    }
     setDetailDrawerOpen(false)
   }
 
@@ -201,6 +219,18 @@ export function CustomersClient({ initialCustomers }: CustomersClientProps) {
         customerCount={customerToDelete ? 1 : customersToDelete.length}
         onConfirm={handleConfirmDelete}
         isDeleting={isPending}
+      />
+
+      {/* Quick Send Modal -- opened from Customer detail drawer */}
+      <QuickSendModal
+        open={quickSendOpen}
+        onOpenChange={setQuickSendOpen}
+        customers={initialCustomers}
+        business={business}
+        templates={templates}
+        monthlyUsage={monthlyUsage}
+        hasReviewLink={hasReviewLink}
+        prefilledCustomer={quickSendCustomer}
       />
     </div>
   )
