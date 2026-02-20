@@ -561,12 +561,12 @@ Plans:
   7. The Standard campaign preset card is centered in the preset picker layout
   8. Saving changes to a campaign via the edit form persists correctly — the known save bug is identified, fixed, and verified with a successful edit round-trip
   9. Jobs page service type filter is visually distinct from the status filter (e.g., different styling, grouping, or chip treatment) so users can tell them apart at a glance
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 37-01-PLAN.md — Job creation bug fix, campaign edit save bug fix, and Jobs page service type filter scoping
-- [ ] 37-02-PLAN.md — Smart name/email field in Add Job form and filter visual distinction
-- [ ] 37-03-PLAN.md — Campaign card full-click, edit as panel, back button, and Standard preset centering
+- [ ] 37-01-PLAN.md — Fix job creation bug and campaign save bug (touch persistence)
+- [ ] 37-02-PLAN.md — Service type filter scoping, smart name/email field, filter visual distinction
+- [ ] 37-03-PLAN.md — Campaign card full-click, edit as Sheet panel, back button fix, preset centering
 
 ### Phase 38: Onboarding Consolidation
 **Goal**: New users complete a 5-step onboarding wizard (down from 7) with horizontal service tiles, plain-English campaign preset names, and a correctly-gated "Review campaign" checklist step.
