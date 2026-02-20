@@ -49,8 +49,8 @@ export function SetupProgressPill({
       onClick={onOpenDrawer}
       className={cn(
         'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium',
-        'bg-primary/10 text-primary border border-primary/20',
-        'hover:bg-primary/20 transition-colors'
+        'bg-warning-bg text-warning-foreground border border-warning-border',
+        'hover:bg-warning-bg/80 transition-colors'
       )}
     >
       <span>Getting Started: {completedCount}/{totalCount}</span>
