@@ -5,6 +5,7 @@ import type {
   ReadyToSendJob,
   AttentionAlert,
   DashboardCounts,
+  CampaignEvent,
 } from '@/lib/types/dashboard'
 
 /**
@@ -487,5 +488,126 @@ export async function getDashboardCounts(): Promise<DashboardCounts> {
   } catch (error) {
     console.error('Error fetching dashboard counts:', error)
     return { readyToSend: 0, attentionAlerts: 0, total: 0 }
+  }
+}
+
+/**
+ * Get recent campaign activity events for the RecentCampaignActivity strip.
+ * Queries 4 sources in parallel: touch sends, review clicks, feedback submissions, enrollments.
+ * Merges, sorts by timestamp descending, returns top `limit` events.
+ */
+export async function getRecentCampaignEvents(
+  businessId: string,
+  limit: number = 5
+): Promise<CampaignEvent[]> {
+  const supabase = await createClient()
+
+  try {
+    const [
+      // Query A — Campaign touch sends (send_logs with campaign attribution)
+      { data: touchSends },
+      // Query B — Feedback submissions
+      { data: feedbackRows },
+      // Query C — Recent enrollments
+      { data: enrollments },
+      // Query D — Review clicks (campaign-attributed sends with reviewed_at set)
+      { data: reviewClicks },
+    ] = await Promise.all([
+      supabase
+        .from('send_logs')
+        .select('id, status, channel, touch_number, created_at, customers!send_logs_customer_id_fkey(name), campaigns(name)')
+        .eq('business_id', businessId)
+        .not('campaign_id', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(limit),
+
+      supabase
+        .from('customer_feedback')
+        .select('id, rating, submitted_at, customers!inner(name)')
+        .eq('business_id', businessId)
+        .order('submitted_at', { ascending: false })
+        .limit(limit),
+
+      supabase
+        .from('campaign_enrollments')
+        .select('id, enrolled_at, customers!inner(name), campaigns!inner(name)')
+        .eq('business_id', businessId)
+        .order('enrolled_at', { ascending: false })
+        .limit(limit),
+
+      supabase
+        .from('send_logs')
+        .select('id, reviewed_at, customers!send_logs_customer_id_fkey(name), campaigns(name)')
+        .eq('business_id', businessId)
+        .not('campaign_id', 'is', null)
+        .not('reviewed_at', 'is', null)
+        .order('reviewed_at', { ascending: false })
+        .limit(limit),
+    ])
+
+    const events: CampaignEvent[] = []
+
+    // Map Query A results — touch sends
+    for (const row of touchSends || []) {
+      const customer = Array.isArray(row.customers) ? row.customers[0] : row.customers
+      const campaign = Array.isArray(row.campaigns) ? row.campaigns[0] : row.campaigns
+      events.push({
+        id: `touch-${row.id}`,
+        type: 'touch_sent',
+        customerName: customer?.name || 'Unknown',
+        campaignName: campaign?.name || 'Campaign',
+        touchNumber: row.touch_number ?? undefined,
+        channel: row.channel as 'email' | 'sms' | undefined,
+        status: row.status,
+        timestamp: row.created_at,
+      })
+    }
+
+    // Map Query B results — feedback submissions
+    for (const row of feedbackRows || []) {
+      const customer = Array.isArray(row.customers) ? row.customers[0] : row.customers
+      events.push({
+        id: `feedback-${row.id}`,
+        type: 'feedback_submitted',
+        customerName: customer?.name || 'Unknown',
+        campaignName: 'Review feedback',
+        rating: row.rating,
+        timestamp: row.submitted_at,
+      })
+    }
+
+    // Map Query C results — enrollments
+    for (const row of enrollments || []) {
+      const customer = Array.isArray(row.customers) ? row.customers[0] : row.customers
+      const campaign = Array.isArray(row.campaigns) ? row.campaigns[0] : row.campaigns
+      events.push({
+        id: `enroll-${row.id}`,
+        type: 'enrollment',
+        customerName: customer?.name || 'Unknown',
+        campaignName: campaign?.name || 'Campaign',
+        timestamp: row.enrolled_at,
+      })
+    }
+
+    // Map Query D results — review clicks
+    for (const row of reviewClicks || []) {
+      const customer = Array.isArray(row.customers) ? row.customers[0] : row.customers
+      const campaign = Array.isArray(row.campaigns) ? row.campaigns[0] : row.campaigns
+      events.push({
+        id: `review-${row.id}`,
+        type: 'review_click',
+        customerName: customer?.name || 'Unknown',
+        campaignName: campaign?.name || 'Campaign',
+        timestamp: row.reviewed_at as string,
+      })
+    }
+
+    // Sort by timestamp descending (most recent first) and return top `limit` items
+    events.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+
+    return events.slice(0, limit)
+  } catch (error) {
+    console.error('Error fetching recent campaign events:', error)
+    return []
   }
 }
