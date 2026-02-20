@@ -5,22 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** Phase 36 — Auth Form Enhancements
+**Current focus:** Phase 37 — Jobs & Campaigns UX Fixes
 
 ## Current Position
 
-Phase: 36 of 39 in v2.5 milestone (Phase 4 of 7 in this milestone)
-Plan: 3 of 3 (paused at checkpoint — awaiting human Google OAuth verification)
-Status: In progress — checkpoint:human-verify
-Last activity: 2026-02-20 — Executed 36-03 (Google OAuth verification), paused at checkpoint
+Phase: 37 of 39 in v2.5 milestone (Phase 5 of 7 in this milestone)
+Plan: 1 of 3 complete
+Status: In progress
+Last activity: 2026-02-19 — Completed 37-01 (job creation bug fix + campaign touch persistence fix)
 
-Progress: [██████░░░░] ~54% (v2.5 milestone)
+Progress: [███████░░░] ~57% (v2.5 milestone)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 179
-- v2.5 plans completed: 9 (36-03 pending checkpoint resolution)
+- Total plans completed (project): 180
+- v2.5 plans completed: 10
 
 *Updated after each plan completion*
 
@@ -67,16 +67,22 @@ Progress: [██████░░░░] ~54% (v2.5 milestone)
 
 None.
 
+### New Decisions from 37-01
+
+- react-hook-form setValue for complex arrays requires `{ shouldDirty: true, shouldValidate: true }` to ensure dirty tracking and correct form submission
+- Server action early-return guard before Zod enum: check `!serviceType` first, return user-friendly error before reaching Zod validation
+- console.error logging in server actions is acceptable in production (server-side, never reaches client, aids diagnosis)
+
 ### Blockers/Concerns
 
 - Phase 21-08: Twilio A2P campaign approval required for production SMS testing (brand approved, campaign pending)
-- Phase 37: Campaign form save bug (touch sequences not persisting) — scope must be investigated before planning
+- Phase 37: Campaign form save bug (JC-08) RESOLVED in 37-01 — shouldDirty fix applied to touches setValue
 - Phase 39: Five server queries on /send page must be traced to new homes before redirect is added
 - Google OAuth: Code complete, Supabase dashboard Google provider config pending (enable provider, add Client ID/Secret, allowlist redirect URLs)
 
 ## Session Continuity
 
-Last session: 2026-02-20
-Stopped at: Phase 36-03 checkpoint — Google OAuth code verified correct, awaiting human Supabase dashboard configuration verification
+Last session: 2026-02-19
+Stopped at: Completed 37-01 — job creation defensive fix (JC-03) + campaign touch persistence (JC-08) + service filter scoping (JC-01)
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
