@@ -222,7 +222,7 @@ export async function sendSmsRequest(
   })
 
   revalidatePath('/dashboard')
-  revalidatePath('/dashboard/send')
+  revalidatePath('/campaigns')
 
   return {
     error: `Failed to send SMS: ${result.error}. Message queued for retry.`,
