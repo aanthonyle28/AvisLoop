@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 37 of 39 in v2.5 milestone (Phase 5 of 7 in this milestone)
-Plan: 1 of 3 complete
+Plan: 2 of 3 complete
 Status: In progress
-Last activity: 2026-02-19 — Completed 37-01 (job creation bug fix + campaign touch persistence fix)
+Last activity: 2026-02-20 — Completed 37-02 (service filter scoping, smart autocomplete, filter visual distinction)
 
-Progress: [███████░░░] ~57% (v2.5 milestone)
+Progress: [███████░░░] ~60% (v2.5 milestone)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 180
-- v2.5 plans completed: 10
+- Total plans completed (project): 181
+- v2.5 plans completed: 11
 
 *Updated after each plan completion*
 
@@ -73,6 +73,13 @@ None.
 - Server action early-return guard before Zod enum: check `!serviceType` first, return user-friendly error before reaching Zod validation
 - console.error logging in server actions is acceptable in production (server-side, never reaches client, aids diagnosis)
 
+### New Decisions from 37-02
+
+- Keep type=text in customer autocomplete even in email mode — changing input type dynamically causes focus loss in some browsers
+- Email badge only shows at query.length >= 3 — bare @ character alone causes flash with no useful context
+- Shape-based distinction (rounded-full vs rounded-md) + group labels is sufficient filter differentiation — no color change needed
+- Filter fallback pattern: enabledServiceTypes && enabledServiceTypes.length > 0 ? filtered : all — empty array means no config, show all
+
 ### Blockers/Concerns
 
 - Phase 21-08: Twilio A2P campaign approval required for production SMS testing (brand approved, campaign pending)
@@ -82,7 +89,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-19
-Stopped at: Completed 37-01 — job creation defensive fix (JC-03) + campaign touch persistence (JC-08) + service filter scoping (JC-01)
+Last session: 2026-02-20
+Stopped at: Completed 37-02 — service filter scoping (JC-01), smart autocomplete email detection (JC-02), filter visual distinction (JC-09). Next: 37-03.
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
