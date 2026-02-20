@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 39 of 39 in v2.5 milestone (Phase 7 of 7 in this milestone)
-Plan: 3 of 4 complete
+Plan: 3 of 4 complete (39-02 and 39-03 complete; executing out-of-order — 39-02 done after 39-03)
 Status: In progress
-Last activity: 2026-02-20 — Completed 39-03 (QuickSendModal: extracted form, campaigns + customer drawer integration)
+Last activity: 2026-02-20 — Completed 39-02 (RecentCampaignActivity strip + pipeline cards removed from dashboard)
 
 Progress: [█████████░] ~93% (v2.5 milestone — Phases 33-38 complete, Phase 39 in progress 3/4)
 
@@ -71,6 +71,8 @@ Progress: [█████████░] ~93% (v2.5 milestone — Phases 33-38
 - Plain-English campaign preset names: Conservative → Gentle Follow-Up, Standard → Steady Follow-Up, Aggressive → Speedy Follow-Up
 - 5-step onboarding: Business Basics, Services Offered, Campaign Preset, Import Jobs, SMS Consent
 - CampaignEvent IDs prefixed by source (touch-/feedback-/enroll-/review-) to guarantee uniqueness when rows from different tables are merged
+- Dashboard pipeline cards (Requests Sent, Active Sequences, Pending/Queued) removed from KPIWidgets — preserved as inline counters in RecentCampaignActivity strip header
+- PipelineSummary derived from kpiData post-Promise.all — no extra DB query; activeSequences/pendingQueued/requestsSentThisWeek already fetched by getDashboardKPIs
 - feedback_submitted events use campaignName='Review feedback' — customer_feedback is not always tied to a named campaign
 - Review clicks use reviewed_at as event timestamp (not created_at) — reflects when customer actually clicked
 - QuickSendForm omits card wrapper and recent chips — modal provides container; chips are send-page-specific context
@@ -91,6 +93,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed Phase 39 Plan 03 — QuickSendModal extracted + wired to Campaigns page and Customer drawer. Next: 39-04 (/send page redirect)
+Stopped at: Completed Phase 39 Plan 02 — RecentCampaignActivity strip created, pipeline cards removed from dashboard, data wired via Promise.all. Next: 39-04 (/send page redirect)
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
