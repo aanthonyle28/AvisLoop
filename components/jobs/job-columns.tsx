@@ -141,7 +141,21 @@ export function columns({ onEdit, onDelete, onMarkComplete, onSendOneOff }: Colu
           )
         }
 
-        // Stopped enrollment
+        // Completed job with one-off override — show current intent, not stale stopped enrollment
+        if (job.status === 'completed' && job.campaign_override === 'one_off') {
+          return (
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); if (job.customers?.id) onSendOneOff(job.customers.id) }}
+              className="text-xs text-primary hover:text-primary/80 flex items-center gap-1 hover:underline cursor-pointer"
+            >
+              <PaperPlaneTilt size={14} weight="fill" />
+              Send One-Off Request
+            </button>
+          )
+        }
+
+        // Stopped enrollment (no override explains current state)
         if (anyEnrollment && anyEnrollment.status === 'stopped') {
           return (
             <span className="text-xs text-muted-foreground flex items-center gap-1">

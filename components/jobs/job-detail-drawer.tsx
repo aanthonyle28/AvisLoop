@@ -117,6 +117,20 @@ export function JobDetailDrawer({
       )
     }
 
+    // Completed job with one-off override — show current intent, not stale stopped enrollment
+    if (job.status === 'completed' && job.campaign_override === 'one_off') {
+      return (
+        <button
+          type="button"
+          onClick={() => { if (customer?.id) onSendOneOff(customer.id) }}
+          className="text-sm text-primary hover:text-primary/80 flex items-center gap-1.5 hover:underline cursor-pointer"
+        >
+          <PaperPlaneTilt size={16} weight="fill" />
+          Send One-Off Request
+        </button>
+      )
+    }
+
     if (anyEnrollment && anyEnrollment.status === 'stopped') {
       return (
         <span className="text-sm text-muted-foreground flex items-center gap-1.5">
