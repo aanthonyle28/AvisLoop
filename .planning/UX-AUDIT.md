@@ -505,7 +505,7 @@ This entire page contradicts V2. V2 states:
 | 2 | Review Destination | Yes | Google review link |
 | 3 | Services Offered | No | Multi-select 8 types |
 | 4 | Software Used | Yes | CRM info |
-| 5 | Campaign Preset | No | Fast/Standard/Slow |
+| 5 | Campaign Preset | No | Gentle/Standard/Aggressive |
 | 6 | Import Customers | Yes | CSV upload |
 | 7 | SMS Consent | No | TCPA acknowledgement |
 

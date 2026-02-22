@@ -68,7 +68,7 @@ Progress: [██████████] 100% (v2.5 milestone — all 7 phases
 - NEXT_PUBLIC_SITE_URL: `http://localhost:3000` in .env.local, `https://app.avisloop.com` in Vercel production (no trailing slash on either)
 - react-hook-form setValue for complex arrays requires `{ shouldDirty: true, shouldValidate: true }` to ensure dirty tracking
 - Sheet-based edit pattern for campaigns: parent component owns open/close state; form uses onSuccess callback instead of router navigation
-- Plain-English campaign preset names: Conservative → Gentle Follow-Up, Standard → Steady Follow-Up, Aggressive → Speedy Follow-Up
+- Plain-English campaign preset names: Conservative → Gentle Follow-Up, Standard → Standard Follow-Up, Aggressive → Aggressive Follow-Up
 - 5-step onboarding: Business Basics, Services Offered, Campaign Preset, Import Jobs, SMS Consent
 - CampaignEvent IDs prefixed by source (touch-/feedback-/enroll-/review-) to guarantee uniqueness when rows from different tables are merged
 - Dashboard pipeline cards (Requests Sent, Active Sequences, Pending/Queued) removed from KPIWidgets — preserved as inline counters in RecentCampaignActivity strip header

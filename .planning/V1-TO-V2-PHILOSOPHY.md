@@ -344,7 +344,7 @@ Tuesday 2:30 PM  Touch 1 email sent (no human involved)
 1. Business basics
 2. Review destination (Google link)
 3. Services offered
-4. Campaign preset (Fast/Standard/Slow)
+4. Campaign preset (Gentle/Standard/Aggressive)
 5. SMS consent acknowledgement
 6. **Done** — Start completing jobs
 

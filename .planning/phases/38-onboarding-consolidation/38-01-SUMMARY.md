@@ -55,7 +55,7 @@ Reduced the onboarding wizard from 7 steps to 5 by removing two steps:
 **New 5-step flow:**
 1. Business Basics (required) — name, phone, google_review_link
 2. Services Offered (required) — which service types the business offers
-3. Campaign Preset (required) — Fast/Standard/Slow automation preset
+3. Campaign Preset (required) — Gentle/Standard/Aggressive Follow-Up automation preset
 4. Import Jobs (optional/skippable) — CSV import for existing jobs
 5. SMS Consent (required) — TCPA acknowledgement
 

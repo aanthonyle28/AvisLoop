@@ -10,9 +10,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { PencilSimple, DotsThree, Copy, Trash } from '@phosphor-icons/react'
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog'
+import { PencilSimple, DotsThree, Copy, Trash, Warning } from '@phosphor-icons/react'
 import { CampaignForm } from '@/components/campaigns/campaign-form'
-import { toggleCampaignStatus, deleteCampaign, duplicateCampaign } from '@/lib/actions/campaign'
+import { toggleCampaignStatus, deleteCampaign, duplicateCampaign, getCampaignDeletionInfo } from '@/lib/actions/campaign'
 import { toast } from 'sonner'
 import {
   Sheet,
@@ -39,6 +49,11 @@ export function CampaignDetailShell({
   const [editOpen, setEditOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [optimisticStatus, setOptimisticStatus] = useState(campaign.status)
+
+  // Delete confirmation dialog state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [deletionInfo, setDeletionInfo] = useState<{ activeEnrollments: number; affectedJobs: number } | null>(null)
+  const [isLoadingDeletionInfo, setIsLoadingDeletionInfo] = useState(false)
 
   // Auto-open edit sheet when ?edit=true is present (e.g. after creation)
   useEffect(() => {
@@ -76,13 +91,23 @@ export function CampaignDetailShell({
         toast.error(result.error)
       } else {
         toast.success('Campaign duplicated')
+        if (result.data?.campaignId) {
+          router.push(`/campaigns/${result.data.campaignId}`)
+        }
       }
     })
   }
 
-  const handleDelete = () => {
-    if (!confirm('Delete this campaign? This cannot be undone.')) return
+  const handleDeleteClick = async () => {
+    setDeleteDialogOpen(true)
+    setIsLoadingDeletionInfo(true)
+    const info = await getCampaignDeletionInfo(campaign.id)
+    setDeletionInfo(info)
+    setIsLoadingDeletionInfo(false)
+  }
 
+  const handleDeleteConfirm = () => {
+    setDeleteDialogOpen(false)
     startTransition(async () => {
       const result = await deleteCampaign(campaign.id)
       if (result.error) {
@@ -119,7 +144,7 @@ export function CampaignDetailShell({
           {/* Overflow menu: Duplicate + Delete */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon" disabled={isPending}>
+              <Button variant="outline" size="icon" disabled={isPending} aria-label="Campaign actions">
                 <DotsThree className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
@@ -129,7 +154,7 @@ export function CampaignDetailShell({
                 Duplicate
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={handleDelete}
+                onClick={handleDeleteClick}
                 className="text-destructive focus:text-destructive"
               >
                 <Trash className="mr-2 h-4 w-4" />
@@ -159,6 +184,50 @@ export function CampaignDetailShell({
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Warning size={20} className="text-destructive" weight="fill" />
+              Delete &ldquo;{campaign.name}&rdquo;?
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3">
+                <p>This action cannot be undone. The campaign and all its touch sequences will be permanently deleted.</p>
+
+                {isLoadingDeletionInfo ? (
+                  <p className="text-sm text-muted-foreground">Checking impact...</p>
+                ) : deletionInfo && (deletionInfo.activeEnrollments > 0 || deletionInfo.affectedJobs > 0) ? (
+                  <div className="rounded-md border border-destructive/20 bg-destructive/5 p-3 space-y-1.5">
+                    {deletionInfo.activeEnrollments > 0 && (
+                      <p className="text-sm font-medium">
+                        {deletionInfo.activeEnrollments} active enrollment{deletionInfo.activeEnrollments !== 1 ? 's' : ''} will be stopped
+                      </p>
+                    )}
+                    {deletionInfo.affectedJobs > 0 && (
+                      <p className="text-sm font-medium">
+                        {deletionInfo.affectedJobs} job{deletionInfo.affectedJobs !== 1 ? 's' : ''} referencing this campaign will be reset to auto-detect
+                      </p>
+                    )}
+                  </div>
+                ) : null}
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={isLoadingDeletionInfo}
+            >
+              Delete Campaign
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }

@@ -729,7 +729,7 @@ Multiple files in `components/onboarding/steps/` and the wizard shell.
 |---|------|---------|-----------|
 | 1 | Business Setup | Name + phone + Google link (all in one form) | No |
 | 2 | Services | Multi-select service types | No |
-| 3 | Campaign Preset | Fast/Standard/Slow picker | No |
+| 3 | Campaign Preset | Gentle/Standard/Aggressive picker | No |
 | 4 | Import Past Jobs | CSV upload (optional) | Yes |
 | 5 | SMS Consent | TCPA acknowledgment | No |
 

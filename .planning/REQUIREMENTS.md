@@ -32,7 +32,7 @@
 
 - [ ] **ONB-01**: Consolidate wizard steps — reduce from 7 to 5 steps: remove duplicate Google review link step (merge into Business Basics), remove Software Used step
 - [ ] **ONB-02**: Horizontal service tiles — change services offered step from vertical list to horizontal selectable tiles/chips layout
-- [ ] **ONB-03**: Plain English campaign presets — rename Fast/Standard/Slow presets to user-friendly names with clear, plain-language descriptions of what each does
+- [x] **ONB-03**: Plain English campaign presets — renamed to Gentle/Standard/Aggressive Follow-Up with clear, plain-language descriptions
 - [ ] **ONB-04**: Getting started pill warm color — update getting started pill styling to use warm palette colors (amber accent) instead of cold blue tint
 - [ ] **ONB-05**: Campaign review step fix — getting started checklist "Review campaign" step should only complete when user actually navigates to and reviews their campaign, not auto-complete
 

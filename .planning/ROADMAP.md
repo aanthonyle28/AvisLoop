@@ -575,7 +575,7 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. Onboarding wizard has exactly 5 steps — the Google Review Destination step (duplicate of Step 1 field) and the Software Used step are removed; existing in-progress drafts are cleanly abandoned via a versioned localStorage key (`onboarding-draft-v2`)
   2. The Services step displays service options as horizontal selectable tiles or chips, not a vertical checkbox list — selecting "Other" reveals a text input for the user to type a custom service name
-  3. Campaign preset options use plain-English names and descriptions — no "Fast/Standard/Slow" labels, no mention of "multi-touch sequence" or "touch #1/2/3"
+  3. Campaign preset options use plain-English names and descriptions — Gentle/Standard/Aggressive Follow-Up, no mention of "multi-touch sequence" or "touch #1/2/3"
   4. The Getting Started checklist pill uses warm amber accent styling consistent with the new palette (not cold blue)
   5. The "Review your campaign" checklist item only marks complete when the user actually navigates to and views their campaign page — it does not auto-complete on wizard finish
 **Plans**: 3 plans in 1 wave
