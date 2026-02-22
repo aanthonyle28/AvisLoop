@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { getActiveCampaignForJob } from '@/lib/data/campaign'
 import type { QuickEnrollResult } from '@/lib/types/dashboard'
-import type { ServiceType } from '@/lib/types/database'
+import type { ServiceType, JobWithEnrollment } from '@/lib/types/database'
 
 /**
  * Quick enroll a job from the dashboard ready-to-send queue.
@@ -265,6 +265,85 @@ export async function acknowledgeAlert(sendLogId: string): Promise<{ success: bo
     return { success: true }
   } catch (error) {
     console.error('Error acknowledging alert:', error)
+    return { success: false, error: 'An error occurred' }
+  }
+}
+
+/**
+ * Fetch full job detail for the JobDetailDrawer (from dashboard queue).
+ * Returns JobWithEnrollment shape with customer and enrollment data.
+ */
+export async function getJobDetail(jobId: string): Promise<JobWithEnrollment | null> {
+  try {
+    const supabase = await createClient()
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return null
+
+    const { data: business } = await supabase
+      .from('businesses')
+      .select('id')
+      .eq('user_id', user.id)
+      .single()
+
+    if (!business) return null
+
+    const { data: job, error } = await supabase
+      .from('jobs')
+      .select(`
+        *,
+        customers!inner (id, name, email, phone),
+        campaign_enrollments (
+          id,
+          status,
+          campaigns (id, name)
+        )
+      `)
+      .eq('id', jobId)
+      .eq('business_id', business.id)
+      .single()
+
+    if (error || !job) return null
+
+    return job as unknown as JobWithEnrollment
+  } catch (error) {
+    console.error('Error fetching job detail:', error)
+    return null
+  }
+}
+
+/**
+ * Dismiss a job from the dashboard ready-to-send queue.
+ * Sets campaign_override = 'dismissed' to exclude it from the queue.
+ * Different from 'one_off' which is a legitimate user choice (send manually).
+ */
+export async function dismissJobFromQueue(jobId: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createClient()
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'Not authenticated' }
+
+    const { data: business } = await supabase
+      .from('businesses')
+      .select('id')
+      .eq('user_id', user.id)
+      .single()
+
+    if (!business) return { success: false, error: 'Business not found' }
+
+    const { error } = await supabase
+      .from('jobs')
+      .update({ campaign_override: 'dismissed' })
+      .eq('id', jobId)
+      .eq('business_id', business.id)
+
+    if (error) return { success: false, error: error.message }
+
+    revalidatePath('/dashboard')
+    return { success: true }
+  } catch (error) {
+    console.error('Error dismissing job from queue:', error)
     return { success: false, error: 'An error occurred' }
   }
 }

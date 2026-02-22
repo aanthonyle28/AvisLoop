@@ -234,6 +234,7 @@ export async function enrollJobInCampaign(
 
   revalidatePath('/campaigns')
   revalidatePath('/jobs')
+  revalidatePath('/dashboard')
 
   return {
     success: true,

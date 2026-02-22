@@ -173,9 +173,9 @@ export async function createJob(
   }
 
   // Enroll in campaign if status is 'completed' and enrollInCampaign is true
-  // Honor campaign_override: 'one_off' skips enrollment, UUID targets specific campaign
+  // Honor campaign_override: 'one_off'/'dismissed' skip enrollment, UUID targets specific campaign
   const override = parsed.data.campaignOverride
-  if (parsed.data.status === 'completed' && parsed.data.enrollInCampaign !== false && override !== 'one_off') {
+  if (parsed.data.status === 'completed' && parsed.data.enrollInCampaign !== false && override !== 'one_off' && override !== 'dismissed') {
     const effectiveCampaignId = override || campaignId
     const enrollResult = await enrollJobInCampaign(newJob.id, effectiveCampaignId ? { campaignId: effectiveCampaignId } : undefined)
     if (!enrollResult.success && !enrollResult.skipped) {
@@ -303,8 +303,8 @@ export async function updateJob(
     // Stop existing enrollments first
     await stopEnrollmentsForJob(jobId, 'owner_stopped')
 
-    // Re-enroll if new choice is a campaign (not one_off, not do_not_send)
-    if (override !== 'one_off' && enrollInCampaign !== false) {
+    // Re-enroll if new choice is a campaign (not one_off/dismissed, not do_not_send)
+    if (override !== 'one_off' && override !== 'dismissed' && enrollInCampaign !== false) {
       const effectiveCampaignId = override || campaignId
       const enrollResult = await enrollJobInCampaign(jobId, effectiveCampaignId
         ? { campaignId: effectiveCampaignId, forceCooldownOverride: true }
@@ -316,7 +316,7 @@ export async function updateJob(
   }
 
   // Case 3: Transitioning TO completed (fresh enrollment)
-  if (!wasCompleted && isNowCompleted && enrollInCampaign !== false && override !== 'one_off') {
+  if (!wasCompleted && isNowCompleted && enrollInCampaign !== false && override !== 'one_off' && override !== 'dismissed') {
     const effectiveCampaignId = override || campaignId
     const enrollResult = await enrollJobInCampaign(jobId, effectiveCampaignId ? { campaignId: effectiveCampaignId } : undefined)
     if (!enrollResult.success && !enrollResult.skipped) {
@@ -366,6 +366,7 @@ export async function deleteJob(jobId: string): Promise<JobActionState> {
   }
 
   revalidatePath('/jobs')
+  revalidatePath('/dashboard')
   return { success: true }
 }
 
@@ -420,8 +421,8 @@ export async function markJobComplete(
   }
 
   // Enroll in campaign if enrollInCampaign is true (default)
-  // Honor campaign_override: 'one_off' skips enrollment, UUID targets specific campaign
-  if (enrollInCampaign && override !== 'one_off') {
+  // Honor campaign_override: 'one_off'/'dismissed' skip enrollment, UUID targets specific campaign
+  if (enrollInCampaign && override !== 'one_off' && override !== 'dismissed') {
     const enrollOpts = override ? { campaignId: override } : undefined
     const enrollResult = await enrollJobInCampaign(jobId, enrollOpts)
 
@@ -432,6 +433,7 @@ export async function markJobComplete(
   }
 
   revalidatePath('/jobs')
+  revalidatePath('/dashboard')
   return { success: true }
 }
 

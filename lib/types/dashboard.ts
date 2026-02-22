@@ -20,15 +20,18 @@ export interface DashboardKPIs {
   pendingQueued: KPIMetric       // pending/scheduled sends
 }
 
-// Ready-to-send job (completed but not enrolled)
+// Ready-to-send job (scheduled or completed but not enrolled)
 export interface ReadyToSendJob {
   id: string
   customer: { id: string; name: string; email: string }
   service_type: ServiceType
-  completed_at: string
-  isStale: boolean           // exceeds optimal service type window
+  completed_at: string       // completed_at for completed jobs, created_at for scheduled
+  isStale: boolean           // exceeds optimal service type window (completed only)
   hoursElapsed: number
   threshold: number          // from business.service_type_timing
+  status: 'scheduled' | 'completed'
+  campaign_override: string | null
+  hasMatchingCampaign: boolean
 }
 
 // Attention alert with contextual action

@@ -240,8 +240,8 @@ export async function getDashboardKPIs(businessId: string): Promise<DashboardKPI
 }
 
 /**
- * Get ready-to-send jobs: completed jobs not enrolled in any active campaign.
- * Uses two-step approach: fetch completed jobs, fetch enrolled jobs, filter in JS.
+ * Get ready-to-send jobs: scheduled jobs + completed jobs not enrolled in any campaign.
+ * Uses multi-step approach: fetch jobs, fetch enrollments, fetch campaigns, filter in JS.
  */
 export async function getReadyToSendJobs(
   businessId: string,
@@ -250,34 +250,64 @@ export async function getReadyToSendJobs(
   const supabase = await createClient()
 
   try {
-    // Step 1: Fetch completed jobs with customer data (include campaign_override for filtering)
-    const { data: completedJobs } = await supabase
-      .from('jobs')
-      .select('id, service_type, completed_at, campaign_override, customers!inner(id, name, email)')
-      .eq('business_id', businessId)
-      .eq('status', 'completed')
-      .order('completed_at', { ascending: true })
-      .limit(50) // Fetch more than needed, will filter down
+    // Fetch in parallel: jobs, all enrollments, active campaigns
+    const [
+      { data: jobs },
+      { data: enrolledJobs },
+      { data: activeCampaigns },
+    ] = await Promise.all([
+      // Step 1: Fetch scheduled + completed jobs with customer data
+      supabase
+        .from('jobs')
+        .select('id, service_type, status, completed_at, created_at, campaign_override, customers!inner(id, name, email)')
+        .eq('business_id', businessId)
+        .in('status', ['scheduled', 'completed'])
+        .order('created_at', { ascending: true })
+        .limit(50),
 
-    // Step 2: Fetch job_ids that have active campaign enrollments
-    const { data: enrolledJobs } = await supabase
-      .from('campaign_enrollments')
-      .select('job_id')
-      .eq('business_id', businessId)
-      .eq('status', 'active')
+      // Step 2: Fetch job_ids that have ANY campaign enrollment (not just active)
+      supabase
+        .from('campaign_enrollments')
+        .select('job_id')
+        .eq('business_id', businessId),
 
-    // Step 3: Filter in JavaScript - exclude jobs with active enrollments and one-off jobs
+      // Step 3: Fetch active campaigns to check service type matching
+      supabase
+        .from('campaigns')
+        .select('id, service_type')
+        .eq('business_id', businessId)
+        .eq('status', 'active'),
+    ])
+
+    // Build lookup sets
     const enrolledJobIds = new Set((enrolledJobs || []).map(e => e.job_id))
-    const unenrolledJobs = (completedJobs || []).filter(
-      j => !enrolledJobIds.has(j.id) && j.campaign_override !== 'one_off'
+    const campaignServiceTypes = new Set(
+      (activeCampaigns || []).filter(c => c.service_type).map(c => c.service_type)
     )
+    const hasAllServicesCampaign = (activeCampaigns || []).some(c => c.service_type === null)
 
-    // Calculate staleness for each job
-    const jobsWithUrgency = unenrolledJobs.map(job => {
+    // Filter in JavaScript
+    const eligibleJobs = (jobs || []).filter(j => {
+      // Exclude dismissed jobs (removed from queue by user)
+      if (j.campaign_override === 'dismissed') return false
+      // For completed jobs, exclude those with ANY enrollment record
+      if (j.status === 'completed' && enrolledJobIds.has(j.id)) return false
+      return true
+    })
+
+    // Calculate staleness and campaign matching for each job
+    const jobsWithContext = eligibleJobs.map(job => {
       const customer = Array.isArray(job.customers) ? job.customers[0] : job.customers
-      const hoursElapsed = differenceInHours(new Date(), new Date(job.completed_at || new Date()))
+      const referenceDate = job.status === 'completed'
+        ? (job.completed_at || job.created_at)
+        : job.created_at
+      const hoursElapsed = differenceInHours(new Date(), new Date(referenceDate))
       const threshold = serviceTypeTiming[job.service_type] ?? 24
-      const isStale = hoursElapsed > threshold
+      // Only completed jobs can be stale
+      const isStale = job.status === 'completed' && hoursElapsed > threshold
+
+      // Check if a matching campaign exists for this service type
+      const hasMatchingCampaign = hasAllServicesCampaign || campaignServiceTypes.has(job.service_type)
 
       return {
         id: job.id,
@@ -287,21 +317,25 @@ export async function getReadyToSendJobs(
           email: customer?.email || '',
         },
         service_type: job.service_type,
-        completed_at: job.completed_at || new Date().toISOString(),
+        completed_at: referenceDate || new Date().toISOString(),
         isStale,
         hoursElapsed,
         threshold,
+        status: job.status as 'scheduled' | 'completed',
+        campaign_override: job.campaign_override,
+        hasMatchingCampaign,
       }
     })
 
-    // Sort: stale jobs first, then by completed_at ascending (oldest first)
-    jobsWithUrgency.sort((a, b) => {
+    // Sort: stale completed first, then completed, then scheduled, then by date
+    jobsWithContext.sort((a, b) => {
       if (a.isStale !== b.isStale) return a.isStale ? -1 : 1
+      if (a.status !== b.status) return a.status === 'completed' ? -1 : 1
       return new Date(a.completed_at).getTime() - new Date(b.completed_at).getTime()
     })
 
     // Limit to 20 results for display
-    return jobsWithUrgency.slice(0, 20)
+    return jobsWithContext.slice(0, 20)
   } catch (error) {
     console.error('Error fetching ready-to-send jobs:', error)
     return []
@@ -441,10 +475,10 @@ export async function getDashboardCounts(): Promise<DashboardCounts> {
     }
 
     const [
-      // Count completed jobs
-      { count: completedJobsCount },
-      // Count enrolled jobs
-      { count: enrolledJobsCount },
+      // Count scheduled + completed jobs (queue candidates)
+      { count: queueCandidateCount },
+      // Count distinct enrolled job_ids (any status)
+      { data: enrolledJobIds },
       // Count failed/bounced sends (excluding acknowledged)
       { count: failedSendsCount },
       // Count unresolved feedback
@@ -454,13 +488,12 @@ export async function getDashboardCounts(): Promise<DashboardCounts> {
         .from('jobs')
         .select('*', { count: 'exact', head: true })
         .eq('business_id', business.id)
-        .eq('status', 'completed'),
+        .in('status', ['scheduled', 'completed']),
 
       supabase
         .from('campaign_enrollments')
-        .select('*', { count: 'exact', head: true })
-        .eq('business_id', business.id)
-        .eq('status', 'active'),
+        .select('job_id')
+        .eq('business_id', business.id),
 
       supabase
         .from('send_logs')
@@ -476,8 +509,9 @@ export async function getDashboardCounts(): Promise<DashboardCounts> {
         .is('resolved_at', null),
     ])
 
-    // Ready-to-send = completed jobs - enrolled jobs (approximate)
-    const readyToSend = Math.max(0, (completedJobsCount || 0) - (enrolledJobsCount || 0))
+    // Ready-to-send ≈ queue candidates - enrolled jobs (approximate, excludes one_off in full query)
+    const enrolledCount = new Set((enrolledJobIds || []).map(e => e.job_id)).size
+    const readyToSend = Math.max(0, (queueCandidateCount || 0) - enrolledCount)
 
     // Attention alerts = failed sends + unresolved feedback
     const attentionAlerts = (failedSendsCount || 0) + (unresolvedFeedbackCount || 0)
