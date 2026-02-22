@@ -11,6 +11,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { SERVICE_TYPE_LABELS } from '@/lib/validations/job'
 import { MarkCompleteButton } from './mark-complete-button'
 import type { JobWithEnrollment } from '@/lib/types/database'
@@ -213,41 +219,69 @@ export function columns({ onEdit, onDelete, onMarkComplete, onSendOneOff }: Colu
         const job = row.original
 
         return (
-          <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
-            {/* Mark Complete button — desktop only, for scheduled jobs */}
-            {job.status === 'scheduled' && (
-              <MarkCompleteButton jobId={job.id} size="xs" className="hidden sm:inline-flex" />
-            )}
+          <>
+            {/* Desktop: inline icon buttons */}
+            <div className="hidden sm:flex items-center gap-1" onClick={e => e.stopPropagation()}>
+              <TooltipProvider delayDuration={300}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon-sm" onClick={() => onEdit(job)} aria-label="Edit job">
+                      <PencilSimple className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Edit</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => onDelete(job.id)}
+                      aria-label="Delete job"
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Delete</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              {job.status === 'scheduled' && (
+                <MarkCompleteButton jobId={job.id} size="xs" />
+              )}
+            </div>
 
-            {/* 3-dot dropdown menu */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <DotsThree size={20} />
-                  <span className="sr-only">Open menu</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {job.status === 'scheduled' && (
-                  <DropdownMenuItem onClick={() => onMarkComplete(job.id)}>
-                    <CheckCircle size={16} className="mr-2" />
-                    Mark Complete
+            {/* Mobile: 3-dot dropdown menu */}
+            <div className="sm:hidden" onClick={e => e.stopPropagation()}>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <DotsThree size={20} />
+                    <span className="sr-only">Open menu</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {job.status === 'scheduled' && (
+                    <DropdownMenuItem onClick={() => onMarkComplete(job.id)}>
+                      <CheckCircle size={16} className="mr-2" />
+                      Mark Complete
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem onClick={() => onEdit(job)}>
+                    <PencilSimple size={16} className="mr-2" />
+                    Edit
                   </DropdownMenuItem>
-                )}
-                <DropdownMenuItem onClick={() => onEdit(job)}>
-                  <PencilSimple size={16} className="mr-2" />
-                  Edit
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => onDelete(job.id)}
-                  className="text-destructive focus:text-destructive"
-                >
-                  <Trash size={16} className="mr-2" />
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+                  <DropdownMenuItem
+                    onClick={() => onDelete(job.id)}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <Trash size={16} className="mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </>
         )
       },
     },

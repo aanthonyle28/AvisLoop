@@ -8,12 +8,23 @@ import {
   flexRender,
   type SortingState,
 } from '@tanstack/react-table'
+import { Warning } from '@phosphor-icons/react'
 import { columns } from './job-columns'
 import type { JobWithEnrollment, Customer } from '@/lib/types/database'
 import { EditJobSheet } from './edit-job-sheet'
 import { JobDetailDrawer } from './job-detail-drawer'
 import { QuickSendModal } from '@/components/send/quick-send-modal'
 import { TableSkeleton } from '@/components/ui/table-skeleton'
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog'
 import { getSendOneOffData, type SendOneOffData } from '@/lib/actions/send-one-off-data'
 import { deleteJob, markJobComplete } from '@/lib/actions/job'
 import { toast } from 'sonner'
@@ -38,6 +49,9 @@ export function JobTable({ jobs, customers, campaignMap, campaignNames, loading 
   const [detailJob, setDetailJob] = useState<JobWithEnrollment | null>(null)
   const [showDetailDrawer, setShowDetailDrawer] = useState(false)
 
+  // Delete confirmation state
+  const [jobToDelete, setJobToDelete] = useState<string | null>(null)
+
   // Send one-off modal state
   const [sendOneOffOpen, setSendOneOffOpen] = useState(false)
   const [sendOneOffData, setSendOneOffData] = useState<SendOneOffData | null>(null)
@@ -58,16 +72,21 @@ export function JobTable({ jobs, customers, campaignMap, campaignNames, loading 
     setShowDetailDrawer(true)
   }, [])
 
-  const handleDelete = useCallback(async (jobId: string) => {
-    if (!confirm('Are you sure you want to delete this job?')) return
-    const result = await deleteJob(jobId)
+  const handleDeleteRequest = useCallback((jobId: string) => {
+    setJobToDelete(jobId)
+  }, [])
+
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!jobToDelete) return
+    const result = await deleteJob(jobToDelete)
     if (result.error) {
       toast.error(result.error)
     } else {
       toast.success('Job deleted')
       setShowDetailDrawer(false)
     }
-  }, [])
+    setJobToDelete(null)
+  }, [jobToDelete])
 
   const handleMarkComplete = useCallback(async (jobId: string) => {
     const result = await markJobComplete(jobId, true)
@@ -115,7 +134,7 @@ export function JobTable({ jobs, customers, campaignMap, campaignNames, loading 
     data: enhancedJobs,
     columns: columns({
       onEdit: (job) => { setSelectedJob(job); setShowEditSheet(true) },
-      onDelete: handleDelete,
+      onDelete: handleDeleteRequest,
       onMarkComplete: handleMarkComplete,
       onSendOneOff: handleSendOneOff,
     }),
@@ -174,7 +193,7 @@ export function JobTable({ jobs, customers, campaignMap, campaignNames, loading 
         onOpenChange={setShowDetailDrawer}
         job={detailJob}
         onEdit={(job) => { setShowDetailDrawer(false); setSelectedJob(job); setShowEditSheet(true) }}
-        onDelete={handleDelete}
+        onDelete={handleDeleteRequest}
         onSendOneOff={handleSendOneOff}
       />
 
@@ -207,6 +226,30 @@ export function JobTable({ jobs, customers, campaignMap, campaignNames, loading 
           prefilledCustomer={prefilledCustomer}
         />
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!jobToDelete} onOpenChange={(open) => { if (!open) setJobToDelete(null) }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Warning size={20} className="text-destructive" weight="fill" />
+              Delete this job?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. The job record will be permanently deleted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete Job
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }
