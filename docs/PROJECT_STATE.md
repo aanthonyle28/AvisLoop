@@ -4,7 +4,7 @@
 - v1.0-v1.4 milestones complete (shipped through 2026-02-02)
 - **v2.0 Review Follow-Up System COMPLETE** (all phases verified 2026-02-18)
 - **v2.5 UI/UX Redesign COMPLETE** (Phases 33-39 all verified 2026-02-20)
-- **Security Review COMPLETE** (2026-02-22) — 26 findings, all Critical/High resolved
+- **Security Review COMPLETE** (2026-02-22) — 26 findings, all Critical/High/Medium resolved, Low quick wins done
 - Phase 21 (SMS Foundation) 7/8 plans complete, blocked on Twilio A2P for final verification
 - Twilio A2P: Brand approved, campaign pending
 - 192 plans complete across all milestones
@@ -47,6 +47,18 @@
 - `next.config.ts`: Added 6 security headers (X-Frame-Options DENY, HSTS, nosniff, Referrer-Policy, Permissions-Policy, DNS-Prefetch)
 - Supabase security advisor: all warnings cleared except leaked password protection (manual)
 
+### Additional Medium/Low Fixes (Session 2)
+- **M-5**: Auth rate limiting (5/min per IP) added to signUp, signIn, resetPassword via Upstash Redis
+- **M-7**: Stripe webhook in-memory rate limiting replaced with Upstash Redis-based `checkWebhookRateLimit`
+- **L-4**: All raw `error.message` returns in server actions replaced with generic user-facing messages (customer.ts, job.ts, send.ts) — internal errors logged server-side only
+- **L-7**: Review token logging already adequate — IDs truncated with `.slice(0,8)`
+
+### Remaining (deferred)
+- **L-3**: Legacy `contact_id` column in send_logs — low risk, requires careful migration
+- **L-5**: deleteAccount re-auth guard — requires UI changes (password confirmation dialog)
+- **H-6**: RLS policy on `subscriptions` table — requires manual Supabase Dashboard action
+- Enable leaked password protection in Supabase Dashboard > Auth > Settings
+
 ### Verification
 - `pnpm lint`: PASS
 - `pnpm typecheck`: PASS
@@ -59,7 +71,7 @@
 - **Jobs**: Jobs table with service types, completion status, timing defaults, scheduled->completed workflow, inline actions, detail drawer, campaign selector with one-off option
 - **Campaigns**: Multi-touch campaigns, presets, enrollment, touch processing, analytics, creation dialog, edit sheet panel, delete with enrollment reassignment, QuickSendModal for one-off sends
 - **Review Funnel**: Pre-qualification page, HMAC-signed tokens, rating capture, Google redirect, private feedback form
-- **Security**: HMAC review tokens, server-only guards, rate limiting (send/webhook/public), SQL injection protection, pagination, bulk limits, middleware route protection, security headers, RLS on all tables with WITH CHECK
+- **Security**: HMAC review tokens, server-only guards, rate limiting (send/webhook/public/auth), SQL injection protection, pagination, bulk limits, middleware route protection, security headers, RLS on all tables with WITH CHECK, generic error messages (no internal leaks)
 - **History**: Send history with date filtering, search, status badges, bulk resend for failed messages
 - **Billing**: Stripe integration, tier enforcement, usage tracking
 - **Onboarding**: 3-step setup wizard (business setup, campaign preset, SMS consent), WelcomeCard first-run experience, post-onboarding checklist (warm amber pill+drawer), first-visit tooltip hints

@@ -10,6 +10,8 @@ import {
   resetPasswordSchema,
   updatePasswordSchema,
 } from '@/lib/validations/auth'
+import { headers } from 'next/headers'
+import { checkAuthRateLimit } from '@/lib/rate-limit'
 
 export type AuthActionState = {
   error?: string
@@ -21,6 +23,14 @@ export async function signUp(
   _prevState: AuthActionState | null,
   formData: FormData
 ): Promise<AuthActionState> {
+  // Rate limit by IP
+  const headersList = await headers()
+  const ip = headersList.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+  const rateLimitResult = await checkAuthRateLimit(ip)
+  if (!rateLimitResult.success) {
+    return { error: 'Too many attempts. Please wait a moment and try again.' }
+  }
+
   const supabase = await createClient()
 
   const parsed = signUpSchema.safeParse({
@@ -57,6 +67,14 @@ export async function signIn(
   _prevState: AuthActionState | null,
   formData: FormData
 ): Promise<AuthActionState> {
+  // Rate limit by IP
+  const headersList = await headers()
+  const ip = headersList.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+  const rateLimitResult = await checkAuthRateLimit(ip)
+  if (!rateLimitResult.success) {
+    return { error: 'Too many attempts. Please wait a moment and try again.' }
+  }
+
   const supabase = await createClient()
 
   const parsed = signInSchema.safeParse({
@@ -94,6 +112,14 @@ export async function resetPassword(
   _prevState: AuthActionState | null,
   formData: FormData
 ): Promise<AuthActionState> {
+  // Rate limit by IP
+  const headersList = await headers()
+  const ip = headersList.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+  const rateLimitResult = await checkAuthRateLimit(ip)
+  if (!rateLimitResult.success) {
+    return { error: 'Too many attempts. Please wait a moment and try again.' }
+  }
+
   const supabase = await createClient()
 
   const parsed = resetPasswordSchema.safeParse({

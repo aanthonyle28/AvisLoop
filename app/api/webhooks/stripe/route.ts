@@ -2,35 +2,9 @@ import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe/client'
 import { createClient } from '@supabase/supabase-js'
+import { checkWebhookRateLimit } from '@/lib/rate-limit'
 import type Stripe from 'stripe'
 import type { SupabaseClient } from '@supabase/supabase-js'
-
-// In-memory rate limiting for failed signature verification attempts
-const failedAttempts = new Map<string, { count: number; firstAttempt: number }>()
-const RATE_LIMIT_WINDOW = 60 * 1000 // 1 minute
-const MAX_FAILED_ATTEMPTS = 10
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now()
-  const record = failedAttempts.get(ip)
-
-  if (!record || now - record.firstAttempt > RATE_LIMIT_WINDOW) {
-    return true // Allow
-  }
-
-  return record.count < MAX_FAILED_ATTEMPTS
-}
-
-function recordFailedAttempt(ip: string): void {
-  const now = Date.now()
-  const record = failedAttempts.get(ip)
-
-  if (!record || now - record.firstAttempt > RATE_LIMIT_WINDOW) {
-    failedAttempts.set(ip, { count: 1, firstAttempt: now })
-  } else {
-    record.count++
-  }
-}
 
 export async function POST(request: Request) {
   // CRITICAL: Use text(), not json() for signature verification
@@ -38,9 +12,10 @@ export async function POST(request: Request) {
   const headersList = await headers()
   const signature = headersList.get('stripe-signature')
 
-  // Rate limit check before signature verification
+  // Rate limit check before signature verification (Upstash Redis-based)
   const ip = headersList.get('x-forwarded-for')?.split(',')[0] || 'unknown'
-  if (!checkRateLimit(ip)) {
+  const rateLimitResult = await checkWebhookRateLimit(ip)
+  if (!rateLimitResult.success) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
   }
 
@@ -64,7 +39,6 @@ export async function POST(request: Request) {
     )
   } catch (err) {
     console.error('Webhook signature verification failed:', err)
-    recordFailedAttempt(ip)
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 

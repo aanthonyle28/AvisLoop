@@ -93,7 +93,8 @@ export async function findOrCreateCustomer({
     .single()
 
   if (error) {
-    return { error: error.message }
+    console.error('Failed to create customer:', error)
+    return { error: 'Failed to create customer. Please try again.' }
   }
 
   revalidatePath('/customers')
@@ -195,7 +196,8 @@ export async function createCustomer(
     .single()
 
   if (error) {
-    return { error: error.message }
+    console.error('Failed to create customer:', error)
+    return { error: 'Failed to create customer. Please try again.' }
   }
 
   revalidatePath('/customers')
@@ -286,7 +288,8 @@ export async function updateCustomer(
     .eq('business_id', business.id)
 
   if (error) {
-    return { error: error.message }
+    console.error('Failed to update customer:', error)
+    return { error: 'Failed to update customer. Please try again.' }
   }
 
   revalidatePath('/customers')
@@ -314,7 +317,8 @@ export async function archiveCustomer(
     .eq('id', customerId)
 
   if (error) {
-    return { error: error.message }
+    console.error('Failed to archive customer:', error)
+    return { error: 'Failed to archive customer. Please try again.' }
   }
 
   revalidatePath('/customers')
@@ -342,7 +346,8 @@ export async function restoreCustomer(
     .eq('id', customerId)
 
   if (error) {
-    return { error: error.message }
+    console.error('Failed to restore customer:', error)
+    return { error: 'Failed to restore customer. Please try again.' }
   }
 
   revalidatePath('/customers')
@@ -370,7 +375,8 @@ export async function deleteCustomer(
     .eq('id', customerId)
 
   if (error) {
-    return { error: error.message }
+    console.error('Failed to delete customer:', error)
+    return { error: 'Failed to delete customer. Please try again.' }
   }
 
   revalidatePath('/customers')
@@ -406,7 +412,8 @@ export async function bulkArchiveCustomers(
     .in('id', customerIds)
 
   if (error) {
-    return { error: error.message }
+    console.error('Failed to archive customers:', error)
+    return { error: 'Failed to archive customers. Please try again.' }
   }
 
   revalidatePath('/customers')
@@ -442,7 +449,8 @@ export async function bulkDeleteCustomers(
     .in('id', customerIds)
 
   if (error) {
-    return { error: error.message }
+    console.error('Failed to delete customers:', error)
+    return { error: 'Failed to delete customers. Please try again.' }
   }
 
   revalidatePath('/customers')
@@ -545,7 +553,8 @@ export async function bulkCreateCustomers(
       .select('id, name, email, phone, phone_status')
 
     if (error) {
-      return { error: error.message }
+      console.error('Failed to import customers:', error)
+      return { error: 'Failed to import customers. Please try again.' }
     }
 
     insertedCustomers = data || []
@@ -756,7 +765,8 @@ export async function updateCustomerSmsConsent(
     .eq('id', customerId)
 
   if (error) {
-    return { error: error.message }
+    console.error('Failed to update SMS consent:', error)
+    return { error: 'Failed to update SMS consent. Please try again.' }
   }
 
   // Note: Per CONTEXT.md, SMS opt-out should only skip SMS touches, not stop entire enrollment
@@ -794,7 +804,8 @@ export async function updateCustomerTags(
     .eq('id', customerId)
 
   if (error) {
-    return { error: error.message }
+    console.error('Failed to update tags:', error)
+    return { error: 'Failed to update tags. Please try again.' }
   }
 
   revalidatePath('/customers')
@@ -825,7 +836,8 @@ export async function updateCustomerPhone(
     .eq('id', customerId)
 
   if (error) {
-    return { error: error.message }
+    console.error('Failed to update phone:', error)
+    return { error: 'Failed to update phone number. Please try again.' }
   }
 
   revalidatePath('/customers')
@@ -854,7 +866,8 @@ export async function markCustomerEmailOnly(
     .eq('id', customerId)
 
   if (error) {
-    return { error: error.message }
+    console.error('Failed to update customer:', error)
+    return { error: 'Failed to update customer. Please try again.' }
   }
 
   revalidatePath('/customers')
@@ -922,7 +935,8 @@ export async function optOutCustomerEmail(
     .eq('id', customerId)
 
   if (updateError) {
-    return { error: updateError.message }
+    console.error('Failed to opt out customer:', updateError)
+    return { error: 'Failed to opt out customer. Please try again.' }
   }
 
   // Stop any active campaign enrollments for this customer
@@ -966,7 +980,8 @@ export async function optInCustomerEmail(
     .eq('id', customerId)
 
   if (error) {
-    return { error: error.message }
+    console.error('Failed to opt in customer:', error)
+    return { error: 'Failed to opt in customer. Please try again.' }
   }
 
   revalidatePath('/customers')

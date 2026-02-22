@@ -88,6 +88,37 @@ export async function checkWebhookRateLimit(identifier: string): Promise<{
 }
 
 /**
+ * Per-IP rate limit for auth endpoints (signUp, signIn, resetPassword).
+ * Allows 5 attempts per minute per IP to prevent brute-force attacks.
+ */
+export const authRatelimit = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(5, '1 m'),
+      prefix: 'ratelimit:auth',
+    })
+  : null
+
+/**
+ * Check rate limit for auth endpoints by IP address.
+ * Bypasses in development if Upstash not configured.
+ */
+export async function checkAuthRateLimit(ip: string): Promise<{
+  success: boolean
+  remaining?: number
+}> {
+  if (!authRatelimit) {
+    return { success: true, remaining: 999 }
+  }
+
+  const result = await authRatelimit.limit(ip)
+  return {
+    success: result.success,
+    remaining: result.remaining,
+  }
+}
+
+/**
  * Per-IP rate limit for public-facing API endpoints (no auth required).
  * Allows 20 requests per minute per IP to prevent abuse.
  * Used by /api/review/rate and /api/feedback.

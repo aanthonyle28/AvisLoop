@@ -194,7 +194,8 @@ export async function sendReviewRequest(
     .eq('id', sendLog.id)
 
   if (emailError) {
-    return { error: `Failed to send email: ${emailError.message}` }
+    console.error('Email send failed:', emailError)
+    return { error: 'Failed to send email. Please try again later.' }
   }
 
   // === 10. Update contact tracking fields ===

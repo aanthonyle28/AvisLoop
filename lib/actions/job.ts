@@ -169,7 +169,7 @@ export async function createJob(
 
   if (error) {
     console.error('[createJob] insert error:', error.code, error.message)
-    return { error: error.message }
+    return { error: 'Failed to create job. Please try again.' }
   }
 
   // Enroll in campaign if status is 'completed' and enrollInCampaign is true
@@ -282,7 +282,8 @@ export async function updateJob(
     .eq('id', jobId)
 
   if (error) {
-    return { error: error.message }
+    console.error('Failed to update job:', error)
+    return { error: 'Failed to update job. Please try again.' }
   }
 
   const override = parsed.data.campaignOverride
@@ -362,7 +363,8 @@ export async function deleteJob(jobId: string): Promise<JobActionState> {
     .eq('business_id', business.id)
 
   if (error) {
-    return { error: error.message }
+    console.error('Failed to delete job:', error)
+    return { error: 'Failed to delete job. Please try again.' }
   }
 
   revalidatePath('/jobs')
@@ -417,7 +419,8 @@ export async function markJobComplete(
     .eq('business_id', business.id)
 
   if (error) {
-    return { error: error.message }
+    console.error('Failed to complete job:', error)
+    return { error: 'Failed to complete job. Please try again.' }
   }
 
   // Enroll in campaign if enrollInCampaign is true (default)
@@ -472,7 +475,8 @@ export async function markJobDoNotSend(jobId: string): Promise<JobActionState> {
     .eq('business_id', business.id)
 
   if (error) {
-    return { error: error.message }
+    console.error('Failed to update job:', error)
+    return { error: 'Failed to update job. Please try again.' }
   }
 
   // Stop any active campaign enrollments for this job
