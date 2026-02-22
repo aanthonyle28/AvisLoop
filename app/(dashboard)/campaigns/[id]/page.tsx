@@ -1,11 +1,14 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getCampaign, getCampaignEnrollments, getCampaignEnrollmentCounts, getCampaignAnalytics } from '@/lib/data/campaign'
+import { getAvailableTemplates } from '@/lib/data/message-template'
+import { getBusiness } from '@/lib/actions/business'
 import { CampaignStats } from '@/components/campaigns/campaign-stats'
-import { Button } from '@/components/ui/button'
+import { CampaignDetailShell } from './campaign-detail-shell'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { PencilSimple, EnvelopeSimple, ChatCircle, ArrowLeft, Sparkle, CaretLeft, CaretRight } from '@phosphor-icons/react/dist/ssr'
+import { Button } from '@/components/ui/button'
+import { EnvelopeSimple, ChatCircle, ArrowLeft, Sparkle, CaretLeft, CaretRight } from '@phosphor-icons/react/dist/ssr'
 import { SERVICE_TYPE_LABELS } from '@/lib/validations/job'
 import { ENROLLMENT_STATUS_LABELS, STOP_REASON_LABELS } from '@/lib/constants/campaigns'
 import { formatDistanceToNow } from 'date-fns'
@@ -31,11 +34,13 @@ export default async function CampaignDetailPage({ params, searchParams }: Campa
   const pageSize = 20
   const offset = (currentPage - 1) * pageSize
 
-  const [campaign, enrollmentsResult, counts, analytics] = await Promise.all([
+  const [campaign, enrollmentsResult, counts, analytics, templates, business] = await Promise.all([
     getCampaign(id),
     getCampaignEnrollments(id, { limit: pageSize, offset }),
     getCampaignEnrollmentCounts(id),
     getCampaignAnalytics(id),
+    getAvailableTemplates(),
+    getBusiness(),
   ])
 
   const { enrollments, total } = enrollmentsResult
@@ -44,6 +49,8 @@ export default async function CampaignDetailPage({ params, searchParams }: Campa
   if (!campaign) {
     notFound()
   }
+
+  if (!business) redirect('/onboarding')
 
   return (
     <div className="container py-6 space-y-6">
@@ -59,9 +66,6 @@ export default async function CampaignDetailPage({ params, searchParams }: Campa
           </Link>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-semibold">{campaign.name}</h1>
-            <Badge variant={campaign.status === 'active' ? 'default' : 'secondary'}>
-              {campaign.status === 'active' ? 'Active' : 'Paused'}
-            </Badge>
             {campaign.personalization_enabled && (
               <Badge variant="secondary" className="gap-1">
                 <Sparkle weight="fill" className="h-3 w-3 text-amber-500" />
@@ -78,14 +82,11 @@ export default async function CampaignDetailPage({ params, searchParams }: Campa
           </p>
         </div>
 
-        {!campaign.is_preset && (
-          <Link href={`/campaigns/${id}/edit`}>
-            <Button>
-              <PencilSimple className="mr-2 h-4 w-4" />
-              Edit Campaign
-            </Button>
-          </Link>
-        )}
+        <CampaignDetailShell
+          campaign={campaign}
+          templates={templates}
+          enabledServiceTypes={business.service_types_enabled || []}
+        />
       </div>
 
       {/* Stats cards */}

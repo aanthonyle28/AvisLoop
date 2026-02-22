@@ -16,22 +16,17 @@ import type { CampaignWithTouches, MessageTemplate } from '@/lib/types/database'
 interface CampaignListProps {
   campaigns: CampaignWithTouches[]
   templates: MessageTemplate[]
+  enabledServiceTypes?: string[]
 }
 
-export function CampaignList({ campaigns, templates }: CampaignListProps) {
+export function CampaignList({ campaigns, templates, enabledServiceTypes }: CampaignListProps) {
   const [editingCampaignId, setEditingCampaignId] = useState<string | null>(null)
 
   const editingCampaign = editingCampaignId
     ? campaigns.find(c => c.id === editingCampaignId) || null
     : null
 
-  if (campaigns.length === 0) {
-    return (
-      <div className="text-center py-8 text-muted-foreground">
-        No campaigns yet
-      </div>
-    )
-  }
+  if (campaigns.length === 0) return null
 
   return (
     <>
@@ -67,7 +62,7 @@ export function CampaignList({ campaigns, templates }: CampaignListProps) {
         open={!!editingCampaign}
         onOpenChange={(open) => !open && setEditingCampaignId(null)}
       >
-        <SheetContent className="overflow-y-auto sm:max-w-xl">
+        <SheetContent className="overflow-y-auto sm:max-w-2xl">
           <SheetHeader>
             <SheetTitle>Edit Campaign</SheetTitle>
             <SheetDescription>
@@ -79,6 +74,7 @@ export function CampaignList({ campaigns, templates }: CampaignListProps) {
               <CampaignForm
                 campaign={editingCampaign}
                 templates={templates}
+                enabledServiceTypes={enabledServiceTypes}
                 onSuccess={() => setEditingCampaignId(null)}
               />
             </div>

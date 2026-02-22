@@ -27,10 +27,11 @@ import type { CampaignWithTouches, MessageTemplate, ServiceType } from '@/lib/ty
 interface CampaignFormProps {
   campaign?: CampaignWithTouches
   templates: MessageTemplate[]
+  enabledServiceTypes?: string[]
   onSuccess?: () => void
 }
 
-export function CampaignForm({ campaign, templates, onSuccess }: CampaignFormProps) {
+export function CampaignForm({ campaign, templates, enabledServiceTypes, onSuccess }: CampaignFormProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const isEditing = !!campaign
@@ -120,11 +121,13 @@ export function CampaignForm({ campaign, templates, onSuccess }: CampaignFormPro
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Services</SelectItem>
-              {Object.entries(SERVICE_TYPE_LABELS).map(([value, label]) => (
-                <SelectItem key={value} value={value}>
-                  {label}
-                </SelectItem>
-              ))}
+              {Object.entries(SERVICE_TYPE_LABELS)
+                .filter(([value]) => !enabledServiceTypes || enabledServiceTypes.includes(value))
+                .map(([value, label]) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
             </SelectContent>
           </Select>
           <p className="text-sm text-muted-foreground">

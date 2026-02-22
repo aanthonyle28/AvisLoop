@@ -46,7 +46,7 @@ export function PresetPicker({ presets, compact = false }: PresetPickerProps) {
   }
 
   // Match database presets with constant definitions for descriptions
-  // Sort to ensure deterministic order: Gentle → Steady → Speedy
+  // Sort to ensure deterministic order: Gentle → Standard → Aggressive
   const presetsWithMeta = presets
     .map(preset => {
       const meta = CAMPAIGN_PRESETS.find(p =>

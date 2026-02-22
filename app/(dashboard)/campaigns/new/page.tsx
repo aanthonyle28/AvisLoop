@@ -1,14 +1,20 @@
 import Link from 'next/link'
 import { Lightbulb, ArrowRight, ArrowLeft } from '@phosphor-icons/react/dist/ssr'
 import { getAvailableTemplates } from '@/lib/data/message-template'
+import { getBusiness } from '@/lib/actions/business'
 import { CampaignForm } from '@/components/campaigns/campaign-form'
+import { redirect } from 'next/navigation'
 
 export const metadata = {
   title: 'New Campaign',
 }
 
 export default async function NewCampaignPage() {
-  const templates = await getAvailableTemplates()
+  const [templates, business] = await Promise.all([
+    getAvailableTemplates(),
+    getBusiness(),
+  ])
+  if (!business) redirect('/onboarding')
 
   return (
     <div className="container max-w-3xl py-6 space-y-6">
@@ -37,7 +43,7 @@ export default async function NewCampaignPage() {
             </p>
             <p className="mt-1 text-sm text-info">
               Campaign presets are pre-configured sequences optimized for different follow-up styles.
-              Choose Conservative, Standard, or Aggressive based on your preference.
+              Choose Gentle, Standard, or Aggressive Follow-Up based on your preference.
             </p>
             <Link
               href="/campaigns#presets"
@@ -50,7 +56,7 @@ export default async function NewCampaignPage() {
         </div>
       </div>
 
-      <CampaignForm templates={templates} />
+      <CampaignForm templates={templates} enabledServiceTypes={business.service_types_enabled || []} />
     </div>
   )
 }

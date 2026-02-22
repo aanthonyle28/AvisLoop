@@ -18,7 +18,7 @@ const faqs = [
   {
     question: "What's a campaign and do I need to set one up?",
     answer:
-      "Campaigns are pre-built multi-touch sequences. During onboarding, you choose a preset (Fast, Standard, or Slow) and AvisLoop creates campaigns for each service type you offer. These run automatically—you never manually trigger a campaign. Just complete jobs.",
+      "Campaigns are pre-built multi-touch sequences. During onboarding, you choose a preset (Gentle, Standard, or Aggressive) and AvisLoop creates campaigns for each service type you offer. These run automatically—you never manually trigger a campaign. Just complete jobs.",
   },
   {
     question: "What's the review funnel and why does it matter?",

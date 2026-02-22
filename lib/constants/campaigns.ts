@@ -29,7 +29,7 @@ export const CAMPAIGN_PRESETS: CampaignPreset[] = [
   },
   {
     id: 'standard',
-    name: 'Steady Follow-Up',
+    name: 'Standard Follow-Up',
     description: 'Two emails and a text message over 7 days. Works well for most businesses.',
     touches: [
       { touch_number: 1, channel: 'email', delay_hours: 24 },
@@ -40,7 +40,7 @@ export const CAMPAIGN_PRESETS: CampaignPreset[] = [
   },
   {
     id: 'aggressive',
-    name: 'Speedy Follow-Up',
+    name: 'Aggressive Follow-Up',
     description: 'A text within hours, then email and SMS reminders. Best for quick-turnaround services like cleaning.',
     touches: [
       { touch_number: 1, channel: 'sms', delay_hours: 4 },

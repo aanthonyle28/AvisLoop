@@ -1,7 +1,8 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getCampaign } from '@/lib/data/campaign'
 import { getAvailableTemplates } from '@/lib/data/message-template'
+import { getBusiness } from '@/lib/actions/business'
 import { CampaignForm } from '@/components/campaigns/campaign-form'
 import { ArrowLeft, Sparkle } from '@phosphor-icons/react/dist/ssr'
 import { Badge } from '@/components/ui/badge'
@@ -20,10 +21,12 @@ export async function generateMetadata({ params }: EditCampaignPageProps) {
 
 export default async function EditCampaignPage({ params }: EditCampaignPageProps) {
   const { id } = await params
-  const [campaign, templates] = await Promise.all([
+  const [campaign, templates, business] = await Promise.all([
     getCampaign(id),
     getAvailableTemplates(),
+    getBusiness(),
   ])
+  if (!business) redirect('/onboarding')
 
   if (!campaign) {
     notFound()
@@ -59,7 +62,7 @@ export default async function EditCampaignPage({ params }: EditCampaignPageProps
         </p>
       </div>
 
-      <CampaignForm campaign={campaign} templates={templates} />
+      <CampaignForm campaign={campaign} templates={templates} enabledServiceTypes={business.service_types_enabled || []} />
     </div>
   )
 }
