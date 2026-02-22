@@ -6,6 +6,8 @@ import { getServiceTypeSettings } from '@/lib/data/business'
 import { getAvailableTemplates } from '@/lib/data/message-template'
 import { getPersonalizationSummary } from '@/lib/data/personalization'
 import { hasApiKey } from '@/lib/actions/api-key'
+import { getCustomers } from '@/lib/actions/customer'
+import { getMonthlyUsage } from '@/lib/data/send-logs'
 import type { MessageTemplate } from '@/lib/types/database'
 
 export const metadata = {
@@ -52,12 +54,14 @@ async function SettingsContent() {
     .eq('user_id', user.id)
     .single()
 
-  // Get message templates, service types, personalization stats, and API key status in parallel
-  const [templates, serviceTypeSettings, personalizationSummary, hasKey] = await Promise.all([
+  // Get message templates, service types, personalization stats, API key status, and customers in parallel
+  const [templates, serviceTypeSettings, personalizationSummary, hasKey, customersResult, monthlyUsage] = await Promise.all([
     business ? getAvailableTemplates() : Promise.resolve([] as MessageTemplate[]),
     getServiceTypeSettings(),
     getPersonalizationSummary(),
     hasApiKey(),
+    getCustomers(),
+    getMonthlyUsage(),
   ])
 
   return (
@@ -76,6 +80,8 @@ async function SettingsContent() {
           serviceTypeSettings={serviceTypeSettings}
           personalizationSummary={personalizationSummary}
           hasApiKey={hasKey}
+          customers={customersResult.customers}
+          monthlyUsage={monthlyUsage}
         />
       </div>
     </div>

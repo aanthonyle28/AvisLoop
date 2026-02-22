@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useTransition } from 'react'
+import { usePathname } from 'next/navigation'
 import { SetupProgressPill } from './setup-progress-pill'
 import { SetupProgressDrawer } from './setup-progress-drawer'
 import { updateChecklistState } from '@/lib/actions/checklist'
@@ -21,6 +22,7 @@ export function SetupProgress({
   dismissed: initialDismissed,
   firstSeenAt,
 }: SetupProgressProps) {
+  const pathname = usePathname()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [isDismissed, setIsDismissed] = useState(initialDismissed)
   const [isPending, startTransition] = useTransition()
@@ -45,6 +47,11 @@ export function SetupProgress({
 
   // Don't render if dismissed
   if (isDismissed) {
+    return null
+  }
+
+  // On dashboard, suppress pill when WelcomeCard is showing (completedCount === 0)
+  if (pathname === '/dashboard' && completedCount === 0) {
     return null
   }
 

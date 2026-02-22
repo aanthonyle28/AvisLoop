@@ -298,18 +298,17 @@ Tuesday 2:30 PM  Touch 1 email sent (no human involved)
 4. Settings
 ```
 
-**V2 Navigation (Correct):**
+**V2 Navigation (Correct — Implemented 2026-02-21):**
 ```
-1. Dashboard     ← Hub with Ready-to-Enroll queue
-2. Jobs          ← THE core action
+1. Dashboard     ← Hub with WelcomeCard (first-run) + Ready-to-Enroll queue
+2. Jobs          ← THE core action (orange Add Job button)
 3. Campaigns     ← Automation config
 4. Analytics     ← Insights
-5. Activity      ← Audit trail
+5. Activity      ← Audit trail + bulk retry for failed sends
+6. Feedback      ← Customer sentiment
 ---
-[De-emphasized]
-6. Customers     ← Database lookup only
-7. Manual Send   ← Escape hatch, not primary
-8. Feedback      ← Customer sentiment
+[Moved to Settings]
+7. Customers     ← Settings > Customers tab (not in main nav)
 ```
 
 ### Primary Action Placement
@@ -389,12 +388,12 @@ For any feature, count how many apply:
 
 ### Keep but De-emphasize
 
-| Feature | Current | V2 Treatment |
-|---------|---------|--------------|
-| "Add Customer" | Prominent button | Move to overflow menu or remove |
-| "Send" page | Main navigation | Rename "Manual Request", move to bottom, add friction |
-| CSV Import | Onboarding step | Remove from onboarding, keep as advanced option |
-| Template selection before send | Default flow | Only in campaign setup, not per-send |
+| Feature | Current | V2 Treatment | Status |
+|---------|---------|--------------|--------|
+| "Add Customer" | Prominent button | Move to overflow menu or remove | Moved to Settings > Customers tab (2026-02-21) |
+| "Send" page | Main navigation | Rename "Manual Request", move to bottom, add friction | Removed from main nav (Phase 30) |
+| CSV Import | Onboarding step | Remove from onboarding, keep as advanced option | Removed from onboarding (2026-02-21), kept in Settings > Customers |
+| Template selection before send | Default flow | Only in campaign setup, not per-send | Done |
 
 ### Keep as Escape Hatch
 
@@ -413,10 +412,10 @@ These should exist but with friction:
 
 After V2 adoption is confirmed via metrics:
 
-- Consider hiding Customers page from main nav
+- ~~Consider hiding Customers page from main nav~~ Done (2026-02-21) — moved to Settings tab
 - Consider removing Send page entirely
-- Remove CSV import from onboarding
-- Simplify to: Dashboard, Jobs, Campaigns, Analytics, Activity
+- ~~Remove CSV import from onboarding~~ Done (2026-02-21) — onboarding collapsed to 3 steps
+- ~~Simplify to: Dashboard, Jobs, Campaigns, Analytics, Activity~~ Done — nav is Dashboard, Jobs, Campaigns, Analytics, Activity, Feedback
 
 ---
 
@@ -481,27 +480,27 @@ After V2 adoption is confirmed via metrics:
 
 ## Implementation Priorities
 
-### Phase 1: De-emphasize V1 (Quick Wins)
+### Phase 1: De-emphasize V1 (Quick Wins) — COMPLETE
 
-1. Change "Add Job" button from `outline` to `default` variant
-2. Update Customers empty state copy
-3. Rename "Send" → "Manual Request" in navigation
-4. Move "Manual Request" to bottom of navigation
-5. Add friction message on manual send
+1. ~~Change "Add Job" button from `outline` to `default` variant~~ Done (Phase 30)
+2. ~~Update Customers empty state copy~~ Done (Phase 30)
+3. ~~Rename "Send" → "Manual Request" in navigation~~ Done (Phase 30)
+4. ~~Move "Manual Request" to bottom of navigation~~ Done (Phase 30)
+5. ~~Add friction message on manual send~~ Done (Phase 30)
 
-### Phase 2: Strengthen V2 Flow (Medium Effort)
+### Phase 2: Strengthen V2 Flow (Medium Effort) — PARTIAL
 
-1. Add inline customer creation in "Add Job" sheet
-2. Add mobile FAB for "Add Job"
+1. ~~Add inline customer creation in "Add Job" sheet~~ Done (Phase 30)
+2. ~~Add mobile FAB for "Add Job"~~ Done (Phase 30)
 3. Show campaign enrollment preview on job cards
 4. Show "Will enroll in [Campaign] in X hours" on jobs
 
-### Phase 3: Full V2 (Larger Changes)
+### Phase 3: Full V2 (Larger Changes) — COMPLETE (2026-02-21)
 
-1. Remove "Import Customers" from onboarding
-2. Consider hiding Customers from main nav
+1. ~~Remove "Import Customers" from onboarding~~ Done — onboarding collapsed to 3 steps
+2. ~~Consider hiding Customers from main nav~~ Done — moved to Settings > Customers tab
 3. Evaluate Send page removal based on usage data
-4. Dashboard becomes the "Complete Job" entry point
+4. ~~Dashboard becomes the "Complete Job" entry point~~ Done — WelcomeCard + reordered dashboard
 
 ---
 

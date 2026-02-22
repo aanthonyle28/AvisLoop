@@ -8,7 +8,8 @@ import { ServiceTypesSection } from '@/components/settings/service-types-section
 import { PersonalizationSection } from '@/components/settings/personalization-section'
 import { IntegrationsSection } from '@/components/settings/integrations-section'
 import { DeleteAccountDialog } from '@/components/settings/delete-account-dialog'
-import type { Business, MessageTemplate } from '@/lib/types/database'
+import { CustomersClient } from '@/components/customers/customers-client'
+import type { Business, MessageTemplate, Customer } from '@/lib/types/database'
 import type { PersonalizationSummary } from '@/lib/data/personalization'
 
 interface SettingsTabsProps {
@@ -20,6 +21,8 @@ interface SettingsTabsProps {
   } | null
   personalizationSummary: PersonalizationSummary
   hasApiKey: boolean
+  customers?: Customer[]
+  monthlyUsage?: { count: number; limit: number; tier: string }
 }
 
 export function SettingsTabs({
@@ -28,7 +31,12 @@ export function SettingsTabs({
   serviceTypeSettings,
   personalizationSummary,
   hasApiKey,
+  customers,
+  monthlyUsage,
 }: SettingsTabsProps) {
+  // Email-only templates for the customers QuickSendModal
+  const emailTemplates = templates.filter((t) => t.channel === 'email')
+
   return (
     <Tabs defaultValue="general" className="w-full">
       <TabsList className="w-full justify-start overflow-x-auto">
@@ -37,6 +45,7 @@ export function SettingsTabs({
         <TabsTrigger value="services">Services</TabsTrigger>
         <TabsTrigger value="messaging">Messaging</TabsTrigger>
         <TabsTrigger value="integrations">Integrations</TabsTrigger>
+        <TabsTrigger value="customers">Customers</TabsTrigger>
         <TabsTrigger value="account">Account</TabsTrigger>
       </TabsList>
 
@@ -109,6 +118,25 @@ export function SettingsTabs({
           </p>
           <IntegrationsSection hasExistingKey={hasApiKey} />
         </section>
+      </TabsContent>
+
+      {/* Customers — Customer Management */}
+      <TabsContent value="customers">
+        {business && customers ? (
+          <CustomersClient
+            initialCustomers={customers}
+            business={business as Business & { message_templates?: MessageTemplate[] }}
+            templates={emailTemplates}
+            monthlyUsage={monthlyUsage || { count: 0, limit: 0, tier: 'none' }}
+            hasReviewLink={!!business.google_review_link}
+          />
+        ) : (
+          <section className="border border-border rounded-lg p-6 bg-card shadow-sm">
+            <p className="text-muted-foreground">
+              Save your business profile first (in General tab) to manage customers.
+            </p>
+          </section>
+        )}
       </TabsContent>
 
       {/* Account — Danger Zone */}

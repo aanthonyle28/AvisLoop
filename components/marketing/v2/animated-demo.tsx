@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { CheckCircle, Star } from '@phosphor-icons/react';
 import { GeometricMarker } from '@/components/ui/geometric-marker';
 
@@ -12,14 +12,26 @@ const STEPS = [
 
 export function AnimatedProductDemo() {
   const [currentStep, setCurrentStep] = useState(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
+  const startAutoPlay = useCallback(() => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => {
       setCurrentStep((prev) => (prev + 1) % STEPS.length);
     }, 3000);
-
-    return () => clearInterval(interval);
   }, []);
+
+  const handleStepClick = useCallback((index: number) => {
+    setCurrentStep(index);
+    startAutoPlay();
+  }, [startAutoPlay]);
+
+  useEffect(() => {
+    startAutoPlay();
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [startAutoPlay]);
 
   return (
     <div className="relative">
@@ -130,13 +142,18 @@ export function AnimatedProductDemo() {
           </div>
         </div>
 
-        {/* Progress bar */}
-        <div className="mt-6 flex gap-2">
+        {/* Progress bar — clickable */}
+        <div className="mt-6 flex gap-2" role="tablist" aria-label="Demo steps">
           {STEPS.map((step, index) => (
-            <div
+            <button
               key={step.id}
-              className={`h-1.5 flex-1 rounded-full motion-safe:transition-colors motion-safe:duration-300 ${
-                index === currentStep ? 'bg-accent' : 'bg-muted'
+              type="button"
+              role="tab"
+              aria-selected={index === currentStep}
+              aria-label={step.label}
+              onClick={() => handleStepClick(index)}
+              className={`h-1.5 flex-1 rounded-full cursor-pointer motion-safe:transition-colors motion-safe:duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                index === currentStep ? 'bg-accent' : 'bg-muted hover:bg-muted-foreground/30'
               }`}
             />
           ))}

@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { useLocalStorage } from '@/lib/hooks/use-local-storage'
 import {
-  AddressBook,
   ClockCounterClockwise,
   UserCircle,
   CaretLeft,
@@ -35,7 +34,6 @@ const mainNav: NavItem[] = [
   { icon: Briefcase, label: 'Jobs', href: '/jobs' },
   { icon: Megaphone, label: 'Campaigns', href: '/campaigns' },
   { icon: ChartBar, label: 'Analytics', href: '/analytics' },
-  { icon: AddressBook, label: 'Customers', href: '/customers' },
   { icon: ClockCounterClockwise, label: 'Activity', href: '/history' },
   { icon: ChatCircleText, label: 'Feedback', href: '/feedback' },
 ]
@@ -164,7 +162,7 @@ export function Sidebar({ notificationCounts }: SidebarProps = {}) {
           <Button
             variant="default"
             className={cn(
-              "w-full justify-start gap-2 text-sm",
+              "w-full justify-start gap-2 text-sm bg-accent text-accent-foreground hover:bg-accent/90",
               collapsed && "justify-center px-2"
             )}
           >

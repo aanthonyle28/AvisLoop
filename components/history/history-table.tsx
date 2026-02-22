@@ -7,6 +7,7 @@ import {
   getSortedRowModel,
   flexRender,
   SortingState,
+  RowSelectionState,
 } from '@tanstack/react-table'
 import { useState } from 'react'
 import {
@@ -21,6 +22,8 @@ import { createColumns } from './history-columns'
 import type { SendLogWithContact } from '@/lib/types/database'
 import { TableSkeleton } from '@/components/ui/table-skeleton'
 
+const RESENDABLE_STATUSES = ['failed', 'bounced', 'complained']
+
 interface HistoryTableProps {
   data: SendLogWithContact[]
   /** Show skeleton loading state */
@@ -28,10 +31,13 @@ interface HistoryTableProps {
   onRowClick?: (request: SendLogWithContact) => void
   onResend?: (request: SendLogWithContact) => void
   onCancel?: (request: SendLogWithContact) => void
+  rowSelection?: RowSelectionState
+  onRowSelectionChange?: (selection: RowSelectionState) => void
 }
 
-export function HistoryTable({ data, loading, onRowClick, onResend, onCancel }: HistoryTableProps) {
-  const columns = useMemo(() => createColumns({ onResend, onCancel }), [onResend, onCancel])
+export function HistoryTable({ data, loading, onRowClick, onResend, onCancel, rowSelection, onRowSelectionChange }: HistoryTableProps) {
+  const enableSelection = !!onRowSelectionChange
+  const columns = useMemo(() => createColumns({ onResend, onCancel, enableSelection }), [onResend, onCancel, enableSelection])
   const [sorting, setSorting] = useState<SortingState>([])
 
   const table = useReactTable({
@@ -40,8 +46,16 @@ export function HistoryTable({ data, loading, onRowClick, onResend, onCancel }: 
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
+    enableRowSelection: (row) => RESENDABLE_STATUSES.includes(row.original.status),
+    onRowSelectionChange: onRowSelectionChange
+      ? (updater) => {
+          const newSelection = typeof updater === 'function' ? updater(rowSelection || {}) : updater
+          onRowSelectionChange(newSelection)
+        }
+      : undefined,
     state: {
       sorting,
+      ...(rowSelection !== undefined ? { rowSelection } : {}),
     },
   })
 
@@ -72,6 +86,7 @@ export function HistoryTable({ data, loading, onRowClick, onResend, onCancel }: 
               <TableRow
                 key={row.id}
                 className="group cursor-pointer hover:bg-muted/50"
+                data-state={row.getIsSelected() && 'selected'}
                 onClick={() => onRowClick?.(row.original)}
               >
                 {row.getVisibleCells().map((cell) => (

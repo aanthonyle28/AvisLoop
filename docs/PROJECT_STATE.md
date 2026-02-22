@@ -18,19 +18,15 @@
 - Phase 32 (Post-Onboarding Guidance) complete — 4/4 verified
 - Twilio A2P: Brand approved, campaign pending
 
-## Last session summary (Phase 31+32 verification)
-- Ran Phase 31-05 visual verification of landing page V2 copy
-  - All sections confirmed V2-aligned (hero, how it works, problem, FAQ, testimonials, CTA)
-  - Fixed 3 remaining V1 language issues: animated demo steps, pricing FAQ, footer tagline
-  - Dark mode and mobile responsive verified
-- Ran Phase 32-04 verification of post-onboarding guidance
-  - Checklist pill+drawer pattern confirmed working (refactored from dashboard card)
-  - 4 V2-aligned items: Add job, Review campaign, Complete job, Get review click
-  - FirstVisitHint tooltips integrated on Jobs and Campaigns pages
-  - Data flow verified: layout → getSetupProgress → getChecklistState → AppShell → SetupProgress
-  - Build passes (typecheck, lint, production build)
-- Updated ROADMAP.md to mark v2.0 milestone as complete
-- Created summary files for both phases
+## Last session summary (UX Improvements)
+- **Dashboard reorder**: Moved RecentCampaignActivity below ReadyToSendQueue and AttentionAlerts (actionable content first)
+- **Sidebar Add Job button**: Changed to brand orange (bg-accent) to match mobile FAB
+- **Onboarding collapsed**: 5 steps → 3 steps (Business Setup merges basics+services, removed Import Jobs step)
+- **Customers moved to Settings**: Removed from sidebar nav (7→6 items), added as Customers tab in Settings with full CRUD/CSV import. Direct `/customers` route still works
+- **Activity bulk resend**: Added checkbox column for failed/bounced/complained rows, bulk retry action bar with up to 25 messages at once
+- **Dashboard WelcomeCard**: First-run experience card with 4 checklist action items, auto-hides when first item completed. Suppresses pill/drawer on dashboard to avoid duplication
+- **Animated demo controls**: Landing page demo progress bars are now clickable buttons with proper ARIA roles, auto-play resumes after click
+- Typecheck + lint pass with zero errors
 
 ## What's been built
 - **Auth**: Sign up, sign in, sign out, password reset, session persistence
@@ -41,9 +37,9 @@
 - **Review Funnel**: Pre-qualification page, rating capture, Google redirect, private feedback form
 - **Security**: SQL injection protection, pagination, bulk limits, rate limiting, middleware route protection
 - **Sending**: Customer selector, message preview, Resend integration, cooldown, quotas
-- **History**: Send history with date filtering, search, status badges
+- **History**: Send history with date filtering, search, status badges, bulk resend for failed messages
 - **Billing**: Stripe integration, tier enforcement, usage tracking
-- **Onboarding**: 7-step setup wizard, post-onboarding checklist (pill+drawer), first-visit tooltip hints
+- **Onboarding**: 3-step setup wizard (business setup, campaign preset, SMS consent), WelcomeCard first-run experience, post-onboarding checklist (pill+drawer), first-visit tooltip hints
 - **Marketing**: V2 landing page (automation-first copy), pricing page, responsive design, mobile nav
 - **Polish**: Design system, loading states, micro-interactions, accessibility, dark mode, V2 alignment
 

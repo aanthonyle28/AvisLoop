@@ -1,9 +1,7 @@
 'use client'
 
-import { BusinessBasicsStep } from './steps/business-basics-step'
-import { ServicesOfferedStep } from './steps/services-offered-step'
+import { BusinessSetupStep } from './steps/business-setup-step'
 import { CampaignPresetStep } from './steps/campaign-preset-step'
-import { CustomerImportStep } from './steps/customer-import-step'
 import { SMSConsentStep } from './steps/sms-consent-step'
 import type { OnboardingBusiness } from '@/lib/types/onboarding'
 import type { CampaignWithTouches } from '@/lib/types/database'
@@ -20,7 +18,7 @@ interface OnboardingStepsProps {
 
 /**
  * Client component that renders the appropriate step component based on currentStep.
- * Steps 1-5: Business basics, services, campaign preset, import, SMS consent
+ * Steps 1-3: Business setup (basics + services), campaign preset, SMS consent
  */
 export function OnboardingSteps({
   currentStep,
@@ -34,26 +32,18 @@ export function OnboardingSteps({
   switch (currentStep) {
     case 1:
       return (
-        <BusinessBasicsStep
+        <BusinessSetupStep
           onComplete={onGoToNext}
           defaultValues={{
             name: business?.name || '',
             phone: business?.phone || '',
             google_review_link: business?.google_review_link || '',
           }}
-        />
-      )
-
-    case 2:
-      return (
-        <ServicesOfferedStep
-          onComplete={onGoToNext}
-          onGoBack={onGoBack}
           defaultEnabled={business?.service_types_enabled || []}
         />
       )
 
-    case 3:
+    case 2:
       return (
         <CampaignPresetStep
           onComplete={onGoToNext}
@@ -62,15 +52,7 @@ export function OnboardingSteps({
         />
       )
 
-    case 4:
-      return (
-        <CustomerImportStep
-          onComplete={onGoToNext}
-          onGoBack={onGoBack}
-        />
-      )
-
-    case 5:
+    case 3:
       return (
         <SMSConsentStep
           onComplete={onComplete}

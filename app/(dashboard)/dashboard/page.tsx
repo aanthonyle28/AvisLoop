@@ -14,6 +14,8 @@ import { KPIWidgets } from '@/components/dashboard/kpi-widgets'
 import { ReadyToSendQueue } from '@/components/dashboard/ready-to-send-queue'
 import { AttentionAlerts } from '@/components/dashboard/attention-alerts'
 import { RecentCampaignActivity } from '@/components/dashboard/recent-campaign-activity'
+import { WelcomeCard } from '@/components/dashboard/welcome-card'
+import { getSetupProgress } from '@/lib/data/onboarding'
 import type { PipelineSummary } from '@/lib/types/dashboard'
 
 export const metadata = {
@@ -54,12 +56,13 @@ export default async function DashboardPage() {
   }
 
   // Fetch all dashboard data in parallel
-  const [kpiData, readyJobs, alerts, jobCounts, recentEvents] = await Promise.all([
+  const [kpiData, readyJobs, alerts, jobCounts, recentEvents, setupProgress] = await Promise.all([
     getDashboardKPIs(business.id),
     getReadyToSendJobs(business.id, serviceTypeTiming),
     getAttentionAlerts(business.id),
     getJobCounts(),
     getRecentCampaignEvents(business.id),
+    getSetupProgress(),
   ])
 
   const pipelineSummary: PipelineSummary = {
@@ -77,13 +80,16 @@ export default async function DashboardPage() {
         <p className="text-sm text-muted-foreground mt-1">Here&apos;s your overview for today</p>
       </div>
 
+      {setupProgress && setupProgress.completedCount === 0 && !setupProgress.dismissed && (
+        <WelcomeCard items={setupProgress.items} />
+      )}
       <KPIWidgets data={kpiData} />
-      <RecentCampaignActivity events={recentEvents} pipelineSummary={pipelineSummary} />
       <ReadyToSendQueue
         jobs={readyJobs}
         hasJobHistory={jobCounts.total > 0}
       />
       <AttentionAlerts alerts={alerts} />
+      <RecentCampaignActivity events={recentEvents} pipelineSummary={pipelineSummary} />
     </div>
   )
 }

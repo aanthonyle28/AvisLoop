@@ -2,19 +2,66 @@
 
 import { ColumnDef } from '@tanstack/react-table'
 import { format } from 'date-fns'
+import { Checkbox } from '@/components/ui/checkbox'
 import { StatusBadge } from './status-badge'
 import { Button } from '@/components/ui/button'
 import { ArrowClockwise, X } from '@phosphor-icons/react'
 import type { SendLogWithCustomer } from '@/lib/types/database'
 import type { SendStatus } from './status-badge'
 
+const RESENDABLE_STATUSES = ['failed', 'bounced', 'complained']
+
 interface CreateColumnsProps {
   onResend?: (request: SendLogWithCustomer) => void
   onCancel?: (request: SendLogWithCustomer) => void
+  enableSelection?: boolean
 }
 
-export function createColumns({ onResend, onCancel }: CreateColumnsProps = {}): ColumnDef<SendLogWithCustomer>[] {
-  return [
+export function createColumns({ onResend, onCancel, enableSelection }: CreateColumnsProps = {}): ColumnDef<SendLogWithCustomer>[] {
+  const columns: ColumnDef<SendLogWithCustomer>[] = []
+
+  if (enableSelection) {
+    columns.push({
+      id: 'select',
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getFilteredSelectedRowModel().rows.length > 0 &&
+            table.getFilteredSelectedRowModel().rows.length ===
+              table.getFilteredRowModel().rows.filter((r) =>
+                RESENDABLE_STATUSES.includes(r.original.status)
+              ).length
+          }
+          onCheckedChange={(value) => {
+            table.getFilteredRowModel().rows.forEach((row) => {
+              if (RESENDABLE_STATUSES.includes(row.original.status)) {
+                row.toggleSelected(!!value)
+              }
+            })
+          }}
+          aria-label="Select all failed"
+          onClick={(e) => e.stopPropagation()}
+        />
+      ),
+      cell: ({ row }) => {
+        if (!RESENDABLE_STATUSES.includes(row.original.status)) {
+          return <div className="w-4" />
+        }
+        return (
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+            onClick={(e) => e.stopPropagation()}
+          />
+        )
+      },
+      enableSorting: false,
+      enableHiding: false,
+    })
+  }
+
+  columns.push(
     {
       accessorKey: 'customers',
       header: 'Recipient',
@@ -95,5 +142,7 @@ export function createColumns({ onResend, onCancel }: CreateColumnsProps = {}): 
         )
       },
     },
-  ]
+  )
+
+  return columns
 }

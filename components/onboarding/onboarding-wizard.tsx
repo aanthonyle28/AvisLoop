@@ -20,14 +20,12 @@ type StepConfig = {
 }
 
 const STEPS: StepConfig[] = [
-  { id: 1, title: 'Business Basics', skippable: false },
-  { id: 2, title: 'Services Offered', skippable: false },
-  { id: 3, title: 'Campaign Preset', skippable: false },
-  { id: 4, title: 'Import Jobs', skippable: true },
-  { id: 5, title: 'SMS Consent', skippable: false },
+  { id: 1, title: 'Business Setup', skippable: false },
+  { id: 2, title: 'Campaign Preset', skippable: false },
+  { id: 3, title: 'SMS Consent', skippable: false },
 ]
 
-const STORAGE_KEY = 'onboarding-draft-v2'
+const STORAGE_KEY = 'onboarding-draft-v3'
 
 interface OnboardingWizardProps {
   initialStep: number

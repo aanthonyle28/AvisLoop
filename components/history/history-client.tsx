@@ -8,8 +8,10 @@ import { HistoryFilters } from './history-filters'
 import { EmptyState } from './empty-state'
 import { RequestDetailDrawer } from './request-detail-drawer'
 import { Button } from '@/components/ui/button'
-import { CaretLeft, CaretRight } from '@phosphor-icons/react'
+import { CaretLeft, CaretRight, ArrowClockwise } from '@phosphor-icons/react'
 import { sendReviewRequest } from '@/lib/actions/send'
+import { bulkResendRequests } from '@/lib/actions/bulk-resend'
+import type { RowSelectionState } from '@tanstack/react-table'
 import type { SendLogWithContact, Business, MessageTemplate } from '@/lib/types/database'
 
 interface HistoryClientProps {
@@ -28,6 +30,8 @@ export function HistoryClient({ initialLogs, total, currentPage, pageSize, busin
   const [isPending, startTransition] = useTransition()
   const [selectedRequest, setSelectedRequest] = useState<SendLogWithContact | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+  const [isRetrying, setIsRetrying] = useState(false)
 
   // Pagination logic
   const totalPages = Math.ceil(total / pageSize)
@@ -107,6 +111,40 @@ export function HistoryClient({ initialLogs, total, currentPage, pageSize, busin
     handleCancel(request.id)
   }
 
+  // Handle bulk resend of failed messages
+  const selectedCount = Object.keys(rowSelection).length
+  const handleBulkResend = async () => {
+    const selectedIds = Object.keys(rowSelection)
+      .map((index) => initialLogs[Number(index)]?.id)
+      .filter(Boolean) as string[]
+
+    if (!selectedIds.length) return
+
+    setIsRetrying(true)
+    try {
+      const result = await bulkResendRequests(selectedIds)
+
+      if (result.success) {
+        toast.success(`Retried ${result.totalSuccess} message${result.totalSuccess !== 1 ? 's' : ''}`, {
+          description: result.totalFailed > 0
+            ? `${result.totalFailed} failed to resend`
+            : 'Messages queued for delivery',
+          duration: 6000,
+        })
+      } else {
+        toast.error('Retry failed', {
+          description: result.error || 'An error occurred',
+          duration: 5000,
+        })
+      }
+
+      setRowSelection({})
+      refresh()
+    } finally {
+      setIsRetrying(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -125,14 +163,33 @@ export function HistoryClient({ initialLogs, total, currentPage, pageSize, busin
       {/* Content */}
       {hasLogs ? (
         <div className="space-y-4">
-          <div className="text-sm text-muted-foreground">
-            Showing {((currentPage - 1) * pageSize) + 1}-{Math.min(currentPage * pageSize, total)} of {total} message{total !== 1 ? 's' : ''}
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-muted-foreground">
+              Showing {((currentPage - 1) * pageSize) + 1}-{Math.min(currentPage * pageSize, total)} of {total} message{total !== 1 ? 's' : ''}
+            </div>
+            {selectedCount > 0 && (
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-medium">
+                  {selectedCount} failed message{selectedCount !== 1 ? 's' : ''} selected
+                </span>
+                <Button
+                  size="sm"
+                  onClick={handleBulkResend}
+                  disabled={isRetrying}
+                >
+                  <ArrowClockwise className={`h-4 w-4 mr-1.5 ${isRetrying ? 'animate-spin' : ''}`} />
+                  {isRetrying ? 'Retrying...' : 'Retry Selected'}
+                </Button>
+              </div>
+            )}
           </div>
           <HistoryTable
             data={initialLogs}
             onRowClick={handleRowClick}
             onResend={handleQuickResend}
             onCancel={handleQuickCancel}
+            rowSelection={rowSelection}
+            onRowSelectionChange={setRowSelection}
           />
           {totalPages > 1 && (
             <div className="flex items-center justify-between pt-4">
