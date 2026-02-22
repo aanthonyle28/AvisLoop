@@ -159,7 +159,11 @@ export function EditJobSheet({ open, onOpenChange, job, customers }: EditJobShee
                 selectedCampaignId={campaignChoice}
                 onCampaignChange={setCampaignChoice}
                 showOneOff
-                defaultCampaignId={job.campaign_override}
+                defaultCampaignId={
+                  job.status === 'do_not_send' ? CAMPAIGN_DO_NOT_SEND :
+                  job.campaign_override === 'one_off' ? CAMPAIGN_ONE_OFF :
+                  job.campaign_override ?? undefined
+                }
               />
             </div>
           )}
@@ -193,7 +197,7 @@ export function EditJobSheet({ open, onOpenChange, job, customers }: EditJobShee
               rows={3}
             />
             {state?.fieldErrors?.notes?.[0] && (
-              <p className="text-sm text-destructive">{state.fieldErrors.notes[0]}</p>
+              <p role="alert" className="text-sm text-destructive">{state.fieldErrors.notes[0]}</p>
             )}
           </div>
 

@@ -1,7 +1,15 @@
-import { randomBytes } from 'crypto'
+import { randomBytes, createHmac, timingSafeEqual } from 'crypto'
 
 // Token expiration: 30 days in milliseconds
 const TOKEN_EXPIRY_MS = 30 * 24 * 60 * 60 * 1000
+
+// HMAC secret — falls back to a random key per process to avoid crash,
+// but production MUST set REVIEW_TOKEN_SECRET for token portability across deploys.
+const TOKEN_SECRET = process.env.REVIEW_TOKEN_SECRET || randomBytes(32).toString('hex')
+
+if (!process.env.REVIEW_TOKEN_SECRET) {
+  console.warn('REVIEW_TOKEN_SECRET not set — review tokens will not survive redeploys')
+}
 
 export interface ReviewTokenPayload {
   customerId: string
@@ -11,17 +19,18 @@ export interface ReviewTokenPayload {
 }
 
 /**
- * Generate a secure, URL-safe review token.
+ * Compute HMAC-SHA256 signature for a token payload.
+ */
+function signPayload(payload: string): string {
+  return createHmac('sha256', TOKEN_SECRET).update(payload).digest('hex')
+}
+
+/**
+ * Generate a secure, URL-safe review token with HMAC signature.
  * Token encodes customer, business, and optional enrollment IDs with timestamp.
- * Uses cryptographically secure random data to prevent guessing.
+ * HMAC prevents forgery even if token structure is known.
  *
- * @example
- * const token = generateReviewToken({
- *   customerId: 'uuid-1',
- *   businessId: 'uuid-2',
- *   enrollmentId: 'uuid-3'
- * })
- * // Returns: base64url encoded string like "dXVpZC0xOnV1aWQtMjp1dWlkLTM6MTcwNDEyMzQ1Njc4OTphYmNkZWYxMjM0NTY3ODkw"
+ * Format: base64url(customerId:businessId:enrollmentId:timestamp:random:hmac)
  */
 export function generateReviewToken(params: {
   customerId: string
@@ -31,8 +40,7 @@ export function generateReviewToken(params: {
   const timestamp = Date.now()
   const random = randomBytes(16).toString('hex')
 
-  // Format: customerId:businessId:enrollmentId:timestamp:random
-  // enrollmentId is empty string if not provided
+  // Payload without signature
   const payload = [
     params.customerId,
     params.businessId,
@@ -41,37 +49,44 @@ export function generateReviewToken(params: {
     random,
   ].join(':')
 
-  // Use base64url encoding for URL safety (no +, /, or = padding issues)
-  return Buffer.from(payload).toString('base64url')
+  // Sign the payload
+  const hmac = signPayload(payload)
+
+  // Append signature
+  const signedPayload = payload + ':' + hmac
+
+  return Buffer.from(signedPayload).toString('base64url')
 }
 
 /**
  * Parse and validate a review token.
- * Returns null if token is invalid, expired, or malformed.
- * Does NOT throw exceptions - callers check for null.
- *
- * @example
- * const data = parseReviewToken(token)
- * if (!data) {
- *   return notFound()
- * }
- * const { customerId, businessId, enrollmentId } = data
+ * Verifies HMAC signature, expiration, and structure.
+ * Returns null if token is invalid, expired, forged, or malformed.
  */
 export function parseReviewToken(token: string): ReviewTokenPayload | null {
   try {
-    // Decode base64url
     const decoded = Buffer.from(token, 'base64url').toString('utf-8')
     const parts = decoded.split(':')
 
-    // Expect 5 parts: customerId, businessId, enrollmentId, timestamp, random
-    if (parts.length !== 5) {
+    // Expect 6 parts: customerId, businessId, enrollmentId, timestamp, random, hmac
+    if (parts.length !== 6) {
       return null
     }
 
-    const [customerId, businessId, enrollmentId, timestampStr] = parts
-    const timestamp = parseInt(timestampStr, 10)
+    const [customerId, businessId, enrollmentId, timestampStr, random, hmac] = parts
 
-    // Validate timestamp is a number
+    // Reconstruct payload (without hmac) and verify signature
+    const payload = [customerId, businessId, enrollmentId, timestampStr, random].join(':')
+    const expectedHmac = signPayload(payload)
+
+    // Timing-safe comparison to prevent timing attacks
+    const hmacBuffer = Buffer.from(hmac, 'utf-8')
+    const expectedBuffer = Buffer.from(expectedHmac, 'utf-8')
+    if (hmacBuffer.length !== expectedBuffer.length || !timingSafeEqual(hmacBuffer, expectedBuffer)) {
+      return null
+    }
+
+    const timestamp = parseInt(timestampStr, 10)
     if (isNaN(timestamp)) {
       return null
     }
@@ -79,11 +94,9 @@ export function parseReviewToken(token: string): ReviewTokenPayload | null {
     // Check token age (30 days max)
     const age = Date.now() - timestamp
     if (age > TOKEN_EXPIRY_MS) {
-      console.log('Review token expired:', { age: Math.floor(age / 1000 / 60 / 60), hours: 'hours' })
       return null
     }
 
-    // Validate required fields are non-empty
     if (!customerId || !businessId) {
       return null
     }
@@ -94,16 +107,13 @@ export function parseReviewToken(token: string): ReviewTokenPayload | null {
       enrollmentId: enrollmentId || undefined,
       timestamp,
     }
-  } catch (error) {
-    // Any parsing error returns null (don't expose internals)
-    console.error('Token parse error:', error)
+  } catch {
     return null
   }
 }
 
 /**
  * Check if a token is still valid (not expired).
- * Useful for quick expiration checks without full parsing.
  */
 export function isTokenExpired(token: string): boolean {
   const data = parseReviewToken(token)
@@ -112,7 +122,6 @@ export function isTokenExpired(token: string): boolean {
 
 /**
  * Get the review page URL for a given token.
- * Uses NEXT_PUBLIC_SITE_URL for proper domain handling.
  */
 export function getReviewUrl(token: string): string {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'

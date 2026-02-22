@@ -145,7 +145,6 @@ export async function sendSmsRequest(
     .from('send_logs')
     .insert({
       business_id: business.id,
-      contact_id: customerId, // Legacy field
       customer_id: customerId,
       template_id: templateId || null,
       channel: 'sms',

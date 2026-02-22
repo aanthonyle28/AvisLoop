@@ -159,6 +159,7 @@ export function TouchSequenceEditor({
                 onClick={() => removeTouch(index)}
                 disabled={touches.length <= 1}
                 className="shrink-0"
+                aria-label={`Remove touch ${index + 1}`}
               >
                 <Trash className="h-4 w-4" />
               </Button>

@@ -88,6 +88,7 @@ export function PreviewSampleCard({
               size="icon-xs"
               onClick={handleRegenerate}
               disabled={isPending}
+              aria-label="Regenerate preview"
               title="Regenerate this sample"
             >
               <ArrowsClockwise

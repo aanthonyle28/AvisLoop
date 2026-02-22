@@ -13,7 +13,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createServiceRoleClient } from '@/lib/supabase/service-role'
 import {
   validateTwilioRequest,
   parseWebhookBody,
@@ -99,7 +99,7 @@ async function updateSendLog(
   errorCode?: string,
   errorMessage?: string
 ) {
-  const supabase = await createClient()
+  const supabase = createServiceRoleClient()
 
   // Find send_log by Twilio message SID in provider_message_id JSONB
   // Query: provider_message_id->>'twilio_sid' = messageSid

@@ -23,6 +23,7 @@ export async function getCustomersForAutocomplete(): Promise<Pick<Customer, 'id'
     .eq('business_id', business.id)
     .eq('status', 'active')
     .order('name')
+    .limit(500)
 
   if (error) {
     console.error('Error fetching customers for autocomplete:', error)

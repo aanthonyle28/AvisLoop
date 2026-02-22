@@ -1,6 +1,4 @@
-// Server-side Stripe client
-// DO NOT import this file in client-side code
-
+import 'server-only'
 import Stripe from 'stripe'
 
 if (!process.env.STRIPE_SECRET_KEY) {

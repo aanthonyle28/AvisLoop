@@ -13,7 +13,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createServiceRoleClient } from '@/lib/supabase/service-role'
 import {
   validateTwilioRequest,
   parseWebhookBody,
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
  * @param phoneNumber - The phone number that sent the STOP message
  */
 async function handleOptOut(phoneNumber: string) {
-  const supabase = await createClient()
+  const supabase = createServiceRoleClient()
 
   const { error, count } = await supabase
     .from('customers')

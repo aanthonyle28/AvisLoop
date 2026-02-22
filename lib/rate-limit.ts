@@ -86,3 +86,35 @@ export async function checkWebhookRateLimit(identifier: string): Promise<{
     reset: result.reset,
   }
 }
+
+/**
+ * Per-IP rate limit for public-facing API endpoints (no auth required).
+ * Allows 20 requests per minute per IP to prevent abuse.
+ * Used by /api/review/rate and /api/feedback.
+ */
+export const publicRatelimit = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(20, '1 m'),
+      prefix: 'ratelimit:public',
+    })
+  : null
+
+/**
+ * Check rate limit for a public endpoint by IP address.
+ * Bypasses in development if Upstash not configured.
+ */
+export async function checkPublicRateLimit(ip: string): Promise<{
+  success: boolean
+  remaining?: number
+}> {
+  if (!publicRatelimit) {
+    return { success: true, remaining: 999 }
+  }
+
+  const result = await publicRatelimit.limit(ip)
+  return {
+    success: result.success,
+    remaining: result.remaining,
+  }
+}

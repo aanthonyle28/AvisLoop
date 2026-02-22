@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createServiceRoleClient } from '@/lib/supabase/service-role'
 import { processSmsRetryItem } from '@/lib/actions/sms-retry'
 import type { SmsRetryQueueItem } from '@/lib/sms/types'
-
-// Vercel cron authorization header
-const CRON_SECRET = process.env.CRON_SECRET
 
 /**
  * Process SMS retry queue.
@@ -18,15 +15,21 @@ const CRON_SECRET = process.env.CRON_SECRET
  * 5. Return structured JSON with counts for monitoring
  */
 export async function GET(request: NextRequest) {
-  // Verify cron secret (if configured)
+  // Verify cron secret — fail closed if not configured
+  const cronSecret = process.env.CRON_SECRET
+  if (!cronSecret) {
+    console.error('CRON_SECRET not set')
+    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
+  }
+
   const authHeader = request.headers.get('Authorization')
-  if (CRON_SECRET && authHeader !== `Bearer ${CRON_SECRET}`) {
+  if (!authHeader || authHeader !== `Bearer ${cronSecret}`) {
     console.error('Invalid cron authorization')
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   const startTime = Date.now()
-  const supabase = await createClient()
+  const supabase = createServiceRoleClient()
 
   try {
     // 1. Recover stuck retries (processing > 10 minutes)

@@ -40,7 +40,7 @@ export function SignUpForm({
               placeholder="John Doe"
             />
             {state?.fieldErrors?.fullName && (
-              <p className="text-sm text-error-text">{state.fieldErrors.fullName[0]}</p>
+              <p id="signup-fullName-error" role="alert" className="text-sm text-error-text">{state.fieldErrors.fullName[0]}</p>
             )}
           </div>
           <div className="space-y-2">
@@ -76,7 +76,7 @@ export function SignUpForm({
             )}
             <PasswordStrengthChecklist password={passwordValue} />
           </div>
-          {state?.error && <p className="text-sm text-error-text">{state.error}</p>}
+          {state?.error && <p role="alert" className="text-sm text-error-text">{state.error}</p>}
         </div>
         <Button type="submit" className="w-full" disabled={pending}>
           {pending ? "Creating an account..." : "Sign up"}

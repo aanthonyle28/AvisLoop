@@ -20,7 +20,7 @@ export function BusinessSettingsForm({ initialData, templates }: BusinessSetting
     <form action={formAction} className="space-y-6">
       {/* General error */}
       {state?.error && (
-        <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded">
+        <div role="alert" className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded">
           {state.error}
         </div>
       )}
@@ -47,7 +47,7 @@ export function BusinessSettingsForm({ initialData, templates }: BusinessSetting
           placeholder="Your Business Name"
         />
         {state?.fieldErrors?.name && (
-          <p className="text-error-text text-sm mt-1">{state.fieldErrors.name[0]}</p>
+          <p role="alert" className="text-error-text text-sm mt-1">{state.fieldErrors.name[0]}</p>
         )}
       </div>
 
@@ -65,7 +65,7 @@ export function BusinessSettingsForm({ initialData, templates }: BusinessSetting
           placeholder="https://search.google.com/local/writereview?placeid=..."
         />
         {state?.fieldErrors?.googleReviewLink && (
-          <p className="text-error-text text-sm mt-1">{state.fieldErrors.googleReviewLink[0]}</p>
+          <p role="alert" className="text-error-text text-sm mt-1">{state.fieldErrors.googleReviewLink[0]}</p>
         )}
         <p className="text-sm text-muted-foreground mt-1">
           Find your Google Business Profile and copy the &quot;Write a review&quot; link
@@ -86,7 +86,7 @@ export function BusinessSettingsForm({ initialData, templates }: BusinessSetting
           placeholder="Your Name or Business Name"
         />
         {state?.fieldErrors?.defaultSenderName && (
-          <p className="text-error-text text-sm mt-1">{state.fieldErrors.defaultSenderName[0]}</p>
+          <p role="alert" className="text-error-text text-sm mt-1">{state.fieldErrors.defaultSenderName[0]}</p>
         )}
         <p className="text-sm text-muted-foreground mt-1">
           This name will appear in your review request emails
@@ -112,7 +112,7 @@ export function BusinessSettingsForm({ initialData, templates }: BusinessSetting
           ))}
         </select>
         {state?.fieldErrors?.defaultTemplateId && (
-          <p className="text-error-text text-sm mt-1">{state.fieldErrors.defaultTemplateId[0]}</p>
+          <p role="alert" className="text-error-text text-sm mt-1">{state.fieldErrors.defaultTemplateId[0]}</p>
         )}
       </div>
 

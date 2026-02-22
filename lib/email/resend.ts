@@ -1,3 +1,4 @@
+import 'server-only'
 import { Resend } from 'resend'
 
 // Validate environment variable exists (will throw at module load if missing)

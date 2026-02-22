@@ -45,7 +45,7 @@ export async function getSendLogs(options?: {
     .order('created_at', { ascending: false })
 
   if (options?.contactId) {
-    query = query.eq('contact_id', options.contactId)
+    query = query.eq('customer_id', options.contactId)
   }
 
   // Search filter (query): Use Supabase's or filter with referencedTable option

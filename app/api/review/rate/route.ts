@@ -1,13 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { parseReviewToken } from '@/lib/review/token'
 import { z } from 'zod'
-
-// Use service role for public endpoint (no user context)
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+import { createServiceRoleClient } from '@/lib/supabase/service-role'
+import { checkPublicRateLimit } from '@/lib/rate-limit'
 
 const ratingSchema = z.object({
   token: z.string().min(1),
@@ -20,17 +15,15 @@ const ratingSchema = z.object({
  *
  * Records the customer's rating selection and stops campaign enrollment.
  * Called when customer submits their rating (before redirect or feedback form).
- *
- * This endpoint:
- * 1. Validates the review token
- * 2. Stops any active campaign enrollment (prevents further touches)
- * 3. Returns success (rating is logged but not stored separately - feedback is stored in /api/feedback)
- *
- * Note: For 4-5 star ratings going to Google, this is our only record.
- * For 1-3 star ratings, the feedback will be stored via /api/feedback.
  */
 export async function POST(req: NextRequest) {
   try {
+    // Rate limit by IP
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+    const rateLimitResult = await checkPublicRateLimit(ip)
+    if (!rateLimitResult.success) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+    }
     const body = await req.json()
     const validated = ratingSchema.parse(body)
 
@@ -39,6 +32,9 @@ export async function POST(req: NextRequest) {
     if (!tokenData) {
       return NextResponse.json({ error: 'Invalid or expired token' }, { status: 400 })
     }
+
+    // Create service role client inside handler (not module scope)
+    const supabase = createServiceRoleClient()
 
     // Verify customer and business exist
     const [customerCheck, businessCheck] = await Promise.all([
@@ -66,19 +62,17 @@ export async function POST(req: NextRequest) {
 
       if (stopError) {
         console.error('Failed to stop enrollment:', stopError)
-        // Don't fail the request - enrollment stop is secondary
       } else {
         console.log(`Stopped enrollment ${tokenData.enrollmentId} - ${stopReason}`)
       }
     }
 
-    // Log the interaction (for analytics, could expand later)
+    // Log the interaction for analytics
     console.log('Review rating recorded:', {
-      customerId: tokenData.customerId,
-      businessId: tokenData.businessId,
+      customerId: tokenData.customerId.slice(0, 8) + '...',
+      businessId: tokenData.businessId.slice(0, 8) + '...',
       rating: validated.rating,
       destination: validated.destination,
-      enrollmentId: tokenData.enrollmentId || 'none',
     })
 
     return NextResponse.json({ success: true })

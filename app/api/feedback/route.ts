@@ -1,17 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { Resend } from 'resend'
 import { parseReviewToken } from '@/lib/review/token'
 import { feedbackSchema } from '@/lib/validations/feedback'
 import { z } from 'zod'
-
-// Use service role for public endpoint (no user context)
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
-const resend = new Resend(process.env.RESEND_API_KEY || 'placeholder')
+import { createServiceRoleClient } from '@/lib/supabase/service-role'
+import { checkPublicRateLimit } from '@/lib/rate-limit'
 
 /**
  * POST /api/feedback
@@ -27,6 +20,12 @@ const resend = new Resend(process.env.RESEND_API_KEY || 'placeholder')
  */
 export async function POST(req: NextRequest) {
   try {
+    // Rate limit by IP
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+    const rateLimitResult = await checkPublicRateLimit(ip)
+    if (!rateLimitResult.success) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+    }
     const body = await req.json()
     const validated = feedbackSchema.parse(body)
 
@@ -35,6 +34,9 @@ export async function POST(req: NextRequest) {
     if (!tokenData) {
       return NextResponse.json({ error: 'Invalid or expired token' }, { status: 400 })
     }
+
+    // Create service role client inside handler (not module scope)
+    const supabase = createServiceRoleClient()
 
     // Fetch customer and business data
     const [customerResult, businessResult] = await Promise.all([
@@ -105,6 +107,7 @@ export async function POST(req: NextRequest) {
     // Send notification email to owner
     if (ownerEmail && process.env.RESEND_API_KEY) {
       try {
+        const resend = new Resend(process.env.RESEND_API_KEY)
         const dashboardUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard/feedback`
         const starsFilled = generateStars(validated.rating)
         const starsEmpty = generateStars(5 - validated.rating, true)
@@ -183,10 +186,9 @@ export async function POST(req: NextRequest) {
 
 /**
  * Generate star characters for email display.
- * Uses Unicode stars that render well in most email clients.
  */
 function generateStars(count: number, empty = false): string {
-  const star = empty ? '\u2606' : '\u2B50' // Star outline vs filled star
+  const star = empty ? '\u2606' : '\u2B50'
   return star.repeat(count)
 }
 

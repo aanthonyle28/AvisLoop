@@ -475,6 +475,9 @@ export async function markJobDoNotSend(jobId: string): Promise<JobActionState> {
     return { error: error.message }
   }
 
+  // Stop any active campaign enrollments for this job
+  await stopEnrollmentsForJob(jobId, 'owner_stopped')
+
   revalidatePath('/jobs')
   return { success: true }
 }

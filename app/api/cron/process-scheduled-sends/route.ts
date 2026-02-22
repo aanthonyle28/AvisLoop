@@ -266,14 +266,11 @@ export async function GET(request: Request) {
               failedCount++
               totalFailed++
             } else {
-              // Update contact tracking
-              await supabase
-                .from('customers')
-                .update({
-                  last_sent_at: new Date().toISOString(),
-                  send_count: (contact.send_count || 0) + 1,
-                })
-                .eq('id', contact.id)
+              // Update contact tracking (atomic increment)
+              await supabase.rpc('increment_customer_send_count', {
+                p_customer_id: contact.id,
+                p_sent_at: new Date().toISOString(),
+              })
 
               sentCount++
               totalSent++

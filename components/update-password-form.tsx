@@ -67,7 +67,7 @@ export function UpdatePasswordForm({
                   <p id="confirmPassword-error" role="alert" className="text-sm text-error-text">{state.fieldErrors.confirmPassword[0]}</p>
                 )}
               </div>
-              {state?.error && <p className="text-sm text-error-text">{state.error}</p>}
+              {state?.error && <p role="alert" className="text-sm text-error-text">{state.error}</p>}
               <Button type="submit" className="w-full" disabled={pending}>
                 {pending ? "Saving..." : "Save new password"}
               </Button>

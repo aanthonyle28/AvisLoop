@@ -144,7 +144,7 @@ export async function sendReviewRequest(
     .from('send_logs')
     .insert({
       business_id: business.id,
-      contact_id: contactId,
+      customer_id: contactId,
       template_id: templateId || null,
       status: 'pending',
       subject,
@@ -409,7 +409,7 @@ export async function batchSendReviewRequest(
         .from('send_logs')
         .insert({
           business_id: business.id,
-          contact_id: contact.id,
+          customer_id: contact.id,
           template_id: templateId || null,
           status: 'pending',
           subject: defaultSubject,

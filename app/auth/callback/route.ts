@@ -8,7 +8,16 @@ export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   const rawNext = searchParams.get('next') ?? '/dashboard'
-  const next = rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/dashboard'
+  // Validate redirect target: must be a relative path, no protocol/host manipulation
+  let next = '/dashboard'
+  try {
+    const parsed = new URL(rawNext, origin)
+    if (parsed.origin === origin && parsed.pathname.startsWith('/')) {
+      next = parsed.pathname + parsed.search + parsed.hash
+    }
+  } catch {
+    // Invalid URL — use default
+  }
   const hostname = request.headers.get('host') || ''
 
   // Determine redirect base URL

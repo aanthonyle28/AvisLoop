@@ -288,8 +288,8 @@ export async function getReadyToSendJobs(
 
     // Filter in JavaScript
     const eligibleJobs = (jobs || []).filter(j => {
-      // Exclude dismissed jobs (removed from queue by user)
-      if (j.campaign_override === 'dismissed') return false
+      // Exclude dismissed and one-off jobs (handled manually by user)
+      if (j.campaign_override === 'dismissed' || j.campaign_override === 'one_off') return false
       // For completed jobs, exclude those with ANY enrollment record
       if (j.status === 'completed' && enrolledJobIds.has(j.id)) return false
       return true

@@ -104,7 +104,7 @@ export function CampaignForm({ campaign, templates, enabledServiceTypes, onSucce
             placeholder="e.g., HVAC Follow-up"
           />
           {errors.name && (
-            <p className="text-sm text-destructive">{errors.name.message}</p>
+            <p role="alert" className="text-sm text-destructive">{errors.name.message}</p>
           )}
         </div>
 
@@ -152,7 +152,7 @@ export function CampaignForm({ campaign, templates, enabledServiceTypes, onSucce
         />
 
         {errors.touches && (
-          <p className="text-sm text-destructive">
+          <p role="alert" className="text-sm text-destructive">
             {typeof errors.touches === 'string'
               ? errors.touches
               : errors.touches.message || 'Invalid touch configuration'}

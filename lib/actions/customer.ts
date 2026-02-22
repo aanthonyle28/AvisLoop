@@ -52,6 +52,18 @@ export async function findOrCreateCustomer({
     return { error: 'You must be logged in' }
   }
 
+  // Verify business ownership
+  const { data: business } = await supabase
+    .from('businesses')
+    .select('id')
+    .eq('id', businessId)
+    .eq('user_id', user.id)
+    .single()
+
+  if (!business) {
+    return { error: 'Business not found' }
+  }
+
   const normalizedEmail = email.toLowerCase()
 
   // Check for existing customer
@@ -261,7 +273,7 @@ export async function updateCustomer(
     }
   }
 
-  // Update customer (RLS handles ownership check)
+  // Update customer (RLS + explicit business_id check for defense-in-depth)
   const { error } = await supabase
     .from('customers')
     .update({
@@ -271,6 +283,7 @@ export async function updateCustomer(
       phone_status: phoneResult.status,
     })
     .eq('id', customerId)
+    .eq('business_id', business.id)
 
   if (error) {
     return { error: error.message }

@@ -1,36 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
-import { createClient } from '@supabase/supabase-js'
-
-// === In-memory rate limiting for webhook endpoint ===
-const ipRequestCounts = new Map<string, { count: number; resetAt: number }>()
-const RATE_LIMIT = 100 // requests per minute
-const RATE_WINDOW = 60 * 1000 // 1 minute in ms
-
-function checkWebhookRateLimit(ip: string): boolean {
-  const now = Date.now()
-  const record = ipRequestCounts.get(ip)
-
-  if (!record || now > record.resetAt) {
-    ipRequestCounts.set(ip, { count: 1, resetAt: now + RATE_WINDOW })
-    return true
-  }
-
-  if (record.count >= RATE_LIMIT) {
-    return false
-  }
-
-  record.count++
-  return true
-}
-
-// Use service role for webhook handler - no user context available
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
-const resend = new Resend(process.env.RESEND_API_KEY || 'placeholder')
+import { createServiceRoleClient } from '@/lib/supabase/service-role'
 
 // Map Resend event types to our status values
 const STATUS_MAP: Record<string, string> = {
@@ -56,12 +26,6 @@ interface ResendWebhookEvent {
 }
 
 export async function POST(req: NextRequest) {
-  // === Rate limit check BEFORE signature verification (save CPU) ===
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown'
-  if (!checkWebhookRateLimit(ip)) {
-    return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
-  }
-
   try {
     const payload = await req.text()
 
@@ -72,9 +36,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 })
     }
 
+    const resendApiKey = process.env.RESEND_API_KEY
+    if (!resendApiKey) {
+      console.error('RESEND_API_KEY not configured')
+      return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 })
+    }
+
+    const resend = new Resend(resendApiKey)
+
     let event: ResendWebhookEvent
     try {
-      // Verify signature using Resend SDK
       event = resend.webhooks.verify({
         payload,
         headers: {
@@ -89,11 +60,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid webhook signature' }, { status: 400 })
     }
 
+    // Create service role client inside handler
+    const supabase = createServiceRoleClient()
+
     // === Extract send_log_id from tags ===
     const sendLogId = event.data.tags?.find(tag => tag.name === 'send_log_id')?.value
 
     if (!sendLogId) {
-      // Email wasn't sent through our system (or missing tag) - ignore
       console.log(`Webhook received for unknown email: ${event.type}`)
       return NextResponse.json({ received: true })
     }
@@ -101,7 +74,6 @@ export async function POST(req: NextRequest) {
     // === Map event type to status ===
     const newStatus = STATUS_MAP[event.type]
     if (!newStatus) {
-      // Unknown event type - acknowledge but don't process
       console.log(`Unknown webhook event type: ${event.type}`)
       return NextResponse.json({ received: true })
     }
@@ -117,28 +89,26 @@ export async function POST(req: NextRequest) {
 
     if (updateError) {
       console.error('Failed to update send_log:', updateError)
-      // Don't return error - we don't want Resend to retry for our DB issues
     }
 
     // === Auto opt-out contact on bounce or complaint ===
     if (OPT_OUT_EVENTS.includes(event.type)) {
-      // Get the contact_id from the send_log
       const { data: sendLog } = await supabase
         .from('send_logs')
-        .select('contact_id')
+        .select('customer_id')
         .eq('id', sendLogId)
         .single()
 
-      if (sendLog?.contact_id) {
+      if (sendLog?.customer_id) {
         const { error: optOutError } = await supabase
           .from('customers')
           .update({ opted_out: true })
-          .eq('id', sendLog.contact_id)
+          .eq('id', sendLog.customer_id)
 
         if (optOutError) {
           console.error('Failed to opt-out contact:', optOutError)
         } else {
-          console.log(`Contact ${sendLog.contact_id} opted out due to ${event.type}`)
+          console.log(`Contact ${sendLog.customer_id} opted out due to ${event.type}`)
 
           // Stop any active campaign enrollments for this customer
           await supabase
@@ -148,10 +118,10 @@ export async function POST(req: NextRequest) {
               stop_reason: 'opted_out_email',
               stopped_at: new Date().toISOString(),
             })
-            .eq('customer_id', sendLog.contact_id)
+            .eq('customer_id', sendLog.customer_id)
             .eq('status', 'active')
 
-          console.log(`Stopped active enrollments for customer ${sendLog.contact_id} - opted out of email`)
+          console.log(`Stopped active enrollments for customer ${sendLog.customer_id} - opted out of email`)
         }
       }
     }
@@ -160,7 +130,6 @@ export async function POST(req: NextRequest) {
     if (event.type === 'email.clicked') {
       const enrollmentId = event.data.tags?.find((t: { name: string; value: string }) => t.name === 'enrollment_id')?.value
 
-      // If this was a campaign email, stop the enrollment
       if (enrollmentId) {
         await supabase
           .from('campaign_enrollments')
@@ -170,11 +139,10 @@ export async function POST(req: NextRequest) {
             stopped_at: new Date().toISOString(),
           })
           .eq('id', enrollmentId)
-          .eq('status', 'active')  // Only stop if still active
+          .eq('status', 'active')
 
         console.log(`Stopped enrollment ${enrollmentId} - review clicked`)
       } else {
-        // Try to find enrollment via send_log
         const { data: sendLog } = await supabase
           .from('send_logs')
           .select('campaign_enrollment_id')
