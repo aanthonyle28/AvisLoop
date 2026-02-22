@@ -166,12 +166,14 @@ export async function updateCampaign(
 export async function getCampaignDeletionInfo(campaignId: string): Promise<{
   activeEnrollments: number
   affectedJobs: number
+  availableCampaigns: { id: string; name: string; service_type: string | null }[]
   error?: string
 }> {
+  const empty = { activeEnrollments: 0, affectedJobs: 0, availableCampaigns: [] }
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { activeEnrollments: 0, affectedJobs: 0, error: 'Not authenticated' }
+  if (!user) return { ...empty, error: 'Not authenticated' }
 
   // Verify campaign belongs to user's business
   const { data: business } = await supabase
@@ -180,7 +182,7 @@ export async function getCampaignDeletionInfo(campaignId: string): Promise<{
     .eq('user_id', user.id)
     .single()
 
-  if (!business) return { activeEnrollments: 0, affectedJobs: 0, error: 'Business not found' }
+  if (!business) return { ...empty, error: 'Business not found' }
 
   // Verify campaign ownership
   const { data: campaign } = await supabase
@@ -190,9 +192,9 @@ export async function getCampaignDeletionInfo(campaignId: string): Promise<{
     .eq('business_id', business.id)
     .single()
 
-  if (!campaign) return { activeEnrollments: 0, affectedJobs: 0, error: 'Campaign not found' }
+  if (!campaign) return { ...empty, error: 'Campaign not found' }
 
-  const [enrollments, jobs] = await Promise.all([
+  const [enrollments, jobs, otherCampaigns] = await Promise.all([
     supabase
       .from('campaign_enrollments')
       .select('*', { count: 'exact', head: true })
@@ -204,18 +206,30 @@ export async function getCampaignDeletionInfo(campaignId: string): Promise<{
       .select('*', { count: 'exact', head: true })
       .eq('campaign_override', campaignId)
       .eq('business_id', business.id),
+    supabase
+      .from('campaigns')
+      .select('id, name, service_type')
+      .eq('business_id', business.id)
+      .eq('is_preset', false)
+      .neq('id', campaignId)
+      .order('name'),
   ])
 
   return {
     activeEnrollments: enrollments.count ?? 0,
     affectedJobs: jobs.count ?? 0,
+    availableCampaigns: (otherCampaigns.data || []) as { id: string; name: string; service_type: string | null }[],
   }
 }
 
 /**
- * Delete a campaign. Stops active enrollments and clears job references first.
+ * Delete a campaign. Optionally reassigns active enrollments to another campaign.
+ * If no reassignCampaignId, stops active enrollments. Otherwise, moves them.
  */
-export async function deleteCampaign(campaignId: string): Promise<ActionState> {
+export async function deleteCampaign(
+  campaignId: string,
+  reassignCampaignId?: string | null
+): Promise<ActionState> {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -241,17 +255,89 @@ export async function deleteCampaign(campaignId: string): Promise<ActionState> {
   if (!campaign) return { error: 'Campaign not found' }
   if (campaign.is_preset) return { error: 'Cannot delete preset campaigns' }
 
-  // Stop all active enrollments for this campaign (scoped to business)
-  await supabase
-    .from('campaign_enrollments')
-    .update({
-      status: 'stopped',
-      stop_reason: 'campaign_deleted',
-      stopped_at: new Date().toISOString(),
-    })
-    .eq('campaign_id', campaignId)
-    .eq('business_id', business.id)
-    .eq('status', 'active')
+  if (reassignCampaignId) {
+    // --- Reassign enrollments to another campaign ---
+
+    // Fetch active enrollments from the campaign being deleted
+    const { data: activeEnrollments } = await supabase
+      .from('campaign_enrollments')
+      .select('id, job_id, customer_id, business_id')
+      .eq('campaign_id', campaignId)
+      .eq('business_id', business.id)
+      .eq('status', 'active')
+
+    // Stop old enrollments
+    await supabase
+      .from('campaign_enrollments')
+      .update({
+        status: 'stopped',
+        stop_reason: 'campaign_deleted',
+        stopped_at: new Date().toISOString(),
+      })
+      .eq('campaign_id', campaignId)
+      .eq('business_id', business.id)
+      .eq('status', 'active')
+
+    // Create new enrollments in target campaign if there were active ones
+    if (activeEnrollments?.length) {
+      // Get target campaign's first touch for scheduling
+      const { data: targetTouches } = await supabase
+        .from('campaign_touches')
+        .select('touch_number, delay_hours')
+        .eq('campaign_id', reassignCampaignId)
+        .order('touch_number')
+
+      const touch1 = targetTouches?.find(t => t.touch_number === 1)
+
+      if (touch1) {
+        // Check which customers already have active enrollment in target campaign
+        const { data: existingInTarget } = await supabase
+          .from('campaign_enrollments')
+          .select('customer_id')
+          .eq('campaign_id', reassignCampaignId)
+          .eq('status', 'active')
+
+        const existingCustomerIds = new Set(
+          existingInTarget?.map(e => e.customer_id) || []
+        )
+
+        const now = new Date()
+        const touch1ScheduledAt = new Date(
+          now.getTime() + touch1.delay_hours * 60 * 60 * 1000
+        )
+
+        const newEnrollments = activeEnrollments
+          .filter(e => !existingCustomerIds.has(e.customer_id))
+          .map(e => ({
+            business_id: e.business_id,
+            campaign_id: reassignCampaignId,
+            job_id: e.job_id,
+            customer_id: e.customer_id,
+            status: 'active' as const,
+            current_touch: 1,
+            touch_1_scheduled_at: touch1ScheduledAt.toISOString(),
+            touch_1_status: 'pending' as const,
+            enrolled_at: now.toISOString(),
+          }))
+
+        if (newEnrollments.length > 0) {
+          await supabase.from('campaign_enrollments').insert(newEnrollments)
+        }
+      }
+    }
+  } else {
+    // --- Original behavior: stop all active enrollments ---
+    await supabase
+      .from('campaign_enrollments')
+      .update({
+        status: 'stopped',
+        stop_reason: 'campaign_deleted',
+        stopped_at: new Date().toISOString(),
+      })
+      .eq('campaign_id', campaignId)
+      .eq('business_id', business.id)
+      .eq('status', 'active')
+  }
 
   // Clear campaign_override on jobs referencing this campaign (scoped to business)
   await supabase

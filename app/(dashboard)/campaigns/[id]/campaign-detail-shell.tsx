@@ -10,19 +10,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogFooter,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogCancel,
-  AlertDialogAction,
-} from '@/components/ui/alert-dialog'
-import { PencilSimple, DotsThree, Copy, Trash, Warning } from '@phosphor-icons/react'
+import { PencilSimple, DotsThree, Copy, Trash } from '@phosphor-icons/react'
 import { CampaignForm } from '@/components/campaigns/campaign-form'
-import { toggleCampaignStatus, deleteCampaign, duplicateCampaign, getCampaignDeletionInfo } from '@/lib/actions/campaign'
+import { DeleteCampaignDialog } from '@/components/campaigns/delete-campaign-dialog'
+import { toggleCampaignStatus, duplicateCampaign } from '@/lib/actions/campaign'
 import { toast } from 'sonner'
 import {
   Sheet,
@@ -52,8 +43,6 @@ export function CampaignDetailShell({
 
   // Delete confirmation dialog state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [deletionInfo, setDeletionInfo] = useState<{ activeEnrollments: number; affectedJobs: number } | null>(null)
-  const [isLoadingDeletionInfo, setIsLoadingDeletionInfo] = useState(false)
 
   // Auto-open edit sheet when ?edit=true is present (e.g. after creation)
   useEffect(() => {
@@ -98,31 +87,8 @@ export function CampaignDetailShell({
     })
   }
 
-  const handleDeleteClick = async () => {
+  const handleDeleteClick = () => {
     setDeleteDialogOpen(true)
-    setIsLoadingDeletionInfo(true)
-    try {
-      const info = await getCampaignDeletionInfo(campaign.id)
-      setDeletionInfo(info)
-    } catch {
-      setDeletionInfo({ activeEnrollments: 0, affectedJobs: 0 })
-      toast.error('Failed to load deletion impact info')
-    } finally {
-      setIsLoadingDeletionInfo(false)
-    }
-  }
-
-  const handleDeleteConfirm = () => {
-    setDeleteDialogOpen(false)
-    startTransition(async () => {
-      const result = await deleteCampaign(campaign.id)
-      if (result.error) {
-        toast.error(result.error)
-      } else {
-        toast.success('Campaign deleted')
-        router.push('/campaigns')
-      }
-    })
   }
 
   return (
@@ -192,48 +158,13 @@ export function CampaignDetailShell({
       </Sheet>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2">
-              <Warning size={20} className="text-destructive" weight="fill" />
-              Delete &ldquo;{campaign.name}&rdquo;?
-            </AlertDialogTitle>
-            <AlertDialogDescription asChild>
-              <div className="space-y-3">
-                <p>This action cannot be undone. The campaign and all its touch sequences will be permanently deleted.</p>
-
-                {isLoadingDeletionInfo ? (
-                  <p className="text-sm text-muted-foreground">Checking impact...</p>
-                ) : deletionInfo && (deletionInfo.activeEnrollments > 0 || deletionInfo.affectedJobs > 0) ? (
-                  <div className="rounded-md border border-destructive/20 bg-destructive/5 p-3 space-y-1.5">
-                    {deletionInfo.activeEnrollments > 0 && (
-                      <p className="text-sm font-medium">
-                        {deletionInfo.activeEnrollments} active enrollment{deletionInfo.activeEnrollments !== 1 ? 's' : ''} will be stopped
-                      </p>
-                    )}
-                    {deletionInfo.affectedJobs > 0 && (
-                      <p className="text-sm font-medium">
-                        {deletionInfo.affectedJobs} job{deletionInfo.affectedJobs !== 1 ? 's' : ''} referencing this campaign will be reset to auto-detect
-                      </p>
-                    )}
-                  </div>
-                ) : null}
-              </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeleteConfirm}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              disabled={isLoadingDeletionInfo}
-            >
-              Delete Campaign
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteCampaignDialog
+        campaignId={campaign.id}
+        campaignName={campaign.name}
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onDeleted={() => router.push('/campaigns')}
+      />
     </>
   )
 }
