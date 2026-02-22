@@ -161,7 +161,59 @@ export async function updateCampaign(
 }
 
 /**
- * Delete a campaign (only if no active enrollments).
+ * Get deletion impact info for a campaign (used by confirmation dialog).
+ */
+export async function getCampaignDeletionInfo(campaignId: string): Promise<{
+  activeEnrollments: number
+  affectedJobs: number
+  error?: string
+}> {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { activeEnrollments: 0, affectedJobs: 0, error: 'Not authenticated' }
+
+  // Verify campaign belongs to user's business
+  const { data: business } = await supabase
+    .from('businesses')
+    .select('id')
+    .eq('user_id', user.id)
+    .single()
+
+  if (!business) return { activeEnrollments: 0, affectedJobs: 0, error: 'Business not found' }
+
+  // Verify campaign ownership
+  const { data: campaign } = await supabase
+    .from('campaigns')
+    .select('id')
+    .eq('id', campaignId)
+    .eq('business_id', business.id)
+    .single()
+
+  if (!campaign) return { activeEnrollments: 0, affectedJobs: 0, error: 'Campaign not found' }
+
+  const [enrollments, jobs] = await Promise.all([
+    supabase
+      .from('campaign_enrollments')
+      .select('*', { count: 'exact', head: true })
+      .eq('campaign_id', campaignId)
+      .eq('business_id', business.id)
+      .eq('status', 'active'),
+    supabase
+      .from('jobs')
+      .select('*', { count: 'exact', head: true })
+      .eq('campaign_override', campaignId)
+      .eq('business_id', business.id),
+  ])
+
+  return {
+    activeEnrollments: enrollments.count ?? 0,
+    affectedJobs: jobs.count ?? 0,
+  }
+}
+
+/**
+ * Delete a campaign. Stops active enrollments and clears job references first.
  */
 export async function deleteCampaign(campaignId: string): Promise<ActionState> {
   const supabase = await createClient()
@@ -169,27 +221,44 @@ export async function deleteCampaign(campaignId: string): Promise<ActionState> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Not authenticated' }
 
-  // Check for active enrollments
-  const { count } = await supabase
-    .from('campaign_enrollments')
-    .select('*', { count: 'exact', head: true })
-    .eq('campaign_id', campaignId)
-    .eq('status', 'active')
-
-  if (count && count > 0) {
-    return { error: `Cannot delete: ${count} active enrollments. Stop them first.` }
-  }
-
-  // Verify not preset
-  const { data: campaign } = await supabase
-    .from('campaigns')
-    .select('is_preset')
-    .eq('id', campaignId)
+  // Verify ownership
+  const { data: business } = await supabase
+    .from('businesses')
+    .select('id')
+    .eq('user_id', user.id)
     .single()
 
-  if (campaign?.is_preset) {
-    return { error: 'Cannot delete preset campaigns' }
-  }
+  if (!business) return { error: 'Business not found' }
+
+  // Verify not preset and belongs to user's business
+  const { data: campaign } = await supabase
+    .from('campaigns')
+    .select('is_preset, business_id')
+    .eq('id', campaignId)
+    .eq('business_id', business.id)
+    .single()
+
+  if (!campaign) return { error: 'Campaign not found' }
+  if (campaign.is_preset) return { error: 'Cannot delete preset campaigns' }
+
+  // Stop all active enrollments for this campaign (scoped to business)
+  await supabase
+    .from('campaign_enrollments')
+    .update({
+      status: 'stopped',
+      stop_reason: 'campaign_deleted',
+      stopped_at: new Date().toISOString(),
+    })
+    .eq('campaign_id', campaignId)
+    .eq('business_id', business.id)
+    .eq('status', 'active')
+
+  // Clear campaign_override on jobs referencing this campaign (scoped to business)
+  await supabase
+    .from('jobs')
+    .update({ campaign_override: null })
+    .eq('campaign_override', campaignId)
+    .eq('business_id', business.id)
 
   // Delete (touches will cascade)
   const { error } = await supabase
@@ -202,6 +271,7 @@ export async function deleteCampaign(campaignId: string): Promise<ActionState> {
   }
 
   revalidatePath('/campaigns')
+  revalidatePath('/jobs')
   return { success: true }
 }
 

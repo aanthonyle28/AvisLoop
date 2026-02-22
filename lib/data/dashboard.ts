@@ -250,10 +250,10 @@ export async function getReadyToSendJobs(
   const supabase = await createClient()
 
   try {
-    // Step 1: Fetch completed jobs with customer data
+    // Step 1: Fetch completed jobs with customer data (include campaign_override for filtering)
     const { data: completedJobs } = await supabase
       .from('jobs')
-      .select('id, service_type, completed_at, customers!inner(id, name, email)')
+      .select('id, service_type, completed_at, campaign_override, customers!inner(id, name, email)')
       .eq('business_id', businessId)
       .eq('status', 'completed')
       .order('completed_at', { ascending: true })
@@ -266,9 +266,11 @@ export async function getReadyToSendJobs(
       .eq('business_id', businessId)
       .eq('status', 'active')
 
-    // Step 3: Filter in JavaScript - exclude jobs with active enrollments
+    // Step 3: Filter in JavaScript - exclude jobs with active enrollments and one-off jobs
     const enrolledJobIds = new Set((enrolledJobs || []).map(e => e.job_id))
-    const unenrolledJobs = (completedJobs || []).filter(j => !enrolledJobIds.has(j.id))
+    const unenrolledJobs = (completedJobs || []).filter(
+      j => !enrolledJobIds.has(j.id) && j.campaign_override !== 'one_off'
+    )
 
     // Calculate staleness for each job
     const jobsWithUrgency = unenrolledJobs.map(job => {

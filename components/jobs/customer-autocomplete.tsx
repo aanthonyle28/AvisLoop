@@ -46,7 +46,7 @@ export function CustomerAutocomplete({
       .slice(0, 6)  // Limit to 6 suggestions
   }, [query, customers])
 
-  const showCreateNew = query.length >= 2 && filtered.length === 0
+  const showCreateNew = query.length >= 2
 
   // Reset highlighted index when filtered changes
   useEffect(() => {
@@ -82,6 +82,10 @@ export function CustomerAutocomplete({
     setIsOpen(false)
   }
 
+  // Total options = filtered matches + "Create new" (if shown)
+  const totalOptions = filtered.length + (showCreateNew ? 1 : 0)
+  const createNewIndex = showCreateNew ? filtered.length : -1
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!isOpen) return
 
@@ -89,7 +93,7 @@ export function CustomerAutocomplete({
       case 'ArrowDown':
         e.preventDefault()
         setHighlightedIndex(prev =>
-          prev < filtered.length - 1 ? prev + 1 : prev
+          prev < totalOptions - 1 ? prev + 1 : prev
         )
         break
       case 'ArrowUp':
@@ -98,9 +102,12 @@ export function CustomerAutocomplete({
         break
       case 'Enter':
         e.preventDefault()
-        if (highlightedIndex >= 0 && filtered[highlightedIndex]) {
+        if (highlightedIndex >= 0 && highlightedIndex < filtered.length && filtered[highlightedIndex]) {
           handleSelect(filtered[highlightedIndex])
-        } else if (showCreateNew) {
+        } else if (highlightedIndex === createNewIndex) {
+          handleCreateNewClick()
+        } else if (showCreateNew && highlightedIndex === -1) {
+          // Default to create new if nothing highlighted
           handleCreateNewClick()
         }
         break
@@ -173,14 +180,21 @@ export function CustomerAutocomplete({
           {showCreateNew && (
             <button
               type="button"
+              id={`customer-option-${createNewIndex}`}
+              role="option"
+              aria-selected={highlightedIndex === createNewIndex}
               onClick={handleCreateNewClick}
-              className="w-full px-3 py-2 text-left border-t hover:bg-muted cursor-pointer"
+              className={cn(
+                'w-full px-3 py-2 text-left hover:bg-muted cursor-pointer',
+                filtered.length > 0 && 'border-t',
+                highlightedIndex === createNewIndex && 'bg-muted'
+              )}
             >
               <div className="font-medium text-primary">
-                + Create new customer &ldquo;{query}&rdquo;
+                + Create new customer {isEmailQuery ? `with email "${query}"` : `"${query}"`}
               </div>
               <div className="text-sm text-muted-foreground">
-                Add email and phone in the form below
+                {isEmailQuery ? 'Fill in name and phone in the form below' : 'Add email and phone in the form below'}
               </div>
             </button>
           )}

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useAddJob } from '@/components/jobs/add-job-provider'
 import { cn } from '@/lib/utils'
 import { useLocalStorage } from '@/lib/hooks/use-local-storage'
 import {
@@ -48,6 +49,7 @@ interface SidebarProps {
 
 export function Sidebar({ notificationCounts }: SidebarProps = {}) {
   const pathname = usePathname()
+  const { openAddJob } = useAddJob()
   const [isCollapsed, setIsCollapsed] = useLocalStorage('sidebarCollapsed', false)
 
   // Auto-collapse on medium screens (tablet), expand on large
@@ -158,18 +160,17 @@ export function Sidebar({ notificationCounts }: SidebarProps = {}) {
 
       {/* Add Job button - V2: Primary variant to emphasize core action */}
       <div className="p-3 border-t border-border">
-        <Link href="/jobs?action=add">
-          <Button
-            variant="default"
-            className={cn(
-              "w-full justify-start gap-2 text-sm bg-accent text-accent-foreground hover:bg-accent/90",
-              collapsed && "justify-center px-2"
-            )}
-          >
-            <Plus size={16} weight="bold" />
-            {!collapsed && "Add Job"}
-          </Button>
-        </Link>
+        <Button
+          variant="default"
+          onClick={openAddJob}
+          className={cn(
+            "w-full justify-start gap-2 text-sm bg-accent text-accent-foreground hover:bg-accent/90",
+            collapsed && "justify-center px-2"
+          )}
+        >
+          <Plus size={16} weight="bold" />
+          {!collapsed && "Add Job"}
+        </Button>
       </div>
 
       {/* Footer with notifications and account */}

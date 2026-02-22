@@ -71,6 +71,7 @@ export const jobSchema = z.object({
     .optional()
     .or(z.literal('')),
   enrollInCampaign: z.boolean().optional().default(true),
+  campaignOverride: z.string().optional().nullable().transform(v => v || null),
 })
 
 // Infer types from schema

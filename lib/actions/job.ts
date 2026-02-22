@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { jobSchema, type CSVJobRow } from '@/lib/validations/job'
-import { enrollJobInCampaign } from '@/lib/actions/enrollment'
+import { enrollJobInCampaign, stopEnrollmentsForJob } from '@/lib/actions/enrollment'
 import { parseAndValidatePhone } from '@/lib/utils/phone'
 
 export type JobActionState = {
@@ -63,6 +63,8 @@ export async function createJob(
   const notes = (formData.get('notes') as string) || ''
   const enrollInCampaignValue = formData.get('enrollInCampaign')
   const enrollInCampaign = enrollInCampaignValue === 'true' || enrollInCampaignValue === null
+  const campaignId = formData.get('campaignId') as string | null
+  const campaignOverride = formData.get('campaignOverride') as string | null
 
   // Defensive check: service type must be provided and valid before Zod validation
   if (!serviceType) {
@@ -130,6 +132,7 @@ export async function createJob(
     status,
     notes,
     enrollInCampaign,
+    campaignOverride,
   })
 
   if (!parsed.success) {
@@ -158,6 +161,7 @@ export async function createJob(
       service_type: parsed.data.serviceType,
       status: parsed.data.status,
       notes: parsed.data.notes || null,
+      campaign_override: parsed.data.campaignOverride,
       completed_at: parsed.data.status === 'completed' ? new Date().toISOString() : null,
     })
     .select('id')
@@ -169,8 +173,11 @@ export async function createJob(
   }
 
   // Enroll in campaign if status is 'completed' and enrollInCampaign is true
-  if (parsed.data.status === 'completed' && parsed.data.enrollInCampaign !== false) {
-    const enrollResult = await enrollJobInCampaign(newJob.id)
+  // Honor campaign_override: 'one_off' skips enrollment, UUID targets specific campaign
+  const override = parsed.data.campaignOverride
+  if (parsed.data.status === 'completed' && parsed.data.enrollInCampaign !== false && override !== 'one_off') {
+    const effectiveCampaignId = override || campaignId
+    const enrollResult = await enrollJobInCampaign(newJob.id, effectiveCampaignId ? { campaignId: effectiveCampaignId } : undefined)
     if (!enrollResult.success && !enrollResult.skipped) {
       console.warn('Enrollment failed:', enrollResult.error)
     }
@@ -216,12 +223,14 @@ export async function updateJob(
   }
 
   // Parse and validate input
+  const campaignOverride = formData.get('campaignOverride') as string | null
   const parsed = jobSchema.safeParse({
     customerId: formData.get('customerId'),
     serviceType: formData.get('serviceType'),
     status: formData.get('status') || 'scheduled',
     notes: formData.get('notes') || '',
     enrollInCampaign: formData.get('enrollInCampaign') === 'true' || formData.get('enrollInCampaign') === null,
+    campaignOverride,
   })
 
   if (!parsed.success) {
@@ -242,10 +251,10 @@ export async function updateJob(
     return { fieldErrors: { customerId: ['Please select a valid customer'] } }
   }
 
-  // Get current job to check status change
+  // Get current job to check status change and current campaign_override
   const { data: currentJob } = await supabase
     .from('jobs')
-    .select('status, completed_at')
+    .select('status, completed_at, campaign_override')
     .eq('id', jobId)
     .single()
 
@@ -267,6 +276,7 @@ export async function updateJob(
       service_type: serviceType,
       status,
       notes: notes || null,
+      campaign_override: parsed.data.campaignOverride,
       completed_at: completedAt,
     })
     .eq('id', jobId)
@@ -275,15 +285,49 @@ export async function updateJob(
     return { error: error.message }
   }
 
-  // Enroll in campaign if status changed to 'completed' and enrollInCampaign is true
-  if (status === 'completed' && currentJob?.status !== 'completed' && enrollInCampaign !== false) {
-    const enrollResult = await enrollJobInCampaign(jobId)
+  const override = parsed.data.campaignOverride
+  const campaignId = formData.get('campaignId') as string | null
+  const wasCompleted = currentJob?.status === 'completed'
+  const isNowCompleted = status === 'completed'
+  const previousOverride = currentJob?.campaign_override as string | null
+
+  // --- Enrollment / unenrollment logic ---
+
+  // Case 1: Status moving AWAY from completed → stop any active enrollments
+  if (wasCompleted && !isNowCompleted) {
+    await stopEnrollmentsForJob(jobId, 'owner_stopped')
+  }
+
+  // Case 2: Already completed, campaign choice changed → stop old enrollment, maybe re-enroll
+  if (wasCompleted && isNowCompleted && override !== previousOverride) {
+    // Stop existing enrollments first
+    await stopEnrollmentsForJob(jobId, 'owner_stopped')
+
+    // Re-enroll if new choice is a campaign (not one_off, not do_not_send)
+    if (override !== 'one_off' && enrollInCampaign !== false) {
+      const effectiveCampaignId = override || campaignId
+      const enrollResult = await enrollJobInCampaign(jobId, effectiveCampaignId
+        ? { campaignId: effectiveCampaignId, forceCooldownOverride: true }
+        : { forceCooldownOverride: true })
+      if (!enrollResult.success && !enrollResult.skipped) {
+        console.warn('Re-enrollment failed:', enrollResult.error)
+      }
+    }
+  }
+
+  // Case 3: Transitioning TO completed (fresh enrollment)
+  if (!wasCompleted && isNowCompleted && enrollInCampaign !== false && override !== 'one_off') {
+    const effectiveCampaignId = override || campaignId
+    const enrollResult = await enrollJobInCampaign(jobId, effectiveCampaignId ? { campaignId: effectiveCampaignId } : undefined)
     if (!enrollResult.success && !enrollResult.skipped) {
       console.warn('Enrollment failed:', enrollResult.error)
     }
   }
 
   revalidatePath('/jobs')
+  revalidatePath('/customers')
+  revalidatePath('/dashboard')
+  revalidatePath('/campaigns')
   return { success: true, data: { id: jobId } }
 }
 
@@ -352,6 +396,16 @@ export async function markJobComplete(
     return { error: 'Business not found' }
   }
 
+  // Fetch the job's campaign_override before updating
+  const { data: currentJob } = await supabase
+    .from('jobs')
+    .select('campaign_override')
+    .eq('id', jobId)
+    .eq('business_id', business.id)
+    .single()
+
+  const override = currentJob?.campaign_override as string | null
+
   const { error } = await supabase
     .from('jobs')
     .update({
@@ -366,8 +420,10 @@ export async function markJobComplete(
   }
 
   // Enroll in campaign if enrollInCampaign is true (default)
-  if (enrollInCampaign) {
-    const enrollResult = await enrollJobInCampaign(jobId)
+  // Honor campaign_override: 'one_off' skips enrollment, UUID targets specific campaign
+  if (enrollInCampaign && override !== 'one_off') {
+    const enrollOpts = override ? { campaignId: override } : undefined
+    const enrollResult = await enrollJobInCampaign(jobId, enrollOpts)
 
     // Don't fail the job update if enrollment fails - just log
     if (!enrollResult.success && !enrollResult.skipped) {

@@ -14,12 +14,16 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Checkbox } from '@/components/ui/checkbox'
+import { Skeleton } from '@/components/ui/skeleton'
 import { CustomerAutocomplete } from './customer-autocomplete'
 import { ServiceTypeSelect } from './service-type-select'
+import { CampaignSelector, CAMPAIGN_DO_NOT_SEND, CAMPAIGN_ONE_OFF } from './campaign-selector'
 import { createJob, type JobActionState } from '@/lib/actions/job'
-import { JOB_STATUSES, JOB_STATUS_LABELS, JOB_STATUS_DESCRIPTIONS } from '@/lib/validations/job'
+import { JOB_STATUS_LABELS, JOB_STATUS_DESCRIPTIONS } from '@/lib/validations/job'
 import type { ServiceType, JobStatus } from '@/lib/types/database'
+
+// Statuses shown in the Add Job sheet (do_not_send is handled via campaign selector)
+const ADD_JOB_STATUSES: JobStatus[] = ['scheduled', 'completed']
 
 interface Customer {
   id: string
@@ -34,9 +38,11 @@ interface AddJobSheetProps {
   customers: Customer[]
   /** Service types enabled for this business (scopes the ServiceTypeSelect options) */
   enabledServiceTypes?: ServiceType[]
+  /** Show loading skeletons while data is being fetched */
+  isLoadingData?: boolean
 }
 
-export function AddJobSheet({ open, onOpenChange, customers, enabledServiceTypes }: AddJobSheetProps) {
+export function AddJobSheet({ open, onOpenChange, customers, enabledServiceTypes, isLoadingData }: AddJobSheetProps) {
   const [state, formAction, isPending] = useActionState<JobActionState | null, FormData>(
     createJob,
     null
@@ -57,8 +63,9 @@ export function AddJobSheet({ open, onOpenChange, customers, enabledServiceTypes
   const [serviceType, setServiceType] = useState<ServiceType | ''>('')
   const [status, setStatus] = useState<JobStatus>('scheduled')
   const [notes, setNotes] = useState('')
-  const [enrollInCampaign, setEnrollInCampaign] = useState(true)
-  const [sendOneOff, setSendOneOff] = useState(false)
+
+  // Campaign choice: campaign UUID, CAMPAIGN_DO_NOT_SEND, or CAMPAIGN_ONE_OFF
+  const [campaignChoice, setCampaignChoice] = useState<string | null>(null)
 
   // Reset form when sheet closes
   useEffect(() => {
@@ -71,8 +78,7 @@ export function AddJobSheet({ open, onOpenChange, customers, enabledServiceTypes
       setServiceType('')
       setStatus('scheduled')
       setNotes('')
-      setEnrollInCampaign(true)
-      setSendOneOff(false)
+      setCampaignChoice(null)
     }
   }, [open])
 
@@ -93,10 +99,16 @@ export function AddJobSheet({ open, onOpenChange, customers, enabledServiceTypes
     }
   }
 
-  const handleCreateNew = (name: string) => {
+  const handleCreateNew = (query: string) => {
     setMode('create')
-    setCustomerName(name)
     setSelectedCustomer(null)
+    if (query.includes('@')) {
+      setCustomerEmail(query)
+      setCustomerName('')
+    } else {
+      setCustomerName(query)
+      setCustomerEmail('')
+    }
   }
 
   const handleBackToSearch = () => {
@@ -117,13 +129,24 @@ export function AddJobSheet({ open, onOpenChange, customers, enabledServiceTypes
     }
 
     formData.set('serviceType', serviceType)
-    formData.set('status', status)
     formData.set('notes', notes)
 
-    if (status === 'completed') {
-      formData.set('enrollInCampaign', enrollInCampaign.toString())
-      if (!enrollInCampaign && sendOneOff) {
-        formData.set('sendOneOff', 'true')
+    // Determine actual status and enrollment based on campaign choice
+    if (campaignChoice === CAMPAIGN_DO_NOT_SEND) {
+      formData.set('status', 'do_not_send')
+      formData.set('enrollInCampaign', 'false')
+    } else if (campaignChoice === CAMPAIGN_ONE_OFF) {
+      formData.set('status', status)
+      formData.set('enrollInCampaign', 'false')
+      formData.set('campaignOverride', 'one_off')
+    } else {
+      formData.set('status', status)
+      if (campaignChoice) {
+        formData.set('enrollInCampaign', 'true')
+        formData.set('campaignId', campaignChoice)
+        formData.set('campaignOverride', campaignChoice)
+      } else {
+        formData.set('enrollInCampaign', 'true')
       }
     }
 
@@ -132,13 +155,22 @@ export function AddJobSheet({ open, onOpenChange, customers, enabledServiceTypes
 
   const isCustomerValid = selectedCustomer || (mode === 'create' && customerName && customerEmail)
 
+  // Description changes based on status and campaign choice
+  const description = status === 'scheduled'
+    ? 'Mark complete later when work is done.'
+    : campaignChoice === CAMPAIGN_ONE_OFF
+      ? 'You can send a one-off request after saving.'
+      : campaignChoice === CAMPAIGN_DO_NOT_SEND
+        ? 'No review request will be sent.'
+        : 'This job will be enrolled in the selected campaign.'
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Add Job</SheetTitle>
           <SheetDescription>
-            Create a new job. {status === 'scheduled' ? 'Mark complete later when work is done.' : 'Completed jobs are enrolled in campaigns.'}
+            Create a new job. {description}
           </SheetDescription>
         </SheetHeader>
 
@@ -147,7 +179,9 @@ export function AddJobSheet({ open, onOpenChange, customers, enabledServiceTypes
           <div className="space-y-2">
             <Label>Customer *</Label>
 
-            {mode === 'search' ? (
+            {isLoadingData ? (
+              <Skeleton className="h-9 w-full" />
+            ) : mode === 'search' ? (
               <CustomerAutocomplete
                 customers={customers}
                 value={selectedCustomer}
@@ -212,13 +246,30 @@ export function AddJobSheet({ open, onOpenChange, customers, enabledServiceTypes
           {/* Service Type */}
           <div className="space-y-2">
             <Label>Service Type *</Label>
-            <ServiceTypeSelect
-              value={serviceType}
-              onChange={setServiceType}
-              error={state?.fieldErrors?.serviceType?.[0]}
-              enabledTypes={enabledServiceTypes}
-            />
+            {isLoadingData ? (
+              <Skeleton className="h-9 w-full" />
+            ) : (
+              <ServiceTypeSelect
+                value={serviceType}
+                onChange={setServiceType}
+                error={state?.fieldErrors?.serviceType?.[0]}
+                enabledTypes={enabledServiceTypes}
+              />
+            )}
           </div>
+
+          {/* Campaign — appears after service type is selected */}
+          {serviceType && (
+            <div className="space-y-2">
+              <Label>Campaign</Label>
+              <CampaignSelector
+                serviceType={serviceType as ServiceType}
+                selectedCampaignId={campaignChoice}
+                onCampaignChange={setCampaignChoice}
+                showOneOff
+              />
+            </div>
+          )}
 
           {/* Status */}
           <div className="space-y-2">
@@ -228,7 +279,7 @@ export function AddJobSheet({ open, onOpenChange, customers, enabledServiceTypes
               onChange={(e) => setStatus(e.target.value as JobStatus)}
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             >
-              {JOB_STATUSES.map(s => (
+              {ADD_JOB_STATUSES.map(s => (
                 <option key={s} value={s}>
                   {JOB_STATUS_LABELS[s]}
                 </option>
@@ -238,44 +289,6 @@ export function AddJobSheet({ open, onOpenChange, customers, enabledServiceTypes
               {JOB_STATUS_DESCRIPTIONS[status]}
             </p>
           </div>
-
-          {/* Campaign enrollment checkbox - only for completed status */}
-          {status === 'completed' && (
-            <div className="space-y-2 rounded-lg border bg-muted/50 p-4">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="enrollInCampaign"
-                  checked={enrollInCampaign}
-                  onCheckedChange={(checked) => setEnrollInCampaign(!!checked)}
-                />
-                <Label htmlFor="enrollInCampaign" className="font-normal cursor-pointer">
-                  Enroll in review campaign
-                </Label>
-              </div>
-              <p className="text-xs text-muted-foreground ml-6">
-                Automatically send review requests based on your active campaign
-              </p>
-            </div>
-          )}
-
-          {/* One-off send toggle - shown when completed and not enrolling in campaign */}
-          {status === 'completed' && !enrollInCampaign && (
-            <div className="space-y-2 rounded-lg border border-warning-border bg-warning-bg/30 p-4">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="sendOneOff"
-                  checked={sendOneOff}
-                  onCheckedChange={(checked) => setSendOneOff(!!checked)}
-                />
-                <Label htmlFor="sendOneOff" className="font-normal cursor-pointer">
-                  Send one-off review request instead
-                </Label>
-              </div>
-              <p className="text-xs text-muted-foreground ml-6">
-                Sends a single manual request. For recurring follow-up, use campaign enrollment above.
-              </p>
-            </div>
-          )}
 
           {/* Notes */}
           <div className="space-y-2">

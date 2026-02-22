@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import { getJobs } from '@/lib/data/jobs'
 import { getCustomers } from '@/lib/actions/customer'
-import { getMatchingCampaignsForJobs } from '@/lib/data/campaign'
+import { getMatchingCampaignsForJobs, getCampaignsByIds } from '@/lib/data/campaign'
 import { getServiceTypeSettings } from '@/lib/data/business'
 import { JobsClient } from '@/components/jobs/jobs-client'
 import type { ServiceType } from '@/lib/types/database'
@@ -11,11 +11,7 @@ export const metadata = {
   description: 'Manage your service jobs',
 }
 
-interface JobsPageProps {
-  searchParams: Promise<{ action?: string }>
-}
-
-async function JobsContent({ defaultAddJobOpen }: { defaultAddJobOpen: boolean }) {
+async function JobsContent() {
   const [{ jobs, total, businessId }, { customers }, serviceSettings] = await Promise.all([
     getJobs(),
     getCustomers({ limit: 200 }), // For customer selector in add/edit forms
@@ -32,22 +28,29 @@ async function JobsContent({ defaultAddJobOpen }: { defaultAddJobOpen: boolean }
     ? await getMatchingCampaignsForJobs(businessId, serviceTypes)
     : new Map<string, { campaignName: string; firstTouchDelay: number }>()
 
+  // Fetch campaign names for jobs with campaign_override UUIDs
+  const overrideIds = [...new Set(
+    jobs
+      .filter(j => j.campaign_override && j.campaign_override !== 'one_off')
+      .map(j => j.campaign_override!)
+  )]
+  const campaignNames = overrideIds.length > 0
+    ? await getCampaignsByIds(overrideIds)
+    : new Map<string, { campaignName: string; firstTouchDelay: number }>()
+
   return (
     <JobsClient
       initialJobs={jobs}
       totalJobs={total}
       customers={customers}
       campaignMap={campaignMap}
-      defaultAddJobOpen={defaultAddJobOpen}
+      campaignNames={campaignNames}
       enabledServiceTypes={enabledServiceTypes}
     />
   )
 }
 
-export default async function JobsPage({ searchParams }: JobsPageProps) {
-  const { action } = await searchParams
-  const shouldOpenAddJob = action === 'add'
-
+export default function JobsPage() {
   return (
     <div className="container py-6 space-y-6">
       <Suspense fallback={
@@ -58,7 +61,7 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
           </div>
         </div>
       }>
-        <JobsContent defaultAddJobOpen={shouldOpenAddJob} />
+        <JobsContent />
       </Suspense>
     </div>
   )

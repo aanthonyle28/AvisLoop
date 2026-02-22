@@ -121,6 +121,7 @@ export interface Job {
   service_type: ServiceType
   status: JobStatus
   notes: string | null
+  campaign_override: string | null
   completed_at: string | null
   created_at: string
   updated_at: string
@@ -140,6 +141,8 @@ export interface JobWithEnrollment extends JobWithCustomer {
   }>
   // Added client-side for scheduled jobs without enrollment
   matchingCampaign?: { campaignName: string; firstTouchDelay: number } | null
+  // Resolved campaign_override UUID → campaign name (for display in columns)
+  overrideCampaign?: { campaignName: string; firstTouchDelay: number } | null
 }
 
 // Insert type (omit auto-generated fields)

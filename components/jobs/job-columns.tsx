@@ -2,20 +2,27 @@
 
 import { type ColumnDef } from '@tanstack/react-table'
 import { format, formatDistanceToNow } from 'date-fns'
-import { PencilSimple, Trash, Clock, CheckCircle, XCircle, Minus } from '@phosphor-icons/react'
+import { PencilSimple, Trash, Clock, CheckCircle, XCircle, Minus, PaperPlaneTilt, DotsThree } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { SERVICE_TYPE_LABELS } from '@/lib/validations/job'
-import { deleteJob } from '@/lib/actions/job'
-import { toast } from 'sonner'
 import { MarkCompleteButton } from './mark-complete-button'
 import type { JobWithEnrollment } from '@/lib/types/database'
 
 interface ColumnsOptions {
   onEdit: (job: JobWithEnrollment) => void
+  onDelete: (jobId: string) => void
+  onMarkComplete: (jobId: string) => void
+  onSendOneOff: (customerId: string) => void
 }
 
-export function columns({ onEdit }: ColumnsOptions): ColumnDef<JobWithEnrollment>[] {
+export function columns({ onEdit, onDelete, onMarkComplete, onSendOneOff }: ColumnsOptions): ColumnDef<JobWithEnrollment>[] {
   return [
     {
       accessorKey: 'customers.name',
@@ -49,18 +56,14 @@ export function columns({ onEdit }: ColumnsOptions): ColumnDef<JobWithEnrollment
         const status = row.original.status
         const completedAt = row.original.completed_at
 
-        // Three-state workflow: scheduled -> completed -> do_not_send
         if (status === 'scheduled') {
           return (
-            <div className="flex items-center gap-2">
-              <Badge
-                variant="secondary"
-                className="bg-warning-bg text-warning-foreground"
-              >
-                Scheduled
-              </Badge>
-              <MarkCompleteButton jobId={row.original.id} size="xs" />
-            </div>
+            <Badge
+              variant="secondary"
+              className="bg-warning-bg text-warning-foreground"
+            >
+              Scheduled
+            </Badge>
           )
         }
 
@@ -142,7 +145,29 @@ export function columns({ onEdit }: ColumnsOptions): ColumnDef<JobWithEnrollment
           )
         }
 
-        // Scheduled job with matching campaign - show preview
+        // Scheduled job with campaign_override = 'one_off' — dimmed preview
+        if (job.status === 'scheduled' && job.campaign_override === 'one_off') {
+          return (
+            <span className="text-xs text-muted-foreground flex items-center gap-1">
+              <PaperPlaneTilt size={14} className="text-muted-foreground/70" />
+              One-off (on complete)
+            </span>
+          )
+        }
+
+        // Scheduled job with campaign_override = UUID — show chosen campaign name
+        if (job.status === 'scheduled' && job.overrideCampaign) {
+          const hours = job.overrideCampaign.firstTouchDelay
+          const timeStr = hours < 24 ? `${hours}h` : `${Math.round(hours / 24)}d`
+          return (
+            <span className="text-xs text-muted-foreground flex items-center gap-1">
+              <Clock size={14} weight="fill" className="text-primary/70" />
+              {job.overrideCampaign.campaignName} in {timeStr}
+            </span>
+          )
+        }
+
+        // Scheduled job with matching campaign - show preview (auto-detect fallback)
         if (matchingCampaign && job.status === 'scheduled') {
           const hours = matchingCampaign.firstTouchDelay
           const timeStr = hours < 24 ? `${hours}h` : `${Math.round(hours / 24)}d`
@@ -154,17 +179,21 @@ export function columns({ onEdit }: ColumnsOptions): ColumnDef<JobWithEnrollment
           )
         }
 
-        // Completed job should be enrolled but isn't (edge case)
-        if (matchingCampaign && job.status === 'completed') {
+        // Completed job with no enrollment — offer one-off send
+        if (job.status === 'completed') {
           return (
-            <span className="text-xs text-warning flex items-center gap-1">
-              <Clock size={14} weight="fill" />
-              Pending enrollment
-            </span>
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); if (job.customers?.id) onSendOneOff(job.customers.id) }}
+              className="text-xs text-primary hover:text-primary/80 flex items-center gap-1 hover:underline cursor-pointer"
+            >
+              <PaperPlaneTilt size={14} weight="fill" />
+              Send One-Off Request
+            </button>
           )
         }
 
-        // No matching campaign
+        // Scheduled job with no matching campaign
         return (
           <span className="text-xs text-muted-foreground">
             No campaign
@@ -183,36 +212,41 @@ export function columns({ onEdit }: ColumnsOptions): ColumnDef<JobWithEnrollment
       cell: ({ row }) => {
         const job = row.original
 
-        const handleDelete = async () => {
-          if (!confirm('Are you sure you want to delete this job?')) return
-          const result = await deleteJob(job.id)
-          if (result.error) {
-            toast.error(result.error)
-          } else {
-            toast.success('Job deleted')
-          }
-        }
-
         return (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onEdit(job)}
-              className="h-8 w-8"
-            >
-              <PencilSimple className="h-4 w-4" />
-              <span className="sr-only">Edit</span>
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleDelete}
-              className="h-8 w-8 text-destructive hover:text-destructive"
-            >
-              <Trash className="h-4 w-4" />
-              <span className="sr-only">Delete</span>
-            </Button>
+          <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
+            {/* Mark Complete button — desktop only, for scheduled jobs */}
+            {job.status === 'scheduled' && (
+              <MarkCompleteButton jobId={job.id} size="xs" className="hidden sm:inline-flex" />
+            )}
+
+            {/* 3-dot dropdown menu */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <DotsThree size={20} />
+                  <span className="sr-only">Open menu</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {job.status === 'scheduled' && (
+                  <DropdownMenuItem onClick={() => onMarkComplete(job.id)}>
+                    <CheckCircle size={16} className="mr-2" />
+                    Mark Complete
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={() => onEdit(job)}>
+                  <PencilSimple size={16} className="mr-2" />
+                  Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => onDelete(job.id)}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <Trash size={16} className="mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         )
       },

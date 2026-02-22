@@ -1,10 +1,12 @@
 'use client'
 
-import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { AddressBook, Briefcase, Users } from '@phosphor-icons/react'
+import { useAddJob } from '@/components/jobs/add-job-provider'
 
 export function CustomersEmptyState() {
+  const { openAddJob } = useAddJob()
+
   return (
     <div className='flex flex-col items-center justify-center py-16 px-4 text-center'>
       <div className='rounded-full bg-muted p-6 mb-6'>
@@ -20,12 +22,10 @@ export function CustomersEmptyState() {
       </p>
 
       <div className='flex flex-col sm:flex-row gap-3'>
-        <Link href="/jobs?action=add">
-          <Button>
-            <Briefcase className='mr-2 h-4 w-4' weight="regular" />
-            Add Your First Job
-          </Button>
-        </Link>
+        <Button onClick={openAddJob}>
+          <Briefcase className='mr-2 h-4 w-4' weight="regular" />
+          Add Your First Job
+        </Button>
       </div>
 
       <p className='text-sm text-muted-foreground mt-6 max-w-sm'>

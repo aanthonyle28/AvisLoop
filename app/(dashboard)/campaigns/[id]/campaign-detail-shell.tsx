@@ -101,9 +101,15 @@ export function CampaignDetailShell({
   const handleDeleteClick = async () => {
     setDeleteDialogOpen(true)
     setIsLoadingDeletionInfo(true)
-    const info = await getCampaignDeletionInfo(campaign.id)
-    setDeletionInfo(info)
-    setIsLoadingDeletionInfo(false)
+    try {
+      const info = await getCampaignDeletionInfo(campaign.id)
+      setDeletionInfo(info)
+    } catch {
+      setDeletionInfo({ activeEnrollments: 0, affectedJobs: 0 })
+      toast.error('Failed to load deletion impact info')
+    } finally {
+      setIsLoadingDeletionInfo(false)
+    }
   }
 
   const handleDeleteConfirm = () => {

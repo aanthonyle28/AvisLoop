@@ -97,6 +97,7 @@ Stores completed service jobs for each business. Each job links to exactly one c
 | service_type | TEXT | NO | - | One of: hvac, plumbing, electrical, cleaning, roofing, painting, handyman, other |
 | status | TEXT | NO | 'completed' | 'completed' or 'do_not_send' |
 | notes | TEXT | YES | - | Internal notes about the job |
+| campaign_override | TEXT | YES | - | Campaign choice: NULL=auto-detect, UUID=specific campaign, 'one_off'=skip enrollment |
 | completed_at | TIMESTAMPTZ | YES | - | When job was marked completed (null if do_not_send) |
 | created_at | TIMESTAMPTZ | YES | NOW() | Created timestamp |
 | updated_at | TIMESTAMPTZ | YES | NOW() | Updated timestamp |
@@ -138,6 +139,21 @@ Simple two-state workflow for v2.0:
 - `do_not_send` - Job complete but should not trigger review request
 
 When status changes to 'completed', completed_at is set. Campaign enrollment logic (Phase 24) uses completed_at to determine timing.
+
+### Campaign Override
+
+The `campaign_override` column persists the user's campaign choice from the CampaignSelector dropdown:
+
+- `NULL` — Auto-detect campaign based on service type (default, current behavior)
+- UUID string — Enroll in this specific campaign when job is completed
+- `'one_off'` — Skip campaign enrollment; user intends to send a one-off review request manually
+
+When `markJobComplete()` is called, it reads `campaign_override` to determine enrollment behavior:
+- `one_off` → skip enrollment entirely
+- UUID → pass to `enrollJobInCampaign({ campaignId: override })`
+- `null` → auto-detect matching campaign (current behavior)
+
+One-off jobs are excluded from the dashboard's "Ready to Send" queue since they are intentionally unenrolled.
 
 ## Business Service Type Settings
 

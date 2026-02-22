@@ -64,6 +64,38 @@ async function cancelActiveEnrollments(
 }
 
 /**
+ * Stop all active enrollments for a specific job.
+ * Used when editing a job to change campaign or revert status.
+ */
+export async function stopEnrollmentsForJob(
+  jobId: string,
+  stopReason: 'owner_stopped' | 'repeat_job' = 'owner_stopped'
+): Promise<{ stopped: number; error?: string }> {
+  const supabase = await createClient()
+
+  // Verify the user is authenticated (RLS provides business scoping)
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { stopped: 0, error: 'Not authenticated' }
+
+  const { data, error } = await supabase
+    .from('campaign_enrollments')
+    .update({
+      status: 'stopped',
+      stop_reason: stopReason,
+      stopped_at: new Date().toISOString(),
+    })
+    .eq('job_id', jobId)
+    .eq('status', 'active')
+    .select('id')
+
+  if (error) {
+    return { stopped: 0, error: error.message }
+  }
+
+  return { stopped: data?.length || 0 }
+}
+
+/**
  * Enroll a completed job in its matching campaign.
  *
  * Flow:

@@ -1,28 +1,15 @@
 'use client'
 
-import { useRouter, usePathname } from 'next/navigation'
 import { Plus } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
-
-// Pages where FAB should be hidden (Jobs page has header button)
-const HIDDEN_ON_PATHS = ['/jobs']
+import { useAddJob } from '@/components/jobs/add-job-provider'
 
 export function MobileFAB() {
-  const router = useRouter()
-  const pathname = usePathname()
-
-  // Hide on certain pages or when path matches
-  const shouldHide = HIDDEN_ON_PATHS.some(p => pathname.startsWith(p))
-
-  if (shouldHide) return null
-
-  const handleClick = () => {
-    router.push('/jobs?action=add')
-  }
+  const { openAddJob } = useAddJob()
 
   return (
     <button
-      onClick={handleClick}
+      onClick={openAddJob}
       aria-label="Add Job"
       className={cn(
         // Positioning: fixed bottom-right, above bottom nav (72px + 8px margin)

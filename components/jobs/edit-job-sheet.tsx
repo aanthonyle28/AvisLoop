@@ -13,12 +13,15 @@ import {
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Checkbox } from '@/components/ui/checkbox'
 import { CustomerSelector } from './customer-selector'
 import { ServiceTypeSelect } from './service-type-select'
+import { CampaignSelector, CAMPAIGN_DO_NOT_SEND, CAMPAIGN_ONE_OFF } from './campaign-selector'
 import { updateJob, type JobActionState } from '@/lib/actions/job'
-import { JOB_STATUSES, JOB_STATUS_LABELS } from '@/lib/validations/job'
+import { JOB_STATUS_LABELS, JOB_STATUS_DESCRIPTIONS } from '@/lib/validations/job'
 import type { JobWithCustomer, Customer, ServiceType, JobStatus } from '@/lib/types/database'
+
+// Statuses shown in the Edit Job sheet (do_not_send handled via campaign selector)
+const EDIT_JOB_STATUSES: JobStatus[] = ['scheduled', 'completed']
 
 interface EditJobSheetProps {
   open: boolean
@@ -36,17 +39,34 @@ export function EditJobSheet({ open, onOpenChange, job, customers }: EditJobShee
   // Local state initialized from job
   const [customerId, setCustomerId] = useState<string | null>(job.customer_id)
   const [serviceType, setServiceType] = useState<ServiceType>(job.service_type)
-  const [status, setStatus] = useState<JobStatus>(job.status)
+  const [status, setStatus] = useState<JobStatus>(
+    // If the job is do_not_send, default to completed in the dropdown
+    // (the campaign selector will be set to "Do not send")
+    job.status === 'do_not_send' ? 'completed' : job.status
+  )
   const [notes, setNotes] = useState(job.notes || '')
-  const [enrollInCampaign, setEnrollInCampaign] = useState(true)
+  const [campaignChoice, setCampaignChoice] = useState<string | null>(() => {
+    if (job.status === 'do_not_send') return CAMPAIGN_DO_NOT_SEND
+    if (job.campaign_override === 'one_off') return CAMPAIGN_ONE_OFF
+    if (job.campaign_override) return job.campaign_override
+    return null
+  })
 
   // Reset form when job changes
   useEffect(() => {
     setCustomerId(job.customer_id)
     setServiceType(job.service_type)
-    setStatus(job.status)
+    setStatus(job.status === 'do_not_send' ? 'completed' : job.status)
     setNotes(job.notes || '')
-    setEnrollInCampaign(true)
+    if (job.status === 'do_not_send') {
+      setCampaignChoice(CAMPAIGN_DO_NOT_SEND)
+    } else if (job.campaign_override === 'one_off') {
+      setCampaignChoice(CAMPAIGN_ONE_OFF)
+    } else if (job.campaign_override) {
+      setCampaignChoice(job.campaign_override)
+    } else {
+      setCampaignChoice(null)
+    }
   }, [job])
 
   // Handle success/error
@@ -63,14 +83,40 @@ export function EditJobSheet({ open, onOpenChange, job, customers }: EditJobShee
     formData.set('jobId', job.id)
     if (customerId) formData.set('customerId', customerId)
     formData.set('serviceType', serviceType)
-    formData.set('status', status)
     formData.set('notes', notes)
-    if (status === 'completed' && job.status !== 'completed') {
-      // Only send enrollInCampaign when changing status to completed
-      formData.set('enrollInCampaign', enrollInCampaign.toString())
+
+    // Determine actual status and enrollment based on campaign choice
+    if (campaignChoice === CAMPAIGN_DO_NOT_SEND) {
+      formData.set('status', 'do_not_send')
+      formData.set('enrollInCampaign', 'false')
+    } else if (campaignChoice === CAMPAIGN_ONE_OFF) {
+      formData.set('status', status)
+      formData.set('enrollInCampaign', 'false')
+      formData.set('campaignOverride', 'one_off')
+    } else {
+      formData.set('status', status)
+      if (campaignChoice) {
+        formData.set('campaignOverride', campaignChoice)
+      }
+      if (status === 'completed' && job.status !== 'completed') {
+        // Changing to completed — enroll in selected campaign
+        formData.set('enrollInCampaign', 'true')
+        if (campaignChoice) {
+          formData.set('campaignId', campaignChoice)
+        }
+      }
     }
+
     formAction(formData)
   }
+
+  // Contextual completion note when transitioning to completed
+  const completionNote = (() => {
+    if (status !== 'completed' || job.status === 'completed') return ''
+    if (campaignChoice === CAMPAIGN_DO_NOT_SEND) return ''
+    if (campaignChoice === CAMPAIGN_ONE_OFF) return ' You can send a one-off request after completion.'
+    return ' This will enroll the customer in the selected campaign.'
+  })()
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -78,7 +124,7 @@ export function EditJobSheet({ open, onOpenChange, job, customers }: EditJobShee
         <SheetHeader>
           <SheetTitle>Edit Job</SheetTitle>
           <SheetDescription>
-            Update job details. Changing status to completed will set the completion timestamp.
+            Update job details.{completionNote}
           </SheetDescription>
         </SheetHeader>
 
@@ -104,6 +150,20 @@ export function EditJobSheet({ open, onOpenChange, job, customers }: EditJobShee
             />
           </div>
 
+          {/* Campaign — appears after service type is selected */}
+          {serviceType && (
+            <div className="space-y-2">
+              <Label>Campaign</Label>
+              <CampaignSelector
+                serviceType={serviceType}
+                selectedCampaignId={campaignChoice}
+                onCampaignChange={setCampaignChoice}
+                showOneOff
+                defaultCampaignId={job.campaign_override}
+              />
+            </div>
+          )}
+
           {/* Status */}
           <div className="space-y-2">
             <Label>Status</Label>
@@ -112,37 +172,16 @@ export function EditJobSheet({ open, onOpenChange, job, customers }: EditJobShee
               onChange={(e) => setStatus(e.target.value as JobStatus)}
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             >
-              {JOB_STATUSES.map(s => (
+              {EDIT_JOB_STATUSES.map(s => (
                 <option key={s} value={s}>
                   {JOB_STATUS_LABELS[s]}
                 </option>
               ))}
             </select>
             <p className="text-xs text-muted-foreground">
-              {status === 'completed'
-                ? 'Completed jobs will be enrolled in campaigns automatically.'
-                : 'Do Not Send jobs will not trigger review requests.'}
+              {JOB_STATUS_DESCRIPTIONS[status]}
             </p>
           </div>
-
-          {/* Campaign enrollment checkbox - only when changing status to completed */}
-          {status === 'completed' && job.status !== 'completed' && (
-            <div className="space-y-2 rounded-lg border bg-muted/50 p-4">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="enrollInCampaign"
-                  checked={enrollInCampaign}
-                  onCheckedChange={(checked) => setEnrollInCampaign(!!checked)}
-                />
-                <Label htmlFor="enrollInCampaign" className="font-normal cursor-pointer">
-                  Enroll in review campaign
-                </Label>
-              </div>
-              <p className="text-xs text-muted-foreground ml-6">
-                Automatically send review requests based on your active campaign
-              </p>
-            </div>
-          )}
 
           {/* Notes */}
           <div className="space-y-2">

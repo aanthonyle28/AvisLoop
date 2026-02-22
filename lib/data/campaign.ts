@@ -52,7 +52,12 @@ export async function getCampaigns(
     }
   }
 
-  const { data } = await query
+  const { data, error } = await query
+
+  if (error) {
+    console.error('[getCampaigns] Query failed:', error.message)
+    return []
+  }
 
   // Sort touches by touch_number
   return (data || []).map(campaign => ({
@@ -72,7 +77,7 @@ export async function getCampaign(campaignId: string): Promise<CampaignWithTouch
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('campaigns')
     .select(`
       *,
@@ -80,6 +85,11 @@ export async function getCampaign(campaignId: string): Promise<CampaignWithTouch
     `)
     .eq('id', campaignId)
     .single()
+
+  if (error) {
+    console.error('[getCampaign] Query failed:', error.message, { campaignId })
+    return null
+  }
 
   if (!data) return null
 
@@ -339,6 +349,35 @@ export async function getMatchingCampaignsForJobs(
     }
   }
 
+  return result
+}
+
+/**
+ * Fetch campaign names and first touch delay for a list of campaign IDs.
+ * Used to resolve campaign_override UUIDs to display names in job columns.
+ */
+export async function getCampaignsByIds(
+  campaignIds: string[]
+): Promise<Map<string, { campaignName: string; firstTouchDelay: number }>> {
+  if (campaignIds.length === 0) return new Map()
+
+  const supabase = await createClient()
+
+  const { data: campaigns } = await supabase
+    .from('campaigns')
+    .select('id, name, campaign_touches(delay_hours)')
+    .in('id', campaignIds)
+
+  if (!campaigns) return new Map()
+
+  const result = new Map<string, { campaignName: string; firstTouchDelay: number }>()
+  for (const c of campaigns) {
+    const firstTouch = c.campaign_touches?.[0]
+    result.set(c.id, {
+      campaignName: c.name,
+      firstTouchDelay: firstTouch?.delay_hours || 24,
+    })
+  }
   return result
 }
 

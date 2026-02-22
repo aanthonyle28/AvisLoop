@@ -1,4 +1,5 @@
 import { AppShell } from '@/components/layout/app-shell'
+import { AddJobProvider } from '@/components/jobs/add-job-provider'
 import { getSetupProgress } from '@/lib/data/onboarding'
 import { getDashboardCounts } from '@/lib/data/dashboard'
 
@@ -25,12 +26,14 @@ export default async function DashboardGroupLayout({
   }
 
   return (
-    <AppShell
-      setupProgress={setupProgress}
-      dashboardBadge={dashboardBadge}
-      notificationCounts={notificationCounts}
-    >
-      {children}
-    </AppShell>
+    <AddJobProvider>
+      <AppShell
+        setupProgress={setupProgress}
+        dashboardBadge={dashboardBadge}
+        notificationCounts={notificationCounts}
+      >
+        {children}
+      </AppShell>
+    </AddJobProvider>
   )
 }

@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { EnvelopeSimple, ChatCircle, Clock, Star, Wrench } from '@phosphor-icons/react'
+import { EnvelopeSimple, ChatCircle, Clock, Star, Wrench, PaperPlaneTilt } from '@phosphor-icons/react'
 import { duplicateCampaign, createCampaign } from '@/lib/actions/campaign'
 import { CAMPAIGN_PRESETS, type CampaignPreset } from '@/lib/constants/campaigns'
 import { SERVICE_TYPE_LABELS } from '@/lib/validations/job'
@@ -32,11 +32,12 @@ interface CreateCampaignDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   presets: CampaignWithTouches[]
+  onOneOff?: () => void
 }
 
 type Selection = { type: 'preset'; presetId: string; meta: CampaignPreset } | { type: 'custom' }
 
-export function CreateCampaignDialog({ open, onOpenChange, presets }: CreateCampaignDialogProps) {
+export function CreateCampaignDialog({ open, onOpenChange, presets, onOneOff }: CreateCampaignDialogProps) {
   const router = useRouter()
   const [selected, setSelected] = useState<Selection | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -211,6 +212,28 @@ export function CreateCampaignDialog({ open, onOpenChange, presets }: CreateCamp
             </div>
           </div>
         </div>
+
+        {/* One-off send option */}
+        {onOneOff && (
+          <div className="border-t pt-4 mt-1">
+            <button
+              type="button"
+              onClick={onOneOff}
+              className="flex items-start gap-3 w-full text-left rounded-lg p-3 hover:bg-muted/50 transition-colors"
+            >
+              <div className="rounded-full bg-muted p-2 shrink-0 mt-0.5">
+                <PaperPlaneTilt className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <div>
+                <p className="text-sm font-medium">Send a one-off request instead</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Best for one-time customers who won&apos;t return, like a handyman visit or emergency repair.
+                  Sends a single review request without creating a campaign.
+                </p>
+              </div>
+            </button>
+          </div>
+        )}
 
         <DialogFooter>
           <Button variant="outline" onClick={() => handleOpenChange(false)} disabled={isPending}>

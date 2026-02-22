@@ -4,16 +4,35 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Plus, Megaphone } from '@phosphor-icons/react'
 import { CreateCampaignDialog } from '@/components/campaigns/create-campaign-dialog'
-import type { CampaignWithTouches } from '@/lib/types/database'
+import { QuickSendModal } from '@/components/send/quick-send-modal'
+import type { CampaignWithTouches, Customer, Business, MessageTemplate } from '@/lib/types/database'
 
 interface CampaignsPageShellProps {
   hasCampaigns: boolean
   presets: CampaignWithTouches[]
+  business: Business & { message_templates?: MessageTemplate[] }
+  customers: Customer[]
+  sendTemplates: MessageTemplate[]
+  monthlyUsage: { count: number; limit: number; tier: string }
   children: React.ReactNode
 }
 
-export function CampaignsPageShell({ hasCampaigns, presets, children }: CampaignsPageShellProps) {
+export function CampaignsPageShell({
+  hasCampaigns,
+  presets,
+  business,
+  customers,
+  sendTemplates,
+  monthlyUsage,
+  children,
+}: CampaignsPageShellProps) {
   const [createOpen, setCreateOpen] = useState(false)
+  const [quickSendOpen, setQuickSendOpen] = useState(false)
+
+  const handleOneOff = () => {
+    setCreateOpen(false)
+    setQuickSendOpen(true)
+  }
 
   return (
     <div className="container py-6 space-y-6">
@@ -69,6 +88,17 @@ export function CampaignsPageShell({ hasCampaigns, presets, children }: Campaign
         open={createOpen}
         onOpenChange={setCreateOpen}
         presets={presets}
+        onOneOff={handleOneOff}
+      />
+
+      <QuickSendModal
+        open={quickSendOpen}
+        onOpenChange={setQuickSendOpen}
+        customers={customers}
+        business={business}
+        templates={sendTemplates}
+        monthlyUsage={monthlyUsage}
+        hasReviewLink={!!business.google_review_link}
       />
     </div>
   )

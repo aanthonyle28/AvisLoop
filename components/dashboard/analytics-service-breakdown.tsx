@@ -1,9 +1,9 @@
 'use client'
 
-import Link from 'next/link'
 import { ChartBar } from '@phosphor-icons/react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { useAddJob } from '@/components/jobs/add-job-provider'
 import type { ServiceTypeAnalytics } from '@/lib/data/analytics'
 
 interface Props {
@@ -11,6 +11,8 @@ interface Props {
 }
 
 export function ServiceTypeBreakdown({ data }: Props) {
+  const { openAddJob } = useAddJob()
+
   // Empty state
   if (data.byServiceType.length === 0) {
     return (
@@ -24,9 +26,7 @@ export function ServiceTypeBreakdown({ data }: Props) {
         <p className="text-muted-foreground mb-6 max-w-sm">
           Analytics appear once campaigns start sending. Complete a job to kick off your first campaign.
         </p>
-        <Link href="/jobs?action=add">
-          <Button>Add your first job</Button>
-        </Link>
+        <Button onClick={openAddJob}>Add your first job</Button>
       </div>
     )
   }
