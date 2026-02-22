@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 import { Info } from '@phosphor-icons/react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { getAvailableCampaignsForJob, type AvailableCampaign } from '@/lib/actions/add-job-campaigns'
@@ -16,7 +16,7 @@ interface CampaignSelectorProps {
   onCampaignChange: (campaignId: string | null) => void
   /** Show "Send one-off review" option */
   showOneOff?: boolean
-  /** When set, suppresses auto-recommendation on initial load (preserves saved campaign_override when editing) */
+  /** When set, preserves the saved campaign choice instead of auto-selecting recommended */
   defaultCampaignId?: string | null
 }
 
@@ -29,39 +29,37 @@ export function CampaignSelector({
 }: CampaignSelectorProps) {
   const [isLoading, startTransition] = useTransition()
   const [campaigns, setCampaigns] = useState<AvailableCampaign[]>([])
-  const [lastServiceType, setLastServiceType] = useState<string>('')
-  const isInitialFetch = useRef(true)
-
-  // Stable callback ref so useEffect doesn't re-fire on every render
-  const onCampaignChangeRef = useCallback(onCampaignChange, [onCampaignChange])
+  const lastServiceTypeRef = useRef<string>('')
+  const onCampaignChangeRef = useRef(onCampaignChange)
+  onCampaignChangeRef.current = onCampaignChange
 
   // Fetch campaigns when serviceType changes
   useEffect(() => {
-    if (serviceType === lastServiceType) return
-    setLastServiceType(serviceType)
+    if (serviceType === lastServiceTypeRef.current) return
+    lastServiceTypeRef.current = serviceType
 
     startTransition(async () => {
       const result = await getAvailableCampaignsForJob(serviceType)
       setCampaigns(result)
 
-      // On initial fetch with a defaultCampaignId, preserve the saved choice
-      // BUT only if the saved campaign still exists (wasn't deleted)
-      if (isInitialFetch.current && defaultCampaignId !== undefined && defaultCampaignId !== null) {
-        isInitialFetch.current = false
-        const savedExists =
+      // If a saved value was provided, preserve it (unless the campaign was deleted)
+      if (defaultCampaignId !== undefined) {
+        if (
+          defaultCampaignId === null ||
           defaultCampaignId === CAMPAIGN_ONE_OFF ||
           defaultCampaignId === CAMPAIGN_DO_NOT_SEND ||
           result.some(c => c.id === defaultCampaignId)
-        if (savedExists) return
+        ) {
+          return // Saved choice is still valid — don't overwrite
+        }
         // Saved campaign was deleted — fall through to auto-select
       }
-      isInitialFetch.current = false
 
-      // Auto-select recommended campaign
+      // Auto-select recommended campaign (AddJob flow, or deleted-campaign fallback)
       const recommended = result.find(c => c.isRecommended)
-      onCampaignChangeRef(recommended?.id ?? null)
+      onCampaignChangeRef.current(recommended?.id ?? null)
     })
-  }, [serviceType, lastServiceType, onCampaignChangeRef, defaultCampaignId])
+  }, [serviceType, defaultCampaignId])
 
   if (isLoading) {
     return <Skeleton className="h-9 w-full" />
