@@ -45,7 +45,6 @@ export default async function CampaignsPage() {
       <CampaignList
         campaigns={campaigns}
         templates={campaignTemplates}
-        enabledServiceTypes={business.service_types_enabled || []}
       />
     </CampaignsPageShell>
   )

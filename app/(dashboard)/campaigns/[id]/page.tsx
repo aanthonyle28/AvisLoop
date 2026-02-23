@@ -85,7 +85,6 @@ export default async function CampaignDetailPage({ params, searchParams }: Campa
         <CampaignDetailShell
           campaign={campaign}
           templates={templates}
-          enabledServiceTypes={business.service_types_enabled || []}
         />
       </div>
 

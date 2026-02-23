@@ -1,7 +1,6 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import type { ServiceType } from '@/lib/types/database'
 
 interface AddJobCustomer {
   id: string
@@ -12,29 +11,29 @@ interface AddJobCustomer {
 
 export interface AddJobData {
   customers: AddJobCustomer[]
-  enabledServiceTypes: ServiceType[]
 }
 
 /**
  * Lazy-load data needed for the Add Job sheet.
  * Called on-demand when the drawer opens (not on every page load).
+ * Note: enabledServiceTypes is provided by BusinessSettingsProvider context.
  */
 export async function getAddJobData(): Promise<AddJobData> {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
-    return { customers: [], enabledServiceTypes: [] }
+    return { customers: [] }
   }
 
   const { data: business } = await supabase
     .from('businesses')
-    .select('id, service_types_enabled')
+    .select('id')
     .eq('user_id', user.id)
     .single()
 
   if (!business) {
-    return { customers: [], enabledServiceTypes: [] }
+    return { customers: [] }
   }
 
   // Fetch active customers for autocomplete (limit 200)
@@ -48,6 +47,5 @@ export async function getAddJobData(): Promise<AddJobData> {
 
   return {
     customers: (customers || []) as AddJobCustomer[],
-    enabledServiceTypes: (business.service_types_enabled || []) as ServiceType[],
   }
 }

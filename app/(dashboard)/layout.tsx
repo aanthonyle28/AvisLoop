@@ -1,7 +1,10 @@
 import { AppShell } from '@/components/layout/app-shell'
 import { AddJobProvider } from '@/components/jobs/add-job-provider'
+import { BusinessSettingsProvider } from '@/components/providers/business-settings-provider'
 import { getSetupProgress } from '@/lib/data/onboarding'
 import { getDashboardCounts } from '@/lib/data/dashboard'
+import { getServiceTypeSettings } from '@/lib/data/business'
+import type { ServiceType } from '@/lib/types/database'
 
 export default async function DashboardGroupLayout({
   children,
@@ -9,7 +12,12 @@ export default async function DashboardGroupLayout({
   children: React.ReactNode
 }) {
   // Fetch setup progress for all dashboard pages (V2 checklist data)
-  const setupProgress = await getSetupProgress()
+  const [setupProgress, serviceSettings] = await Promise.all([
+    getSetupProgress(),
+    getServiceTypeSettings(),
+  ])
+
+  const enabledServiceTypes = (serviceSettings?.serviceTypesEnabled || []) as ServiceType[]
 
   // Get badge count for nav and notification bell (lightweight query)
   let dashboardBadge = 0
@@ -26,14 +34,16 @@ export default async function DashboardGroupLayout({
   }
 
   return (
-    <AddJobProvider>
-      <AppShell
-        setupProgress={setupProgress}
-        dashboardBadge={dashboardBadge}
-        notificationCounts={notificationCounts}
-      >
-        {children}
-      </AppShell>
-    </AddJobProvider>
+    <BusinessSettingsProvider enabledServiceTypes={enabledServiceTypes}>
+      <AddJobProvider>
+        <AppShell
+          setupProgress={setupProgress}
+          dashboardBadge={dashboardBadge}
+          notificationCounts={notificationCounts}
+        >
+          {children}
+        </AppShell>
+      </AddJobProvider>
+    </BusinessSettingsProvider>
   )
 }

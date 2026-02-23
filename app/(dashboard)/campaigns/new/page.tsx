@@ -56,7 +56,7 @@ export default async function NewCampaignPage() {
         </div>
       </div>
 
-      <CampaignForm templates={templates} enabledServiceTypes={business.service_types_enabled || []} />
+      <CampaignForm templates={templates} />
     </div>
   )
 }

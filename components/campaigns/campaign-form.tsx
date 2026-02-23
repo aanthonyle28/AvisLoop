@@ -21,17 +21,18 @@ import { PersonalizationPreview } from '@/components/ai/personalization-preview'
 import { createCampaign, updateCampaign } from '@/lib/actions/campaign'
 import { campaignWithTouchesSchema, type CampaignWithTouchesFormData } from '@/lib/validations/campaign'
 import { SERVICE_TYPE_LABELS } from '@/lib/validations/job'
+import { useBusinessSettings } from '@/components/providers/business-settings-provider'
 import { toast } from 'sonner'
 import type { CampaignWithTouches, MessageTemplate, ServiceType } from '@/lib/types/database'
 
 interface CampaignFormProps {
   campaign?: CampaignWithTouches
   templates: MessageTemplate[]
-  enabledServiceTypes?: string[]
   onSuccess?: () => void
 }
 
-export function CampaignForm({ campaign, templates, enabledServiceTypes, onSuccess }: CampaignFormProps) {
+export function CampaignForm({ campaign, templates, onSuccess }: CampaignFormProps) {
+  const { enabledServiceTypes } = useBusinessSettings()
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const isEditing = !!campaign
@@ -122,7 +123,7 @@ export function CampaignForm({ campaign, templates, enabledServiceTypes, onSucce
             <SelectContent>
               <SelectItem value="all">All Services</SelectItem>
               {Object.entries(SERVICE_TYPE_LABELS)
-                .filter(([value]) => !enabledServiceTypes || enabledServiceTypes.includes(value))
+                .filter(([value]) => enabledServiceTypes.length === 0 || enabledServiceTypes.includes(value as ServiceType))
                 .map(([value, label]) => (
                   <SelectItem key={value} value={value}>
                     {label}

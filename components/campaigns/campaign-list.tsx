@@ -16,10 +16,9 @@ import type { CampaignWithTouches, MessageTemplate } from '@/lib/types/database'
 interface CampaignListProps {
   campaigns: CampaignWithTouches[]
   templates: MessageTemplate[]
-  enabledServiceTypes?: string[]
 }
 
-export function CampaignList({ campaigns, templates, enabledServiceTypes }: CampaignListProps) {
+export function CampaignList({ campaigns, templates }: CampaignListProps) {
   const [editingCampaignId, setEditingCampaignId] = useState<string | null>(null)
 
   const editingCampaign = editingCampaignId
@@ -74,7 +73,6 @@ export function CampaignList({ campaigns, templates, enabledServiceTypes }: Camp
               <CampaignForm
                 campaign={editingCampaign}
                 templates={templates}
-                enabledServiceTypes={enabledServiceTypes}
                 onSuccess={() => setEditingCampaignId(null)}
               />
             </div>

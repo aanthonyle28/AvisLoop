@@ -27,13 +27,11 @@ import type { CampaignWithTouches, MessageTemplate } from '@/lib/types/database'
 interface CampaignDetailShellProps {
   campaign: CampaignWithTouches
   templates: MessageTemplate[]
-  enabledServiceTypes: string[]
 }
 
 export function CampaignDetailShell({
   campaign,
   templates,
-  enabledServiceTypes,
 }: CampaignDetailShellProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -150,7 +148,6 @@ export function CampaignDetailShell({
             <CampaignForm
               campaign={campaign}
               templates={templates}
-              enabledServiceTypes={enabledServiceTypes}
               onSuccess={handleEditClose}
             />
           </div>

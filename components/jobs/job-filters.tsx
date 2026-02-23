@@ -4,6 +4,7 @@ import { MagnifyingGlass, X } from '@phosphor-icons/react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { SERVICE_TYPES, SERVICE_TYPE_LABELS, JOB_STATUSES, JOB_STATUS_LABELS } from '@/lib/validations/job'
+import { useBusinessSettings } from '@/components/providers/business-settings-provider'
 import type { ServiceType, JobStatus } from '@/lib/types/database'
 
 export interface JobFiltersState {
@@ -15,11 +16,10 @@ export interface JobFiltersState {
 interface JobFiltersProps {
   filters: JobFiltersState
   onFiltersChange: (filters: JobFiltersState) => void
-  /** Service types enabled for this business. If empty/undefined, shows all 8 types. */
-  enabledServiceTypes?: string[]
 }
 
-export function JobFilters({ filters, onFiltersChange, enabledServiceTypes }: JobFiltersProps) {
+export function JobFilters({ filters, onFiltersChange }: JobFiltersProps) {
+  const { enabledServiceTypes } = useBusinessSettings()
   const hasActiveFilters = filters.status || filters.serviceType || filters.search
 
   // Scope to enabled types; fall back to all 8 if none configured

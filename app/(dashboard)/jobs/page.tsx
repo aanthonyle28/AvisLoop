@@ -2,7 +2,6 @@ import { Suspense } from 'react'
 import { getJobs } from '@/lib/data/jobs'
 import { getCustomers } from '@/lib/actions/customer'
 import { getMatchingCampaignsForJobs, getCampaignsByIds } from '@/lib/data/campaign'
-import { getServiceTypeSettings } from '@/lib/data/business'
 import { JobsClient } from '@/components/jobs/jobs-client'
 import type { ServiceType } from '@/lib/types/database'
 
@@ -12,13 +11,10 @@ export const metadata = {
 }
 
 async function JobsContent() {
-  const [{ jobs, total, businessId }, { customers }, serviceSettings] = await Promise.all([
+  const [{ jobs, total, businessId }, { customers }] = await Promise.all([
     getJobs(),
     getCustomers({ limit: 200 }), // For customer selector in add/edit forms
-    getServiceTypeSettings(),
   ])
-
-  const enabledServiceTypes = (serviceSettings?.serviceTypesEnabled || []) as ServiceType[]
 
   // Get unique service types from jobs for campaign preview
   const serviceTypes = [...new Set(jobs.map(j => j.service_type))] as ServiceType[]
@@ -45,7 +41,6 @@ async function JobsContent() {
       customers={customers}
       campaignMap={campaignMap}
       campaignNames={campaignNames}
-      enabledServiceTypes={enabledServiceTypes}
     />
   )
 }

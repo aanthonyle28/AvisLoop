@@ -20,6 +20,7 @@ import { ServiceTypeSelect } from './service-type-select'
 import { CampaignSelector, CAMPAIGN_DO_NOT_SEND, CAMPAIGN_ONE_OFF } from './campaign-selector'
 import { createJob, type JobActionState } from '@/lib/actions/job'
 import { JOB_STATUS_LABELS, JOB_STATUS_DESCRIPTIONS } from '@/lib/validations/job'
+import { useBusinessSettings } from '@/components/providers/business-settings-provider'
 import type { ServiceType, JobStatus } from '@/lib/types/database'
 
 // Statuses shown in the Add Job sheet (do_not_send is handled via campaign selector)
@@ -36,13 +37,12 @@ interface AddJobSheetProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   customers: Customer[]
-  /** Service types enabled for this business (scopes the ServiceTypeSelect options) */
-  enabledServiceTypes?: ServiceType[]
   /** Show loading skeletons while data is being fetched */
   isLoadingData?: boolean
 }
 
-export function AddJobSheet({ open, onOpenChange, customers, enabledServiceTypes, isLoadingData }: AddJobSheetProps) {
+export function AddJobSheet({ open, onOpenChange, customers, isLoadingData }: AddJobSheetProps) {
+  const { enabledServiceTypes } = useBusinessSettings()
   const [state, formAction, isPending] = useActionState<JobActionState | null, FormData>(
     createJob,
     null

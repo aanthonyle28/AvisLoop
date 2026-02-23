@@ -52,7 +52,6 @@ export function AddJobProvider({ children }: { children: React.ReactNode }) {
         open={open}
         onOpenChange={handleOpenChange}
         customers={data?.customers ?? []}
-        enabledServiceTypes={data?.enabledServiceTypes}
         isLoadingData={isLoadingData}
       />
     </AddJobContext.Provider>

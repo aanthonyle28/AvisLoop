@@ -18,6 +18,7 @@ import { ServiceTypeSelect } from './service-type-select'
 import { CampaignSelector, CAMPAIGN_DO_NOT_SEND, CAMPAIGN_ONE_OFF } from './campaign-selector'
 import { updateJob, type JobActionState } from '@/lib/actions/job'
 import { JOB_STATUS_LABELS, JOB_STATUS_DESCRIPTIONS } from '@/lib/validations/job'
+import { useBusinessSettings } from '@/components/providers/business-settings-provider'
 import type { JobWithCustomer, Customer, ServiceType, JobStatus } from '@/lib/types/database'
 
 // Statuses shown in the Edit Job sheet (do_not_send handled via campaign selector)
@@ -28,10 +29,10 @@ interface EditJobSheetProps {
   onOpenChange: (open: boolean) => void
   job: JobWithCustomer
   customers: Customer[]
-  enabledServiceTypes?: ServiceType[]
 }
 
-export function EditJobSheet({ open, onOpenChange, job, customers, enabledServiceTypes }: EditJobSheetProps) {
+export function EditJobSheet({ open, onOpenChange, job, customers }: EditJobSheetProps) {
+  const { enabledServiceTypes } = useBusinessSettings()
   const [state, formAction, isPending] = useActionState<JobActionState | null, FormData>(
     updateJob,
     null

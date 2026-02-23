@@ -9,7 +9,7 @@ import { JobTable } from './job-table'
 import { JobFilters, type JobFiltersState } from './job-filters'
 import { EmptyState } from './empty-state'
 import { useAddJob } from './add-job-provider'
-import type { JobWithEnrollment, Customer, ServiceType } from '@/lib/types/database'
+import type { JobWithEnrollment, Customer } from '@/lib/types/database'
 
 interface JobsClientProps {
   initialJobs: JobWithEnrollment[]
@@ -19,11 +19,9 @@ interface JobsClientProps {
   campaignMap?: Map<string, { campaignName: string; firstTouchDelay: number }>
   /** Map of campaign UUID to name/delay for campaign_override display */
   campaignNames?: Map<string, { campaignName: string; firstTouchDelay: number }>
-  /** Service types enabled for this business (from onboarding settings) */
-  enabledServiceTypes?: ServiceType[]
 }
 
-export function JobsClient({ initialJobs, totalJobs, customers, campaignMap, campaignNames, enabledServiceTypes }: JobsClientProps) {
+export function JobsClient({ initialJobs, totalJobs, customers, campaignMap, campaignNames }: JobsClientProps) {
   const searchParams = useSearchParams()
   const { openAddJob } = useAddJob()
   const [filters, setFilters] = useState<JobFiltersState>({
@@ -78,7 +76,7 @@ export function JobsClient({ initialJobs, totalJobs, customers, campaignMap, cam
       </div>
 
       {/* Filters */}
-      <JobFilters filters={filters} onFiltersChange={setFilters} enabledServiceTypes={enabledServiceTypes} />
+      <JobFilters filters={filters} onFiltersChange={setFilters} />
 
       {/* Table or Empty State */}
       {filteredJobs.length === 0 ? (
@@ -88,7 +86,7 @@ export function JobsClient({ initialJobs, totalJobs, customers, campaignMap, cam
           onAddJob={openAddJob}
         />
       ) : (
-        <JobTable jobs={filteredJobs} customers={customers} campaignMap={campaignMap} campaignNames={campaignNames} enabledServiceTypes={enabledServiceTypes} />
+        <JobTable jobs={filteredJobs} customers={customers} campaignMap={campaignMap} campaignNames={campaignNames} />
       )}
     </div>
   )
