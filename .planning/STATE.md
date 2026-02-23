@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v2.5 milestone complete — Phase 39 (Manual Request Elimination) done + ad-hoc UX improvements
+**Current focus:** v2.5 milestone complete — post-security hardening, bug fixes, and architecture improvements
 
 ## Current Position
 
 Phase: 39 of 39 in v2.5 milestone (Phase 7 of 7 in this milestone)
 Plan: 4 of 4 complete
 Status: Phase complete — v2.5 milestone complete
-Last activity: 2026-02-20 — Completed 39-04 (/send eliminated: 308 redirect, nav cleaned, 8 files deleted)
+Last activity: 2026-02-22 — Enrollment conflict system, bug fixes (conflict bypass, edit job service types), BusinessSettingsProvider refactor
 
 Progress: [██████████] 100% (v2.5 milestone — all 7 phases complete)
 
@@ -79,6 +79,14 @@ Progress: [██████████] 100% (v2.5 milestone — all 7 phases
 - CampaignsPageClient pattern: server page passes JSX children to thin client wrapper that hosts modal open state
 - prefilledCustomer → useEffect sync in QuickSendForm: parent sets prop, form syncs to local state on mount/change
 
+### Key Decisions (Post v2.5)
+
+- BusinessSettingsProvider context replaces enabledServiceTypes prop drilling — all dashboard components use useBusinessSettings() hook
+- Enrollment conflict forceCooldownOverride is conditional on previous campaign being a real campaign (not one_off/dismissed)
+- Enrollment conflict cron runs every 5 minutes: auto-resolves 24h+ stale conflicts, processes queue_after when sequence completes
+- Review cooldown configurable 7-90 days in Settings (default 30)
+- reviewed_at set on send_logs when customer rates or submits feedback — powers KPI tracking
+
 ### Pending Todos
 
 None.
@@ -91,6 +99,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: All v2.5 phases (33-39) complete + ad-hoc UX improvements (campaigns redesign, jobs overhaul, onboarding 5→3, customers→settings, dashboard queue fixes, WelcomeCard, bulk resend). 96 commits unpushed to remote.
+Stopped at: Enrollment conflict system complete, bug fixes done (conflict bypass + edit job service types), BusinessSettingsProvider refactor merged. All commits pushed to remote.
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!

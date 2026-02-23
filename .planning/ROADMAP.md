@@ -664,11 +664,13 @@ See individual phase sections above for requirements, success criteria, and depe
 - Twilio A2P 10DLC registration required before Phase 21-08 execution (webhook verification)
 
 After v2.5:
+- **Security Review** — Full codebase audit (26 findings), all Critical/High/Medium resolved (2026-02-22)
+- **Post-Security Hardening** — Enrollment conflict resolution system, review cooldown, cron processor, BusinessSettingsProvider refactor (2026-02-22)
+- **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 - **v2.1 Integrations** — ServiceTitan/Jobber/Housecall Pro API integrations for auto job import
 - **v2.2 Review Inbox** — Ingest reviews from Google Business Profile, AI reply suggestions
 - **v3.0 Agency Mode** — Multi-business management UI, white-label option, client reporting portal
-- **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 
 ---
-*Last updated: 2026-02-20 — v2.0 milestone complete (Phases 20-32 verified), v2.5 UI/UX Redesign COMPLETE (Phases 33-39 all verified)*
+*Last updated: 2026-02-22 — v2.0 milestone complete (Phases 20-32 verified), v2.5 UI/UX Redesign COMPLETE (Phases 33-39 all verified), Security Review complete, post-security hardening complete, all commits pushed*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
