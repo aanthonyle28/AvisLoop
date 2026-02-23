@@ -6,22 +6,28 @@ import { Check, Clock, CircleNotch } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { updateServiceTypeSettings } from '@/lib/actions/business'
+import { updateServiceTypeSettings, updateReviewCooldown } from '@/lib/actions/business'
 import { SERVICE_TYPES, SERVICE_TYPE_LABELS, DEFAULT_TIMING_HOURS } from '@/lib/validations/job'
+import { MIN_ENROLLMENT_COOLDOWN_DAYS, MAX_ENROLLMENT_COOLDOWN_DAYS } from '@/lib/constants/campaigns'
 
 interface ServiceTypesSectionProps {
   initialEnabled: string[]
   initialTiming: Record<string, number>
+  initialCooldownDays?: number
 }
 
 export function ServiceTypesSection({
   initialEnabled,
   initialTiming,
+  initialCooldownDays = 30,
 }: ServiceTypesSectionProps) {
   const [enabled, setEnabled] = useState<Set<string>>(new Set(initialEnabled))
   const [timing, setTiming] = useState<Record<string, number>>(initialTiming)
   const [isPending, startTransition] = useTransition()
   const [hasChanges, setHasChanges] = useState(false)
+  const [cooldownDays, setCooldownDays] = useState(initialCooldownDays)
+  const [cooldownPending, startCooldownTransition] = useTransition()
+  const [cooldownChanged, setCooldownChanged] = useState(false)
 
   const toggleService = (type: string) => {
     const newEnabled = new Set(enabled)
@@ -137,6 +143,51 @@ export function ServiceTypesSection({
           </Button>
         </div>
       )}
+
+      {/* Review cooldown setting */}
+      <div className="rounded-lg border p-4 space-y-3">
+        <div>
+          <h4 className="font-medium">Review cooldown</h4>
+          <p className="text-sm text-muted-foreground mt-1">
+            After a customer leaves a review, wait this many days before enrolling them in a new campaign.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Input
+            type="number"
+            min={MIN_ENROLLMENT_COOLDOWN_DAYS}
+            max={MAX_ENROLLMENT_COOLDOWN_DAYS}
+            value={cooldownDays}
+            onChange={(e) => {
+              const val = parseInt(e.target.value) || 30
+              setCooldownDays(val)
+              setCooldownChanged(val !== initialCooldownDays)
+            }}
+            className="h-8 w-20"
+          />
+          <span className="text-sm text-muted-foreground">days</span>
+          {cooldownChanged && (
+            <Button
+              size="sm"
+              onClick={() => {
+                startCooldownTransition(async () => {
+                  const result = await updateReviewCooldown(cooldownDays)
+                  if (result.error) {
+                    toast.error(result.error)
+                  } else {
+                    toast.success('Review cooldown updated')
+                    setCooldownChanged(false)
+                  }
+                })
+              }}
+              disabled={cooldownPending}
+            >
+              {cooldownPending && <CircleNotch size={16} className="mr-2 animate-spin" />}
+              Save
+            </Button>
+          )}
+        </div>
+      </div>
 
       {/* Help text */}
       <div className="rounded-md bg-muted p-3 text-sm text-muted-foreground">

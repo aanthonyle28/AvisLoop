@@ -65,6 +65,17 @@ export async function POST(req: NextRequest) {
       } else {
         console.log(`Stopped enrollment ${tokenData.enrollmentId} - ${stopReason}`)
       }
+
+      // Mark associated send_logs as reviewed so KPI "Reviews This Month" works
+      const { error: reviewedError } = await supabase
+        .from('send_logs')
+        .update({ reviewed_at: new Date().toISOString() })
+        .eq('campaign_enrollment_id', tokenData.enrollmentId)
+        .is('reviewed_at', null)
+
+      if (reviewedError) {
+        console.error('Failed to set reviewed_at on send_logs:', reviewedError)
+      }
     }
 
     // Log the interaction for analytics

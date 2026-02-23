@@ -1,4 +1,4 @@
-import type { ServiceType } from './database'
+import type { ServiceType, EnrollmentResolution } from './database'
 
 // KPI data with trend comparisons
 export interface KPIMetric {
@@ -32,6 +32,12 @@ export interface ReadyToSendJob {
   status: 'scheduled' | 'completed'
   campaign_override: string | null
   hasMatchingCampaign: boolean
+  enrollment_resolution: EnrollmentResolution | null
+  conflictDetail?: {
+    existingCampaignName: string
+    currentTouch: number
+    totalTouches: number
+  }
 }
 
 // Attention alert with contextual action

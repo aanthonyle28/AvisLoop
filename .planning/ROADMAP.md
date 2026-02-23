@@ -14,7 +14,7 @@ AvisLoop is a review follow-up system for home service businesses. v1.0 through 
 - **v1.3 Dashboard UX Overhaul** - Phases 20-22 (shipped 2026-02-02)
 - **v1.4 Landing Page Redesign** - Phase 25 (shipped 2026-02-02)
 - **v2.0 Review Follow-Up System** - Phases 20-32 (complete 2026-02-18)
-- **v2.5 UI/UX Redesign** - Phases 33-39 (in progress)
+- **v2.5 UI/UX Redesign** - Phases 33-39 (complete 2026-02-20)
 
 ## Phases
 

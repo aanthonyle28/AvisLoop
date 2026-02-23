@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v2.5 milestone complete — Phase 39 (Manual Request Elimination) done
+**Current focus:** v2.5 milestone complete — Phase 39 (Manual Request Elimination) done + ad-hoc UX improvements
 
 ## Current Position
 
@@ -90,7 +90,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-20
-Stopped at: Completed Phase 39 Plan 04 — /send eliminated (308 redirect to /campaigns), nav cleaned, 8 obsolete files deleted. v2.5 milestone complete.
+Last session: 2026-02-22
+Stopped at: All v2.5 phases (33-39) complete + ad-hoc UX improvements (campaigns redesign, jobs overhaul, onboarding 5→3, customers→settings, dashboard queue fixes, WelcomeCard, bulk resend). 96 commits unpushed to remote.
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!

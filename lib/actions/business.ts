@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { businessSchema } from '@/lib/validations/business'
+import { MIN_ENROLLMENT_COOLDOWN_DAYS, MAX_ENROLLMENT_COOLDOWN_DAYS } from '@/lib/constants/campaigns'
 
 export type BusinessActionState = {
   error?: string
@@ -257,5 +258,37 @@ export async function updateServiceTypeSettings(settings: {
 
   revalidatePath('/settings')
   revalidatePath('/jobs')
+  return { success: true }
+}
+
+/**
+ * Update the review cooldown period for the current user's business.
+ * Controls how long after a customer reviews before they can be enrolled again.
+ */
+export async function updateReviewCooldown(
+  days: number
+): Promise<{ error?: string; success?: boolean }> {
+  const supabase = await createClient()
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return { error: 'You must be logged in' }
+  }
+
+  // Validate range
+  if (days < MIN_ENROLLMENT_COOLDOWN_DAYS || days > MAX_ENROLLMENT_COOLDOWN_DAYS) {
+    return { error: `Cooldown must be between ${MIN_ENROLLMENT_COOLDOWN_DAYS} and ${MAX_ENROLLMENT_COOLDOWN_DAYS} days` }
+  }
+
+  const { error } = await supabase
+    .from('businesses')
+    .update({ review_cooldown_days: days })
+    .eq('user_id', user.id)
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  revalidatePath('/settings')
   return { success: true }
 }

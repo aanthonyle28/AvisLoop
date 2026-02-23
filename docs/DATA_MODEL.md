@@ -98,9 +98,23 @@ Stores completed service jobs for each business. Each job links to exactly one c
 | status | TEXT | NO | 'completed' | 'completed' or 'do_not_send' |
 | notes | TEXT | YES | - | Internal notes about the job |
 | campaign_override | TEXT | YES | - | Campaign choice: NULL=auto-detect, UUID=specific campaign, 'one_off'=skip enrollment |
+| enrollment_resolution | TEXT | YES | NULL | Conflict state: 'conflict', 'queue_after', 'skipped', 'suppressed' |
+| conflict_detected_at | TIMESTAMPTZ | YES | NULL | When conflict was first detected |
 | completed_at | TIMESTAMPTZ | YES | - | When job was marked completed (null if do_not_send) |
 | created_at | TIMESTAMPTZ | YES | NOW() | Created timestamp |
 | updated_at | TIMESTAMPTZ | YES | NOW() | Updated timestamp |
+
+### Enrollment Resolution (Conflict Handling)
+
+When a customer completes a new job while still in an active campaign sequence:
+
+| Value | Meaning | Dashboard Display |
+|-------|---------|-------------------|
+| NULL | No conflict (normal state) | Standard queue actions |
+| `conflict` | Active sequence detected, awaiting user choice | Warning + Replace/Skip/Queue buttons |
+| `queue_after` | User chose to wait for sequence to finish | "Queued" badge, auto-enrolls later |
+| `skipped` | User explicitly skipped enrollment | Hidden from queue |
+| `suppressed` | Customer reviewed within cooldown window | Hidden from queue |
 
 ### RLS Policies
 
@@ -114,6 +128,7 @@ Stores completed service jobs for each business. Each job links to exactly one c
 - idx_jobs_business_status (btree on business_id, status)
 - idx_jobs_business_service_type (btree on business_id, service_type)
 - idx_jobs_completed_at (partial: completed_at IS NOT NULL)
+- idx_jobs_enrollment_resolution (partial: WHERE enrollment_resolution IS NOT NULL)
 
 ### Foreign Keys
 
@@ -163,6 +178,7 @@ Added in Phase 22 for service-specific campaign timing:
 |--------|------|-------------|
 | service_types_enabled | TEXT[] | Array of service types this business offers |
 | service_type_timing | JSONB | Map of service type to hours until first campaign touch |
+| review_cooldown_days | INT | Days after review before customer can be re-enrolled (default: 30, range: 7-90) |
 
 Default timing values:
 - hvac: 24 hours

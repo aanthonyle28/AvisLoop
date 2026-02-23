@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import type { JobWithCustomer, JobWithEnrollment } from '@/lib/types/database'
+import type { JobWithCustomer, JobWithEnrollment, ConflictDetail } from '@/lib/types/database'
 
 /**
  * Fetch jobs for the current user's business with pagination and filters.
@@ -63,8 +63,44 @@ export async function getJobs(options?: {
     return { jobs: [], total: 0, businessId: business.id }
   }
 
+  const jobs = data as JobWithEnrollment[]
+
+  // Batch-fetch conflict detail for conflict/queue_after jobs
+  const conflictCustomerIds = new Set(
+    jobs
+      .filter(j => j.enrollment_resolution === 'conflict' || j.enrollment_resolution === 'queue_after')
+      .map(j => j.customer_id)
+  )
+
+  const customerEnrollments = new Map<string, ConflictDetail>()
+  if (conflictCustomerIds.size > 0) {
+    const { data: activeEnrollments } = await supabase
+      .from('campaign_enrollments')
+      .select('customer_id, current_touch, campaigns:campaign_id(name, campaign_touches(touch_number))')
+      .in('customer_id', Array.from(conflictCustomerIds))
+      .eq('business_id', business.id)
+      .eq('status', 'active')
+
+    for (const enrollment of activeEnrollments || []) {
+      const campaign = Array.isArray(enrollment.campaigns) ? enrollment.campaigns[0] : enrollment.campaigns
+      const campaignData = campaign as { name: string; campaign_touches: { touch_number: number }[] } | null
+      customerEnrollments.set(enrollment.customer_id, {
+        existingCampaignName: campaignData?.name || 'Unknown',
+        currentTouch: enrollment.current_touch,
+        totalTouches: campaignData?.campaign_touches?.length || 0,
+      })
+    }
+
+    // Attach conflict detail to jobs
+    for (const job of jobs) {
+      if (job.enrollment_resolution === 'conflict' || job.enrollment_resolution === 'queue_after') {
+        job.conflictDetail = customerEnrollments.get(job.customer_id)
+      }
+    }
+  }
+
   return {
-    jobs: data as JobWithEnrollment[],
+    jobs,
     total: count || 0,
     businessId: business.id,
   }

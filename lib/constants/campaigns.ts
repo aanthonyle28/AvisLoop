@@ -62,6 +62,10 @@ export const DEFAULT_ENROLLMENT_COOLDOWN_DAYS = 30
 export const MIN_ENROLLMENT_COOLDOWN_DAYS = 7
 export const MAX_ENROLLMENT_COOLDOWN_DAYS = 90
 
+// Conflict resolution timing
+export const QUEUE_AFTER_GAP_DAYS = 7       // Days to wait after sequence ends before auto-enrolling queued jobs
+export const CONFLICT_AUTO_RESOLVE_HOURS = 24 // Hours before stale conflicts are auto-resolved (replace)
+
 // Rate limits per channel per business (per hour)
 export const DEFAULT_EMAIL_RATE_LIMIT = 100
 export const DEFAULT_SMS_RATE_LIMIT = 100

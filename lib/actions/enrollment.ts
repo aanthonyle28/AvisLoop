@@ -6,40 +6,96 @@ import { getActiveCampaignForJob } from '@/lib/data/campaign'
 import { DEFAULT_ENROLLMENT_COOLDOWN_DAYS } from '@/lib/constants/campaigns'
 import type { ServiceType, CampaignWithTouches } from '@/lib/types/database'
 
-type EnrollmentResult = {
+export type EnrollmentResult = {
   success: boolean
   enrollmentId?: string
   error?: string
   skipped?: boolean
   skipReason?: string
+  conflict?: {
+    id: string
+    campaignName: string
+    currentTouch: number
+  }
+}
+
+// Conflict check result — replaces the old blanket cooldown
+export type ConflictCheckResult = {
+  case: 'clear' | 'active_sequence' | 'recent_review'
+  activeEnrollment?: {
+    id: string
+    campaignName: string
+    currentTouch: number
+  }
+  lastReviewedAt?: string
 }
 
 /**
- * Check if customer is within enrollment cooldown period.
- * Returns true if customer was enrolled in ANY campaign within cooldown days.
+ * Check for enrollment conflicts for a customer.
+ *
+ * Cases:
+ * - 'clear': No conflict — enroll normally
+ * - 'active_sequence': Customer has an active enrollment in progress
+ * - 'recent_review': Customer left a review within the cooldown window
+ *
+ * Key improvement over old checkEnrollmentCooldown: a completed sequence
+ * with no review does NOT block re-enrollment.
  */
-export async function checkEnrollmentCooldown(
+export async function checkEnrollmentConflict(
   customerId: string,
+  businessId: string,
   cooldownDays: number = DEFAULT_ENROLLMENT_COOLDOWN_DAYS
-): Promise<{ inCooldown: boolean; lastEnrolledAt?: string }> {
+): Promise<ConflictCheckResult> {
   const supabase = await createClient()
 
+  // 1. Check for active enrollment
+  const { data: activeEnrollment } = await supabase
+    .from('campaign_enrollments')
+    .select('id, current_touch, campaigns:campaign_id(name)')
+    .eq('customer_id', customerId)
+    .eq('business_id', businessId)
+    .eq('status', 'active')
+    .limit(1)
+    .maybeSingle()
+
+  if (activeEnrollment) {
+    const campaign = Array.isArray(activeEnrollment.campaigns)
+      ? activeEnrollment.campaigns[0]
+      : activeEnrollment.campaigns
+    return {
+      case: 'active_sequence',
+      activeEnrollment: {
+        id: activeEnrollment.id,
+        campaignName: (campaign as { name: string } | null)?.name || 'Unknown',
+        currentTouch: activeEnrollment.current_touch,
+      },
+    }
+  }
+
+  // 2. Check for recent review (stopped with review_clicked or feedback_submitted within cooldown)
   const cooldownDate = new Date()
   cooldownDate.setDate(cooldownDate.getDate() - cooldownDays)
 
-  const { data } = await supabase
+  const { data: recentReview } = await supabase
     .from('campaign_enrollments')
-    .select('enrolled_at')
+    .select('stopped_at')
     .eq('customer_id', customerId)
-    .gte('enrolled_at', cooldownDate.toISOString())
-    .order('enrolled_at', { ascending: false })
+    .eq('business_id', businessId)
+    .in('stop_reason', ['review_clicked', 'feedback_submitted'])
+    .gte('stopped_at', cooldownDate.toISOString())
+    .order('stopped_at', { ascending: false })
     .limit(1)
-    .single()
+    .maybeSingle()
 
-  return {
-    inCooldown: !!data,
-    lastEnrolledAt: data?.enrolled_at,
+  if (recentReview) {
+    return {
+      case: 'recent_review',
+      lastReviewedAt: recentReview.stopped_at,
+    }
   }
+
+  // 3. Clear — previous sequence completed with no review = fresh opportunity
+  return { case: 'clear' }
 }
 
 /**
@@ -98,27 +154,27 @@ export async function stopEnrollmentsForJob(
 /**
  * Enroll a completed job in its matching campaign.
  *
- * Flow:
+ * V2 conflict-aware flow:
  * 1. Find active campaign for job's service type (or "all services" fallback)
- * 2. Check cooldown period
- * 3. Cancel any active enrollments for same customer (repeat job)
- * 4. Calculate touch 1 scheduled time using service type timing defaults from businesses.service_type_timing
- * 5. Create enrollment record
- *
- * IMPORTANT: This function fetches service_type_timing from the business record via the job query.
- * The timing is used to calculate the delay for touch 1 (SVCT-03 requirement).
+ * 2. Unless forced, check for enrollment conflicts:
+ *    - recent_review → set enrollment_resolution='suppressed' on job, skip silently
+ *    - active_sequence → set enrollment_resolution='conflict' on job, skip with conflict info
+ *    - clear → proceed to enroll
+ * 3. If conflictResolution='replace', cancel active enrollments first
+ * 4. Calculate touch 1 scheduled time using service type timing defaults
+ * 5. Create enrollment record, clear enrollment_resolution on job
  */
 export async function enrollJobInCampaign(
   jobId: string,
   options?: {
     forceCooldownOverride?: boolean
-    campaignId?: string  // Optional: specify campaign instead of auto-detect
+    campaignId?: string
+    conflictResolution?: 'replace'
   }
 ): Promise<EnrollmentResult> {
   const supabase = await createClient()
 
-  // Fetch job with business (including service_type_timing) and customer info
-  // The service_type_timing from businesses is used to determine touch 1 delay
+  // Fetch job with business (including service_type_timing and review_cooldown_days)
   const { data: job, error: jobError } = await supabase
     .from('jobs')
     .select(`
@@ -130,7 +186,8 @@ export async function enrollJobInCampaign(
       status,
       businesses:business_id (
         id,
-        service_type_timing
+        service_type_timing,
+        review_cooldown_days
       )
     `)
     .eq('id', jobId)
@@ -175,20 +232,57 @@ export async function enrollJobInCampaign(
     }
   }
 
-  // Check cooldown (unless forced)
-  if (!options?.forceCooldownOverride) {
-    const { inCooldown, lastEnrolledAt } = await checkEnrollmentCooldown(job.customer_id)
-    if (inCooldown) {
+  // Check for conflicts (unless forced or explicitly resolving)
+  if (!options?.forceCooldownOverride && !options?.conflictResolution) {
+    const businessData = job.businesses as unknown as { review_cooldown_days?: number } | null
+    const cooldownDays = businessData?.review_cooldown_days ?? DEFAULT_ENROLLMENT_COOLDOWN_DAYS
+
+    const conflictResult = await checkEnrollmentConflict(
+      job.customer_id,
+      job.business_id,
+      cooldownDays
+    )
+
+    if (conflictResult.case === 'recent_review') {
+      // Silently suppress — customer reviewed recently
+      await supabase
+        .from('jobs')
+        .update({
+          enrollment_resolution: 'suppressed',
+          conflict_detected_at: new Date().toISOString(),
+        })
+        .eq('id', jobId)
+
       return {
         success: false,
         skipped: true,
-        skipReason: `Customer enrolled recently (${lastEnrolledAt}). Cooldown active.`,
+        skipReason: `Customer reviewed recently (${conflictResult.lastReviewedAt}). Suppressed.`,
+      }
+    }
+
+    if (conflictResult.case === 'active_sequence') {
+      // Flag conflict — job appears in dashboard queue with 3 options
+      await supabase
+        .from('jobs')
+        .update({
+          enrollment_resolution: 'conflict',
+          conflict_detected_at: new Date().toISOString(),
+        })
+        .eq('id', jobId)
+
+      return {
+        success: false,
+        skipped: true,
+        skipReason: `Customer has active sequence: ${conflictResult.activeEnrollment!.campaignName}`,
+        conflict: conflictResult.activeEnrollment,
       }
     }
   }
 
-  // Cancel any existing active enrollments for this customer (repeat job handling)
-  await cancelActiveEnrollments(supabase, job.customer_id)
+  // If resolving with 'replace', cancel active enrollments first
+  if (options?.conflictResolution === 'replace') {
+    await cancelActiveEnrollments(supabase, job.customer_id)
+  }
 
   // Calculate touch 1 scheduled time
   const touch1 = campaign.campaign_touches.find(t => t.touch_number === 1)
@@ -197,7 +291,6 @@ export async function enrollJobInCampaign(
   }
 
   // SVCT-03: Use service type timing from business settings if available
-  // This is fetched above in the job query via businesses.service_type_timing
   const businessTiming = (job.businesses as unknown as { service_type_timing?: Record<string, number> })?.service_type_timing
   const defaultDelayHours = businessTiming?.[job.service_type] || touch1.delay_hours
 
@@ -231,6 +324,15 @@ export async function enrollJobInCampaign(
     }
     return { success: false, error: `Failed to enroll: ${enrollError.message}` }
   }
+
+  // Clear any enrollment_resolution on this job (successful enrollment)
+  await supabase
+    .from('jobs')
+    .update({
+      enrollment_resolution: null,
+      conflict_detected_at: null,
+    })
+    .eq('id', jobId)
 
   revalidatePath('/campaigns')
   revalidatePath('/jobs')
