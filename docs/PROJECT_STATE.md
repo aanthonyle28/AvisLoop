@@ -35,11 +35,12 @@
 - **M-4**: Auth callback open redirect — proper URL origin validation
 - **M-8**: UPDATE policies already have WITH CHECK clauses
 
-### Database Migrations (4)
+### Database Migrations (5)
 - `add_missing_rpc_functions`: Created `claim_due_scheduled_sends`, `recover_stuck_scheduled_sends`, `increment_customer_send_count`
 - `add_notes_column_to_customers`: Added missing `notes` TEXT column
 - `add_missing_fk_indexes`: 4 FK indexes on businesses, customer_feedback, customers, scheduled_sends
 - `fix_function_search_path_and_rls_initplan`: Set search_path='' on all RPCs + wrapped auth.uid() in (SELECT) for 3 RLS policies
+- `drop_legacy_contact_id_from_send_logs`: Dropped dual FK — removed `contact_id` column + FK constraint (all code uses `customer_id`)
 
 ### Code Hardening
 - `lib/rate-limit.ts`: Added `publicRatelimit` (20/min per IP) for unauthenticated endpoints
@@ -53,11 +54,13 @@
 - **L-4**: All raw `error.message` returns in server actions replaced with generic user-facing messages (customer.ts, job.ts, send.ts) — internal errors logged server-side only
 - **L-7**: Review token logging already adequate — IDs truncated with `.slice(0,8)`
 
-### Remaining (deferred)
-- **L-3**: Legacy `contact_id` column in send_logs — low risk, requires careful migration
-- **L-5**: deleteAccount re-auth guard — requires UI changes (password confirmation dialog)
-- **H-6**: RLS policy on `subscriptions` table — requires manual Supabase Dashboard action
-- Enable leaked password protection in Supabase Dashboard > Auth > Settings
+### Final Fixes (Session 3)
+- **L-3**: Dropped legacy `contact_id` column from send_logs (was dual FK to customers). Updated cron processor + SendLogDetail type.
+- **L-5**: `deleteAccount` now requires password re-authentication for email/password users. OAuth-only users skip (no password). Dialog UI updated with password field.
+
+### Remaining (manual only)
+- **H-6**: Skipped — leaked password protection (user decision)
+- Enable Supabase password requirements in Dashboard > Auth > Providers > Email
 
 ### Verification
 - `pnpm lint`: PASS
