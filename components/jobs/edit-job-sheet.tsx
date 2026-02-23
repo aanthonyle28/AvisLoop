@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { CircleNotch } from '@phosphor-icons/react'
+import { CircleNotch, WarningCircle } from '@phosphor-icons/react'
 import {
   Sheet,
   SheetContent,
@@ -129,6 +129,24 @@ export function EditJobSheet({ open, onOpenChange, job, customers }: EditJobShee
         </SheetHeader>
 
         <form action={handleSubmit} className="mt-6 space-y-4">
+          {/* Conflict state warning */}
+          {job.enrollment_resolution && (
+            <div className="flex items-start gap-2 rounded-md bg-warning-bg px-3 py-2.5 text-sm text-warning-foreground">
+              <WarningCircle size={16} weight="fill" className="text-warning mt-0.5 shrink-0" />
+              <p>
+                {job.enrollment_resolution === 'conflict'
+                  ? 'This job has an enrollment conflict. Saving changes to status, customer, or service type will clear the conflict state.'
+                  : job.enrollment_resolution === 'queue_after'
+                  ? 'This job is queued for enrollment after the active sequence finishes. Saving changes may clear this queue state.'
+                  : job.enrollment_resolution === 'skipped'
+                  ? 'Enrollment was skipped for this job. Saving changes may clear this state.'
+                  : job.enrollment_resolution === 'suppressed'
+                  ? 'Enrollment was suppressed due to review cooldown.'
+                  : null}
+              </p>
+            </div>
+          )}
+
           {/* Customer selector */}
           <div className="space-y-2">
             <Label>Customer *</Label>

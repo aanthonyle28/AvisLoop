@@ -251,10 +251,10 @@ export async function updateJob(
     return { fieldErrors: { customerId: ['Please select a valid customer'] } }
   }
 
-  // Get current job to check status change and current campaign_override
+  // Get current job to check status change, campaign_override, and conflict state
   const { data: currentJob } = await supabase
     .from('jobs')
-    .select('status, completed_at, campaign_override')
+    .select('status, completed_at, campaign_override, customer_id, service_type, enrollment_resolution')
     .eq('id', jobId)
     .single()
 
@@ -268,6 +268,19 @@ export async function updateJob(
     completedAt = null
   }
 
+  // Determine whether to clear enrollment_resolution (Bug 1 fix)
+  // Conflict state becomes stale when any of these change:
+  const shouldClearConflict = currentJob?.enrollment_resolution && (
+    // Status moving away from completed — conflict is about campaign enrollment which only applies to completed jobs
+    (status !== 'completed') ||
+    // Campaign choice changed to one_off or dismissed — user opted out of campaign, conflict irrelevant
+    (parsed.data.campaignOverride === 'one_off' || parsed.data.campaignOverride === 'dismissed') ||
+    // Customer changed — conflict was about the OLD customer's active enrollment
+    (customerId !== currentJob.customer_id) ||
+    // Service type changed — conflict detail (campaign name, touch info) becomes stale
+    (serviceType !== currentJob.service_type)
+  )
+
   // Update job (RLS handles ownership check)
   const { error } = await supabase
     .from('jobs')
@@ -278,6 +291,7 @@ export async function updateJob(
       notes: notes || null,
       campaign_override: parsed.data.campaignOverride,
       completed_at: completedAt,
+      ...(shouldClearConflict ? { enrollment_resolution: null, conflict_detected_at: null } : {}),
     })
     .eq('id', jobId)
 

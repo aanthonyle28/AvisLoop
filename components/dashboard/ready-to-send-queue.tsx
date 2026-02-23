@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 import {
   WarningCircle,
+  Warning,
   DotsThree,
   CheckCircle,
   Plus,
@@ -13,11 +14,21 @@ import {
   X,
   CalendarBlank,
   CircleNotch,
+  Clock,
+  ArrowsClockwise,
+  SkipForward,
+  Queue,
 } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
+} from '@/components/ui/tooltip'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,10 +36,21 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog'
 import { JobDetailDrawer } from '@/components/jobs/job-detail-drawer'
 import { QuickSendModal } from '@/components/send/quick-send-modal'
 import { quickEnrollJob, getJobDetail, dismissJobFromQueue } from '@/lib/actions/dashboard'
 import { markJobComplete, deleteJob } from '@/lib/actions/job'
+import { resolveEnrollmentConflict, revertConflictResolution } from '@/lib/actions/conflict-resolution'
 import { getSendOneOffData, type SendOneOffData } from '@/lib/actions/send-one-off-data'
 import type { ReadyToSendJob } from '@/lib/types/dashboard'
 import type { JobWithEnrollment } from '@/lib/types/database'
@@ -51,6 +73,9 @@ export function ReadyToSendQueue({ jobs, hasJobHistory }: ReadyToSendQueueProps)
   const [sendOneOffData, setSendOneOffData] = useState<SendOneOffData | null>(null)
   const [sendOneOffCustomerId, setSendOneOffCustomerId] = useState<string | null>(null)
   const [, startSendTransition] = useTransition()
+
+  // Replace confirmation state
+  const [replaceConfirm, setReplaceConfirm] = useState<{ jobId: string; conflictDetail?: ReadyToSendJob['conflictDetail'] } | null>(null)
 
   const displayJobs = jobs.slice(0, 5)
   const hasMore = jobs.length > 5
@@ -183,9 +208,140 @@ export function ReadyToSendQueue({ jobs, hasJobHistory }: ReadyToSendQueueProps)
     window.location.href = '/jobs'
   }
 
+  // --- Handle conflict resolution ---
+  const handleResolveConflict = (jobId: string, action: 'replace' | 'skip' | 'queue_after') => {
+    // Replace requires confirmation
+    if (action === 'replace') {
+      const job = jobs.find(j => j.id === jobId)
+      setReplaceConfirm({ jobId, conflictDetail: job?.conflictDetail })
+      return
+    }
+
+    setActiveAction({ jobId, action: `conflict-${action}` })
+    startTransition(async () => {
+      try {
+        const result = await resolveEnrollmentConflict(jobId, action)
+        if (result.success) {
+          const label = action === 'skip' ? 'Job skipped — removed from queue' : 'Job queued — ready to enroll when active sequence ends'
+          toast.success(label, {
+            action: {
+              label: 'Undo',
+              onClick: async () => {
+                const revertResult = await revertConflictResolution(jobId)
+                if (revertResult.success) {
+                  toast.success('Resolution reverted')
+                } else {
+                  toast.error(revertResult.error || 'Failed to undo')
+                }
+              },
+            },
+          })
+        } else {
+          toast.error(result.error || 'Failed to resolve conflict')
+        }
+      } catch {
+        toast.error('Failed to resolve conflict')
+      } finally {
+        setActiveAction(null)
+      }
+    })
+  }
+
+  const handleReplaceConfirmed = () => {
+    if (!replaceConfirm) return
+    const jobId = replaceConfirm.jobId
+    setReplaceConfirm(null)
+    setActiveAction({ jobId, action: 'conflict-replace' })
+    startTransition(async () => {
+      try {
+        const result = await resolveEnrollmentConflict(jobId, 'replace')
+        if (result.success) {
+          toast.success('Replaced active sequence with new enrollment')
+        } else {
+          toast.error(result.error || 'Failed to resolve conflict')
+        }
+      } catch {
+        toast.error('Failed to resolve conflict')
+      } finally {
+        setActiveAction(null)
+      }
+    })
+  }
+
   // --- Determine primary button for each job ---
   const renderPrimaryAction = (job: ReadyToSendJob) => {
     const busy = isJobBusy(job.id)
+
+    // Conflict jobs: Replace, Skip, Queue After as inline buttons
+    if (job.enrollment_resolution === 'conflict') {
+      return (
+        <div className="flex items-center gap-1.5">
+          <Button
+            size="sm"
+            variant="default"
+            onClick={() => handleResolveConflict(job.id, 'replace')}
+            disabled={busy}
+          >
+            {busy && activeAction?.action === 'conflict-replace' ? (
+              <CircleNotch className="h-4 w-4 mr-1 animate-spin" />
+            ) : (
+              <ArrowsClockwise className="h-4 w-4 mr-1" />
+            )}
+            Replace
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleResolveConflict(job.id, 'skip')}
+            disabled={busy}
+          >
+            {busy && activeAction?.action === 'conflict-skip' ? (
+              <CircleNotch className="h-4 w-4 mr-1 animate-spin" />
+            ) : (
+              <SkipForward className="h-4 w-4 mr-1" />
+            )}
+            Skip
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleResolveConflict(job.id, 'queue_after')}
+            disabled={busy}
+          >
+            {busy && activeAction?.action === 'conflict-queue_after' ? (
+              <CircleNotch className="h-4 w-4 mr-1 animate-spin" />
+            ) : (
+              <Queue className="h-4 w-4 mr-1" />
+            )}
+            Queue
+          </Button>
+        </div>
+      )
+    }
+
+    // Queue_after jobs: show "Queued" badge with cancel option
+    if (job.enrollment_resolution === 'queue_after') {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size="sm" variant="outline" disabled={busy}>
+              <Clock className="h-4 w-4 mr-1" />
+              Queued
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => handleResolveConflict(job.id, 'skip')}>
+              <X className="h-4 w-4 mr-2" />
+              Cancel queue
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleResolveConflict(job.id, 'replace')}>
+              <ArrowsClockwise className="h-4 w-4 mr-2" />
+              Enroll now (replace)
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )
+    }
 
     if (job.status === 'scheduled') {
       return (
@@ -235,6 +391,22 @@ export function ReadyToSendQueue({ jobs, hasJobHistory }: ReadyToSendQueueProps)
     const serviceTypeName = job.service_type.charAt(0).toUpperCase() + job.service_type.slice(1)
     const timeAgo = formatDistanceToNow(new Date(job.completed_at), { addSuffix: true })
 
+    if (job.enrollment_resolution === 'conflict' && job.conflictDetail) {
+      return (
+        <span className="text-warning-foreground">
+          {serviceTypeName} • Active: {job.conflictDetail.existingCampaignName} (Touch {job.conflictDetail.currentTouch} of {job.conflictDetail.totalTouches})
+        </span>
+      )
+    }
+
+    if (job.enrollment_resolution === 'queue_after' && job.conflictDetail) {
+      return (
+        <span className="text-muted-foreground">
+          {serviceTypeName} • Queued — waiting for {job.conflictDetail.existingCampaignName}
+        </span>
+      )
+    }
+
     if (job.status === 'scheduled') {
       return `${serviceTypeName} • Scheduled ${timeAgo}`
     }
@@ -242,7 +414,7 @@ export function ReadyToSendQueue({ jobs, hasJobHistory }: ReadyToSendQueueProps)
   }
 
   return (
-    <>
+    <TooltipProvider delayDuration={200}>
       <Card id="ready-to-send-queue">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
           <CardTitle className="text-lg font-semibold">Ready to Send</CardTitle>
@@ -291,15 +463,61 @@ export function ReadyToSendQueue({ jobs, hasJobHistory }: ReadyToSendQueueProps)
                   >
                     {/* Left side: status/urgency flag + customer info */}
                     <div className="flex items-start gap-3 flex-1 min-w-0">
-                      {job.isStale && (
-                        <div
-                          className="flex-shrink-0 mt-0.5"
-                          title={`${job.service_type.charAt(0).toUpperCase() + job.service_type.slice(1)} jobs typically send within ${job.threshold}h`}
-                        >
-                          <WarningCircle className="h-5 w-5 text-warning" weight="fill" />
-                        </div>
+                      {job.enrollment_resolution === 'conflict' && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="flex-shrink-0 mt-0.5 cursor-help">
+                              <WarningCircle className="h-5 w-5 text-warning" weight="fill" />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent
+                            side="right"
+                            className="max-w-[240px] bg-card text-card-foreground border shadow-md px-3 py-2.5 text-xs leading-relaxed"
+                          >
+                            <p className="font-semibold text-warning-foreground mb-1">Enrollment conflict</p>
+                            <p className="text-muted-foreground">
+                              This customer is currently enrolled in another campaign.
+                              Choose to <strong>replace</strong> the active sequence, <strong>skip</strong> this job, or <strong>queue</strong> it until the current sequence finishes.
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
                       )}
-                      {job.status === 'scheduled' && !job.isStale && (
+                      {job.enrollment_resolution === 'queue_after' && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="flex-shrink-0 mt-0.5 cursor-help">
+                              <Clock className="h-5 w-5 text-primary" weight="fill" />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent
+                            side="right"
+                            className="max-w-[220px] bg-card text-card-foreground border shadow-md px-3 py-2.5 text-xs leading-relaxed"
+                          >
+                            <p className="font-semibold mb-1">Queued</p>
+                            <p className="text-muted-foreground">
+                              Waiting for the active campaign sequence to finish. You can enroll this job once the sequence completes.
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                      {!job.enrollment_resolution && job.isStale && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="flex-shrink-0 mt-0.5 cursor-help">
+                              <WarningCircle className="h-5 w-5 text-warning" weight="fill" />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent
+                            side="right"
+                            className="max-w-[200px] bg-card text-card-foreground border shadow-md px-3 py-2.5 text-xs leading-relaxed"
+                          >
+                            <p className="text-muted-foreground">
+                              {job.service_type.charAt(0).toUpperCase() + job.service_type.slice(1)} jobs typically send within {job.threshold}h
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                      {!job.enrollment_resolution && job.status === 'scheduled' && !job.isStale && (
                         <div className="flex-shrink-0 mt-0.5">
                           <CalendarBlank className="h-5 w-5 text-muted-foreground" />
                         </div>
@@ -402,7 +620,39 @@ export function ReadyToSendQueue({ jobs, hasJobHistory }: ReadyToSendQueueProps)
           prefilledCustomer={prefilledCustomer}
         />
       )}
-    </>
+
+      {/* Replace Confirmation Dialog */}
+      <AlertDialog open={!!replaceConfirm} onOpenChange={(open) => { if (!open) setReplaceConfirm(null) }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Warning size={20} className="text-warning" weight="fill" />
+              Replace active sequence?
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2">
+                {replaceConfirm?.conflictDetail ? (
+                  <p>
+                    <strong>{replaceConfirm.conflictDetail.existingCampaignName}</strong> is at Touch {replaceConfirm.conflictDetail.currentTouch} of {replaceConfirm.conflictDetail.totalTouches} for this customer. Replacing will cancel the remaining touches and start a new sequence for this job.
+                  </p>
+                ) : (
+                  <p>
+                    This customer has an active campaign sequence. Replacing will cancel the remaining touches and start a new sequence for this job.
+                  </p>
+                )}
+                <p className="text-xs">This cannot be undone.</p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleReplaceConfirmed}>
+              Replace
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </TooltipProvider>
   )
 }
 

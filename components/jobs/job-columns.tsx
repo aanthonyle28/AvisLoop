@@ -2,7 +2,7 @@
 
 import { type ColumnDef } from '@tanstack/react-table'
 import { format, formatDistanceToNow } from 'date-fns'
-import { PencilSimple, Trash, Clock, CheckCircle, XCircle, Minus, PaperPlaneTilt, DotsThree } from '@phosphor-icons/react'
+import { PencilSimple, Trash, Clock, CheckCircle, XCircle, Minus, PaperPlaneTilt, DotsThree, WarningCircle, Queue, ArrowsClockwise, SkipForward } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -26,9 +26,10 @@ interface ColumnsOptions {
   onDelete: (jobId: string) => void
   onMarkComplete: (jobId: string) => void
   onSendOneOff: (customerId: string) => void
+  onResolveConflict: (jobId: string, action: 'replace' | 'skip' | 'queue_after') => void
 }
 
-export function columns({ onEdit, onDelete, onMarkComplete, onSendOneOff }: ColumnsOptions): ColumnDef<JobWithEnrollment>[] {
+export function columns({ onEdit, onDelete, onMarkComplete, onSendOneOff, onResolveConflict }: ColumnsOptions): ColumnDef<JobWithEnrollment>[] {
   return [
     {
       accessorKey: 'customers.name',
@@ -155,6 +156,85 @@ export function columns({ onEdit, onDelete, onMarkComplete, onSendOneOff }: Colu
           )
         }
 
+        // Enrollment resolution states (conflict / queue_after / suppressed / skipped)
+        if (job.enrollment_resolution === 'conflict') {
+          return (
+            <TooltipProvider delayDuration={200}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="text-xs text-warning-foreground flex items-center gap-1 cursor-help">
+                  <WarningCircle size={14} weight="fill" className="text-warning" />
+                  Conflict — awaiting resolution
+                </span>
+              </TooltipTrigger>
+              <TooltipContent
+                side="bottom"
+                className="max-w-[260px] bg-card text-card-foreground border shadow-md px-3 py-2.5 text-xs leading-relaxed"
+              >
+                <p className="font-semibold text-warning-foreground mb-1">Enrollment conflict</p>
+                {job.conflictDetail ? (
+                  <p className="text-muted-foreground">
+                    Active: <strong>{job.conflictDetail.existingCampaignName}</strong> (Touch {job.conflictDetail.currentTouch} of {job.conflictDetail.totalTouches}). Choose to <strong>replace</strong>, <strong>skip</strong>, or <strong>queue</strong>.
+                  </p>
+                ) : (
+                  <p className="text-muted-foreground">
+                    This customer is currently enrolled in another campaign. Choose to <strong>replace</strong> the active sequence, <strong>skip</strong> this job, or <strong>queue</strong> it until the current sequence finishes.
+                  </p>
+                )}
+              </TooltipContent>
+            </Tooltip>
+            </TooltipProvider>
+          )
+        }
+
+        if (job.enrollment_resolution === 'queue_after') {
+          return (
+            <TooltipProvider delayDuration={200}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="text-xs text-primary flex items-center gap-1 cursor-help">
+                  <Queue size={14} weight="fill" />
+                  Queued after active sequence
+                </span>
+              </TooltipTrigger>
+              <TooltipContent
+                side="bottom"
+                className="max-w-[240px] bg-card text-card-foreground border shadow-md px-3 py-2.5 text-xs leading-relaxed"
+              >
+                <p className="font-semibold mb-1">Queued</p>
+                {job.conflictDetail ? (
+                  <p className="text-muted-foreground">
+                    Waiting for <strong>{job.conflictDetail.existingCampaignName}</strong> (Touch {job.conflictDetail.currentTouch} of {job.conflictDetail.totalTouches}) to finish. You can enroll this job once the sequence completes.
+                  </p>
+                ) : (
+                  <p className="text-muted-foreground">
+                    Waiting for the active campaign sequence to finish. You can enroll this job once the sequence completes.
+                  </p>
+                )}
+              </TooltipContent>
+            </Tooltip>
+            </TooltipProvider>
+          )
+        }
+
+        if (job.enrollment_resolution === 'suppressed') {
+          return (
+            <span className="text-xs text-muted-foreground flex items-center gap-1">
+              <CheckCircle size={14} weight="fill" className="text-muted-foreground/70" />
+              Review cooldown
+            </span>
+          )
+        }
+
+        if (job.enrollment_resolution === 'skipped') {
+          return (
+            <span className="text-xs text-muted-foreground flex items-center gap-1">
+              <Minus size={14} weight="bold" className="text-muted-foreground/70" />
+              Skipped
+            </span>
+          )
+        }
+
         // Stopped enrollment (no override explains current state)
         if (anyEnrollment && anyEnrollment.status === 'stopped') {
           return (
@@ -259,6 +339,35 @@ export function columns({ onEdit, onDelete, onMarkComplete, onSendOneOff }: Colu
                   </TooltipTrigger>
                   <TooltipContent>Delete</TooltipContent>
                 </Tooltip>
+                {job.enrollment_resolution === 'conflict' && (
+                  <DropdownMenu>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" size="xs" className="text-warning-foreground border-warning/40 hover:bg-warning-bg" aria-label="Resolve conflict">
+                            <WarningCircle size={14} weight="fill" className="mr-1 text-warning" />
+                            Resolve
+                          </Button>
+                        </DropdownMenuTrigger>
+                      </TooltipTrigger>
+                      <TooltipContent>Resolve enrollment conflict</TooltipContent>
+                    </Tooltip>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => onResolveConflict(job.id, 'replace')}>
+                        <ArrowsClockwise size={16} className="mr-2" />
+                        Replace active sequence
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onResolveConflict(job.id, 'skip')}>
+                        <SkipForward size={16} className="mr-2" />
+                        Skip enrollment
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onResolveConflict(job.id, 'queue_after')}>
+                        <Queue size={16} className="mr-2" />
+                        Queue after active
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
               </TooltipProvider>
               {job.status === 'scheduled' && (
                 <MarkCompleteButton jobId={job.id} size="xs" />
@@ -275,6 +384,22 @@ export function columns({ onEdit, onDelete, onMarkComplete, onSendOneOff }: Colu
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  {job.enrollment_resolution === 'conflict' && (
+                    <>
+                      <DropdownMenuItem onClick={() => onResolveConflict(job.id, 'replace')}>
+                        <ArrowsClockwise size={16} className="mr-2" />
+                        Replace active sequence
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onResolveConflict(job.id, 'skip')}>
+                        <SkipForward size={16} className="mr-2" />
+                        Skip enrollment
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onResolveConflict(job.id, 'queue_after')}>
+                        <Queue size={16} className="mr-2" />
+                        Queue after active
+                      </DropdownMenuItem>
+                    </>
+                  )}
                   {job.status === 'scheduled' && (
                     <DropdownMenuItem onClick={() => onMarkComplete(job.id)}>
                       <CheckCircle size={16} className="mr-2" />
