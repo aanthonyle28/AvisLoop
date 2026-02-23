@@ -32,9 +32,7 @@ export default async function DashboardGroupLayout({
         dashboardBadge={dashboardBadge}
         notificationCounts={notificationCounts}
       >
-        <main id="main-content">
-          {children}
-        </main>
+        {children}
       </AppShell>
     </AddJobProvider>
   )

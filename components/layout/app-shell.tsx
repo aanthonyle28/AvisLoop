@@ -29,7 +29,7 @@ export function AppShell({ children, pageTitle, setupProgress, dashboardBadge, n
   const showSetupProgress = setupProgress && !setupProgress.dismissed
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex h-screen overflow-hidden bg-background">
       {/* Skip link for keyboard navigation - must be first focusable element */}
       <SkipLink />
 
