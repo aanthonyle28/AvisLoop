@@ -48,16 +48,21 @@ export async function quickEnrollJob(jobId: string): Promise<QuickEnrollResult> 
       return { success: false, error: 'Job must be completed to enroll' }
     }
 
-    // Check if job already has active enrollment
+    // Check if CUSTOMER already has active enrollment (not just this job)
+    // Fixes duplicate enrollment bug: old code checked job_id, missing cross-job duplicates
     const { data: existingEnrollment } = await supabase
       .from('campaign_enrollments')
-      .select('id')
-      .eq('job_id', jobId)
+      .select('id, campaigns:campaign_id(name)')
+      .eq('customer_id', job.customer_id)
       .eq('status', 'active')
       .maybeSingle()
 
     if (existingEnrollment) {
-      return { success: false, error: 'Job already enrolled in a campaign' }
+      const campaign = Array.isArray(existingEnrollment.campaigns)
+        ? existingEnrollment.campaigns[0]
+        : existingEnrollment.campaigns
+      const name = (campaign as { name: string } | null)?.name || 'a campaign'
+      return { success: false, error: `Customer already enrolled in ${name}` }
     }
 
     // Find matching active campaign (service-specific or "all services" fallback)
@@ -344,6 +349,41 @@ export async function dismissJobFromQueue(jobId: string): Promise<{ success: boo
     return { success: true }
   } catch (error) {
     console.error('Error dismissing job from queue:', error)
+    return { success: false, error: 'An error occurred' }
+  }
+}
+
+/**
+ * Mark a one-off job as sent after the user successfully sends a one-off request.
+ * Sets campaign_override = 'one_off_sent' to remove it from the ready-to-send queue.
+ */
+export async function markOneOffSent(jobId: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createClient()
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'Not authenticated' }
+
+    const { data: business } = await supabase
+      .from('businesses')
+      .select('id')
+      .eq('user_id', user.id)
+      .single()
+
+    if (!business) return { success: false, error: 'Business not found' }
+
+    const { error } = await supabase
+      .from('jobs')
+      .update({ campaign_override: 'one_off_sent' })
+      .eq('id', jobId)
+      .eq('business_id', business.id)
+
+    if (error) return { success: false, error: error.message }
+
+    revalidatePath('/dashboard')
+    return { success: true }
+  } catch (error) {
+    console.error('Error marking one-off as sent:', error)
     return { success: false, error: 'An error occurred' }
   }
 }

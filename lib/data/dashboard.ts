@@ -256,10 +256,10 @@ export async function getReadyToSendJobs(
       { data: enrolledJobs },
       { data: activeCampaigns },
     ] = await Promise.all([
-      // Step 1: Fetch scheduled + completed jobs with customer data
+      // Step 1: Fetch scheduled + completed jobs with customer data + conflict fields
       supabase
         .from('jobs')
-        .select('id, service_type, status, completed_at, created_at, campaign_override, customers!inner(id, name, email)')
+        .select('id, service_type, status, completed_at, created_at, campaign_override, enrollment_resolution, conflict_detected_at, customer_id, customers!inner(id, name, email)')
         .eq('business_id', businessId)
         .in('status', ['scheduled', 'completed'])
         .order('created_at', { ascending: true })
@@ -288,12 +288,46 @@ export async function getReadyToSendJobs(
 
     // Filter in JavaScript
     const eligibleJobs = (jobs || []).filter(j => {
-      // Exclude dismissed and one-off jobs (handled manually by user)
-      if (j.campaign_override === 'dismissed' || j.campaign_override === 'one_off') return false
+      // Exclude dismissed jobs and one-off jobs that have already been sent
+      if (j.campaign_override === 'dismissed' || j.campaign_override === 'one_off_sent') return false
+      // Exclude skipped and suppressed jobs (resolved by user or system)
+      if (j.enrollment_resolution === 'skipped' || j.enrollment_resolution === 'suppressed') return false
+      // Keep conflict and queue_after jobs (they need to appear in queue)
+      if (j.enrollment_resolution === 'conflict' || j.enrollment_resolution === 'queue_after') return true
+      // One-off jobs stay in queue regardless of enrollment records (they need manual send)
+      if (j.campaign_override === 'one_off') return true
       // For completed jobs, exclude those with ANY enrollment record
       if (j.status === 'completed' && enrolledJobIds.has(j.id)) return false
       return true
     })
+
+    // For conflict/queue_after jobs, batch-fetch the customer's active enrollment details
+    const conflictCustomerIds = new Set(
+      eligibleJobs
+        .filter(j => j.enrollment_resolution === 'conflict' || j.enrollment_resolution === 'queue_after')
+        .map(j => j.customer_id)
+    )
+
+    // Fetch active enrollments for conflict customers
+    const customerEnrollments: Map<string, { existingCampaignName: string; currentTouch: number; totalTouches: number }> = new Map()
+    if (conflictCustomerIds.size > 0) {
+      const { data: activeEnrollments } = await supabase
+        .from('campaign_enrollments')
+        .select('customer_id, current_touch, campaigns:campaign_id(name, campaign_touches(touch_number))')
+        .in('customer_id', Array.from(conflictCustomerIds))
+        .eq('business_id', businessId)
+        .eq('status', 'active')
+
+      for (const enrollment of activeEnrollments || []) {
+        const campaign = Array.isArray(enrollment.campaigns) ? enrollment.campaigns[0] : enrollment.campaigns
+        const campaignData = campaign as { name: string; campaign_touches: { touch_number: number }[] } | null
+        customerEnrollments.set(enrollment.customer_id, {
+          existingCampaignName: campaignData?.name || 'Unknown',
+          currentTouch: enrollment.current_touch,
+          totalTouches: campaignData?.campaign_touches?.length || 0,
+        })
+      }
+    }
 
     // Calculate staleness and campaign matching for each job
     const jobsWithContext = eligibleJobs.map(job => {
@@ -308,6 +342,11 @@ export async function getReadyToSendJobs(
 
       // Check if a matching campaign exists for this service type
       const hasMatchingCampaign = hasAllServicesCampaign || campaignServiceTypes.has(job.service_type)
+
+      // Build conflict detail if applicable
+      const conflictDetail = (job.enrollment_resolution === 'conflict' || job.enrollment_resolution === 'queue_after')
+        ? customerEnrollments.get(job.customer_id)
+        : undefined
 
       return {
         id: job.id,
@@ -324,6 +363,8 @@ export async function getReadyToSendJobs(
         status: job.status as 'scheduled' | 'completed',
         campaign_override: job.campaign_override,
         hasMatchingCampaign,
+        enrollment_resolution: job.enrollment_resolution as ReadyToSendJob['enrollment_resolution'],
+        conflictDetail,
       }
     })
 

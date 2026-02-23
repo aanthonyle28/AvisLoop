@@ -15,6 +15,7 @@ interface QuickSendModalProps {
   monthlyUsage: { count: number; limit: number; tier: string }
   hasReviewLink: boolean
   prefilledCustomer?: Customer | null
+  onSendSuccess?: () => void
 }
 
 export function QuickSendModal({
@@ -26,6 +27,7 @@ export function QuickSendModal({
   monthlyUsage,
   hasReviewLink,
   prefilledCustomer,
+  onSendSuccess,
 }: QuickSendModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -60,7 +62,10 @@ export function QuickSendModal({
           monthlyUsage={monthlyUsage}
           hasReviewLink={hasReviewLink}
           prefilledCustomer={prefilledCustomer}
-          onSuccess={() => onOpenChange(false)}
+          onSuccess={() => {
+            onSendSuccess?.()
+            onOpenChange(false)
+          }}
         />
       </DialogContent>
     </Dialog>

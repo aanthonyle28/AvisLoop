@@ -6,11 +6,9 @@ import { formatDistanceToNow } from 'date-fns'
 import {
   WarningCircle,
   Warning,
-  DotsThree,
   CheckCircle,
   Plus,
   PaperPlaneTilt,
-  Eye,
   X,
   CalendarBlank,
   CircleNotch,
@@ -33,7 +31,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import {
@@ -48,7 +45,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { JobDetailDrawer } from '@/components/jobs/job-detail-drawer'
 import { QuickSendModal } from '@/components/send/quick-send-modal'
-import { quickEnrollJob, getJobDetail, dismissJobFromQueue } from '@/lib/actions/dashboard'
+import { quickEnrollJob, getJobDetail, dismissJobFromQueue, markOneOffSent } from '@/lib/actions/dashboard'
 import { markJobComplete, deleteJob } from '@/lib/actions/job'
 import { resolveEnrollmentConflict, revertConflictResolution } from '@/lib/actions/conflict-resolution'
 import { getSendOneOffData, type SendOneOffData } from '@/lib/actions/send-one-off-data'
@@ -72,6 +69,7 @@ export function ReadyToSendQueue({ jobs, hasJobHistory }: ReadyToSendQueueProps)
   const [sendOneOffOpen, setSendOneOffOpen] = useState(false)
   const [sendOneOffData, setSendOneOffData] = useState<SendOneOffData | null>(null)
   const [sendOneOffCustomerId, setSendOneOffCustomerId] = useState<string | null>(null)
+  const [sendOneOffJobId, setSendOneOffJobId] = useState<string | null>(null)
   const [, startSendTransition] = useTransition()
 
   // Replace confirmation state
@@ -89,8 +87,9 @@ export function ReadyToSendQueue({ jobs, hasJobHistory }: ReadyToSendQueueProps)
   }, [sendOneOffCustomerId, sendOneOffData])
 
   // --- Send one-off: open modal with lazy-loaded data ---
-  const handleSendOneOff = useCallback((customerId: string) => {
+  const handleSendOneOff = useCallback((customerId: string, jobId?: string) => {
     setSendOneOffCustomerId(customerId)
+    setSendOneOffJobId(jobId ?? null)
     setSendOneOffOpen(true)
     startSendTransition(async () => {
       const data = await getSendOneOffData()
@@ -378,7 +377,7 @@ export function ReadyToSendQueue({ jobs, hasJobHistory }: ReadyToSendQueueProps)
       <Button
         size="sm"
         variant="outline"
-        onClick={() => handleSendOneOff(job.customer.id)}
+        onClick={() => handleSendOneOff(job.customer.id, job.id)}
       >
         <PaperPlaneTilt className="h-4 w-4 mr-1" />
         Send One-Off
@@ -409,6 +408,9 @@ export function ReadyToSendQueue({ jobs, hasJobHistory }: ReadyToSendQueueProps)
 
     if (job.status === 'scheduled') {
       return `${serviceTypeName} • Scheduled ${timeAgo}`
+    }
+    if (job.campaign_override === 'one_off') {
+      return `${serviceTypeName} • One-off • Completed ${timeAgo}`
     }
     return `${serviceTypeName} • Completed ${timeAgo}`
   }
@@ -461,8 +463,13 @@ export function ReadyToSendQueue({ jobs, hasJobHistory }: ReadyToSendQueueProps)
                       index < displayJobs.length - 1 ? 'border-b' : ''
                     }`}
                   >
-                    {/* Left side: status/urgency flag + customer info */}
-                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                    {/* Left side: clickable row to view job */}
+                    <button
+                      type="button"
+                      className="flex items-start gap-3 flex-1 min-w-0 text-left hover:opacity-80 transition-opacity"
+                      onClick={() => handleViewJob(job.id)}
+                      disabled={busy && activeAction?.action === 'view'}
+                    >
                       {job.enrollment_resolution === 'conflict' && (
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -517,7 +524,12 @@ export function ReadyToSendQueue({ jobs, hasJobHistory }: ReadyToSendQueueProps)
                           </TooltipContent>
                         </Tooltip>
                       )}
-                      {!job.enrollment_resolution && job.status === 'scheduled' && !job.isStale && (
+                      {!job.enrollment_resolution && !job.isStale && job.campaign_override === 'one_off' && (
+                        <div className="flex-shrink-0 mt-0.5">
+                          <PaperPlaneTilt className="h-5 w-5 text-primary" weight="fill" />
+                        </div>
+                      )}
+                      {!job.enrollment_resolution && job.status === 'scheduled' && !job.isStale && job.campaign_override !== 'one_off' && (
                         <div className="flex-shrink-0 mt-0.5">
                           <CalendarBlank className="h-5 w-5 text-muted-foreground" />
                         </div>
@@ -530,46 +542,31 @@ export function ReadyToSendQueue({ jobs, hasJobHistory }: ReadyToSendQueueProps)
                           {renderSubtitle(job)}
                         </p>
                       </div>
-                    </div>
+                    </button>
 
-                    {/* Right side: context-aware actions */}
-                    <div className="flex items-center gap-2 ml-4">
+                    {/* Right side: primary action + dismiss */}
+                    <div className="flex items-center gap-1.5 ml-4">
                       {renderPrimaryAction(job)}
 
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button size="icon-sm" variant="ghost" disabled={busy}>
-                            {busy && activeAction?.action === 'view' ? (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            size="icon-sm"
+                            variant="ghost"
+                            disabled={busy}
+                            onClick={() => handleDismiss(job.id)}
+                            className="text-muted-foreground hover:text-destructive"
+                          >
+                            {busy && activeAction?.action === 'dismiss' ? (
                               <CircleNotch className="h-4 w-4 animate-spin" />
                             ) : (
-                              <DotsThree className="h-4 w-4" weight="bold" />
+                              <X className="h-4 w-4" weight="bold" />
                             )}
-                            <span className="sr-only">More options</span>
+                            <span className="sr-only">Remove from queue</span>
                           </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleViewJob(job.id)}>
-                            <Eye className="h-4 w-4 mr-2" />
-                            View job
-                          </DropdownMenuItem>
-                          {job.status === 'completed' && (
-                            <DropdownMenuItem
-                              onClick={() => handleSendOneOff(job.customer.id)}
-                            >
-                              <PaperPlaneTilt className="h-4 w-4 mr-2" />
-                              Send one-off
-                            </DropdownMenuItem>
-                          )}
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            onClick={() => handleDismiss(job.id)}
-                            className="text-muted-foreground"
-                          >
-                            <X className="h-4 w-4 mr-2" />
-                            Remove from queue
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">Remove from queue</TooltipContent>
+                      </Tooltip>
                     </div>
                   </div>
                 )
@@ -610,6 +607,7 @@ export function ReadyToSendQueue({ jobs, hasJobHistory }: ReadyToSendQueueProps)
             if (!open) {
               setSendOneOffData(null)
               setSendOneOffCustomerId(null)
+              setSendOneOffJobId(null)
             }
           }}
           customers={sendOneOffData.customers}
@@ -618,6 +616,14 @@ export function ReadyToSendQueue({ jobs, hasJobHistory }: ReadyToSendQueueProps)
           monthlyUsage={sendOneOffData.monthlyUsage}
           hasReviewLink={sendOneOffData.hasReviewLink}
           prefilledCustomer={prefilledCustomer}
+          onSendSuccess={() => {
+            if (sendOneOffJobId) {
+              const job = jobs.find(j => j.id === sendOneOffJobId)
+              if (job?.campaign_override === 'one_off') {
+                markOneOffSent(sendOneOffJobId)
+              }
+            }
+          }}
         />
       )}
 
