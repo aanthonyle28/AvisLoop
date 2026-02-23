@@ -320,10 +320,14 @@ export async function updateJob(
 
     // Re-enroll if new choice is a campaign (not one_off/dismissed, not do_not_send)
     if (override !== 'one_off' && override !== 'dismissed' && enrollInCampaign !== false) {
+      // Only skip conflict check when previous override was a real campaign.
+      // If previous was one_off/dismissed, conflict state was cleared artificially
+      // so we must re-check to avoid bypassing conflict detection.
+      const wasRealCampaign = previousOverride !== 'one_off' && previousOverride !== 'dismissed'
       const effectiveCampaignId = override || campaignId
       const enrollResult = await enrollJobInCampaign(jobId, effectiveCampaignId
-        ? { campaignId: effectiveCampaignId, forceCooldownOverride: true }
-        : { forceCooldownOverride: true })
+        ? { campaignId: effectiveCampaignId, forceCooldownOverride: wasRealCampaign }
+        : { forceCooldownOverride: wasRealCampaign })
       if (!enrollResult.success && !enrollResult.skipped) {
         console.warn('Re-enrollment failed:', enrollResult.error)
       }

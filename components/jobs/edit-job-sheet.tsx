@@ -28,9 +28,10 @@ interface EditJobSheetProps {
   onOpenChange: (open: boolean) => void
   job: JobWithCustomer
   customers: Customer[]
+  enabledServiceTypes?: ServiceType[]
 }
 
-export function EditJobSheet({ open, onOpenChange, job, customers }: EditJobSheetProps) {
+export function EditJobSheet({ open, onOpenChange, job, customers, enabledServiceTypes }: EditJobSheetProps) {
   const [state, formAction, isPending] = useActionState<JobActionState | null, FormData>(
     updateJob,
     null
@@ -165,6 +166,7 @@ export function EditJobSheet({ open, onOpenChange, job, customers }: EditJobShee
               value={serviceType}
               onChange={setServiceType}
               error={state?.fieldErrors?.serviceType?.[0]}
+              enabledTypes={enabledServiceTypes}
             />
           </div>
 

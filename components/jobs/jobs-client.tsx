@@ -88,7 +88,7 @@ export function JobsClient({ initialJobs, totalJobs, customers, campaignMap, cam
           onAddJob={openAddJob}
         />
       ) : (
-        <JobTable jobs={filteredJobs} customers={customers} campaignMap={campaignMap} campaignNames={campaignNames} />
+        <JobTable jobs={filteredJobs} customers={customers} campaignMap={campaignMap} campaignNames={campaignNames} enabledServiceTypes={enabledServiceTypes} />
       )}
     </div>
   )

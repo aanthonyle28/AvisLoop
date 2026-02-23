@@ -10,7 +10,7 @@ import {
 } from '@tanstack/react-table'
 import { Warning } from '@phosphor-icons/react'
 import { columns } from './job-columns'
-import type { JobWithEnrollment, Customer } from '@/lib/types/database'
+import type { JobWithEnrollment, Customer, ServiceType } from '@/lib/types/database'
 import { EditJobSheet } from './edit-job-sheet'
 import { JobDetailDrawer } from './job-detail-drawer'
 import { QuickSendModal } from '@/components/send/quick-send-modal'
@@ -40,9 +40,11 @@ interface JobTableProps {
   campaignNames?: Map<string, { campaignName: string; firstTouchDelay: number }>
   /** Show skeleton loading state */
   loading?: boolean
+  /** Service types enabled for this business (from onboarding settings) */
+  enabledServiceTypes?: ServiceType[]
 }
 
-export function JobTable({ jobs, customers, campaignMap, campaignNames, loading }: JobTableProps) {
+export function JobTable({ jobs, customers, campaignMap, campaignNames, loading, enabledServiceTypes }: JobTableProps) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [selectedJob, setSelectedJob] = useState<JobWithEnrollment | null>(null)
   const [showEditSheet, setShowEditSheet] = useState(false)
@@ -252,6 +254,7 @@ export function JobTable({ jobs, customers, campaignMap, campaignNames, loading 
           onOpenChange={setShowEditSheet}
           job={selectedJob}
           customers={customers}
+          enabledServiceTypes={enabledServiceTypes}
         />
       )}
 
