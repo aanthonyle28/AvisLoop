@@ -30,18 +30,18 @@ export function MarkCompleteButton({ jobId, size = 'sm', className }: MarkComple
 
   return (
     <Button
-      variant="default"
+      variant="outline"
       size={size}
       onClick={handleClick}
       disabled={isPending}
-      className={cn("gap-1.5", className)}
+      className={cn("text-success-foreground border-success/40 hover:bg-success-bg", className)}
     >
       {isPending ? (
-        <CircleNotch className="h-4 w-4 animate-spin" />
+        <CircleNotch size={14} className="mr-1 animate-spin" />
       ) : (
-        <CheckCircle className="h-4 w-4" weight="bold" />
+        <CheckCircle size={14} weight="fill" className="mr-1 text-success" />
       )}
-      {size !== 'xs' && (isPending ? 'Completing...' : 'Mark Complete')}
+      {isPending ? 'Completing...' : 'Complete'}
     </Button>
   )
 }

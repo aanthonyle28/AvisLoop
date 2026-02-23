@@ -34,12 +34,13 @@ export function columns({ onEdit, onDelete, onMarkComplete, onSendOneOff, onReso
     {
       accessorKey: 'customers.name',
       header: 'Customer',
+      meta: { width: '22%' },
       cell: ({ row }) => {
         const customer = row.original.customers
         return (
-          <div>
-            <div className="font-medium">{customer?.name || 'Unknown'}</div>
-            <div className="text-sm text-muted-foreground">{customer?.email || ''}</div>
+          <div className="min-w-0">
+            <div className="font-medium truncate">{customer?.name || 'Unknown'}</div>
+            <div className="text-sm text-muted-foreground truncate">{customer?.email || ''}</div>
           </div>
         )
       },
@@ -47,6 +48,7 @@ export function columns({ onEdit, onDelete, onMarkComplete, onSendOneOff, onReso
     {
       accessorKey: 'service_type',
       header: 'Service Type',
+      meta: { width: '13%' },
       cell: ({ row }) => {
         const serviceType = row.original.service_type
         return (
@@ -59,6 +61,7 @@ export function columns({ onEdit, onDelete, onMarkComplete, onSendOneOff, onReso
     {
       accessorKey: 'status',
       header: 'Status',
+      meta: { width: '13%' },
       cell: ({ row }) => {
         const status = row.original.status
         const completedAt = row.original.completed_at
@@ -106,6 +109,7 @@ export function columns({ onEdit, onDelete, onMarkComplete, onSendOneOff, onReso
     {
       id: 'campaign',
       header: 'Campaign',
+      meta: { width: '22%' },
       cell: ({ row }) => {
         const job = row.original
         const activeEnrollment = job.campaign_enrollments?.find(e => e.status === 'active')
@@ -142,17 +146,13 @@ export function columns({ onEdit, onDelete, onMarkComplete, onSendOneOff, onReso
           )
         }
 
-        // Completed job with one-off override — show current intent, not stale stopped enrollment
+        // Completed job with one-off override
         if (job.status === 'completed' && job.campaign_override === 'one_off') {
           return (
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); if (job.customers?.id) onSendOneOff(job.customers.id) }}
-              className="text-xs text-primary hover:text-primary/80 flex items-center gap-1 hover:underline cursor-pointer"
-            >
-              <PaperPlaneTilt size={14} weight="fill" />
-              Send One-Off Request
-            </button>
+            <span className="text-xs text-foreground flex items-center gap-1">
+              <PaperPlaneTilt size={14} />
+              One-off
+            </span>
           )
         }
 
@@ -279,17 +279,13 @@ export function columns({ onEdit, onDelete, onMarkComplete, onSendOneOff, onReso
           )
         }
 
-        // Completed job with no enrollment — offer one-off send
+        // Completed job with no enrollment
         if (job.status === 'completed') {
           return (
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); if (job.customers?.id) onSendOneOff(job.customers.id) }}
-              className="text-xs text-primary hover:text-primary/80 flex items-center gap-1 hover:underline cursor-pointer"
-            >
-              <PaperPlaneTilt size={14} weight="fill" />
-              Send One-Off Request
-            </button>
+            <span className="text-xs text-muted-foreground flex items-center gap-1">
+              <Minus size={14} weight="bold" className="text-muted-foreground/70" />
+              Not enrolled
+            </span>
           )
         }
 
@@ -304,13 +300,19 @@ export function columns({ onEdit, onDelete, onMarkComplete, onSendOneOff, onReso
     {
       accessorKey: 'created_at',
       header: 'Created',
+      meta: { width: '14%' },
       cell: ({ row }) => format(new Date(row.original.created_at), 'MMM d, yyyy'),
     },
     {
       id: 'actions',
       header: '',
+      meta: { width: '16%' },
       cell: ({ row }) => {
         const job = row.original
+        const canSendOneOff = job.status === 'completed' &&
+          !!job.customers?.id &&
+          job.enrollment_resolution !== 'suppressed' &&
+          !job.campaign_enrollments?.some(e => e.status === 'active' || e.status === 'completed')
 
         return (
           <>
@@ -339,6 +341,21 @@ export function columns({ onEdit, onDelete, onMarkComplete, onSendOneOff, onReso
                   </TooltipTrigger>
                   <TooltipContent>Delete</TooltipContent>
                 </Tooltip>
+                {canSendOneOff && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={() => onSendOneOff(job.customers!.id)}
+                        aria-label="Send one-off request"
+                      >
+                        <PaperPlaneTilt className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Send One-Off</TooltipContent>
+                  </Tooltip>
+                )}
                 {job.enrollment_resolution === 'conflict' && (
                   <DropdownMenu>
                     <Tooltip>
@@ -410,6 +427,12 @@ export function columns({ onEdit, onDelete, onMarkComplete, onSendOneOff, onReso
                     <PencilSimple size={16} className="mr-2" />
                     Edit
                   </DropdownMenuItem>
+                  {canSendOneOff && (
+                    <DropdownMenuItem onClick={() => onSendOneOff(job.customers!.id)}>
+                      <PaperPlaneTilt size={16} className="mr-2" />
+                      Send One-Off
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem
                     onClick={() => onDelete(job.id)}
                     className="text-destructive focus:text-destructive"

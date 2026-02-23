@@ -27,7 +27,9 @@ import {
 } from '@/components/ui/alert-dialog'
 import { getSendOneOffData, type SendOneOffData } from '@/lib/actions/send-one-off-data'
 import { deleteJob, markJobComplete } from '@/lib/actions/job'
+import { resolveEnrollmentConflict, revertConflictResolution } from '@/lib/actions/conflict-resolution'
 import { toast } from 'sonner'
+import type { ConflictDetail } from '@/lib/types/database'
 
 interface JobTableProps {
   jobs: JobWithEnrollment[]
@@ -57,6 +59,9 @@ export function JobTable({ jobs, customers, campaignMap, campaignNames, loading 
   const [sendOneOffData, setSendOneOffData] = useState<SendOneOffData | null>(null)
   const [sendOneOffCustomerId, setSendOneOffCustomerId] = useState<string | null>(null)
   const [, startSendTransition] = useTransition()
+
+  // Replace confirmation state
+  const [replaceConfirm, setReplaceConfirm] = useState<{ jobId: string; conflictDetail?: ConflictDetail } | null>(null)
 
   const handleSendOneOff = useCallback((customerId: string) => {
     setSendOneOffCustomerId(customerId)
@@ -96,6 +101,47 @@ export function JobTable({ jobs, customers, campaignMap, campaignNames, loading 
       toast.error(result.error || 'Failed to complete job')
     }
   }, [])
+
+  const handleResolveConflict = useCallback(async (jobId: string, action: 'replace' | 'skip' | 'queue_after') => {
+    // Replace requires confirmation
+    if (action === 'replace') {
+      const job = jobs.find(j => j.id === jobId)
+      setReplaceConfirm({ jobId, conflictDetail: job?.conflictDetail })
+      return
+    }
+
+    const result = await resolveEnrollmentConflict(jobId, action)
+    if (result.success) {
+      const label = action === 'skip' ? 'Enrollment skipped' : 'Queued after active sequence'
+      toast.success(label, {
+        action: {
+          label: 'Undo',
+          onClick: async () => {
+            const revertResult = await revertConflictResolution(jobId)
+            if (revertResult.success) {
+              toast.success('Resolution reverted')
+            } else {
+              toast.error(revertResult.error || 'Failed to undo')
+            }
+          },
+        },
+      })
+    } else {
+      toast.error(result.error || 'Failed to resolve conflict')
+    }
+  }, [jobs])
+
+  const handleReplaceConfirmed = useCallback(async () => {
+    if (!replaceConfirm) return
+    const jobId = replaceConfirm.jobId
+    setReplaceConfirm(null)
+    const result = await resolveEnrollmentConflict(jobId, 'replace')
+    if (result.success) {
+      toast.success('Replaced active sequence')
+    } else {
+      toast.error(result.error || 'Failed to replace sequence')
+    }
+  }, [replaceConfirm])
 
   // Find the prefilled customer from lazy-loaded data
   const prefilledCustomer = useMemo(() => {
@@ -137,6 +183,7 @@ export function JobTable({ jobs, customers, campaignMap, campaignNames, loading 
       onDelete: handleDeleteRequest,
       onMarkComplete: handleMarkComplete,
       onSendOneOff: handleSendOneOff,
+      onResolveConflict: handleResolveConflict,
     }),
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -152,7 +199,7 @@ export function JobTable({ jobs, customers, campaignMap, campaignNames, loading 
   return (
     <>
       <div className="rounded-md border border-border">
-        <table className="w-full">
+        <table className="w-full table-fixed">
           <thead className="bg-muted/50">
             {table.getHeaderGroups().map(headerGroup => (
               <tr key={headerGroup.id}>
@@ -160,6 +207,7 @@ export function JobTable({ jobs, customers, campaignMap, campaignNames, loading 
                   <th
                     key={header.id}
                     className="h-10 px-4 text-left align-middle font-medium text-muted-foreground"
+                    style={{ width: (header.column.columnDef.meta as Record<string, string>)?.width }}
                   >
                     {header.isPlaceholder
                       ? null
@@ -177,7 +225,7 @@ export function JobTable({ jobs, customers, campaignMap, campaignNames, loading 
                 className="border-t border-border transition-colors hover:bg-muted/50 cursor-pointer"
               >
                 {row.getVisibleCells().map(cell => (
-                  <td key={cell.id} className="p-4">
+                  <td key={cell.id} className="p-4 overflow-hidden">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
@@ -246,6 +294,38 @@ export function JobTable({ jobs, customers, campaignMap, campaignNames, loading 
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Delete Job
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Replace Confirmation Dialog */}
+      <AlertDialog open={!!replaceConfirm} onOpenChange={(open) => { if (!open) setReplaceConfirm(null) }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Warning size={20} className="text-warning" weight="fill" />
+              Replace active sequence?
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2">
+                {replaceConfirm?.conflictDetail ? (
+                  <p>
+                    <strong>{replaceConfirm.conflictDetail.existingCampaignName}</strong> is at Touch {replaceConfirm.conflictDetail.currentTouch} of {replaceConfirm.conflictDetail.totalTouches} for this customer. Replacing will cancel the remaining touches and start a new sequence for this job.
+                  </p>
+                ) : (
+                  <p>
+                    This customer has an active campaign sequence. Replacing will cancel the remaining touches and start a new sequence for this job.
+                  </p>
+                )}
+                <p className="text-xs">This cannot be undone.</p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleReplaceConfirmed}>
+              Replace
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
