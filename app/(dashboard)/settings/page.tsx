@@ -64,6 +64,10 @@ async function SettingsContent() {
     getMonthlyUsage(),
   ])
 
+  // Check if user signed in with email/password (vs OAuth-only)
+  const hasPasswordAuth = user.app_metadata?.providers?.includes('email') ||
+    user.identities?.some((i) => i.provider === 'email') || false
+
   return (
     <div className="max-w-4xl mx-auto">
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border px-6 py-4">
@@ -82,6 +86,7 @@ async function SettingsContent() {
           hasApiKey={hasKey}
           customers={customersResult.customers}
           monthlyUsage={monthlyUsage}
+          hasPasswordAuth={hasPasswordAuth}
         />
       </div>
     </div>

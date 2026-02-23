@@ -38,6 +38,7 @@ export interface Business {
   tier: 'basic' | 'pro' | 'trial'
   stripe_customer_id: string | null
   onboarding_checklist: OnboardingChecklist | null
+  review_cooldown_days: number
   created_at: string
   updated_at: string
 }
@@ -113,6 +114,9 @@ export type ServiceType = 'hvac' | 'plumbing' | 'electrical' | 'cleaning' | 'roo
 // Job status literal union - V2 three-state workflow
 export type JobStatus = 'scheduled' | 'completed' | 'do_not_send'
 
+// Enrollment resolution state for conflict handling
+export type EnrollmentResolution = 'conflict' | 'queue_after' | 'skipped' | 'suppressed'
+
 // Job interface matching database schema
 export interface Job {
   id: string
@@ -122,6 +126,8 @@ export interface Job {
   status: JobStatus
   notes: string | null
   campaign_override: string | null
+  enrollment_resolution: EnrollmentResolution | null
+  conflict_detected_at: string | null
   completed_at: string | null
   created_at: string
   updated_at: string
@@ -130,6 +136,13 @@ export interface Job {
 // Job with joined customer data for list views
 export interface JobWithCustomer extends Job {
   customers: Pick<Customer, 'id' | 'name' | 'email' | 'phone'>
+}
+
+// Conflict detail for jobs with enrollment_resolution = 'conflict' or 'queue_after'
+export interface ConflictDetail {
+  existingCampaignName: string
+  currentTouch: number
+  totalTouches: number
 }
 
 // Job with customer and enrollment data for jobs list with campaign preview
@@ -143,6 +156,8 @@ export interface JobWithEnrollment extends JobWithCustomer {
   matchingCampaign?: { campaignName: string; firstTouchDelay: number } | null
   // Resolved campaign_override UUID → campaign name (for display in columns)
   overrideCampaign?: { campaignName: string; firstTouchDelay: number } | null
+  // Active enrollment info for conflict/queue_after jobs
+  conflictDetail?: ConflictDetail
 }
 
 // Insert type (omit auto-generated fields)
@@ -237,10 +252,10 @@ export type BatchSendActionState = {
 // Send log detail for scheduled sends with contact info
 export interface SendLogDetail {
   id: string
-  contact_id: string
+  customer_id: string
   status: string
   error_message: string | null
-  contacts: { name: string; email: string }
+  customers: { name: string; email: string }
 }
 
 // Scheduled send with per-contact send_log details

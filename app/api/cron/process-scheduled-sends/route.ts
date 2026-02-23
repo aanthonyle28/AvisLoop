@@ -211,7 +211,7 @@ export async function GET(request: Request) {
               .from('send_logs')
               .insert({
                 business_id: business.id,
-                contact_id: contact.id,
+                customer_id: contact.id,
                 template_id: scheduledSend.template_id || null,
                 status: 'pending' as const,
                 subject,

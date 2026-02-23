@@ -13,9 +13,15 @@ import {
 import { Button } from '@/components/ui/button'
 import { deleteAccount } from '@/lib/actions/auth'
 
-export function DeleteAccountDialog() {
+interface DeleteAccountDialogProps {
+  /** Whether user signed in with email/password (vs OAuth-only) */
+  hasPasswordAuth?: boolean
+}
+
+export function DeleteAccountDialog({ hasPasswordAuth = true }: DeleteAccountDialogProps) {
   const [open, setOpen] = useState(false)
   const [confirmText, setConfirmText] = useState('')
+  const [password, setPassword] = useState('')
   const [isDeleting, setIsDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -24,6 +30,7 @@ export function DeleteAccountDialog() {
       setOpen(nextOpen)
       if (!nextOpen) {
         setConfirmText('')
+        setPassword('')
         setError(null)
         setIsDeleting(false)
       }
@@ -35,7 +42,7 @@ export function DeleteAccountDialog() {
     setError(null)
 
     try {
-      const result = await deleteAccount()
+      const result = await deleteAccount(hasPasswordAuth ? password : undefined)
       if (result?.error) {
         setError(result.error)
         setIsDeleting(false)
@@ -49,7 +56,7 @@ export function DeleteAccountDialog() {
     }
   }
 
-  const isConfirmed = confirmText === 'DELETE'
+  const isConfirmed = confirmText === 'DELETE' && (!hasPasswordAuth || password.length > 0)
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -85,6 +92,27 @@ export function DeleteAccountDialog() {
               autoComplete="off"
             />
           </div>
+
+          {hasPasswordAuth && (
+            <div>
+              <label
+                htmlFor="delete-password"
+                className="block text-sm font-medium text-foreground mb-1"
+              >
+                Enter your password
+              </label>
+              <input
+                id="delete-password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Your current password"
+                className="border border-border bg-background text-foreground rounded-md px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-destructive/50 focus:border-destructive"
+                disabled={isDeleting}
+                autoComplete="current-password"
+              />
+            </div>
+          )}
 
           {error && (
             <p className="text-sm text-destructive">{error}</p>

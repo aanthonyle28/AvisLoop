@@ -170,12 +170,31 @@ export async function updatePassword(
   redirect('/dashboard')
 }
 
-export async function deleteAccount(): Promise<AuthActionState> {
+export async function deleteAccount(password?: string): Promise<AuthActionState> {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return { error: 'Not authenticated' }
+  }
+
+  // Re-authenticate: require password for email/password users
+  const hasPasswordIdentity = user.app_metadata?.providers?.includes('email') ||
+    user.identities?.some((i) => i.provider === 'email')
+
+  if (hasPasswordIdentity) {
+    if (!password) {
+      return { error: 'Password is required to delete your account' }
+    }
+
+    const { error: verifyError } = await supabase.auth.signInWithPassword({
+      email: user.email!,
+      password,
+    })
+
+    if (verifyError) {
+      return { error: 'Incorrect password' }
+    }
   }
 
   const admin = createServiceRoleClient()

@@ -23,6 +23,7 @@ interface SettingsTabsProps {
   hasApiKey: boolean
   customers?: Customer[]
   monthlyUsage?: { count: number; limit: number; tier: string }
+  hasPasswordAuth?: boolean
 }
 
 export function SettingsTabs({
@@ -33,6 +34,7 @@ export function SettingsTabs({
   hasApiKey,
   customers,
   monthlyUsage,
+  hasPasswordAuth = true,
 }: SettingsTabsProps) {
   // Email-only templates for the customers QuickSendModal
   const emailTemplates = templates.filter((t) => t.channel === 'email')
@@ -93,6 +95,7 @@ export function SettingsTabs({
               hvac: 24, plumbing: 48, electrical: 24, cleaning: 4,
               roofing: 72, painting: 48, handyman: 24, other: 24
             }}
+            initialCooldownDays={business?.review_cooldown_days ?? 30}
           />
         </section>
       </TabsContent>
@@ -146,7 +149,7 @@ export function SettingsTabs({
           <p className="text-muted-foreground mb-4">
             Permanently delete your account and all associated data. This action cannot be undone.
           </p>
-          <DeleteAccountDialog />
+          <DeleteAccountDialog hasPasswordAuth={hasPasswordAuth} />
         </section>
       </TabsContent>
     </Tabs>
