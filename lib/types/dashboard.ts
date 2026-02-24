@@ -100,3 +100,37 @@ export type QuickEnrollResult = {
   noMatchingCampaign?: boolean  // true if no campaign exists for service type
   serviceType?: string
 }
+
+// Right panel state machine for dashboard command center
+export type RightPanelView =
+  | { type: 'default' }
+  | { type: 'job-detail'; jobId: string }
+  | { type: 'attention-detail'; alertId: string }
+  | { type: 'getting-started' }
+
+// Props for items that can be selected in left column lists
+export interface SelectableJobItem {
+  id: string
+  customerName: string
+  serviceType: string
+  completedAt: string
+  campaignName: string | null
+}
+
+export interface SelectableAlertItem {
+  id: string
+  type: AlertType
+  severity: AlertSeverity
+  title: string
+  description: string
+  customerName: string
+  timestamp: string
+  // For failed sends
+  retryable?: boolean
+  sendLogId?: string
+  errorMessage?: string
+  // For feedback
+  feedbackId?: string
+  rating?: number
+  feedbackText?: string
+}
