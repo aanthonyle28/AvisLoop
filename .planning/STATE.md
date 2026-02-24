@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 ## Current Position
 
 Phase: 40 (Phase 1 of 1 in v2.6 milestone)
-Plan: 04 of ~8 complete
+Plan: 05 of ~8 complete
 Status: In progress
-Last activity: 2026-02-24 — Completed 40-04-PLAN.md (right panel detail views: job detail + attention detail + Getting Started wired)
+Last activity: 2026-02-24 — Completed 40-05-PLAN.md (mobile responsive dashboard: MobileBottomSheet + KPISummaryBar)
 
-Progress: [████░░░░░░] ~50% (v2.6 milestone, est. 8 plans)
+Progress: [█████░░░░░] ~62% (v2.6 milestone, est. 8 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 196
-- v2.6 plans completed: 4
+- Total plans completed (project): 197
+- v2.6 plans completed: 5
 
 *Updated after each plan completion*
 
@@ -44,6 +44,10 @@ Progress: [████░░░░░░] ~50% (v2.6 milestone, est. 8 plans)
 - DashboardDetailContent rendered as detailContent prop to DashboardShell — renders inside Provider so useDashboardPanel() works correctly
 - Alert detail data extracted from description strings via regex (no schema changes needed)
 - RightPanelJobDetail fetches its own data on mount via getReadyToSendJobWithCampaign (self-contained, no prop drilling)
+- MobileBottomSheet uses CSS transitions (not Radix Dialog) — simpler, no new dependency
+- mobileSheetMode 'kpi-full' is a virtual mode local to DashboardContent — not added to RightPanelView union
+- panelView reset to 'default' (e.g. from within detail components after action) also closes the mobile sheet automatically
+- KPISummaryBar receives onClick prop rather than panel setter — keeps it decoupled and generic
 
 ### Key Decisions (Inherited from v2.5)
 
@@ -64,6 +68,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 40-04-PLAN.md — right panel detail views (job detail, attention detail, Getting Started) wired into dashboard.
+Stopped at: Completed 40-05-PLAN.md — mobile responsive dashboard with MobileBottomSheet and KPISummaryBar.
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
