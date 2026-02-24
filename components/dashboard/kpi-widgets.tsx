@@ -13,7 +13,7 @@ interface TrendIndicatorProps {
   size?: 'default' | 'sm'
 }
 
-function TrendIndicator({ value, period, size = 'default' }: TrendIndicatorProps) {
+export function TrendIndicator({ value, period, size = 'default' }: TrendIndicatorProps) {
   // If value is zero, show muted dash for no meaningful data
   if (value === 0) {
     return (
