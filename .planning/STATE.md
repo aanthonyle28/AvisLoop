@@ -38,6 +38,9 @@ Progress: [███░░░░░░░] ~37% (v2.6 milestone, est. 8 plans)
 - Getting Started consolidated into right panel — pill and drawer removed from dashboard
 - DashboardShell embeds DashboardPanelProvider internally — no separate wrapper needed for common usage
 - key={panelView.type} on content div triggers clean re-mount + animate-in on each panel view change
+- DashboardClient uses inner/outer split: outer passes RightPanelDefault to DashboardShell, inner DashboardContent accesses useDashboardPanel context as children
+- Alert rows keep inline action buttons even in compact form — right panel detail (Plan 04) adds context, not replaces
+- Enroll All button only shows when enrollable jobs exist (completed, no conflict, has campaign, not one_off)
 
 ### Key Decisions (Inherited from v2.5)
 
