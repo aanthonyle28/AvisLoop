@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { Badge } from '@/components/ui/badge'
+import { StatusDot } from '@/components/ui/status-dot'
 import {
   AlertDialog,
   AlertDialogContent,
@@ -178,8 +178,8 @@ export function JobDetailDrawer({
 
     if (activeEnrollment) {
       return (
-        <span className="text-sm text-success flex items-center gap-1.5">
-          <CheckCircle size={16} weight="fill" />
+        <span className="text-sm text-foreground flex items-center gap-1.5">
+          <CheckCircle size={16} weight="fill" className="text-success" />
           {activeEnrollment.campaigns?.name || 'Enrolled'}
         </span>
       )
@@ -402,24 +402,12 @@ export function JobDetailDrawer({
   // Status badge
   const renderStatusBadge = () => {
     if (job.status === 'scheduled') {
-      return (
-        <Badge variant="secondary" className="bg-warning-bg text-warning-foreground">
-          Scheduled
-        </Badge>
-      )
+      return <StatusDot dotColor="bg-info" label="Scheduled" />
     }
     if (job.status === 'completed') {
-      return (
-        <Badge variant="default" className="w-fit bg-success-bg text-success-foreground">
-          Completed
-        </Badge>
-      )
+      return <StatusDot dotColor="bg-success" label="Completed" />
     }
-    return (
-      <Badge variant="secondary" className="bg-muted text-muted-foreground">
-        Do Not Send
-      </Badge>
-    )
+    return <StatusDot dotColor="bg-muted-foreground" label="Do Not Send" />
   }
 
   return (

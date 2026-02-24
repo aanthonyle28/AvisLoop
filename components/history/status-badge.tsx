@@ -1,47 +1,38 @@
 'use client'
 
-import { Badge } from '@/components/ui/badge'
-import { cn } from '@/lib/utils'
-import { CircleNotch, CheckCircle, Cursor, WarningCircle, Star } from '@phosphor-icons/react'
+import { StatusDot } from '@/components/ui/status-dot'
 
 // Primary status types
 export type SendStatus = 'pending' | 'delivered' | 'clicked' | 'failed' | 'reviewed' | 'scheduled'
 
 const statusConfig: Record<SendStatus, {
   label: string
-  className: string
-  Icon: typeof CircleNotch
+  dotColor: string
 }> = {
   pending: {
     label: 'Pending',
-    className: 'bg-status-pending-bg text-status-pending-text border border-status-pending-text/20',
-    Icon: CircleNotch
+    dotColor: 'bg-warning',
   },
   delivered: {
     label: 'Delivered',
-    className: 'bg-status-delivered-bg text-status-delivered-text border border-status-delivered-text/20',
-    Icon: CheckCircle
+    dotColor: 'bg-success',
   },
   clicked: {
     label: 'Clicked',
-    className: 'bg-status-clicked-bg text-status-clicked-text border border-status-clicked-text/20',
-    Icon: Cursor
+    dotColor: 'bg-info',
   },
   failed: {
     label: 'Failed',
-    className: 'bg-status-failed-bg text-status-failed-text border border-status-failed-text/20',
-    Icon: WarningCircle
+    dotColor: 'bg-destructive',
   },
   reviewed: {
     label: 'Reviewed',
-    className: 'bg-status-reviewed-bg text-status-reviewed-text border border-status-reviewed-text/20',
-    Icon: Star
+    dotColor: 'bg-success',
   },
   scheduled: {
     label: 'Scheduled',
-    className: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border border-purple-200 dark:border-purple-800',
-    Icon: CheckCircle
-  }
+    dotColor: 'bg-purple-500 dark:bg-purple-400',
+  },
 }
 
 // Normalize legacy status strings to primary statuses
@@ -73,21 +64,12 @@ interface StatusBadgeProps {
 export function StatusBadge({ status, className }: StatusBadgeProps) {
   const normalizedStatus = normalizeStatus(status)
   const config = statusConfig[normalizedStatus]
-  const Icon = config.Icon
 
   return (
-    <Badge
-      className={cn(
-        config.className,
-        'inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold rounded-full',
-        className
-      )}
-    >
-      <Icon
-        className={normalizedStatus === 'pending' ? 'h-3.5 w-3.5 animate-spin' : 'h-3.5 w-3.5'}
-        weight="bold"
-      />
-      {config.label}
-    </Badge>
+    <StatusDot
+      dotColor={config.dotColor}
+      label={config.label}
+      className={className}
+    />
   )
 }

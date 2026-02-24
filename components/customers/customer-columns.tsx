@@ -2,7 +2,7 @@
 
 import { ColumnDef } from '@tanstack/react-table'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Badge } from '@/components/ui/badge'
+import { StatusDot } from '@/components/ui/status-dot'
 import { Button } from '@/components/ui/button'
 import {
   DotsThree,
@@ -135,9 +135,10 @@ export const createColumns = (handlers: ColumnHandlers): ColumnDef<Customer>[] =
     cell: ({ row }) => {
       const status = row.getValue('status') as 'active' | 'archived'
       return (
-        <Badge variant={status === 'active' ? 'default' : 'secondary'}>
-          {status === 'active' ? 'Active' : 'Archived'}
-        </Badge>
+        <StatusDot
+          dotColor={status === 'active' ? 'bg-success' : 'bg-muted-foreground'}
+          label={status === 'active' ? 'Active' : 'Archived'}
+        />
       )
     },
   },

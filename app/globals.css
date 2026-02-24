@@ -40,16 +40,6 @@
     --chart-3: 197 37% 24%;
     --chart-4: 280 50% 55%;
     --chart-5: 340 65% 55%;
-    --status-pending-bg: 220 14% 90%;
-    --status-pending-text: 220 43% 11%;
-    --status-delivered-bg: 194 38% 87%;
-    --status-delivered-text: 189 60% 18%;
-    --status-clicked-bg: 43 92% 82%;
-    --status-clicked-text: 30 100% 27%;
-    --status-failed-bg: 0 100% 89%;
-    --status-failed-text: 358 100% 28%;
-    --status-reviewed-bg: 138 68% 86%;
-    --status-reviewed-text: 149 100% 16%;
     /* Warning (amber — warm hue family) */
     --warning-bg: 45 100% 96%;
     --warning: 32 95% 44%;
@@ -100,16 +90,6 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --status-pending-bg: 220 14% 20%;
-    --status-pending-text: 220 14% 80%;
-    --status-delivered-bg: 189 30% 20%;
-    --status-delivered-text: 189 57% 55%;
-    --status-clicked-bg: 40 40% 20%;
-    --status-clicked-text: 30 80% 70%;
-    --status-failed-bg: 0 40% 20%;
-    --status-failed-text: 358 80% 78%;
-    --status-reviewed-bg: 149 30% 20%;
-    --status-reviewed-text: 149 80% 45%;
     /* Warning (amber) */
     --warning-bg: 38 40% 14%;
     --warning: 38 90% 56%;

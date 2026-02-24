@@ -4,7 +4,7 @@ import { type ColumnDef } from '@tanstack/react-table'
 import { format, formatDistanceToNow } from 'date-fns'
 import { PencilSimple, Trash, Clock, CheckCircle, XCircle, Minus, PaperPlaneTilt, DotsThree, WarningCircle, Queue, ArrowsClockwise, SkipForward } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
+import { StatusDot } from '@/components/ui/status-dot'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -68,24 +68,14 @@ export function columns({ onEdit, onDelete, onMarkComplete, onSendOneOff, onReso
 
         if (status === 'scheduled') {
           return (
-            <Badge
-              variant="secondary"
-              className="bg-warning-bg text-warning-foreground"
-            >
-              Scheduled
-            </Badge>
+            <StatusDot dotColor="bg-info" label="Scheduled" />
           )
         }
 
         if (status === 'completed') {
           return (
             <div className="flex flex-col gap-0.5">
-              <Badge
-                variant="default"
-                className="w-fit bg-success-bg text-success-foreground"
-              >
-                Completed
-              </Badge>
+              <StatusDot dotColor="bg-success" label="Completed" />
               {completedAt && (
                 <span className="text-xs text-muted-foreground">
                   {formatDistanceToNow(new Date(completedAt), { addSuffix: true })}
@@ -97,12 +87,7 @@ export function columns({ onEdit, onDelete, onMarkComplete, onSendOneOff, onReso
 
         // do_not_send
         return (
-          <Badge
-            variant="secondary"
-            className="bg-muted text-muted-foreground"
-          >
-            Do Not Send
-          </Badge>
+          <StatusDot dotColor="bg-muted-foreground" label="Do Not Send" />
         )
       },
     },
@@ -129,8 +114,8 @@ export function columns({ onEdit, onDelete, onMarkComplete, onSendOneOff, onReso
         // Already has active enrollment
         if (activeEnrollment) {
           return (
-            <span className="text-xs text-success flex items-center gap-1">
-              <CheckCircle size={14} weight="fill" />
+            <span className="text-xs text-foreground flex items-center gap-1">
+              <CheckCircle size={14} weight="fill" className="text-success" />
               {activeEnrollment.campaigns?.name || 'Enrolled'}
             </span>
           )

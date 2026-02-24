@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
-import { Badge } from '@/components/ui/badge'
+import { StatusDot } from '@/components/ui/status-dot'
 import { format } from 'date-fns'
 import { updateCustomer, type CustomerActionState } from '@/lib/actions/customer'
 import type { Customer } from '@/lib/types/database'
@@ -191,9 +191,10 @@ export function EditCustomerSheet({ customer, open, onOpenChange }: EditCustomer
               <div className='flex justify-between items-center'>
                 <dt className='text-muted-foreground'>Status</dt>
                 <dd>
-                  <Badge variant={customer.status === 'archived' ? 'secondary' : 'default'}>
-                    {customer.status === 'active' ? 'Active' : 'Archived'}
-                  </Badge>
+                  <StatusDot
+                    dotColor={customer.status === 'active' ? 'bg-success' : 'bg-muted-foreground'}
+                    label={customer.status === 'active' ? 'Active' : 'Archived'}
+                  />
                 </dd>
               </div>
               <div className='flex justify-between items-center'>

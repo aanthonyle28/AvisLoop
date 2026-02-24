@@ -76,18 +76,6 @@ export default {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
-        status: {
-          "pending-bg": "hsl(var(--status-pending-bg))",
-          "pending-text": "hsl(var(--status-pending-text))",
-          "delivered-bg": "hsl(var(--status-delivered-bg))",
-          "delivered-text": "hsl(var(--status-delivered-text))",
-          "clicked-bg": "hsl(var(--status-clicked-bg))",
-          "clicked-text": "hsl(var(--status-clicked-text))",
-          "failed-bg": "hsl(var(--status-failed-bg))",
-          "failed-text": "hsl(var(--status-failed-text))",
-          "reviewed-bg": "hsl(var(--status-reviewed-bg))",
-          "reviewed-text": "hsl(var(--status-reviewed-text))",
-        },
         warning: {
           DEFAULT: "hsl(var(--warning))",
           bg: "hsl(var(--warning-bg))",
