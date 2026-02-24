@@ -134,3 +134,22 @@ export interface SelectableAlertItem {
   rating?: number
   feedbackText?: string
 }
+
+// Job detail data for the right panel view (fetched on demand)
+export interface JobPanelDetail {
+  id: string
+  customer: { id: string; name: string; email: string; phone: string | null }
+  serviceType: string
+  status: string
+  completedAt: string | null
+  createdAt: string
+  notes: string | null
+  campaignOverride: string | null
+  enrollmentResolution: string | null
+  // Campaign info for display
+  matchingCampaignName: string | null
+  matchingCampaignId: string | null
+  // Enrollment info if already enrolled
+  enrollmentStatus: string | null
+  enrollmentCampaignName: string | null
+}

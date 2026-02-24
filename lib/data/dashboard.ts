@@ -6,6 +6,7 @@ import type {
   AttentionAlert,
   DashboardCounts,
   CampaignEvent,
+  JobPanelDetail,
 } from '@/lib/types/dashboard'
 
 /**
@@ -686,5 +687,97 @@ export async function getRecentCampaignEvents(
   } catch (error) {
     console.error('Error fetching recent campaign events:', error)
     return []
+  }
+}
+
+/**
+ * Fetch job detail data for the right panel job-detail view.
+ * Returns customer info, campaign matching info, and enrollment status.
+ * Returns null if job not found or unauthorized.
+ */
+export async function getReadyToSendJobWithCampaign(
+  jobId: string,
+  businessId: string
+): Promise<JobPanelDetail | null> {
+  const supabase = await createClient()
+
+  try {
+    // Fetch job with customer data
+    const { data: job, error: jobError } = await supabase
+      .from('jobs')
+      .select(`
+        id, service_type, status, completed_at, created_at, notes,
+        campaign_override, enrollment_resolution,
+        customers!inner (id, name, email, phone),
+        campaign_enrollments (
+          id, status,
+          campaigns:campaign_id (id, name)
+        )
+      `)
+      .eq('id', jobId)
+      .eq('business_id', businessId)
+      .single()
+
+    if (jobError || !job) return null
+
+    const customer = Array.isArray(job.customers) ? job.customers[0] : job.customers
+    if (!customer) return null
+
+    // Find the active or most recent enrollment
+    type EnrollmentRow = {
+      id: string
+      status: string
+      campaigns: { id: string; name: string } | { id: string; name: string }[] | null
+    }
+    const enrollments = (job.campaign_enrollments || []) as unknown as EnrollmentRow[]
+    const activeEnrollment = enrollments.find(e => e.status === 'active')
+    const latestEnrollment = activeEnrollment || enrollments[0] || null
+    const enrollmentCampaign = latestEnrollment?.campaigns
+    const enrolledCampaign = Array.isArray(enrollmentCampaign) ? enrollmentCampaign[0] : enrollmentCampaign
+
+    // If not enrolled, find a matching active campaign for the service type
+    let matchingCampaignName: string | null = null
+    let matchingCampaignId: string | null = null
+
+    if (!activeEnrollment) {
+      const { data: matchedCampaign } = await supabase
+        .from('campaigns')
+        .select('id, name, service_type')
+        .eq('business_id', businessId)
+        .eq('status', 'active')
+        .or(`service_type.eq.${job.service_type},service_type.is.null`)
+        .order('service_type', { ascending: false, nullsFirst: false }) // service-specific first
+        .limit(1)
+        .single()
+
+      if (matchedCampaign) {
+        matchingCampaignName = matchedCampaign.name
+        matchingCampaignId = matchedCampaign.id
+      }
+    }
+
+    return {
+      id: job.id,
+      customer: {
+        id: customer.id,
+        name: customer.name,
+        email: customer.email,
+        phone: customer.phone ?? null,
+      },
+      serviceType: job.service_type,
+      status: job.status,
+      completedAt: job.completed_at ?? null,
+      createdAt: job.created_at,
+      notes: job.notes ?? null,
+      campaignOverride: job.campaign_override ?? null,
+      enrollmentResolution: job.enrollment_resolution ?? null,
+      matchingCampaignName,
+      matchingCampaignId,
+      enrollmentStatus: latestEnrollment?.status ?? null,
+      enrollmentCampaignName: enrolledCampaign?.name ?? null,
+    }
+  } catch (error) {
+    console.error('Error fetching job panel detail:', error)
+    return null
   }
 }
