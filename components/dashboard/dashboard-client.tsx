@@ -1,13 +1,14 @@
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import Link from 'next/link'
 import { DashboardShell } from '@/components/dashboard/dashboard-shell'
 import { useDashboardPanel } from '@/components/dashboard/dashboard-shell'
-import { RightPanelDefault } from '@/components/dashboard/right-panel-default'
+import { RightPanelDefault, KPISummaryBar } from '@/components/dashboard/right-panel-default'
 import { RightPanelJobDetail } from '@/components/dashboard/right-panel-job-detail'
 import { RightPanelAttentionDetail } from '@/components/dashboard/right-panel-attention-detail'
 import { RightPanelGettingStarted } from '@/components/dashboard/right-panel-getting-started'
+import { MobileBottomSheet } from '@/components/dashboard/mobile-bottom-sheet'
 import { ReadyToSendQueue } from '@/components/dashboard/ready-to-send-queue'
 import { AttentionAlerts } from '@/components/dashboard/attention-alerts'
 import { Button } from '@/components/ui/button'
@@ -83,33 +84,68 @@ function toSelectableAlerts(alerts: AttentionAlert[]): SelectableAlertItem[] {
   }))
 }
 
+// ── Derive bottom sheet title from panel view type ────────────────────────────
+
+function getMobileSheetTitle(type: string): string {
+  switch (type) {
+    case 'job-detail':
+      return 'Job Details'
+    case 'attention-detail':
+      return 'Alert Details'
+    case 'getting-started':
+      return 'Getting Started'
+    case 'kpi-full':
+      return 'Dashboard Stats'
+    default:
+      return 'Details'
+  }
+}
+
 // ── Inner components (have access to useDashboardPanel context) ───────────────
 
 interface DashboardContentProps {
   greeting: string
   firstName: string
   kpiData: DashboardKPIs
+  pipelineSummary: PipelineSummary
+  events: CampaignEvent[]
   readyJobs: ReadyToSendJob[]
   alerts: AttentionAlert[]
   hasJobHistory: boolean
   setupProgress: { completedCount: number; dismissed: boolean; items: Record<ChecklistItemId, boolean> } | null
+  businessId: string
 }
 
 /**
  * Left-column content — rendered inside DashboardShell so it has access
  * to useDashboardPanel context.
+ *
+ * On mobile this component also manages the bottom sheet state:
+ * - Watches panelView and opens/closes the sheet accordingly
+ * - Renders MobileBottomSheet with the appropriate content
+ * - Renders KPISummaryBar above task lists so stats are accessible without scrolling
  */
 function DashboardContent({
   greeting,
   firstName,
   kpiData,
+  pipelineSummary,
+  events,
   readyJobs,
   alerts,
   hasJobHistory,
   setupProgress,
+  businessId,
 }: DashboardContentProps) {
-  const { panelView, setPanelView } = useDashboardPanel()
+  const { panelView, setPanelView, closePanel } = useDashboardPanel()
   const { openAddJob } = useAddJob()
+
+  // Mobile bottom sheet state
+  // 'kpi-full' is a virtual view type for the mobile KPI tap — not in RightPanelView union
+  const [mobileSheetOpen, setMobileSheetOpen] = useState(false)
+  const [mobileSheetMode, setMobileSheetMode] = useState<
+    'job-detail' | 'attention-detail' | 'getting-started' | 'kpi-full'
+  >('kpi-full')
 
   const selectedJobId = panelView.type === 'job-detail' ? panelView.jobId : undefined
   const selectedAlertId = panelView.type === 'attention-detail' ? panelView.alertId : undefined
@@ -121,6 +157,32 @@ function DashboardContent({
   const handleSelectAlert = useCallback((alertId: string) => {
     setPanelView({ type: 'attention-detail', alertId })
   }, [setPanelView])
+
+  // When panelView changes to a detail view, open the mobile bottom sheet
+  useEffect(() => {
+    if (panelView.type === 'job-detail' || panelView.type === 'attention-detail' || panelView.type === 'getting-started') {
+      setMobileSheetMode(panelView.type)
+      setMobileSheetOpen(true)
+    } else if (panelView.type === 'default') {
+      // Panel closed — close the sheet too
+      setMobileSheetOpen(false)
+    }
+  }, [panelView])
+
+  // Handle mobile sheet close — reset panel to default
+  const handleMobileSheetClose = useCallback(() => {
+    setMobileSheetOpen(false)
+    // If the sheet mode was a panelView-backed view, close the panel
+    if (mobileSheetMode !== 'kpi-full') {
+      closePanel()
+    }
+  }, [closePanel, mobileSheetMode])
+
+  // Handle KPI summary bar tap — open bottom sheet with full stats
+  const handleKpiBarTap = useCallback(() => {
+    setMobileSheetMode('kpi-full')
+    setMobileSheetOpen(true)
+  }, [])
 
   // Dynamic subtitle based on current counts
   const subtitle = (() => {
@@ -142,48 +204,105 @@ function DashboardContent({
     setupProgress.items &&
     !setupProgress.items['first_review_click']
 
+  const selectableAlerts = toSelectableAlerts(alerts)
+
+  // Determine content for mobile bottom sheet
+  function renderMobileSheetContent() {
+    switch (mobileSheetMode) {
+      case 'job-detail':
+        if (panelView.type === 'job-detail') {
+          return (
+            <RightPanelJobDetail
+              jobId={panelView.jobId}
+              businessId={businessId}
+            />
+          )
+        }
+        return null
+      case 'attention-detail':
+        if (panelView.type === 'attention-detail') {
+          const alert = selectableAlerts.find(a => a.id === panelView.alertId)
+          if (alert) {
+            return <RightPanelAttentionDetail alert={alert} />
+          }
+        }
+        return null
+      case 'getting-started':
+        if (setupProgress) {
+          return (
+            <div className="p-4">
+              <RightPanelGettingStarted items={setupProgress.items} />
+            </div>
+          )
+        }
+        return null
+      case 'kpi-full':
+        return (
+          <RightPanelDefault
+            kpiData={kpiData}
+            pipelineSummary={pipelineSummary}
+            events={events}
+          />
+        )
+    }
+  }
+
   return (
-    <div className="container py-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">
-            {firstName ? `${greeting}, ${firstName}` : greeting}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
+    <>
+      <div className="container py-6 space-y-6">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold">
+              {firstName ? `${greeting}, ${firstName}` : greeting}
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button onClick={openAddJob}>
+              Add Job
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/campaigns">View Campaigns</Link>
+            </Button>
+          </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <Button onClick={openAddJob}>
-            Add Job
-          </Button>
-          <Button variant="outline" asChild>
-            <Link href="/campaigns">View Campaigns</Link>
-          </Button>
-        </div>
+
+        {/* Compact KPI summary bar — mobile only, tappable to open full stats */}
+        <KPISummaryBar kpiData={kpiData} onClick={handleKpiBarTap} />
+
+        {/* Ready to Send — compact rows */}
+        <ReadyToSendQueue
+          jobs={readyJobs}
+          hasJobHistory={hasJobHistory}
+          onSelectJob={handleSelectJob}
+          selectedJobId={selectedJobId}
+        />
+
+        {/* Needs Attention — compact rows */}
+        <AttentionAlerts
+          alerts={alerts}
+          onSelectAlert={handleSelectAlert}
+          selectedAlertId={selectedAlertId}
+        />
+
+        {/* Getting Started — mobile only (right panel hidden on mobile) */}
+        {showGettingStartedMobile && (
+          <div className="lg:hidden">
+            <RightPanelGettingStarted items={setupProgress!.items} />
+          </div>
+        )}
       </div>
 
-      {/* Ready to Send — compact rows */}
-      <ReadyToSendQueue
-        jobs={readyJobs}
-        hasJobHistory={hasJobHistory}
-        onSelectJob={handleSelectJob}
-        selectedJobId={selectedJobId}
-      />
-
-      {/* Needs Attention — compact rows */}
-      <AttentionAlerts
-        alerts={alerts}
-        onSelectAlert={handleSelectAlert}
-        selectedAlertId={selectedAlertId}
-      />
-
-      {/* Getting Started — mobile only (right panel hidden on mobile) */}
-      {showGettingStartedMobile && (
-        <div className="lg:hidden">
-          <RightPanelGettingStarted items={setupProgress!.items} />
-        </div>
-      )}
-    </div>
+      {/* Mobile bottom sheet — renders right panel content on screens below lg */}
+      <MobileBottomSheet
+        open={mobileSheetOpen}
+        onOpenChange={handleMobileSheetClose}
+        title={getMobileSheetTitle(mobileSheetMode)}
+      >
+        {renderMobileSheetContent()}
+      </MobileBottomSheet>
+    </>
   )
 }
 
@@ -247,6 +366,12 @@ export interface DashboardClientProps {
  *
  * Both DashboardContent and DashboardDetailContent are rendered as children
  * of DashboardShell, giving them access to useDashboardPanel context.
+ *
+ * Mobile strategy:
+ * - Right panel is hidden on mobile (lg:hidden in RightPanel component)
+ * - DashboardContent renders KPISummaryBar above task lists on mobile
+ * - Tapping a job/alert or the KPI bar opens MobileBottomSheet with the detail
+ * - MobileBottomSheet close resets panelView to 'default'
  */
 export function DashboardClient({
   greeting,
@@ -297,10 +422,13 @@ export function DashboardClient({
         greeting={greeting}
         firstName={firstName}
         kpiData={kpiData}
+        pipelineSummary={pipelineSummary}
+        events={events}
         readyJobs={readyJobs}
         alerts={alerts}
         hasJobHistory={hasJobHistory}
         setupProgress={setupProgress}
+        businessId={businessId}
       />
     </DashboardShell>
   )

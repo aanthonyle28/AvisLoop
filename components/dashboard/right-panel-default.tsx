@@ -10,6 +10,7 @@ import {
   UserPlus,
   ChatCircleText,
   ArrowRight,
+  CaretRight,
 } from '@phosphor-icons/react'
 import { Card } from '@/components/ui/card'
 import { TrendIndicator } from '@/components/dashboard/kpi-widgets'
@@ -19,6 +20,48 @@ interface RightPanelDefaultProps {
   kpiData: DashboardKPIs
   pipelineSummary: PipelineSummary
   events: CampaignEvent[]
+}
+
+// ─── KPISummaryBar ────────────────────────────────────────────────────────────
+
+interface KPISummaryBarProps {
+  kpiData: DashboardKPIs
+  onClick: () => void
+}
+
+/**
+ * KPISummaryBar — compact mobile KPI row shown at the top of the dashboard.
+ *
+ * Only visible below the lg breakpoint (lg:hidden).
+ * Tapping opens the full KPI/activity view in the mobile bottom sheet.
+ */
+export function KPISummaryBar({ kpiData, onClick }: KPISummaryBarProps) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="lg:hidden w-full flex items-center justify-between rounded-lg border bg-card px-4 py-3 text-sm hover:bg-muted/30 active:bg-muted/50 transition-colors text-left"
+      aria-label="View full dashboard stats"
+    >
+      <div className="flex items-center gap-3 min-w-0">
+        <span className="flex items-center gap-1">
+          <span className="font-semibold">{kpiData.reviewsThisMonth.value}</span>
+          <span className="text-muted-foreground text-xs">reviews</span>
+        </span>
+        <span className="text-muted-foreground/40 text-xs" aria-hidden="true">·</span>
+        <span className="flex items-center gap-1">
+          <span className="font-semibold">{kpiData.averageRating.value.toFixed(1)}</span>
+          <span className="text-muted-foreground text-xs">avg</span>
+        </span>
+        <span className="text-muted-foreground/40 text-xs" aria-hidden="true">·</span>
+        <span className="flex items-center gap-1">
+          <span className="font-semibold">{kpiData.conversionRate.value}%</span>
+          <span className="text-muted-foreground text-xs">conv</span>
+        </span>
+      </div>
+      <CaretRight size={14} className="text-muted-foreground shrink-0 ml-2" />
+    </button>
+  )
 }
 
 function getEventIcon(type: CampaignEvent['type']) {
