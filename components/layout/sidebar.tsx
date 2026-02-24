@@ -21,7 +21,6 @@ import {
 } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { AccountMenu } from './account-menu'
-import { NotificationBell } from './notification-bell'
 
 interface NavItem {
   icon: React.ElementType
@@ -41,13 +40,9 @@ const mainNav: NavItem[] = [
 
 interface SidebarProps {
   dashboardBadge?: number
-  notificationCounts?: {
-    readyToSend: number
-    attentionAlerts: number
-  }
 }
 
-export function Sidebar({ notificationCounts }: SidebarProps = {}) {
+export function Sidebar({ dashboardBadge }: SidebarProps = {}) {
   const pathname = usePathname()
   const { openAddJob } = useAddJob()
   const [isCollapsed, setIsCollapsed] = useLocalStorage('sidebarCollapsed', false)
@@ -152,7 +147,7 @@ export function Sidebar({ notificationCounts }: SidebarProps = {}) {
             key={item.href}
             item={{
               ...item,
-              badge: undefined,
+              badge: item.href === '/dashboard' ? dashboardBadge : undefined,
             }}
           />
         ))}
@@ -173,15 +168,8 @@ export function Sidebar({ notificationCounts }: SidebarProps = {}) {
         </Button>
       </div>
 
-      {/* Footer with notifications and account */}
+      {/* Footer with account */}
       <div className="p-3 border-t border-border space-y-1">
-        {notificationCounts && (
-          <NotificationBell
-            readyToSend={notificationCounts.readyToSend}
-            attentionAlerts={notificationCounts.attentionAlerts}
-            collapsed={collapsed}
-          />
-        )}
         <AccountMenu
           side="top"
           align={collapsed ? "center" : "start"}

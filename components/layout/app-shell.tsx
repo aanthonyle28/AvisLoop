@@ -18,13 +18,9 @@ interface AppShellProps {
     firstSeenAt: string | null
   } | null
   dashboardBadge?: number
-  notificationCounts?: {
-    readyToSend: number
-    attentionAlerts: number
-  }
 }
 
-export function AppShell({ children, pageTitle, setupProgress, dashboardBadge, notificationCounts }: AppShellProps) {
+export function AppShell({ children, pageTitle, setupProgress, dashboardBadge }: AppShellProps) {
   // Don't show setup progress if dismissed or all complete
   const showSetupProgress = setupProgress && !setupProgress.dismissed
 
@@ -37,7 +33,7 @@ export function AppShell({ children, pageTitle, setupProgress, dashboardBadge, n
       <NavigationProgressBar />
 
       {/* Desktop sidebar */}
-      <Sidebar dashboardBadge={dashboardBadge} notificationCounts={notificationCounts} />
+      <Sidebar dashboardBadge={dashboardBadge} />
 
       {/* Main content area */}
       <main id="main-content" className="flex-1 overflow-auto px-4 sm:px-6 lg:px-8">
@@ -45,7 +41,6 @@ export function AppShell({ children, pageTitle, setupProgress, dashboardBadge, n
         <PageHeader
           title={pageTitle}
           setupProgress={showSetupProgress ? setupProgress : null}
-          notificationCounts={notificationCounts}
         />
 
         {/* Add bottom padding on mobile for bottom nav, remove on desktop */}

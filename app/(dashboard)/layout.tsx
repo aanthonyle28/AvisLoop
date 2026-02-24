@@ -19,16 +19,11 @@ export default async function DashboardGroupLayout({
 
   const enabledServiceTypes = (serviceSettings?.serviceTypesEnabled || []) as ServiceType[]
 
-  // Get badge count for nav and notification bell (lightweight query)
+  // Get badge count for nav (lightweight query)
   let dashboardBadge = 0
-  let notificationCounts = { readyToSend: 0, attentionAlerts: 0 }
   try {
     const counts = await getDashboardCounts()
     dashboardBadge = counts.total
-    notificationCounts = {
-      readyToSend: counts.readyToSend,
-      attentionAlerts: counts.attentionAlerts,
-    }
   } catch {
     // Non-critical, badge just shows 0
   }
@@ -39,7 +34,6 @@ export default async function DashboardGroupLayout({
         <AppShell
           setupProgress={setupProgress}
           dashboardBadge={dashboardBadge}
-          notificationCounts={notificationCounts}
         >
           {children}
         </AppShell>

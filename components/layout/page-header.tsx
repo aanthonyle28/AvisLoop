@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { UserCircle, ArrowsClockwise } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { AccountMenu } from './account-menu'
-import { NotificationBell } from './notification-bell'
 import { SetupProgress } from '@/components/onboarding/setup-progress'
 import type { ChecklistItemId } from '@/lib/constants/checklist'
 
@@ -17,13 +16,9 @@ interface PageHeaderProps {
     dismissed: boolean
     firstSeenAt: string | null
   } | null
-  notificationCounts?: {
-    readyToSend: number
-    attentionAlerts: number
-  }
 }
 
-export function PageHeader({ title, setupProgress, notificationCounts }: PageHeaderProps) {
+export function PageHeader({ title, setupProgress }: PageHeaderProps) {
   return (
     <header className="md:hidden bg-card border-b border-border">
       <div className="h-16 px-4 flex items-center justify-between">
@@ -39,14 +34,8 @@ export function PageHeader({ title, setupProgress, notificationCounts }: PageHea
           )}
         </div>
 
-        {/* Right side: Notifications + Account */}
+        {/* Right side: Account */}
         <div className="flex items-center gap-1">
-          {notificationCounts && (
-            <NotificationBell
-              readyToSend={notificationCounts.readyToSend}
-              attentionAlerts={notificationCounts.attentionAlerts}
-            />
-          )}
           <AccountMenu
             side="bottom"
             align="end"
