@@ -22,9 +22,8 @@ import {
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useDashboardPanel } from '@/components/dashboard/dashboard-shell'
-import { quickEnrollJob } from '@/lib/actions/dashboard'
+import { quickEnrollJob, fetchJobPanelDetail } from '@/lib/actions/dashboard'
 import { resolveEnrollmentConflict } from '@/lib/actions/conflict-resolution'
-import { getReadyToSendJobWithCampaign } from '@/lib/data/dashboard'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import type { JobPanelDetail } from '@/lib/types/dashboard'
@@ -271,7 +270,7 @@ export function RightPanelJobDetail({
     setIsLoading(true)
     setError(null)
     try {
-      const data = await getReadyToSendJobWithCampaign(jobId, businessId)
+      const data = await fetchJobPanelDetail(jobId, businessId)
       if (data) {
         setJob(data)
       } else {

@@ -3,7 +3,8 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { getActiveCampaignForJob } from '@/lib/data/campaign'
-import type { QuickEnrollResult } from '@/lib/types/dashboard'
+import { getReadyToSendJobWithCampaign } from '@/lib/data/dashboard'
+import type { QuickEnrollResult, JobPanelDetail } from '@/lib/types/dashboard'
 import type { ServiceType, JobWithEnrollment } from '@/lib/types/database'
 
 /**
@@ -357,6 +358,17 @@ export async function dismissJobFromQueue(jobId: string): Promise<{ success: boo
  * Mark a one-off job as sent after the user successfully sends a one-off request.
  * Sets campaign_override = 'one_off_sent' to remove it from the ready-to-send queue.
  */
+/**
+ * Server action wrapper for getReadyToSendJobWithCampaign.
+ * Callable from client components (unlike the data function which uses server-only imports).
+ */
+export async function fetchJobPanelDetail(
+  jobId: string,
+  businessId: string
+): Promise<JobPanelDetail | null> {
+  return getReadyToSendJobWithCampaign(jobId, businessId)
+}
+
 export async function markOneOffSent(jobId: string): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await createClient()
