@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 ## Current Position
 
 Phase: 40 (Phase 1 of 1 in v2.6 milestone)
-Plan: 01 of ~8 complete
+Plan: 03 of ~8 complete
 Status: In progress
-Last activity: 2026-02-24 — Completed 40-01-PLAN.md (foundation layout shell + types)
+Last activity: 2026-02-24 — Completed 40-03-PLAN.md (layout cleanup: NotificationBell removal, dashboard badge, RightPanelGettingStarted)
 
-Progress: [█░░░░░░░░░] ~12% (v2.6 milestone, est. 8 plans)
+Progress: [███░░░░░░░] ~37% (v2.6 milestone, est. 8 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 193
-- v2.6 plans completed: 1
+- Total plans completed (project): 195
+- v2.6 plans completed: 3
 
 *Updated after each plan completion*
 
@@ -58,6 +58,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 40-01-PLAN.md — foundation types, DashboardShell, RightPanel, useDashboardPanel hook.
+Stopped at: Completed 40-03-PLAN.md — NotificationBell removal, dashboard nav badge restored, RightPanelGettingStarted component, setup-progress suppressed on /dashboard.
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
