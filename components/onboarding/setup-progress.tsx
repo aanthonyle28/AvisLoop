@@ -50,8 +50,8 @@ export function SetupProgress({
     return null
   }
 
-  // On dashboard, suppress pill when WelcomeCard is showing (completedCount === 0)
-  if (pathname === '/dashboard' && completedCount === 0) {
+  // On dashboard, suppress pill always — Getting Started lives in the right panel
+  if (pathname === '/dashboard') {
     return null
   }
 
