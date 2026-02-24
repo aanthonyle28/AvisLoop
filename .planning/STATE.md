@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 ## Current Position
 
 Phase: 40 (Phase 1 of 1 in v2.6 milestone)
-Plan: 03 of ~8 complete
+Plan: 04 of ~8 complete
 Status: In progress
-Last activity: 2026-02-24 — Completed 40-03-PLAN.md (layout cleanup: NotificationBell removal, dashboard badge, RightPanelGettingStarted)
+Last activity: 2026-02-24 — Completed 40-04-PLAN.md (right panel detail views: job detail + attention detail + Getting Started wired)
 
-Progress: [███░░░░░░░] ~37% (v2.6 milestone, est. 8 plans)
+Progress: [████░░░░░░] ~50% (v2.6 milestone, est. 8 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 195
-- v2.6 plans completed: 3
+- Total plans completed (project): 196
+- v2.6 plans completed: 4
 
 *Updated after each plan completion*
 
@@ -41,6 +41,9 @@ Progress: [███░░░░░░░] ~37% (v2.6 milestone, est. 8 plans)
 - DashboardClient uses inner/outer split: outer passes RightPanelDefault to DashboardShell, inner DashboardContent accesses useDashboardPanel context as children
 - Alert rows keep inline action buttons even in compact form — right panel detail (Plan 04) adds context, not replaces
 - Enroll All button only shows when enrollable jobs exist (completed, no conflict, has campaign, not one_off)
+- DashboardDetailContent rendered as detailContent prop to DashboardShell — renders inside Provider so useDashboardPanel() works correctly
+- Alert detail data extracted from description strings via regex (no schema changes needed)
+- RightPanelJobDetail fetches its own data on mount via getReadyToSendJobWithCampaign (self-contained, no prop drilling)
 
 ### Key Decisions (Inherited from v2.5)
 
@@ -61,6 +64,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 40-03-PLAN.md — NotificationBell removal, dashboard nav badge restored, RightPanelGettingStarted component, setup-progress suppressed on /dashboard.
+Stopped at: Completed 40-04-PLAN.md — right panel detail views (job detail, attention detail, Getting Started) wired into dashboard.
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
