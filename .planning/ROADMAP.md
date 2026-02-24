@@ -633,7 +633,14 @@ Plans:
   8. Getting Started card renders in right panel (full card until first job, compact card until first review); Getting Started pill and drawer removed from dashboard
   9. On mobile (below lg breakpoint), right panel content renders as a bottom sheet triggered by tapping list items
   10. Header shows greeting + dynamic subtitle ("X jobs ready to send · Y items need attention") with right-aligned "+ Add Job" and "View Campaigns" buttons
-**Plans**: TBD (to be created via /gsd:plan-phase 40)
+**Plans**: 6 plans in 5 waves
+Plans:
+- [ ] 40-01-PLAN.md — Foundation: types, right panel shell, two-column layout, panel state machine
+- [ ] 40-02-PLAN.md — Right panel default content + left column compact lists + dashboard page restructure
+- [ ] 40-03-PLAN.md — NotificationBell removal, dashboard nav badge, Getting Started consolidation
+- [ ] 40-04-PLAN.md — Job detail panel + attention detail panel + Getting Started wiring
+- [ ] 40-05-PLAN.md — Mobile bottom sheet + compact KPI summary bar
+- [ ] 40-06-PLAN.md — Visual verification checkpoint
 
 ---
 
@@ -677,7 +684,7 @@ See individual phase sections above for requirements, success criteria, and depe
 | **37** | **v2.5 UI/UX Redesign** | **3/3** | **Complete** | **2026-02-19** |
 | **38** | **v2.5 UI/UX Redesign** | **3/3** | **Complete** | **2026-02-19** |
 | **39** | **v2.5 UI/UX Redesign** | **4/4** | **Complete** | **2026-02-20** |
-| **40** | **v2.6 Dashboard Command Center** | **0/TBD** | **Planned** | **-** |
+| **40** | **v2.6 Dashboard Command Center** | **0/6** | **Planned** | **-** |
 
 **Total:** 192 plans complete across shipped phases.
 
