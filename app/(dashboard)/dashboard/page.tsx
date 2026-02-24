@@ -10,11 +10,7 @@ import { getJobCounts } from '@/lib/data/jobs'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
-import { KPIWidgets } from '@/components/dashboard/kpi-widgets'
-import { ReadyToSendQueue } from '@/components/dashboard/ready-to-send-queue'
-import { AttentionAlerts } from '@/components/dashboard/attention-alerts'
-import { RecentCampaignActivity } from '@/components/dashboard/recent-campaign-activity'
-import { WelcomeCard } from '@/components/dashboard/welcome-card'
+import { DashboardClient } from '@/components/dashboard/dashboard-client'
 import { getSetupProgress } from '@/lib/data/onboarding'
 import type { PipelineSummary } from '@/lib/types/dashboard'
 
@@ -72,24 +68,16 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="container py-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">
-          {firstName ? `${getGreeting()}, ${firstName}` : getGreeting()}
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">Here&apos;s your overview for today</p>
-      </div>
-
-      {setupProgress && setupProgress.completedCount === 0 && !setupProgress.dismissed && (
-        <WelcomeCard items={setupProgress.items} />
-      )}
-      <KPIWidgets data={kpiData} />
-      <ReadyToSendQueue
-        jobs={readyJobs}
-        hasJobHistory={jobCounts.total > 0}
-      />
-      <AttentionAlerts alerts={alerts} />
-      <RecentCampaignActivity events={recentEvents} pipelineSummary={pipelineSummary} />
-    </div>
+    <DashboardClient
+      greeting={getGreeting()}
+      firstName={firstName}
+      kpiData={kpiData}
+      pipelineSummary={pipelineSummary}
+      events={recentEvents}
+      readyJobs={readyJobs}
+      alerts={alerts}
+      hasJobHistory={jobCounts.total > 0}
+      setupProgress={setupProgress}
+    />
   )
 }

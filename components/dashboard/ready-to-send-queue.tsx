@@ -16,9 +16,9 @@ import {
   ArrowsClockwise,
   SkipForward,
   Queue,
+  ListChecks,
 } from '@phosphor-icons/react'
 import { toast } from 'sonner'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -49,19 +49,24 @@ import { quickEnrollJob, getJobDetail, dismissJobFromQueue, markOneOffSent } fro
 import { markJobComplete, deleteJob } from '@/lib/actions/job'
 import { resolveEnrollmentConflict, revertConflictResolution } from '@/lib/actions/conflict-resolution'
 import { getSendOneOffData, type SendOneOffData } from '@/lib/actions/send-one-off-data'
+import { cn } from '@/lib/utils'
 import type { ReadyToSendJob } from '@/lib/types/dashboard'
 import type { JobWithEnrollment } from '@/lib/types/database'
 
 interface ReadyToSendQueueProps {
   jobs: ReadyToSendJob[]
   hasJobHistory: boolean
+  /** Called when user clicks a job row to open right panel detail */
+  onSelectJob?: (jobId: string) => void
+  /** Currently selected job ID — highlights the row */
+  selectedJobId?: string
 }
 
-export function ReadyToSendQueue({ jobs, hasJobHistory }: ReadyToSendQueueProps) {
+export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJobId }: ReadyToSendQueueProps) {
   const [isPending, startTransition] = useTransition()
   const [activeAction, setActiveAction] = useState<{ jobId: string; action: string } | null>(null)
 
-  // Job detail drawer state
+  // Job detail drawer state (for 3-dot view action)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedJob, setSelectedJob] = useState<JobWithEnrollment | null>(null)
 
@@ -75,8 +80,23 @@ export function ReadyToSendQueue({ jobs, hasJobHistory }: ReadyToSendQueueProps)
   // Replace confirmation state
   const [replaceConfirm, setReplaceConfirm] = useState<{ jobId: string; conflictDetail?: ReadyToSendJob['conflictDetail'] } | null>(null)
 
+  // Enroll All confirmation state
+  const [enrollAllOpen, setEnrollAllOpen] = useState(false)
+  const [isEnrollingAll, startEnrollAllTransition] = useTransition()
+
   const displayJobs = jobs.slice(0, 5)
   const hasMore = jobs.length > 5
+
+  // Jobs that can be directly enrolled (completed, no conflict, has campaign)
+  const enrollableJobs = useMemo(() =>
+    jobs.filter(j =>
+      j.status === 'completed' &&
+      !j.enrollment_resolution &&
+      j.hasMatchingCampaign &&
+      j.campaign_override !== 'one_off'
+    ),
+    [jobs]
+  )
 
   const isJobBusy = (jobId: string) => isPending && activeAction?.jobId === jobId
 
@@ -140,6 +160,34 @@ export function ReadyToSendQueue({ jobs, hasJobHistory }: ReadyToSendQueueProps)
         toast.error('Failed to enroll job')
       } finally {
         setActiveAction(null)
+      }
+    })
+  }
+
+  // --- Enroll All: enroll all enrollable jobs sequentially ---
+  const handleEnrollAll = () => {
+    setEnrollAllOpen(false)
+    startEnrollAllTransition(async () => {
+      let successCount = 0
+      let failCount = 0
+      for (const job of enrollableJobs) {
+        try {
+          const result = await quickEnrollJob(job.id)
+          if (result.success && result.enrolled) {
+            successCount++
+          } else {
+            failCount++
+          }
+        } catch {
+          failCount++
+        }
+      }
+      if (successCount > 0 && failCount === 0) {
+        toast.success(`Enrolled ${successCount} job${successCount !== 1 ? 's' : ''} in campaigns`)
+      } else if (successCount > 0 && failCount > 0) {
+        toast.warning(`Enrolled ${successCount}, failed ${failCount}`)
+      } else {
+        toast.error('Failed to enroll jobs')
       }
     })
   }
@@ -417,176 +465,195 @@ export function ReadyToSendQueue({ jobs, hasJobHistory }: ReadyToSendQueueProps)
 
   return (
     <TooltipProvider delayDuration={200}>
-      <Card id="ready-to-send-queue">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-          <CardTitle className="text-lg font-semibold">Ready to Send</CardTitle>
-          {jobs.length > 0 && (
-            <Badge variant="secondary">{jobs.length}</Badge>
+      <div id="ready-to-send-queue">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-semibold">Ready to Send</h2>
+            {jobs.length > 0 && (
+              <Badge variant="secondary">{jobs.length}</Badge>
+            )}
+          </div>
+          {enrollableJobs.length > 0 && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setEnrollAllOpen(true)}
+              disabled={isEnrollingAll}
+            >
+              {isEnrollingAll ? (
+                <CircleNotch className="h-4 w-4 mr-1.5 animate-spin" />
+              ) : (
+                <ListChecks className="h-4 w-4 mr-1.5" />
+              )}
+              {isEnrollingAll ? 'Enrolling...' : 'Enroll All'}
+            </Button>
           )}
-        </CardHeader>
-        <CardContent>
-          {/* Empty states */}
-          {jobs.length === 0 && hasJobHistory && (
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <CheckCircle className="h-12 w-12 text-success mb-3" weight="fill" />
-              <p className="text-sm text-muted-foreground">
-                All caught up — no jobs waiting for enrollment
-              </p>
-            </div>
-          )}
+        </div>
 
-          {jobs.length === 0 && !hasJobHistory && (
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <Plus className="h-12 w-12 text-muted-foreground mb-3" />
-              <p className="text-sm text-muted-foreground mb-3">
-                No jobs yet — add a completed job to get started
-              </p>
-              <Button asChild size="sm">
-                <Link href="/jobs">
-                  <Plus className="h-4 w-4 mr-1" />
-                  Add Job
-                </Link>
-              </Button>
-            </div>
-          )}
+        {/* Empty states */}
+        {jobs.length === 0 && hasJobHistory && (
+          <div className="flex flex-col items-center justify-center py-8 text-center">
+            <CheckCircle className="h-10 w-10 text-success mb-3" weight="fill" />
+            <p className="text-sm text-muted-foreground">
+              All caught up — no jobs waiting for enrollment
+            </p>
+          </div>
+        )}
 
-          {/* Job list */}
-          {displayJobs.length > 0 && (
-            <div className="space-y-0">
-              {displayJobs.map((job, index) => {
-                const busy = isJobBusy(job.id)
+        {jobs.length === 0 && !hasJobHistory && (
+          <div className="flex flex-col items-center justify-center py-8 text-center">
+            <Plus className="h-10 w-10 text-muted-foreground mb-3" />
+            <p className="text-sm text-muted-foreground mb-3">
+              No jobs yet — add a completed job to get started
+            </p>
+            <Button asChild size="sm">
+              <Link href="/jobs">
+                <Plus className="h-4 w-4 mr-1" />
+                Add Job
+              </Link>
+            </Button>
+          </div>
+        )}
 
-                return (
-                  <div
-                    key={job.id}
-                    className={`flex items-center justify-between py-3 ${
-                      index < displayJobs.length - 1 ? 'border-b' : ''
-                    }`}
+        {/* Job list */}
+        {displayJobs.length > 0 && (
+          <div className="space-y-0">
+            {displayJobs.map((job) => {
+              const busy = isJobBusy(job.id)
+              const isSelected = selectedJobId === job.id
+
+              return (
+                <div
+                  key={job.id}
+                  className={cn(
+                    'flex items-center justify-between rounded-md transition-colors',
+                    isSelected ? 'bg-muted' : 'hover:bg-muted/50',
+                  )}
+                >
+                  {/* Left side: clickable row to open right panel */}
+                  <button
+                    type="button"
+                    className="flex items-start gap-3 flex-1 min-w-0 text-left py-2.5 pl-3 pr-1"
+                    onClick={() => onSelectJob ? onSelectJob(job.id) : handleViewJob(job.id)}
+                    disabled={busy && activeAction?.action === 'view'}
                   >
-                    {/* Left side: clickable row to view job */}
-                    <button
-                      type="button"
-                      className="flex items-start gap-3 flex-1 min-w-0 text-left hover:opacity-80 transition-opacity"
-                      onClick={() => handleViewJob(job.id)}
-                      disabled={busy && activeAction?.action === 'view'}
-                    >
-                      {job.enrollment_resolution === 'conflict' && (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div className="flex-shrink-0 mt-0.5 cursor-help">
-                              <WarningCircle className="h-5 w-5 text-warning" weight="fill" />
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent
-                            side="right"
-                            className="max-w-[240px] bg-card text-card-foreground border shadow-md px-3 py-2.5 text-xs leading-relaxed"
-                          >
-                            <p className="font-semibold text-warning-foreground mb-1">Enrollment conflict</p>
-                            <p className="text-muted-foreground">
-                              This customer is currently enrolled in another campaign.
-                              Choose to <strong>replace</strong> the active sequence, <strong>skip</strong> this job, or <strong>queue</strong> it until the current sequence finishes.
-                            </p>
-                          </TooltipContent>
-                        </Tooltip>
-                      )}
-                      {job.enrollment_resolution === 'queue_after' && (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div className="flex-shrink-0 mt-0.5 cursor-help">
-                              <Clock className="h-5 w-5 text-primary" weight="fill" />
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent
-                            side="right"
-                            className="max-w-[220px] bg-card text-card-foreground border shadow-md px-3 py-2.5 text-xs leading-relaxed"
-                          >
-                            <p className="font-semibold mb-1">Queued</p>
-                            <p className="text-muted-foreground">
-                              Waiting for the active campaign sequence to finish. You can enroll this job once the sequence completes.
-                            </p>
-                          </TooltipContent>
-                        </Tooltip>
-                      )}
-                      {!job.enrollment_resolution && job.isStale && (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div className="flex-shrink-0 mt-0.5 cursor-help">
-                              <WarningCircle className="h-5 w-5 text-warning" weight="fill" />
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent
-                            side="right"
-                            className="max-w-[200px] bg-card text-card-foreground border shadow-md px-3 py-2.5 text-xs leading-relaxed"
-                          >
-                            <p className="text-muted-foreground">
-                              {job.service_type.charAt(0).toUpperCase() + job.service_type.slice(1)} jobs typically send within {job.threshold}h
-                            </p>
-                          </TooltipContent>
-                        </Tooltip>
-                      )}
-                      {!job.enrollment_resolution && !job.isStale && job.campaign_override === 'one_off' && (
-                        <div className="flex-shrink-0 mt-0.5">
-                          <PaperPlaneTilt className="h-5 w-5 text-primary" weight="fill" />
-                        </div>
-                      )}
-                      {!job.enrollment_resolution && job.status === 'scheduled' && !job.isStale && job.campaign_override !== 'one_off' && (
-                        <div className="flex-shrink-0 mt-0.5">
-                          <CalendarBlank className="h-5 w-5 text-muted-foreground" />
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">
-                          {job.customer.name}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {renderSubtitle(job)}
-                        </p>
-                      </div>
-                    </button>
-
-                    {/* Right side: primary action + dismiss */}
-                    <div className="flex items-center gap-1.5 ml-4">
-                      {renderPrimaryAction(job)}
-
+                    {job.enrollment_resolution === 'conflict' && (
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button
-                            size="icon-sm"
-                            variant="ghost"
-                            disabled={busy}
-                            onClick={() => handleDismiss(job.id)}
-                            className="text-muted-foreground hover:text-destructive"
-                          >
-                            {busy && activeAction?.action === 'dismiss' ? (
-                              <CircleNotch className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <X className="h-4 w-4" weight="bold" />
-                            )}
-                            <span className="sr-only">Remove from queue</span>
-                          </Button>
+                          <div className="flex-shrink-0 mt-0.5 cursor-help">
+                            <WarningCircle className="h-5 w-5 text-warning" weight="fill" />
+                          </div>
                         </TooltipTrigger>
-                        <TooltipContent side="top">Remove from queue</TooltipContent>
+                        <TooltipContent
+                          side="right"
+                          className="max-w-[240px] bg-card text-card-foreground border shadow-md px-3 py-2.5 text-xs leading-relaxed"
+                        >
+                          <p className="font-semibold text-warning-foreground mb-1">Enrollment conflict</p>
+                          <p className="text-muted-foreground">
+                            This customer is currently enrolled in another campaign.
+                            Choose to <strong>replace</strong> the active sequence, <strong>skip</strong> this job, or <strong>queue</strong> it until the current sequence finishes.
+                          </p>
+                        </TooltipContent>
                       </Tooltip>
+                    )}
+                    {job.enrollment_resolution === 'queue_after' && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex-shrink-0 mt-0.5 cursor-help">
+                            <Clock className="h-5 w-5 text-primary" weight="fill" />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent
+                          side="right"
+                          className="max-w-[220px] bg-card text-card-foreground border shadow-md px-3 py-2.5 text-xs leading-relaxed"
+                        >
+                          <p className="font-semibold mb-1">Queued</p>
+                          <p className="text-muted-foreground">
+                            Waiting for the active campaign sequence to finish. You can enroll this job once the sequence completes.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                    {!job.enrollment_resolution && job.isStale && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex-shrink-0 mt-0.5 cursor-help">
+                            <WarningCircle className="h-5 w-5 text-warning" weight="fill" />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent
+                          side="right"
+                          className="max-w-[200px] bg-card text-card-foreground border shadow-md px-3 py-2.5 text-xs leading-relaxed"
+                        >
+                          <p className="text-muted-foreground">
+                            {job.service_type.charAt(0).toUpperCase() + job.service_type.slice(1)} jobs typically send within {job.threshold}h
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                    {!job.enrollment_resolution && !job.isStale && job.campaign_override === 'one_off' && (
+                      <div className="flex-shrink-0 mt-0.5">
+                        <PaperPlaneTilt className="h-5 w-5 text-primary" weight="fill" />
+                      </div>
+                    )}
+                    {!job.enrollment_resolution && job.status === 'scheduled' && !job.isStale && job.campaign_override !== 'one_off' && (
+                      <div className="flex-shrink-0 mt-0.5">
+                        <CalendarBlank className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">
+                        {job.customer.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {renderSubtitle(job)}
+                      </p>
                     </div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
+                  </button>
 
-          {/* Show all link */}
-          {hasMore && (
-            <div className="mt-4 pt-3 border-t">
-              <Link
-                href="/jobs?status=completed&enrolled=false"
-                className="text-sm text-accent hover:underline"
-              >
-                Show all ({jobs.length})
-              </Link>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                  {/* Right side: primary action + dismiss */}
+                  <div className="flex items-center gap-1.5 pr-3">
+                    {renderPrimaryAction(job)}
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          size="icon-sm"
+                          variant="ghost"
+                          disabled={busy}
+                          onClick={() => handleDismiss(job.id)}
+                          className="text-muted-foreground hover:text-destructive"
+                        >
+                          {busy && activeAction?.action === 'dismiss' ? (
+                            <CircleNotch className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <X className="h-4 w-4" weight="bold" />
+                          )}
+                          <span className="sr-only">Remove from queue</span>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top">Remove from queue</TooltipContent>
+                    </Tooltip>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {/* Show all link */}
+        {hasMore && (
+          <div className="mt-3 pt-3 border-t">
+            <Link
+              href="/jobs?status=completed&enrolled=false"
+              className="text-sm text-accent hover:underline"
+            >
+              Show all ({jobs.length})
+            </Link>
+          </div>
+        )}
+      </div>
 
       {/* Job detail drawer */}
       <JobDetailDrawer
@@ -658,41 +725,71 @@ export function ReadyToSendQueue({ jobs, hasJobHistory }: ReadyToSendQueueProps)
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Enroll All Confirmation Dialog */}
+      <AlertDialog open={enrollAllOpen} onOpenChange={setEnrollAllOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Enroll {enrollableJobs.length} job{enrollableJobs.length !== 1 ? 's' : ''} in campaigns?</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3">
+                <p>The following jobs will be enrolled in their matching campaigns:</p>
+                <div className="max-h-48 overflow-y-auto space-y-1 rounded-md border bg-muted/30 p-3">
+                  {enrollableJobs.map((job) => (
+                    <div key={job.id} className="flex items-center gap-2 text-sm">
+                      <span className="font-medium">{job.customer.name}</span>
+                      <span className="text-muted-foreground">·</span>
+                      <span className="text-muted-foreground capitalize">{job.service_type}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleEnrollAll}>
+              Enroll All
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </TooltipProvider>
   )
 }
 
 export function ReadyToSendQueueSkeleton() {
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-        <div className="h-5 w-32 bg-muted animate-pulse rounded" />
-        <div className="h-5 w-8 bg-muted animate-pulse rounded-full" />
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-0">
-          {[1, 2, 3].map((i, index) => (
-            <div
-              key={i}
-              className={`flex items-center justify-between py-3 ${
-                index < 2 ? 'border-b' : ''
-              }`}
-            >
-              <div className="flex items-start gap-3 flex-1">
-                <div className="h-5 w-5 bg-muted animate-pulse rounded-full mt-0.5" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 w-40 bg-muted animate-pulse rounded" />
-                  <div className="h-3 w-56 bg-muted animate-pulse rounded" />
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="h-8 w-20 bg-muted animate-pulse rounded" />
-                <div className="h-8 w-8 bg-muted animate-pulse rounded" />
+    <div>
+      {/* Header skeleton */}
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2">
+          <div className="h-5 w-32 bg-muted animate-pulse rounded" />
+          <div className="h-5 w-8 bg-muted animate-pulse rounded-full" />
+        </div>
+        <div className="h-8 w-24 bg-muted animate-pulse rounded" />
+      </div>
+      {/* Row skeletons */}
+      <div className="space-y-0">
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="flex items-center justify-between py-2.5 px-3 rounded-md"
+          >
+            <div className="flex items-start gap-3 flex-1">
+              <div className="h-5 w-5 bg-muted animate-pulse rounded-full mt-0.5" />
+              <div className="flex-1 space-y-1.5">
+                <div className="h-4 w-40 bg-muted animate-pulse rounded" />
+                <div className="h-3 w-52 bg-muted animate-pulse rounded" />
               </div>
             </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-20 bg-muted animate-pulse rounded" />
+              <div className="h-8 w-8 bg-muted animate-pulse rounded" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }

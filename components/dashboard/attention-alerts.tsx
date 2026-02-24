@@ -4,7 +4,6 @@ import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 import { XCircle, WarningCircle, Info, CheckCircle, DotsThree } from '@phosphor-icons/react'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -15,27 +14,50 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { retrySend, acknowledgeAlert } from '@/lib/actions/dashboard'
 import { toast } from 'sonner'
+import { cn } from '@/lib/utils'
 import type { AttentionAlert } from '@/lib/types/dashboard'
 
 interface AttentionAlertsProps {
   alerts: AttentionAlert[]
+  /** Called when user clicks an alert row to open right panel detail */
+  onSelectAlert?: (alertId: string) => void
+  /** Currently selected alert ID — highlights the row */
+  selectedAlertId?: string
 }
 
 function SeverityIcon({ severity }: { severity: AttentionAlert['severity'] }) {
   switch (severity) {
     case 'critical':
-      return <XCircle weight="fill" className="size-5 text-destructive shrink-0" />
+      return <XCircle weight="fill" className="size-4 text-destructive shrink-0" />
     case 'warning':
-      return <WarningCircle weight="fill" className="size-5 text-warning shrink-0" />
+      return <WarningCircle weight="fill" className="size-4 text-warning shrink-0" />
     case 'info':
-      return <Info weight="fill" className="size-5 text-info shrink-0" />
+      return <Info weight="fill" className="size-4 text-info shrink-0" />
   }
 }
 
-function AlertRow({ alert }: { alert: AttentionAlert }) {
+function getBorderColor(severity: AttentionAlert['severity']): string {
+  switch (severity) {
+    case 'critical':
+      return 'border-l-destructive'
+    case 'warning':
+      return 'border-l-warning'
+    case 'info':
+      return 'border-l-info'
+  }
+}
+
+interface AlertRowProps {
+  alert: AttentionAlert
+  isSelected: boolean
+  onSelect?: () => void
+}
+
+function AlertRow({ alert, isSelected, onSelect }: AlertRowProps) {
   const [isPending, startTransition] = useTransition()
 
-  const handleRetry = async () => {
+  const handleRetry = (e: React.MouseEvent) => {
+    e.stopPropagation()
     if (!alert.sendLogId) return
 
     startTransition(async () => {
@@ -48,7 +70,8 @@ function AlertRow({ alert }: { alert: AttentionAlert }) {
     })
   }
 
-  const handleAcknowledge = async () => {
+  const handleAcknowledge = async (e: React.MouseEvent) => {
+    e.stopPropagation()
     if (!alert.sendLogId) return
 
     startTransition(async () => {
@@ -62,19 +85,29 @@ function AlertRow({ alert }: { alert: AttentionAlert }) {
   }
 
   return (
-    <div className="flex items-start justify-between gap-4 py-3 border-b last:border-0">
-      <div className="flex items-start gap-3 min-w-0 flex-1">
+    <div
+      className={cn(
+        'flex items-start justify-between gap-3 rounded-md border-l-2 pl-3 pr-3 py-2.5 cursor-pointer transition-colors',
+        getBorderColor(alert.severity),
+        isSelected ? 'bg-muted' : 'hover:bg-muted/50',
+      )}
+      onClick={onSelect}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onSelect?.() }}
+    >
+      <div className="flex items-start gap-2 min-w-0 flex-1">
         <SeverityIcon severity={alert.severity} />
         <div className="min-w-0 flex-1">
-          <div className="text-sm font-medium">{alert.title}</div>
-          <div className="text-xs text-muted-foreground">
-            {alert.description} • {formatDistanceToNow(new Date(alert.timestamp), { addSuffix: true })}
+          <div className="text-sm font-medium leading-tight">{alert.title}</div>
+          <div className="text-xs text-muted-foreground mt-0.5">
+            {alert.description} · {formatDistanceToNow(new Date(alert.timestamp), { addSuffix: true })}
           </div>
         </div>
       </div>
 
-      <div className="flex items-center gap-2 shrink-0">
-        {/* Primary action */}
+      {/* Action buttons (stop propagation so row click doesn't fire) */}
+      <div className="flex items-center gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
         {alert.type === 'failed_send' && alert.retryable && (
           <Button
             size="sm"
@@ -122,76 +155,81 @@ function AlertRow({ alert }: { alert: AttentionAlert }) {
   )
 }
 
-export function AttentionAlerts({ alerts }: AttentionAlertsProps) {
+export function AttentionAlerts({ alerts, onSelectAlert, selectedAlertId }: AttentionAlertsProps) {
   const [expanded, setExpanded] = useState(false)
 
   const displayedAlerts = expanded ? alerts : alerts.slice(0, 3)
   const hasMore = alerts.length > 3
 
   return (
-    <Card id="attention-alerts">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-        <CardTitle className="text-lg font-semibold">Needs Attention</CardTitle>
+    <div id="attention-alerts">
+      {/* Header */}
+      <div className="flex items-center gap-2 mb-2">
+        <h2 className="text-lg font-semibold">Needs Attention</h2>
         {alerts.length > 0 && (
           <Badge variant="destructive">{alerts.length}</Badge>
         )}
-      </CardHeader>
-      <CardContent>
-        {alerts.length === 0 ? (
-          <div className="flex items-center gap-3 py-8 text-center justify-center">
-            <CheckCircle weight="fill" className="size-6 text-success" />
-            <p className="text-sm text-muted-foreground">
-              No issues — everything is running smoothly
-            </p>
-          </div>
-        ) : (
-          <>
-            <div className="space-y-0">
-              {displayedAlerts.map((alert) => (
-                <AlertRow key={alert.id} alert={alert} />
-              ))}
-            </div>
+      </div>
 
-            {hasMore && (
-              <div className="pt-4">
-                <button
-                  onClick={() => setExpanded(!expanded)}
-                  className="text-sm text-accent hover:underline"
-                >
-                  {expanded ? 'Show less' : `View all (${alerts.length})`}
-                </button>
-              </div>
-            )}
-          </>
-        )}
-      </CardContent>
-    </Card>
+      {alerts.length === 0 ? (
+        <div className="flex items-center gap-3 py-8 text-center justify-center">
+          <CheckCircle weight="fill" className="size-5 text-success" />
+          <p className="text-sm text-muted-foreground">
+            No issues — everything is running smoothly
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="space-y-1">
+            {displayedAlerts.map((alert) => (
+              <AlertRow
+                key={alert.id}
+                alert={alert}
+                isSelected={selectedAlertId === alert.id}
+                onSelect={() => onSelectAlert?.(alert.id)}
+              />
+            ))}
+          </div>
+
+          {hasMore && (
+            <div className="pt-3">
+              <button
+                onClick={() => setExpanded(!expanded)}
+                className="text-sm text-accent hover:underline"
+              >
+                {expanded ? 'Show less' : `View all (${alerts.length})`}
+              </button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
   )
 }
 
 export function AttentionAlertsSkeleton() {
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+    <div>
+      {/* Header skeleton */}
+      <div className="flex items-center gap-2 mb-2">
         <div className="h-5 w-32 bg-muted animate-pulse rounded" />
         <div className="h-5 w-8 bg-muted animate-pulse rounded" />
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-0">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="flex items-start justify-between gap-4 py-3 border-b last:border-0">
-              <div className="flex items-start gap-3 min-w-0 flex-1">
-                <div className="size-5 bg-muted animate-pulse rounded-full shrink-0" />
-                <div className="space-y-2 flex-1">
-                  <div className="h-4 w-48 bg-muted animate-pulse rounded" />
-                  <div className="h-3 w-64 bg-muted animate-pulse rounded" />
-                </div>
+      </div>
+      {/* Row skeletons */}
+      <div className="space-y-1">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="flex items-start justify-between gap-3 rounded-md border-l-2 border-l-muted pl-3 pr-3 py-2.5">
+            <div className="flex items-start gap-2 min-w-0 flex-1">
+              <div className="size-4 bg-muted animate-pulse rounded-full shrink-0" />
+              <div className="space-y-1.5 flex-1">
+                <div className="h-4 w-48 bg-muted animate-pulse rounded" />
+                <div className="h-3 w-64 bg-muted animate-pulse rounded" />
               </div>
-              <div className="h-8 w-20 bg-muted animate-pulse rounded shrink-0" />
             </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+            <div className="h-8 w-20 bg-muted animate-pulse rounded shrink-0" />
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }
