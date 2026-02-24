@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 ## Current Position
 
 Phase: 40 (Phase 1 of 1 in v2.6 milestone)
-Plan: Not started
-Status: Requirements defined, ready for planning
-Last activity: 2026-02-23 — Milestone v2.6 started, Phase 40 scoped
+Plan: 01 of ~8 complete
+Status: In progress
+Last activity: 2026-02-24 — Completed 40-01-PLAN.md (foundation layout shell + types)
 
-Progress: [░░░░░░░░░░] 0% (v2.6 milestone)
+Progress: [█░░░░░░░░░] ~12% (v2.6 milestone, est. 8 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 192
-- v2.6 plans completed: 0
+- Total plans completed (project): 193
+- v2.6 plans completed: 1
 
 *Updated after each plan completion*
 
@@ -36,6 +36,8 @@ Progress: [░░░░░░░░░░] 0% (v2.6 milestone)
 - NotificationBell removed entirely — dashboard badge + subtitle replaces it
 - Needs Attention detail panel shows contextual content (failed: error+retry, low rating: feedback+resolve)
 - Getting Started consolidated into right panel — pill and drawer removed from dashboard
+- DashboardShell embeds DashboardPanelProvider internally — no separate wrapper needed for common usage
+- key={panelView.type} on content div triggers clean re-mount + animate-in on each panel view change
 
 ### Key Decisions (Inherited from v2.5)
 
@@ -55,7 +57,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-23
-Stopped at: Milestone v2.6 initialized, Phase 40 requirements defined. Ready for /gsd:plan-phase 40.
+Last session: 2026-02-24
+Stopped at: Completed 40-01-PLAN.md — foundation types, DashboardShell, RightPanel, useDashboardPanel hook.
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
