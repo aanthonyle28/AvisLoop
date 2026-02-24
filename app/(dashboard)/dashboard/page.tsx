@@ -71,6 +71,7 @@ export default async function DashboardPage() {
     <DashboardClient
       greeting={getGreeting()}
       firstName={firstName}
+      businessId={business.id}
       kpiData={kpiData}
       pipelineSummary={pipelineSummary}
       events={recentEvents}
