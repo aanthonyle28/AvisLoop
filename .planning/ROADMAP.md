@@ -15,6 +15,7 @@ AvisLoop is a review follow-up system for home service businesses. v1.0 through 
 - **v1.4 Landing Page Redesign** - Phase 25 (shipped 2026-02-02)
 - **v2.0 Review Follow-Up System** - Phases 20-32 (complete 2026-02-18)
 - **v2.5 UI/UX Redesign** - Phases 33-39 (complete 2026-02-20)
+- **v2.6 Dashboard Command Center** - Phase 40 (in progress)
 
 ## Phases
 
@@ -609,6 +610,31 @@ Plans:
 - [x] 39-03-PLAN.md — QuickSendModal component and Campaigns page integration
 - [x] 39-04-PLAN.md — Add Job one-off send toggle and /send redirect
 
+### v2.6 Dashboard Command Center (Phase 40)
+
+**Milestone Goal:** Transform the dashboard into a task-oriented command center with persistent two-column layout, contextual right panel, and consolidated getting-started experience.
+
+**Coverage:** 22 requirements across 8 categories (DL, DH, DN, RS, JD, NA, GS, RP)
+
+---
+
+### Phase 40: Dashboard Command Center
+**Goal**: Dashboard redesigned as a two-column command center — left column for actionable task lists (Ready to Send, Needs Attention), right panel for contextual details that dynamically swaps between KPI performance view, job details, attention item details, and getting-started guidance.
+**Depends on**: Phase 39 (v2.5 complete)
+**Requirements**: DL-01 to DL-04, DH-01, DH-02, DN-01, DN-02, RS-01, RS-02, JD-01 to JD-04, NA-01 to NA-03, GS-01 to GS-03, RP-01, RP-02
+**Success Criteria** (what must be TRUE):
+  1. Dashboard renders in a two-column layout on desktop (lg+): left column is flexible-width with Ready to Send and Needs Attention lists; right panel is fixed ~360px with contextual content
+  2. Right panel default state shows 3 KPI cards (Reviews This Month, Average Rating, Conversion Rate) with trend indicators, 3 pipeline counters (Sent, Active Sequences, Queued), and a Recent Activity feed
+  3. Clicking a Ready to Send job item replaces right panel content with Job Details showing customer info, campaign data (matching campaign name), technician, completion date, notes, and "Enroll in [Campaign] Campaign" CTA
+  4. Clicking a Needs Attention item replaces right panel with contextual detail — failed delivery shows error + retry button; low rating shows rating + feedback + resolve button
+  5. Close button (X) on detail views returns right panel to default KPI/activity state
+  6. Dashboard nav badge shows combined count of ready-to-send + needs-attention items; NotificationBell removed from app header
+  7. "Enroll All" button shows confirmation dialog listing jobs before executing bulk enrollment
+  8. Getting Started card renders in right panel (full card until first job, compact card until first review); Getting Started pill and drawer removed from dashboard
+  9. On mobile (below lg breakpoint), right panel content renders as a bottom sheet triggered by tapping list items
+  10. Header shows greeting + dynamic subtitle ("X jobs ready to send · Y items need attention") with right-aligned "+ Add Job" and "View Campaigns" buttons
+**Plans**: TBD (to be created via /gsd:plan-phase 40)
+
 ---
 
 ## Phase Details
@@ -651,6 +677,7 @@ See individual phase sections above for requirements, success criteria, and depe
 | **37** | **v2.5 UI/UX Redesign** | **3/3** | **Complete** | **2026-02-19** |
 | **38** | **v2.5 UI/UX Redesign** | **3/3** | **Complete** | **2026-02-19** |
 | **39** | **v2.5 UI/UX Redesign** | **4/4** | **Complete** | **2026-02-20** |
+| **40** | **v2.6 Dashboard Command Center** | **0/TBD** | **Planned** | **-** |
 
 **Total:** 192 plans complete across shipped phases.
 
@@ -660,17 +687,17 @@ See individual phase sections above for requirements, success criteria, and depe
 
 **v2.5 milestone COMPLETE:** Phases 33-39 all verified (2026-02-20).
 
+**v2.6 Dashboard Command Center:** Phase 40 — planned, not yet started.
+
 **Blockers:**
 - Twilio A2P 10DLC registration required before Phase 21-08 execution (webhook verification)
 
-After v2.5:
-- **Security Review** — Full codebase audit (26 findings), all Critical/High/Medium resolved (2026-02-22)
-- **Post-Security Hardening** — Enrollment conflict resolution system, review cooldown, cron processor, BusinessSettingsProvider refactor (2026-02-22)
+After v2.6:
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 - **v2.1 Integrations** — ServiceTitan/Jobber/Housecall Pro API integrations for auto job import
 - **v2.2 Review Inbox** — Ingest reviews from Google Business Profile, AI reply suggestions
 - **v3.0 Agency Mode** — Multi-business management UI, white-label option, client reporting portal
 
 ---
-*Last updated: 2026-02-22 — v2.0 milestone complete (Phases 20-32 verified), v2.5 UI/UX Redesign COMPLETE (Phases 33-39 all verified), Security Review complete, post-security hardening complete, all commits pushed*
+*Last updated: 2026-02-23 — v2.6 Dashboard Command Center milestone started (Phase 40 added)*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*

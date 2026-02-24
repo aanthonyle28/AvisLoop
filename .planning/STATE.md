@@ -2,90 +2,47 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-18)
+See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v2.5 milestone complete — post-security hardening, bug fixes, and architecture improvements
+**Current focus:** v2.6 Dashboard Command Center — two-column task-oriented layout with contextual right panel
 
 ## Current Position
 
-Phase: 39 of 39 in v2.5 milestone (Phase 7 of 7 in this milestone)
-Plan: 4 of 4 complete
-Status: Phase complete — v2.5 milestone complete
-Last activity: 2026-02-22 — Enrollment conflict system, bug fixes (conflict bypass, edit job service types), BusinessSettingsProvider refactor
+Phase: 40 (Phase 1 of 1 in v2.6 milestone)
+Plan: Not started
+Status: Requirements defined, ready for planning
+Last activity: 2026-02-23 — Milestone v2.6 started, Phase 40 scoped
 
-Progress: [██████████] 100% (v2.5 milestone — all 7 phases complete)
+Progress: [░░░░░░░░░░] 0% (v2.6 milestone)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed (project): 192
-- v2.5 plans completed: 22
+- v2.6 plans completed: 0
 
 *Updated after each plan completion*
 
 ## Accumulated Context
 
-### Key Decisions for v2.5
+### Key Decisions for v2.6
 
-- Amber as accent only, blue stays primary — amber at warm lightness fails WCAG AA on white (2.2:1); blue stays primary for buttons/focus rings
-- Phase 33 (color audit) MUST run before Phase 34 (palette swap) — hardcoded hex bypasses token system
-- Manual Request elimination (Phase 39) is last — most regression risk; /send becomes redirect not deletion
-- Onboarding storage key versioned to `'onboarding-draft-v2'` (Phase 38 complete) — stale 7-step drafts abandoned via key change, no migration code needed
-- Dark mode calibration must be independent of light mode (higher saturation needed for warm hues in dark)
-- bg-secondary for active nav state (replaces bg-[#F2F2F2]) — --secondary is 0 0% 92%, semantically correct for muted interactive surface
-- Redundant dark: overrides removed — bg-card, bg-background, border-border are already mode-aware; dark:bg-X overrides add noise
-- Button component for all interactive elements — raw button elements replaced with Button primitive for consistency and future theming
-- Tier 2 audit: 210 occurrences / 51 files / 16 categories — data-viz dots, stars, marketing stay inline; everything else Phase 35
-- --error-text is distinct from --destructive — form validation text needs darker shade than button-calibrated destructive token
-- Phase 35 token spec implemented: 13 CSS vars (--warning-bg/DEFAULT/border/foreground, --success-bg/DEFAULT/border/foreground, --info-bg/DEFAULT/border/foreground, --error-text) + 4 Tailwind color groups in tailwind.config.ts
-- Warm palette anchored at H=36 (cream light bg), H=24 (charcoal dark bg), H=38 (amber accent), H=213 (blue primary) — all live in globals.css
-- Status badge pattern: className field in config (not bg/text), no style prop, border-status-*-text/20 for warm-bg contrast
-- Accent = decorative only: bg-secondary for outline button hover, bg-muted for ghost/dropdown/select/dialog states
-- Status badge text contrast adjusted post-verification: delivered 25%, failed 33%, reviewed 20% (light); clicked 62%, failed 70% (dark) — all pass WCAG AA
-- Primary color shifted: 224 75% 43% → 213 60% 42% (softer, less saturated blue)
-- Card variants use Tailwind color scale (not semantic tokens) — card tints are decorative, not semantic status; low-opacity (/60 bg, /50 border) keeps them whisper-quiet
-- InteractiveCard: translate-y lift replaced by hover:shadow-sm + always-visible ArrowRight (muted-foreground/30 → /70 on hover); hoverAccent prop adds colored border+arrow on hover (amber/green/blue)
-- KPI top row: each card gets distinct hoverAccent + filled colored icon (amber star, green chart, blue target); bottom row uses variant="default" for cleaner visual separation
-- Server-timezone greeting (UTC on Vercel) is acceptable — client-side hydration adds complexity for minimal UX gain
-- Dashboard badge removed from sidebar nav item — dashboardBadge still in SidebarProps interface/AppShell prop chain but destructured param removed
-- text-error-text for form validation (not text-destructive) — --error-text is darker shade for small inline text readability
-- SMS counter uses two-level threshold: text-warning (soft, >160 chars) → text-destructive (hard, >320 chars)
-- Danger zone section pattern: border-destructive/30 + text-destructive (not hardcoded red-200/red-600)
-- Warning banner pattern: bg-warning-bg + border-warning-border + text-warning (icon/body) + text-warning-foreground (heading)
-- Data-viz stars (text-yellow-400) and positive trend percentages (text-green-600) remain inline — exempt per Phase 33 audit
-- Page container standard: container py-6 space-y-6 (full-width), container max-w-{N} py-6 space-y-6 (constrained) — mx-auto and px-4 are redundant with Tailwind container class
-- SMS consent 3-state display: text-success (opted_in) / text-destructive (opted_out) / text-warning (unknown) — consistent across detail drawer and edit sheet
-- Template channel badge: bg-info/10 text-info (email), bg-success/10 text-success (SMS) — distinct channels via semantic color not arbitrary blue/green
-- PasswordInput toggle button uses tabIndex={-1} + type="button" — Tab skips eye icon to next form field; type=button prevents accidental form submission
-- Error message pattern: id={field}-error role=alert on <p>, linked via aria-describedby on the input — screen readers announce error on focus
-- noValidate on all auth forms — suppress browser validation popups; server-side errors render inline with aria-invalid red border styling
-- aria-invalid:border-destructive on Input component — Tailwind arbitrary variant triggers red border/ring when aria-invalid=true is set
-- PasswordStrengthChecklist returns null when password is empty — no checklist flash on page load, appears on first keystroke
-- Confirm password field stays uncontrolled — checklist only on primary password field
-- signInSchema unchanged — login has no strength enforcement (user signs in with existing password)
-- Google OAuth PKCE flow works end-to-end — no code changes needed; code was correct as-built
-- NEXT_PUBLIC_SITE_URL: `http://localhost:3000` in .env.local, `https://app.avisloop.com` in Vercel production (no trailing slash on either)
-- react-hook-form setValue for complex arrays requires `{ shouldDirty: true, shouldValidate: true }` to ensure dirty tracking
-- Sheet-based edit pattern for campaigns: parent component owns open/close state; form uses onSuccess callback instead of router navigation
-- Plain-English campaign preset names: Conservative → Gentle Follow-Up, Standard → Standard Follow-Up, Aggressive → Aggressive Follow-Up
-- 5-step onboarding: Business Basics, Services Offered, Campaign Preset, Import Jobs, SMS Consent
-- CampaignEvent IDs prefixed by source (touch-/feedback-/enroll-/review-) to guarantee uniqueness when rows from different tables are merged
-- Dashboard pipeline cards (Requests Sent, Active Sequences, Pending/Queued) removed from KPIWidgets — preserved as inline counters in RecentCampaignActivity strip header
-- PipelineSummary derived from kpiData post-Promise.all — no extra DB query; activeSequences/pendingQueued/requestsSentThisWeek already fetched by getDashboardKPIs
-- feedback_submitted events use campaignName='Review feedback' — customer_feedback is not always tied to a named campaign
-- Review clicks use reviewed_at as event timestamp (not created_at) — reflects when customer actually clicked
-- QuickSendForm omits card wrapper and recent chips — modal provides container; chips are send-page-specific context
-- CampaignsPageClient pattern: server page passes JSX children to thin client wrapper that hosts modal open state
-- prefilledCustomer → useEffect sync in QuickSendForm: parent sets prop, form syncs to local state on mount/change
+- Right panel is dashboard-only — other pages retain current drawer behavior
+- Reuse JobDetailDrawer elements for right panel content, but Jobs page keeps its own separate drawer instance
+- Mobile strategy: bottom sheet for right panel content (not full-screen overlay)
+- Enroll All requires confirmation dialog (not one-click)
+- No address field on customers (skip for now)
+- NotificationBell removed entirely — dashboard badge + subtitle replaces it
+- Needs Attention detail panel shows contextual content (failed: error+retry, low rating: feedback+resolve)
+- Getting Started consolidated into right panel — pill and drawer removed from dashboard
 
-### Key Decisions (Post v2.5)
+### Key Decisions (Inherited from v2.5)
 
-- BusinessSettingsProvider context replaces enabledServiceTypes prop drilling — all dashboard components use useBusinessSettings() hook
-- Enrollment conflict forceCooldownOverride is conditional on previous campaign being a real campaign (not one_off/dismissed)
-- Enrollment conflict cron runs every 5 minutes: auto-resolves 24h+ stale conflicts, processes queue_after when sequence completes
+- Amber as accent only, blue stays primary — amber at warm lightness fails WCAG AA on white
+- BusinessSettingsProvider context for shared business settings (eliminates prop drilling)
+- Enrollment conflict forceCooldownOverride is conditional on previous campaign being a real campaign
 - Review cooldown configurable 7-90 days in Settings (default 30)
-- reviewed_at set on send_logs when customer rates or submits feedback — powers KPI tracking
 
 ### Pending Todos
 
@@ -94,11 +51,11 @@ None.
 ### Blockers/Concerns
 
 - Phase 21-08: Twilio A2P campaign approval required for production SMS testing (brand approved, campaign pending)
-- Google OAuth: VERIFIED WORKING (36-03) — NEXT_PUBLIC_SITE_URL must be https://app.avisloop.com in Vercel production env vars
+- Google OAuth: VERIFIED WORKING — NEXT_PUBLIC_SITE_URL must be https://app.avisloop.com in Vercel production env vars
 
 ## Session Continuity
 
-Last session: 2026-02-22
-Stopped at: Enrollment conflict system complete, bug fixes done (conflict bypass + edit job service types), BusinessSettingsProvider refactor merged. All commits pushed to remote.
+Last session: 2026-02-23
+Stopped at: Milestone v2.6 initialized, Phase 40 requirements defined. Ready for /gsd:plan-phase 40.
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!

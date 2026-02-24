@@ -1,80 +1,67 @@
-# Requirements: v2.5 UI/UX Redesign
+# Requirements: v2.6 Dashboard Command Center
 
-**Milestone:** v2.5 — Warm Design System Overhaul + All-Page UX Fixes
-**Created:** 2026-02-18
+**Milestone:** v2.6 — Dashboard Command Center Redesign
+**Created:** 2026-02-23
 **Status:** Scoped
 
 ---
 
-## Design System
+## Dashboard Layout
 
-- [x] **DS-01**: Warm palette migration — replace all CSS custom properties in `globals.css` (light + dark mode) with warm amber/gold accents, cream backgrounds, warm borders, warm-tinted darks
-- [x] **DS-02**: Card variants — add CVA variants (highlight, surface, muted, ghost, outlined) to Card component for colored background differentiation
-- [x] **DS-03**: New semantic tokens — add `--highlight`, `--highlight-foreground`, `--surface`, `--surface-foreground` to globals.css and tailwind.config.ts
-- [x] **DS-04**: Hardcoded color audit — replace all hardcoded hex values (`bg-white`, `border-[#E2E2E2]`, `bg-[#F9F9F9]`, `bg-[#F2F2F2]`) with semantic tokens across sidebar, page-header, app-shell, notification-bell
-- [x] **DS-05**: Consistent page padding — normalize padding/spacing across all dashboard pages (dashboard, jobs, campaigns, analytics, customers, send, history, feedback, billing, settings) to use consistent values
+- [ ] **DL-01**: Two-column layout — left column (flexible width) for task lists, right panel (fixed ~360px) for contextual content
+- [ ] **DL-02**: Right panel default state shows Performance KPIs (Reviews This Month, Average Rating, Conversion Rate) with trend indicators and pipeline counters (Sent, Active Sequences, Queued)
+- [ ] **DL-03**: Right panel default state shows Recent Activity feed below KPIs
+- [ ] **DL-04**: Mobile responsive — right panel renders as bottom sheet triggered by item tap on screens below md breakpoint
 
-## Login & Auth
+## Dashboard Header
 
-- [x] **AUTH-01**: Password visibility toggle — create `PasswordInput` component with show/hide eye icon (Phosphor) wrapping existing Input, use in login, signup, and password reset forms
-- [x] **AUTH-02**: Password requirements checklist — add live validation checklist (length, uppercase, number, special character) visible while typing on signup and password reset forms
-- [x] **AUTH-03**: Google OAuth fix — verify and fix Google OAuth provider configuration in Supabase dashboard and auth flow
+- [ ] **DH-01**: Greeting headline with dynamic subtitle ("X jobs ready to send · Y items need attention")
+- [ ] **DH-02**: Right-aligned action buttons: "+ Add Job" (primary) and "View Campaigns" (outline)
 
-## Dashboard
+## Navigation
 
-- [x] **DASH-01**: Welcome greeting — add "Welcome back, [Name]" with current date at top of dashboard page
-- [x] **DASH-02**: Arrow hover affordance — replace translate-y lift on InteractiveCard with arrow indicator on hover to signal clickability
-- [x] **DASH-03**: Remove notification badge — remove number badge from Dashboard nav item in sidebar
-- [x] **DASH-04**: Differentiate lower cards — make the 3 bottom dashboard metric cards visually distinct from the top 3 KPI cards (different card variant, sizing, or layout)
-- [x] **DASH-05**: Replace pipeline cards with activity strip — remove the 3 bottom pipeline metric cards (Requests Sent, Active Sequences, Pending/Queued) and replace with a compact RecentCampaignActivity strip showing concrete campaign events (touch sends, review clicks, enrollments) with clickable items, status badges, and inline pipeline counters
+- [ ] **DN-01**: Dashboard nav badge restored — shows combined count of ready-to-send + needs-attention items
+- [ ] **DN-02**: NotificationBell component removed entirely from app header
 
-## Onboarding
+## Ready to Send
 
-- [ ] **ONB-01**: Consolidate wizard steps — reduce from 7 to 5 steps: remove duplicate Google review link step (merge into Business Basics), remove Software Used step
-- [ ] **ONB-02**: Horizontal service tiles — change services offered step from vertical list to horizontal selectable tiles/chips layout
-- [x] **ONB-03**: Plain English campaign presets — renamed to Gentle/Standard/Aggressive Follow-Up with clear, plain-language descriptions
-- [ ] **ONB-04**: Getting started pill warm color — update getting started pill styling to use warm palette colors (amber accent) instead of cold blue tint
-- [ ] **ONB-05**: Campaign review step fix — getting started checklist "Review campaign" step should only complete when user actually navigates to and reviews their campaign, not auto-complete
+- [ ] **RS-01**: "Enroll All" button with confirmation dialog listing all jobs before bulk enrollment
+- [ ] **RS-02**: Clicking a Ready to Send job opens Job Details in the right panel (replaces default KPI/activity content)
 
-## Jobs & Campaigns
+## Job Detail Panel
 
-- [x] **JC-01**: Filter services to user selection — Jobs page service type filter only shows services the user selected during onboarding (from `service_types_enabled`)
-- [x] **JC-02**: Smart name/email field — auto-detect whether user is typing a name or email in Add Job form and adjust label/input type accordingly
-- [x] **JC-03**: Fix job creation bug — investigate and fix the bug preventing new job creation
-- [x] **JC-04**: Campaign edit as panel — open campaign editor as side panel or modal instead of full-page navigation
-- [x] **JC-05**: Campaign card full-click — make entire campaign card clickable to open details, not just action buttons (with stopPropagation on internal controls)
-- [x] **JC-06**: Back button hit area — fix oversized back button on campaigns detail/edit pages
-- [x] **JC-07**: Standard preset centered — center the "Standard" campaign preset card in the preset picker layout
+- [ ] **JD-01**: Job Details shows customer info (name, phone, email), job metadata (technician, service type, completion date), and job notes — reuse elements from existing JobDetailDrawer rendered inline (Jobs page keeps its own drawer instance)
+- [ ] **JD-02**: Job Details includes campaign data (matching campaign name/type) — requires data layer enhancement to fetch campaign info for jobs
+- [ ] **JD-03**: "Enroll in [Campaign Name] Campaign" CTA button in job detail panel
+- [ ] **JD-04**: Close button (X) returns right panel to default KPI/activity state
 
-## Navigation & Manual Request
+## Needs Attention Panel
 
-- [x] **NAV-01**: Eliminate Manual Request page — remove /send page from navigation, extract QuickSendForm, create QuickSendModal accessible from campaigns page and customer detail drawer
-- [x] **NAV-02**: Add Job toggle for one-off send — add option in Add Job flow to trigger immediate manual send for one-off situations
+- [ ] **NA-01**: Clicking Needs Attention item opens contextual detail in right panel
+- [ ] **NA-02**: Failed delivery detail: customer info, error description, "Retry" action button
+- [ ] **NA-03**: Low rating detail: customer info, rating, feedback text, "Resolve" action button
 
-## Other Pages
+## Getting Started
 
-- [x] **PG-01**: Analytics empty state — add guidance prompts and suggested actions when analytics page has no data yet
-- [x] **PG-02**: Customers padding — fix inconsistent padding and spacing on Customers page
-- [x] **PG-03**: Feedback UI consistency — fix padding and visual consistency on Feedback page to match other dashboard pages
-- [x] **PG-04**: All-page padding normalization — audit and normalize padding on all pages to use consistent spacing values (p-6 cards, space-y-6 sections, consistent header spacing)
+- [ ] **GS-01**: Getting Started full card displayed in right panel until user completes first job
+- [ ] **GS-02**: After first job completion, Getting Started shrinks to compact card in right panel until first review received
+- [ ] **GS-03**: Getting Started pill and drawer removed from dashboard (content consolidated into right panel)
+
+## Right Panel Architecture
+
+- [ ] **RP-01**: Right panel is dashboard-page-only — other pages retain current drawer behavior
+- [ ] **RP-02**: Panel state machine: default (KPIs + activity) / job-detail / attention-detail / getting-started — mutually exclusive views
 
 ---
 
-## Future Requirements (Deferred)
-
-- Login split-screen image/illustration (deferred — need design asset)
-- Increased border radius (keep current 8px)
-- Colored KPI card backgrounds (keep current white cards)
-- Getting started pill position change (keep in current location)
-
 ## Out of Scope
 
-- Dark mode redesign beyond warm-tinting (no new dark mode features)
-- New component library (stay with shadcn/ui + CVA)
-- Performance optimization (not in scope for this milestone)
-- Data model changes (pure UI milestone)
-- Landing page redesign (separate Phase 31)
-- Agency-mode/multi-tenant (separate Phase 29)
+| Feature | Reason |
+|---------|--------|
+| Customer address field | Not in current data model, skip for now |
+| Navigation changes (remove Activity/Feedback) | Keep current nav — prototype was simplified |
+| Full-screen mobile overlay | Bottom sheet is simpler and less disruptive |
+| Right panel on non-dashboard pages | Other pages keep current drawer behavior |
 
 ---
 
@@ -82,34 +69,34 @@
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| DS-01 | Phase 34 | Complete |
-| DS-02 | Phase 35 | Complete |
-| DS-03 | Phase 34 | Complete |
-| DS-04 | Phase 33 | Complete |
-| DS-05 | Phase 35 | Complete |
-| AUTH-01 | Phase 36 | Complete |
-| AUTH-02 | Phase 36 | Complete |
-| AUTH-03 | Phase 36 | Complete |
-| DASH-01 | Phase 35 | Complete |
-| DASH-02 | Phase 35 | Complete |
-| DASH-03 | Phase 35 | Complete |
-| DASH-04 | Phase 35 | Complete |
-| ONB-01 | Phase 38 | Complete |
-| ONB-02 | Phase 38 | Complete |
-| ONB-03 | Phase 38 | Complete |
-| ONB-04 | Phase 38 | Complete |
-| ONB-05 | Phase 38 | Complete |
-| JC-01 | Phase 37 | Complete |
-| JC-02 | Phase 37 | Complete |
-| JC-03 | Phase 37 | Complete |
-| JC-04 | Phase 37 | Complete |
-| JC-05 | Phase 37 | Complete |
-| JC-06 | Phase 37 | Complete |
-| JC-07 | Phase 37 | Complete |
-| DASH-05 | Phase 39 | Complete |
-| NAV-01 | Phase 39 | Complete |
-| NAV-02 | Phase 39 | Complete |
-| PG-01 | Phase 35 | Complete |
-| PG-02 | Phase 35 | Complete |
-| PG-03 | Phase 35 | Complete |
-| PG-04 | Phase 35 | Complete |
+| DL-01 | Phase 40 | Pending |
+| DL-02 | Phase 40 | Pending |
+| DL-03 | Phase 40 | Pending |
+| DL-04 | Phase 40 | Pending |
+| DH-01 | Phase 40 | Pending |
+| DH-02 | Phase 40 | Pending |
+| DN-01 | Phase 40 | Pending |
+| DN-02 | Phase 40 | Pending |
+| RS-01 | Phase 40 | Pending |
+| RS-02 | Phase 40 | Pending |
+| JD-01 | Phase 40 | Pending |
+| JD-02 | Phase 40 | Pending |
+| JD-03 | Phase 40 | Pending |
+| JD-04 | Phase 40 | Pending |
+| NA-01 | Phase 40 | Pending |
+| NA-02 | Phase 40 | Pending |
+| NA-03 | Phase 40 | Pending |
+| GS-01 | Phase 40 | Pending |
+| GS-02 | Phase 40 | Pending |
+| GS-03 | Phase 40 | Pending |
+| RP-01 | Phase 40 | Pending |
+| RP-02 | Phase 40 | Pending |
+
+**Coverage:**
+- v2.6 requirements: 22 total
+- Mapped to phases: 22
+- Unmapped: 0
+
+---
+*Requirements defined: 2026-02-23*
+*Last updated: 2026-02-23 after initial definition*

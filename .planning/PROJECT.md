@@ -116,26 +116,28 @@ Turn job completions into Google reviews automatically — multi-touch follow-up
 | Dashboard test step cards | Guided walkthrough instead of checklist | Good — auto-detection of completion |
 | Test sends excluded from quota | Fair for users learning the product | Good — is_test flag in database |
 
-## Current Milestone: v2.5 UI/UX Redesign
+## Current Milestone: v2.6 Dashboard Command Center
 
-**Goal:** Full warm design system overhaul (Stratify-inspired amber/gold palette) with all-page UX fixes, onboarding consolidation, manual request elimination, and dashboard redesign.
+**Goal:** Transform the dashboard into a task-oriented command center with a persistent two-column layout — left column for actionable task lists (Ready to Send, Needs Attention), right panel for contextual details (KPIs, job details, attention details, getting started).
 
 **Target features:**
-- Design system: warm color palette (amber/gold accents, soft blue interactive, cream backgrounds), new card styles, updated spacing
-- Login page: split-screen image, logo, password visibility toggle, requirements checklist, Google OAuth fix
-- Onboarding: consolidate from 7 to ~5 steps, horizontal services, text input software, plain English campaign presets
-- Dashboard: welcome greeting, arrow hover on stat cards, redesigned getting started pill, differentiated lower cards, color
-- Jobs: smart field (name vs email detection), filtered services per user selection, filter differentiation, padding fixes
-- Campaigns: standard preset centered, edit as modal/panel, full card clickable, back button hit area fix
-- Analytics: empty state prompts and guidance
-- Customers/Feedback: padding and UI consistency fixes
-- Manual Request: eliminate dedicated page — add "send one-off" toggle in Add Job + fallback modal on campaigns page
-- Navigation: remove notification count from dashboard nav, global Add Job panel
+- Two-column layout: flexible left column (task lists) + fixed right panel (~360px) for contextual content
+- Right panel default: Performance KPIs + pipeline counters + Recent Activity feed
+- Right panel dynamic: clicking Ready to Send item shows Job Details (with campaign data); clicking Needs Attention shows contextual detail (failed: error + retry, low rating: feedback + resolve)
+- Dashboard header: greeting + dynamic subtitle ("X jobs ready · Y need attention"), right-aligned "+ Add Job" and "View Campaigns" buttons
+- Dashboard nav badge restored (combined ready + attention count), NotificationBell removed entirely
+- "Enroll All" button with confirmation dialog for bulk enrollment
+- Getting Started consolidated into right panel (full card → compact card → gone)
+- Getting Started pill/drawer removed from dashboard
+- Mobile: right panel renders as bottom sheet on tap
+- Job details pull campaign data (data layer enhancement)
 
 **Key decisions:**
-- Manual Request approach: Toggle in Add Job sheet (primary path) + "Send one-off" modal on campaigns page (edge case fallback). Remove dedicated page and nav entry.
-- Color direction: Full warm palette like Stratify — amber/gold accents, soft blue interactive, cream-tinted backgrounds
-- Scope: All pages in one push, design system first so changes cascade
+- Right panel is dashboard-only — other pages retain current drawer behavior
+- Reuse JobDetailDrawer elements for right panel content, but Jobs page keeps its own separate drawer instance
+- Mobile strategy: bottom sheet for right panel content, not full-screen overlay
+- Enroll All requires confirmation dialog (not one-click)
+- No address field on customers (skip for now)
 
 ---
-*Last updated: 2026-02-18 after v2.5 milestone started*
+*Last updated: 2026-02-23 after v2.6 milestone started*
