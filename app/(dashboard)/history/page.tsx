@@ -5,8 +5,8 @@ import { HistoryClient } from '@/components/history/history-client'
 import { redirect } from 'next/navigation'
 
 export const metadata = {
-  title: 'Activity',
-  description: 'View and manage all your review requests',
+  title: 'Send History',
+  description: 'Track delivery status of your sent messages',
 }
 
 interface HistoryPageProps {
@@ -64,7 +64,7 @@ export default async function HistoryPage(props: HistoryPageProps) {
           <div className="flex items-center justify-center py-16">
             <div className="text-center">
               <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
-              <p className="mt-4 text-muted-foreground">Loading activity...</p>
+              <p className="mt-4 text-muted-foreground">Loading send history...</p>
             </div>
           </div>
         }

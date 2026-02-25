@@ -18,11 +18,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { createColumns } from './history-columns'
+import { createColumns, RESENDABLE_STATUSES } from './history-columns'
 import type { SendLogWithContact } from '@/lib/types/database'
 import { TableSkeleton } from '@/components/ui/table-skeleton'
-
-const RESENDABLE_STATUSES = ['failed', 'bounced', 'complained']
 
 interface HistoryTableProps {
   data: SendLogWithContact[]
@@ -30,14 +28,13 @@ interface HistoryTableProps {
   loading?: boolean
   onRowClick?: (request: SendLogWithContact) => void
   onResend?: (request: SendLogWithContact) => void
-  onCancel?: (request: SendLogWithContact) => void
   rowSelection?: RowSelectionState
   onRowSelectionChange?: (selection: RowSelectionState) => void
 }
 
-export function HistoryTable({ data, loading, onRowClick, onResend, onCancel, rowSelection, onRowSelectionChange }: HistoryTableProps) {
+export function HistoryTable({ data, loading, onRowClick, onResend, rowSelection, onRowSelectionChange }: HistoryTableProps) {
   const enableSelection = !!onRowSelectionChange
-  const columns = useMemo(() => createColumns({ onResend, onCancel, enableSelection }), [onResend, onCancel, enableSelection])
+  const columns = useMemo(() => createColumns({ onResend, enableSelection }), [onResend, enableSelection])
   const [sorting, setSorting] = useState<SortingState>([])
 
   const table = useReactTable({

@@ -65,7 +65,7 @@ export function HistoryClient({ initialLogs, total, currentPage, pageSize, busin
     setDrawerOpen(true)
   }
 
-  // Handle resend from drawer or inline
+  // Handle resend from drawer
   const handleResend = async (contactId: string, templateId: string | null) => {
     const formData = new FormData()
     formData.append('contactId', contactId)
@@ -90,25 +90,27 @@ export function HistoryClient({ initialLogs, total, currentPage, pageSize, busin
     }
   }
 
-  // Handle quick resend from table row
-  const handleQuickResend = (request: SendLogWithContact) => {
-    setSelectedRequest(request)
-    setDrawerOpen(true)
-  }
-
-  // Handle cancel (for pending/scheduled requests)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleCancel = async (requestId: string) => {
-    // For now, we'll show a toast - full cancel logic would need a server action
-    toast.info('Cancel pending', {
-      description: 'Cancellation for pending requests is not yet implemented.',
-      duration: 5000,
-    })
-  }
-
-  // Handle quick cancel from table row
-  const handleQuickCancel = (request: SendLogWithContact) => {
-    handleCancel(request.id)
+  // Handle inline retry from table row — direct resend, no drawer
+  const handleInlineRetry = async (request: SendLogWithContact) => {
+    setIsRetrying(true)
+    try {
+      const result = await bulkResendRequests([request.id])
+      if (result.success) {
+        toast.success('Message resent', {
+          description: 'The message has been queued for delivery.',
+          duration: 5000,
+        })
+        setRowSelection({})
+        refresh()
+      } else {
+        toast.error('Failed to resend', {
+          description: result.error || 'An error occurred',
+          duration: 5000,
+        })
+      }
+    } finally {
+      setIsRetrying(false)
+    }
   }
 
   // Handle bulk resend of failed messages
@@ -149,9 +151,9 @@ export function HistoryClient({ initialLogs, total, currentPage, pageSize, busin
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Activity</h1>
-        <p className="text-muted-foreground mt-1">
-          View your sent messages and their delivery status
+        <h1 className="text-2xl font-semibold tracking-tight">Send History</h1>
+        <p className="text-muted-foreground">
+          Track delivery status of your sent messages &middot; {total} total
         </p>
       </div>
 
@@ -170,7 +172,7 @@ export function HistoryClient({ initialLogs, total, currentPage, pageSize, busin
             {selectedCount > 0 && (
               <div className="flex items-center gap-3">
                 <span className="text-sm font-medium">
-                  {selectedCount} failed message{selectedCount !== 1 ? 's' : ''} selected
+                  {selectedCount} message{selectedCount !== 1 ? 's' : ''} selected
                 </span>
                 <Button
                   size="sm"
@@ -186,8 +188,7 @@ export function HistoryClient({ initialLogs, total, currentPage, pageSize, busin
           <HistoryTable
             data={initialLogs}
             onRowClick={handleRowClick}
-            onResend={handleQuickResend}
-            onCancel={handleQuickCancel}
+            onResend={handleInlineRetry}
             rowSelection={rowSelection}
             onRowSelectionChange={setRowSelection}
           />
@@ -231,7 +232,10 @@ export function HistoryClient({ initialLogs, total, currentPage, pageSize, busin
         business={business}
         templates={templates}
         onResend={handleResend}
-        onCancel={handleCancel}
+        onCancel={async (_requestId: string) => {
+          // Cancel for pending sends is not yet implemented server-side
+          setDrawerOpen(false)
+        }}
       />
     </div>
   )

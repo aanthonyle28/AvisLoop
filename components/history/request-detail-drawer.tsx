@@ -31,7 +31,7 @@ interface RequestDetailDrawerProps {
   business: Business
   templates: MessageTemplate[]
   onResend: (contactId: string, templateId: string | null) => Promise<void>
-  onCancel: (requestId: string) => Promise<void>
+  onCancel?: (requestId: string) => Promise<void>
 }
 
 export function RequestDetailDrawer({
@@ -104,7 +104,9 @@ export function RequestDetailDrawer({
   const handleCancel = async () => {
     setIsCanceling(true)
     try {
-      await onCancel(request.id)
+      if (onCancel) {
+        await onCancel(request.id)
+      }
       onOpenChange(false)
     } finally {
       setIsCanceling(false)
