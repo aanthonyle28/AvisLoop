@@ -97,16 +97,6 @@ export interface PipelineSummary {
   requestsSentThisWeek: number
 }
 
-// Quick enroll result for dashboard inline actions
-export type QuickEnrollResult = {
-  success: boolean
-  error?: string
-  enrolled?: boolean
-  campaignName?: string
-  noMatchingCampaign?: boolean  // true if no campaign exists for service type
-  serviceType?: string
-}
-
 // Right panel state machine for dashboard command center
 export type RightPanelView =
   | { type: 'default' }

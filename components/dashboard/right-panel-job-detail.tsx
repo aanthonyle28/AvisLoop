@@ -22,7 +22,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useDashboardPanel } from '@/components/dashboard/dashboard-shell'
-import { quickEnrollJob, fetchJobPanelDetail } from '@/lib/actions/dashboard'
+import { fetchJobPanelDetail } from '@/lib/actions/dashboard'
 import { markJobComplete } from '@/lib/actions/job'
 import { resolveEnrollmentConflict } from '@/lib/actions/conflict-resolution'
 import { toast } from 'sonner'
@@ -280,7 +280,6 @@ export function RightPanelJobDetail({
   const [job, setJob] = useState<JobPanelDetail | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [isEnrolling, startEnrollTransition] = useTransition()
   const [isCompleting, startCompleteTransition] = useTransition()
 
   const loadJob = useCallback(async () => {
@@ -303,27 +302,6 @@ export function RightPanelJobDetail({
   useEffect(() => {
     loadJob()
   }, [loadJob])
-
-  const handleEnroll = () => {
-    if (!job) return
-    startEnrollTransition(async () => {
-      try {
-        const result = await quickEnrollJob(job.id)
-        if (result.success && result.enrolled) {
-          toast.success(`Enrolled in ${result.campaignName}`)
-          closePanel()
-        } else if (result.success && result.noMatchingCampaign) {
-          toast.error(`No campaign for ${job.serviceType}`, {
-            description: 'Create a campaign for this service type',
-          })
-        } else if (result.error) {
-          toast.error(result.error)
-        }
-      } catch {
-        toast.error('Failed to enroll job')
-      }
-    })
-  }
 
   const handleComplete = () => {
     if (!job) return
@@ -360,21 +338,10 @@ export function RightPanelJobDetail({
   // Determine which CTAs to show
   const isCompleted = job.status === 'completed'
   const isScheduled = job.status === 'scheduled'
-  const isNotEnrolled = !job.enrollmentStatus || job.enrollmentStatus !== 'active'
-  const hasMatchingCampaign = !!job.matchingCampaignId
   const isOneOff = job.campaignOverride === 'one_off'
   const isConflict = job.enrollmentResolution === 'conflict'
   const isQueueAfter = job.enrollmentResolution === 'queue_after'
   const isReplaceOnComplete = job.enrollmentResolution === 'replace_on_complete'
-
-  const showEnrollCTA =
-    isCompleted &&
-    isNotEnrolled &&
-    hasMatchingCampaign &&
-    !isOneOff &&
-    !isConflict &&
-    !isQueueAfter &&
-    !isReplaceOnComplete
 
   const showSendOneOffCTA = isCompleted && isOneOff
 
@@ -543,7 +510,7 @@ export function RightPanelJobDetail({
       )}
 
       {/* CTA Buttons */}
-      {(showEnrollCTA || showSendOneOffCTA || showCompleteCTA) && (
+      {(showSendOneOffCTA || showCompleteCTA) && (
         <>
           <div className="border-t border-border" />
           <div className="space-y-2">
@@ -562,26 +529,6 @@ export function RightPanelJobDetail({
                   <>
                     <CheckCircle size={14} weight="bold" className="mr-1.5" />
                     Complete Job
-                  </>
-                )}
-              </Button>
-            )}
-
-            {showEnrollCTA && (
-              <Button
-                className="w-full"
-                onClick={handleEnroll}
-                disabled={isEnrolling}
-              >
-                {isEnrolling ? (
-                  <>
-                    <CircleNotch size={14} className="mr-1.5 animate-spin" />
-                    Enrolling...
-                  </>
-                ) : (
-                  <>
-                    <Megaphone size={14} className="mr-1.5" />
-                    Enroll in {job.matchingCampaignName}
                   </>
                 )}
               </Button>

@@ -16,7 +16,6 @@ import {
   ArrowsClockwise,
   SkipForward,
   Queue,
-  ListChecks,
   DotsThreeVertical,
   Briefcase,
 } from '@phosphor-icons/react'
@@ -47,7 +46,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { JobDetailDrawer } from '@/components/jobs/job-detail-drawer'
 import { QuickSendModal } from '@/components/send/quick-send-modal'
-import { quickEnrollJob, getJobDetail, dismissJobFromQueue, markOneOffSent } from '@/lib/actions/dashboard'
+import { getJobDetail, dismissJobFromQueue, markOneOffSent } from '@/lib/actions/dashboard'
 import { markJobComplete, deleteJob } from '@/lib/actions/job'
 import { resolveEnrollmentConflict, revertConflictResolution } from '@/lib/actions/conflict-resolution'
 import { getSendOneOffData, type SendOneOffData } from '@/lib/actions/send-one-off-data'
@@ -82,23 +81,8 @@ export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJob
   // Replace confirmation state
   const [replaceConfirm, setReplaceConfirm] = useState<{ jobId: string; conflictDetail?: ReadyToSendJob['conflictDetail'] } | null>(null)
 
-  // Enroll All confirmation state
-  const [enrollAllOpen, setEnrollAllOpen] = useState(false)
-  const [isEnrollingAll, startEnrollAllTransition] = useTransition()
-
   const displayJobs = jobs.slice(0, 5)
   const hasMore = jobs.length > 5
-
-  // Jobs that can be directly enrolled (completed, no conflict, has campaign)
-  const enrollableJobs = useMemo(() =>
-    jobs.filter(j =>
-      j.status === 'completed' &&
-      !j.enrollment_resolution &&
-      j.hasMatchingCampaign &&
-      j.campaign_override !== 'one_off'
-    ),
-    [jobs]
-  )
 
   const isJobBusy = (jobId: string) => isPending && activeAction?.jobId === jobId
 
@@ -134,62 +118,6 @@ export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJob
         toast.error('Failed to complete job')
       } finally {
         setActiveAction(null)
-      }
-    })
-  }
-
-  // --- Primary action: Enroll (for completed jobs with matching campaign) ---
-  const handleEnroll = (jobId: string, serviceType: string) => {
-    setActiveAction({ jobId, action: 'enroll' })
-    startTransition(async () => {
-      try {
-        const result = await quickEnrollJob(jobId)
-        if (result.success && result.enrolled) {
-          toast.success(`Enrolled in ${result.campaignName}`)
-        } else if (result.success && result.noMatchingCampaign) {
-          const name = serviceType.charAt(0).toUpperCase() + serviceType.slice(1)
-          toast.error(`No campaign for ${name}`, {
-            description: 'Create a campaign for this service type',
-            action: {
-              label: 'Create Campaign',
-              onClick: () => { window.location.href = `/campaigns/new?serviceType=${serviceType}` },
-            },
-          })
-        } else if (result.error) {
-          toast.error(result.error)
-        }
-      } catch {
-        toast.error('Failed to enroll job')
-      } finally {
-        setActiveAction(null)
-      }
-    })
-  }
-
-  // --- Enroll All: enroll all enrollable jobs sequentially ---
-  const handleEnrollAll = () => {
-    setEnrollAllOpen(false)
-    startEnrollAllTransition(async () => {
-      let successCount = 0
-      let failCount = 0
-      for (const job of enrollableJobs) {
-        try {
-          const result = await quickEnrollJob(job.id)
-          if (result.success && result.enrolled) {
-            successCount++
-          } else {
-            failCount++
-          }
-        } catch {
-          failCount++
-        }
-      }
-      if (successCount > 0 && failCount === 0) {
-        toast.success(`Enrolled ${successCount} job${successCount !== 1 ? 's' : ''} in campaigns`)
-      } else if (successCount > 0 && failCount > 0) {
-        toast.warning(`Enrolled ${successCount}, failed ${failCount}`)
-      } else {
-        toast.error('Failed to enroll jobs')
       }
     })
   }
@@ -476,20 +404,7 @@ export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJob
       )
     }
 
-    // One-off jobs always get "Send One-Off" regardless of campaign availability
-    if (job.status === 'completed' && job.campaign_override !== 'one_off' && job.hasMatchingCampaign) {
-      return (
-        <Button
-          size="sm"
-          onClick={() => handleEnroll(job.id, job.service_type)}
-          disabled={busy}
-        >
-          {busy && activeAction?.action === 'enroll' ? 'Enrolling...' : 'Enroll'}
-        </Button>
-      )
-    }
-
-    // Completed + one-off or no matching campaign → Send One-Off
+    // Completed jobs: Send One-Off (campaign enrollment happens automatically on completion)
     return (
       <Button
         size="sm"
@@ -559,21 +474,6 @@ export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJob
               <Badge variant="secondary">{jobs.length}</Badge>
             )}
           </div>
-          {enrollableJobs.length > 0 && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setEnrollAllOpen(true)}
-              disabled={isEnrollingAll}
-            >
-              {isEnrollingAll ? (
-                <CircleNotch className="h-4 w-4 mr-1.5 animate-spin" />
-              ) : (
-                <ListChecks className="h-4 w-4 mr-1.5" />
-              )}
-              {isEnrollingAll ? 'Enrolling...' : 'Enroll All'}
-            </Button>
-          )}
         </div>
 
         {/* Empty states */}
@@ -826,12 +726,7 @@ export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJob
                             Complete
                           </DropdownMenuItem>
                         )}
-                        {!job.enrollment_resolution && job.status === 'completed' && job.campaign_override !== 'one_off' && job.hasMatchingCampaign && (
-                          <DropdownMenuItem onClick={() => handleEnroll(job.id, job.service_type)}>
-                            Enroll
-                          </DropdownMenuItem>
-                        )}
-                        {!job.enrollment_resolution && job.status === 'completed' && (job.campaign_override === 'one_off' || !job.hasMatchingCampaign) && (
+                        {!job.enrollment_resolution && job.status === 'completed' && (
                           <DropdownMenuItem onClick={() => handleSendOneOff(job.customer.id, job.id)}>
                             <PaperPlaneTilt className="h-4 w-4 mr-2" />
                             Send One-Off
@@ -937,34 +832,6 @@ export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJob
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Enroll All Confirmation Dialog */}
-      <AlertDialog open={enrollAllOpen} onOpenChange={setEnrollAllOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Enroll {enrollableJobs.length} job{enrollableJobs.length !== 1 ? 's' : ''} in campaigns?</AlertDialogTitle>
-            <AlertDialogDescription asChild>
-              <div className="space-y-3">
-                <p>The following jobs will be enrolled in their matching campaigns:</p>
-                <div className="max-h-48 overflow-y-auto space-y-1 rounded-md border bg-muted/30 p-3">
-                  {enrollableJobs.map((job) => (
-                    <div key={job.id} className="flex items-center gap-2 text-sm">
-                      <span className="font-medium">{job.customer.name}</span>
-                      <span className="text-muted-foreground">·</span>
-                      <span className="text-muted-foreground capitalize">{job.service_type}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleEnrollAll}>
-              Enroll All
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </TooltipProvider>
   )
 }
