@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 41 of 4 (activity-page-overhaul)
-Plan: 41-01 of 2 in phase 41
-Status: In progress
-Last activity: 2026-02-25 — Completed 41-01-PLAN.md (resend logic, page header, inline retry)
+Plan: 41-02 of 2 in phase 41
+Status: Phase 41 complete
+Last activity: 2026-02-25 — Completed 41-02-PLAN.md (Radix Select + date preset chips)
 
-Progress: [█░░░░░░░░░] 10% (v2.5.1 milestone, 4 phases, plan 1/~10 complete)
+Progress: [██░░░░░░░░] 20% (v2.5.1 milestone, 4 phases, plans 2/~10 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 198
-- v2.5.1 plans completed: 1
+- Total plans completed (project): 199
+- v2.5.1 plans completed: 2
 
 *Updated after each plan completion*
 
@@ -37,6 +37,9 @@ Progress: [█░░░░░░░░░] 10% (v2.5.1 milestone, 4 phases, plan
 - Scalability: remove replaced code, don't leave dead patterns alongside new ones — consolidate, don't duplicate
 - RESENDABLE_STATUSES = ['failed', 'bounced'] — complained excluded because webhook sets opted_out=true, retry silently fails
 - Inline retry uses bulkResendRequests([id]) — single-item reuse of bulk action, no drawer needed
+- Date preset chips use local useState (not URL) — chip highlight resets on nav but dates preserved in URL; reverse-computation from URL is fragile
+- updateDateRange sets from/to atomically in a single replace() call — prevents double re-render
+- onCancel in RequestDetailDrawer is optional — server-side cancel not yet implemented
 
 ### Key Decisions (Inherited from v2.5/v2.6)
 
@@ -58,6 +61,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 41-01-PLAN.md — resend logic, page header, inline retry fixed
+Stopped at: Completed 41-02-PLAN.md — Radix Select + date preset chips in HistoryFilters
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
