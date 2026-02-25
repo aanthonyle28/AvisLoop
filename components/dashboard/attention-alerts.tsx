@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
-import { XCircle, WarningCircle, Info, CheckCircle, DotsThree, DotsThreeVertical } from '@phosphor-icons/react'
+import { XCircle, WarningCircle, Info, CheckCircle, DotsThree, DotsThreeVertical, X } from '@phosphor-icons/react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -28,22 +28,11 @@ interface AttentionAlertsProps {
 function SeverityIcon({ severity }: { severity: AttentionAlert['severity'] }) {
   switch (severity) {
     case 'critical':
-      return <XCircle weight="fill" className="size-4 text-destructive shrink-0" />
+      return <XCircle weight="fill" className="size-5 text-destructive shrink-0" />
     case 'warning':
-      return <WarningCircle weight="fill" className="size-4 text-warning shrink-0" />
+      return <WarningCircle weight="fill" className="size-5 text-warning shrink-0" />
     case 'info':
-      return <Info weight="fill" className="size-4 text-info shrink-0" />
-  }
-}
-
-function getBorderColor(severity: AttentionAlert['severity']): string {
-  switch (severity) {
-    case 'critical':
-      return 'border-l-destructive'
-    case 'warning':
-      return 'border-l-warning'
-    case 'info':
-      return 'border-l-info'
+      return <Info weight="fill" className="size-5 text-info shrink-0" />
   }
 }
 
@@ -51,9 +40,10 @@ interface AlertRowProps {
   alert: AttentionAlert
   isSelected: boolean
   onSelect?: () => void
+  onDismiss?: (id: string) => void
 }
 
-function AlertRow({ alert, isSelected, onSelect }: AlertRowProps) {
+function AlertRow({ alert, isSelected, onSelect, onDismiss }: AlertRowProps) {
   const [isPending, startTransition] = useTransition()
 
   const handleRetry = (e: React.MouseEvent) => {
@@ -87,8 +77,7 @@ function AlertRow({ alert, isSelected, onSelect }: AlertRowProps) {
   return (
     <div
       className={cn(
-        'flex items-start justify-between gap-3 border-l-2 pl-3 pr-3 py-2.5 cursor-pointer transition-colors',
-        getBorderColor(alert.severity),
+        'flex items-start justify-between gap-3 px-3 py-2.5 cursor-pointer transition-colors',
         isSelected ? 'bg-muted' : 'hover:bg-muted/50',
       )}
       onClick={onSelect}
@@ -150,6 +139,16 @@ function AlertRow({ alert, isSelected, onSelect }: AlertRowProps) {
             </DropdownMenuContent>
           </DropdownMenu>
         )}
+
+        <Button
+          size="icon-sm"
+          variant="ghost"
+          className="text-muted-foreground hover:text-foreground"
+          onClick={(e) => { e.stopPropagation(); onDismiss?.(alert.id) }}
+          aria-label="Dismiss alert"
+        >
+          <X className="size-4" />
+        </Button>
       </div>
 
       {/* Action buttons — mobile overflow menu */}
@@ -179,6 +178,10 @@ function AlertRow({ alert, isSelected, onSelect }: AlertRowProps) {
                 Acknowledge
               </DropdownMenuItem>
             )}
+            <DropdownMenuItem onClick={() => onDismiss?.(alert.id)}>
+              <X className="size-4 mr-2" />
+              Dismiss
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -188,21 +191,27 @@ function AlertRow({ alert, isSelected, onSelect }: AlertRowProps) {
 
 export function AttentionAlerts({ alerts, onSelectAlert, selectedAlertId }: AttentionAlertsProps) {
   const [expanded, setExpanded] = useState(false)
+  const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set())
 
-  const displayedAlerts = expanded ? alerts : alerts.slice(0, 3)
-  const hasMore = alerts.length > 3
+  const visibleAlerts = alerts.filter(a => !dismissedIds.has(a.id))
+  const displayedAlerts = expanded ? visibleAlerts : visibleAlerts.slice(0, 3)
+  const hasMore = visibleAlerts.length > 3
+
+  const handleDismiss = (id: string) => {
+    setDismissedIds(prev => new Set([...prev, id]))
+  }
 
   return (
     <div id="attention-alerts">
       {/* Header */}
       <div className="flex items-center gap-2 mb-2">
         <h2 className="text-lg font-semibold">Needs Attention</h2>
-        {alerts.length > 0 && (
-          <Badge variant="destructive">{alerts.length}</Badge>
+        {visibleAlerts.length > 0 && (
+          <Badge variant="destructive">{visibleAlerts.length}</Badge>
         )}
       </div>
 
-      {alerts.length === 0 ? (
+      {visibleAlerts.length === 0 ? (
         <div className="flex items-center gap-3 py-8 text-center justify-center">
           <CheckCircle weight="fill" className="size-5 text-success" />
           <p className="text-sm text-muted-foreground">
@@ -218,6 +227,7 @@ export function AttentionAlerts({ alerts, onSelectAlert, selectedAlertId }: Atte
                 alert={alert}
                 isSelected={selectedAlertId === alert.id}
                 onSelect={() => onSelectAlert?.(alert.id)}
+                onDismiss={handleDismiss}
               />
             ))}
           </div>
@@ -228,7 +238,7 @@ export function AttentionAlerts({ alerts, onSelectAlert, selectedAlertId }: Atte
                 onClick={() => setExpanded(!expanded)}
                 className="text-sm text-accent hover:underline"
               >
-                {expanded ? 'Show less' : `View all (${alerts.length})`}
+                {expanded ? 'Show less' : `View all (${visibleAlerts.length})`}
               </button>
             </div>
           )}
@@ -249,9 +259,9 @@ export function AttentionAlertsSkeleton() {
       {/* Row skeletons */}
       <div className="divide-y divide-border">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="flex items-start justify-between gap-3 rounded-md border-l-2 border-l-muted pl-3 pr-3 py-2.5">
+          <div key={i} className="flex items-start justify-between gap-3 rounded-md px-3 py-2.5">
             <div className="flex items-start gap-2 min-w-0 flex-1">
-              <div className="size-4 bg-muted animate-pulse rounded-full shrink-0" />
+              <div className="size-5 bg-muted animate-pulse rounded-full shrink-0" />
               <div className="space-y-1.5 flex-1">
                 <div className="h-4 w-48 bg-muted animate-pulse rounded" />
                 <div className="h-3 w-64 bg-muted animate-pulse rounded" />
