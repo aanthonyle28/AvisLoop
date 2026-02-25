@@ -8,12 +8,12 @@
 
 ## Activity Page
 
-- [ ] **ACT-01**: Bulk select only selects rows with resendable status (failed/bounced) — header checkbox and "select all" must skip delivered/sent/opened rows
-- [ ] **ACT-02**: Resend button only visible on rows with failed/bounced status — not on successfully delivered/sent/opened rows
-- [ ] **ACT-03**: Resend button always displayed inline (no hover-to-reveal) for applicable rows — remove opacity-0/group-hover pattern
-- [ ] **ACT-04**: Page title uses standard page header pattern matching other pages
-- [ ] **ACT-05**: Status filter uses chip-style filters (like Jobs page) instead of dropdown select — same status options as current
-- [ ] **ACT-06**: Date filter includes preset chips (Past Week, Past Month) alongside custom date range picker
+- [x] **ACT-01**: Bulk select only selects rows with resendable status (failed/bounced) — header checkbox and "select all" must skip delivered/sent/opened rows
+- [x] **ACT-02**: Resend button only visible on rows with failed/bounced status — not on successfully delivered/sent/opened rows
+- [x] **ACT-03**: Resend button always displayed inline (no hover-to-reveal) for applicable rows — remove opacity-0/group-hover pattern
+- [x] **ACT-04**: Page title uses standard page header pattern matching other pages
+- [x] **ACT-05**: Status filter uses chip-style filters (like Jobs page) instead of dropdown select — same status options as current
+- [x] **ACT-06**: Date filter includes preset chips (Past Week, Past Month) alongside custom date range picker
 
 ## Dashboard
 
@@ -55,12 +55,12 @@
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| ACT-01 | Phase 41 | Pending |
-| ACT-02 | Phase 41 | Pending |
-| ACT-03 | Phase 41 | Pending |
-| ACT-04 | Phase 41 | Pending |
-| ACT-05 | Phase 41 | Pending |
-| ACT-06 | Phase 41 | Pending |
+| ACT-01 | Phase 41 | Complete |
+| ACT-02 | Phase 41 | Complete |
+| ACT-03 | Phase 41 | Complete |
+| ACT-04 | Phase 41 | Complete |
+| ACT-05 | Phase 41 | Complete |
+| ACT-06 | Phase 41 | Complete |
 | DASH-01 | Phase 42 | Pending |
 | DASH-02 | Phase 42 | Pending |
 | DASH-03 | Phase 42 | Pending |
@@ -78,4 +78,4 @@
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-24 after initial definition*
+*Last updated: 2026-02-25 — Phase 41 requirements marked Complete*

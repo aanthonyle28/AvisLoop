@@ -666,8 +666,8 @@ Plans:
   6. Date filter includes preset chips (Past Week, Past Month) alongside custom date range inputs — selecting a preset auto-fills the date range
 **Plans**: 2 plans in 1 wave
 Plans:
-- [ ] 41-01-PLAN.md — Fix resend logic (bulk select, button visibility, remove hover-to-reveal) + page header fix
-- [ ] 41-02-PLAN.md — Replace status dropdown with chip filters + add date preset chips
+- [x] 41-01-PLAN.md — Fix resend logic (bulk select, button visibility, remove hover-to-reveal) + page header fix
+- [x] 41-02-PLAN.md — Replace status dropdown with chip filters + add date preset chips
 
 ### Phase 42: Dashboard & Navigation Polish
 **Goal**: Dashboard queue sections have consistent styling, functional dismiss for attention items, proper empty state, and sidebar active state redesigned.
@@ -753,12 +753,12 @@ See individual phase sections above for requirements, success criteria, and depe
 | **38** | **v2.5 UI/UX Redesign** | **3/3** | **Complete** | **2026-02-19** |
 | **39** | **v2.5 UI/UX Redesign** | **4/4** | **Complete** | **2026-02-20** |
 | **40** | **v2.6 Dashboard Command Center** | **5/6** | **Paused** | **-** |
-| **41** | **v2.5.1 Bug Fixes & Polish** | **0/2** | **Planned** | **-** |
+| **41** | **v2.5.1 Bug Fixes & Polish** | **2/2** | **Complete** | **2026-02-24** |
 | **42** | **v2.5.1 Bug Fixes & Polish** | **0/2** | **Planned** | **-** |
 | **43** | **v2.5.1 Bug Fixes & Polish** | **0/2** | **Planned** | **-** |
 | **44** | **v2.5.1 Bug Fixes & Polish** | **0/2** | **Planned** | **-** |
 
-**Total:** 197 plans complete across shipped phases.
+**Total:** 199 plans complete across shipped phases.
 
 ## What's Next
 
@@ -776,5 +776,5 @@ After v2.5.1 + v2.6:
 - **v3.0 Agency Mode** — Multi-business management UI, white-label option, client reporting portal
 
 ---
-*Last updated: 2026-02-24 — v2.5.1 Bug Fixes & Polish milestone started (Phases 41-44 added, v2.6 paused)*
+*Last updated: 2026-02-24 — Phase 41 Activity Page Overhaul complete (2/2 plans)*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
