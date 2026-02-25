@@ -9,18 +9,18 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 
 ## Current Position
 
-Phase: Not started (milestone defined, roadmap created)
-Plan: —
-Status: Ready to plan
-Last activity: 2026-02-24 — Milestone v2.5.1 started (v2.6 paused at plan 5/8)
+Phase: 41 of 4 (activity-page-overhaul)
+Plan: 41-01 of 2 in phase 41
+Status: In progress
+Last activity: 2026-02-25 — Completed 41-01-PLAN.md (resend logic, page header, inline retry)
 
-Progress: [░░░░░░░░░░] 0% (v2.5.1 milestone, 4 phases)
+Progress: [█░░░░░░░░░] 10% (v2.5.1 milestone, 4 phases, plan 1/~10 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 197
-- v2.5.1 plans completed: 0
+- Total plans completed (project): 198
+- v2.5.1 plans completed: 1
 
 *Updated after each plan completion*
 
@@ -35,6 +35,8 @@ Progress: [░░░░░░░░░░] 0% (v2.5.1 milestone, 4 phases)
 - Sidebar active state: filled icon + brand orange text, no left border, same background
 - Design changes must update globals.css / design system tokens — no one-off inline overrides
 - Scalability: remove replaced code, don't leave dead patterns alongside new ones — consolidate, don't duplicate
+- RESENDABLE_STATUSES = ['failed', 'bounced'] — complained excluded because webhook sets opted_out=true, retry silently fails
+- Inline retry uses bulkResendRequests([id]) — single-item reuse of bulk action, no drawer needed
 
 ### Key Decisions (Inherited from v2.5/v2.6)
 
@@ -55,7 +57,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-24
-Stopped at: Milestone v2.5.1 defined, roadmap created. Ready to plan Phase 41.
+Last session: 2026-02-25
+Stopped at: Completed 41-01-PLAN.md — resend logic, page header, inline retry fixed
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
