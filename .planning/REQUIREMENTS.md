@@ -23,12 +23,12 @@
 
 ## Onboarding
 
-- [ ] **ONB-01**: New CRM platform step with square logo cards (Jobber, Housecall Pro, ServiceTitan, etc.), "None" and "Other" with text input, skippable, second-to-last step
+- [x] **ONB-01**: New CRM platform step with square logo cards (Jobber, Housecall Pro, ServiceTitan, etc.), "None" and "Other" with text input, skippable, second-to-last step
 
 ## Services
 
-- [ ] **SVC-01**: Onboarding services step allows adding multiple custom service names when "Other" is selected
-- [ ] **SVC-02**: Settings services section allows adding multiple custom service names
+- [x] **SVC-01**: Onboarding services step allows adding multiple custom service names when "Other" is selected
+- [x] **SVC-02**: Settings services section allows adding multiple custom service names
 
 ## Navigation
 
@@ -67,9 +67,9 @@
 | NAV-01 | Phase 42 | Complete |
 | UX-01 | Phase 43 | Complete |
 | UX-02 | Phase 43 | Complete |
-| ONB-01 | Phase 44 | Pending |
-| SVC-01 | Phase 44 | Pending |
-| SVC-02 | Phase 44 | Pending |
+| ONB-01 | Phase 44 | Complete |
+| SVC-01 | Phase 44 | Complete |
+| SVC-02 | Phase 44 | Complete |
 
 **Coverage:**
 - v2.5.1 requirements: 15 total
@@ -78,4 +78,4 @@
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-25 — Phase 43 requirements marked Complete*
+*Last updated: 2026-02-25 — All v2.5.1 requirements Complete (15/15)*

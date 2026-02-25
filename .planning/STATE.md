@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v2.5.1 Bug Fixes & Polish — activity page fixes, dashboard polish, sidebar redesign, cross-page consistency
+**Current focus:** v2.5.1 Bug Fixes & Polish — COMPLETE. Next: resume v2.6 Dashboard Command Center
 
 ## Current Position
 
-Phase: 44 of 44 (Onboarding Services)
-Plan: 2 of 2
-Status: Phase complete
-Last activity: 2026-02-25 — Completed 44-02-PLAN.md (Custom Service Names multi-tag input)
+Phase: 44 complete, verified ✓
+Plan: —
+Status: v2.5.1 milestone complete. Ready for v2.6 resume.
+Last activity: 2026-02-25 — Phase 44 Onboarding & Services complete (2/2 plans, 14/14 verified)
 
-Progress: [█████████░] 82% (v2.5.1 milestone, 4/4 phases complete, 8/8 plans done)
+Progress: [██████████] 100% (v2.5.1 milestone, 4/4 phases complete, 8/8 plans)
 
 ## Performance Metrics
 

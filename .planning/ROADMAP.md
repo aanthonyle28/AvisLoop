@@ -16,7 +16,7 @@ AvisLoop is a review follow-up system for home service businesses. v1.0 through 
 - **v2.0 Review Follow-Up System** - Phases 20-32 (complete 2026-02-18)
 - **v2.5 UI/UX Redesign** - Phases 33-39 (complete 2026-02-20)
 - **v2.6 Dashboard Command Center** - Phase 40 (paused at plan 5/8)
-- **v2.5.1 Bug Fixes & Polish** - Phases 41-44 (in progress)
+- **v2.5.1 Bug Fixes & Polish** - Phases 41-44 (complete 2026-02-25)
 
 ## Phases
 
@@ -707,8 +707,8 @@ Plans:
   4. CRM selection is saved to business record (software_used field) for future integration planning
 **Plans**: 2 plans in 1 wave
 Plans:
-- [ ] 44-01-PLAN.md — CRM platform onboarding step with logo cards + database field
-- [ ] 44-02-PLAN.md — Multiple custom services in onboarding and settings
+- [x] 44-01-PLAN.md — CRM platform onboarding step with logo cards + database field
+- [x] 44-02-PLAN.md — Multiple custom services in onboarding and settings
 
 ---
 
@@ -756,13 +756,13 @@ See individual phase sections above for requirements, success criteria, and depe
 | **41** | **v2.5.1 Bug Fixes & Polish** | **2/2** | **Complete** | **2026-02-24** |
 | **42** | **v2.5.1 Bug Fixes & Polish** | **2/2** | **Complete** | **2026-02-25** |
 | **43** | **v2.5.1 Bug Fixes & Polish** | **2/2** | **Complete** | **2026-02-25** |
-| **44** | **v2.5.1 Bug Fixes & Polish** | **0/2** | **Planned** | **-** |
+| **44** | **v2.5.1 Bug Fixes & Polish** | **2/2** | **Complete** | **2026-02-25** |
 
-**Total:** 203 plans complete across shipped phases.
+**Total:** 205 plans complete across shipped phases.
 
 ## What's Next
 
-**v2.5.1 Bug Fixes & Polish:** Phases 41-44 — in progress (quick patch before resuming v2.6).
+**v2.5.1 Bug Fixes & Polish:** Phases 41-44 — complete (2026-02-25).
 
 **v2.6 Dashboard Command Center:** Phase 40 — paused at plan 5/8, resume after v2.5.1.
 
@@ -776,5 +776,5 @@ After v2.5.1 + v2.6:
 - **v3.0 Agency Mode** — Multi-business management UI, white-label option, client reporting portal
 
 ---
-*Last updated: 2026-02-25 — Phase 43 Cross-Page Consistency complete (2/2 plans)*
+*Last updated: 2026-02-25 — Phase 44 Onboarding & Services complete (2/2 plans), v2.5.1 milestone complete*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
