@@ -1,4 +1,3 @@
-import { Suspense } from 'react'
 import { getJobs } from '@/lib/data/jobs'
 import { getCustomers } from '@/lib/actions/customer'
 import { getMatchingCampaignsForJobs, getCampaignsByIds } from '@/lib/data/campaign'
@@ -10,7 +9,7 @@ export const metadata = {
   description: 'Manage your service jobs',
 }
 
-async function JobsContent() {
+export default async function JobsPage() {
   const [{ jobs, total, businessId }, { customers }] = await Promise.all([
     getJobs(),
     getCustomers({ limit: 200 }), // For customer selector in add/edit forms
@@ -35,29 +34,14 @@ async function JobsContent() {
     : new Map<string, { campaignName: string; firstTouchDelay: number }>()
 
   return (
-    <JobsClient
-      initialJobs={jobs}
-      totalJobs={total}
-      customers={customers}
-      campaignMap={campaignMap}
-      campaignNames={campaignNames}
-    />
-  )
-}
-
-export default function JobsPage() {
-  return (
     <div className="container py-6 space-y-6">
-      <Suspense fallback={
-        <div className="flex items-center justify-center py-16">
-          <div className="text-center">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
-            <p className="mt-4 text-muted-foreground">Loading jobs...</p>
-          </div>
-        </div>
-      }>
-        <JobsContent />
-      </Suspense>
+      <JobsClient
+        initialJobs={jobs}
+        totalJobs={total}
+        customers={customers}
+        campaignMap={campaignMap}
+        campaignNames={campaignNames}
+      />
     </div>
   )
 }
