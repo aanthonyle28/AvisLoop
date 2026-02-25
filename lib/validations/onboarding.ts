@@ -30,12 +30,26 @@ export const servicesOfferedSchema = z.object({
   serviceTypes: z.array(z.enum(SERVICE_TYPES)).min(1, 'Select at least one service type'),
 })
 
-// Step 4: Software Used (skippable)
+// Step 4 (legacy): Software Used (skippable) — kept for backward compatibility
 export const SOFTWARE_OPTIONS = [
   { value: 'servicetitan', label: 'ServiceTitan' },
   { value: 'jobber', label: 'Jobber' },
   { value: 'housecall_pro', label: 'Housecall Pro' },
   { value: 'none', label: 'None / Other' },
+] as const
+
+// Step 3 (v2 wizard): CRM Platform selection — logo card options
+export const CRM_PLATFORMS = [
+  { value: 'jobber', label: 'Jobber', abbr: 'JB', color: 'bg-emerald-500' },
+  { value: 'housecall_pro', label: 'Housecall Pro', abbr: 'HC', color: 'bg-blue-500' },
+  { value: 'servicetitan', label: 'ServiceTitan', abbr: 'ST', color: 'bg-red-500' },
+  { value: 'gorilladesk', label: 'GorillaDesk', abbr: 'GD', color: 'bg-orange-500' },
+  { value: 'fieldpulse', label: 'FieldPulse', abbr: 'FP', color: 'bg-violet-500' },
+] as const
+
+export const CRM_SPECIAL_OPTIONS = [
+  { value: 'none', label: 'None' },
+  { value: 'other', label: 'Other' },
 ] as const
 
 export const softwareUsedSchema = z.object({

@@ -2,6 +2,7 @@
 
 import { BusinessSetupStep } from './steps/business-setup-step'
 import { CampaignPresetStep } from './steps/campaign-preset-step'
+import { CRMPlatformStep } from './steps/crm-platform-step'
 import { SMSConsentStep } from './steps/sms-consent-step'
 import type { OnboardingBusiness } from '@/lib/types/onboarding'
 import type { CampaignWithTouches } from '@/lib/types/database'
@@ -18,7 +19,7 @@ interface OnboardingStepsProps {
 
 /**
  * Client component that renders the appropriate step component based on currentStep.
- * Steps 1-3: Business setup (basics + services), campaign preset, SMS consent
+ * Steps 1-4: Business setup (basics + services), campaign preset, CRM platform, SMS consent
  */
 export function OnboardingSteps({
   currentStep,
@@ -53,6 +54,15 @@ export function OnboardingSteps({
       )
 
     case 3:
+      return (
+        <CRMPlatformStep
+          onComplete={onGoToNext}
+          onGoBack={onGoBack}
+          defaultValue={business?.software_used || null}
+        />
+      )
+
+    case 4:
       return (
         <SMSConsentStep
           onComplete={onComplete}

@@ -11,11 +11,12 @@ import { OnboardingWizard } from '@/components/onboarding/onboarding-wizard'
  * - Redirects to /login if not authenticated
  * - Redirects to /dashboard if onboarding already complete
  * - Fetches business data and campaign presets for step components
- * - Renders wizard shell with 3-step flow
+ * - Renders wizard shell with 4-step flow
  *
  * Step 1: Business Setup (basics + services)
  * Step 2: Campaign Preset (required)
- * Step 3: SMS Consent (required)
+ * Step 3: CRM Platform (skippable)
+ * Step 4: SMS Consent (required)
  */
 export default async function OnboardingPage({
   searchParams,
@@ -44,8 +45,8 @@ export default async function OnboardingPage({
   const params = await searchParams
   const stepParam = parseInt(params.step || '1', 10) || 1
 
-  // Validate step range (1-3), clamp if out of range
-  const currentStep = Math.min(Math.max(1, stepParam), 3)
+  // Validate step range (1-4), clamp if out of range
+  const currentStep = Math.min(Math.max(1, stepParam), 4)
 
   // Fetch business data for step components
   const business = await getBusiness()

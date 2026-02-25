@@ -22,7 +22,8 @@ type StepConfig = {
 const STEPS: StepConfig[] = [
   { id: 1, title: 'Business Setup', skippable: false },
   { id: 2, title: 'Campaign Preset', skippable: false },
-  { id: 3, title: 'SMS Consent', skippable: false },
+  { id: 3, title: 'CRM Platform', skippable: true },
+  { id: 4, title: 'SMS Consent', skippable: false },
 ]
 
 const STORAGE_KEY = 'onboarding-draft-v3'
