@@ -5,19 +5,18 @@ import { format } from 'date-fns'
 import { Checkbox } from '@/components/ui/checkbox'
 import { StatusBadge } from './status-badge'
 import { Button } from '@/components/ui/button'
-import { ArrowClockwise, X } from '@phosphor-icons/react'
+import { ArrowClockwise } from '@phosphor-icons/react'
 import type { SendLogWithCustomer } from '@/lib/types/database'
 import type { SendStatus } from './status-badge'
 
-const RESENDABLE_STATUSES = ['failed', 'bounced', 'complained']
+export const RESENDABLE_STATUSES = ['failed', 'bounced']
 
 interface CreateColumnsProps {
   onResend?: (request: SendLogWithCustomer) => void
-  onCancel?: (request: SendLogWithCustomer) => void
   enableSelection?: boolean
 }
 
-export function createColumns({ onResend, onCancel, enableSelection }: CreateColumnsProps = {}): ColumnDef<SendLogWithCustomer>[] {
+export function createColumns({ onResend, enableSelection }: CreateColumnsProps = {}): ColumnDef<SendLogWithCustomer>[] {
   const columns: ColumnDef<SendLogWithCustomer>[] = []
 
   if (enableSelection) {
@@ -105,39 +104,24 @@ export function createColumns({ onResend, onCancel, enableSelection }: CreateCol
       header: '',
       cell: ({ row }) => {
         const request = row.original
-        const isPending = request.status === 'pending'
-        const canResend = !isPending && onResend
+        const isResendable = RESENDABLE_STATUSES.includes(request.status)
+
+        if (!isResendable || !onResend) return null
 
         return (
-          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            {canResend && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onResend(request)
-                }}
-                className="h-8 w-8 p-0"
-                title="Resend"
-              >
-                <ArrowClockwise className="h-4 w-4" />
-              </Button>
-            )}
-            {isPending && onCancel && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onCancel(request)
-                }}
-                className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                title="Cancel"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            )}
+          <div className="flex items-center justify-end">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation()
+                onResend(request)
+              }}
+              className="h-8 px-2 gap-1.5"
+            >
+              <ArrowClockwise className="h-4 w-4" />
+              Retry
+            </Button>
           </div>
         )
       },
