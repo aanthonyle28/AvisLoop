@@ -49,7 +49,7 @@ export async function getOnboardingStatus(): Promise<OnboardingStatus | null> {
   // Get business with onboarding columns
   const { data: business } = await supabase
     .from('businesses')
-    .select('id, onboarding_completed_at, google_review_link, phone, software_used, service_types_enabled, sms_consent_acknowledged')
+    .select('id, onboarding_completed_at, google_review_link, phone, software_used, service_types_enabled, custom_service_names, sms_consent_acknowledged')
     .eq('user_id', user.id)
     .single()
 

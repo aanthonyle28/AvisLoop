@@ -79,6 +79,7 @@ export async function getEmailTemplates() {
 export async function getServiceTypeSettings(): Promise<{
   serviceTypesEnabled: string[]
   serviceTypeTiming: Record<string, number>
+  customServiceNames: string[]
 } | null> {
   const supabase = await createClient()
 
@@ -87,7 +88,7 @@ export async function getServiceTypeSettings(): Promise<{
 
   const { data: business } = await supabase
     .from('businesses')
-    .select('service_types_enabled, service_type_timing')
+    .select('service_types_enabled, service_type_timing, custom_service_names')
     .eq('user_id', user.id)
     .single()
 
@@ -99,5 +100,6 @@ export async function getServiceTypeSettings(): Promise<{
       hvac: 24, plumbing: 48, electrical: 24, cleaning: 4,
       roofing: 72, painting: 48, handyman: 24, other: 24
     },
+    customServiceNames: business.custom_service_names || [],
   }
 }

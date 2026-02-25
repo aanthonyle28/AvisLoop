@@ -56,6 +56,7 @@ export function ServicesOfferedStep({
     startTransition(async () => {
       const result = await saveServicesOffered({
         serviceTypes: selected as ServiceTypeValue[],
+        customServiceNames: [],
       })
 
       if (result.success) {

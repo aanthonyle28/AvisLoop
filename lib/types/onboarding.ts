@@ -7,6 +7,7 @@ export type OnboardingBusiness = {
   google_review_link: string | null
   software_used: string | null
   service_types_enabled: string[] | null
+  custom_service_names: string[] | null
   sms_consent_acknowledged: boolean
 } | null
 

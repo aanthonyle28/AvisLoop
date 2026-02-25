@@ -28,6 +28,9 @@ export const reviewDestinationSchema = z.object({
 // Step 3: Services Offered (required)
 export const servicesOfferedSchema = z.object({
   serviceTypes: z.array(z.enum(SERVICE_TYPES)).min(1, 'Select at least one service type'),
+  customServiceNames: z.array(
+    z.string().min(1).max(50).trim()
+  ).max(10).optional().default([]),
 })
 
 // Step 4 (legacy): Software Used (skippable) — kept for backward compatibility

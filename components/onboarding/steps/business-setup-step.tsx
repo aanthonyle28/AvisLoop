@@ -82,6 +82,7 @@ export function BusinessSetupStep({
       // Then save services
       const servicesResult = await saveServicesOffered({
         serviceTypes: selected as ServiceTypeValue[],
+        customServiceNames: [],
       })
 
       if (!servicesResult.success) {

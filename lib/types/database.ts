@@ -39,6 +39,7 @@ export interface Business {
   stripe_customer_id: string | null
   onboarding_checklist: OnboardingChecklist | null
   review_cooldown_days: number
+  custom_service_names: string[]
   created_at: string
   updated_at: string
 }
@@ -115,7 +116,7 @@ export type ServiceType = 'hvac' | 'plumbing' | 'electrical' | 'cleaning' | 'roo
 export type JobStatus = 'scheduled' | 'completed' | 'do_not_send'
 
 // Enrollment resolution state for conflict handling
-export type EnrollmentResolution = 'conflict' | 'queue_after' | 'skipped' | 'suppressed'
+export type EnrollmentResolution = 'conflict' | 'queue_after' | 'skipped' | 'suppressed' | 'replace_on_complete'
 
 // Job interface matching database schema
 export interface Job {
@@ -158,6 +159,8 @@ export interface JobWithEnrollment extends JobWithCustomer {
   overrideCampaign?: { campaignName: string; firstTouchDelay: number } | null
   // Active enrollment info for conflict/queue_after jobs
   conflictDetail?: ConflictDetail
+  // Pre-flight conflict detected for scheduled jobs (customer has active enrollment)
+  potentialConflict?: ConflictDetail
 }
 
 // Insert type (omit auto-generated fields)

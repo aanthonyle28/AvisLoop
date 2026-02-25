@@ -65,6 +65,7 @@ export default async function OnboardingPage({
     google_review_link: business.google_review_link || null,
     software_used: business.software_used || null,
     service_types_enabled: business.service_types_enabled || null,
+    custom_service_names: business.custom_service_names || null,
     sms_consent_acknowledged: business.sms_consent_acknowledged || false,
   } : null
 
