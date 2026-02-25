@@ -36,8 +36,8 @@
 
 ## Cross-Page UX
 
-- [ ] **UX-01**: All pages use consistent lazy loading (navigation progress bar + skeleton, matching campaigns page pattern)
-- [ ] **UX-02**: All pages (except dashboard) use consistent empty state (icon in circle, title, subtitle, contextual action button)
+- [x] **UX-01**: All pages use consistent lazy loading (navigation progress bar + skeleton, matching campaigns page pattern)
+- [x] **UX-02**: All pages (except dashboard) use consistent empty state (icon in circle, title, subtitle, contextual action button)
 
 ---
 
@@ -65,8 +65,8 @@
 | DASH-02 | Phase 42 | Complete |
 | DASH-03 | Phase 42 | Complete |
 | NAV-01 | Phase 42 | Complete |
-| UX-01 | Phase 43 | Pending |
-| UX-02 | Phase 43 | Pending |
+| UX-01 | Phase 43 | Complete |
+| UX-02 | Phase 43 | Complete |
 | ONB-01 | Phase 44 | Pending |
 | SVC-01 | Phase 44 | Pending |
 | SVC-02 | Phase 44 | Pending |
@@ -78,4 +78,4 @@
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-25 — Phase 42 requirements marked Complete*
+*Last updated: 2026-02-25 — Phase 43 requirements marked Complete*
