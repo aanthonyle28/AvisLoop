@@ -220,8 +220,58 @@ export function columns({ onEdit, onDelete, onMarkComplete, onSendOneOff, onReso
           )
         }
 
-        // Stopped enrollment (no override explains current state)
-        if (anyEnrollment && anyEnrollment.status === 'stopped') {
+        // Pre-flight conflict for scheduled jobs (customer has active enrollment elsewhere)
+        if (job.status === 'scheduled' && job.potentialConflict && !job.enrollment_resolution) {
+          return (
+            <TooltipProvider delayDuration={200}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="text-xs text-warning-foreground flex items-center gap-1 cursor-help">
+                  <WarningCircle size={14} weight="fill" className="text-warning" />
+                  Conflict — resolve before completing
+                </span>
+              </TooltipTrigger>
+              <TooltipContent
+                side="bottom"
+                className="max-w-[260px] bg-card text-card-foreground border shadow-md px-3 py-2.5 text-xs leading-relaxed"
+              >
+                <p className="font-semibold text-warning-foreground mb-1">Pre-flight conflict</p>
+                <p className="text-muted-foreground">
+                  Active: <strong>{job.potentialConflict.existingCampaignName}</strong> (Touch {job.potentialConflict.currentTouch} of {job.potentialConflict.totalTouches}). Resolve before marking complete, or the system will detect the conflict at completion.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+            </TooltipProvider>
+          )
+        }
+
+        // Pre-set resolution: will replace active sequence on completion
+        if (job.enrollment_resolution === 'replace_on_complete') {
+          return (
+            <TooltipProvider delayDuration={200}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="text-xs text-primary flex items-center gap-1 cursor-help">
+                  <ArrowsClockwise size={14} weight="fill" />
+                  Will replace on complete
+                </span>
+              </TooltipTrigger>
+              <TooltipContent
+                side="bottom"
+                className="max-w-[240px] bg-card text-card-foreground border shadow-md px-3 py-2.5 text-xs leading-relaxed"
+              >
+                <p className="font-semibold mb-1">Replace on complete</p>
+                <p className="text-muted-foreground">
+                  When this job is marked complete, the active campaign sequence will be replaced with enrollment from this job.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+            </TooltipProvider>
+          )
+        }
+
+        // Stopped enrollment (only for completed jobs — scheduled jobs with stopped enrollment fall through to preview)
+        if (job.status === 'completed' && anyEnrollment && anyEnrollment.status === 'stopped') {
           return (
             <span className="text-xs text-muted-foreground flex items-center gap-1">
               <Minus size={14} weight="bold" className="text-muted-foreground/70" />
@@ -341,7 +391,7 @@ export function columns({ onEdit, onDelete, onMarkComplete, onSendOneOff, onReso
                     <TooltipContent>Send One-Off</TooltipContent>
                   </Tooltip>
                 )}
-                {job.enrollment_resolution === 'conflict' && (
+                {(job.enrollment_resolution === 'conflict' || (job.status === 'scheduled' && job.potentialConflict && !job.enrollment_resolution)) && (
                   <DropdownMenu>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -371,7 +421,7 @@ export function columns({ onEdit, onDelete, onMarkComplete, onSendOneOff, onReso
                   </DropdownMenu>
                 )}
               </TooltipProvider>
-              {job.status === 'scheduled' && (
+              {job.status === 'scheduled' && !(job.potentialConflict && !job.enrollment_resolution) && (
                 <MarkCompleteButton jobId={job.id} size="xs" />
               )}
             </div>
@@ -386,7 +436,7 @@ export function columns({ onEdit, onDelete, onMarkComplete, onSendOneOff, onReso
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  {job.enrollment_resolution === 'conflict' && (
+                  {(job.enrollment_resolution === 'conflict' || (job.status === 'scheduled' && job.potentialConflict && !job.enrollment_resolution)) && (
                     <>
                       <DropdownMenuItem onClick={() => onResolveConflict(job.id, 'replace')}>
                         <ArrowsClockwise size={16} className="mr-2" />
@@ -402,7 +452,7 @@ export function columns({ onEdit, onDelete, onMarkComplete, onSendOneOff, onReso
                       </DropdownMenuItem>
                     </>
                   )}
-                  {job.status === 'scheduled' && (
+                  {job.status === 'scheduled' && !(job.potentialConflict && !job.enrollment_resolution) && (
                     <DropdownMenuItem onClick={() => onMarkComplete(job.id)}>
                       <CheckCircle size={16} className="mr-2" />
                       Mark Complete

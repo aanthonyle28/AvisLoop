@@ -268,11 +268,15 @@ export async function updateJob(
     completedAt = null
   }
 
-  // Determine whether to clear enrollment_resolution (Bug 1 fix)
-  // Conflict state becomes stale when any of these change:
+  // Determine whether to clear enrollment_resolution
+  // Clear when: moving FROM completed to non-completed, moving TO do_not_send,
+  // campaign choice becomes one_off/dismissed, customer changed, or service type changed.
+  // Preserve pre-set resolutions (replace_on_complete, queue_after, skipped) for scheduled jobs.
   const shouldClearConflict = currentJob?.enrollment_resolution && (
-    // Status moving away from completed — conflict is about campaign enrollment which only applies to completed jobs
-    (status !== 'completed') ||
+    // Moving FROM completed to non-completed — old enrollment state is stale
+    (currentJob.status === 'completed' && status !== 'completed') ||
+    // Moving TO do_not_send — no enrollment, conflict irrelevant
+    (status === 'do_not_send') ||
     // Campaign choice changed to one_off or dismissed — user opted out of campaign, conflict irrelevant
     (parsed.data.campaignOverride === 'one_off' || parsed.data.campaignOverride === 'dismissed') ||
     // Customer changed — conflict was about the OLD customer's active enrollment
@@ -335,11 +339,37 @@ export async function updateJob(
   }
 
   // Case 3: Transitioning TO completed (fresh enrollment)
-  if (!wasCompleted && isNowCompleted && enrollInCampaign !== false && override !== 'one_off' && override !== 'dismissed') {
-    const effectiveCampaignId = override || campaignId
-    const enrollResult = await enrollJobInCampaign(jobId, effectiveCampaignId ? { campaignId: effectiveCampaignId } : undefined)
-    if (!enrollResult.success && !enrollResult.skipped) {
-      console.warn('Enrollment failed:', enrollResult.error)
+  // Honor pre-set resolutions from pre-flight conflict detection
+  if (!wasCompleted && isNowCompleted && override !== 'one_off' && override !== 'dismissed') {
+    const presetResolution = currentJob?.enrollment_resolution as string | null
+
+    if (presetResolution === 'skipped') {
+      // User pre-skipped — do nothing
+    } else if (presetResolution === 'queue_after') {
+      // User chose queue — cron handles this
+    } else if (presetResolution === 'replace_on_complete') {
+      // User pre-chose replace — clear the flag and enroll with replace
+      await supabase
+        .from('jobs')
+        .update({ enrollment_resolution: null, conflict_detected_at: null })
+        .eq('id', jobId)
+
+      const effectiveCampaignId = override || campaignId
+      const enrollResult = await enrollJobInCampaign(jobId, {
+        conflictResolution: 'replace',
+        forceCooldownOverride: true,
+        ...(effectiveCampaignId ? { campaignId: effectiveCampaignId } : {}),
+      })
+      if (!enrollResult.success && !enrollResult.skipped) {
+        console.warn('Enrollment (replace) failed:', enrollResult.error)
+      }
+    } else if (enrollInCampaign !== false) {
+      // Normal flow — no pre-set resolution
+      const effectiveCampaignId = override || campaignId
+      const enrollResult = await enrollJobInCampaign(jobId, effectiveCampaignId ? { campaignId: effectiveCampaignId } : undefined)
+      if (!enrollResult.success && !enrollResult.skipped) {
+        console.warn('Enrollment failed:', enrollResult.error)
+      }
     }
   }
 
@@ -417,21 +447,24 @@ export async function markJobComplete(
     return { error: 'Business not found' }
   }
 
-  // Fetch the job's campaign_override before updating
+  // Fetch the job's campaign_override and enrollment_resolution before updating
   const { data: currentJob } = await supabase
     .from('jobs')
-    .select('campaign_override')
+    .select('campaign_override, enrollment_resolution')
     .eq('id', jobId)
     .eq('business_id', business.id)
     .single()
 
   const override = currentJob?.campaign_override as string | null
+  const presetResolution = currentJob?.enrollment_resolution as string | null
 
   const { error } = await supabase
     .from('jobs')
     .update({
       status: 'completed',
       completed_at: new Date().toISOString(),
+      // Clear replace_on_complete after it's been consumed
+      ...(presetResolution === 'replace_on_complete' ? { enrollment_resolution: null, conflict_detected_at: null } : {}),
     })
     .eq('id', jobId)
     .eq('business_id', business.id)
@@ -441,9 +474,26 @@ export async function markJobComplete(
     return { error: 'Failed to complete job. Please try again.' }
   }
 
-  // Enroll in campaign if enrollInCampaign is true (default)
-  // Honor campaign_override: 'one_off'/'dismissed' skip enrollment, UUID targets specific campaign
-  if (enrollInCampaign && override !== 'one_off' && override !== 'dismissed') {
+  // Honor pre-set enrollment resolutions from pre-flight conflict detection
+  if (presetResolution === 'skipped') {
+    // User pre-skipped enrollment — do nothing
+  } else if (presetResolution === 'queue_after') {
+    // User chose queue — cron handles this, do nothing
+  } else if (presetResolution === 'replace_on_complete') {
+    // User pre-chose replace — enroll with conflict resolution
+    if (override !== 'one_off' && override !== 'dismissed') {
+      const enrollOpts: Parameters<typeof enrollJobInCampaign>[1] = {
+        conflictResolution: 'replace',
+        forceCooldownOverride: true,
+        ...(override ? { campaignId: override } : {}),
+      }
+      const enrollResult = await enrollJobInCampaign(jobId, enrollOpts)
+      if (!enrollResult.success && !enrollResult.skipped) {
+        console.warn('Enrollment (replace) failed:', enrollResult.error)
+      }
+    }
+  } else if (enrollInCampaign && override !== 'one_off' && override !== 'dismissed') {
+    // Normal flow — no pre-set resolution
     const enrollOpts = override ? { campaignId: override } : undefined
     const enrollResult = await enrollJobInCampaign(jobId, enrollOpts)
 

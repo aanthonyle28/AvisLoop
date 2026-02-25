@@ -43,7 +43,7 @@ export async function resolveEnrollmentConflict(
 
   const { data: job } = await supabase
     .from('jobs')
-    .select('id, enrollment_resolution, campaign_override')
+    .select('id, status, enrollment_resolution, campaign_override')
     .eq('id', jobId)
     .eq('business_id', business.id)
     .single()
@@ -55,27 +55,43 @@ export async function resolveEnrollmentConflict(
   // Idempotency check: if already in target state, return early (prevents duplicate toasts on double-click)
   if (
     (action === 'skip' && job.enrollment_resolution === 'skipped') ||
-    (action === 'queue_after' && job.enrollment_resolution === 'queue_after')
+    (action === 'queue_after' && job.enrollment_resolution === 'queue_after') ||
+    (action === 'replace' && job.enrollment_resolution === 'replace_on_complete')
   ) {
     return { success: true }
   }
 
   switch (action) {
     case 'replace': {
-      // Use enrollJobInCampaign with conflictResolution='replace'
-      // This cancels active enrollments and creates new one
-      const campaignId = job.campaign_override && job.campaign_override !== 'one_off' && job.campaign_override !== 'dismissed'
-        ? job.campaign_override
-        : undefined
+      if (job.status !== 'completed') {
+        // Job not yet completed — store intent, enrollment happens at completion time
+        const { error } = await supabase
+          .from('jobs')
+          .update({
+            enrollment_resolution: 'replace_on_complete',
+            conflict_detected_at: job.enrollment_resolution === 'conflict' ? undefined : new Date().toISOString(),
+          })
+          .eq('id', jobId)
 
-      const result = await enrollJobInCampaign(jobId, {
-        conflictResolution: 'replace',
-        forceCooldownOverride: true,
-        campaignId: campaignId || undefined,
-      })
+        if (error) {
+          return { success: false, error: error.message }
+        }
+      } else {
+        // Job already completed — use enrollJobInCampaign with conflictResolution='replace'
+        // This cancels active enrollments and creates new one
+        const campaignId = job.campaign_override && job.campaign_override !== 'one_off' && job.campaign_override !== 'dismissed'
+          ? job.campaign_override
+          : undefined
 
-      if (!result.success && !result.skipped) {
-        return { success: false, error: result.error || 'Failed to enroll' }
+        const result = await enrollJobInCampaign(jobId, {
+          conflictResolution: 'replace',
+          forceCooldownOverride: true,
+          campaignId: campaignId || undefined,
+        })
+
+        if (!result.success && !result.skipped) {
+          return { success: false, error: result.error || 'Failed to enroll' }
+        }
       }
       break
     }
@@ -150,8 +166,8 @@ export async function revertConflictResolution(
     return { success: false, error: 'Job not found' }
   }
 
-  // Only revert from skipped or queue_after (guard against stale undo)
-  if (job.enrollment_resolution !== 'skipped' && job.enrollment_resolution !== 'queue_after') {
+  // Only revert from skipped, queue_after, or replace_on_complete (guard against stale undo)
+  if (job.enrollment_resolution !== 'skipped' && job.enrollment_resolution !== 'queue_after' && job.enrollment_resolution !== 'replace_on_complete') {
     return { success: false, error: 'Job is no longer in a revertible state' }
   }
 

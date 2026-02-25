@@ -142,6 +142,8 @@ export function EditJobSheet({ open, onOpenChange, job, customers }: EditJobShee
                   ? 'This job is queued for enrollment after the active sequence finishes. Saving changes may clear this queue state.'
                   : job.enrollment_resolution === 'skipped'
                   ? 'Enrollment was skipped for this job. Saving changes may clear this state.'
+                  : job.enrollment_resolution === 'replace_on_complete'
+                  ? 'This job will replace the active sequence on completion. Saving changes may clear this state.'
                   : job.enrollment_resolution === 'suppressed'
                   ? 'Enrollment was suppressed due to review cooldown.'
                   : null}

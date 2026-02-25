@@ -99,6 +99,55 @@ export async function getJobs(options?: {
     }
   }
 
+  // Pre-flight conflict detection for scheduled jobs:
+  // Identify scheduled jobs that WOULD conflict if completed now
+  const preflightCandidates = jobs.filter(j =>
+    j.status === 'scheduled' &&
+    !j.enrollment_resolution &&
+    j.campaign_override !== 'one_off' &&
+    j.campaign_override !== 'dismissed'
+  )
+
+  const preflightCustomerIds = new Set(preflightCandidates.map(j => j.customer_id))
+  // Exclude customers already fetched above
+  for (const id of conflictCustomerIds) {
+    preflightCustomerIds.delete(id)
+  }
+
+  if (preflightCustomerIds.size > 0) {
+    const { data: activeEnrollments } = await supabase
+      .from('campaign_enrollments')
+      .select('customer_id, current_touch, campaigns:campaign_id(name, campaign_touches(touch_number))')
+      .in('customer_id', Array.from(preflightCustomerIds))
+      .eq('business_id', business.id)
+      .eq('status', 'active')
+
+    const preflightMap = new Map<string, ConflictDetail>()
+    for (const enrollment of activeEnrollments || []) {
+      const campaign = Array.isArray(enrollment.campaigns) ? enrollment.campaigns[0] : enrollment.campaigns
+      const campaignData = campaign as { name: string; campaign_touches: { touch_number: number }[] } | null
+      preflightMap.set(enrollment.customer_id, {
+        existingCampaignName: campaignData?.name || 'Unknown',
+        currentTouch: enrollment.current_touch,
+        totalTouches: campaignData?.campaign_touches?.length || 0,
+      })
+    }
+
+    for (const job of preflightCandidates) {
+      const detail = preflightMap.get(job.customer_id)
+      if (detail) {
+        job.potentialConflict = detail
+      }
+    }
+  }
+
+  // Also check candidates whose customer_id was already in conflictCustomerIds
+  for (const job of preflightCandidates) {
+    if (!job.potentialConflict && conflictCustomerIds.has(job.customer_id)) {
+      job.potentialConflict = customerEnrollments.get(job.customer_id)
+    }
+  }
+
   return {
     jobs,
     total: count || 0,
