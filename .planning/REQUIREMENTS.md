@@ -1,56 +1,43 @@
-# Requirements: v2.6 Dashboard Command Center
+# Requirements: v2.5.1 Bug Fixes & Polish
 
-**Milestone:** v2.6 — Dashboard Command Center Redesign
-**Created:** 2026-02-23
+**Milestone:** v2.5.1 — Bug Fixes & Polish
+**Created:** 2026-02-24
 **Status:** Scoped
 
 ---
 
-## Dashboard Layout
+## Activity Page
 
-- [ ] **DL-01**: Two-column layout — left column (flexible width) for task lists, right panel (fixed ~360px) for contextual content
-- [ ] **DL-02**: Right panel default state shows Performance KPIs (Reviews This Month, Average Rating, Conversion Rate) with trend indicators and pipeline counters (Sent, Active Sequences, Queued)
-- [ ] **DL-03**: Right panel default state shows Recent Activity feed below KPIs
-- [ ] **DL-04**: Mobile responsive — right panel renders as bottom sheet triggered by item tap on screens below md breakpoint
+- [ ] **ACT-01**: Bulk select only selects rows with resendable status (failed/bounced) — header checkbox and "select all" must skip delivered/sent/opened rows
+- [ ] **ACT-02**: Resend button only visible on rows with failed/bounced status — not on successfully delivered/sent/opened rows
+- [ ] **ACT-03**: Resend button always displayed inline (no hover-to-reveal) for applicable rows — remove opacity-0/group-hover pattern
+- [ ] **ACT-04**: Page title uses standard page header pattern matching other pages
+- [ ] **ACT-05**: Status filter uses chip-style filters (like Jobs page) instead of dropdown select — same status options as current
+- [ ] **ACT-06**: Date filter includes preset chips (Past Week, Past Month) alongside custom date range picker
 
-## Dashboard Header
+## Dashboard
 
-- [ ] **DH-01**: Greeting headline with dynamic subtitle ("X jobs ready to send · Y items need attention")
-- [ ] **DH-02**: Right-aligned action buttons: "+ Add Job" (primary) and "View Campaigns" (outline)
+- [ ] **DASH-01**: Needs Attention rows match Ready to Send row styling — no left colored border, consistent icon sizing
+- [ ] **DASH-02**: Needs Attention items have dismiss (X) button to remove from the list
+- [ ] **DASH-03**: Ready to Send empty state has dashed border, icon in circle with correct jobs icon
+
+## Onboarding
+
+- [ ] **ONB-01**: New CRM platform step with square logo cards (Jobber, Housecall Pro, ServiceTitan, etc.), "None" and "Other" with text input, skippable, second-to-last step
+
+## Services
+
+- [ ] **SVC-01**: Onboarding services step allows adding multiple custom service names when "Other" is selected
+- [ ] **SVC-02**: Settings services section allows adding multiple custom service names
 
 ## Navigation
 
-- [ ] **DN-01**: Dashboard nav badge restored — shows combined count of ready-to-send + needs-attention items
-- [ ] **DN-02**: NotificationBell component removed entirely from app header
+- [ ] **NAV-01**: Sidebar active state: filled icon + brand orange text, no left border, background stays the same
 
-## Ready to Send
+## Cross-Page UX
 
-- [ ] **RS-01**: "Enroll All" button with confirmation dialog listing all jobs before bulk enrollment
-- [ ] **RS-02**: Clicking a Ready to Send job opens Job Details in the right panel (replaces default KPI/activity content)
-
-## Job Detail Panel
-
-- [ ] **JD-01**: Job Details shows customer info (name, phone, email), job metadata (technician, service type, completion date), and job notes — reuse elements from existing JobDetailDrawer rendered inline (Jobs page keeps its own drawer instance)
-- [ ] **JD-02**: Job Details includes campaign data (matching campaign name/type) — requires data layer enhancement to fetch campaign info for jobs
-- [ ] **JD-03**: "Enroll in [Campaign Name] Campaign" CTA button in job detail panel
-- [ ] **JD-04**: Close button (X) returns right panel to default KPI/activity state
-
-## Needs Attention Panel
-
-- [ ] **NA-01**: Clicking Needs Attention item opens contextual detail in right panel
-- [ ] **NA-02**: Failed delivery detail: customer info, error description, "Retry" action button
-- [ ] **NA-03**: Low rating detail: customer info, rating, feedback text, "Resolve" action button
-
-## Getting Started
-
-- [ ] **GS-01**: Getting Started full card displayed in right panel until user completes first job
-- [ ] **GS-02**: After first job completion, Getting Started shrinks to compact card in right panel until first review received
-- [ ] **GS-03**: Getting Started pill and drawer removed from dashboard (content consolidated into right panel)
-
-## Right Panel Architecture
-
-- [ ] **RP-01**: Right panel is dashboard-page-only — other pages retain current drawer behavior
-- [ ] **RP-02**: Panel state machine: default (KPIs + activity) / job-detail / attention-detail / getting-started — mutually exclusive views
+- [ ] **UX-01**: All pages use consistent lazy loading (navigation progress bar + skeleton, matching campaigns page pattern)
+- [ ] **UX-02**: All pages (except dashboard) use consistent empty state (icon in circle, title, subtitle, contextual action button)
 
 ---
 
@@ -58,10 +45,9 @@
 
 | Feature | Reason |
 |---------|--------|
-| Customer address field | Not in current data model, skip for now |
-| Navigation changes (remove Activity/Feedback) | Keep current nav — prototype was simplified |
-| Full-screen mobile overlay | Bottom sheet is simpler and less disruptive |
-| Right panel on non-dashboard pages | Other pages keep current drawer behavior |
+| Status badge WCAG contrast fixes | Separate from this patch, tracked in v2.5 audit |
+| Onboarding step count server clamp fix | Low priority, no UI generates invalid step URLs |
+| Security findings from v2.5 audit | Already resolved in post-security hardening session |
 
 ---
 
@@ -69,34 +55,27 @@
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| DL-01 | Phase 40 | Pending |
-| DL-02 | Phase 40 | Pending |
-| DL-03 | Phase 40 | Pending |
-| DL-04 | Phase 40 | Pending |
-| DH-01 | Phase 40 | Pending |
-| DH-02 | Phase 40 | Pending |
-| DN-01 | Phase 40 | Pending |
-| DN-02 | Phase 40 | Pending |
-| RS-01 | Phase 40 | Pending |
-| RS-02 | Phase 40 | Pending |
-| JD-01 | Phase 40 | Pending |
-| JD-02 | Phase 40 | Pending |
-| JD-03 | Phase 40 | Pending |
-| JD-04 | Phase 40 | Pending |
-| NA-01 | Phase 40 | Pending |
-| NA-02 | Phase 40 | Pending |
-| NA-03 | Phase 40 | Pending |
-| GS-01 | Phase 40 | Pending |
-| GS-02 | Phase 40 | Pending |
-| GS-03 | Phase 40 | Pending |
-| RP-01 | Phase 40 | Pending |
-| RP-02 | Phase 40 | Pending |
+| ACT-01 | Phase 41 | Pending |
+| ACT-02 | Phase 41 | Pending |
+| ACT-03 | Phase 41 | Pending |
+| ACT-04 | Phase 41 | Pending |
+| ACT-05 | Phase 41 | Pending |
+| ACT-06 | Phase 41 | Pending |
+| DASH-01 | Phase 42 | Pending |
+| DASH-02 | Phase 42 | Pending |
+| DASH-03 | Phase 42 | Pending |
+| NAV-01 | Phase 42 | Pending |
+| UX-01 | Phase 43 | Pending |
+| UX-02 | Phase 43 | Pending |
+| ONB-01 | Phase 44 | Pending |
+| SVC-01 | Phase 44 | Pending |
+| SVC-02 | Phase 44 | Pending |
 
 **Coverage:**
-- v2.6 requirements: 22 total
-- Mapped to phases: 22
+- v2.5.1 requirements: 15 total
+- Mapped to phases: 15
 - Unmapped: 0
 
 ---
-*Requirements defined: 2026-02-23*
-*Last updated: 2026-02-23 after initial definition*
+*Requirements defined: 2026-02-24*
+*Last updated: 2026-02-24 after initial definition*

@@ -2,54 +2,41 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-23)
+See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v2.6 Dashboard Command Center — two-column task-oriented layout with contextual right panel
+**Current focus:** v2.5.1 Bug Fixes & Polish — activity page fixes, dashboard polish, sidebar redesign, cross-page consistency
 
 ## Current Position
 
-Phase: 40 (Phase 1 of 1 in v2.6 milestone)
-Plan: 05 of ~8 complete
-Status: In progress
-Last activity: 2026-02-24 — Completed 40-05-PLAN.md (mobile responsive dashboard: MobileBottomSheet + KPISummaryBar)
+Phase: Not started (milestone defined, roadmap created)
+Plan: —
+Status: Ready to plan
+Last activity: 2026-02-24 — Milestone v2.5.1 started (v2.6 paused at plan 5/8)
 
-Progress: [█████░░░░░] ~62% (v2.6 milestone, est. 8 plans)
+Progress: [░░░░░░░░░░] 0% (v2.5.1 milestone, 4 phases)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed (project): 197
-- v2.6 plans completed: 5
+- v2.5.1 plans completed: 0
 
 *Updated after each plan completion*
 
 ## Accumulated Context
 
-### Key Decisions for v2.6
+### Key Decisions for v2.5.1
 
-- Right panel is dashboard-only — other pages retain current drawer behavior
-- Reuse JobDetailDrawer elements for right panel content, but Jobs page keeps its own separate drawer instance
-- Mobile strategy: bottom sheet for right panel content (not full-screen overlay)
-- Enroll All requires confirmation dialog (not one-click)
-- No address field on customers (skip for now)
-- NotificationBell removed entirely — dashboard badge + subtitle replaces it
-- Needs Attention detail panel shows contextual content (failed: error+retry, low rating: feedback+resolve)
-- Getting Started consolidated into right panel — pill and drawer removed from dashboard
-- DashboardShell embeds DashboardPanelProvider internally — no separate wrapper needed for common usage
-- key={panelView.type} on content div triggers clean re-mount + animate-in on each panel view change
-- DashboardClient uses inner/outer split: outer passes RightPanelDefault to DashboardShell, inner DashboardContent accesses useDashboardPanel context as children
-- Alert rows keep inline action buttons even in compact form — right panel detail (Plan 04) adds context, not replaces
-- Enroll All button only shows when enrollable jobs exist (completed, no conflict, has campaign, not one_off)
-- DashboardDetailContent rendered as detailContent prop to DashboardShell — renders inside Provider so useDashboardPanel() works correctly
-- Alert detail data extracted from description strings via regex (no schema changes needed)
-- RightPanelJobDetail fetches its own data on mount via getReadyToSendJobWithCampaign (self-contained, no prop drilling)
-- MobileBottomSheet uses CSS transitions (not Radix Dialog) — simpler, no new dependency
-- mobileSheetMode 'kpi-full' is a virtual mode local to DashboardContent — not added to RightPanelView union
-- panelView reset to 'default' (e.g. from within detail components after action) also closes the mobile sheet automatically
-- KPISummaryBar receives onClick prop rather than panel setter — keeps it decoupled and generic
+- Activity page status options stay the same: pending, sent, delivered, bounced, complained, failed, opened
+- Chip filter style matches Jobs page pattern (rounded-full for status, bg-primary when active)
+- CRM onboarding step is skippable and second-to-last (before SMS consent)
+- Needs Attention dismiss is UI-only (hides from list, doesn't resolve underlying issue)
+- Sidebar active state: filled icon + brand orange text, no left border, same background
+- Design changes must update globals.css / design system tokens — no one-off inline overrides
+- Scalability: remove replaced code, don't leave dead patterns alongside new ones — consolidate, don't duplicate
 
-### Key Decisions (Inherited from v2.5)
+### Key Decisions (Inherited from v2.5/v2.6)
 
 - Amber as accent only, blue stays primary — amber at warm lightness fails WCAG AA on white
 - BusinessSettingsProvider context for shared business settings (eliminates prop drilling)
@@ -64,10 +51,11 @@ None.
 
 - Phase 21-08: Twilio A2P campaign approval required for production SMS testing (brand approved, campaign pending)
 - Google OAuth: VERIFIED WORKING — NEXT_PUBLIC_SITE_URL must be https://app.avisloop.com in Vercel production env vars
+- v2.6 paused at plan 5/8 — resume after v2.5.1 completes
 
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Completed 40-05-PLAN.md — mobile responsive dashboard with MobileBottomSheet and KPISummaryBar.
+Stopped at: Milestone v2.5.1 defined, roadmap created. Ready to plan Phase 41.
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!

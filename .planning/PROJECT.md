@@ -116,28 +116,28 @@ Turn job completions into Google reviews automatically — multi-touch follow-up
 | Dashboard test step cards | Guided walkthrough instead of checklist | Good — auto-detection of completion |
 | Test sends excluded from quota | Fair for users learning the product | Good — is_test flag in database |
 
-## Current Milestone: v2.6 Dashboard Command Center
+## Current Milestone: v2.5.1 Bug Fixes & Polish
 
-**Goal:** Transform the dashboard into a task-oriented command center with a persistent two-column layout — left column for actionable task lists (Ready to Send, Needs Attention), right panel for contextual details (KPIs, job details, attention details, getting started).
+**Goal:** Fix activity page bugs (bulk select, resend visibility, filters), polish dashboard queue styling, add CRM onboarding step, redesign sidebar active state, and ensure cross-page consistency for loading states and empty states.
 
 **Target features:**
-- Two-column layout: flexible left column (task lists) + fixed right panel (~360px) for contextual content
-- Right panel default: Performance KPIs + pipeline counters + Recent Activity feed
-- Right panel dynamic: clicking Ready to Send item shows Job Details (with campaign data); clicking Needs Attention shows contextual detail (failed: error + retry, low rating: feedback + resolve)
-- Dashboard header: greeting + dynamic subtitle ("X jobs ready · Y need attention"), right-aligned "+ Add Job" and "View Campaigns" buttons
-- Dashboard nav badge restored (combined ready + attention count), NotificationBell removed entirely
-- "Enroll All" button with confirmation dialog for bulk enrollment
-- Getting Started consolidated into right panel (full card → compact card → gone)
-- Getting Started pill/drawer removed from dashboard
-- Mobile: right panel renders as bottom sheet on tap
-- Job details pull campaign data (data layer enhancement)
+- Activity page: chip filters for status (like Jobs), date preset chips (Past Week/Month), fix bulk select and resend button logic
+- Dashboard: Needs Attention rows match Ready to Send styling, dismiss button, dashed empty state
+- Sidebar: active state with filled icon + brand orange text, no left border
+- Onboarding: CRM platform step with logo cards (Jobber, Housecall Pro, ServiceTitan, etc.)
+- Services: multiple custom service names in onboarding and settings
+- Cross-page: consistent loading skeletons and empty states across all pages
 
 **Key decisions:**
-- Right panel is dashboard-only — other pages retain current drawer behavior
-- Reuse JobDetailDrawer elements for right panel content, but Jobs page keeps its own separate drawer instance
-- Mobile strategy: bottom sheet for right panel content, not full-screen overlay
-- Enroll All requires confirmation dialog (not one-click)
-- No address field on customers (skip for now)
+- v2.6 Dashboard Command Center paused at plan 5/8 — resume after this patch
+- Activity page status filter matches current status options (pending, sent, delivered, bounced, complained, failed, opened)
+- CRM step is skippable and second-to-last in onboarding flow
+
+## Paused: v2.6 Dashboard Command Center
+
+**Status:** Paused at plan 5 of ~8 (~62% complete). Resume after v2.5.1.
+
+**Goal:** Transform the dashboard into a task-oriented command center with persistent two-column layout, contextual right panel, and consolidated getting-started experience.
 
 ---
-*Last updated: 2026-02-23 after v2.6 milestone started*
+*Last updated: 2026-02-24 after v2.5.1 Bug Fixes & Polish milestone started*

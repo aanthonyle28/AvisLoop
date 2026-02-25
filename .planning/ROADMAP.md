@@ -15,7 +15,8 @@ AvisLoop is a review follow-up system for home service businesses. v1.0 through 
 - **v1.4 Landing Page Redesign** - Phase 25 (shipped 2026-02-02)
 - **v2.0 Review Follow-Up System** - Phases 20-32 (complete 2026-02-18)
 - **v2.5 UI/UX Redesign** - Phases 33-39 (complete 2026-02-20)
-- **v2.6 Dashboard Command Center** - Phase 40 (in progress)
+- **v2.6 Dashboard Command Center** - Phase 40 (paused at plan 5/8)
+- **v2.5.1 Bug Fixes & Polish** - Phases 41-44 (in progress)
 
 ## Phases
 
@@ -642,6 +643,73 @@ Plans:
 - [ ] 40-05-PLAN.md — Mobile bottom sheet + compact KPI summary bar
 - [ ] 40-06-PLAN.md — Visual verification checkpoint
 
+### v2.5.1 Bug Fixes & Polish (Phases 41-44)
+
+**Milestone Goal:** Fix activity page bugs, polish dashboard queue styling, add CRM onboarding step, redesign sidebar active state, and ensure cross-page consistency for loading states and empty states.
+
+**Coverage:** 15 requirements across 6 categories (ACT, DASH, ONB, SVC, NAV, UX)
+
+**Build order rationale:** Activity page is self-contained and the biggest chunk of work (first). Dashboard + nav polish are small visual fixes (second). Cross-page consistency touches many files but is mechanical (third). Onboarding & services changes are independent and lower risk (last).
+
+---
+
+### Phase 41: Activity Page Overhaul
+**Goal**: Activity page matches design standards with chip filters, date presets, correct resend behavior, and consistent page header.
+**Depends on**: None (independent)
+**Requirements**: ACT-01, ACT-02, ACT-03, ACT-04, ACT-05, ACT-06
+**Success Criteria** (what must be TRUE):
+  1. Bulk select header checkbox only selects rows with failed/bounced status — delivered/sent/opened rows are not selectable
+  2. Resend button only visible on rows with failed/bounced status — not rendered for delivered/sent/opened rows
+  3. Resend button is always visible inline (no hover-to-reveal opacity transition) for applicable rows
+  4. Page title uses standard page header pattern matching other pages (PageHeader component or equivalent)
+  5. Status filter uses chip-style filter bar (rounded-full pills, bg-primary when active) matching Jobs page filter pattern — same status options as current
+  6. Date filter includes preset chips (Past Week, Past Month) alongside custom date range inputs — selecting a preset auto-fills the date range
+**Plans**: 2 plans in 1 wave
+Plans:
+- [ ] 41-01-PLAN.md — Fix resend logic (bulk select, button visibility, remove hover-to-reveal) + page header fix
+- [ ] 41-02-PLAN.md — Replace status dropdown with chip filters + add date preset chips
+
+### Phase 42: Dashboard & Navigation Polish
+**Goal**: Dashboard queue sections have consistent styling, functional dismiss for attention items, proper empty state, and sidebar active state redesigned.
+**Depends on**: None (independent)
+**Requirements**: DASH-01, DASH-02, DASH-03, NAV-01
+**Success Criteria** (what must be TRUE):
+  1. Needs Attention rows have no left colored border and match Ready to Send row icon sizing and layout
+  2. Each Needs Attention item has an X dismiss button that hides it from the list
+  3. Ready to Send empty state has dashed border, icon in circle (Briefcase) with correct styling
+  4. Sidebar active nav item shows filled icon variant + brand orange text, no left border, same background color
+**Plans**: 2 plans in 1 wave
+Plans:
+- [ ] 42-01-PLAN.md — Needs Attention row styling, dismiss button, Ready to Send empty state
+- [ ] 42-02-PLAN.md — Sidebar active state redesign (filled icon + orange text, no left border)
+
+### Phase 43: Cross-Page Consistency
+**Goal**: All pages use consistent lazy loading (skeleton + progress bar) and empty state patterns (icon circle + title + subtitle + action button).
+**Depends on**: None (independent)
+**Requirements**: UX-01, UX-02
+**Success Criteria** (what must be TRUE):
+  1. All data pages (jobs, customers, history, feedback, analytics, billing, settings) show loading skeleton during data fetch — matching campaigns page loading.tsx pattern
+  2. All pages (except dashboard) show consistent empty state: icon in rounded circle, title, subtitle, and contextual action button — matching campaigns empty state pattern
+  3. Each empty state action button is relevant to the page (e.g., Jobs → "Add Job", Feedback → guidance text)
+**Plans**: 2 plans in 1 wave
+Plans:
+- [ ] 43-01-PLAN.md — Loading skeleton consistency across all pages (loading.tsx files)
+- [ ] 43-02-PLAN.md — Empty state consistency across all pages
+
+### Phase 44: Onboarding & Services
+**Goal**: New CRM platform onboarding step with logo cards, and multi-custom-service support in both onboarding and settings.
+**Depends on**: None (independent)
+**Requirements**: ONB-01, SVC-01, SVC-02
+**Success Criteria** (what must be TRUE):
+  1. Onboarding has CRM platform step with square logo cards (Jobber, Housecall Pro, ServiceTitan, GorillaDesk, FieldPulse, etc.), plus "None" and "Other" (with text input) options — step is skippable, positioned second-to-last (before SMS Consent)
+  2. Onboarding services step "Other" option allows typing and adding multiple custom service names (tag-style input)
+  3. Settings services section "Other" option allows adding multiple custom service names (matching onboarding pattern)
+  4. CRM selection is saved to business record (software_used field) for future integration planning
+**Plans**: 2 plans in 1 wave
+Plans:
+- [ ] 44-01-PLAN.md — CRM platform onboarding step with logo cards + database field
+- [ ] 44-02-PLAN.md — Multiple custom services in onboarding and settings
+
 ---
 
 ## Phase Details
@@ -684,27 +752,29 @@ See individual phase sections above for requirements, success criteria, and depe
 | **37** | **v2.5 UI/UX Redesign** | **3/3** | **Complete** | **2026-02-19** |
 | **38** | **v2.5 UI/UX Redesign** | **3/3** | **Complete** | **2026-02-19** |
 | **39** | **v2.5 UI/UX Redesign** | **4/4** | **Complete** | **2026-02-20** |
-| **40** | **v2.6 Dashboard Command Center** | **0/6** | **Planned** | **-** |
+| **40** | **v2.6 Dashboard Command Center** | **5/6** | **Paused** | **-** |
+| **41** | **v2.5.1 Bug Fixes & Polish** | **0/2** | **Planned** | **-** |
+| **42** | **v2.5.1 Bug Fixes & Polish** | **0/2** | **Planned** | **-** |
+| **43** | **v2.5.1 Bug Fixes & Polish** | **0/2** | **Planned** | **-** |
+| **44** | **v2.5.1 Bug Fixes & Polish** | **0/2** | **Planned** | **-** |
 
-**Total:** 192 plans complete across shipped phases.
+**Total:** 197 plans complete across shipped phases.
 
 ## What's Next
 
-**v2.0 milestone is COMPLETE** (Phases 20-32 all verified, excluding Phase 21 SMS blocked on A2P).
+**v2.5.1 Bug Fixes & Polish:** Phases 41-44 — in progress (quick patch before resuming v2.6).
 
-**v2.5 milestone COMPLETE:** Phases 33-39 all verified (2026-02-20).
-
-**v2.6 Dashboard Command Center:** Phase 40 — planned, not yet started.
+**v2.6 Dashboard Command Center:** Phase 40 — paused at plan 5/8, resume after v2.5.1.
 
 **Blockers:**
 - Twilio A2P 10DLC registration required before Phase 21-08 execution (webhook verification)
 
-After v2.6:
+After v2.5.1 + v2.6:
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 - **v2.1 Integrations** — ServiceTitan/Jobber/Housecall Pro API integrations for auto job import
 - **v2.2 Review Inbox** — Ingest reviews from Google Business Profile, AI reply suggestions
 - **v3.0 Agency Mode** — Multi-business management UI, white-label option, client reporting portal
 
 ---
-*Last updated: 2026-02-23 — v2.6 Dashboard Command Center milestone started (Phase 40 added)*
+*Last updated: 2026-02-24 — v2.5.1 Bug Fixes & Polish milestone started (Phases 41-44 added, v2.6 paused)*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
