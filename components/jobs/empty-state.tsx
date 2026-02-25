@@ -12,13 +12,15 @@ interface EmptyStateProps {
 export function EmptyState({ hasFilters, onClearFilters, onAddJob }: EmptyStateProps) {
   if (hasFilters) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border py-16">
-        <FunnelSimple className="h-12 w-12 text-muted-foreground" />
-        <h3 className="mt-4 text-lg font-medium">No jobs match your filters</h3>
-        <p className="mt-1 text-sm text-muted-foreground">
+      <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+        <div className="rounded-full bg-muted p-6 mb-6">
+          <FunnelSimple className="h-8 w-8 text-muted-foreground" />
+        </div>
+        <h2 className="text-2xl font-semibold tracking-tight mb-2">No jobs match your filters</h2>
+        <p className="text-muted-foreground mb-8 max-w-md">
           Try adjusting your filters or clear them to see all jobs.
         </p>
-        <Button variant="outline" className="mt-4" onClick={onClearFilters}>
+        <Button variant="outline" onClick={onClearFilters}>
           Clear Filters
         </Button>
       </div>
@@ -26,13 +28,15 @@ export function EmptyState({ hasFilters, onClearFilters, onAddJob }: EmptyStateP
   }
 
   return (
-    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border py-16">
-      <Briefcase className="h-12 w-12 text-muted-foreground" />
-      <h3 className="mt-4 text-lg font-medium">No jobs yet</h3>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Create your first job to start tracking completed work.
+    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+      <div className="rounded-full bg-muted p-6 mb-6">
+        <Briefcase className="h-8 w-8 text-muted-foreground" />
+      </div>
+      <h2 className="text-2xl font-semibold tracking-tight mb-2">No jobs yet</h2>
+      <p className="text-muted-foreground mb-8 max-w-md">
+        Create your first job to start tracking completed work and collecting reviews.
       </p>
-      <Button className="mt-4" onClick={onAddJob}>
+      <Button onClick={onAddJob}>
         <Plus className="mr-2 h-4 w-4" weight="bold" />
         Add Job
       </Button>
