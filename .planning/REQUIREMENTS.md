@@ -2,7 +2,7 @@
 
 **Milestone:** v2.5.2 — UX Bugs & UI Fixes
 **Created:** 2026-02-25
-**Status:** Scoped
+**Status:** Roadmapped
 
 ---
 
@@ -65,33 +65,33 @@
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| DRW-01 | TBD | Pending |
-| DRW-02 | TBD | Pending |
-| DRW-03 | TBD | Pending |
-| DRW-04 | TBD | Pending |
-| DRW-05 | TBD | Pending |
-| DRKP-01 | TBD | Pending |
-| DRKP-02 | TBD | Pending |
-| DRKP-03 | TBD | Pending |
-| DRKP-04 | TBD | Pending |
-| DQ-01 | TBD | Pending |
-| DQ-02 | TBD | Pending |
-| DQ-03 | TBD | Pending |
-| DQ-04 | TBD | Pending |
-| CAMP-01 | TBD | Pending |
-| CAMP-02 | TBD | Pending |
-| CAMP-03 | TBD | Pending |
-| CAMP-04 | TBD | Pending |
-| CUI-01 | TBD | Pending |
-| BTN-01 | TBD | Pending |
-| BTN-02 | TBD | Pending |
-| NAV-01 | TBD | Pending |
+| DRW-01 | Phase 46 | Pending |
+| DRW-02 | Phase 46 | Pending |
+| DRW-03 | Phase 46 | Pending |
+| DRW-04 | Phase 46 | Pending |
+| DRW-05 | Phase 47 | Pending |
+| DRKP-01 | Phase 47 | Pending |
+| DRKP-02 | Phase 47 | Pending |
+| DRKP-03 | Phase 47 | Pending |
+| DRKP-04 | Phase 47 | Pending |
+| DQ-01 | Phase 45 | Pending |
+| DQ-02 | Phase 45 | Pending |
+| DQ-03 | Phase 45 | Pending |
+| DQ-04 | Phase 45 | Pending |
+| CAMP-01 | Phase 46 | Pending |
+| CAMP-02 | Phase 46 | Pending |
+| CAMP-03 | Phase 46 | Pending |
+| CAMP-04 | Phase 47 | Pending |
+| CUI-01 | Phase 47 | Pending |
+| BTN-01 | Phase 45 | Pending |
+| BTN-02 | Phase 45 | Pending |
+| NAV-01 | Phase 45 | Pending |
 
 **Coverage:**
 - v2.5.2 requirements: 21 total
-- Mapped to phases: 0
-- Unmapped: 21
+- Mapped to phases: 21
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-25*
-*Last updated: 2026-02-25 after initial definition*
+*Last updated: 2026-02-25 — traceability section complete (Phases 45-47)*

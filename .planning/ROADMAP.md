@@ -17,6 +17,7 @@ AvisLoop is a review follow-up system for home service businesses. v1.0 through 
 - **v2.5 UI/UX Redesign** - Phases 33-39 (complete 2026-02-20)
 - **v2.6 Dashboard Command Center** - Phase 40 (complete 2026-02-25)
 - **v2.5.1 Bug Fixes & Polish** - Phases 41-44 (complete 2026-02-25)
+- **v2.5.2 UX Bugs & UI Fixes** - Phases 45-47 (in progress)
 
 ## Phases
 
@@ -678,6 +679,75 @@ Plans:
 - [x] 44-01-PLAN.md — CRM platform onboarding step with logo cards + database field
 - [x] 44-02-PLAN.md — Multiple custom services in onboarding and settings
 
+### v2.5.2 UX Bugs & UI Fixes (Phases 45-47)
+
+**Milestone Goal:** Drawer consistency overhaul, dashboard right panel KPI/activity redesign, dashboard queue row styling, campaign pause/resume bug fix, button hierarchy cleanup, touch template previews, and navigation rename.
+
+**Coverage:** 21 requirements across 7 categories (DRW, DRKP, DQ, CAMP, CUI, BTN, NAV)
+
+**Build order rationale:** Foundation first (no migrations, no behavior changes) — establishes component primitives and low-risk visual changes. Drawer consistency and campaign freeze second (depends on foundation SheetBody/DrawerLayout; campaign freeze is a data-integrity fix that must stop enrollment destruction as soon as possible). Dashboard right panel and campaign polish last (highest complexity: new data pipeline for sparklines, SSR guard required, Radix Select form state migration).
+
+---
+
+### Phase 45: Foundation + Visual-Only Changes
+**Goal**: Component primitives are in place and all low-risk visual changes are shipped — button soft variant, navigation rename, and dashboard queue cosmetic updates that require no migrations or behavior changes.
+**Depends on**: Phase 44 (v2.5.1 complete)
+**Requirements**: BTN-01, BTN-02, NAV-01, DQ-01, DQ-02, DQ-03, DQ-04
+**Success Criteria** (what must be TRUE):
+  1. A `soft` button variant exists in `button.tsx` CVA and renders with muted background that does not compete with primary CTAs; secondary dashboard actions use the soft variant
+  2. "Activity" label in sidebar and bottom nav displays as "History" — the /history route is unchanged
+  3. Ready to Send and Needs Attention queue rows render as white card-like units with border-radius, not flat divide-y rows
+  4. Ready to Send and Needs Attention empty states use a solid border with white background, not a dashed border
+  5. Ready to Send empty state "Add Jobs" button opens the Add Job drawer directly, not navigate to /jobs
+**Plans**: TBD
+
+Plans:
+- [ ] 45-01-PLAN.md — Add `soft` button variant to CVA + dashboard button audit (BTN-01, BTN-02)
+- [ ] 45-02-PLAN.md — Rename "Activity" to "History" in sidebar and bottom nav (NAV-01)
+- [ ] 45-03-PLAN.md — Queue row card styling, empty state solid borders, Add Jobs drawer trigger (DQ-01, DQ-02, DQ-03, DQ-04)
+
+### Phase 46: Drawer Consistency + Campaign Freeze Fix
+**Goal**: All drawers use consistent white-background content grouping with sticky action buttons, and the campaign pause bug is fixed — pausing a campaign freezes enrollments in place instead of permanently destroying them.
+**Depends on**: Phase 45 (SheetBody and SheetFooter shrink-0 foundation established)
+**Requirements**: DRW-01, DRW-02, DRW-03, DRW-04, CAMP-01, CAMP-02, CAMP-03
+**Success Criteria** (what must be TRUE):
+  1. All drawers (Add Job, Edit Job, Job Detail, Customer Detail, Add Customer, Edit Customer) show content in white-background rounded sections with no borders or dividers — matching the request-detail-drawer reference pattern
+  2. All drawer action buttons remain visible at the bottom without scrolling — the footer is sticky regardless of content height
+  3. Job detail drawer button patterns are consistent with other drawers (same size, variant, placement)
+  4. Add Job drawer width matches other drawers and is not narrower than the rest
+  5. Pausing a campaign sets in-progress enrollments to `frozen` status — they are not marked `stopped` and do not lose remaining touches
+  6. Re-enabling a paused campaign unfreezes all `frozen` enrollments — they resume from the same touch position
+  7. The cron processor skips `frozen` enrollments while their campaign is paused — no touches send during the freeze period
+**Plans**: TBD
+
+Plans:
+- [ ] 46-01-PLAN.md — Supabase migration: add `frozen` to campaign_enrollments status constraint; update deleteCampaign to handle frozen rows (CAMP-02)
+- [ ] 46-02-PLAN.md — Fix toggleCampaignStatus to freeze/unfreeze enrollments; audit cron conflict resolver for paused-campaign edge case (CAMP-01, CAMP-02, CAMP-03)
+- [ ] 46-03-PLAN.md — DrawerLayout wrapper + SheetBody subcomponent + SheetFooter shrink-0 (foundation for all drawer migrations)
+- [ ] 46-04-PLAN.md — Apply drawer consistency to Add Job and Edit Job sheets (DRW-01, DRW-02, DRW-04)
+- [ ] 46-05-PLAN.md — Apply drawer consistency to Job Detail and Customer Detail drawers (DRW-01, DRW-02, DRW-03)
+
+### Phase 47: Dashboard Right Panel + Campaign Polish + Radix Select
+**Goal**: Dashboard right panel KPI cards show sparkline trend graphs with colored activity feed icons, campaign touch sequence shows template preview content, and Add Job form uses Radix Select components instead of native HTML selects.
+**Depends on**: Phase 46 (campaign freeze fix landed; drawer consistency stable)
+**Requirements**: DRKP-01, DRKP-02, DRKP-03, DRKP-04, CAMP-04, CUI-01, DRW-05
+**Success Criteria** (what must be TRUE):
+  1. KPI cards in the dashboard right panel have a light gray background and display a mini sparkline graph showing the 7-30 day trend for each metric
+  2. KPI sparklines show an empty state (no broken chart or blank space) when fewer than 2 data points exist
+  3. Recent Activity items in the right panel show distinct colored circle icons per event type — green for reviews, blue for sends, orange for feedback — with increased vertical spacing
+  4. Pipeline counter row below KPI cards retains its compact horizontal layout and is not promoted to a full card
+  5. Each touch in the campaign touch sequence editor shows an inline collapsible preview of the email or SMS template body, including system default templates
+  6. Campaign detail page has received a visual retouch consistent with overall app design
+  7. Add Job and Edit Job forms use Radix Select components with `onValueChange` (not `onChange`), and full form submit is verified end-to-end in Supabase
+**Plans**: TBD
+
+Plans:
+- [ ] 47-01-PLAN.md — Sparkline data pipeline: extend KPIMetric type with history[], add daily-bucket queries to getDashboardKPIs() with performance benchmark (DRKP-01, DRKP-02)
+- [ ] 47-02-PLAN.md — Sparkline component with dynamic+ssr:false guard, KPI card gray background, colored activity icons, pipeline row retention (DRKP-01, DRKP-02, DRKP-03, DRKP-04)
+- [ ] 47-03-PLAN.md — Touch sequence template preview per touch + campaign page visual retouch (CAMP-04, CUI-01)
+- [ ] 47-04-PLAN.md — Radix Select migration in add-job-sheet and edit-job-sheet with full submit test (DRW-05)
+
+
 ---
 
 ## Phase Details
@@ -725,24 +795,26 @@ See individual phase sections above for requirements, success criteria, and depe
 | **42** | **v2.5.1 Bug Fixes & Polish** | **2/2** | **Complete** | **2026-02-25** |
 | **43** | **v2.5.1 Bug Fixes & Polish** | **2/2** | **Complete** | **2026-02-25** |
 | **44** | **v2.5.1 Bug Fixes & Polish** | **2/2** | **Complete** | **2026-02-25** |
+| **45** | **v2.5.2 UX Bugs & UI Fixes** | **0/TBD** | **Not started** | - |
+| **46** | **v2.5.2 UX Bugs & UI Fixes** | **0/TBD** | **Not started** | - |
+| **47** | **v2.5.2 UX Bugs & UI Fixes** | **0/TBD** | **Not started** | - |
 
 **Total:** 211 plans complete across shipped phases.
 
 ## What's Next
 
-**v2.6 Dashboard Command Center:** Phase 40 — complete (2026-02-25).
-
-**v2.5.1 Bug Fixes & Polish:** Phases 41-44 — complete (2026-02-25).
+**v2.5.2 UX Bugs & UI Fixes:** Phases 45-47 — in progress.
 
 **Blockers:**
 - Twilio A2P 10DLC registration required before Phase 21-08 execution (webhook verification)
 
-After v2.5.1 + v2.6:
+After v2.5.2:
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
+- **v2.6 Dashboard Command Center** — Resume from plan 5/8 after v2.5.2 complete
 - **v2.1 Integrations** — ServiceTitan/Jobber/Housecall Pro API integrations for auto job import
 - **v2.2 Review Inbox** — Ingest reviews from Google Business Profile, AI reply suggestions
 - **v3.0 Agency Mode** — Multi-business management UI, white-label option, client reporting portal
 
 ---
-*Last updated: 2026-02-25 — v2.6 Dashboard Command Center (Phase 40) marked complete, v2.5.1 milestone complete*
+*Last updated: 2026-02-25 — v2.5.2 UX Bugs & UI Fixes milestone roadmap created (Phases 45-47)*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
