@@ -1,414 +1,401 @@
-# Domain Pitfalls: v2.5 UI/UX Redesign — Warm Design System Migration
+# Domain Pitfalls: v2.5.2 UX Bugs & UI Fixes
 
-**Domain:** Adding a warm design system overhaul to an existing production Next.js + Tailwind SaaS with full dark mode
-**Researched:** 2026-02-18
-**Confidence:** HIGH — based on direct codebase inspection, WCAG 2.2 contrast math, and CSS variable cascade analysis
+**Domain:** Adding UX polish (drawer consistency, sparkline KPIs, button variants, campaign state fixes, sticky footers, Radix select migration) to an existing production Next.js + Supabase SaaS with 18,000+ LOC
+**Researched:** 2026-02-25
+**Confidence:** HIGH — based on direct codebase inspection of all named components, verified against official documentation and community knowledge for each pitfall category
 
 ---
 
 ## Critical Pitfalls
 
-These mistakes cause regressions visible to production users or break fundamental functionality.
+These mistakes cause data corruption, broken core workflows, or production regressions that are expensive to recover from.
 
 ---
 
-### Pitfall 1: Treating globals.css as the Only Color Source
+### Pitfall 1: Campaign Pause Now Destroys Active Enrollments — Resume Cannot Restore Them
 
 **What goes wrong:**
-The globals.css CSS custom properties (`--primary`, `--background`, `--border`, etc.) are changed to warm hues, but the components that bypass the design token system continue using light mode values. The redesign looks great on the pages you check but breaks silently on others.
+`toggleCampaignStatus()` in `lib/actions/campaign.ts` (lines 462–472) unconditionally sets all active enrollments to `status='stopped'` with `stop_reason='campaign_paused'` when pausing. When the campaign is later resumed (toggle back to active), those enrollments are already permanently terminated. No enrollment data is preserved. Completed jobs that were mid-sequence now show "stopped" in the job detail drawer — this is the exact bug described in the milestone context.
 
-**Why it happens:**
-Developers change CSS variables, verify a few pages look correct, and ship. They don't know which components use hardcoded values. The codebase already has exactly this pattern:
-
-| Location | Hardcoded value | Token that should be used |
-|----------|-----------------|--------------------------|
-| `sidebar.tsx:120` | `bg-white` (light only) | `bg-card` |
-| `sidebar.tsx:89` | `bg-[#F2F2F2]` | `bg-muted` |
-| `sidebar.tsx:90` | `hover:bg-[#F2F2F2]/70` | `hover:bg-muted/70` |
-| `page-header.tsx:28` | `bg-white` (light only) | `bg-card` |
-| `page-header.tsx:28` | `border-[#E2E2E2]` | `border-border` |
-| `app-shell.tsx:32` | `bg-[#F9F9F9]` | `bg-background` |
-
-These components have correct `dark:` variants but the light-mode hardcoded hex values will not inherit the new warm palette when CSS variables are updated.
-
-**How to avoid:**
-Before touching CSS variables, run a full audit:
-```bash
-# Find all hardcoded hex colors
-grep -rn "bg-\[#\|text-\[#\|border-\[#\|fill-\[#" components/ app/
-
-# Find bare bg-white/bg-black that bypass tokens
-grep -rn "bg-white\|bg-black\|text-white\|text-black" components/ app/ | grep -v "dark:"
-
-# Find Tailwind semantic colors used instead of tokens (amber, blue, green, red, etc.)
-grep -rn "bg-amber-\|bg-blue-\|bg-green-\|bg-red-\|text-amber-\|text-blue-\|text-green-" components/ app/
-```
-Replace all hardcoded values with token-based utilities BEFORE changing the tokens themselves. This ensures when the token value changes, every component updates.
-
-**Warning signs:**
-- Sidebar background doesn't warm after CSS variable change
-- Mobile header stays cool-gray while other surfaces turn warm
-- Visual inconsistency between dashboard and settings pages
-
-**Phase to address:** Phase 1 (Token Audit and Replacement) — must complete before any color value changes
-
----
-
-### Pitfall 2: Dark Mode Warm Palette Requires Separate Calibration, Not Just Inversion
-
-**What goes wrong:**
-A warm amber/gold primary (e.g., hue ~35) is set in `:root`. The `.dark` block is updated by inverting lightness as the existing pattern does: light → dark, dark → light. The result in dark mode is a desaturated, muddy brown rather than the intended warm dark palette. Warm hues in dark mode need higher saturation to avoid looking dirty.
-
-**Why it happens:**
-The existing token pattern:
-```css
-:root { --primary: 224 75% 43%; }     /* Blue */
-.dark { --primary: 224 75% 55%; }     /* Blue, just lighter */
-```
-Blue behaves symmetrically under lightness inversion. Amber/warm tones do not — the perceptual "warmth" requires saturation adjustment, not just lightness shifting. A naive port:
-```css
-:root { --primary: 35 90% 45%; }      /* Warm amber */
-.dark { --primary: 35 90% 55%; }      /* Looks brownish/muddy in dark mode */
-```
-Correct approach requires separate curation:
-```css
-.dark { --primary: 35 95% 65%; }      /* Higher saturation AND lightness for dark mode warmth */
-```
-
-**How to avoid:**
-- Calibrate dark mode tokens independently using a visual tool (oklch color spaces handle perceptual uniformity better than HSL for warm tones)
-- For each warm token, verify dark mode renders with a visible warm quality, not a desaturated muddy tone
-- Test with `prefers-color-scheme: dark` AND with the `next-themes` forced `.dark` class (they should match)
-- Create a color palette preview page during development: a single `/palette-preview` route that renders all tokens in a grid across both modes
-
-**Warning signs:**
-- Dark mode looks "brownish" or "muddy" where it should look warm gold
-- Text contrast appears to worsen in dark mode even when light mode passes WCAG
-- Users on dark mode see a completely different visual personality than light mode users
-
-**Phase to address:** Phase 2 (Token Value Definition) — validate dark mode before wiring up components
-
----
-
-### Pitfall 3: Warm Amber/Gold Text on White Fails WCAG AA at Common Lightness Values
-
-**What goes wrong:**
-Amber/gold at the lightness values that look "warm and inviting" (L 55–70% in HSL) fail WCAG AA contrast (4.5:1) on white backgrounds. The redesign ships with amber-colored labels, status badges, or primary buttons that are technically inaccessible. This is a regulatory risk and will fail any accessibility audit.
-
-**Why it happens:**
-Yellow and amber tones have high perceptual luminance at the same HSL lightness where blue reads as dark. This means:
-- `hsl(35, 90%, 55%)` (warm amber) on white: contrast ratio ≈ 2.8:1 — FAILS AA
-- `hsl(224, 75%, 43%)` (current primary blue) on white: contrast ratio ≈ 5.2:1 — PASSES AA
-
-The existing status color system is already amber-influenced:
-```css
---status-clicked-text: 30 100% 27%;  /* Very dark amber for accessibility */
---status-clicked-bg: 54 96% 88%;     /* Light yellow background */
-```
-This pattern works BECAUSE the text token is `27%` lightness (very dark). Any new warm primary used for text must follow the same constraint.
-
-**How to avoid:**
-Run contrast math before finalizing any text token:
-```
-WCAG AA minimum: 4.5:1 (normal text), 3:1 (large text/UI elements)
-WCAG AAA:        7:1
-
-For warm primary as text on --background (97.6% L in HSL ≈ #F8F8F8):
-- Need darkened amber: approximately hsl(35, 90%, 30%) or darker
-- Test at: https://webaim.org/resources/contrastchecker/
-```
-
-The most common failure modes in a warm palette migration:
-1. Amber badge text on light amber background (both mid-range L — fails even at 3:1)
-2. Gold primary button label — if `--primary` is light amber, the `--primary-foreground` must be very dark, not just white
-3. Warm-tinted `--muted-foreground` for placeholder text — already near the 4.5:1 limit in the current palette (`0 0% 45%`)
-
-**Warning signs:**
-- Browser accessibility dev tools (Chrome Accessibility panel) flagging contrast violations after the migration
-- Status badges look "faded" in the new palette — usually means contrast dropped below 3:1
-- The `--muted-foreground` placeholder text becomes harder to read on warm backgrounds
-
-**Phase to address:** Phase 2 (Token Value Definition) — validate every foreground/background token pair before shipping
-
----
-
-### Pitfall 4: Semantic Color Leakage — Inline Colors That Don't Participate in the Token System
-
-**What goes wrong:**
-The redesign updates all CSS tokens but ~50 component files use Tailwind semantic colors inline (`text-amber-600`, `bg-blue-50`, `text-green-600`, `bg-red-500`). These colors don't change when the design system changes. After migration, the system has two color realities: the new warm palette via tokens, and the unchanged semantic palette baked into components.
-
-**Why it happens:**
-Tailwind's semantic scale (amber-600, blue-50, etc.) is convenient for one-off usage. The current codebase has substantial inline semantic color usage that was added incrementally:
-
-Examples found in codebase:
-- `components/billing/usage-warning-banner.tsx`: `bg-amber-50`, `border-amber-200`, `text-amber-600`, `text-amber-800`
-- `components/campaigns/campaign-stats.tsx`: `bg-green-500`, `bg-yellow-500`, `bg-red-500`
-- `notification-bell.tsx:86`: `bg-blue-100 dark:bg-blue-900/30`, `text-blue-600 dark:text-blue-400`
-- `notification-bell.tsx:111`: `bg-amber-100 dark:bg-amber-900/30`, `text-amber-600 dark:text-amber-400`
-- `app/(dashboard)/campaigns/new/page.tsx`: `bg-blue-50`, `border-blue-200`, `text-blue-600`, `text-blue-900` — six individual classes for one info banner
-
-**How to avoid:**
-Extend the token system to cover semantic use cases, then migrate inline colors to tokens. A warm palette migration is the right time to add:
-```css
-/* globals.css additions */
---info-bg: [token];
---info-text: [token];
---success-bg: [token];
---success-text: [token];
---warning-bg: [token];   /* replaces inline amber-50/amber-600 */
---warning-text: [token];
-```
-The existing `--status-*` tokens are already correctly tokenized. The inline billing, campaign, and notification colors are not. Migrate these systematically before or during the color change phase.
-
-**Warning signs:**
-- Info banners in campaign create page look "off brand" after the redesign
-- Usage warning banners on billing page use a different shade of amber than the new primary
-- Chart colors (bg-green-500, bg-yellow-500 in campaign-stats) clash with the new warm palette
-
-**Phase to address:** Phase 1 (Token Audit) and Phase 3 (Component Update) — audit first, migrate alongside component redesign
-
----
-
-### Pitfall 5: Removing the Manual Request Page Without Preserving Its Data Queries
-
-**What goes wrong:**
-`/send` (Manual Request) provides several data functions not duplicated elsewhere: monthly usage stats, response rate, attention needs count, recent activity, and resend-ready customers. If the page is removed and its content merged into the dashboard or jobs page, the consuming Server Component queries (`getMonthlyUsage`, `getResponseRate`, `getNeedsAttentionCount`, `getRecentActivity`, `getResendReadyCustomers`) either get duplicated incorrectly or dropped entirely.
-
-**Why it happens:**
-The send page (`app/(dashboard)/send/page.tsx`) loads five separate data queries server-side:
+**The current code path:**
 ```typescript
-getMonthlyUsage, getResponseRate, getNeedsAttentionCount,
-getRecentActivity, getRecentActivityFull, getResendReadyCustomers
+// toggleCampaignStatus() — current behavior
+if (newStatus === 'paused') {
+  await supabase
+    .from('campaign_enrollments')
+    .update({
+      status: 'stopped',         // PERMANENT — cannot be undone
+      stop_reason: 'campaign_paused',
+      stopped_at: new Date().toISOString(),
+    })
+    .eq('campaign_id', campaignId)
+    .eq('status', 'active')
+}
+// Resume path: does nothing to enrollments — they are already stopped
 ```
-These are business metrics. If the UI shell is removed but these queries aren't moved to the right home, the dashboard loses visibility into resend-ready customers and the attention count that powers the notification badge on the sidebar.
-
-**How to avoid:**
-- Before removing the page, map every prop passed to `SendPageClient` to its query source
-- Identify which data belongs on Dashboard, which belongs on Jobs, which belongs on Activity
-- Move queries first, verify data still flows, then remove the page
-- The `notificationCounts.readyToSend` badge on the sidebar will need to continue being computed — its current source is likely the send page or a shared server layout
-
-**Warning signs:**
-- Dashboard "Ready to Send" queue goes empty after page removal
-- Sidebar notification badge stops updating
-- Activity page loses the "resend ready" customer list
-
-**Phase to address:** Phase dealing with navigation consolidation — plan data migration before page deletion, not after
-
----
-
-### Pitfall 6: Onboarding Step Removal Breaks Draft Persistence Key Expectations
-
-**What goes wrong:**
-The onboarding wizard stores draft data in `localStorage` under key `'onboarding-draft'` as a record of step data indexed by step ID or field name. The schema is validated with Zod on load (`draftDataSchema.safeParse(parsed)`). If steps are removed or renumbered, existing users who have a partial onboarding draft in localStorage will either:
-1. Have their draft silently cleared (Zod validation fails → `localStorage.removeItem(STORAGE_KEY)`)
-2. Advance to the wrong step if `initialStep` numbering changes
 
 **Why it happens:**
-The current `STEPS` array in `onboarding-wizard.tsx`:
+The current architecture only models two enrollment terminal states (`completed`, `stopped`). There is no `paused` enrollment state. The quick fix of "stop everything on pause" was correct for v1 behavior but is wrong for v2 where campaigns run autonomously and a user pausing for maintenance should not lose mid-sequence customers.
+
+**Consequences:**
+- Active customers in a 3-touch sequence lose their remaining touches when the owner briefly pauses to adjust settings
+- Job detail drawer shows "Stopped" for enrollments that the user expected to resume
+- Re-enabling the campaign does not re-enroll these jobs — the `queue_after` and `conflict` resolution states on those jobs remain, preventing automatic re-enrollment
+- The cron processor (`/api/cron/process-campaign-touches/`) correctly skips `stopped` enrollments, so no sends occur even after re-enabling
+
+**Prevention strategy:**
+Implement freeze-in-place: add a `paused` enrollment status (or a `paused_at` / `resume_at` timestamp column) so enrollments freeze at their current touch position rather than terminating. The cron processor must then check campaign status before sending any touch for an active enrollment:
+
 ```typescript
-const STEPS: StepConfig[] = [
-  { id: 1, title: 'Business Basics', skippable: false },
-  { id: 2, title: 'Review Destination', skippable: true },
-  { id: 3, title: 'Services Offered', skippable: false },
-  { id: 4, title: 'Software Used', skippable: true },
-  { id: 5, title: 'Campaign Preset', skippable: false },
-  { id: 6, title: 'Import Jobs', skippable: true },
-  { id: 7, title: 'SMS Consent', skippable: false },
-]
+// Cron should skip touches belonging to paused campaigns
+// Query must join campaign status
+WHERE enrollment.status = 'active'
+  AND campaign.status = 'active'  // ← must add this guard
 ```
-If step 4 (Software Used) or step 6 (Import Jobs) are removed during the redesign, the remaining steps renumber. A user who had `currentStep: 6` stored in a draft now advances into SMS Consent (new step 5) or beyond.
 
-**How to avoid:**
-- Use stable string IDs for draft keys, not step numbers: `'business-basics'`, `'review-destination'`, etc.
-- When removing a step, verify the Zod schema shape still accepts existing drafts (add forward-compatible parsing)
-- Consider incrementing the `STORAGE_KEY` version on structural step changes: `'onboarding-draft-v2'` — old drafts are cleanly abandoned, new users start fresh
-- Test: start onboarding, save draft at step 3, deploy step removal, reload — verify graceful handling
+On resume, the cron picks them back up automatically with no additional action needed.
+
+**If a full `paused` enrollment state is too large for this milestone:** As a minimal fix, stop calling the enrollment update on pause at all. Instead, make the cron processor's touch claim query filter by `campaign.status = 'active'`. This means enrolled customers freeze automatically (cron skips paused campaign's due touches) and resume automatically (cron processes them again once campaign is active). This requires no enrollment record changes and no data migration.
 
 **Warning signs:**
-- New users starting onboarding after the redesign land on wrong step
-- Existing draft users see Zod validation errors in console log at load
-- Step numbers in URL params (`?step=6`) land on wrong step content after renumbering
+- After pausing and resuming a campaign, jobs that were previously "Enrolled" now show "Stopped" in the drawer
+- Dashboard "Active Sequences" KPI drops to zero after a pause even though the campaign was quickly re-enabled
+- Customers stop receiving touches mid-sequence after a campaign toggle
 
-**Phase to address:** Onboarding consolidation phase — schema versioning must be decided before implementing step removal
+**Phase to address:** Must be the first task in any campaign pause/resume work — do not address the UI for the toggle switch until the underlying state behavior is correct
 
 ---
 
-### Pitfall 7: Campaign Edit Page — Fixing Underlying Bugs Must Precede Visual Redesign
+### Pitfall 2: Sparkline Charts Break SSR — Server Component KPI Cards Cannot Render Them
 
 **What goes wrong:**
-The campaign form (`components/campaigns/campaign-form.tsx`) has reported save bugs. If the redesign phase reflows the form's layout and component hierarchy without first fixing the underlying data bug, the redesign obscures the bug further. Post-redesign debugging becomes harder because visual changes and functional changes are entangled in the same diff.
+`kpi-widgets.tsx` is currently a `'use client'` component that renders KPI values. If sparkline charts are added using Recharts (or any chart library), those libraries access `window`, `document`, or `ResizeObserver` at module load time. In a Next.js App Router setup, even `'use client'` components are server-rendered on first load (SSR). Chart library initialization that touches browser globals crashes the initial render with `ReferenceError: window is not defined`.
 
 **Why it happens:**
-Design changes are visually apparent and feel like forward progress. Functional bugs are less visible. The instinct is to "clean up the visual first, fix the bug in the next pass." But changing form structure (adding tabs, reordering fields, changing Submit button hierarchy) can shift form submission behavior and mask or alter existing bugs.
+The distinction between "client component" and "server-rendered" is often misunderstood. In Next.js App Router, `'use client'` means the component ships JavaScript to the browser and runs interactively, but the component is still rendered once on the server to produce the initial HTML. A chart library that calls `window.innerWidth` during module initialization (not inside an effect or event handler) runs on the server and crashes.
 
-The campaign form uses `react-hook-form` with `zodResolver`. Touch sequence editor (`TouchSequenceEditor`) is a nested controller. Bugs in touch data not being submitted correctly are invisible to visual inspection.
+Recharts specifically is known to trigger this — it uses ResizeObserver and window internally.
 
-**How to avoid:**
-- File a discrete bug ticket for each known campaign/jobs functional issue before beginning that section's visual redesign
-- Fix and merge the functional bug first (small, targeted diff)
-- Then apply the visual redesign (larger, clearly visual diff)
-- Verify the bug fix still passes after the visual change by running the same reproduction steps
+**Consequences:**
+- The entire KPI row fails to render (white card area or hydration error)
+- The error only appears when the chart data is non-empty (edge case: empty arrays skip the chart render path, masking the bug in development with no data)
+- Next.js hydration errors show as client-side console warnings that appear to be style-only mismatches — easy to miss during review
+
+**Prevention strategy:**
+Wrap any chart component with `dynamic()` and `ssr: false`:
+
+```typescript
+// In kpi-widgets.tsx
+import dynamic from 'next/dynamic'
+
+const SparklineChart = dynamic(
+  () => import('@/components/ui/sparkline-chart'),
+  { ssr: false, loading: () => <div className="h-8 w-16" /> }
+)
+```
+
+The loading state placeholder should match the chart's rendered dimensions to prevent layout shift. Ensure the chart component file begins with `'use client'` and all chart initialization is inside the component body (not module scope).
+
+**Alternative:** Use a pure SVG sparkline rendered as a static server component — no library required, no SSR risk, minimal bundle size. A simple polyline drawn from data points avoids this category of problem entirely for dashboard KPIs where interactivity is not needed.
 
 **Warning signs:**
-- Campaign save appears to succeed (no error toast) but touch sequences aren't persisted
-- Jobs creation form submits but customer record isn't created
-- After the redesign, a bug that "was there before" is now "worse" — the redesign changed behavior accidentally
+- Build succeeds but production crashes on first KPI page load
+- Console shows "ReferenceError: window is not defined" in server logs
+- Works in development (`next dev` disables strict SSR in some edge cases) but fails in production build
 
-**Phase to address:** First task in any campaign or jobs redesign phase — fix bugs in isolation before visual changes
+**Phase to address:** Before importing any chart library — the dynamic import wrapper must be in place before any chart code is merged
+
+---
+
+### Pitfall 3: Replacing Native Select With Radix Select Breaks Form State on Reset and Submission
+
+**What goes wrong:**
+`add-job-sheet.tsx` (line 277) and `service-type-select.tsx` use a native `<select>` element. Migrating to Radix UI `Select` while the form uses `useActionState` (not react-hook-form) introduces two failure modes:
+
+1. **`onValueChange` vs `onChange` mismatch:** Radix `Select.Root` does not fire a standard DOM `onChange` event. It uses `onValueChange` (a Radix-specific prop). Any code expecting a synthetic event (e.g., `(e) => setServiceType(e.target.value as ServiceType)`) receives `undefined` silently — the state never updates, the form submits the empty string for service type.
+
+2. **`reset()` does not clear the visible selection:** The `useEffect` reset pattern in `add-job-sheet.tsx` (lines 71–83) calls `setServiceType('')` on sheet close. With native select, this clears the visible field. With Radix Select, clearing the controlled `value` prop to `''` may not visually reset the displayed item — Radix Select treats `''` and `undefined` differently for placeholder rendering. The user reopens the sheet and sees a stale service type.
+
+**Note on current form pattern:** `add-job-sheet.tsx` uses `useActionState` + `formAction`, not react-hook-form. The service type is managed via a `useState` that is manually injected into `FormData` at submit time (line 131: `formData.set('serviceType', serviceType)`). The Radix Select replacement must wire `onValueChange` to the same `setServiceType` state setter, not to any `onChange` prop.
+
+**Consequences:**
+- Jobs created with wrong or empty service type
+- Campaign matching fails (no matching campaign found for empty service type)
+- Dashboard "Ready to Complete" queue shows these jobs as unenrollable
+
+**Prevention strategy:**
+When replacing the native select:
+```typescript
+// Wrong — native select pattern, won't fire for Radix
+<select onChange={(e) => setServiceType(e.target.value as ServiceType)}>
+
+// Correct — Radix pattern
+<Select value={serviceType} onValueChange={(val) => setServiceType(val as ServiceType)}>
+```
+
+For the reset behavior, use `value={serviceType || undefined}` rather than `value={serviceType || ''}` — passing `undefined` triggers Radix Select to show the placeholder text, while `''` may display a blank selected item.
+
+Test the full add-job flow after migration: open sheet, select type, submit → job has correct service type. Open again → shows placeholder. This is the acceptance test for the migration.
+
+**Warning signs:**
+- Jobs created after migration have `service_type = ''` in the database
+- Radix Select shows previous selection after sheet reopens
+- TypeScript compiles without error (the `onValueChange` type signature is `(value: string) => void` — it won't catch wiring to `onChange`)
+
+**Phase to address:** The native → Radix migration task must include an explicit form state test, not just a visual verification
 
 ---
 
 ## Moderate Pitfalls
 
-These cause delays or regressions that are fixable but expensive to discover late.
+These cause delays, hard-to-debug issues, or technical debt that compounds over subsequent phases.
 
 ---
 
-### Pitfall 8: Status Color Distinguishability in a Warm Palette
+### Pitfall 4: Adding a New Button Variant Breaks `data-variant` Attribute Selectors Elsewhere
 
 **What goes wrong:**
-The existing status system has five distinct states:
-- `status-pending` (cool gray-blue)
-- `status-delivered` (teal)
-- `status-clicked` (amber/orange)
-- `status-failed` (red)
-- `status-reviewed` (green)
+`button.tsx` uses `data-variant={variant}` (line 56). If any CSS rule, test selector, or Playwright assertion targets `[data-variant="outline"]` or similar, adding a new variant (e.g., `"soft"`) does not break those selectors — but if the new variant is used where `"outline"` was expected (e.g., replacing outline buttons with soft buttons as part of a hierarchy fix), those selectors silently match zero elements.
 
-A warm palette migration shifts the neutral base toward amber/gold. The `status-clicked` amber-orange badge now reads as "normal/neutral" because the surrounding UI is also amber-toned. The signal-to-noise ratio collapses — "clicked" looks like default, not a meaningful state.
-
-**How to avoid:**
-- Test the full status badge set against the new warm background before finalizing tokens
-- `status-clicked` may need to shift toward orange-red in a warm palette to maintain distinctiveness
-- `status-pending` needs to remain clearly distinguishable from the background; a warm neutral muted tone needs more contrast than the current cool gray provides
-- Run the visual test: display all five status badges side by side on the new warm `--background`. If any badge reads as "background-level noise", adjust that badge's hue/saturation
-
-**Warning signs:**
-- Activity page status badges look similar to the card backgrounds after migration
-- "Clicked" status looks identical to "Pending" in the new palette
-- Users ask "is this badge an error or normal?" — loss of semantic clarity
-
-**Phase to address:** Phase 2 (Token Definition) — status token calibration alongside main palette decisions
-
----
-
-### Pitfall 9: Hardcoded `bg-[#F2F2F2]` Active State Breaks Sidebar Logic
-
-**What goes wrong:**
-The sidebar active nav item state uses `bg-[#F2F2F2]` (hardcoded hex) for light mode. When the background warms (to an off-white with warm tint), the active state `#F2F2F2` is a noticeably cooler gray. The visual accent of "I'm on this page" weakens or looks wrong.
+The more common failure: adding a new variant without auditing all call sites where the old variant was used. If `"soft"` is semantically equivalent to `"outline"` but with reduced border weight, developers will selectively apply it, creating visual inconsistency within the same page.
 
 **Why it happens:**
-This is the specific pattern:
-```typescript
-// sidebar.tsx line 89-90
-? "bg-[#F2F2F2] dark:bg-muted text-foreground"
-: "text-foreground/70 dark:text-muted-foreground hover:bg-[#F2F2F2]/70 dark:hover:bg-muted/70"
+CVA variants are type-safe — TypeScript enforces valid variant names. But TypeScript cannot enforce "use this variant for this semantic context." Without a clear semantic rule for when to use `soft` vs `outline` vs `ghost`, each developer makes a different call. The codebase already has this tension: job detail drawer action buttons use `variant="outline"` with custom className overrides to change their appearance, rather than a purpose-built variant.
+
+**Consequences:**
+- Multiple components use the new variant for different purposes (some as "secondary action", some as "informational", some as "de-emphasized primary")
+- Future phases must audit which variant means what, across all components
+- Design system documentation (if any) becomes stale
+
+**Prevention strategy:**
+Before adding any new variant, define its semantic contract:
+- What it communicates (hierarchy, emphasis, danger level)
+- When to use it vs existing variants
+- Which existing usages it replaces
+
+Document this in a comment block in `button.tsx` above the variant definition. Add the new variant to the TypeScript union type last — after the semantic contract is written — to prevent premature adoption across the codebase.
+
+**Warning signs:**
+- The same new variant appears in 10+ components within 2 days of adding it
+- PR review comments say "I'm not sure which variant to use here"
+- Visual QA finds the same action button using three different variants across different drawers
+
+**Phase to address:** Variant definition task — write the semantic contract in the PR description before touching any component
+
+---
+
+### Pitfall 5: Drawer Consistency Refactor Breaks Existing Scroll and Focus Behavior
+
+**What goes wrong:**
+Multiple drawers in the codebase (`job-detail-drawer.tsx`, `customer-detail-drawer.tsx`, `add-job-sheet.tsx`, `edit-job-sheet.tsx`, `add-customer-sheet.tsx`, `edit-customer-sheet.tsx`) all use `<SheetContent className="... overflow-y-auto">` individually. When consolidating to a shared structure (white bg content grouping, sticky bottom buttons), three specific failures arise:
+
+**1. Sticky footer inside overflow-y-auto requires specific flex structure:**
+The current `SheetContent` renders as `flex flex-col` (line 63 of `sheet.tsx`). The sticky footer pattern requires the content area to grow (`flex-1 overflow-y-auto`) with the footer in a sibling `div` at flex level. If the footer is placed inside the scrollable area and uses `position: sticky; bottom: 0`, it will scroll away rather than stay fixed — because `position: sticky` binds to the nearest scroll container ancestor, and if the footer's parent is the same `overflow-y: auto` div that contains all the content, the sticky element will only stick at the bottom of its own scrollable parent.
+
+**Correct flex structure:**
+```tsx
+<SheetContent className="flex flex-col">
+  <SheetHeader>...</SheetHeader>         {/* fixed at top */}
+  <div className="flex-1 overflow-y-auto px-6">  {/* scrolls */}
+    {/* content sections */}
+  </div>
+  <div className="shrink-0 p-6 border-t bg-background">  {/* fixed at bottom */}
+    {/* action buttons */}
+  </div>
+</SheetContent>
 ```
-Dark mode already uses `bg-muted` (a token). Light mode uses `#F2F2F2` (hardcoded). The migration must convert the light mode value to a token. The correct token is `bg-muted`, which then gets its value updated in globals.css as part of the warm migration.
 
-**How to avoid:**
-Replace `bg-[#F2F2F2]` with `bg-muted` and `hover:bg-[#F2F2F2]/70` with `hover:bg-muted/70` across sidebar and notification bell BEFORE changing token values. Then the CSS variable change propagates correctly to the sidebar active state.
+**2. Auto-save notes debounce in customer-detail-drawer.tsx:**
+`customer-detail-drawer.tsx` has an auto-save mechanism using `timeoutRef` and `notesRef` (lines 51–96). It flushes pending notes on drawer close via `useEffect`. If the drawer layout is restructured (adding wrapper divs, changing the scroll container), the `Textarea` component may be inside a new scrollable context — this does not break the auto-save, but moving the notes textarea above or below the separator as part of visual reordering can change what the user sees when they first open the drawer, which affects adoption.
+
+**3. Focus restoration after drawer close:**
+Radix `Sheet` (via `SheetPrimitive.Content`) manages focus trap and focus restoration automatically. Adding `overflow-y-auto` to an inner div wrapper (rather than to `SheetContent` itself) breaks the Radix focus trap in some versions — the trap targets elements inside `SheetContent` by default, and if the inner scrollable div has `tabIndex=-1` or similar, it may capture the initial focus.
 
 **Warning signs:**
-- After migration, the active sidebar item has a different shade than the hover state on other items
-- Light and dark mode sidebar active states look inconsistent with each other
-- The "selected" effect disappears or becomes invisible on warm backgrounds
+- Action buttons scroll away with content instead of staying fixed at the bottom
+- Focus is placed on the first form field instead of the drawer header on open
+- On mobile, keyboard appearance pushes the sticky footer off-screen
+- Notes auto-save stops firing after layout restructure
 
-**Phase to address:** Phase 1 (Token Audit) — this is a specific replacement that must be in the first pass
+**Phase to address:** Before restructuring any drawer — establish the flex/overflow structure in a single drawer first, verify focus behavior, verify sticky footer, then apply the pattern to remaining drawers
 
 ---
 
-### Pitfall 10: `next-themes` Dark Mode Applies Class, Not Media Query — Test Both Paths
+### Pitfall 6: White Background Content Grouping Creates Z-Index Conflicts With Radix Portal Overlays
 
 **What goes wrong:**
-`next-themes` applies dark mode via the `.dark` CSS class on `<html>`, not via `prefers-color-scheme` media query. The system checks for class-based tokens only. If any styles use `@media (prefers-color-scheme: dark)` instead of `.dark {}` selectors, they won't respond to the theme toggle — they'll only respond to OS-level setting changes.
+Adding `bg-white rounded-lg` sections inside a drawer (for visual grouping) creates new stacking contexts if those sections also have `shadow-sm` or `overflow: hidden`. Radix `Sheet` renders in a portal at z-50. Tooltip, Dropdown, and AlertDialog components used inside drawers (already present in `job-detail-drawer.tsx` — see lines 638–668 for AlertDialog, lines 239–264 for conflict resolution buttons with Tooltip) also render in portals at their own z-index values.
 
-**Why it happens:**
-Developers mix the two systems. New styles added during redesign might use the media query (standard CSS instinct) while the existing system uses class-based theming. The bug is invisible when testing with the app's own toggle but breaks when a user has their OS set to dark and the app theme set to light (or vice versa).
+If white grouped sections have `position: relative` + `overflow: hidden` or `transform`, they create a new stacking context. This can make Radix portal-rendered dropdowns and tooltips appear behind the grouped section rather than above the drawer overlay.
 
-**How to avoid:**
-- All dark mode CSS in globals.css must be inside `.dark {}` selectors, never inside `@media (prefers-color-scheme: dark)`
-- The only media query usage is for `prefers-reduced-motion` (already correct in the codebase)
-- When adding any new CSS rules during redesign, verify dark mode is `.dark {}` not `@media`
-- Test by: (1) Set OS to light mode, use toggle to switch app to dark → verify dark styles apply. (2) Set OS to dark mode, toggle app to light → verify light styles apply.
+**Specific risk in this codebase:**
+`job-detail-drawer.tsx` renders an `AlertDialog` as a sibling to `Sheet` (lines 638–668). This is outside the Sheet portal, which is correct. But any inner Tooltip or DropdownMenu inside the Sheet renders into the document body portal. If a white grouped section has `z-index: 1` (or any stacking-context-creating property), the portal's `z-50` may still render behind the grouped section's stacking context.
+
+**Prevention strategy:**
+Avoid setting explicit z-index values on content grouping containers. Use `bg-background` or `bg-muted/30` for sectioning rather than `bg-white rounded-lg shadow-sm`. If a shadow is required, use `ring-1 ring-border` (which does not create a stacking context) rather than `box-shadow`.
 
 **Warning signs:**
-- Dark mode looks different when using the in-app toggle vs. setting OS dark mode
-- Some elements flip to dark on OS preference change without the user toggling the app theme
-- Newly added CSS "doesn't seem to respect the theme toggle"
+- Tooltips inside the drawer appear behind a content section
+- Dropdown menus inside the drawer are cut off or hidden behind grouping containers
+- AlertDialog that was working before the layout change no longer appears on top
 
-**Phase to address:** Phase 2 (Token Definition) — establish the rule at the start of CSS work, verify in testing
+**Phase to address:** Content grouping implementation — test all portal-rendered elements (Tooltip, AlertDialog, DropdownMenu) inside each drawer after adding white bg sections
 
 ---
 
-### Pitfall 11: Button Variant System Must Be Reviewed When Primary Color Changes
+### Pitfall 7: Conflict Cron Processor Re-enrolls Into Paused Campaigns
 
 **What goes wrong:**
-`variant="default"` buttons use `bg-primary` with `hover:bg-primary/90`. When primary shifts from a dark blue (43% lightness) to a warm amber, the foreground text color (`--primary-foreground: 0 0% 98%`) — which is white — may no longer meet contrast requirements against the new lighter amber primary.
+`/api/cron/resolve-enrollment-conflicts/route.ts` (Task A, lines 52–80) auto-resolves stale conflicts by canceling active enrollments and calling `enrollJobInCampaign()`. If at the time of auto-resolution the matching campaign has been paused (status = `'paused'`), `enrollJobInCampaign()` in `lib/actions/enrollment.ts` (lines 207–233) fetches the campaign with `.eq('status', 'active')` — this query returns null for a paused campaign, and the enrollment is skipped with reason "No active campaign for this service type."
 
-Additionally, `variant="outline"` uses `border-border` and `hover:bg-accent`. Since `--accent` currently mirrors `--primary`, a warm primary makes outline hover states warm. This may read as "active" when the user is merely hovering.
+This is actually the correct behavior — but the cron does not update the job's `enrollment_resolution` to indicate why it was skipped. The job remains in `enrollment_resolution='conflict'` state indefinitely, continuing to appear in the dashboard queue even though it was "processed."
 
-**How to avoid:**
-- After defining new `--primary` value, compute contrast ratio of `--primary-foreground` (white, `0 0% 98%`) against new primary
-- If new primary lightness > ~50% HSL, white foreground will fail AA — switch to a dark foreground token
-- Review all button variants in `components/ui/button.tsx` — trace which tokens each variant uses
-- Review `--accent` — if it should no longer mirror `--primary`, decouple them in globals.css
+**The gap:** After the 24-hour stale threshold passes and auto-resolution runs, the job should transition to `enrollment_resolution='skipped'` with an appropriate reason. Currently if `enrollJobInCampaign()` returns `skipped: true` (no active campaign), the cron does nothing to update the job's resolution state.
 
 **Warning signs:**
-- White text on warm amber button fails contrast check
-- Outline hover state looks "selected" rather than just "hovered"
-- Ghost buttons are invisible because `hover:bg-accent` is now too warm for the context
+- Dashboard shows the same "conflict" jobs for days even after the auto-resolution cron runs
+- Jobs that should have self-resolved remain in the queue permanently
+- Pausing a campaign causes a spike in unresolvable conflict states in the queue
 
-**Phase to address:** Phase 2 (Token Definition) and Phase 3 (Component Review) — token-to-variant mapping review
-
----
-
-## Technical Debt Patterns
-
-| Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
-|----------|-------------------|----------------|-----------------|
-| Change only `:root` tokens, don't audit hardcoded classes | Fast initial visual | Components with hardcoded colors stay broken; discovered by QA or users | Never — audit first |
-| Define dark mode tokens as simple lightness inversion | Quick parity | Warm tones read muddy/brown in dark mode | Never for warm palettes |
-| Skip contrast checks on "decorative" elements | Saves time | Fails accessibility audit, legally risky if required | Never — even decorative elements should not actively fail |
-| Keep inline semantic colors (amber-600, blue-50) during migration | Less work now | Two parallel color systems that diverge over time | Only if a dedicated cleanup phase is explicitly planned |
-| Redesign campaign form without fixing save bugs first | Visual progress visible immediately | Bug becomes harder to isolate, mixed in with visual diff | Never — functional bugs first |
-| Remove onboarding step without versioning the draft storage key | Simpler code | Existing partial drafts may corrupt to wrong step | Never — always version the key |
+**Phase to address:** Campaign pause/resume fix phase — check the cron's handling of the `skipped` enrollment result and ensure the job record is updated appropriately
 
 ---
 
-## Integration Gotchas
+### Pitfall 8: KPI Sparkline Data Fetching Adds Latency to an Already-Server-Rendered Page
 
-| Integration | Common Mistake | Correct Approach |
-|-------------|----------------|------------------|
-| `next-themes` | Using `@media (prefers-color-scheme: dark)` instead of `.dark {}` | All dark mode CSS uses `.dark {}` class selector exclusively |
-| Tailwind JIT | Assuming dynamic class construction works with warm colors | Any dynamic class like `bg-${color}-500` must be in safelist or use static strings |
-| Radix UI primitives | Overriding Radix color props directly instead of via CSS variables | Override via CSS variables only — Radix respects the cascade |
-| shadcn components | Adding new shadcn components that import their own color assumptions | Check each new shadcn component for color token usage before adding |
+**What goes wrong:**
+Dashboard KPIs (`getDashboardKPIs()`) are fetched server-side in the dashboard page. Adding sparkline historical data (e.g., "reviews per day for the last 7 days" for each KPI) means either:
+
+- Adding the time-series query to the existing server-side fetch (increases sequential DB query latency), or
+- Loading sparkline data client-side after initial render (creates layout shift as charts pop in)
+
+The existing `KPIWidgetsSkeleton` only accounts for the current value display — it does not include a sparkline placeholder. If sparklines load after the skeleton, the card height changes when sparklines appear, causing a layout shift visible to users.
+
+**Prevention strategy:**
+Add the sparkline time-series data to the server-side fetch using `Promise.all()` so it is parallel, not sequential. Add sparkline placeholder dimensions to `KPIWidgetsSkeleton` immediately — even if the actual chart is not yet built — to prevent future layout shift:
+
+```tsx
+// Add to KPIWidgetsSkeleton cards
+<Skeleton className="h-8 w-full mt-2" />  {/* sparkline area placeholder */}
+```
+
+For the database query, a 7-day window of `send_logs` grouped by day is likely sufficient. Avoid a separate query per KPI card — one query returning all KPI time-series data is cheaper than three separate queries.
+
+**Warning signs:**
+- Dashboard page load time increases by more than 100ms after adding sparklines
+- KPI cards visibly grow in height after page load (layout shift)
+- Lighthouse CLS score worsens
+
+**Phase to address:** KPI sparkline implementation — time-series query design must be reviewed before writing any chart rendering code
 
 ---
 
-## Performance Traps
+## Minor Pitfalls
 
-| Trap | Symptoms | Prevention | When It Breaks |
-|------|----------|------------|----------------|
-| Adding CSS backdrop-filter for warm frosted effects | Sidebar/modal sluggish on low-end devices | Test on 3-5 year old hardware; prefer solid backgrounds | 60fps drops below 30fps on integrated graphics |
-| Importing CSS variables in JS for color calculations | Forced reflow on every read | Use Tailwind tokens exclusively; avoid `getComputedStyle` for colors | As component count scales |
-| Animating background-color on warm gradients | Gradient transitions are GPU-expensive | Prefer opacity animations over color animations | Mobile — especially iOS Safari |
+These cause visual inconsistency or minor friction but are fixable without structural changes.
+
+---
+
+### Pitfall 9: Dashboard Queue Row White Background + Border Radius at Different Content Heights
+
+**What goes wrong:**
+`ready-to-send-queue.tsx` renders job rows. Some rows have conflict resolution buttons (Replace/Skip/Queue), some have "Mark Complete," some have no actions. Adding `bg-white rounded-lg border` to each row creates height variation — rows with conflict resolution buttons are taller than rows with a single action. In a list context, visually unequal card heights look like an error state rather than intentional design.
+
+**Prevention strategy:**
+Ensure the base row height is consistent regardless of actions shown. Use `min-h-[N]` or a consistent padding rather than content-driven height. If conflict buttons must be shown inline, use a collapsible section (chevron expand) rather than always-visible buttons, which normalizes row height across all states.
+
+**Warning signs:**
+- The queue looks visually unstable when some jobs have conflicts and some do not
+- The list appears to have "broken" items intermixed with normal items
+
+**Phase to address:** Queue row styling task — design the conflict-expanded state before setting the base card dimensions
+
+---
+
+### Pitfall 10: Touch Template Preview Triggers a Fetch Per Row on Open
+
+**What goes wrong:**
+If template preview in the touch sequence editor loads template content on hover or on a preview button click, and there are 4 touches each with a different template, rapid hover or open/close cycling triggers 4 individual template fetches. If fetches are not deduped or cached, this creates noticeable loading jank.
+
+**Prevention strategy:**
+Load all templates for a campaign's touches in a single prefetch when the campaign detail page opens (the data is already available via `campaign_touches.template_id` — the templates can be eager-loaded alongside the touch query). Cache the result in component state. Individual template previews then render from local state, not from individual network requests.
+
+**Warning signs:**
+- Network tab shows multiple sequential `/template/:id` requests when switching between touch previews
+- Preview appears to "reload" each time the same template is opened again
+
+**Phase to address:** Template preview implementation — fetch strategy must be decided before building the preview UI
+
+---
+
+## Integration-Specific Pitfalls
+
+These apply specifically to the integrations in this codebase.
+
+---
+
+### Pitfall 11: Optimistic UI on Campaign Toggle Reverts on Server Error — Must Rollback Enrollment UI Too
+
+**What goes wrong:**
+`campaign-card.tsx` uses optimistic UI for the pause/resume toggle: `setOptimisticStatus(newStatus)` updates the switch visually before the server confirms. If `toggleCampaignStatus()` returns an error, the code correctly reverts `setOptimisticStatus(campaign.status)` (line 50). However, the enrollment data shown in job detail drawers and the dashboard queue is not optimistically updated — it reflects server state after `revalidatePath` fires.
+
+If the new pause behavior changes what `revalidatePath('/campaigns')` and `revalidatePath('/jobs')` invalidate, the optimistic toggle state and the actual enrollment count badges may be out of sync for 1–2 seconds. This is a cosmetic issue but looks like a data loading error to users who toggle and immediately check job statuses.
+
+**Prevention strategy:**
+No change needed if `revalidatePath` is called correctly (already done in `toggleCampaignStatus`). Ensure any new enrollment freeze-in-place logic also calls `revalidatePath('/dashboard')` — currently missing from `toggleCampaignStatus`.
+
+**Warning signs:**
+- Campaign toggle switch snaps back to previous position after 2 seconds (server error)
+- Dashboard KPI for "Active Sequences" shows wrong count immediately after toggle
+
+---
+
+### Pitfall 12: Native Select Inconsistency Across Form Contexts After Partial Migration
+
+**What goes wrong:**
+`add-job-sheet.tsx` has two native `<select>` elements: the status select (line 277) and the service type select (which uses `ServiceTypeSelect` component — itself a native `<select>`). If only one is migrated to Radix Select and the other is not, the two selects have different visual heights, focus ring styles, and dark mode behavior within the same form. The mismatch is obvious in side-by-side layout and requires a follow-up pass to fix.
+
+**Prevention strategy:**
+Migrate both selects in `add-job-sheet.tsx` in the same PR. If the edit job sheet (`edit-job-sheet.tsx`) also has native selects, include those in the same migration. A partial migration is worse than no migration — it creates two parallel visual systems within a single form.
+
+**Warning signs:**
+- Two select dropdowns in the same form have different heights (Radix `h-10` vs native `h-9`)
+- One select shows a custom styled dropdown list; the other shows the OS native picker on mobile
+- Focus ring styles differ between the two selects
+
+---
+
+## Phase-Specific Warnings
+
+| Phase Topic | Likely Pitfall | Mitigation |
+|-------------|---------------|------------|
+| Campaign pause/resume fix | Enrollment permanent termination (Pitfall 1) | Add cron campaign-status guard before touching UI |
+| Sparkline charts | SSR crash with `window is not defined` (Pitfall 2) | Use `dynamic` + `ssr: false` or pure SVG; add loading placeholder |
+| Radix Select migration | `onValueChange` / `onChange` mismatch (Pitfall 3) | Test full form submit flow, not just visual appearance |
+| New button variant | Semantic drift without contract (Pitfall 4) | Write semantic contract in PR before adding variant |
+| Drawer consistency refactor | Sticky footer inside scroll container (Pitfall 5) | Establish flex structure in one drawer, verify, then replicate |
+| White bg content grouping | Stacking context breaks Radix portals (Pitfall 6) | Test Tooltip and AlertDialog inside each refactored drawer |
+| Conflict cron + paused campaigns | Stale conflict jobs never clear (Pitfall 7) | Update job resolution state when enrollment is skipped |
+| KPI sparklines | Server-side latency + layout shift (Pitfall 8) | Parallel fetch, add skeleton placeholder dimensions immediately |
+| Queue row restyling | Height inconsistency for conflict rows (Pitfall 9) | Define base height before picking conflict button layout |
+| Touch template preview | Per-row fetch on open (Pitfall 10) | Eager-load all touch templates with campaign fetch |
+| Campaign toggle optimistic UI | `revalidatePath('/dashboard')` missing (Pitfall 11) | Add dashboard revalidation to `toggleCampaignStatus` |
+| Partial Radix Select migration | Visual inconsistency between migrated and unmigrated selects (Pitfall 12) | Migrate all selects in one component in the same PR |
 
 ---
 
 ## "Looks Done But Isn't" Checklist
 
-- [ ] **Token audit complete:** Run grep for all hardcoded hex values (`bg-\[#`) and semantic colors (`bg-amber-\|bg-blue-`) — count must be zero or explicitly accounted for
-- [ ] **Dark mode warm:** View every page in dark mode after migration — warm quality should be visible, not muddy brown
-- [ ] **Contrast verified:** Use browser accessibility panel on at least: primary button text, muted-foreground text on background, each status badge text on its background
-- [ ] **Status badges distinguishable:** View all five status badges side by side on new warm background — each must read as semantically distinct
-- [ ] **Sidebar active state:** Confirm active and hover states are visually distinguishable in both modes after `bg-[#F2F2F2]` replacement
-- [ ] **Campaign form bug fixed:** Reproduce the known campaign save bug before starting visual redesign of that section; verify fix is isolated and merged first
-- [ ] **Manual request data preserved:** Confirm all queries from `/send/page.tsx` have known destinations before removing the page
-- [ ] **Onboarding draft versioned:** If any steps removed or renumbered, confirm `STORAGE_KEY` is incremented and existing drafts are handled gracefully
-- [ ] **Button foreground contrast:** White text on new primary button passes 4.5:1 — measure with actual new HSL value, not eyeballed
-- [ ] **next-themes dark mode:** All new CSS uses `.dark {}` not `@media (prefers-color-scheme: dark)`
+- [ ] **Campaign pause behavior:** After pause + resume, a job that was mid-sequence shows "Active" not "Stopped" in job detail drawer
+- [ ] **Sparkline SSR:** `pnpm build` succeeds without `window is not defined` errors in server logs
+- [ ] **Radix Select form state:** Creating a job with Radix service type select submits the correct service type to the database (verify in Supabase dashboard, not just the toast message)
+- [ ] **Radix Select reset:** After closing and reopening Add Job sheet, service type shows placeholder (not previous selection)
+- [ ] **Sticky footer mobile:** On a mobile viewport (375px), action buttons remain visible when the drawer content scrolls
+- [ ] **Sticky footer not scrolling away:** Drawer content area scrolls independently of the action buttons
+- [ ] **Tooltip inside refactored drawer:** All tooltips in job detail drawer appear above all content sections
+- [ ] **AlertDialog inside refactored drawer:** "Replace active sequence?" confirmation dialog appears above the drawer overlay
+- [ ] **Conflict cron after pause:** Pausing a campaign, waiting 24 hours (or triggering cron manually), verifying stale conflicts do not remain stuck in `enrollment_resolution='conflict'` state
+- [ ] **Button variant coverage:** Grep for the new variant name shows it appears only in contexts matching its semantic definition
 
 ---
 
@@ -416,44 +403,30 @@ Additionally, `variant="outline"` uses `border-border` and `hover:bg-accent`. Si
 
 | Pitfall | Recovery Cost | Recovery Steps |
 |---------|---------------|----------------|
-| Shipped warm palette with hardcoded colors still present | MEDIUM | Audit and replace hardcoded values; targeted CSS deploy |
-| Dark mode tokens look muddy | LOW | Adjust `.dark` HSL values; no component changes needed |
-| Contrast failures on primary button | LOW-MEDIUM | Change `--primary-foreground` token; verify all button variants |
-| Status badges lose distinctiveness | LOW | Adjust `--status-clicked-*` hue to orange-red range |
-| Onboarding drafts corrupted by step removal | MEDIUM | Bump storage key version; display "your progress was reset" message |
-| Manual request data lost after page removal | HIGH | Re-add queries to destination page; requires careful tracing of data dependencies |
-| Campaign form bug obscured by redesign diff | HIGH | Revert visual changes, fix bug in isolation, reapply visual changes |
-
----
-
-## Pitfall-to-Phase Mapping
-
-| Pitfall | Prevention Phase | Verification |
-|---------|------------------|--------------|
-| Hardcoded colors bypass token system | Phase 1: Token Audit | Zero grep results for `bg-\[#`, `text-\[#`, `border-\[#` |
-| Dark mode warm calibration | Phase 2: Token Values | Manual dark mode review of all 8 dashboard pages |
-| Warm text fails WCAG contrast | Phase 2: Token Values | Browser a11y panel shows zero contrast violations |
-| Semantic color leakage | Phase 1: Token Audit + Phase 3: Components | All inline amber/blue/green/red semantic classes replaced with tokens |
-| Manual request page data loss | Navigation consolidation phase | Dashboard and activity page still show all five data points previously on send page |
-| Onboarding step removal breaks draft | Onboarding redesign phase | Existing draft → new wizard → lands on correct step or gracefully resets |
-| Campaign bugs entangled with visual changes | Campaign redesign phase | Bug reproduction case documented and resolved before visual PR opens |
-| Status badge distinguishability | Phase 2: Token Values | Five-badge side-by-side visual test on new background |
-| Sidebar active state `#F2F2F2` | Phase 1: Token Audit | Sidebar active and hover states use `bg-muted` not hardcoded hex |
-| Button variant contrast with warm primary | Phase 2: Token Values | Primary button foreground contrast computed ≥ 4.5:1 |
-| `next-themes` class vs media query | Phase 2: Token Values | Search for `@media (prefers-color-scheme)` in CSS returns no results in dark-themed blocks |
+| Enrollment terminated by pause | HIGH | Write migration to find stopped enrollments with `stop_reason='campaign_paused'` in the re-enabled window; re-enroll manually or offer a UI tool to bulk re-enroll |
+| SSR crash from chart library | LOW | Remove chart import, deploy fix, add `dynamic` wrapper, redeploy |
+| Radix Select submitting wrong value | MEDIUM | Fix `onValueChange` wiring; data fix requires identifying affected jobs in DB and prompting user to correct service type |
+| Partial Radix migration mismatch | LOW | Complete the migration in a follow-up PR |
+| Sticky footer scrolling away | LOW | Fix flex structure — structural change only, no data impact |
+| Stacking context breaks portals | MEDIUM | Remove `overflow: hidden` or explicit z-index from content grouping containers |
 
 ---
 
 ## Sources
 
-- Direct codebase inspection: `app/globals.css`, `components/layout/sidebar.tsx`, `app/(dashboard)/send/page.tsx`, `components/onboarding/onboarding-wizard.tsx`, `components/campaigns/campaign-form.tsx`
-- WCAG 2.2 contrast requirements (4.5:1 AA for normal text, 3:1 for large text and UI components)
-- HSL color math for warm tone contrast at mid-range lightness values
-- `next-themes` class-based dark mode behavior (confirmed by existing `.dark {}` CSS structure in codebase)
-- Tailwind CSS JIT token system cascade behavior
-- Existing status token pattern in `app/globals.css` as evidence of correct tokenization approach
+- Direct codebase inspection: `lib/actions/campaign.ts` (toggleCampaignStatus), `lib/actions/enrollment.ts` (enrollJobInCampaign), `components/jobs/job-detail-drawer.tsx`, `components/customers/customer-detail-drawer.tsx`, `components/jobs/add-job-sheet.tsx`, `components/jobs/service-type-select.tsx`, `components/dashboard/kpi-widgets.tsx`, `components/campaigns/campaign-card.tsx`, `components/ui/button.tsx`, `components/ui/sheet.tsx`, `app/api/cron/resolve-enrollment-conflicts/route.ts`
+- [Stop "Window Is Not Defined" in Next.js (2025)](https://dev.to/devin-rosario/stop-window-is-not-defined-in-nextjs-2025-394j) — SSR chart library pitfalls
+- [Recharts + Next.js SSR issue (GitHub)](https://github.com/apexcharts/react-apexcharts/issues/469) — confirmed pattern applies across chart libraries
+- [Getting stuck: all the ways position:sticky can fail](https://polypane.app/blog/getting-stuck-all-the-ways-position-sticky-can-fail/) — overflow-y-auto + sticky footer interaction
+- [Dealing with overflow and position: sticky](https://css-tricks.com/dealing-with-overflow-and-position-sticky/) — CSS-Tricks canonical reference
+- [Radix UI Select reset issue (GitHub)](https://github.com/radix-ui/primitives/issues/1808) — reset() + undefined vs '' behavior
+- [React Hook Form + Radix Select Controller integration](https://www.restack.io/p/radix-ui-select-answer-react-hook-form-cat-ai) — onValueChange vs onChange mismatch
+- [How to Pause/Resume a Prospect in an Active Campaign](https://prospectingtoolkit.tawk.help/article/how-to-pauseresume-a-prospect-in-an-active-campaign) — freeze-in-place reference implementation
+- [HubSpot pause/resume sequence behavior](https://knowledge.hubspot.com/sequences/pause-or-resume-your-sequences) — canonical SaaS pause behavior (resume from exact position)
+- Enrollment state machine: DATA_MODEL.md, enrollment stop_reason enum review
 
 ---
 
-*Pitfalls research for: v2.5 Warm Design System Migration on AvisLoop*
-*Researched: 2026-02-18*
+*Pitfalls research for: v2.5.2 UX Bugs & UI Fixes on AvisLoop*
+*Researched: 2026-02-25*
+*Confidence: HIGH — all critical pitfalls verified against actual code in this codebase*

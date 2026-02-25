@@ -1,19 +1,17 @@
-# Technology Stack: v2.5 UI/UX Redesign — Warm Design System
+# Technology Stack: v2.5.2 UX Bugs & UI Fixes
 
-**Project:** AvisLoop v2.5 — Warm Design System Overhaul
-**Researched:** 2026-02-18
-**Milestone Type:** Subsequent — Design system change to existing Next.js + Tailwind + shadcn/ui app
-**Confidence:** HIGH (based on direct codebase inspection + authoritative knowledge of CSS variable architecture)
+**Project:** AvisLoop v2.5.2 — UX Polish, Drawer Consistency, KPI Redesign
+**Researched:** 2026-02-25
+**Milestone Type:** Subsequent — UX polish on existing Next.js + Supabase + Tailwind + shadcn/ui app
+**Confidence:** HIGH (based on direct codebase inspection + Context7 + authoritative sources)
 
 ---
 
 ## Executive Summary
 
-**Recommendation: Zero new npm dependencies required.**
+**One new dependency is justified. Four areas require no new packages.**
 
-The existing stack (Tailwind CSS 3.4 + CSS custom properties + CVA + shadcn/ui pattern) is already the correct architecture for a warm palette overhaul. All changes are confined to `globals.css` (CSS variable values) and component files (CVA variants, className additions). No Tailwind plugins, no color libraries, no new packages.
-
-The redesign is purely a design token + component variant change. The hard work is picking the right HSL values — the tooling is already there.
+Adding `recharts` (for KPI sparklines) is the only npm change for this milestone. All other concerns — sticky drawer footers, button hierarchy, Radix Select migration, and campaign pause state — are solved with existing tooling: Tailwind flex layout, CVA variant additions, the existing `components/ui/select.tsx`, and a Supabase enrollment model change.
 
 ---
 
@@ -21,473 +19,538 @@ The redesign is purely a design token + component variant change. The hard work 
 
 | Technology | Version | Role |
 |------------|---------|------|
-| Next.js | 15 (latest) | App Router framework |
+| Next.js | 15 (App Router) | Framework |
 | TypeScript | 5.x | Type safety |
 | Tailwind CSS | 3.4.1 | Utility classes |
-| tailwindcss-animate | 1.0.7 | Animation utilities |
-| CSS custom properties | Native | Design token system (HSL-based) |
-| next-themes | 0.4.6 | Dark mode class toggling |
 | class-variance-authority | 0.7.1 | Component variant system (CVA) |
-| @radix-ui/* | Various | Unstyled accessible primitives |
-| @phosphor-icons/react | 2.1.10 | Icon library |
-| Kumbh Sans | Google Fonts | App typeface |
-| lucide-react | 0.511.0 | Partial migration (select, sheet still use it) |
+| @radix-ui/react-select | ^2.2.6 | Already installed — use this, not native `<select>` |
+| @radix-ui/react-dialog | ^1.1.15 | Sheet primitive (via shadcn/ui) |
+| react-hook-form | ^7.71.1 | Form state management |
+| zod | ^4.3.6 | Schema validation |
+| @phosphor-icons/react | ^2.1.10 | Icon library |
+| Supabase | latest | Database + auth |
 
 ---
 
-## What Changes: Design Token Architecture
+## Area 1: Sparkline Charts in KPI Cards
 
-The entire warm palette change is implemented by replacing HSL values in `globals.css` and adding two new semantic tokens. Nothing else changes in the build system.
+### Recommendation: Add `recharts` ^3.7.0
 
-### Principle: Semantic Token Layering
+**Confidence: HIGH** — Verified via npm registry (latest stable: 3.7.0, released January 2025) and shadcn/ui GitHub issue #7669 confirming Recharts v3 is now the recommended version.
 
-The existing system uses a single layer of semantic tokens (`--primary`, `--background`, etc.) mapped directly to HSL values. For the warm redesign, keep the same structure but replace the values. Do NOT add a base token layer (like `--amber-400: ...`). The shadcn/ui pattern uses semantic-only tokens and that pattern works fine here.
+**Why recharts over alternatives:**
 
-**Why this approach:** The entire app already references `bg-primary`, `text-muted-foreground`, `bg-card`, etc. Changing the HSL values behind those tokens propagates the new palette everywhere automatically — no component file changes for basic colors.
+| Option | Bundle Impact | SSR | Tailwind fit | Decision |
+|--------|-------------|-----|-------------|----------|
+| `recharts` ^3.7.0 | ~180kB gzipped | Client-only (requires `"use client"`) | Works with any className | **Use this** |
+| `tremor` SparkChart | ~400kB+ (pulls full UI kit) | Client-only | Tailwind-based | No — brings entire design system |
+| MUI X SparkLineChart | ~500kB+ (MUI dependency tree) | Client-only | No Tailwind | No — conflicts with design system |
+| Handrolled SVG path | ~0kB | SSR-safe | Full control | Viable but high maintenance |
+| `react-sparklines` | ~10kB | Client-only | Manual styling | No — unmaintained, last release 2019 |
 
----
+**Why NOT handrolled SVG:** The codebase uses Recharts via the `shadcn/ui chart` component pattern for the existing analytics page. Adding recharts also enables the full shadcn/ui Chart (`ChartContainer`) ecosystem, which is the correct long-term direction for any future chart work.
 
-## New CSS Variable Values — Light Mode
+**Why recharts v3, not v2:** The shadcn/ui chart component was updated (via PR #8486) to support Recharts v3 API changes. v3 rewrote state management, enabling fixes for long-standing bugs. New projects should use v3. (MEDIUM confidence on exact version pinning — shadcn docs note v3 upgrade in progress; recommending `^3.7.0` with the understanding that the shadcn `chart.tsx` component must be added at the same time using the v3-compatible version.)
 
-Replace the `:root` block in `app/globals.css` with these values:
+**Installation:**
 
-```css
-:root {
-  /* Page background: warm cream-tinted white, not pure gray */
-  --background: 36 20% 96%;          /* #F6F3EE — warm off-white */
+```bash
+pnpm add recharts
+pnpm dlx shadcn@latest add chart
+```
 
-  /* Text: warm near-black, slight brown undertone */
-  --foreground: 24 10% 10%;          /* #1C1814 — warm charcoal */
+The `shadcn add chart` command copies `components/ui/chart.tsx` into the project — a thin wrapper providing `ChartContainer`, `ChartTooltip`, `ChartTooltipContent`, and theme-aware CSS variable bindings.
 
-  /* Cards: clean white with barely-perceptible warmth */
-  --card: 0 0% 100%;                 /* #FFFFFF — stays pure white for contrast */
-  --card-foreground: 24 10% 10%;     /* matches foreground */
+### Sparkline Pattern for KPI Cards
 
-  /* Popovers/dropdowns: same as card */
-  --popover: 0 0% 100%;
-  --popover-foreground: 24 10% 10%;
+A sparkline is a `LineChart` or `AreaChart` with all axes, grid, and legend suppressed. The composition approach (shadcn/ui's philosophy: "you add nothing you don't need") makes this exactly 3 recharts components.
 
-  /* Primary: soft blue for interactive (buttons, links, focus rings) */
-  /* NOT amber — amber is accent, blue remains the action color */
-  --primary: 213 60% 42%;            /* #2B6CB0 — slightly desaturated, warmer blue */
-  --primary-foreground: 0 0% 98%;
+**Minimal sparkline component:**
 
-  /* Secondary: warm light tan for secondary buttons/surfaces */
-  --secondary: 36 25% 91%;           /* #EDE8DF — warm stone */
-  --secondary-foreground: 24 12% 18%;
+```tsx
+'use client'
 
-  /* Muted: warm background for subdued areas */
-  --muted: 36 15% 94%;               /* #F2EEE8 — warm muted */
-  --muted-foreground: 24 8% 46%;     /* #7A7068 — warm gray */
+import { AreaChart, Area, ResponsiveContainer } from 'recharts'
+import { ChartContainer, type ChartConfig } from '@/components/ui/chart'
 
-  /* Accent: amber/gold — the visual differentiator */
-  --accent: 38 92% 50%;              /* #F59E0B — amber-500, warm gold */
-  --accent-foreground: 24 10% 10%;   /* dark text on amber background */
+interface SparklineProps {
+  data: { value: number }[]
+  color?: string
+  className?: string
+}
 
-  /* Border: warm beige-gray, not cold gray */
-  --border: 36 18% 86%;              /* #DDD7CC — warm border */
-  --input: 36 18% 86%;               /* matches border */
-  --ring: 213 60% 42%;               /* matches primary — focus rings stay blue */
+const sparkConfig = { value: { color: 'hsl(var(--chart-1))' } } satisfies ChartConfig
 
-  /* Destructive: unchanged red */
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 0 0% 98%;
+export function Sparkline({ data, color, className }: SparklineProps) {
+  const config = color
+    ? { value: { color } } satisfies ChartConfig
+    : sparkConfig
 
-  /* Border radius: increase slightly for softer feel */
-  --radius: 0.625rem;                /* 10px — up from 8px */
-
-  /* Highlight: new amber surface token for colored card backgrounds */
-  --highlight: 45 95% 94%;           /* #FFFBEB — amber-50 equivalent */
-  --highlight-foreground: 30 80% 25%;/* #7C3A10 — dark amber for contrast */
-
-  /* Surface: new warm card variant */
-  --surface: 36 30% 95%;             /* #F5F0E8 — warm cream surface */
-  --surface-foreground: 24 10% 20%;
-
-  /* Accent colors — kept from existing, can warm them later */
-  --accent-lime: 75 75% 50%;
-  --accent-coral: 0 85% 65%;
-
-  /* Status colors — unchanged, they're correct */
-  --status-pending-bg: 220 14% 96%;
-  --status-pending-text: 220 43% 11%;
-  --status-delivered-bg: 194 33% 94%;
-  --status-delivered-text: 189 57% 40%;
-  --status-clicked-bg: 54 96% 88%;
-  --status-clicked-text: 30 100% 27%;
-  --status-failed-bg: 0 100% 94%;
-  --status-failed-text: 358 100% 38%;
-  --status-reviewed-bg: 138 68% 92%;
-  --status-reviewed-text: 149 100% 25%;
-
-  /* Chart colors: warm-shifted palette */
-  --chart-1: 38 92% 50%;             /* amber */
-  --chart-2: 173 58% 39%;            /* teal — unchanged */
-  --chart-3: 213 60% 42%;            /* soft blue */
-  --chart-4: 27 87% 55%;             /* warm orange */
-  --chart-5: 340 75% 55%;            /* pink — unchanged */
+  return (
+    <ChartContainer config={config} className={cn('h-12 w-full', className)}>
+      <AreaChart data={data} margin={{ top: 2, right: 0, bottom: 0, left: 0 }}>
+        {/* No XAxis, YAxis, CartesianGrid, Tooltip, or Legend */}
+        <Area
+          type="monotone"
+          dataKey="value"
+          stroke="var(--color-value)"
+          fill="var(--color-value)"
+          fillOpacity={0.15}
+          strokeWidth={1.5}
+          dot={false}
+          isAnimationActive={false}
+        />
+      </AreaChart>
+    </ChartContainer>
+  )
 }
 ```
 
-**Key decisions:**
+**Key decisions in this pattern:**
 
-- `--background: 36 20% 96%` gives the warm cream page feel without being yellow. At 96% lightness it reads as off-white but warm, not cold gray.
-- `--accent: 38 92% 50%` is amber-500 (the Tailwind amber scale midpoint). It's used for highlight surfaces and interactive accent elements — not the primary button color.
-- `--primary: 213 60% 42%` keeps blue as the action color. Soft blue + warm amber is the combination described in the milestone brief ("soft blues for interactive, warm amber for accents"). Using amber as the primary button color would fail WCAG AA contrast on light backgrounds.
-- Two new tokens (`--highlight`, `--surface`) added for colored card backgrounds. These do not break any existing component since they are additive.
+- `isAnimationActive={false}` — disables entrance animation on KPI cards, which would be distracting on every dashboard load. Animation is appropriate for standalone chart pages, not sparklines.
+- `margin={{ top: 2, right: 0, bottom: 0, left: 0 }}` — eliminates default Recharts margin that clips the stroke at edges.
+- `fillOpacity={0.15}` — provides a subtle area fill without overwhelming the small card space.
+- `ChartContainer` handles the CSS variable color bindings and responsive sizing. The `min-h` value is required by shadcn's ChartContainer for ResponsiveContainer to work.
 
----
+**SSR handling:** Recharts requires browser APIs. The `Sparkline` component must be a Client Component (`'use client'`). The KPI card data is fetched server-side; the sparkline component receives pre-computed data as props. There is no need for `dynamic(() => import(...), { ssr: false })` because the whole dashboard KPI section is already inside a Client Component (`kpi-widgets.tsx` has `'use client'`).
 
-## New CSS Variable Values — Dark Mode
+**Data shape for sparklines:** KPI cards currently receive `{ value: number, trend: number }`. Extend the `DashboardKPIs` type to include historical data:
 
-Replace the `.dark` block with these values:
+```typescript
+// Current shape
+reviewsThisMonth: { value: number; trend: number }
 
-```css
-.dark {
-  /* Dark background: warm-tinted dark, not pure black */
-  --background: 24 8% 10%;           /* #1C1916 — warm very dark brown */
-  --foreground: 36 15% 92%;          /* #EDE8DF — warm near-white */
-
-  --card: 24 8% 14%;                 /* #231F1C — warm dark card */
-  --card-foreground: 36 15% 92%;
-
-  --popover: 24 8% 14%;
-  --popover-foreground: 36 15% 92%;
-
-  /* Primary: brighter blue for dark backgrounds */
-  --primary: 213 70% 62%;            /* #5B9BD5 — lighter blue for dark mode */
-  --primary-foreground: 24 10% 10%;
-
-  /* Secondary: dark warm surface */
-  --secondary: 24 8% 18%;            /* #2E2923 */
-  --secondary-foreground: 36 15% 88%;
-
-  /* Muted: dark warm muted */
-  --muted: 24 8% 16%;                /* #28231F */
-  --muted-foreground: 36 10% 58%;    /* #9E9590 */
-
-  /* Accent: amber slightly toned down for dark mode readability */
-  --accent: 38 85% 56%;              /* #F6A623 — slightly lighter amber */
-  --accent-foreground: 24 10% 10%;
-
-  --border: 24 8% 22%;               /* #38302B — dark warm border */
-  --input: 24 8% 22%;
-  --ring: 213 70% 62%;               /* matches dark primary */
-
-  --destructive: 0 72% 51%;
-  --destructive-foreground: 0 0% 98%;
-
-  /* Highlight: dark amber surface for colored cards */
-  --highlight: 38 50% 18%;           /* #3D2E10 — dark amber glow */
-  --highlight-foreground: 45 90% 78%;/* #F6D878 — golden text on dark amber */
-
-  /* Surface: dark warm surface variant */
-  --surface: 24 10% 17%;             /* #2B2420 */
-  --surface-foreground: 36 15% 85%;
-
-  --accent-lime: 75 75% 48%;
-  --accent-coral: 0 80% 62%;
-
-  /* Status colors — dark mode equivalents */
-  --status-pending-bg: 220 14% 20%;
-  --status-pending-text: 220 14% 80%;
-  --status-delivered-bg: 189 30% 20%;
-  --status-delivered-text: 189 57% 55%;
-  --status-clicked-bg: 40 40% 20%;
-  --status-clicked-text: 30 80% 65%;
-  --status-failed-bg: 0 40% 20%;
-  --status-failed-text: 358 80% 65%;
-  --status-reviewed-bg: 149 30% 18%;
-  --status-reviewed-text: 149 70% 55%;
-
-  /* Chart colors — dark mode warm */
-  --chart-1: 38 85% 56%;
-  --chart-2: 173 58% 45%;
-  --chart-3: 213 70% 62%;
-  --chart-4: 27 80% 60%;
-  --chart-5: 340 65% 60%;
+// Extended shape for sparklines
+reviewsThisMonth: {
+  value: number
+  trend: number
+  history: { value: number }[]  // 12 data points (months or weeks)
 }
 ```
 
-**Dark mode warmth strategy:** The dark backgrounds use HSL hue 24 (warm brown) instead of hue 0 (neutral gray). At the lightnesses used (8-18%), the warmth is subtle — backgrounds look dark but slightly cozy, not sterile. The amber accent becomes the golden highlight on dark surfaces.
+If historical data is not yet available in the query, pass an empty array — the `Sparkline` component should gracefully render nothing when `data.length < 2`.
 
 ---
 
-## Tailwind Config Changes
+## Area 2: Sticky Drawer Footers in Sheet Components
 
-Add the two new semantic tokens to `tailwind.config.ts`:
+### Recommendation: No new dependency — CSS flex layout change
 
-```typescript
-// tailwind.config.ts — add to the colors object inside theme.extend
-colors: {
-  // ... existing colors unchanged ...
+**Confidence: HIGH** — Verified against shadcn/ui official patterns (`shadcn.io/patterns/sheet-multi-section-5`) and direct inspection of `components/ui/sheet.tsx`.
 
-  // New warm palette additions
-  highlight: {
-    DEFAULT: "hsl(var(--highlight))",
-    foreground: "hsl(var(--highlight-foreground))",
-  },
-  surface: {
-    DEFAULT: "hsl(var(--surface))",
-    foreground: "hsl(var(--surface-foreground))",
-  },
+**Root cause of the current problem:**
 
-  // Rename accent-lime and accent-coral to match their CSS vars
-  // (these are already in the config, no change needed)
-},
-
-borderRadius: {
-  // Increase slightly to match the --radius: 0.625rem change
-  lg: "var(--radius)",              // 10px
-  md: "calc(var(--radius) - 2px)", // 8px
-  sm: "calc(var(--radius) - 4px)", // 6px
-  xl: "calc(var(--radius) + 4px)", // 14px — new, for card containers
-},
+```tsx
+// Current broken pattern in add-job-sheet.tsx (line 169):
+<SheetContent className="overflow-y-auto">
+  <SheetHeader>...</SheetHeader>
+  <form>
+    {/* All content + submit button scrolls together */}
+    <div className="flex justify-end gap-2 pt-4">
+      <Button>Cancel</Button>
+      <Button>Create Job</Button>
+    </div>
+  </form>
+</SheetContent>
 ```
 
-**Why only two new tokens:** `highlight` covers amber-tinted card backgrounds (like the "4 items need attention" banner, KPI card accents, featured sections). `surface` covers the warm cream panels (sidebar backgrounds, form panels, onboarding sections). Every other semantic color already exists.
+`overflow-y-auto` on `SheetContent` causes the entire sheet to scroll, including the submit buttons. When the form is long (as in Add Job with the customer creation mode), the action buttons scroll out of view.
+
+**SheetContent already has `flex flex-col`** (line 63 in `sheet.tsx`): `"bg-background ... fixed z-50 flex flex-col gap-4 shadow-lg px-8 ..."`. The fix is to use this flex column properly with a scrollable middle zone.
+
+**The correct pattern:**
+
+```tsx
+<SheetContent>
+  {/* Header: shrinks to its natural size, stays at top */}
+  <SheetHeader>
+    <SheetTitle>Add Job</SheetTitle>
+    <SheetDescription>...</SheetDescription>
+  </SheetHeader>
+
+  {/* Scrollable body: grows to fill space, scrolls independently */}
+  <div className="flex-1 overflow-y-auto -mx-8 px-8 py-1">
+    {/* All form fields here */}
+  </div>
+
+  {/* Footer: shrinks to its natural size, stays at bottom */}
+  <SheetFooter>
+    <Button variant="outline">Cancel</Button>
+    <Button type="submit">Create Job</Button>
+  </SheetFooter>
+</SheetContent>
+```
+
+**Why `-mx-8 px-8` on the scroll zone:** `SheetContent` has `px-8` padding. To let the scrollbar appear at the sheet edge (not indented), apply negative horizontal margin to cancel the parent padding, then re-apply the same padding inside. This is the standard shadcn approach for nested scrollable areas.
+
+**SheetFooter already has `mt-auto`** (line 101 in `sheet.tsx`): `"mt-auto flex flex-col gap-2 py-8"`. The `mt-auto` pushes the footer to the bottom in a flex column — but only if the body between header and footer does NOT itself have `flex-1 overflow-y-auto`. The current pattern uses `overflow-y-auto` on the entire `SheetContent`, which breaks `mt-auto`. Switching to `flex-1 overflow-y-auto` on the inner scroll zone restores `mt-auto` behavior.
+
+**Files to update:**
+
+| File | Change |
+|------|--------|
+| `components/jobs/add-job-sheet.tsx` | Remove `overflow-y-auto` from `SheetContent`, wrap form fields in `flex-1 overflow-y-auto` div, move buttons to `SheetFooter` |
+| `components/jobs/edit-job-sheet.tsx` | Same pattern |
+| `components/jobs/job-detail-drawer.tsx` | Same pattern (uses `sm:max-w-lg overflow-y-auto`) |
+
+**No changes to `sheet.tsx`** — the component already supports this layout correctly. The issue is usage, not the primitive.
 
 ---
 
-## Card Component Variants
+## Area 3: Button Hierarchy Variants
 
-The current `card.tsx` has `Card` (static) and `InteractiveCard` (hover lift). The redesign needs colored background variants — add CVA to the Card component.
+### Recommendation: Add `soft` variant to CVA — no new dependency
 
-**New card.tsx pattern:**
+**Confidence: HIGH** — Based on direct inspection of `components/ui/button.tsx` and design system best practices from IBM Carbon Design System.
+
+**Current button variants:**
+
+| Variant | Visual | Current Use |
+|---------|--------|-------------|
+| `default` | Filled blue (primary) | Primary actions — too many places |
+| `outline` | Border, no fill | Secondary actions |
+| `secondary` | Warm stone fill | Rarely used |
+| `ghost` | No fill, no border | Icon buttons, table actions |
+| `destructive` | Red fill | Delete/danger actions |
+| `link` | Text underline | Inline links |
+
+**The problem:** Multiple `variant="default"` buttons appear on the same screen (e.g., "Create Job" + "Save" + "Add Customer" on the same page). The Carbon Design System principle: a layout should contain a single high-emphasis button.
+
+**The fix: Add a `soft` variant.**
+
+A "soft" button uses a filled background in a low-saturation tone (muted or secondary) — more prominent than `ghost` or `outline` but clearly subordinate to `default`. This is the missing middle tier.
+
+**Updated `buttonVariants` in `components/ui/button.tsx`:**
 
 ```typescript
-import { cva, type VariantProps } from "class-variance-authority"
-
-const cardVariants = cva(
-  "rounded-lg border text-card-foreground",
+const buttonVariants = cva(
+  // base classes unchanged
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[0.98]",
   {
     variants: {
       variant: {
-        // Default: pure white card (existing behavior)
-        default: "bg-card border-border",
-
-        // Warm surface: cream-tinted for panels and form containers
-        surface: "bg-surface text-surface-foreground border-border",
-
-        // Highlight: amber-tinted for featured items, callouts
-        highlight: "bg-highlight text-highlight-foreground border-amber-200 dark:border-amber-900",
-
-        // Muted: subdued warm background for secondary cards
-        muted: "bg-muted text-foreground border-border",
-
-        // Ghost: no background, no border — for layout containers
-        ghost: "bg-transparent border-transparent",
-
-        // Outlined: explicit border emphasis with warm tint
-        outlined: "bg-background border-border shadow-sm",
+        default:     "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive: "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+        outline:     "border bg-background hover:bg-secondary hover:text-secondary-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
+        secondary:   "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        // NEW: soft — muted fill, no border. Sits between secondary and ghost.
+        // Use for: secondary actions in toolbars, cancel buttons, filter chips
+        soft:        "bg-muted text-foreground hover:bg-muted/80 dark:bg-muted/50 dark:hover:bg-muted/70",
+        ghost:       "hover:bg-muted hover:text-foreground dark:hover:bg-muted/50",
+        link:        "text-primary underline-offset-4 hover:underline motion-safe:hover:translate-y-0 motion-safe:active:scale-100",
       },
-      padding: {
-        none: "",
-        sm: "p-4",
-        default: "p-6",
-        lg: "p-8",
-      },
-      shadow: {
-        none: "",
-        sm: "shadow-sm",
-        default: "shadow",
-        lg: "shadow-lg",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      padding: "none",  // Keep default none so existing `className="p-6"` usages work
-      shadow: "none",
+      // sizes unchanged
     },
   }
 )
 ```
 
-**Usage examples:**
+**Button hierarchy decision guide (for this codebase):**
+
+| Tier | Variant | When to use |
+|------|---------|-------------|
+| Primary | `default` | One per section max — "Create Job", "Save Changes", "Submit" |
+| Secondary | `outline` | Paired with a primary — "Cancel", "Go Back" |
+| Soft | `soft` | Multiple peers on one surface — "Edit", "Duplicate", filter toggles |
+| Tertiary | `ghost` | Icon buttons, table row actions, overflow menus |
+| Danger | `destructive` | Destructive confirms only |
+
+**Why `soft` over `secondary`:** The existing `secondary` variant uses `bg-secondary` (warm stone, `#EDE8DF`). It is already correct but has low contrast between text and background in some states. `soft` uses `bg-muted` which is a slightly more neutral base and the naming makes intent clearer in code review. Both `secondary` and `soft` can coexist — `secondary` for badge-like UI elements, `soft` for button-shaped controls.
+
+**Do NOT add an `amber` or `warning` variant to buttons.** The amber/highlight tokens are for surfaces (cards, banners), not interactive buttons. Amber button backgrounds fail WCAG AA contrast with white text (computed ~2.2:1).
+
+---
+
+## Area 4: Radix Select Migration (Native `<select>` Replacement)
+
+### Recommendation: Replace native `<select>` with existing `components/ui/select.tsx` — no new dependency
+
+**Confidence: HIGH** — `@radix-ui/react-select` is already installed (`^2.2.6` in `package.json`) and `components/ui/select.tsx` is already present. This is a component usage change, not an installation.
+
+**Files using native `<select>`:**
+
+| File | Uses |
+|------|------|
+| `components/jobs/service-type-select.tsx` | Service type selector (`<select>` with manual className) |
+| `components/jobs/add-job-sheet.tsx` | Job status selector (line 277-288) |
+| `components/jobs/edit-job-sheet.tsx` | Job status selector (similar pattern) |
+
+The `components/send/send-settings-bar.tsx` also uses native selects — check during implementation.
+
+**The wiring pattern for uncontrolled Radix Select (no react-hook-form):**
 
 ```tsx
-// Existing usage — no change needed (backward compatible)
-<Card className="p-6">...</Card>
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
-// New: amber callout card (dashboard attention alerts)
-<Card variant="highlight" className="p-4">...</Card>
+// Before (native select):
+<select
+  value={serviceType}
+  onChange={(e) => setServiceType(e.target.value as ServiceType)}
+  className="w-full rounded-md border..."
+>
+  <option value="">Select service type...</option>
+  {availableTypes.map(type => (
+    <option key={type} value={type}>{SERVICE_TYPE_LABELS[type]}</option>
+  ))}
+</select>
 
-// New: warm cream form panel (onboarding steps)
-<Card variant="surface" className="p-6">...</Card>
-
-// New: KPI card with shadow
-<Card variant="outlined" shadow="sm" className="p-6">...</Card>
+// After (Radix Select):
+<Select
+  value={serviceType}
+  onValueChange={(value) => setServiceType(value as ServiceType)}
+>
+  <SelectTrigger>
+    <SelectValue placeholder="Select service type..." />
+  </SelectTrigger>
+  <SelectContent>
+    {availableTypes.map(type => (
+      <SelectItem key={type} value={type}>
+        {SERVICE_TYPE_LABELS[type]}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
 ```
 
-**InteractiveCard:** Keep as-is. The hover lift animation (`-translate-y-1`) works with any variant. Add an optional `arrow` prop later during component implementation — it's a UI feature, not a token.
+**Key difference from native `<select>`:** Radix Select uses `onValueChange` (not `onChange`). The value returned is the string value directly (not an event object). The empty string `value=""` for unselected state is handled via `placeholder` on `SelectValue`, not an empty `<option>`.
+
+**The wiring pattern with react-hook-form (if forms ever adopt RHF):**
+
+```tsx
+import { Controller } from 'react-hook-form'
+
+<Controller
+  name="serviceType"
+  control={control}
+  render={({ field }) => (
+    <Select onValueChange={field.onChange} defaultValue={field.value}>
+      <SelectTrigger>
+        <SelectValue placeholder="Select service type..." />
+      </SelectTrigger>
+      <SelectContent>
+        {availableTypes.map(type => (
+          <SelectItem key={type} value={type}>
+            {SERVICE_TYPE_LABELS[type]}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  )}
+/>
+```
+
+**Note:** The current Add Job and Edit Job forms use `useActionState` + `FormData` (Server Actions pattern), not react-hook-form. The `Controller` wrapper is only needed if migrating to RHF. For now, use the direct `value` / `onValueChange` pattern.
+
+**The empty-value edge case:** Radix Select does not support `value=""` as a meaningful selected option — it treats empty string as "nothing selected." For the service type select (which needs a "Select service type..." placeholder), the `value` prop should be `undefined` when nothing is selected (not `""`), or use the `defaultValue` prop for initial uncontrolled state.
+
+```tsx
+// Replace:
+const [serviceType, setServiceType] = useState<ServiceType | ''>('')
+
+// With:
+const [serviceType, setServiceType] = useState<ServiceType | undefined>(undefined)
+
+// And guard submission:
+if (!serviceType) return // or show validation error
+```
 
 ---
 
-## Form Component Enhancements
+## Area 5: Campaign Pause/Resume — Freeze Enrollment Model
 
-The redesign calls for two form improvements:
+### Recommendation: Add `frozen` status to `campaign_enrollments` — no new npm dependency
 
-### 1. Password Visibility Toggle
+**Confidence: HIGH** — Based on direct inspection of `lib/actions/campaign.ts` and `toggleCampaignStatus` function. The current implementation is destructive: pausing a campaign calls `status = 'stopped'` on all active enrollments. Resuming creates no new enrollments — those customers are permanently dropped.
 
-A new component `PasswordInput` wrapping the existing `Input`. No new dependencies needed — use React state + Phosphor icon.
-
-```typescript
-// components/ui/password-input.tsx
-'use client'
-
-import * as React from "react"
-import { Eye, EyeSlash } from "@phosphor-icons/react"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-
-const PasswordInput = React.forwardRef<
-  HTMLInputElement,
-  React.ComponentProps<"input">
->(({ className, ...props }, ref) => {
-  const [showPassword, setShowPassword] = React.useState(false)
-
-  return (
-    <div className="relative">
-      <Input
-        type={showPassword ? "text" : "password"}
-        className={cn("pr-10", className)}
-        ref={ref}
-        {...props}
-      />
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon-sm"
-        className="absolute right-1 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-        onClick={() => setShowPassword(!showPassword)}
-        aria-label={showPassword ? "Hide password" : "Show password"}
-      >
-        {showPassword
-          ? <EyeSlash size={16} weight="regular" />
-          : <Eye size={16} weight="regular" />
-        }
-      </Button>
-    </div>
-  )
-})
-PasswordInput.displayName = "PasswordInput"
-
-export { PasswordInput }
-```
-
-**Why no library:** `react-password-strength-meter`, `@hookform/resolvers` extensions, etc. add weight for a 15-line component. Phosphor already has `Eye` and `EyeSlash` icons. This is a composable pattern.
-
-### 2. Smart Field (Name vs Email Detection)
-
-For the Jobs "Add Job" sheet, the brief mentions a smart field that detects whether the user is typing a name or email. This is pure logic in a client component — no dependency needed.
+**Current broken behavior (line 461-471 in `lib/actions/campaign.ts`):**
 
 ```typescript
-// Pattern: detect @ symbol to switch label hint
-const isEmail = value.includes('@')
-const label = isEmail ? 'Email' : 'Customer name or email'
-const inputType = isEmail ? 'email' : 'text'
+// PROBLEM: pause is DESTRUCTIVE — enrollments are stopped, not paused
+if (newStatus === 'paused') {
+  await supabase
+    .from('campaign_enrollments')
+    .update({
+      status: 'stopped',          // <-- permanent. Cannot be reversed.
+      stop_reason: 'campaign_paused',
+      stopped_at: new Date().toISOString(),
+    })
+    .eq('campaign_id', campaignId)
+    .eq('status', 'active')
+}
+// Resume does nothing to enrollments — they are already stopped.
 ```
 
-This goes in the specific job form component, not as a shared UI primitive. No new component file needed at the design system level.
+**The correct mental model:** Pausing a campaign should FREEZE active enrollments, not stop them. Resuming should UNFREEZE them — the cron processor skips frozen enrollments until they are active again.
 
-### 3. Input Warm Styling
+**Implementation approach: Add `frozen` status to `campaign_enrollments`**
 
-The existing `input.tsx` uses `h-9` (36px, below 44px touch minimum). The warm redesign is a good moment to fix this. Update the base input class:
+Option A (schema addition — recommended):
+- Add `frozen` as a valid value for `campaign_enrollments.status`
+- Pause sets `status = 'frozen'`
+- Resume sets `status = 'active'` on all `frozen` enrollments for that campaign
+- Cron processor already queries `WHERE status = 'active'` — frozen enrollments are automatically skipped
+
+Option B (separate `paused_at` timestamp column):
+- Add `paused_at TIMESTAMPTZ` to `campaign_enrollments`
+- Pause sets `paused_at = now()`; enrollments remain `status = 'active'` but cron skips rows WHERE `paused_at IS NOT NULL`
+- Resume sets `paused_at = NULL`
+
+**Recommendation: Option A (frozen status).** The existing status enum (`active`, `completed`, `stopped`) has clear semantics. Adding `frozen` fits the pattern — it is a recoverable pause state, semantically distinct from `stopped` (which is terminal). The cron queries already filter by `status = 'active'`, so frozen enrollments are automatically excluded.
+
+**Required changes:**
+
+1. Supabase migration: update `campaign_enrollments.status` constraint to include `'frozen'`
+2. Update `toggleCampaignStatus` in `lib/actions/campaign.ts`:
 
 ```typescript
-// input.tsx change: h-9 → h-10 (40px)
-// Also warm the background: bg-transparent → bg-background
-// And warm the border focus: border color picks up --primary warm blue
+export async function toggleCampaignStatus(campaignId: string): Promise<ActionState> {
+  // ... auth checks unchanged ...
 
-"flex h-10 w-full rounded-md border border-input bg-background px-3 py-2
- text-base shadow-sm transition-colors
- placeholder:text-muted-foreground
- focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:border-primary
- disabled:cursor-not-allowed disabled:opacity-50
- md:text-sm"
+  const newStatus = campaign.status === 'active' ? 'paused' : 'active'
+
+  // Update campaign status
+  await supabase
+    .from('campaigns')
+    .update({ status: newStatus })
+    .eq('id', campaignId)
+
+  if (newStatus === 'paused') {
+    // FREEZE active enrollments — reversible
+    await supabase
+      .from('campaign_enrollments')
+      .update({ status: 'frozen' })
+      .eq('campaign_id', campaignId)
+      .eq('status', 'active')
+  } else {
+    // UNFREEZE frozen enrollments on resume
+    await supabase
+      .from('campaign_enrollments')
+      .update({ status: 'active' })
+      .eq('campaign_id', campaignId)
+      .eq('status', 'frozen')
+  }
+
+  revalidatePath('/campaigns')
+  revalidatePath(`/campaigns/${campaignId}`)
+  return { success: true }
+}
 ```
 
-**The `h-10` change is not breaking** — it increases input height from 36px to 40px. All form layouts use flex/grid, so inputs will just be 4px taller. This also matches the `SelectTrigger` which already uses `h-10`.
+3. Update `DATA_MODEL.md` — add `frozen` to the enrollment status enum and document the pause/freeze/resume state machine.
+
+4. Update `deleteCampaign` — currently only stops `status = 'active'` enrollments. Must also stop `status = 'frozen'` enrollments when a campaign is deleted:
+
+```typescript
+.in('status', ['active', 'frozen'])  // was: .eq('status', 'active')
+```
+
+**Enrollment state machine (complete):**
+
+```
+                 ┌─────────────────────────────────────┐
+                 │         campaign_enrollments         │
+                 └─────────────────────────────────────┘
+
+  Job completed ──► active ──────────────────► completed
+                      │                          (all touches sent)
+                      │ campaign paused
+                      ▼
+                   frozen ◄─── campaign resumed
+                      │
+                      │ campaign deleted
+                      ▼
+                   stopped (stop_reason: campaign_deleted)
+
+  active ──────────────────────────────────────► stopped
+  frozen ──────────────────────────────────────► stopped
+              (stop_reason: campaign_paused is NO LONGER USED)
+              (stop_reason: campaign_deleted, review_clicked, etc.)
+```
+
+**Cron impact:** The existing cron queries `WHERE status = 'active' AND current_touch = N AND touch_N_sent_at IS NULL`. No cron changes needed — `frozen` enrollments are naturally excluded. The cron processor already handles only `active` status.
+
+**Touch timestamp preservation:** When an enrollment is frozen, its `touch_N_scheduled_at` timestamps are preserved. On resume, those scheduled times may be in the past. The cron processor should send past-due touches immediately (on the next cron run) rather than skipping them. Verify the current cron behavior against this expectation during implementation.
 
 ---
 
-## No New Dependencies Needed
+## Summary: What Changes
+
+| Area | Change | New npm dep? |
+|------|--------|-------------|
+| Sparkline charts | Add `recharts ^3.7.0` + `pnpm dlx shadcn@latest add chart` | **Yes — recharts** |
+| Sticky drawer footers | CSS flex layout change in 3 sheet components | No |
+| Button hierarchy | Add `soft` variant to `buttonVariants` CVA in `button.tsx` | No |
+| Radix Select migration | Replace 3 native `<select>` usages with existing `components/ui/select.tsx` | No |
+| Campaign pause/freeze | Add `frozen` status + update `toggleCampaignStatus` + 1 migration | No |
+
+---
+
+## What NOT to Add
 
 | Considered | Decision | Reason |
 |------------|----------|--------|
-| `@radix-ui/colors` | No | Provides fixed color scales, not semantic tokens. Our HSL-based system is more flexible for dark mode. |
-| `open-props` | No | External CSS custom property system that would conflict with Tailwind's semantic token approach. |
-| `tailwind-scrollbar` | No | Not needed for this milestone. |
-| `framer-motion` | No | `tailwindcss-animate` and Tailwind transitions handle all redesign animations (hover lifts, fades). |
-| `@radix-ui/react-tooltip` | Already installed | No new install needed. |
-| Color name libraries (chroma.js, etc.) | No | HSL values are specified directly. No runtime color computation needed. |
-| shadcn/ui CLI | Optional | Can use `npx shadcn@latest add [component]` to pull updated variants, but the components are already present and manually editing them is equivalent. |
-
-**Bottom line:** The design system change is a CSS and component-logic change. npm is not involved.
+| `@tremor/react` | No | 400kB+ bundle for a full UI kit. Only need sparklines. Recharts alone is sufficient. |
+| `victory` | No | 500kB+, React 18 only, no Tailwind fit. |
+| `d3` directly | No | Low-level, would require significant custom code. Recharts wraps D3 correctly. |
+| `framer-motion` | No | Existing Tailwind transitions (`transition-all duration-200`) cover all UX polish needs in this milestone. |
+| `@radix-ui/react-scroll-area` | No | `overflow-y-auto` on a flex child is sufficient for the sheet scroll zone. ScrollArea adds a styled scrollbar but that is out of scope for this milestone. |
+| XState or similar state machine library | No | The campaign pause state machine has 4 states and 3 transitions. A Supabase enum column + conditional updates is the correct solution at this scale. |
+| `react-window` or `react-virtual` | No | Table virtualization is not in scope. |
 
 ---
 
-## Contrast & Accessibility Compliance
+## Migration Notes
 
-Before finalizing HSL values, verify WCAG AA (4.5:1 for body text, 3:1 for large text/UI components):
+### Recharts v3 Peer Dependency
 
-| Combination | Foreground | Background | Approximate Contrast | Status |
-|-------------|------------|------------|---------------------|--------|
-| Body text on page | `24 10% 10%` (#1C1814) | `36 20% 96%` (#F6F3EE) | ~14:1 | AA pass |
-| Body text on card | `24 10% 10%` (#1C1814) | `0 0% 100%` (#FFFFFF) | ~16:1 | AA pass |
-| Primary button text | `0 0% 98%` (#FAFAFA) | `213 60% 42%` (#2B6CB0) | ~4.8:1 | AA pass |
-| Muted foreground on muted | `24 8% 46%` (#7A7068) | `36 15% 94%` (#F2EEE8) | ~4.6:1 | AA pass |
-| Amber accent text on highlight | `30 80% 25%` (#7C3A10) | `45 95% 94%` (#FFFBEB) | ~7.2:1 | AA pass |
-| Dark mode body on background | `36 15% 92%` (#EDE8DF) | `24 8% 10%` (#1C1916) | ~13:1 | AA pass |
-| Dark primary button | `24 10% 10%` (#1C1814) | `213 70% 62%` (#5B9BD5) | ~4.6:1 | AA pass |
+Recharts v3.7.0 requires React 16.8+ (satisfied — project uses React 19). The v3 API change that affects shadcn/ui charts: internal props like `payload`, `label`, `item`, `index` on tooltip/legend components were removed. The updated `chart.tsx` from `pnpm dlx shadcn@latest add chart` handles this. Do not copy `chart.tsx` from older shadcn documentation.
 
-**Critical:** Amber (`38 92% 50%` = #F59E0B) on white fails WCAG AA (2.2:1). Never use amber as background with white text. Always use `highlight-foreground` (dark amber brown) on amber backgrounds. The component patterns above enforce this via the variant system.
+### Campaign Enrollment Migration
 
----
+The `frozen` status addition requires a Supabase migration:
 
-## Dark Mode Strategy
+```sql
+-- Update the status constraint on campaign_enrollments
+ALTER TABLE campaign_enrollments
+  DROP CONSTRAINT IF EXISTS campaign_enrollments_status_check;
 
-The dark mode warm palette uses a technique called "hue-tinted darks": instead of hue 0 (neutral gray), all dark surface backgrounds use hue 24 (warm brown). At 8-18% lightness, the hue effect is subtle — the backgrounds appear dark but not sterile.
+ALTER TABLE campaign_enrollments
+  ADD CONSTRAINT campaign_enrollments_status_check
+  CHECK (status IN ('active', 'completed', 'stopped', 'frozen'));
+```
 
-The practical consequence: dark mode backgrounds are `#1C1916` instead of `#171717`. The difference is visible side-by-side but not jarring. It reads as "cozy" rather than "harsh."
+This is a non-destructive migration — existing rows are unaffected. The migration file should be named: `supabase/migrations/YYYYMMDDHHMMSS_add_frozen_enrollment_status.sql`.
 
-`next-themes` (already installed) handles the `.dark` class toggle on `<html>`. No changes to the theme system needed. The existing provider setup in the root layout already works correctly.
-
----
-
-## Migration Path
-
-Changes propagate automatically through CSS variables — no find-and-replace across component files needed for basic color changes. The migration is:
-
-1. Update `app/globals.css` CSS variable values (one file change)
-2. Add two new tokens (`--highlight`, `--highlight-foreground`, `--surface`, `--surface-foreground`) to globals.css and `tailwind.config.ts`
-3. Update `components/ui/card.tsx` to add CVA variants
-4. Update `components/ui/input.tsx` for `h-10` and warm focus ring
-5. Create `components/ui/password-input.tsx` (new component)
-6. Update individual page/component files to use new card variants where colored backgrounds are needed
-
-Steps 1-2 change every component's colors automatically. Steps 3-6 are targeted additions.
+Update `DATA_MODEL.md` to document the new status value and the freeze/resume state machine.
 
 ---
 
 ## Sources
 
-- `app/globals.css` — inspected directly; all current HSL values confirmed
-- `tailwind.config.ts` — inspected directly; confirmed token mapping to CSS vars
-- `components/ui/card.tsx` — inspected directly; confirmed current variant structure
-- `components/ui/button.tsx` — inspected directly; confirmed CVA pattern
-- `components/ui/input.tsx` — inspected directly; confirmed h-9 height issue
-- `components/ui/checkbox.tsx` — inspected directly; confirmed 44px touch wrapper exists
-- `components.json` — inspected; confirmed shadcn/ui "new-york" style, CSS variables enabled
-- `audit-screenshots/` — inspected visually; confirmed current cold blue (#2563EB) design
-- `audit-02-dashboard.png` — confirmed card layout and warm attention banner style already partially present
-- `.planning/PROJECT.md` — confirmed v2.5 milestone color direction: "Full warm palette like Stratify — amber/gold accents, soft blue interactive, cream-tinted backgrounds"
-- WCAG 2.1 contrast ratios computed from HSL values; verified against specification requirement of 4.5:1 (text) and 3:1 (UI components)
-- Amber (#F59E0B) on white contrast computed as ~2.2:1 — this is why amber is accent/highlight background, not text color on white
+- `components/ui/button.tsx` — inspected directly; confirmed existing CVA variant structure
+- `components/ui/sheet.tsx` — inspected directly; confirmed `flex flex-col` + `SheetFooter mt-auto` structure
+- `components/ui/select.tsx` — inspected directly; confirmed Radix Select is already present
+- `components/jobs/add-job-sheet.tsx` — inspected directly; confirmed native `<select>` on line 277-288 and `overflow-y-auto` footer problem on line 169
+- `components/jobs/service-type-select.tsx` — inspected directly; confirmed native `<select>` component
+- `components/campaigns/campaign-card.tsx` — inspected directly; confirmed `toggleCampaignStatus` call
+- `lib/actions/campaign.ts` — inspected directly; confirmed destructive pause behavior (lines 461-471)
+- `package.json` — inspected directly; confirmed recharts is NOT yet installed
+- [recharts/recharts GitHub releases](https://github.com/recharts/recharts/releases) — confirmed v3.7.0 is latest stable (January 2025)
+- [shadcn/ui chart docs](https://ui.shadcn.com/docs/components/radix/chart) — confirmed `pnpm dlx shadcn@latest add chart` command and composition model
+- [shadcn/ui issue #7669](https://github.com/shadcn-ui/ui/issues/7669) — confirmed Recharts v3 support implemented in PR #8486; v3 now recommended
+- [shadcn/ui sheet sticky header/footer pattern](https://www.shadcn.io/patterns/sheet-multi-section-5) — confirmed `flex-1 overflow-y-auto` middle zone pattern
+- [shadcn/ui Select docs](https://ui.shadcn.com/docs/components/radix/select) — confirmed `onValueChange` / `defaultValue` wiring for react-hook-form Controller
+- [Carbon Design System — Button usage](https://carbondesignsystem.com/components/button/usage/) — confirmed single high-emphasis button principle; tertiary/ghost for dense UIs
 
 ---
 
-*Stack research for: v2.5 UI/UX Redesign — Warm Design System*
-*Researched: 2026-02-18*
-*Confidence: HIGH — all findings based on direct codebase inspection*
+*Stack research for: v2.5.2 UX Bugs & UI Fixes*
+*Researched: 2026-02-25*
+*Confidence: HIGH — all findings based on direct codebase inspection + authoritative documentation*
