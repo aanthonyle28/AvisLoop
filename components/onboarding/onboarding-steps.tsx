@@ -41,6 +41,7 @@ export function OnboardingSteps({
             google_review_link: business?.google_review_link || '',
           }}
           defaultEnabled={business?.service_types_enabled || []}
+          defaultCustomServiceNames={business?.custom_service_names || []}
         />
       )
 

@@ -6,6 +6,7 @@ import { Check, Clock, CircleNotch } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { TagBadge } from '@/components/ui/tag-badge'
 import { updateServiceTypeSettings, updateReviewCooldown } from '@/lib/actions/business'
 import { SERVICE_TYPES, SERVICE_TYPE_LABELS, DEFAULT_TIMING_HOURS } from '@/lib/validations/job'
 import { MIN_ENROLLMENT_COOLDOWN_DAYS, MAX_ENROLLMENT_COOLDOWN_DAYS } from '@/lib/constants/campaigns'
@@ -14,12 +15,14 @@ interface ServiceTypesSectionProps {
   initialEnabled: string[]
   initialTiming: Record<string, number>
   initialCooldownDays?: number
+  initialCustomServiceNames?: string[]
 }
 
 export function ServiceTypesSection({
   initialEnabled,
   initialTiming,
   initialCooldownDays = 30,
+  initialCustomServiceNames = [],
 }: ServiceTypesSectionProps) {
   const [enabled, setEnabled] = useState<Set<string>>(new Set(initialEnabled))
   const [timing, setTiming] = useState<Record<string, number>>(initialTiming)
@@ -28,6 +31,8 @@ export function ServiceTypesSection({
   const [cooldownDays, setCooldownDays] = useState(initialCooldownDays)
   const [cooldownPending, startCooldownTransition] = useTransition()
   const [cooldownChanged, setCooldownChanged] = useState(false)
+  const [customServiceNames, setCustomServiceNames] = useState<string[]>(initialCustomServiceNames)
+  const [customServiceInput, setCustomServiceInput] = useState('')
 
   const toggleService = (type: string) => {
     const newEnabled = new Set(enabled)
@@ -45,11 +50,26 @@ export function ServiceTypesSection({
     setHasChanges(true)
   }
 
+  const addCustomService = () => {
+    const trimmed = customServiceInput.trim()
+    if (trimmed && !customServiceNames.includes(trimmed) && customServiceNames.length < 10) {
+      setCustomServiceNames(prev => [...prev, trimmed])
+      setCustomServiceInput('')
+      setHasChanges(true)
+    }
+  }
+
+  const removeCustomService = (name: string) => {
+    setCustomServiceNames(prev => prev.filter(n => n !== name))
+    setHasChanges(true)
+  }
+
   const handleSave = () => {
     startTransition(async () => {
       const result = await updateServiceTypeSettings({
         serviceTypesEnabled: Array.from(enabled),
         serviceTypeTiming: timing,
+        customServiceNames: enabled.has('other') ? customServiceNames : [],
       })
 
       if (result.error) {
@@ -64,6 +84,8 @@ export function ServiceTypesSection({
   const handleReset = () => {
     setEnabled(new Set(initialEnabled))
     setTiming(initialTiming)
+    setCustomServiceNames(initialCustomServiceNames)
+    setCustomServiceInput('')
     setHasChanges(false)
   }
 
@@ -130,6 +152,56 @@ export function ServiceTypesSection({
           )
         })}
       </div>
+
+      {/* Custom service names (shown when "Other" is enabled) */}
+      {enabled.has('other') && (
+        <div className="rounded-lg border p-4 space-y-3">
+          <div>
+            <h4 className="font-medium">Custom service names</h4>
+            <p className="text-sm text-muted-foreground mt-1">
+              Add names for your other services (up to 10).
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Input
+              value={customServiceInput}
+              onChange={(e) => setCustomServiceInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  addCustomService()
+                }
+              }}
+              placeholder="e.g. Pest Control, Pool Cleaning..."
+              maxLength={50}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={addCustomService}
+              disabled={!customServiceInput.trim() || customServiceNames.length >= 10}
+              className="shrink-0"
+            >
+              Add
+            </Button>
+          </div>
+          {customServiceNames.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {customServiceNames.map((name) => (
+                <TagBadge
+                  key={name}
+                  tag={name}
+                  onRemove={() => removeCustomService(name)}
+                />
+              ))}
+            </div>
+          )}
+          {customServiceNames.length >= 10 && (
+            <p className="text-xs text-muted-foreground">Maximum 10 custom services</p>
+          )}
+        </div>
+      )}
 
       {/* Actions */}
       {hasChanges && (

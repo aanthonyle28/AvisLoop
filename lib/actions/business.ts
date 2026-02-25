@@ -217,6 +217,7 @@ export async function getEmailTemplates() {
 export async function updateServiceTypeSettings(settings: {
   serviceTypesEnabled: string[]
   serviceTypeTiming: Record<string, number>
+  customServiceNames?: string[]
 }): Promise<{ error?: string; success?: boolean }> {
   const supabase = await createClient()
 
@@ -244,11 +245,18 @@ export async function updateServiceTypeSettings(settings: {
   }
   const finalTiming = { ...defaultTiming, ...validatedTiming }
 
+  // Validate and sanitize custom service names (max 10, max 50 chars each)
+  const validatedCustomNames = (settings.customServiceNames || [])
+    .map(n => n.trim())
+    .filter(n => n.length > 0 && n.length <= 50)
+    .slice(0, 10)
+
   const { error } = await supabase
     .from('businesses')
     .update({
       service_types_enabled: filteredEnabled,
       service_type_timing: finalTiming,
+      custom_service_names: validatedCustomNames,
     })
     .eq('user_id', user.id)
 

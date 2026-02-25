@@ -18,6 +18,7 @@ interface SettingsTabsProps {
   serviceTypeSettings: {
     serviceTypesEnabled: string[]
     serviceTypeTiming: Record<string, number>
+    customServiceNames: string[]
   } | null
   personalizationSummary: PersonalizationSummary
   hasApiKey: boolean
@@ -96,6 +97,7 @@ export function SettingsTabs({
               roofing: 72, painting: 48, handyman: 24, other: 24
             }}
             initialCooldownDays={business?.review_cooldown_days ?? 30}
+            initialCustomServiceNames={serviceTypeSettings?.customServiceNames || []}
           />
         </section>
       </TabsContent>

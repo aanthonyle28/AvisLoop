@@ -236,7 +236,7 @@ export async function saveServicesOffered(
     return { success: false, error: parsed.error.issues[0]?.message || 'Invalid input' }
   }
 
-  const { serviceTypes } = parsed.data
+  const { serviceTypes, customServiceNames } = parsed.data
 
   // Get business
   const { data: business } = await supabase
@@ -261,6 +261,7 @@ export async function saveServicesOffered(
     .update({
       service_types_enabled: serviceTypes,
       service_type_timing: timingMap,
+      custom_service_names: customServiceNames || [],
     })
     .eq('id', business.id)
 

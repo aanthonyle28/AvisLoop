@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
+import { TagBadge } from '@/components/ui/tag-badge'
 import { saveBusinessBasics, saveServicesOffered } from '@/lib/actions/onboarding'
 import {
   SERVICE_TYPES,
@@ -22,16 +23,19 @@ interface BusinessSetupStepProps {
     google_review_link?: string
   }
   defaultEnabled?: string[]
+  defaultCustomServiceNames?: string[]
 }
 
 /**
  * Step 1: Business Setup (merged Business Basics + Services Offered)
  * Collects business name, phone, Google review link, and service types.
+ * Selecting "Other" reveals a multi-tag input for custom service names.
  */
 export function BusinessSetupStep({
   onComplete,
   defaultValues,
   defaultEnabled,
+  defaultCustomServiceNames,
 }: BusinessSetupStepProps) {
   const [name, setName] = useState(defaultValues?.name || '')
   const [phone, setPhone] = useState(defaultValues?.phone || '')
@@ -39,7 +43,10 @@ export function BusinessSetupStep({
     defaultValues?.google_review_link || ''
   )
   const [selected, setSelected] = useState<string[]>(defaultEnabled || [])
-  const [customServiceLabel, setCustomServiceLabel] = useState('')
+  const [customServiceNames, setCustomServiceNames] = useState<string[]>(
+    defaultCustomServiceNames || []
+  )
+  const [customServiceInput, setCustomServiceInput] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
@@ -50,6 +57,18 @@ export function BusinessSetupStep({
         : [...prev, serviceType]
     )
     setError(null)
+  }
+
+  const addCustomService = () => {
+    const trimmed = customServiceInput.trim()
+    if (trimmed && !customServiceNames.includes(trimmed) && customServiceNames.length < 10) {
+      setCustomServiceNames(prev => [...prev, trimmed])
+      setCustomServiceInput('')
+    }
+  }
+
+  const removeCustomService = (name: string) => {
+    setCustomServiceNames(prev => prev.filter(n => n !== name))
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -82,7 +101,7 @@ export function BusinessSetupStep({
       // Then save services
       const servicesResult = await saveServicesOffered({
         serviceTypes: selected as ServiceTypeValue[],
-        customServiceNames: [],
+        customServiceNames: selected.includes('other') ? customServiceNames : [],
       })
 
       if (!servicesResult.success) {
@@ -183,17 +202,50 @@ export function BusinessSetupStep({
             })}
           </div>
 
-          {/* "Other" custom service name reveal */}
+          {/* "Other" multi-tag custom service input */}
           {selected.includes('other') && (
-            <div className="space-y-1.5">
-              <Label htmlFor="custom-service">What type of service? (optional)</Label>
-              <Input
-                id="custom-service"
-                value={customServiceLabel}
-                onChange={(e) => setCustomServiceLabel(e.target.value)}
-                placeholder="e.g. Pest Control, Pool Cleaning..."
-                disabled={isPending}
-              />
+            <div className="space-y-2">
+              <Label htmlFor="custom-service">What type of service?</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="custom-service"
+                  value={customServiceInput}
+                  onChange={(e) => setCustomServiceInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      addCustomService()
+                    }
+                  }}
+                  placeholder="e.g. Pest Control, Pool Cleaning..."
+                  disabled={isPending}
+                  maxLength={50}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addCustomService}
+                  disabled={isPending || !customServiceInput.trim() || customServiceNames.length >= 10}
+                  className="shrink-0"
+                >
+                  Add
+                </Button>
+              </div>
+              {customServiceNames.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {customServiceNames.map((name) => (
+                    <TagBadge
+                      key={name}
+                      tag={name}
+                      onRemove={() => removeCustomService(name)}
+                    />
+                  ))}
+                </div>
+              )}
+              {customServiceNames.length >= 10 && (
+                <p className="text-xs text-muted-foreground">Maximum 10 custom services</p>
+              )}
             </div>
           )}
         </div>
