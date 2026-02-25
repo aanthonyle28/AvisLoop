@@ -61,6 +61,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 42-01-PLAN.md. AlertRow left-border removed, dismiss added, Ready to Send empty state dashed-border.
+Stopped at: Completed 42-02-PLAN.md. Sidebar NavLink active state: filled Phosphor icon + text-accent, no border-l-2.
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
