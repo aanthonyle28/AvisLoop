@@ -2,6 +2,7 @@
 
 import { useCallback, useState, useEffect } from 'react'
 import Link from 'next/link'
+import { Plus, Megaphone } from '@phosphor-icons/react'
 import { DashboardShell } from '@/components/dashboard/dashboard-shell'
 import { useDashboardPanel } from '@/components/dashboard/dashboard-shell'
 import { RightPanelDefault, KPISummaryBar } from '@/components/dashboard/right-panel-default'
@@ -254,10 +255,14 @@ function DashboardContent({
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <Button onClick={openAddJob}>
+              <Plus size={16} weight="bold" className="mr-1.5" />
               Add Job
             </Button>
             <Button variant="outline" asChild>
-              <Link href="/campaigns">View Campaigns</Link>
+              <Link href="/campaigns">
+                <Megaphone size={16} weight="regular" className="mr-1.5" />
+                View Campaigns
+              </Link>
             </Button>
           </div>
         </div>
