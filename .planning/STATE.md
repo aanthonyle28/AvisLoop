@@ -9,18 +9,18 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 
 ## Current Position
 
-Phase: 43 complete, verified ✓
-Plan: —
-Status: Ready for Phase 44
-Last activity: 2026-02-25 — Phase 43 Cross-Page Consistency complete (2/2 plans, 7/7 verified)
+Phase: 44 of 44 (Onboarding Services)
+Plan: 1 of 2
+Status: In progress
+Last activity: 2026-02-25 — Completed 44-01-PLAN.md (CRM Platform Step)
 
-Progress: [███████░░░] 75% (v2.5.1 milestone, 3/4 phases complete, 6/8 plans)
+Progress: [████████░░] 78% (v2.5.1 milestone, 4/4 phases started, 7/8 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 203
-- v2.5.1 plans completed: 6
+- Total plans completed (project): 204
+- v2.5.1 plans completed: 7
 
 *Updated after each plan completion*
 
@@ -30,7 +30,9 @@ Progress: [███████░░░] 75% (v2.5.1 milestone, 3/4 phases com
 
 - Activity page status options stay the same: pending, sent, delivered, bounced, complained, failed, opened
 - Chip filter style matches Jobs page pattern (rounded-full for status, bg-primary when active)
-- CRM onboarding step is skippable and second-to-last (before SMS consent)
+- CRM onboarding step is skippable and second-to-last (before SMS consent) — IMPLEMENTED in 44-01
+- CRM step skip: calls onComplete() directly (no empty string saved to DB)
+- CRM continue: saves even with no selection (nil → null in DB), never blocks progression
 - Needs Attention dismiss is UI-only (hides from list, doesn't resolve underlying issue)
 - Sidebar active state: filled icon + brand orange text, no left border, same background
 - Design changes must update globals.css / design system tokens — no one-off inline overrides
@@ -66,6 +68,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Phase 43 complete and verified. Ready to plan Phase 44.
+Stopped at: Completed 44-01-PLAN.md (CRM Platform Step). Phase 44, plan 1/2 done.
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
