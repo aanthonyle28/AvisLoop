@@ -18,6 +18,7 @@ import {
   Queue,
   ListChecks,
   DotsThreeVertical,
+  Briefcase,
 } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
@@ -586,8 +587,10 @@ export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJob
         )}
 
         {jobs.length === 0 && !hasJobHistory && (
-          <div className="flex flex-col items-center justify-center py-8 text-center">
-            <Plus className="h-10 w-10 text-muted-foreground mb-3" />
+          <div className="flex flex-col items-center justify-center py-8 text-center rounded-lg border-2 border-dashed border-border">
+            <div className="rounded-full bg-muted p-3 mb-3">
+              <Briefcase className="h-6 w-6 text-muted-foreground" />
+            </div>
             <p className="text-sm text-muted-foreground mb-3">
               No jobs yet — add a completed job to get started
             </p>
