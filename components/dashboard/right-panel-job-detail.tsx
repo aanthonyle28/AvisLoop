@@ -23,6 +23,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useDashboardPanel } from '@/components/dashboard/dashboard-shell'
 import { quickEnrollJob, fetchJobPanelDetail } from '@/lib/actions/dashboard'
+import { markJobComplete } from '@/lib/actions/job'
 import { resolveEnrollmentConflict } from '@/lib/actions/conflict-resolution'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -74,7 +75,22 @@ function ServiceTypeBadge({ serviceType }: { serviceType: string }) {
 }
 
 function CampaignSection({ job }: { job: JobPanelDetail }) {
-  // One-off jobs
+  // Scheduled one-off jobs (will send one-off on complete)
+  if (job.status === 'scheduled' && job.campaignOverride === 'one_off') {
+    return (
+      <div className="flex items-start gap-2 rounded-md bg-muted/30 p-3">
+        <PaperPlaneTilt size={14} className="text-muted-foreground mt-0.5 shrink-0" />
+        <div>
+          <p className="text-xs font-medium">One-off (on complete)</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Will send a manual request when job is completed
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Completed one-off jobs
   if (job.campaignOverride === 'one_off') {
     return (
       <div className="flex items-start gap-2 rounded-md bg-muted/30 p-3">
@@ -265,6 +281,7 @@ export function RightPanelJobDetail({
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isEnrolling, startEnrollTransition] = useTransition()
+  const [isCompleting, startCompleteTransition] = useTransition()
 
   const loadJob = useCallback(async () => {
     setIsLoading(true)
@@ -308,6 +325,23 @@ export function RightPanelJobDetail({
     })
   }
 
+  const handleComplete = () => {
+    if (!job) return
+    startCompleteTransition(async () => {
+      try {
+        const result = await markJobComplete(job.id, true)
+        if (result.success) {
+          toast.success('Job completed! Campaign enrollment started.')
+          closePanel()
+        } else {
+          toast.error(result.error || 'Failed to complete job')
+        }
+      } catch {
+        toast.error('Failed to complete job')
+      }
+    })
+  }
+
   if (isLoading) {
     return <RightPanelJobDetailSkeleton />
   }
@@ -323,13 +357,15 @@ export function RightPanelJobDetail({
     )
   }
 
-  // Determine if the enroll CTA should show
+  // Determine which CTAs to show
   const isCompleted = job.status === 'completed'
+  const isScheduled = job.status === 'scheduled'
   const isNotEnrolled = !job.enrollmentStatus || job.enrollmentStatus !== 'active'
   const hasMatchingCampaign = !!job.matchingCampaignId
   const isOneOff = job.campaignOverride === 'one_off'
   const isConflict = job.enrollmentResolution === 'conflict'
   const isQueueAfter = job.enrollmentResolution === 'queue_after'
+  const isReplaceOnComplete = job.enrollmentResolution === 'replace_on_complete'
 
   const showEnrollCTA =
     isCompleted &&
@@ -337,9 +373,13 @@ export function RightPanelJobDetail({
     hasMatchingCampaign &&
     !isOneOff &&
     !isConflict &&
-    !isQueueAfter
+    !isQueueAfter &&
+    !isReplaceOnComplete
 
   const showSendOneOffCTA = isCompleted && isOneOff
+
+  const hasPotentialConflict = isScheduled && !!job.potentialConflict && !job.enrollmentResolution
+  const showCompleteCTA = isScheduled && !isConflict && !isQueueAfter && !isReplaceOnComplete && !hasPotentialConflict
 
   return (
     <div className="p-4 space-y-5">
@@ -472,11 +512,61 @@ export function RightPanelJobDetail({
         </>
       )}
 
-      {/* CTA Buttons */}
-      {(showEnrollCTA || showSendOneOffCTA) && (
+      {/* Pre-flight conflict for scheduled jobs */}
+      {hasPotentialConflict && (
         <>
           <div className="border-t border-border" />
-          <div>
+          <div className="rounded-md bg-warning/10 border border-warning/20 p-3">
+            <div className="flex items-center gap-1.5 mb-2">
+              <Warning size={14} weight="fill" className="text-warning shrink-0" />
+              <span className="text-xs font-semibold text-warning-foreground">Pre-flight conflict</span>
+            </div>
+            <p className="text-xs text-muted-foreground mb-2">
+              {job.potentialConflict!.existingCampaignName} (Touch {job.potentialConflict!.currentTouch} of {job.potentialConflict!.totalTouches}) — resolve before completing
+            </p>
+            <ConflictActions jobId={job.id} onClose={closePanel} />
+          </div>
+        </>
+      )}
+
+      {/* Replace on Complete info */}
+      {isReplaceOnComplete && (
+        <>
+          <div className="border-t border-border" />
+          <div className="rounded-md bg-primary/10 border border-primary/20 p-3 flex items-center gap-2">
+            <ArrowsClockwise size={14} className="text-primary shrink-0" />
+            <p className="text-xs text-muted-foreground">
+              Will replace active sequence when completed
+            </p>
+          </div>
+        </>
+      )}
+
+      {/* CTA Buttons */}
+      {(showEnrollCTA || showSendOneOffCTA || showCompleteCTA) && (
+        <>
+          <div className="border-t border-border" />
+          <div className="space-y-2">
+            {showCompleteCTA && (
+              <Button
+                className="w-full"
+                onClick={handleComplete}
+                disabled={isCompleting}
+              >
+                {isCompleting ? (
+                  <>
+                    <CircleNotch size={14} className="mr-1.5 animate-spin" />
+                    Completing...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle size={14} weight="bold" className="mr-1.5" />
+                    Complete Job
+                  </>
+                )}
+              </Button>
+            )}
+
             {showEnrollCTA && (
               <Button
                 className="w-full"

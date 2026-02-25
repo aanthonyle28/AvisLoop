@@ -293,8 +293,8 @@ export async function getReadyToSendJobs(
       if (j.campaign_override === 'dismissed' || j.campaign_override === 'one_off_sent') return false
       // Exclude skipped and suppressed jobs (resolved by user or system)
       if (j.enrollment_resolution === 'skipped' || j.enrollment_resolution === 'suppressed') return false
-      // Keep conflict and queue_after jobs (they need to appear in queue)
-      if (j.enrollment_resolution === 'conflict' || j.enrollment_resolution === 'queue_after') return true
+      // Keep conflict, queue_after, and replace_on_complete jobs (they need to appear in queue)
+      if (j.enrollment_resolution === 'conflict' || j.enrollment_resolution === 'queue_after' || j.enrollment_resolution === 'replace_on_complete') return true
       // One-off jobs stay in queue regardless of enrollment records (they need manual send)
       if (j.campaign_override === 'one_off') return true
       // For completed jobs, exclude those with ANY enrollment record
@@ -302,10 +302,10 @@ export async function getReadyToSendJobs(
       return true
     })
 
-    // For conflict/queue_after jobs, batch-fetch the customer's active enrollment details
+    // For conflict/queue_after/replace_on_complete jobs, batch-fetch the customer's active enrollment details
     const conflictCustomerIds = new Set(
       eligibleJobs
-        .filter(j => j.enrollment_resolution === 'conflict' || j.enrollment_resolution === 'queue_after')
+        .filter(j => j.enrollment_resolution === 'conflict' || j.enrollment_resolution === 'queue_after' || j.enrollment_resolution === 'replace_on_complete')
         .map(j => j.customer_id)
     )
 
@@ -330,6 +330,37 @@ export async function getReadyToSendJobs(
       }
     }
 
+    // Pre-flight conflict detection: scheduled jobs with no enrollment_resolution
+    // whose customer is already in an active campaign sequence
+    const preflightCandidates = eligibleJobs.filter(
+      j => j.status === 'scheduled' && !j.enrollment_resolution && j.campaign_override !== 'one_off'
+    )
+    const preflightCustomerIds = new Set(
+      preflightCandidates
+        .map(j => j.customer_id)
+        .filter(cid => !conflictCustomerIds.has(cid)) // skip already-fetched
+    )
+
+    const preflightEnrollments: Map<string, { existingCampaignName: string; currentTouch: number; totalTouches: number }> = new Map()
+    if (preflightCustomerIds.size > 0) {
+      const { data: activeEnrollments } = await supabase
+        .from('campaign_enrollments')
+        .select('customer_id, current_touch, campaigns:campaign_id(name, campaign_touches(touch_number))')
+        .in('customer_id', Array.from(preflightCustomerIds))
+        .eq('business_id', businessId)
+        .eq('status', 'active')
+
+      for (const enrollment of activeEnrollments || []) {
+        const campaign = Array.isArray(enrollment.campaigns) ? enrollment.campaigns[0] : enrollment.campaigns
+        const campaignData = campaign as { name: string; campaign_touches: { touch_number: number }[] } | null
+        preflightEnrollments.set(enrollment.customer_id, {
+          existingCampaignName: campaignData?.name || 'Unknown',
+          currentTouch: enrollment.current_touch,
+          totalTouches: campaignData?.campaign_touches?.length || 0,
+        })
+      }
+    }
+
     // Calculate staleness and campaign matching for each job
     const jobsWithContext = eligibleJobs.map(job => {
       const customer = Array.isArray(job.customers) ? job.customers[0] : job.customers
@@ -345,8 +376,13 @@ export async function getReadyToSendJobs(
       const hasMatchingCampaign = hasAllServicesCampaign || campaignServiceTypes.has(job.service_type)
 
       // Build conflict detail if applicable
-      const conflictDetail = (job.enrollment_resolution === 'conflict' || job.enrollment_resolution === 'queue_after')
+      const conflictDetail = (job.enrollment_resolution === 'conflict' || job.enrollment_resolution === 'queue_after' || job.enrollment_resolution === 'replace_on_complete')
         ? customerEnrollments.get(job.customer_id)
+        : undefined
+
+      // Pre-flight conflict for scheduled jobs with no resolution
+      const potentialConflict = (job.status === 'scheduled' && !job.enrollment_resolution && job.campaign_override !== 'one_off')
+        ? preflightEnrollments.get(job.customer_id)
         : undefined
 
       return {
@@ -366,6 +402,7 @@ export async function getReadyToSendJobs(
         hasMatchingCampaign,
         enrollment_resolution: job.enrollment_resolution as ReadyToSendJob['enrollment_resolution'],
         conflictDetail,
+        potentialConflict,
       }
     })
 
@@ -756,6 +793,31 @@ export async function getReadyToSendJobWithCampaign(
       }
     }
 
+    // Pre-flight conflict detection for scheduled jobs with no enrollment_resolution
+    let potentialConflict: JobPanelDetail['potentialConflict'] = undefined
+    if (job.status === 'scheduled' && !job.enrollment_resolution && job.campaign_override !== 'one_off') {
+      const { data: customerActiveEnrollment } = await supabase
+        .from('campaign_enrollments')
+        .select('customer_id, current_touch, campaigns:campaign_id(name, campaign_touches(touch_number))')
+        .eq('customer_id', customer.id)
+        .eq('business_id', businessId)
+        .eq('status', 'active')
+        .limit(1)
+        .maybeSingle()
+
+      if (customerActiveEnrollment) {
+        const pCampaign = Array.isArray(customerActiveEnrollment.campaigns)
+          ? customerActiveEnrollment.campaigns[0]
+          : customerActiveEnrollment.campaigns
+        const pCampaignData = pCampaign as { name: string; campaign_touches: { touch_number: number }[] } | null
+        potentialConflict = {
+          existingCampaignName: pCampaignData?.name || 'Unknown',
+          currentTouch: customerActiveEnrollment.current_touch,
+          totalTouches: pCampaignData?.campaign_touches?.length || 0,
+        }
+      }
+    }
+
     return {
       id: job.id,
       customer: {
@@ -775,6 +837,7 @@ export async function getReadyToSendJobWithCampaign(
       matchingCampaignId,
       enrollmentStatus: latestEnrollment?.status ?? null,
       enrollmentCampaignName: enrolledCampaign?.name ?? null,
+      potentialConflict,
     }
   } catch (error) {
     console.error('Error fetching job panel detail:', error)

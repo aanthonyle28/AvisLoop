@@ -302,6 +302,29 @@ export function JobDetailDrawer({
       )
     }
 
+    if (job.enrollment_resolution === 'replace_on_complete') {
+      return (
+        <div className="space-y-3">
+          <span className="text-sm text-primary flex items-center gap-1.5">
+            <ArrowsClockwise size={16} weight="fill" />
+            Will replace on complete
+          </span>
+          <p className="text-xs text-muted-foreground">
+            When this job is marked complete, the active campaign sequence will be replaced.
+          </p>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={handleRevertResolution}
+            disabled={isResolving}
+          >
+            <ArrowCounterClockwise size={14} className="mr-1.5" />
+            Re-evaluate
+          </Button>
+        </div>
+      )
+    }
+
     if (job.enrollment_resolution === 'suppressed') {
       return (
         <span className="text-sm text-muted-foreground flex items-center gap-1.5">
@@ -331,7 +354,50 @@ export function JobDetailDrawer({
       )
     }
 
-    if (anyEnrollment && anyEnrollment.status === 'stopped') {
+    // Pre-flight conflict for scheduled jobs (customer has active enrollment but no resolution yet)
+    if (job.status === 'scheduled' && job.potentialConflict && !job.enrollment_resolution) {
+      return (
+        <div className="space-y-3">
+          <span className="text-sm text-warning-foreground flex items-center gap-1.5">
+            <WarningCircle size={16} weight="fill" className="text-warning" />
+            Conflict — resolve before completing
+          </span>
+          <p className="text-xs text-muted-foreground">
+            Active: <strong>{job.potentialConflict.existingCampaignName}</strong> (Touch {job.potentialConflict.currentTouch} of {job.potentialConflict.totalTouches})
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              size="sm"
+              onClick={() => handleResolveConflict('replace')}
+              disabled={isResolving}
+            >
+              <ArrowsClockwise size={14} className="mr-1.5" />
+              Replace
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleResolveConflict('skip')}
+              disabled={isResolving}
+            >
+              <SkipForward size={14} className="mr-1.5" />
+              Skip
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleResolveConflict('queue_after')}
+              disabled={isResolving}
+            >
+              <Queue size={14} className="mr-1.5" />
+              Queue
+            </Button>
+          </div>
+        </div>
+      )
+    }
+
+    if (job.status === 'completed' && anyEnrollment && anyEnrollment.status === 'stopped') {
       return (
         <span className="text-sm text-muted-foreground flex items-center gap-1.5">
           <Minus size={16} weight="bold" className="text-muted-foreground/70" />

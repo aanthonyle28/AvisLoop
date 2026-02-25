@@ -38,6 +38,12 @@ export interface ReadyToSendJob {
     currentTouch: number
     totalTouches: number
   }
+  /** Pre-flight conflict: scheduled job whose customer is in an active enrollment (no resolution set yet) */
+  potentialConflict?: {
+    existingCampaignName: string
+    currentTouch: number
+    totalTouches: number
+  }
 }
 
 // Attention alert with contextual action
@@ -106,7 +112,6 @@ export type RightPanelView =
   | { type: 'default' }
   | { type: 'job-detail'; jobId: string }
   | { type: 'attention-detail'; alertId: string }
-  | { type: 'getting-started' }
 
 // Props for items that can be selected in left column lists
 export interface SelectableJobItem {
@@ -152,4 +157,10 @@ export interface JobPanelDetail {
   // Enrollment info if already enrolled
   enrollmentStatus: string | null
   enrollmentCampaignName: string | null
+  /** Pre-flight conflict: scheduled job whose customer is in an active enrollment */
+  potentialConflict?: {
+    existingCampaignName: string
+    currentTouch: number
+    totalTouches: number
+  }
 }

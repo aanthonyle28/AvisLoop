@@ -391,6 +391,73 @@ export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJob
       )
     }
 
+    // Replace_on_complete jobs: show "Will Replace" badge with cancel option
+    if (job.enrollment_resolution === 'replace_on_complete') {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size="sm" variant="outline" disabled={busy}>
+              <ArrowsClockwise className="h-4 w-4 mr-1" />
+              Will Replace
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => handleResolveConflict(job.id, 'skip')}>
+              <X className="h-4 w-4 mr-2" />
+              Cancel (skip instead)
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )
+    }
+
+    // Scheduled job with pre-flight conflict: show resolve buttons instead of Complete
+    if (job.status === 'scheduled' && job.potentialConflict) {
+      return (
+        <div className="flex items-center gap-1.5">
+          <Button
+            size="sm"
+            variant="default"
+            onClick={() => handleResolveConflict(job.id, 'replace')}
+            disabled={busy}
+          >
+            {busy && activeAction?.action === 'conflict-replace' ? (
+              <CircleNotch className="h-4 w-4 mr-1 animate-spin" />
+            ) : (
+              <ArrowsClockwise className="h-4 w-4 mr-1" />
+            )}
+            Replace
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleResolveConflict(job.id, 'skip')}
+            disabled={busy}
+          >
+            {busy && activeAction?.action === 'conflict-skip' ? (
+              <CircleNotch className="h-4 w-4 mr-1 animate-spin" />
+            ) : (
+              <SkipForward className="h-4 w-4 mr-1" />
+            )}
+            Skip
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleResolveConflict(job.id, 'queue_after')}
+            disabled={busy}
+          >
+            {busy && activeAction?.action === 'conflict-queue_after' ? (
+              <CircleNotch className="h-4 w-4 mr-1 animate-spin" />
+            ) : (
+              <Queue className="h-4 w-4 mr-1" />
+            )}
+            Queue
+          </Button>
+        </div>
+      )
+    }
+
     if (job.status === 'scheduled') {
       return (
         <Button
@@ -451,6 +518,22 @@ export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJob
       return (
         <span className="text-muted-foreground">
           {serviceTypeName} • Queued — waiting for {job.conflictDetail.existingCampaignName}
+        </span>
+      )
+    }
+
+    if (job.enrollment_resolution === 'replace_on_complete') {
+      return (
+        <span className="text-primary">
+          {serviceTypeName} • Will replace active sequence on complete
+        </span>
+      )
+    }
+
+    if (job.status === 'scheduled' && job.potentialConflict) {
+      return (
+        <span className="text-warning-foreground">
+          {serviceTypeName} • Active: {job.potentialConflict.existingCampaignName} (Touch {job.potentialConflict.currentTouch} of {job.potentialConflict.totalTouches})
         </span>
       )
     }
@@ -576,6 +659,24 @@ export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJob
                         </TooltipContent>
                       </Tooltip>
                     )}
+                    {job.enrollment_resolution === 'replace_on_complete' && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex-shrink-0 mt-0.5 cursor-help">
+                            <ArrowsClockwise className="h-5 w-5 text-primary" />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent
+                          side="right"
+                          className="max-w-[220px] bg-card text-card-foreground border shadow-md px-3 py-2.5 text-xs leading-relaxed"
+                        >
+                          <p className="font-semibold mb-1">Will Replace</p>
+                          <p className="text-muted-foreground">
+                            When this job is marked complete, the active campaign sequence will be replaced with a new enrollment.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
                     {!job.enrollment_resolution && job.isStale && (
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -598,7 +699,25 @@ export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJob
                         <PaperPlaneTilt className="h-5 w-5 text-primary" weight="fill" />
                       </div>
                     )}
-                    {!job.enrollment_resolution && job.status === 'scheduled' && !job.isStale && job.campaign_override !== 'one_off' && (
+                    {!job.enrollment_resolution && job.status === 'scheduled' && job.potentialConflict && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex-shrink-0 mt-0.5 cursor-help">
+                            <WarningCircle className="h-5 w-5 text-warning" weight="fill" />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent
+                          side="right"
+                          className="max-w-[240px] bg-card text-card-foreground border shadow-md px-3 py-2.5 text-xs leading-relaxed"
+                        >
+                          <p className="font-semibold text-warning-foreground mb-1">Pre-flight conflict</p>
+                          <p className="text-muted-foreground">
+                            This customer is in an active campaign. Resolve the conflict before completing this job.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                    {!job.enrollment_resolution && job.status === 'scheduled' && !job.potentialConflict && !job.isStale && job.campaign_override !== 'one_off' && (
                       <div className="flex-shrink-0 mt-0.5">
                         <CalendarBlank className="h-5 w-5 text-muted-foreground" />
                       </div>
@@ -676,7 +795,29 @@ export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJob
                             </DropdownMenuItem>
                           </>
                         )}
-                        {!job.enrollment_resolution && job.status === 'scheduled' && (
+                        {job.enrollment_resolution === 'replace_on_complete' && (
+                          <DropdownMenuItem onClick={() => handleResolveConflict(job.id, 'skip')}>
+                            <X className="h-4 w-4 mr-2" />
+                            Cancel (skip instead)
+                          </DropdownMenuItem>
+                        )}
+                        {!job.enrollment_resolution && job.status === 'scheduled' && job.potentialConflict && (
+                          <>
+                            <DropdownMenuItem onClick={() => handleResolveConflict(job.id, 'replace')}>
+                              <ArrowsClockwise className="h-4 w-4 mr-2" />
+                              Replace
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleResolveConflict(job.id, 'skip')}>
+                              <SkipForward className="h-4 w-4 mr-2" />
+                              Skip
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleResolveConflict(job.id, 'queue_after')}>
+                              <Queue className="h-4 w-4 mr-2" />
+                              Queue
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                        {!job.enrollment_resolution && job.status === 'scheduled' && !job.potentialConflict && (
                           <DropdownMenuItem onClick={() => handleComplete(job.id)}>
                             <CheckCircle className="h-4 w-4 mr-2" weight="bold" />
                             Complete
