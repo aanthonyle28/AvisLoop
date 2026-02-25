@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 43 (cross-page-consistency) — in progress
-Plan: 02 of ? complete
+Plan: 01 and 02 of ? complete
 Status: In progress
-Last activity: 2026-02-25 — Completed 43-02 empty state normalization (5 files)
+Last activity: 2026-02-25 — Completed 43-01 loading skeleton standardization + 43-02 empty state normalization
 
-Progress: [█████░░░░░] 53% (v2.5.1 milestone, 2/4 phases complete + 43 in progress, 6/8+ plans)
+Progress: [█████░░░░░] 55% (v2.5.1 milestone, 2/4 phases complete + 43 in progress, 7/8+ plans)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed (project): 203
-- v2.5.1 plans completed: 6
+- v2.5.1 plans completed: 7
 
 *Updated after each plan completion*
 
@@ -40,6 +40,9 @@ Progress: [█████░░░░░] 53% (v2.5.1 milestone, 2/4 phases com
 - Date preset chips use local useState (not URL) — chip highlight resets on nav but dates preserved in URL; reverse-computation from URL is fragile
 - updateDateRange sets from/to atomically in a single replace() call — prevents double re-render
 - onCancel in RequestDetailDrawer is optional — server-side cancel not yet implemented
+- Loading skeleton pattern: always use Skeleton component (never raw bg-muted animate-pulse divs), container py-6 space-y-8 for full-width pages, container max-w-4xl py-6 space-y-8 for constrained pages
+- No inline Suspense in page.tsx when loading.tsx exists — making page async uses loading.tsx as single state, eliminates double-loading
+- Settings page is the exception: loading.tsx handles route-level, inline Suspense handles streaming within page (both coexist correctly)
 - Empty state pattern (canonical): rounded-full bg-muted p-6 mb-6 circle, h-8 w-8 icon, text-2xl font-semibold tracking-tight mb-2 title, max-w-md subtitle — all 5 pages normalized (jobs, history, feedback, customers, analytics)
 - Empty state feedback variant: no action button by design — feedback comes from review funnel only; subtitle mb-8 omitted when no button follows
 
@@ -63,6 +66,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 43-02 (empty state normalization). Phase 43 in progress.
+Stopped at: Completed 43-01 (loading skeleton standardization) and 43-02 (empty state normalization). Phase 43 in progress.
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
