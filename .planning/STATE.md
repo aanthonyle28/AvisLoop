@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 ## Current Position
 
 Phase: 44 of 44 (Onboarding Services)
-Plan: 1 of 2
-Status: In progress
-Last activity: 2026-02-25 — Completed 44-01-PLAN.md (CRM Platform Step)
+Plan: 2 of 2
+Status: Phase complete
+Last activity: 2026-02-25 — Completed 44-02-PLAN.md (Custom Service Names multi-tag input)
 
-Progress: [████████░░] 78% (v2.5.1 milestone, 4/4 phases started, 7/8 plans)
+Progress: [█████████░] 82% (v2.5.1 milestone, 4/4 phases complete, 8/8 plans done)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 204
-- v2.5.1 plans completed: 7
+- Total plans completed (project): 205
+- v2.5.1 plans completed: 8
 
 *Updated after each plan completion*
 
@@ -47,6 +47,9 @@ Progress: [████████░░] 78% (v2.5.1 milestone, 4/4 phases sta
 - Settings page is the exception: loading.tsx handles route-level, inline Suspense handles streaming within page (both coexist correctly)
 - Empty state pattern (canonical): rounded-full bg-muted p-6 mb-6 circle, h-8 w-8 icon, text-2xl font-semibold tracking-tight mb-2 title, max-w-md subtitle — all 5 pages normalized (jobs, history, feedback, customers, analytics)
 - Empty state feedback variant: no action button by design — feedback comes from review funnel only; subtitle mb-8 omitted when no button follows
+- custom_service_names stored as TEXT[] (not JSONB) — simple array, no metadata needed, display-only
+- Multi-tag input pattern: useState array + text input + Add button + onKeyDown Enter handler + TagBadge per item with onRemove
+- Enter key in sub-input must call e.preventDefault() to prevent parent form submission — critical for correctness
 
 ### Key Decisions (Inherited from v2.5/v2.6)
 
@@ -68,6 +71,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 44-01-PLAN.md (CRM Platform Step). Phase 44, plan 1/2 done.
+Stopped at: Completed 44-02-PLAN.md (Custom Service Names). Phase 44 complete. v2.5.1 milestone complete (8/8 plans).
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
