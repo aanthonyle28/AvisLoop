@@ -79,8 +79,8 @@ export function Sidebar({ dashboardBadge }: SidebarProps = {}) {
         className={cn(
           "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
           isActive
-            ? "bg-secondary dark:bg-muted text-foreground border-l-2 border-accent"
-            : "text-foreground/70 dark:text-muted-foreground hover:bg-secondary/70 dark:hover:bg-muted/70 border-l-2 border-transparent",
+            ? "bg-secondary dark:bg-muted text-accent"
+            : "text-foreground/70 dark:text-muted-foreground hover:bg-secondary/70 dark:hover:bg-muted/70",
           collapsed && "justify-center px-2",
           item.badge && "relative"
         )}
@@ -88,11 +88,8 @@ export function Sidebar({ dashboardBadge }: SidebarProps = {}) {
       >
         <Icon
           size={20}
-          weight="regular"
-          className={cn(
-            "shrink-0",
-            isActive ? "text-accent" : ""
-          )}
+          weight={isActive ? "fill" : "regular"}
+          className="shrink-0"
         />
         {!collapsed && <span className="flex-1">{item.label}</span>}
         {!collapsed && item.badge && item.badge > 0 && (
