@@ -32,11 +32,15 @@ export function createColumns({ onResend, enableSelection }: CreateColumnsProps 
               ).length
           }
           onCheckedChange={(value) => {
-            table.getFilteredRowModel().rows.forEach((row) => {
-              if (RESENDABLE_STATUSES.includes(row.original.status)) {
-                row.toggleSelected(!!value)
-              }
-            })
+            const newSelection: Record<string, boolean> = {}
+            if (value) {
+              table.getFilteredRowModel().rows.forEach((row) => {
+                if (RESENDABLE_STATUSES.includes(row.original.status)) {
+                  newSelection[row.id] = true
+                }
+              })
+            }
+            table.setRowSelection(newSelection)
           }}
           aria-label="Select all failed"
           onClick={(e) => e.stopPropagation()}
