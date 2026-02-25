@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v2.5.1 Bug Fixes & Polish — COMPLETE. Next: resume v2.6 Dashboard Command Center
+**Current focus:** v2.5.2 UX Bugs & UI Fixes
 
 ## Current Position
 
-Phase: 44 complete, verified ✓
+Phase: Not started (defining requirements)
 Plan: —
-Status: v2.5.1 milestone complete. Ready for v2.6 resume.
-Last activity: 2026-02-25 — Phase 44 Onboarding & Services complete (2/2 plans, 14/14 verified)
+Status: Defining requirements for v2.5.2
+Last activity: 2026-02-25 — Milestone v2.5.2 started
 
-Progress: [██████████] 100% (v2.5.1 milestone, 4/4 phases complete, 8/8 plans)
+Progress: [░░░░░░░░░░] 0% (v2.5.2 milestone)
 
 ## Performance Metrics
 
@@ -71,6 +71,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 44-02-PLAN.md (Custom Service Names). Phase 44 complete. v2.5.1 milestone complete (8/8 plans).
+Stopped at: Starting v2.5.2 milestone — defining requirements
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!

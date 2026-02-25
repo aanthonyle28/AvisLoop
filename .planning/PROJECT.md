@@ -116,22 +116,23 @@ Turn job completions into Google reviews automatically — multi-touch follow-up
 | Dashboard test step cards | Guided walkthrough instead of checklist | Good — auto-detection of completion |
 | Test sends excluded from quota | Fair for users learning the product | Good — is_test flag in database |
 
-## Current Milestone: v2.5.1 Bug Fixes & Polish
+## Current Milestone: v2.5.2 UX Bugs & UI Fixes
 
-**Goal:** Fix activity page bugs (bulk select, resend visibility, filters), polish dashboard queue styling, add CRM onboarding step, redesign sidebar active state, and ensure cross-page consistency for loading states and empty states.
+**Goal:** Drawer consistency overhaul, dashboard right panel KPI/activity redesign, dashboard queue row styling, campaign pause/resume bug fix, button hierarchy cleanup, touch template previews, and navigation rename.
 
 **Target features:**
-- Activity page: chip filters for status (like Jobs), date preset chips (Past Week/Month), fix bulk select and resend button logic
-- Dashboard: Needs Attention rows match Ready to Send styling, dismiss button, dashed empty state
-- Sidebar: active state with filled icon + brand orange text, no left border
-- Onboarding: CRM platform step with logo cards (Jobber, Housecall Pro, ServiceTitan, etc.)
-- Services: multiple custom service names in onboarding and settings
-- Cross-page: consistent loading skeletons and empty states across all pages
+- Drawers: consistent white-background content grouping, sticky bottom action buttons, wider Add Job drawer, Radix selects (no native HTML)
+- Dashboard right panel: KPI cards with light gray background + sparkline graphs, recent activity with distinct icons + spacing (per reference image)
+- Dashboard queue: white background + border-radius rows, solid border empty states, Add Jobs opens drawer
+- Campaign fixes: pause/re-enable bug (completed jobs stuck as stopped), freeze-in-place pause behavior for mid-sequence enrollments
+- Campaign page: touch sequence template preview (email/SMS, including defaults)
+- Button hierarchy: new softer variant for secondary actions, dashboard button audit
+- Navigation: rename "Activity" to "History"
 
 **Key decisions:**
-- v2.6 Dashboard Command Center paused at plan 5/8 — resume after this patch
-- Activity page status filter matches current status options (pending, sent, delivered, bounced, complained, failed, opened)
-- CRM step is skippable and second-to-last in onboarding flow
+- v2.6 Dashboard Command Center still paused at plan 5/8 — resume after this patch
+- Campaign pause = freeze enrollments in place, resume from same touch on un-pause
+- Button variant needed: softer styling so secondary actions don't compete with primary CTAs
 
 ## Paused: v2.6 Dashboard Command Center
 
@@ -140,4 +141,4 @@ Turn job completions into Google reviews automatically — multi-touch follow-up
 **Goal:** Transform the dashboard into a task-oriented command center with persistent two-column layout, contextual right panel, and consolidated getting-started experience.
 
 ---
-*Last updated: 2026-02-24 after v2.5.1 Bug Fixes & Polish milestone started*
+*Last updated: 2026-02-25 after v2.5.2 UX Bugs & UI Fixes milestone started*
