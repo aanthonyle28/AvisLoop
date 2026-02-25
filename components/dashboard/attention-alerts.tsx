@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
-import { XCircle, WarningCircle, Info, CheckCircle, DotsThree } from '@phosphor-icons/react'
+import { XCircle, WarningCircle, Info, CheckCircle, DotsThree, DotsThreeVertical } from '@phosphor-icons/react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -87,7 +87,7 @@ function AlertRow({ alert, isSelected, onSelect }: AlertRowProps) {
   return (
     <div
       className={cn(
-        'flex items-start justify-between gap-3 rounded-md border-l-2 pl-3 pr-3 py-2.5 cursor-pointer transition-colors',
+        'flex items-start justify-between gap-3 border-l-2 pl-3 pr-3 py-2.5 cursor-pointer transition-colors',
         getBorderColor(alert.severity),
         isSelected ? 'bg-muted' : 'hover:bg-muted/50',
       )}
@@ -106,8 +106,8 @@ function AlertRow({ alert, isSelected, onSelect }: AlertRowProps) {
         </div>
       </div>
 
-      {/* Action buttons (stop propagation so row click doesn't fire) */}
-      <div className="flex items-center gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
+      {/* Action buttons — desktop (stop propagation so row click doesn't fire) */}
+      <div className="hidden lg:flex items-center gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
         {alert.type === 'failed_send' && alert.retryable && (
           <Button
             size="sm"
@@ -151,6 +151,37 @@ function AlertRow({ alert, isSelected, onSelect }: AlertRowProps) {
           </DropdownMenu>
         )}
       </div>
+
+      {/* Action buttons — mobile overflow menu */}
+      <div className="flex lg:hidden items-center shrink-0" onClick={(e) => e.stopPropagation()}>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size="icon-sm" variant="ghost">
+              <DotsThreeVertical className="h-5 w-5" weight="bold" />
+              <span className="sr-only">Actions</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {alert.type === 'failed_send' && alert.retryable && (
+              <DropdownMenuItem onClick={handleRetry} disabled={isPending}>
+                {isPending ? 'Retrying...' : 'Retry'}
+              </DropdownMenuItem>
+            )}
+            {(alert.type === 'bounced_email' || alert.type === 'unresolved_feedback') && (
+              <DropdownMenuItem asChild>
+                <Link href={alert.contextualAction.href}>
+                  {alert.contextualAction.label}
+                </Link>
+              </DropdownMenuItem>
+            )}
+            {(alert.type === 'bounced_email' || alert.type === 'stop_request') && (
+              <DropdownMenuItem onClick={handleAcknowledge} disabled={isPending}>
+                Acknowledge
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </div>
   )
 }
@@ -180,7 +211,7 @@ export function AttentionAlerts({ alerts, onSelectAlert, selectedAlertId }: Atte
         </div>
       ) : (
         <>
-          <div className="space-y-1">
+          <div className="divide-y divide-border">
             {displayedAlerts.map((alert) => (
               <AlertRow
                 key={alert.id}
@@ -216,7 +247,7 @@ export function AttentionAlertsSkeleton() {
         <div className="h-5 w-8 bg-muted animate-pulse rounded" />
       </div>
       {/* Row skeletons */}
-      <div className="space-y-1">
+      <div className="divide-y divide-border">
         {[1, 2, 3].map((i) => (
           <div key={i} className="flex items-start justify-between gap-3 rounded-md border-l-2 border-l-muted pl-3 pr-3 py-2.5">
             <div className="flex items-start gap-2 min-w-0 flex-1">

@@ -17,6 +17,7 @@ import {
   SkipForward,
   Queue,
   ListChecks,
+  DotsThreeVertical,
 } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
@@ -518,7 +519,7 @@ export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJob
 
         {/* Job list */}
         {displayJobs.length > 0 && (
-          <div className="space-y-0">
+          <div className="divide-y divide-border">
             {displayJobs.map((job) => {
               const busy = isJobBusy(job.id)
               const isSelected = selectedJobId === job.id
@@ -527,7 +528,7 @@ export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJob
                 <div
                   key={job.id}
                   className={cn(
-                    'flex items-center justify-between rounded-md transition-colors',
+                    'flex items-center justify-between transition-colors',
                     isSelected ? 'bg-muted' : 'hover:bg-muted/50',
                   )}
                 >
@@ -612,8 +613,8 @@ export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJob
                     </div>
                   </button>
 
-                  {/* Right side: primary action + dismiss */}
-                  <div className="flex items-center gap-1.5 pr-3">
+                  {/* Right side: primary action + dismiss (desktop) */}
+                  <div className="hidden lg:flex items-center gap-1.5 pr-3">
                     {renderPrimaryAction(job)}
 
                     <Tooltip>
@@ -635,6 +636,72 @@ export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJob
                       </TooltipTrigger>
                       <TooltipContent side="top">Remove from queue</TooltipContent>
                     </Tooltip>
+                  </div>
+
+                  {/* Right side: overflow menu (mobile) */}
+                  <div className="flex lg:hidden items-center pr-3">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button size="icon-sm" variant="ghost" disabled={busy}>
+                          <DotsThreeVertical className="h-5 w-5" weight="bold" />
+                          <span className="sr-only">Actions</span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        {job.enrollment_resolution === 'conflict' && (
+                          <>
+                            <DropdownMenuItem onClick={() => handleResolveConflict(job.id, 'replace')}>
+                              <ArrowsClockwise className="h-4 w-4 mr-2" />
+                              Replace
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleResolveConflict(job.id, 'skip')}>
+                              <SkipForward className="h-4 w-4 mr-2" />
+                              Skip
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleResolveConflict(job.id, 'queue_after')}>
+                              <Queue className="h-4 w-4 mr-2" />
+                              Queue
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                        {job.enrollment_resolution === 'queue_after' && (
+                          <>
+                            <DropdownMenuItem onClick={() => handleResolveConflict(job.id, 'replace')}>
+                              <ArrowsClockwise className="h-4 w-4 mr-2" />
+                              Enroll now (replace)
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleResolveConflict(job.id, 'skip')}>
+                              <X className="h-4 w-4 mr-2" />
+                              Cancel queue
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                        {!job.enrollment_resolution && job.status === 'scheduled' && (
+                          <DropdownMenuItem onClick={() => handleComplete(job.id)}>
+                            <CheckCircle className="h-4 w-4 mr-2" weight="bold" />
+                            Complete
+                          </DropdownMenuItem>
+                        )}
+                        {!job.enrollment_resolution && job.status === 'completed' && job.campaign_override !== 'one_off' && job.hasMatchingCampaign && (
+                          <DropdownMenuItem onClick={() => handleEnroll(job.id, job.service_type)}>
+                            Enroll
+                          </DropdownMenuItem>
+                        )}
+                        {!job.enrollment_resolution && job.status === 'completed' && (job.campaign_override === 'one_off' || !job.hasMatchingCampaign) && (
+                          <DropdownMenuItem onClick={() => handleSendOneOff(job.customer.id, job.id)}>
+                            <PaperPlaneTilt className="h-4 w-4 mr-2" />
+                            Send One-Off
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem
+                          onClick={() => handleDismiss(job.id)}
+                          className="text-destructive focus:text-destructive"
+                        >
+                          <X className="h-4 w-4 mr-2" />
+                          Remove from queue
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
               )
@@ -770,7 +837,7 @@ export function ReadyToSendQueueSkeleton() {
         <div className="h-8 w-24 bg-muted animate-pulse rounded" />
       </div>
       {/* Row skeletons */}
-      <div className="space-y-0">
+      <div className="divide-y divide-border">
         {[1, 2, 3].map((i) => (
           <div
             key={i}
