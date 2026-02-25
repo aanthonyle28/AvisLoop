@@ -17,9 +17,9 @@
 
 ## Dashboard
 
-- [ ] **DASH-01**: Needs Attention rows match Ready to Send row styling — no left colored border, consistent icon sizing
-- [ ] **DASH-02**: Needs Attention items have dismiss (X) button to remove from the list
-- [ ] **DASH-03**: Ready to Send empty state has dashed border, icon in circle with correct jobs icon
+- [x] **DASH-01**: Needs Attention rows match Ready to Send row styling — no left colored border, consistent icon sizing
+- [x] **DASH-02**: Needs Attention items have dismiss (X) button to remove from the list
+- [x] **DASH-03**: Ready to Send empty state has dashed border, icon in circle with correct jobs icon
 
 ## Onboarding
 
@@ -32,7 +32,7 @@
 
 ## Navigation
 
-- [ ] **NAV-01**: Sidebar active state: filled icon + brand orange text, no left border, background stays the same
+- [x] **NAV-01**: Sidebar active state: filled icon + brand orange text, no left border, background stays the same
 
 ## Cross-Page UX
 
@@ -61,10 +61,10 @@
 | ACT-04 | Phase 41 | Complete |
 | ACT-05 | Phase 41 | Complete |
 | ACT-06 | Phase 41 | Complete |
-| DASH-01 | Phase 42 | Pending |
-| DASH-02 | Phase 42 | Pending |
-| DASH-03 | Phase 42 | Pending |
-| NAV-01 | Phase 42 | Pending |
+| DASH-01 | Phase 42 | Complete |
+| DASH-02 | Phase 42 | Complete |
+| DASH-03 | Phase 42 | Complete |
+| NAV-01 | Phase 42 | Complete |
 | UX-01 | Phase 43 | Pending |
 | UX-02 | Phase 43 | Pending |
 | ONB-01 | Phase 44 | Pending |
@@ -78,4 +78,4 @@
 
 ---
 *Requirements defined: 2026-02-24*
-*Last updated: 2026-02-25 — Phase 41 requirements marked Complete*
+*Last updated: 2026-02-25 — Phase 42 requirements marked Complete*

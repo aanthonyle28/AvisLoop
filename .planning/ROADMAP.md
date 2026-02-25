@@ -680,8 +680,8 @@ Plans:
   4. Sidebar active nav item shows filled icon variant + brand orange text, no left border, same background color
 **Plans**: 2 plans in 1 wave
 Plans:
-- [ ] 42-01-PLAN.md — Needs Attention row styling, dismiss button, Ready to Send empty state
-- [ ] 42-02-PLAN.md — Sidebar active state redesign (filled icon + orange text, no left border)
+- [x] 42-01-PLAN.md — Needs Attention row styling, dismiss button, Ready to Send empty state
+- [x] 42-02-PLAN.md — Sidebar active state redesign (filled icon + orange text, no left border)
 
 ### Phase 43: Cross-Page Consistency
 **Goal**: All pages use consistent lazy loading (skeleton + progress bar) and empty state patterns (icon circle + title + subtitle + action button).
@@ -754,11 +754,11 @@ See individual phase sections above for requirements, success criteria, and depe
 | **39** | **v2.5 UI/UX Redesign** | **4/4** | **Complete** | **2026-02-20** |
 | **40** | **v2.6 Dashboard Command Center** | **5/6** | **Paused** | **-** |
 | **41** | **v2.5.1 Bug Fixes & Polish** | **2/2** | **Complete** | **2026-02-24** |
-| **42** | **v2.5.1 Bug Fixes & Polish** | **0/2** | **Planned** | **-** |
+| **42** | **v2.5.1 Bug Fixes & Polish** | **2/2** | **Complete** | **2026-02-25** |
 | **43** | **v2.5.1 Bug Fixes & Polish** | **0/2** | **Planned** | **-** |
 | **44** | **v2.5.1 Bug Fixes & Polish** | **0/2** | **Planned** | **-** |
 
-**Total:** 199 plans complete across shipped phases.
+**Total:** 201 plans complete across shipped phases.
 
 ## What's Next
 
@@ -776,5 +776,5 @@ After v2.5.1 + v2.6:
 - **v3.0 Agency Mode** — Multi-business management UI, white-label option, client reporting portal
 
 ---
-*Last updated: 2026-02-24 — Phase 41 Activity Page Overhaul complete (2/2 plans)*
+*Last updated: 2026-02-25 — Phase 42 Dashboard & Navigation Polish complete (2/2 plans)*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
