@@ -232,7 +232,7 @@ export function HistoryClient({ initialLogs, total, currentPage, pageSize, busin
         business={business}
         templates={templates}
         onResend={handleResend}
-        onCancel={async (_requestId: string) => {
+        onCancel={async () => {
           // Cancel for pending sends is not yet implemented server-side
           setDrawerOpen(false)
         }}
