@@ -1,6 +1,7 @@
 'use client'
 
 import { X } from '@phosphor-icons/react'
+import { cn } from '@/lib/utils'
 import type { RightPanelView } from '@/lib/types/dashboard'
 
 interface RightPanelProps {
@@ -17,8 +18,6 @@ function getPanelTitle(view: RightPanelView): string {
       return 'Job Details'
     case 'attention-detail':
       return 'Alert Details'
-    case 'getting-started':
-      return 'Getting Started'
     default:
       return ''
   }
@@ -41,14 +40,19 @@ export function RightPanel({
       case 'job-detail':
       case 'attention-detail':
         return detailContent
-      case 'getting-started':
-        return gettingStartedContent ?? null
     }
   }
 
   return (
-    <aside className="hidden lg:flex lg:flex-col w-[360px] shrink-0 border-l border-border bg-card overflow-y-auto">
-      {/* Sticky header — only shown for detail views */}
+    <aside className="hidden lg:flex lg:flex-col w-[360px] shrink-0 border-l border-border bg-card overflow-y-auto scrollbar-hidden">
+      {/* Getting Started — persistent at top, hidden when a detail view is open */}
+      {gettingStartedContent && (
+        <div className={cn('px-4 pt-4', isDetailView && 'hidden')}>
+          {gettingStartedContent}
+        </div>
+      )}
+
+      {/* Sticky header — detail views only */}
       {isDetailView && (
         <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 border-b border-border bg-card">
           <span className="text-sm font-medium text-foreground">{title}</span>

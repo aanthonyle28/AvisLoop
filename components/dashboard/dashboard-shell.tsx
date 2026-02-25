@@ -69,7 +69,7 @@ export function DashboardShell({
 
   return (
     <DashboardPanelContext.Provider value={{ panelView, setPanelView, closePanel }}>
-      <div className="flex gap-0 h-full">
+      <div className="flex gap-0 h-full -mr-4 sm:-mr-6 lg:-mr-8">
         {/* Left column — flexible, scrollable */}
         <div className="flex-1 min-w-0 overflow-y-auto">
           {children}

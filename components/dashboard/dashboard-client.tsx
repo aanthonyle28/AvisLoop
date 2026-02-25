@@ -92,8 +92,6 @@ function getMobileSheetTitle(type: string): string {
       return 'Job Details'
     case 'attention-detail':
       return 'Alert Details'
-    case 'getting-started':
-      return 'Getting Started'
     case 'kpi-full':
       return 'Dashboard Stats'
     default:
@@ -112,7 +110,13 @@ interface DashboardContentProps {
   readyJobs: ReadyToSendJob[]
   alerts: AttentionAlert[]
   hasJobHistory: boolean
-  setupProgress: { completedCount: number; dismissed: boolean; items: Record<ChecklistItemId, boolean> } | null
+  setupProgress: {
+    completedCount: number
+    dismissed: boolean
+    collapsed: boolean
+    allComplete: boolean
+    items: Record<ChecklistItemId, boolean>
+  } | null
   businessId: string
 }
 
@@ -144,7 +148,7 @@ function DashboardContent({
   // 'kpi-full' is a virtual view type for the mobile KPI tap — not in RightPanelView union
   const [mobileSheetOpen, setMobileSheetOpen] = useState(false)
   const [mobileSheetMode, setMobileSheetMode] = useState<
-    'job-detail' | 'attention-detail' | 'getting-started' | 'kpi-full'
+    'job-detail' | 'attention-detail' | 'kpi-full'
   >('kpi-full')
 
   const selectedJobId = panelView.type === 'job-detail' ? panelView.jobId : undefined
@@ -160,7 +164,7 @@ function DashboardContent({
 
   // When panelView changes to a detail view, open the mobile bottom sheet
   useEffect(() => {
-    if (panelView.type === 'job-detail' || panelView.type === 'attention-detail' || panelView.type === 'getting-started') {
+    if (panelView.type === 'job-detail' || panelView.type === 'attention-detail') {
       setMobileSheetMode(panelView.type)
       setMobileSheetOpen(true)
     } else if (panelView.type === 'default') {
@@ -201,8 +205,7 @@ function DashboardContent({
   const showGettingStartedMobile =
     setupProgress &&
     !setupProgress.dismissed &&
-    setupProgress.items &&
-    !setupProgress.items['first_review_click']
+    !setupProgress.allComplete
 
   const selectableAlerts = toSelectableAlerts(alerts)
 
@@ -225,15 +228,6 @@ function DashboardContent({
           if (alert) {
             return <RightPanelAttentionDetail alert={alert} />
           }
-        }
-        return null
-      case 'getting-started':
-        if (setupProgress) {
-          return (
-            <div className="p-4">
-              <RightPanelGettingStarted items={setupProgress.items} />
-            </div>
-          )
         }
         return null
       case 'kpi-full':
@@ -289,7 +283,13 @@ function DashboardContent({
         {/* Getting Started — mobile only (right panel hidden on mobile) */}
         {showGettingStartedMobile && (
           <div className="lg:hidden">
-            <RightPanelGettingStarted items={setupProgress!.items} />
+            <RightPanelGettingStarted
+              items={setupProgress!.items}
+              completedCount={setupProgress!.completedCount}
+              allComplete={setupProgress!.allComplete}
+              initialCollapsed={setupProgress!.collapsed}
+              initialDismissed={setupProgress!.dismissed}
+            />
           </div>
         )}
       </div>
@@ -351,7 +351,13 @@ export interface DashboardClientProps {
   readyJobs: ReadyToSendJob[]
   alerts: AttentionAlert[]
   hasJobHistory: boolean
-  setupProgress: { completedCount: number; dismissed: boolean; items: Record<ChecklistItemId, boolean> } | null
+  setupProgress: {
+    completedCount: number
+    dismissed: boolean
+    collapsed: boolean
+    allComplete: boolean
+    items: Record<ChecklistItemId, boolean>
+  } | null
 }
 
 /**
@@ -362,7 +368,7 @@ export interface DashboardClientProps {
  * - Left column (children): DashboardContent with task lists
  * - Right panel default: compact KPIs + pipeline + recent activity
  * - Right panel detail: DashboardDetailContent (reads panelView from context)
- * - Right panel getting-started: checklist for new users
+ * - Right panel getting-started: persistent checklist card at top of right panel
  *
  * Both DashboardContent and DashboardDetailContent are rendered as children
  * of DashboardShell, giving them access to useDashboardPanel context.
@@ -372,6 +378,7 @@ export interface DashboardClientProps {
  * - DashboardContent renders KPISummaryBar above task lists on mobile
  * - Tapping a job/alert or the KPI bar opens MobileBottomSheet with the detail
  * - MobileBottomSheet close resets panelView to 'default'
+ * - Getting Started renders inline in left column on mobile
  */
 export function DashboardClient({
   greeting,
@@ -393,18 +400,19 @@ export function DashboardClient({
     />
   )
 
-  // Getting Started content for right panel
-  // Show when user hasn't gotten their first review click and hasn't dismissed
+  // Getting Started content for right panel — persistent card at top
   const showGettingStarted =
     setupProgress &&
-    !setupProgress.dismissed &&
-    setupProgress.items &&
-    !setupProgress.items['first_review_click']
+    !setupProgress.dismissed
 
   const gettingStartedContent = showGettingStarted ? (
-    <div className="p-4">
-      <RightPanelGettingStarted items={setupProgress!.items} />
-    </div>
+    <RightPanelGettingStarted
+      items={setupProgress!.items}
+      completedCount={setupProgress!.completedCount}
+      allComplete={setupProgress!.allComplete}
+      initialCollapsed={setupProgress!.collapsed}
+      initialDismissed={setupProgress!.dismissed}
+    />
   ) : undefined
 
   return (

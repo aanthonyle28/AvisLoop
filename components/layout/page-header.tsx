@@ -4,21 +4,12 @@ import Link from 'next/link'
 import { UserCircle, ArrowsClockwise } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { AccountMenu } from './account-menu'
-import { SetupProgress } from '@/components/onboarding/setup-progress'
-import type { ChecklistItemId } from '@/lib/constants/checklist'
 
 interface PageHeaderProps {
   title?: string
-  setupProgress?: {
-    items: Record<ChecklistItemId, boolean>
-    completedCount: number
-    allComplete: boolean
-    dismissed: boolean
-    firstSeenAt: string | null
-  } | null
 }
 
-export function PageHeader({ title, setupProgress }: PageHeaderProps) {
+export function PageHeader({ title }: PageHeaderProps) {
   return (
     <header className="md:hidden bg-card border-b border-border">
       <div className="h-16 px-4 flex items-center justify-between">
@@ -47,19 +38,6 @@ export function PageHeader({ title, setupProgress }: PageHeaderProps) {
           />
         </div>
       </div>
-
-      {/* Setup progress pill - mobile only, below header */}
-      {setupProgress && !setupProgress.allComplete && (
-        <div className="px-4 pb-3 flex justify-center">
-          <SetupProgress
-            items={setupProgress.items}
-            completedCount={setupProgress.completedCount}
-            allComplete={setupProgress.allComplete}
-            dismissed={setupProgress.dismissed}
-            firstSeenAt={setupProgress.firstSeenAt}
-          />
-        </div>
-      )}
     </header>
   )
 }
