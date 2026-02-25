@@ -3,7 +3,7 @@ import { CardSkeleton } from '@/components/skeletons/card-skeleton'
 
 export default function BillingLoading() {
   return (
-    <div className="container mx-auto py-6 px-4 space-y-6">
+    <div className="container max-w-4xl py-6 space-y-8">
       {/* Header */}
       <Skeleton className="h-8 w-48" />
 

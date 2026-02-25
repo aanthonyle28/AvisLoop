@@ -3,10 +3,13 @@ import { TableSkeleton } from '@/components/skeletons/table-skeleton'
 
 export default function JobsLoading() {
   return (
-    <div className="container py-6 space-y-6">
+    <div className="container py-6 space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <Skeleton className="h-8 w-24" />
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-24" />
+          <Skeleton className="h-4 w-48" />
+        </div>
         <Skeleton className="h-10 w-28" />
       </div>
 

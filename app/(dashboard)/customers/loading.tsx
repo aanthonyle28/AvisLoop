@@ -1,12 +1,15 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import { TableSkeleton } from '@/components/skeletons/table-skeleton'
 
-export default function ContactsLoading() {
+export default function CustomersLoading() {
   return (
-    <div className="container py-6 space-y-6">
+    <div className="container py-6 space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <Skeleton className="h-8 w-32" />
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-32" />
+          <Skeleton className="h-4 w-56" />
+        </div>
         <div className="flex gap-2">
           <Skeleton className="h-10 w-28" />
           <Skeleton className="h-10 w-32" />
