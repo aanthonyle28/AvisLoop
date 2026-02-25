@@ -18,12 +18,12 @@ export function ServiceTypeBreakdown({ data }: Props) {
     return (
       <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
         <div className="rounded-full bg-muted p-6 mb-6">
-          <ChartBar size={32} weight="regular" className="text-muted-foreground" />
+          <ChartBar className="h-8 w-8 text-muted-foreground" weight="regular" />
         </div>
-        <h2 className="text-xl font-semibold tracking-tight mb-2">
+        <h2 className="text-2xl font-semibold tracking-tight mb-2">
           No analytics data yet
         </h2>
-        <p className="text-muted-foreground mb-6 max-w-sm">
+        <p className="text-muted-foreground mb-8 max-w-md">
           Analytics appear once campaigns start sending. Complete a job to kick off your first campaign.
         </p>
         <Button onClick={openAddJob}>Add your first job</Button>

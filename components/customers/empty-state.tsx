@@ -10,7 +10,7 @@ export function CustomersEmptyState() {
   return (
     <div className='flex flex-col items-center justify-center py-16 px-4 text-center'>
       <div className='rounded-full bg-muted p-6 mb-6'>
-        <AddressBook size={48} weight="regular" className='text-muted-foreground' />
+        <AddressBook className='h-8 w-8 text-muted-foreground' weight="regular" />
       </div>
 
       <h2 className='text-2xl font-semibold tracking-tight mb-2'>
@@ -39,11 +39,11 @@ export function CustomersEmptyState() {
 export function CustomersFilteredEmptyState() {
   return (
     <div className='flex flex-col items-center justify-center py-16 px-4 text-center'>
-      <div className='rounded-full bg-muted p-4 mb-4'>
-        <Users size={32} weight="regular" className="text-muted-foreground" />
+      <div className='rounded-full bg-muted p-6 mb-6'>
+        <Users className="h-8 w-8 text-muted-foreground" weight="regular" />
       </div>
-      <h3 className='text-lg font-semibold mb-2'>No customers found</h3>
-      <p className='text-muted-foreground max-w-sm'>
+      <h2 className='text-2xl font-semibold tracking-tight mb-2'>No customers found</h2>
+      <p className='text-muted-foreground max-w-md'>
         Try adjusting your search or filter criteria.
       </p>
     </div>
