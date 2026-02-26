@@ -5,26 +5,33 @@
 See: .planning/PROJECT.md (updated 2026-02-25)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** Phase 49 — Custom Services Visual Polish (COMPLETE), Phase 50 — Code Review & Audit (in progress)
+**Current focus:** Phase 46 — Drawer Consistency & Campaign Freeze Fix (in progress), Phase 50 — Code Review & Audit (in progress)
 
 ## Current Position
 
-Phase: 49 of 50 (Custom Services Visual Polish) — COMPLETE
-Plan: 3 of 3 complete (49-01, 49-02, 49-03 done)
-Status: Phase 49 complete — ready for Phase 50 continuation (50-03 next)
-Last activity: 2026-02-26 — Completed 49-03-PLAN.md (page subtitle normalization, bg-card table rows)
+Phase: 46 (Drawer Consistency & Campaign Freeze Fix) — In progress
+Plan: 46-04 of 5 complete (46-01, 46-03, 46-04 done; 46-02, 46-05 in progress)
+Status: In progress — 46-04 complete, continuing Wave 2
+Last activity: 2026-02-26 — Completed 46-04-PLAN.md (drawer consistency for 4 form sheets)
 
-Progress: [██████░░░░] ~65% (v2.5.3+ — phases 46, 49 complete, 50 remaining)
+Progress: [██████░░░░] ~66% (v2.5.3+ — phases 46 in progress, 49 complete, 50 in progress)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 223
-- Phase 49 plans completed: 3 (49-01, 49-02, 49-03)
+- Total plans completed (project): 224
+- Phase 46 plans completed: 3 (46-01, 46-03, 46-04)
 
 *Updated after each plan completion*
 
 ## Accumulated Context
+
+### Key Decisions for Phase 46 (Drawer Consistency)
+
+- SheetBody/SheetFooter pattern: form wraps both SheetBody and SheetFooter (flex flex-col flex-1 min-h-0) so submit buttons are native form children
+- Edit Customer exception: uses form id attribute (form='edit-customer-form') because non-form content (SMS consent, activity) sits between form fields and footer
+- All form sheets normalized to sm:max-w-lg width (512px)
+- Separator components removed from Edit Customer (replaced by natural space-y-6 spacing)
 
 ### Key Decisions for Phase 49 (Visual Polish)
 
@@ -91,6 +98,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-26
-Stopped at: Completed 49-03-PLAN.md (page subtitle normalization, table row bg-card)
+Stopped at: Completed 46-04-PLAN.md (drawer consistency for Add Job, Edit Job, Add Customer, Edit Customer)
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
