@@ -5,6 +5,7 @@ import type { ServiceType } from '@/lib/types/database'
 
 interface BusinessSettingsContextValue {
   enabledServiceTypes: ServiceType[]
+  customServiceNames: string[]
 }
 
 const BusinessSettingsContext = createContext<BusinessSettingsContextValue | null>(null)
@@ -19,15 +20,17 @@ export function useBusinessSettings() {
 
 interface BusinessSettingsProviderProps {
   enabledServiceTypes: ServiceType[]
+  customServiceNames: string[]
   children: React.ReactNode
 }
 
 export function BusinessSettingsProvider({
   enabledServiceTypes,
+  customServiceNames,
   children,
 }: BusinessSettingsProviderProps) {
   return (
-    <BusinessSettingsContext.Provider value={{ enabledServiceTypes }}>
+    <BusinessSettingsContext.Provider value={{ enabledServiceTypes, customServiceNames }}>
       {children}
     </BusinessSettingsContext.Provider>
   )

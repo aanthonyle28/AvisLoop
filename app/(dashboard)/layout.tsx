@@ -12,6 +12,7 @@ export default async function DashboardGroupLayout({
 }) {
   const serviceSettings = await getServiceTypeSettings()
   const enabledServiceTypes = (serviceSettings?.serviceTypesEnabled || []) as ServiceType[]
+  const customServiceNames = serviceSettings?.customServiceNames || []
 
   // Get badge count for nav (lightweight query)
   let dashboardBadge = 0
@@ -23,7 +24,7 @@ export default async function DashboardGroupLayout({
   }
 
   return (
-    <BusinessSettingsProvider enabledServiceTypes={enabledServiceTypes}>
+    <BusinessSettingsProvider enabledServiceTypes={enabledServiceTypes} customServiceNames={customServiceNames}>
       <AddJobProvider>
         <AppShell dashboardBadge={dashboardBadge}>
           {children}
