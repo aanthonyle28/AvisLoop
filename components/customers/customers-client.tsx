@@ -155,9 +155,9 @@ export function CustomersClient({
       {/* Header */}
       <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
         <div>
-          <h1 className='text-3xl font-bold tracking-tight'>Customers</h1>
-          <p className='text-muted-foreground mt-1'>
-            Customers are created automatically when you complete jobs
+          <h1 className="text-2xl font-semibold tracking-tight">Customers</h1>
+          <p className="text-muted-foreground">
+            Created automatically when you complete jobs &middot; {initialCustomers.length} total
           </p>
         </div>
 

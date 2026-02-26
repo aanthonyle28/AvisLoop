@@ -2,7 +2,6 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getFeedbackForBusiness, getFeedbackStats } from '@/lib/data/feedback'
 import { FeedbackList } from '@/components/feedback/feedback-list'
-import { ChatCircle } from '@phosphor-icons/react/dist/ssr'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -41,13 +40,10 @@ export default async function FeedbackPage() {
   return (
     <div className="container max-w-4xl py-6 space-y-6">
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <ChatCircle size={24} weight="regular" />
-          <h1 className="text-2xl font-bold">Customer Feedback</h1>
-        </div>
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Customer Feedback</h1>
         <p className="text-muted-foreground">
-          Private feedback from customers collected through your review funnel.
+          Private feedback from your review funnel &middot; {stats.total} total
         </p>
       </div>
 

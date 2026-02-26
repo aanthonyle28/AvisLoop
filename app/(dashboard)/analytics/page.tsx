@@ -19,7 +19,12 @@ export default async function AnalyticsPage() {
 
   return (
     <div className="container py-6 space-y-6">
-      <h1 className="text-2xl font-bold mb-6">Analytics</h1>
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Analytics</h1>
+        <p className="text-muted-foreground">
+          Track review performance by service type
+        </p>
+      </div>
       <ServiceTypeBreakdown data={analyticsData} />
     </div>
   )

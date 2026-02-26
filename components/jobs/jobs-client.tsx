@@ -59,7 +59,7 @@ export function JobsClient({ initialJobs, totalJobs, customers, campaignMap, cam
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Jobs</h1>
           <p className="text-muted-foreground">
-            {totalJobs} {totalJobs === 1 ? 'job' : 'jobs'} total
+            Track your service jobs &middot; {totalJobs} total
           </p>
         </div>
         <FirstVisitHint

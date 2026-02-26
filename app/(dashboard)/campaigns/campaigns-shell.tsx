@@ -39,7 +39,7 @@ export function CampaignsPageShell({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Campaigns</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Campaigns</h1>
           <p className="text-muted-foreground">
             Automated review request sequences for completed jobs
           </p>
