@@ -42,7 +42,7 @@ interface AddJobSheetProps {
 }
 
 export function AddJobSheet({ open, onOpenChange, customers, isLoadingData }: AddJobSheetProps) {
-  const { enabledServiceTypes } = useBusinessSettings()
+  const { enabledServiceTypes, customServiceNames } = useBusinessSettings()
   const [state, formAction, isPending] = useActionState<JobActionState | null, FormData>(
     createJob,
     null
@@ -254,6 +254,7 @@ export function AddJobSheet({ open, onOpenChange, customers, isLoadingData }: Ad
                 onChange={setServiceType}
                 error={state?.fieldErrors?.serviceType?.[0]}
                 enabledTypes={enabledServiceTypes}
+                customServiceNames={customServiceNames}
               />
             )}
           </div>
