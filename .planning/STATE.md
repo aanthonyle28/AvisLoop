@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-25)
 ## Current Position
 
 Phase: 45 of 49 (Foundation Visual Changes)
-Plan: 45-02 of 3
+Plan: 45-01 of 3
 Status: In progress
-Last activity: 2026-02-25 — Completed 45-02-PLAN.md (rename Activity → History in nav)
+Last activity: 2026-02-26 — Completed 45-01-PLAN.md (soft button variant + dashboard audit)
 
 Progress: [░░░░░░░░░░] 0% (v2.5.3 milestone)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 212
-- v2.5.3 plans completed: 1
+- Total plans completed (project): 213
+- v2.5.3 plans completed: 2
 
 *Updated after each plan completion*
 
@@ -34,6 +34,8 @@ Progress: [░░░░░░░░░░] 0% (v2.5.3 milestone)
 - Campaign preset picker: vertical stack, Standard in middle, plain-English copy
 - Custom service names must propagate to all service selectors (Add Job, filters, etc.)
 - Needs Attention dismiss must actually remove items (UI-only hide)
+- soft button variant: bg-muted/text-muted-foreground — use for secondary actions alongside a primary default CTA
+- outline button retained for primary-action-among-equals (e.g., Send One-Off — no competing default CTA present)
 
 ### Cross-Cutting Concerns (apply to every plan)
 
@@ -62,7 +64,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-25
-Stopped at: Completed 45-02-PLAN.md — nav label rename done
+Last session: 2026-02-26
+Stopped at: Completed 45-01-PLAN.md — soft button variant + dashboard button audit done
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
