@@ -5,28 +5,28 @@
 See: .planning/PROJECT.md (updated 2026-02-25)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** Phase 46 — Drawer Consistency & Campaign Freeze Fix (in progress), Phase 50 — Code Review & Audit (in progress)
+**Current focus:** Phase 46 — Drawer Consistency & Campaign Freeze Fix (COMPLETE), Phase 50 — Code Review & Audit (in progress)
 
 ## Current Position
 
-Phase: 46 (Drawer Consistency & Campaign Freeze Fix) — In progress
-Plan: 46-05 of 5 complete (46-01, 46-03, 46-04, 46-05 done; 46-02 remaining)
-Status: In progress — 46-05 complete, only 46-02 remaining
-Last activity: 2026-02-26 — Completed 46-05-PLAN.md (drawer consistency for Job Detail + Customer Detail)
+Phase: 46 (Drawer Consistency & Campaign Freeze Fix) — COMPLETE
+Plan: 5 of 5 complete (46-01, 46-02, 46-03, 46-04, 46-05 all done)
+Status: Phase complete
+Last activity: 2026-02-26 — Completed 46-02-PLAN.md (campaign freeze/unfreeze + frozen-aware query audit)
 
-Progress: [██████░░░░] ~68% (v2.5.3+ — phases 46 near-complete, 49 complete, 50 in progress)
+Progress: [███████░░░] ~70% (v2.5.3+ — phase 46 complete, 49 complete, 50 in progress)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 225
-- Phase 46 plans completed: 4 (46-01, 46-03, 46-04, 46-05)
+- Total plans completed (project): 226
+- Phase 46 plans completed: 5 (46-01, 46-02, 46-03, 46-04, 46-05) -- PHASE COMPLETE
 
 *Updated after each plan completion*
 
 ## Accumulated Context
 
-### Key Decisions for Phase 46 (Drawer Consistency)
+### Key Decisions for Phase 46 (Drawer Consistency + Campaign Freeze)
 
 - SheetBody/SheetFooter pattern: form wraps both SheetBody and SheetFooter (flex flex-col flex-1 min-h-0) so submit buttons are native form children
 - Edit Customer exception: uses form id attribute (form='edit-customer-form') because non-form content (SMS consent, activity) sits between form fields and footer
@@ -34,6 +34,9 @@ Progress: [██████░░░░] ~68% (v2.5.3+ — phases 46 near-comp
 - Separator components removed from Edit Customer (replaced by natural space-y-6 spacing)
 - Job Detail "Complete" button normalized to default variant (primary CTA) — removed outline + custom color overrides
 - Conflict resolution buttons stay in SheetBody (contextual), not SheetFooter (global actions)
+- Campaign pause freezes enrollments (status='frozen') instead of stopping them -- non-terminal, preserves touch position
+- Campaign resume unfreezes frozen enrollments back to 'active' and bumps stale scheduled times to NOW
+- getCampaignEnrollmentCounts returns frozen count alongside active/completed/stopped
 
 ### Key Decisions for Phase 49 (Visual Polish)
 
@@ -100,6 +103,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-26
-Stopped at: Completed 46-05-PLAN.md (drawer consistency for Job Detail + Customer Detail drawers)
+Stopped at: Completed 46-02-PLAN.md (campaign freeze/unfreeze + frozen-aware query audit) -- Phase 46 COMPLETE
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
