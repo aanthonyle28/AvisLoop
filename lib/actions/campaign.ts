@@ -200,7 +200,7 @@ export async function getCampaignDeletionInfo(campaignId: string): Promise<{
       .select('*', { count: 'exact', head: true })
       .eq('campaign_id', campaignId)
       .eq('business_id', business.id)
-      .eq('status', 'active'),
+      .in('status', ['active', 'frozen']),
     supabase
       .from('jobs')
       .select('*', { count: 'exact', head: true })
@@ -258,15 +258,15 @@ export async function deleteCampaign(
   if (reassignCampaignId) {
     // --- Reassign enrollments to another campaign ---
 
-    // Fetch active enrollments from the campaign being deleted
+    // Fetch active/frozen enrollments from the campaign being deleted
     const { data: activeEnrollments } = await supabase
       .from('campaign_enrollments')
       .select('id, job_id, customer_id, business_id')
       .eq('campaign_id', campaignId)
       .eq('business_id', business.id)
-      .eq('status', 'active')
+      .in('status', ['active', 'frozen'])
 
-    // Stop old enrollments
+    // Stop old enrollments (both active and frozen)
     await supabase
       .from('campaign_enrollments')
       .update({
@@ -276,7 +276,7 @@ export async function deleteCampaign(
       })
       .eq('campaign_id', campaignId)
       .eq('business_id', business.id)
-      .eq('status', 'active')
+      .in('status', ['active', 'frozen'])
 
     // Create new enrollments in target campaign if there were active ones
     if (activeEnrollments?.length) {
@@ -290,12 +290,12 @@ export async function deleteCampaign(
       const touch1 = targetTouches?.find(t => t.touch_number === 1)
 
       if (touch1) {
-        // Check which customers already have active enrollment in target campaign
+        // Check which customers already have active/frozen enrollment in target campaign
         const { data: existingInTarget } = await supabase
           .from('campaign_enrollments')
           .select('customer_id')
           .eq('campaign_id', reassignCampaignId)
-          .eq('status', 'active')
+          .in('status', ['active', 'frozen'])
 
         const existingCustomerIds = new Set(
           existingInTarget?.map(e => e.customer_id) || []
@@ -326,7 +326,7 @@ export async function deleteCampaign(
       }
     }
   } else {
-    // --- Original behavior: stop all active enrollments ---
+    // --- Original behavior: stop all active/frozen enrollments ---
     await supabase
       .from('campaign_enrollments')
       .update({
@@ -336,7 +336,7 @@ export async function deleteCampaign(
       })
       .eq('campaign_id', campaignId)
       .eq('business_id', business.id)
-      .eq('status', 'active')
+      .in('status', ['active', 'frozen'])
   }
 
   // Clear campaign_override on jobs referencing this campaign (scoped to business)
