@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { Info } from '@phosphor-icons/react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { getAvailableCampaignsForJob, type AvailableCampaign } from '@/lib/actions/add-job-campaigns'
@@ -9,6 +10,7 @@ import type { ServiceType } from '@/lib/types/database'
 // Special campaign choice values
 export const CAMPAIGN_DO_NOT_SEND = '__do_not_send__'
 export const CAMPAIGN_ONE_OFF = '__one_off__'
+export const CAMPAIGN_CREATE = '__create_campaign__'
 
 interface CampaignSelectorProps {
   serviceType: ServiceType
@@ -27,6 +29,7 @@ export function CampaignSelector({
   showOneOff = false,
   defaultCampaignId,
 }: CampaignSelectorProps) {
+  const router = useRouter()
   const [isLoading, startTransition] = useTransition()
   const [campaigns, setCampaigns] = useState<AvailableCampaign[]>([])
   const lastServiceTypeRef = useRef<string>('')
@@ -77,6 +80,9 @@ export function CampaignSelector({
     options.push({ value: c.id, label })
   }
 
+  // Create new campaign option
+  options.push({ value: CAMPAIGN_CREATE, label: '+ Create new campaign' })
+
   // One-off option
   if (showOneOff) {
     options.push({ value: CAMPAIGN_ONE_OFF, label: 'Send one-off review request' })
@@ -98,7 +104,14 @@ export function CampaignSelector({
       )}
       <select
         value={selectedCampaignId || ''}
-        onChange={(e) => onCampaignChange(e.target.value || null)}
+        onChange={(e) => {
+          const val = e.target.value
+          if (val === CAMPAIGN_CREATE) {
+            router.push('/campaigns')
+            return
+          }
+          onCampaignChange(val || null)
+        }}
         className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
       >
         {noCampaigns && <option value="">No campaign</option>}
