@@ -77,8 +77,8 @@ function AlertRow({ alert, isSelected, onSelect, onDismiss }: AlertRowProps) {
   return (
     <div
       className={cn(
-        'flex items-start justify-between gap-3 px-3 py-2.5 cursor-pointer transition-colors',
-        isSelected ? 'bg-muted' : 'hover:bg-muted/50',
+        'flex items-start justify-between gap-3 px-3 py-2.5 cursor-pointer transition-colors rounded-lg border border-border',
+        isSelected ? 'bg-muted' : 'bg-card hover:bg-muted/50',
       )}
       onClick={onSelect}
       role="button"
@@ -220,7 +220,7 @@ export function AttentionAlerts({ alerts, onSelectAlert, selectedAlertId }: Atte
         </div>
       ) : (
         <>
-          <div className="divide-y divide-border">
+          <div className="space-y-2">
             {displayedAlerts.map((alert) => (
               <AlertRow
                 key={alert.id}
@@ -257,9 +257,9 @@ export function AttentionAlertsSkeleton() {
         <div className="h-5 w-8 bg-muted animate-pulse rounded" />
       </div>
       {/* Row skeletons */}
-      <div className="divide-y divide-border">
+      <div className="space-y-2">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="flex items-start justify-between gap-3 rounded-md px-3 py-2.5">
+          <div key={i} className="flex items-start justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2.5">
             <div className="flex items-start gap-2 min-w-0 flex-1">
               <div className="size-5 bg-muted animate-pulse rounded-full shrink-0" />
               <div className="space-y-1.5 flex-1">
