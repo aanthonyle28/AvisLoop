@@ -1,52 +1,44 @@
-# Requirements: v2.5.2 UX Bugs & UI Fixes
+# Requirements: v2.5.3 UX Bugs & UI Fixes Part 2
 
-**Milestone:** v2.5.2 — UX Bugs & UI Fixes
+**Milestone:** v2.5.3 — UX Bugs & UI Fixes Part 2
 **Created:** 2026-02-25
-**Status:** Roadmapped
+**Status:** Scoped
 
 ---
 
-## Drawers
+## Getting Started / Onboarding
 
-- [ ] **DRW-01**: All drawers use white background content sections to group related content (no borders/dividers) — matching request details drawer pattern
-- [ ] **DRW-02**: All drawer action buttons are sticky/fixed at the bottom, always visible during scroll
-- [ ] **DRW-03**: Job detail drawer buttons are consistent with other drawer button patterns
-- [ ] **DRW-04**: Add Job drawer width matches other drawers (not skinny)
-- [ ] **DRW-05**: Add Job form uses Radix Select components instead of native HTML selects
+- [ ] **GS-01**: Getting Started step 2 ("Review your campaign") marks complete only when user visits a campaign detail page — not when a campaign exists
+- [ ] **GS-02**: Getting Started step 2 handles edge case where onboarding campaign is deleted — any campaign detail visit counts
 
-## Dashboard Right Panel
+- [ ] **ONB-01**: Campaign preset picker uses vertical stack layout with Standard preset in the middle position
+- [ ] **ONB-02**: Campaign preset picker uses plain-English descriptions without jargon (no "multi-touch sequence", "touch #1/2/3")
+- [ ] **ONB-03**: Campaign preset picker subtitle says "You can change this later in Campaigns" (not "in Settings")
 
-- [ ] **DRKP-01**: KPI cards have light gray background with mini sparkline graphs showing trend data
-- [ ] **DRKP-02**: KPI sparklines have appropriate empty state when no historical data exists
-- [ ] **DRKP-03**: Recent Activity items have distinct colored circle icons per event type with increased spacing
-- [ ] **DRKP-04**: Pipeline counter row retains compact layout below KPI cards
+## Custom Services
 
-## Dashboard Queue
+- [ ] **SVC-01**: Custom service name pills in onboarding and settings render at readable size (not clipped/tiny)
+- [ ] **SVC-02**: Custom service names propagate to Add Job service type dropdown
+- [ ] **SVC-03**: Custom service names propagate to all other service selectors (job filters, campaign service targeting, etc.)
 
-- [ ] **DQ-01**: Ready to Send and Needs Attention rows have white background with border-radius (not floating)
-- [ ] **DQ-02**: Ready to Send empty state uses solid border (not dashed) with white background
-- [ ] **DQ-03**: Needs Attention empty state matches Ready to Send empty state treatment (solid border, white background)
-- [ ] **DQ-04**: Ready to Send empty state "Add Jobs" button opens Add Job drawer instead of navigating to /jobs
+## Dashboard
 
-## Campaign Fixes
+- [ ] **DASH-01**: Needs Attention X dismiss button actually removes the item from the dashboard list
+- [ ] **DASH-02**: KPI stat cards all navigate to /analytics (unified destination, not split between history/analytics)
 
-- [ ] **CAMP-01**: Campaign pause/re-enable bug fixed — completed jobs no longer stuck as "stopped" after campaign is re-enabled
-- [ ] **CAMP-02**: Pausing a campaign freezes all in-progress enrollments in place (new `frozen` status); resuming picks up from the same touch position
-- [ ] **CAMP-03**: Cron processor correctly skips frozen enrollments and resumes them when campaign is re-activated
-- [ ] **CAMP-04**: Touch sequence section on campaign detail page shows preview of email/SMS template content for each touch (including default templates)
+## Add Job
 
-## Campaign UI Polish
+- [ ] **JOB-01**: Campaign dropdown in Add Job drawer includes "Create new campaign" option that navigates to campaigns page (create campaign modal)
 
-- [ ] **CUI-01**: Campaign page receives visual retouch consistent with overall app design
+## Page Subtitles
 
-## Button Hierarchy
+- [ ] **SUB-01**: All app pages use consistent subtitle pattern: static description + dynamic count (e.g., "Track your service jobs · 12 this month")
 
-- [ ] **BTN-01**: New `soft` button variant added to CVA (muted background, doesn't compete with primary)
-- [ ] **BTN-02**: Dashboard buttons audited and secondary actions switched to soft variant to reduce visual noise
+## Visual Polish
 
-## Navigation
-
-- [ ] **NAV-01**: "Activity" renamed to "History" in sidebar and bottom nav
+- [ ] **VIS-01**: Jobs table rows have white background
+- [ ] **VIS-02**: Activity/history page rows have white background
+- [ ] **VIS-03**: QuickSendModal UI redesigned to match current design style (layout, spacing, visual refresh)
 
 ---
 
@@ -54,10 +46,10 @@
 
 | Feature | Reason |
 |---------|--------|
-| Full dashboard command center (v2.6) | Paused milestone, resume after v2.5.2 |
-| Virtual scrolling for large lists | Low priority, no performance complaints |
-| Full Phosphor icon migration (remaining lucide) | Tracked separately |
-| Onboarding step changes | Already addressed in v2.5.1 |
+| v2.5.2 scope (drawers, campaign freeze, sparklines, soft button variant) | Separate milestone, Phases 45-47 |
+| v2.6 Dashboard Command Center | Paused, resume after patch series |
+| Getting Started step logic for steps other than step 2 | Only step 2 is broken |
+| Full campaign preset redesign | Only the picker UI during onboarding |
 
 ---
 
@@ -65,33 +57,27 @@
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| DRW-01 | Phase 46 | Pending |
-| DRW-02 | Phase 46 | Pending |
-| DRW-03 | Phase 46 | Pending |
-| DRW-04 | Phase 46 | Pending |
-| DRW-05 | Phase 47 | Pending |
-| DRKP-01 | Phase 47 | Pending |
-| DRKP-02 | Phase 47 | Pending |
-| DRKP-03 | Phase 47 | Pending |
-| DRKP-04 | Phase 47 | Pending |
-| DQ-01 | Phase 45 | Pending |
-| DQ-02 | Phase 45 | Pending |
-| DQ-03 | Phase 45 | Pending |
-| DQ-04 | Phase 45 | Pending |
-| CAMP-01 | Phase 46 | Pending |
-| CAMP-02 | Phase 46 | Pending |
-| CAMP-03 | Phase 46 | Pending |
-| CAMP-04 | Phase 47 | Pending |
-| CUI-01 | Phase 47 | Pending |
-| BTN-01 | Phase 45 | Pending |
-| BTN-02 | Phase 45 | Pending |
-| NAV-01 | Phase 45 | Pending |
+| GS-01 | TBD | Pending |
+| GS-02 | TBD | Pending |
+| ONB-01 | TBD | Pending |
+| ONB-02 | TBD | Pending |
+| ONB-03 | TBD | Pending |
+| SVC-01 | TBD | Pending |
+| SVC-02 | TBD | Pending |
+| SVC-03 | TBD | Pending |
+| DASH-01 | TBD | Pending |
+| DASH-02 | TBD | Pending |
+| JOB-01 | TBD | Pending |
+| SUB-01 | TBD | Pending |
+| VIS-01 | TBD | Pending |
+| VIS-02 | TBD | Pending |
+| VIS-03 | TBD | Pending |
 
 **Coverage:**
-- v2.5.2 requirements: 21 total
-- Mapped to phases: 21
-- Unmapped: 0
+- v2.5.3 requirements: 15 total
+- Mapped to phases: 0
+- Unmapped: 15
 
 ---
 *Requirements defined: 2026-02-25*
-*Last updated: 2026-02-25 — traceability section complete (Phases 45-47)*
+*Last updated: 2026-02-25 after initial definition*
