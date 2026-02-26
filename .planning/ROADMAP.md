@@ -772,7 +772,10 @@ Plans:
   5. Clicking the X dismiss button on a Needs Attention item removes it from the dashboard list immediately
   6. All three KPI stat cards on the dashboard navigate to /analytics when clicked (not split between /history and /analytics)
   7. Add Job campaign dropdown includes a "Create new campaign" option that opens the campaign creation flow when no campaigns exist for the selected service type
-**Plans**: TBD
+**Plans**: 2 plans in 1 wave
+Plans:
+- [x] 48-01-PLAN.md — Getting Started trigger, KPI links, dismiss verify, campaign selector
+- [x] 48-02-PLAN.md — Campaign preset picker redesign: vertical stack, plain English, correct subtitle
 
 ### Phase 49: Custom Services, Visual Polish & Page Subtitles
 **Goal**: Custom service names render correctly and propagate to all service selectors across the app, all pages have consistent subtitles, table rows have white backgrounds, and QuickSendModal matches the current design language.
@@ -874,12 +877,12 @@ See individual phase sections above for requirements, success criteria, and depe
 | **45** | **v2.5.2 UX Bugs & UI Fixes** | **3/3** | **Complete** | **2026-02-26** |
 | **46** | **v2.5.2 UX Bugs & UI Fixes** | **0/TBD** | **Not started** | - |
 | **47** | **v2.5.2 UX Bugs & UI Fixes** | **0/TBD** | **Not started** | - |
-| **48** | **v2.5.3 UX Bugs Part 2** | **0/TBD** | **Not started** | - |
+| **48** | **v2.5.3 UX Bugs Part 2** | **2/2** | **Complete** | **2026-02-25** |
 | **49** | **v2.5.3 UX Bugs Part 2** | **0/TBD** | **Not started** | - |
 | **50** | **v2.5.4 Code Review** | **0/TBD** | **Not started** | - |
 | **51** | **v2.5.4 Code Review** | **0/TBD** | **Not started** | - |
 
-**Total:** 214 plans complete across shipped phases.
+**Total:** 216 plans complete across shipped phases.
 
 ## What's Next
 
