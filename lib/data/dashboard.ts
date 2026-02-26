@@ -123,19 +123,19 @@ export async function getDashboardKPIs(businessId: string): Promise<DashboardKPI
         .gte('created_at', lastWeekStart.toISOString())
         .lte('created_at', lastWeekEnd.toISOString()),
 
-      // Active sequences (enrollments) now
+      // Active sequences (enrollments) now — includes frozen (paused campaign)
       supabase
         .from('campaign_enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('business_id', businessId)
-        .eq('status', 'active'),
+        .in('status', ['active', 'frozen']),
 
       // Active sequences 7 days ago (approximate via enrolled_at counting)
       supabase
         .from('campaign_enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('business_id', businessId)
-        .eq('status', 'active')
+        .in('status', ['active', 'frozen'])
         .lte('enrolled_at', lastWeekEnd.toISOString()),
 
       // Pending/queued sends now
@@ -309,7 +309,7 @@ export async function getReadyToSendJobs(
         .map(j => j.customer_id)
     )
 
-    // Fetch active enrollments for conflict customers
+    // Fetch active/frozen enrollments for conflict customers
     const customerEnrollments: Map<string, { existingCampaignName: string; currentTouch: number; totalTouches: number }> = new Map()
     if (conflictCustomerIds.size > 0) {
       const { data: activeEnrollments } = await supabase
@@ -317,7 +317,7 @@ export async function getReadyToSendJobs(
         .select('customer_id, current_touch, campaigns:campaign_id(name, campaign_touches(touch_number))')
         .in('customer_id', Array.from(conflictCustomerIds))
         .eq('business_id', businessId)
-        .eq('status', 'active')
+        .in('status', ['active', 'frozen'])
 
       for (const enrollment of activeEnrollments || []) {
         const campaign = Array.isArray(enrollment.campaigns) ? enrollment.campaigns[0] : enrollment.campaigns
@@ -348,7 +348,7 @@ export async function getReadyToSendJobs(
         .select('customer_id, current_touch, campaigns:campaign_id(name, campaign_touches(touch_number))')
         .in('customer_id', Array.from(preflightCustomerIds))
         .eq('business_id', businessId)
-        .eq('status', 'active')
+        .in('status', ['active', 'frozen'])
 
       for (const enrollment of activeEnrollments || []) {
         const campaign = Array.isArray(enrollment.campaigns) ? enrollment.campaigns[0] : enrollment.campaigns
@@ -767,7 +767,7 @@ export async function getReadyToSendJobWithCampaign(
       campaigns: { id: string; name: string } | { id: string; name: string }[] | null
     }
     const enrollments = (job.campaign_enrollments || []) as unknown as EnrollmentRow[]
-    const activeEnrollment = enrollments.find(e => e.status === 'active')
+    const activeEnrollment = enrollments.find(e => e.status === 'active' || e.status === 'frozen')
     const latestEnrollment = activeEnrollment || enrollments[0] || null
     const enrollmentCampaign = latestEnrollment?.campaigns
     const enrolledCampaign = Array.isArray(enrollmentCampaign) ? enrollmentCampaign[0] : enrollmentCampaign
@@ -801,7 +801,7 @@ export async function getReadyToSendJobWithCampaign(
         .select('customer_id, current_touch, campaigns:campaign_id(name, campaign_touches(touch_number))')
         .eq('customer_id', customer.id)
         .eq('business_id', businessId)
-        .eq('status', 'active')
+        .in('status', ['active', 'frozen'])
         .limit(1)
         .maybeSingle()
 

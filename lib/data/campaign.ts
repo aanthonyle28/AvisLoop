@@ -202,13 +202,14 @@ export async function getCampaignEnrollmentCounts(campaignId: string): Promise<{
   active: number
   completed: number
   stopped: number
+  frozen: number
 }> {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { active: 0, completed: 0, stopped: 0 }
+  if (!user) return { active: 0, completed: 0, stopped: 0, frozen: 0 }
 
-  const [activeResult, completedResult, stoppedResult] = await Promise.all([
+  const [activeResult, completedResult, stoppedResult, frozenResult] = await Promise.all([
     supabase
       .from('campaign_enrollments')
       .select('*', { count: 'exact', head: true })
@@ -224,12 +225,18 @@ export async function getCampaignEnrollmentCounts(campaignId: string): Promise<{
       .select('*', { count: 'exact', head: true })
       .eq('campaign_id', campaignId)
       .eq('status', 'stopped'),
+    supabase
+      .from('campaign_enrollments')
+      .select('*', { count: 'exact', head: true })
+      .eq('campaign_id', campaignId)
+      .eq('status', 'frozen'),
   ])
 
   return {
     active: activeResult.count || 0,
     completed: completedResult.count || 0,
     stopped: stoppedResult.count || 0,
+    frozen: frozenResult.count || 0,
   }
 }
 

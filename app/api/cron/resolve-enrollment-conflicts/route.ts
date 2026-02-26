@@ -91,13 +91,13 @@ export async function GET(request: Request) {
 
     for (const job of queuedJobs || []) {
       try {
-        // Check if customer still has active enrollment
+        // Check if customer still has active or frozen enrollment
         const { data: activeEnrollment } = await supabase
           .from('campaign_enrollments')
           .select('id')
           .eq('customer_id', job.customer_id)
           .eq('business_id', job.business_id)
-          .eq('status', 'active')
+          .in('status', ['active', 'frozen'])
           .maybeSingle()
 
         if (activeEnrollment) {
