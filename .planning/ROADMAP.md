@@ -720,14 +720,14 @@ Plans:
   5. Pausing a campaign sets in-progress enrollments to `frozen` status — they are not marked `stopped` and do not lose remaining touches
   6. Re-enabling a paused campaign unfreezes all `frozen` enrollments — they resume from the same touch position
   7. The cron processor skips `frozen` enrollments while their campaign is paused — no touches send during the freeze period
-**Plans**: TBD
+**Plans**: 5 plans in 2 waves
 
 Plans:
-- [ ] 46-01-PLAN.md — Supabase migration: add `frozen` to campaign_enrollments status constraint; update deleteCampaign to handle frozen rows (CAMP-02)
-- [ ] 46-02-PLAN.md — Fix toggleCampaignStatus to freeze/unfreeze enrollments; audit cron conflict resolver for paused-campaign edge case (CAMP-01, CAMP-02, CAMP-03)
-- [ ] 46-03-PLAN.md — DrawerLayout wrapper + SheetBody subcomponent + SheetFooter shrink-0 (foundation for all drawer migrations)
-- [ ] 46-04-PLAN.md — Apply drawer consistency to Add Job and Edit Job sheets (DRW-01, DRW-02, DRW-04)
-- [ ] 46-05-PLAN.md — Apply drawer consistency to Job Detail and Customer Detail drawers (DRW-01, DRW-02, DRW-03)
+- [x] 46-01-PLAN.md — Supabase migration: add `frozen` to campaign_enrollments status constraint; update deleteCampaign to handle frozen rows (CAMP-02)
+- [x] 46-02-PLAN.md — Fix toggleCampaignStatus to freeze/unfreeze enrollments; audit cron conflict resolver for paused-campaign edge case (CAMP-01, CAMP-02, CAMP-03)
+- [x] 46-03-PLAN.md — DrawerLayout wrapper + SheetBody subcomponent + SheetFooter shrink-0 (foundation for all drawer migrations)
+- [x] 46-04-PLAN.md — Apply drawer consistency to Add Job and Edit Job sheets (DRW-01, DRW-02, DRW-04)
+- [x] 46-05-PLAN.md — Apply drawer consistency to Job Detail and Customer Detail drawers (DRW-01, DRW-02, DRW-03)
 
 ### Phase 47: Dashboard Right Panel + Campaign Polish + Radix Select
 **Goal**: Dashboard right panel KPI cards show sparkline trend graphs with colored activity feed icons, campaign touch sequence shows template preview content, and Add Job form uses Radix Select components instead of native HTML selects.
@@ -875,14 +875,14 @@ See individual phase sections above for requirements, success criteria, and depe
 | **43** | **v2.5.1 Bug Fixes & Polish** | **2/2** | **Complete** | **2026-02-25** |
 | **44** | **v2.5.1 Bug Fixes & Polish** | **2/2** | **Complete** | **2026-02-25** |
 | **45** | **v2.5.2 UX Bugs & UI Fixes** | **3/3** | **Complete** | **2026-02-26** |
-| **46** | **v2.5.2 UX Bugs & UI Fixes** | **0/TBD** | **Not started** | - |
+| **46** | **v2.5.2 UX Bugs & UI Fixes** | **5/5** | **Complete** | **2026-02-26** |
 | **47** | **v2.5.2 UX Bugs & UI Fixes** | **0/TBD** | **Not started** | - |
 | **48** | **v2.5.3 UX Bugs Part 2** | **2/2** | **Complete** | **2026-02-25** |
 | **49** | **v2.5.3 UX Bugs Part 2** | **0/TBD** | **Not started** | - |
 | **50** | **v2.5.4 Code Review** | **0/TBD** | **Not started** | - |
 | **51** | **v2.5.4 Code Review** | **0/TBD** | **Not started** | - |
 
-**Total:** 216 plans complete across shipped phases.
+**Total:** 221 plans complete across shipped phases.
 
 ## What's Next
 
