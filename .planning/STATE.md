@@ -5,32 +5,40 @@
 See: .planning/PROJECT.md (updated 2026-02-25)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v2.5.4 Code Review (Phases 41-44)
+**Current focus:** v2.5.3 UX Bugs & UI Fixes Part 2 — Phase 45 (Foundation Visual Changes)
 
 ## Current Position
 
-Phase: 50 (Code Review & Audit)
-Plan: —
-Status: Ready to plan
-Last activity: 2026-02-25 — Milestone v2.5.4 started (code review of Phases 41-44)
+Phase: 45 of 49 (Foundation Visual Changes)
+Plan: 45-03 of 3 (complete)
+Status: Phase complete
+Last activity: 2026-02-26 — Completed 45-03-PLAN.md (queue card styling, empty state solid borders, Add Jobs drawer trigger)
 
-Progress: [░░░░░░░░░░] 0% (v2.5.4 milestone)
+Progress: [░░░░░░░░░░] 0% (v2.5.3 milestone)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 213
-- v2.5.4 plans completed: 0
+- Total plans completed (project): 216
+- v2.5.3 plans completed: 3
 
 *Updated after each plan completion*
 
 ## Accumulated Context
 
-### Key Decisions for v2.5.4
+### Key Decisions for v2.5.3
 
-- Full audit scope: bugs, dead code, security, performance, V2 alignment, design system, accessibility
-- Report + fix in same milestone (not report-only)
-- Phases 41-44 scope: Activity page overhaul, Dashboard & nav polish, Cross-page consistency, Onboarding & services
+- Getting Started step 2 = campaign detail page visit (not campaign existence)
+- All KPI cards navigate to /analytics (unified destination)
+- Page subtitle pattern: "Static description · X dynamic count" on every page
+- Campaign preset picker: vertical stack, Standard in middle, plain-English copy
+- Custom service names must propagate to all service selectors (Add Job, filters, etc.)
+- Needs Attention dismiss must actually remove items (UI-only hide)
+- soft button variant: bg-muted/text-muted-foreground — use for secondary actions alongside a primary default CTA
+- outline button retained for primary-action-among-equals (e.g., Send One-Off — no competing default CTA present)
+- Queue row card pattern: space-y-2 container + rounded-lg border border-border bg-card per row (not divide-y)
+- Empty state border pattern: border border-border bg-card (1px solid, white bg — no dashed borders in dashboard queues)
+- Add Jobs empty state button opens drawer via useAddJob() hook (not Link href="/jobs")
 
 ### Cross-Cutting Concerns (apply to every plan)
 
@@ -53,7 +61,7 @@ Progress: [░░░░░░░░░░] 0% (v2.5.4 milestone)
 
 ### Pending Todos
 
-- Note: Phase 45 work in progress (uncommitted changes in sidebar.tsx, bottom-nav.tsx, attention-alerts.tsx, dashboard-client.tsx) — not part of code review scope
+None.
 
 ### Blockers/Concerns
 
@@ -61,7 +69,7 @@ Progress: [░░░░░░░░░░] 0% (v2.5.4 milestone)
 
 ## Session Continuity
 
-Last session: 2026-02-25
-Stopped at: Milestone v2.5.4 started — ready to plan Phase 50
+Last session: 2026-02-26
+Stopped at: Completed 45-03-PLAN.md — queue card rows, solid empty states, Add Jobs drawer trigger
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
