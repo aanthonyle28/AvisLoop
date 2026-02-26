@@ -5,26 +5,35 @@
 See: .planning/PROJECT.md (updated 2026-02-25)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** Phase 49 — Custom Services Visual Polish (in progress)
+**Current focus:** Phase 50 — Code Review & Audit (in progress), Phase 49 — Custom Services Visual Polish (in progress)
 
 ## Current Position
 
-Phase: 49 (Custom Services Visual Polish) — In progress
-Plan: 1 of N complete (49-01 done)
-Status: In progress
-Last activity: 2026-02-26 — Completed 49-01-PLAN.md (customServiceNames threaded to ServiceTypeSelect)
+Phase: 50 (Code Review & Audit) — In progress
+Plan: 2 of 3 complete (50-01 done, 50-02 done)
+Status: In progress — ready for 50-03 (cross-cutting consolidation)
+Last activity: 2026-02-26 — Completed 50-02-PLAN.md (onboarding & data layer security audit, 9 findings)
 
 Progress: [██████░░░░] ~62% (v2.5.3+ — phases 46, 49, 50 in progress)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 221
-- Phase 49 plans completed: 1 (49-01)
+- Total plans completed (project): 222
+- Phase 50 plans completed: 2 (50-01, 50-02)
 
 *Updated after each plan completion*
 
 ## Accumulated Context
+
+### Key Decisions for Phase 50 (Code Review)
+
+- F-44-01 (MEDIUM): updateServiceTypeSettings uses user_id directly — should fetch business.id first for defense-in-depth
+- F-44-03 (LOW): CRM step saves empty string instead of null when no selection — normalize to null in server action
+- F-44-04 (LOW): Business.custom_service_names typed as non-nullable but DB may return null — type vs runtime mismatch
+- F-44-08 (LOW): CRM brand colors (bg-emerald-500 etc.) documented as acceptable exception to semantic tokens rule
+- getOnboardingStatus fetches custom_service_names but does not use it in return value — minor waste, not a bug
+- arrow key navigation not implemented for custom CRM radiogroup — minor accessibility gap (Tab works, arrow keys don't)
 
 ### Key Decisions for v2.5.3
 
@@ -74,6 +83,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-26
-Stopped at: Completed 49-01-PLAN.md (customServiceNames threaded to ServiceTypeSelect)
+Stopped at: Completed 50-02-PLAN.md (Phase 44 onboarding & data layer security audit — 9 findings)
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
