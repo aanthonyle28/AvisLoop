@@ -5,26 +5,34 @@
 See: .planning/PROJECT.md (updated 2026-02-25)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** Phase 50 — Code Review & Audit (in progress), Phase 49 — Custom Services Visual Polish (in progress)
+**Current focus:** Phase 49 — Custom Services Visual Polish (COMPLETE), Phase 50 — Code Review & Audit (in progress)
 
 ## Current Position
 
-Phase: 50 (Code Review & Audit) — In progress
-Plan: 2 of 3 complete (50-01 done, 50-02 done)
-Status: In progress — ready for 50-03 (cross-cutting consolidation)
-Last activity: 2026-02-26 — Re-verified 50-01-PLAN.md (UI component audit, 18 findings confirmed); 50-02 complete
+Phase: 49 of 50 (Custom Services Visual Polish) — COMPLETE
+Plan: 3 of 3 complete (49-01, 49-02, 49-03 done)
+Status: Phase 49 complete — ready for Phase 50 continuation (50-03 next)
+Last activity: 2026-02-26 — Completed 49-03-PLAN.md (page subtitle normalization, bg-card table rows)
 
-Progress: [██████░░░░] ~62% (v2.5.3+ — phases 46, 49, 50 in progress)
+Progress: [██████░░░░] ~65% (v2.5.3+ — phases 46, 49 complete, 50 remaining)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 222
-- Phase 50 plans completed: 2 (50-01, 50-02)
+- Total plans completed (project): 223
+- Phase 49 plans completed: 3 (49-01, 49-02, 49-03)
 
 *Updated after each plan completion*
 
 ## Accumulated Context
+
+### Key Decisions for Phase 49 (Visual Polish)
+
+- Subtitle canonical pattern: text-2xl font-semibold tracking-tight h1 + text-muted-foreground subtitle with static description + optional middot + count total
+- Analytics subtitle: static description only (service type count not meaningful)
+- Campaigns subtitle: static description only (count not available in shell without new prop threading)
+- bg-card applied to table body rows at call site only (ui/table.tsx NOT modified)
+- QuickSendModal spacing: DialogContent base already has gap-4 (grid layout) — no change needed
 
 ### Key Decisions for Phase 50 (Code Review)
 
@@ -42,9 +50,9 @@ Progress: [██████░░░░] ~62% (v2.5.3+ — phases 46, 49, 50 i
 - CampaignSelector sentinel pattern: CAMPAIGN_CREATE = '__create_campaign__' intercepted in onChange before calling parent handler
 - "Create new campaign" navigates to /campaigns page (has New Campaign button) rather than inline dialog
 - Campaign preset picker: vertical stack (flex-col), sorted by CAMPAIGN_PRESETS index, no touch badges
-- Frozen enrollment status: treated as "in-progress" in all deletion, reassignment, and conflict queries (use `.in('status', ['active', 'frozen'])`)
-- stopEnrollment (single enrollment by ID) keeps `.eq('status', 'active')` — frozen enrollments are unfrozen via campaign resume, not individually stopped
-- Custom service names use `value="other"` in ServiceTypeSelect — DB stores enum 'other', display names are cosmetic only
+- Frozen enrollment status: treated as "in-progress" in all deletion, reassignment, and conflict queries (use .in('status', ['active', 'frozen']))
+- stopEnrollment (single enrollment by ID) keeps .eq('status', 'active') — frozen enrollments are unfrozen via campaign resume, not individually stopped
+- Custom service names use value="other" in ServiceTypeSelect — DB stores enum 'other', display names are cosmetic only
 - flatMap used on availableTypes array to allow returning arrays for the 'other' custom names case
 
 ### Key Decisions for v2.5.2
@@ -83,6 +91,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-26
-Stopped at: Completed 50-02-PLAN.md (Phase 44 onboarding & data layer security audit — 9 findings)
+Stopped at: Completed 49-03-PLAN.md (page subtitle normalization, table row bg-card)
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
