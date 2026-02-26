@@ -6,6 +6,8 @@ import { CircleNotch, WarningCircle } from '@phosphor-icons/react'
 import {
   Sheet,
   SheetContent,
+  SheetBody,
+  SheetFooter,
   SheetDescription,
   SheetHeader,
   SheetTitle,
@@ -122,7 +124,7 @@ export function EditJobSheet({ open, onOpenChange, job, customers }: EditJobShee
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="overflow-y-auto">
+      <SheetContent className="sm:max-w-lg">
         <SheetHeader>
           <SheetTitle>Edit Job</SheetTitle>
           <SheetDescription>
@@ -130,129 +132,134 @@ export function EditJobSheet({ open, onOpenChange, job, customers }: EditJobShee
           </SheetDescription>
         </SheetHeader>
 
-        <form action={handleSubmit} className="mt-6 space-y-4">
-          {/* Conflict state warning */}
-          {job.enrollment_resolution && (
-            <div className="flex items-start gap-2 rounded-md bg-warning-bg px-3 py-2.5 text-sm text-warning-foreground">
-              <WarningCircle size={16} weight="fill" className="text-warning mt-0.5 shrink-0" />
-              <p>
-                {job.enrollment_resolution === 'conflict'
-                  ? 'This job has an enrollment conflict. Saving changes to status, customer, or service type will clear the conflict state.'
-                  : job.enrollment_resolution === 'queue_after'
-                  ? 'This job is queued for enrollment after the active sequence finishes. Saving changes may clear this queue state.'
-                  : job.enrollment_resolution === 'skipped'
-                  ? 'Enrollment was skipped for this job. Saving changes may clear this state.'
-                  : job.enrollment_resolution === 'replace_on_complete'
-                  ? 'This job will replace the active sequence on completion. Saving changes may clear this state.'
-                  : job.enrollment_resolution === 'suppressed'
-                  ? 'Enrollment was suppressed due to review cooldown.'
-                  : null}
-              </p>
-            </div>
-          )}
+        <form action={handleSubmit} className="flex flex-col flex-1 min-h-0">
+          <SheetBody>
+            <div className="space-y-4">
+              {/* Conflict state warning */}
+              {job.enrollment_resolution && (
+                <div className="flex items-start gap-2 rounded-md bg-warning-bg px-3 py-2.5 text-sm text-warning-foreground">
+                  <WarningCircle size={16} weight="fill" className="text-warning mt-0.5 shrink-0" />
+                  <p>
+                    {job.enrollment_resolution === 'conflict'
+                      ? 'This job has an enrollment conflict. Saving changes to status, customer, or service type will clear the conflict state.'
+                      : job.enrollment_resolution === 'queue_after'
+                      ? 'This job is queued for enrollment after the active sequence finishes. Saving changes may clear this queue state.'
+                      : job.enrollment_resolution === 'skipped'
+                      ? 'Enrollment was skipped for this job. Saving changes may clear this state.'
+                      : job.enrollment_resolution === 'replace_on_complete'
+                      ? 'This job will replace the active sequence on completion. Saving changes may clear this state.'
+                      : job.enrollment_resolution === 'suppressed'
+                      ? 'Enrollment was suppressed due to review cooldown.'
+                      : null}
+                  </p>
+                </div>
+              )}
 
-          {/* Customer selector */}
-          <div className="space-y-2">
-            <Label>Customer *</Label>
-            <CustomerSelector
-              customers={customers}
-              value={customerId}
-              onChange={setCustomerId}
-              error={state?.fieldErrors?.customerId?.[0]}
-            />
-          </div>
-
-          {/* Service type */}
-          <div className="space-y-2">
-            <Label>Service Type *</Label>
-            <ServiceTypeSelect
-              value={serviceType}
-              onChange={setServiceType}
-              error={state?.fieldErrors?.serviceType?.[0]}
-              enabledTypes={enabledServiceTypes}
-              customServiceNames={customServiceNames}
-            />
-          </div>
-
-          {/* Campaign — appears after service type is selected */}
-          {serviceType && (
-            <div className="space-y-2">
-              <Label>Campaign</Label>
-              <CampaignSelector
-                serviceType={serviceType}
-                selectedCampaignId={campaignChoice}
-                onCampaignChange={setCampaignChoice}
-                showOneOff
-                defaultCampaignId={
-                  job.status === 'do_not_send' ? CAMPAIGN_DO_NOT_SEND :
-                  job.campaign_override === 'one_off' ? CAMPAIGN_ONE_OFF :
-                  job.campaign_override ?? undefined
-                }
-              />
-            </div>
-          )}
-
-          {/* Status */}
-          <div className="space-y-2">
-            <Label>Status</Label>
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value as JobStatus)}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-            >
-              {EDIT_JOB_STATUSES.map(s => (
-                <option key={s} value={s}>
-                  {JOB_STATUS_LABELS[s]}
-                </option>
-              ))}
-            </select>
-            <p className="text-xs text-muted-foreground">
-              {JOB_STATUS_DESCRIPTIONS[status]}
-            </p>
-          </div>
-
-          {/* Notes */}
-          <div className="space-y-2">
-            <Label>Notes (optional)</Label>
-            <Textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Add any notes about this job..."
-              rows={3}
-            />
-            {state?.fieldErrors?.notes?.[0] && (
-              <p role="alert" className="text-sm text-destructive">{state.fieldErrors.notes[0]}</p>
-            )}
-          </div>
-
-          {/* Job info (read-only) */}
-          <div className="rounded-md bg-muted p-3 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Created</span>
-              <span>{new Date(job.created_at).toLocaleDateString()}</span>
-            </div>
-            {job.completed_at && (
-              <div className="mt-1 flex justify-between">
-                <span className="text-muted-foreground">Completed</span>
-                <span>{new Date(job.completed_at).toLocaleDateString()}</span>
+              {/* Customer selector */}
+              <div className="space-y-2">
+                <Label>Customer *</Label>
+                <CustomerSelector
+                  customers={customers}
+                  value={customerId}
+                  onChange={setCustomerId}
+                  error={state?.fieldErrors?.customerId?.[0]}
+                />
               </div>
-            )}
-          </div>
 
-          {/* Submit */}
-          <div className="flex justify-end gap-2 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isPending || !customerId || !serviceType}>
-              {isPending && <CircleNotch size={16} className="mr-2 animate-spin" />}
-              Save Changes
-            </Button>
-          </div>
+              {/* Service type */}
+              <div className="space-y-2">
+                <Label>Service Type *</Label>
+                <ServiceTypeSelect
+                  value={serviceType}
+                  onChange={setServiceType}
+                  error={state?.fieldErrors?.serviceType?.[0]}
+                  enabledTypes={enabledServiceTypes}
+                  customServiceNames={customServiceNames}
+                />
+              </div>
+
+              {/* Campaign — appears after service type is selected */}
+              {serviceType && (
+                <div className="space-y-2">
+                  <Label>Campaign</Label>
+                  <CampaignSelector
+                    serviceType={serviceType}
+                    selectedCampaignId={campaignChoice}
+                    onCampaignChange={setCampaignChoice}
+                    showOneOff
+                    defaultCampaignId={
+                      job.status === 'do_not_send' ? CAMPAIGN_DO_NOT_SEND :
+                      job.campaign_override === 'one_off' ? CAMPAIGN_ONE_OFF :
+                      job.campaign_override ?? undefined
+                    }
+                  />
+                </div>
+              )}
+
+              {/* Status */}
+              <div className="space-y-2">
+                <Label>Status</Label>
+                <select
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value as JobStatus)}
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  {EDIT_JOB_STATUSES.map(s => (
+                    <option key={s} value={s}>
+                      {JOB_STATUS_LABELS[s]}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-muted-foreground">
+                  {JOB_STATUS_DESCRIPTIONS[status]}
+                </p>
+              </div>
+
+              {/* Notes */}
+              <div className="space-y-2">
+                <Label>Notes (optional)</Label>
+                <Textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Add any notes about this job..."
+                  rows={3}
+                />
+                {state?.fieldErrors?.notes?.[0] && (
+                  <p role="alert" className="text-sm text-destructive">{state.fieldErrors.notes[0]}</p>
+                )}
+              </div>
+
+              {/* Job info (read-only) */}
+              <div className="rounded-md bg-muted p-3 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Created</span>
+                  <span>{new Date(job.created_at).toLocaleDateString()}</span>
+                </div>
+                {job.completed_at && (
+                  <div className="mt-1 flex justify-between">
+                    <span className="text-muted-foreground">Completed</span>
+                    <span>{new Date(job.completed_at).toLocaleDateString()}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </SheetBody>
+
+          <SheetFooter>
+            <div className="flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isPending || !customerId || !serviceType}>
+                {isPending && <CircleNotch size={16} className="mr-2 animate-spin" />}
+                Save Changes
+              </Button>
+            </div>
+          </SheetFooter>
         </form>
       </SheetContent>
     </Sheet>
