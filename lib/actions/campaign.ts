@@ -428,7 +428,9 @@ export async function duplicateCampaign(
 }
 
 /**
- * Toggle campaign status (pause/resume). Pausing stops all active enrollments.
+ * Toggle campaign status (pause/resume). Pausing freezes active enrollments
+ * (preserving touch position). Resuming unfreezes them and adjusts stale
+ * scheduled times.
  */
 export async function toggleCampaignStatus(campaignId: string): Promise<ActionState> {
   const supabase = await createClient()
@@ -458,17 +460,41 @@ export async function toggleCampaignStatus(campaignId: string): Promise<ActionSt
     return { error: `Failed to update status: ${error.message}` }
   }
 
-  // If pausing, stop all active enrollments
+  // If pausing, freeze active enrollments (preserves touch position for later resume)
   if (newStatus === 'paused') {
     await supabase
       .from('campaign_enrollments')
-      .update({
-        status: 'stopped',
-        stop_reason: 'campaign_paused',
-        stopped_at: new Date().toISOString(),
-      })
+      .update({ status: 'frozen' })
       .eq('campaign_id', campaignId)
       .eq('status', 'active')
+  }
+
+  // If resuming, unfreeze frozen enrollments and adjust stale scheduled times
+  if (newStatus === 'active') {
+    const { data: frozenEnrollments } = await supabase
+      .from('campaign_enrollments')
+      .select('id, current_touch, touch_1_scheduled_at, touch_2_scheduled_at, touch_3_scheduled_at, touch_4_scheduled_at')
+      .eq('campaign_id', campaignId)
+      .eq('status', 'frozen')
+
+    const now = new Date().toISOString()
+
+    for (const enrollment of frozenEnrollments || []) {
+      const touchKey = `touch_${enrollment.current_touch}_scheduled_at`
+      const originalScheduled = enrollment[touchKey as keyof typeof enrollment] as string | null
+
+      const updateData: Record<string, unknown> = { status: 'active' }
+
+      // If the next touch was scheduled in the past, bump to now so it processes in next cron cycle
+      if (originalScheduled && new Date(originalScheduled) < new Date()) {
+        updateData[`touch_${enrollment.current_touch}_scheduled_at`] = now
+      }
+
+      await supabase
+        .from('campaign_enrollments')
+        .update(updateData)
+        .eq('id', enrollment.id)
+    }
   }
 
   revalidatePath('/campaigns')
