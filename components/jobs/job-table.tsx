@@ -222,7 +222,7 @@ export function JobTable({ jobs, customers, campaignMap, campaignNames, loading 
               <tr
                 key={row.id}
                 onClick={() => handleRowClick(row.original)}
-                className="border-t border-border transition-colors hover:bg-muted/50 cursor-pointer"
+                className="border-t border-border bg-card transition-colors hover:bg-muted/50 cursor-pointer"
               >
                 {row.getVisibleCells().map(cell => (
                   <td key={cell.id} className="p-4 overflow-hidden">

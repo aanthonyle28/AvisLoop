@@ -82,7 +82,7 @@ export function HistoryTable({ data, loading, onRowClick, onResend, rowSelection
             table.getRowModel().rows.map((row) => (
               <TableRow
                 key={row.id}
-                className="group cursor-pointer hover:bg-muted/50"
+                className="group cursor-pointer bg-card hover:bg-muted/50"
                 data-state={row.getIsSelected() && 'selected'}
                 onClick={() => onRowClick?.(row.original)}
               >
