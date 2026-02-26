@@ -34,7 +34,7 @@ const mainNav: NavItem[] = [
   { icon: Briefcase, label: 'Jobs', href: '/jobs' },
   { icon: Megaphone, label: 'Campaigns', href: '/campaigns' },
   { icon: ChartBar, label: 'Analytics', href: '/analytics' },
-  { icon: ClockCounterClockwise, label: 'Activity', href: '/history' },
+  { icon: ClockCounterClockwise, label: 'History', href: '/history' },
   { icon: ChatCircleText, label: 'Feedback', href: '/feedback' },
 ]
 

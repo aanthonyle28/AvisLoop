@@ -11,7 +11,7 @@ const items = [
   { icon: House, label: 'Dashboard', href: '/dashboard' },
   { icon: Briefcase, label: 'Jobs', href: '/jobs' },
   { icon: Megaphone, label: 'Campaigns', href: '/campaigns' },
-  { icon: ClockCounterClockwise, label: 'Activity', href: '/history' },
+  { icon: ClockCounterClockwise, label: 'History', href: '/history' },
 ]
 
 export function BottomNav() {
