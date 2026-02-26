@@ -116,26 +116,25 @@ Turn job completions into Google reviews automatically — multi-touch follow-up
 | Dashboard test step cards | Guided walkthrough instead of checklist | Good — auto-detection of completion |
 | Test sends excluded from quota | Fair for users learning the product | Good — is_test flag in database |
 
-## Current Milestone: v2.5.3 UX Bugs & UI Fixes Part 2
+## Current Milestone: v2.5.4 Code Review (Phases 41-44)
 
-**Goal:** Fix getting started step 2 logic, Needs Attention dismiss, custom service propagation, campaign preset picker UX, page subtitle consistency, KPI navigation, QuickSendModal redesign, and visual polish (white table rows, service pills).
+**Goal:** Full quality audit of v2.5.1 Bug Fixes & Polish code (Phases 41-44), covering bugs, dead code, security, performance, V2 alignment, design system compliance, and accessibility — then fix all findings.
 
 **Target features:**
-- Getting Started step 2: track campaign page visit (not campaign existence), mark complete only when user opens campaign detail page
-- Add Job drawer: "Create new campaign" option in campaign dropdown when no campaigns exist
-- Page subtitles: consistent "static description · dynamic count" pattern across all pages
-- Needs Attention dismiss: fix X button to actually remove items from dashboard queue
-- Campaign preset picker: vertical stack layout, plain-English descriptions, Standard in middle position, fix subtitle "settings" → "campaigns"
-- Custom services: fix pill sizing, propagate custom service names to Add Job dropdown and all service selectors
-- Jobs table + activity rows: white background
-- QuickSendModal: visual refresh to match current design style
-- KPI stat cards: all three navigate to /analytics
+- Systematic code review of all files modified in Phases 41-44
+- Security review of user input handling, RLS policies, and server actions
+- Performance review of queries, data fetching, and rendering patterns
+- V2 philosophy alignment check on all user-facing changes
+- Design system compliance check (semantic tokens, consistent patterns)
+- Accessibility audit (aria labels, touch targets, keyboard navigation)
+- Dead code and unused import cleanup
+- Findings report with severity ratings and fix recommendations
+- Remediation of all Critical, High, and Medium findings
 
 **Key decisions:**
 - v2.5.2 (Phases 45-47) remains in roadmap but unexecuted — separate scope
+- v2.5.3 (Phases 48-49) remains in roadmap but unexecuted — separate scope
 - v2.6 Dashboard Command Center paused — resume after patch series
-- Getting Started step 2 tracks campaign detail page visit, not campaign existence
-- All KPI cards → /analytics (unified destination)
 
 ---
-*Last updated: 2026-02-25 after v2.5.3 UX Bugs & UI Fixes Part 2 milestone started*
+*Last updated: 2026-02-25 after v2.5.4 Code Review milestone started*
