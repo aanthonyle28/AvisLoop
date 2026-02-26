@@ -6,6 +6,8 @@ import { CircleNotch } from '@phosphor-icons/react'
 import {
   Sheet,
   SheetContent,
+  SheetBody,
+  SheetFooter,
   SheetDescription,
   SheetHeader,
   SheetTitle,
@@ -166,7 +168,7 @@ export function AddJobSheet({ open, onOpenChange, customers, isLoadingData }: Ad
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="overflow-y-auto">
+      <SheetContent className="sm:max-w-lg">
         <SheetHeader>
           <SheetTitle>Add Job</SheetTitle>
           <SheetDescription>
@@ -174,151 +176,156 @@ export function AddJobSheet({ open, onOpenChange, customers, isLoadingData }: Ad
           </SheetDescription>
         </SheetHeader>
 
-        <form action={handleSubmit} className="mt-6 space-y-4">
-          {/* Customer Section - Autocomplete or Inline Create */}
-          <div className="space-y-2">
-            <Label>Customer *</Label>
+        <form action={handleSubmit} className="flex flex-col flex-1 min-h-0">
+          <SheetBody>
+            <div className="space-y-4">
+              {/* Customer Section - Autocomplete or Inline Create */}
+              <div className="space-y-2">
+                <Label>Customer *</Label>
 
-            {isLoadingData ? (
-              <Skeleton className="h-9 w-full" />
-            ) : mode === 'search' ? (
-              <CustomerAutocomplete
-                customers={customers}
-                value={selectedCustomer}
-                onChange={handleSelectCustomer}
-                onCreateNew={handleCreateNew}
-                error={state?.fieldErrors?.customerId?.[0]}
-              />
-            ) : (
-              <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
-                <p className="text-sm font-medium">New Customer</p>
-
-                <div className="space-y-2">
-                  <Label htmlFor="customerName">Name *</Label>
-                  <Input
-                    id="customerName"
-                    value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
-                    placeholder="Customer name"
-                    required
+                {isLoadingData ? (
+                  <Skeleton className="h-9 w-full" />
+                ) : mode === 'search' ? (
+                  <CustomerAutocomplete
+                    customers={customers}
+                    value={selectedCustomer}
+                    onChange={handleSelectCustomer}
+                    onCreateNew={handleCreateNew}
+                    error={state?.fieldErrors?.customerId?.[0]}
                   />
-                </div>
+                ) : (
+                  <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
+                    <p className="text-sm font-medium">New Customer</p>
 
-                <div className="space-y-2">
-                  <Label htmlFor="customerEmail">Email *</Label>
-                  <Input
-                    id="customerEmail"
-                    type="email"
-                    value={customerEmail}
-                    onChange={(e) => setCustomerEmail(e.target.value)}
-                    placeholder="customer@email.com"
-                    required
-                  />
-                </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="customerName">Name *</Label>
+                      <Input
+                        id="customerName"
+                        value={customerName}
+                        onChange={(e) => setCustomerName(e.target.value)}
+                        placeholder="Customer name"
+                        required
+                      />
+                    </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="customerPhone">Phone (optional)</Label>
-                  <Input
-                    id="customerPhone"
-                    type="tel"
-                    value={customerPhone}
-                    onChange={(e) => setCustomerPhone(e.target.value)}
-                    placeholder="+1 (555) 123-4567"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Required for SMS review requests
-                  </p>
-                </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="customerEmail">Email *</Label>
+                      <Input
+                        id="customerEmail"
+                        type="email"
+                        value={customerEmail}
+                        onChange={(e) => setCustomerEmail(e.target.value)}
+                        placeholder="customer@email.com"
+                        required
+                      />
+                    </div>
 
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleBackToSearch}
-                  className="mt-2"
-                >
-                  Or select existing customer
-                </Button>
+                    <div className="space-y-2">
+                      <Label htmlFor="customerPhone">Phone (optional)</Label>
+                      <Input
+                        id="customerPhone"
+                        type="tel"
+                        value={customerPhone}
+                        onChange={(e) => setCustomerPhone(e.target.value)}
+                        placeholder="+1 (555) 123-4567"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Required for SMS review requests
+                      </p>
+                    </div>
+
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleBackToSearch}
+                      className="mt-2"
+                    >
+                      Or select existing customer
+                    </Button>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
 
-          {/* Service Type */}
-          <div className="space-y-2">
-            <Label>Service Type *</Label>
-            {isLoadingData ? (
-              <Skeleton className="h-9 w-full" />
-            ) : (
-              <ServiceTypeSelect
-                value={serviceType}
-                onChange={setServiceType}
-                error={state?.fieldErrors?.serviceType?.[0]}
-                enabledTypes={enabledServiceTypes}
-                customServiceNames={customServiceNames}
-              />
-            )}
-          </div>
+              {/* Service Type */}
+              <div className="space-y-2">
+                <Label>Service Type *</Label>
+                {isLoadingData ? (
+                  <Skeleton className="h-9 w-full" />
+                ) : (
+                  <ServiceTypeSelect
+                    value={serviceType}
+                    onChange={setServiceType}
+                    error={state?.fieldErrors?.serviceType?.[0]}
+                    enabledTypes={enabledServiceTypes}
+                    customServiceNames={customServiceNames}
+                  />
+                )}
+              </div>
 
-          {/* Campaign — appears after service type is selected */}
-          {serviceType && (
-            <div className="space-y-2">
-              <Label>Campaign</Label>
-              <CampaignSelector
-                serviceType={serviceType as ServiceType}
-                selectedCampaignId={campaignChoice}
-                onCampaignChange={setCampaignChoice}
-                showOneOff
-              />
+              {/* Campaign — appears after service type is selected */}
+              {serviceType && (
+                <div className="space-y-2">
+                  <Label>Campaign</Label>
+                  <CampaignSelector
+                    serviceType={serviceType as ServiceType}
+                    selectedCampaignId={campaignChoice}
+                    onCampaignChange={setCampaignChoice}
+                    showOneOff
+                  />
+                </div>
+              )}
+
+              {/* Status */}
+              <div className="space-y-2">
+                <Label>Status</Label>
+                <select
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value as JobStatus)}
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  {ADD_JOB_STATUSES.map(s => (
+                    <option key={s} value={s}>
+                      {JOB_STATUS_LABELS[s]}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-muted-foreground">
+                  {JOB_STATUS_DESCRIPTIONS[status]}
+                </p>
+              </div>
+
+              {/* Notes */}
+              <div className="space-y-2">
+                <Label>Notes (optional)</Label>
+                <Textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Add any notes about this job..."
+                  rows={3}
+                />
+                {state?.fieldErrors?.notes?.[0] && (
+                  <p className="text-sm text-destructive">{state.fieldErrors.notes[0]}</p>
+                )}
+              </div>
             </div>
-          )}
+          </SheetBody>
 
-          {/* Status */}
-          <div className="space-y-2">
-            <Label>Status</Label>
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value as JobStatus)}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-            >
-              {ADD_JOB_STATUSES.map(s => (
-                <option key={s} value={s}>
-                  {JOB_STATUS_LABELS[s]}
-                </option>
-              ))}
-            </select>
-            <p className="text-xs text-muted-foreground">
-              {JOB_STATUS_DESCRIPTIONS[status]}
-            </p>
-          </div>
-
-          {/* Notes */}
-          <div className="space-y-2">
-            <Label>Notes (optional)</Label>
-            <Textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Add any notes about this job..."
-              rows={3}
-            />
-            {state?.fieldErrors?.notes?.[0] && (
-              <p className="text-sm text-destructive">{state.fieldErrors.notes[0]}</p>
-            )}
-          </div>
-
-          {/* Submit */}
-          <div className="flex justify-end gap-2 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isPending || !isCustomerValid || !serviceType}>
-              {isPending && <CircleNotch className="mr-2 h-4 w-4 animate-spin" />}
-              Create Job
-            </Button>
-          </div>
+          <SheetFooter>
+            <div className="flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isPending || !isCustomerValid || !serviceType}>
+                {isPending && <CircleNotch className="mr-2 h-4 w-4 animate-spin" />}
+                Create Job
+              </Button>
+            </div>
+          </SheetFooter>
         </form>
       </SheetContent>
     </Sheet>
