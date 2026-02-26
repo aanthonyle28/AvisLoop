@@ -233,12 +233,13 @@ export function BusinessSetupStep({
                 </Button>
               </div>
               {customServiceNames.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 pt-1">
+                <div className="flex flex-wrap gap-2 pt-1">
                   {customServiceNames.map((name) => (
                     <TagBadge
                       key={name}
                       tag={name}
                       onRemove={() => removeCustomService(name)}
+                      className="text-sm px-2.5 py-1"
                     />
                   ))}
                 </div>

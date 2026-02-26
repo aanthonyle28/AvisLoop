@@ -187,12 +187,13 @@ export function ServiceTypesSection({
             </Button>
           </div>
           {customServiceNames.length > 0 && (
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               {customServiceNames.map((name) => (
                 <TagBadge
                   key={name}
                   tag={name}
                   onRemove={() => removeCustomService(name)}
+                  className="text-sm px-2.5 py-1"
                 />
               ))}
             </div>
