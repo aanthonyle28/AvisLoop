@@ -19,13 +19,21 @@ interface JobFiltersProps {
 }
 
 export function JobFilters({ filters, onFiltersChange }: JobFiltersProps) {
-  const { enabledServiceTypes } = useBusinessSettings()
+  const { enabledServiceTypes, customServiceNames } = useBusinessSettings()
   const hasActiveFilters = filters.status || filters.serviceType || filters.search
 
   // Scope to enabled types; fall back to all 8 if none configured
   const visibleServiceTypes = enabledServiceTypes && enabledServiceTypes.length > 0
     ? SERVICE_TYPES.filter(t => enabledServiceTypes.includes(t))
     : SERVICE_TYPES
+
+  const getServiceLabel = (type: ServiceType) => {
+    if (type === 'other' && customServiceNames.length > 0) {
+      if (customServiceNames.length === 1) return customServiceNames[0]
+      return `${customServiceNames[0]} +${customServiceNames.length - 1}`
+    }
+    return SERVICE_TYPE_LABELS[type]
+  }
 
   return (
     <div className="space-y-4">
@@ -87,7 +95,7 @@ export function JobFilters({ filters, onFiltersChange }: JobFiltersProps) {
                 : 'bg-muted text-muted-foreground hover:bg-muted/80'
             }`}
           >
-            {SERVICE_TYPE_LABELS[type]}
+            {getServiceLabel(type)}
           </button>
         ))}
 

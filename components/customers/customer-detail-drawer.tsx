@@ -6,12 +6,13 @@ import {
   SheetContent,
   SheetDescription,
   SheetHeader,
+  SheetBody,
+  SheetFooter,
   SheetTitle,
 } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Separator } from '@/components/ui/separator'
 import {
   PaperPlaneRight,
   PencilSimple,
@@ -129,7 +130,7 @@ export function CustomerDetailDrawer({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side='right' className='sm:max-w-lg overflow-y-auto'>
+      <SheetContent side='right' className='sm:max-w-lg'>
         <SheetHeader>
           <SheetTitle>Customer Details</SheetTitle>
           <SheetDescription>
@@ -137,162 +138,155 @@ export function CustomerDetailDrawer({
           </SheetDescription>
         </SheetHeader>
 
-        <div className='mt-6 space-y-6'>
-          {/* Contact Info */}
-          <div>
-            <div className='flex items-center gap-3 mb-3'>
-              <div className='h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center'>
-                <span className='text-sm font-medium text-primary'>{initials}</span>
+        <SheetBody>
+          <div className='space-y-6'>
+            {/* Contact Info */}
+            <div>
+              <div className='flex items-center gap-3 mb-3'>
+                <div className='h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center'>
+                  <span className='text-sm font-medium text-primary'>{initials}</span>
+                </div>
+                <div className='flex-1 min-w-0'>
+                  <p className='font-medium truncate'>{customer.name}</p>
+                  <p className='text-sm text-muted-foreground truncate'>{customer.email}</p>
+                </div>
               </div>
-              <div className='flex-1 min-w-0'>
-                <p className='font-medium truncate'>{customer.name}</p>
-                <p className='text-sm text-muted-foreground truncate'>{customer.email}</p>
-              </div>
+              {customer.phone && customer.phone_status === 'valid' && (
+                <div className='flex items-center gap-2'>
+                  <span className='text-sm font-mono'>{formatPhoneDisplay(customer.phone)}</span>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(customer.phone!)
+                      toast.success('Phone copied')
+                    }}
+                    className='p-1 hover:bg-muted rounded transition-colors'
+                  >
+                    <Copy className='h-4 w-4 text-muted-foreground' />
+                  </button>
+                </div>
+              )}
             </div>
-            {customer.phone && customer.phone_status === 'valid' && (
-              <div className='flex items-center gap-2'>
-                <span className='text-sm font-mono'>{formatPhoneDisplay(customer.phone)}</span>
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(customer.phone!)
-                    toast.success('Phone copied')
-                  }}
-                  className='p-1 hover:bg-muted rounded transition-colors'
-                >
-                  <Copy className='h-4 w-4 text-muted-foreground' />
-                </button>
-              </div>
-            )}
-          </div>
 
-          <Separator />
-
-          {/* Notes Field */}
-          <div>
-            <div className='space-y-2'>
-              <Label htmlFor='customer-notes'>Notes</Label>
-              <p className='text-xs text-muted-foreground'>
-                Add private notes about this customer (auto-saved)
-              </p>
-              <Textarea
-                id='customer-notes'
-                value={notes}
-                onChange={(e) => handleNotesChange(e.target.value)}
-                placeholder='Add notes about this customer...'
-                className='min-h-[120px] resize-none'
-              />
-            </div>
-          </div>
-
-          <Separator />
-
-          {/* SMS Consent Status */}
-          <div>
-            <h4 className='text-sm font-medium mb-3'>SMS Consent</h4>
-
-            {customer.sms_consent_status === 'opted_in' && (
+            {/* Notes Field */}
+            <div>
               <div className='space-y-2'>
-                <div className='flex items-center gap-2 text-sm text-success'>
-                  <CheckCircle className='h-4 w-4' />
-                  <span>Consented</span>
-                  {customer.sms_consent_at && (
-                    <span className='text-muted-foreground'>
-                      ({new Date(customer.sms_consent_at).toLocaleDateString()})
-                    </span>
-                  )}
-                </div>
-                {customer.sms_consent_method && (
-                  <div className='text-xs text-muted-foreground space-y-1'>
-                    <p>Method: {formatConsentMethod(customer.sms_consent_method)}</p>
-                    {customer.sms_consent_notes && <p>Notes: {customer.sms_consent_notes}</p>}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {customer.sms_consent_status === 'opted_out' && (
-              <div className='flex items-center gap-2 text-sm text-destructive'>
-                <Warning className='h-4 w-4' />
-                <span>Opted out</span>
-              </div>
-            )}
-
-            {customer.sms_consent_status === 'unknown' && (
-              <div className='space-y-3'>
-                <div className='flex items-center gap-2 text-sm text-warning'>
-                  <Question className='h-4 w-4' />
-                  <span>SMS: Consent needed</span>
-                </div>
-                <SmsConsentForm
-                  customerId={customer.id}
-                  mode='standalone'
+                <Label htmlFor='customer-notes'>Notes</Label>
+                <p className='text-xs text-muted-foreground'>
+                  Add private notes about this customer (auto-saved)
+                </p>
+                <Textarea
+                  id='customer-notes'
+                  value={notes}
+                  onChange={(e) => handleNotesChange(e.target.value)}
+                  placeholder='Add notes about this customer...'
+                  className='min-h-[120px] resize-none'
                 />
               </div>
-            )}
-          </div>
+            </div>
 
-          <Separator />
+            {/* SMS Consent Status */}
+            <div>
+              <h4 className='text-sm font-medium mb-3'>SMS Consent</h4>
 
-          {/* Activity Summary */}
-          <div>
-            <h3 className='text-sm font-medium mb-3'>Activity</h3>
-            <div className='space-y-2 text-sm'>
-              <div className='flex justify-between'>
-                <span className='text-muted-foreground'>Last sent:</span>
-                <span className='font-medium'>
-                  {customer.last_sent_at
-                    ? format(new Date(customer.last_sent_at), 'MMM d, yyyy')
-                    : 'Never'}
-                </span>
-              </div>
-              <div className='flex justify-between'>
-                <span className='text-muted-foreground'>Total sent:</span>
-                <span className='font-medium'>{customer.send_count}</span>
-              </div>
-              <div className='flex justify-between'>
-                <span className='text-muted-foreground'>Status:</span>
-                <span className='font-medium capitalize'>{customer.status}</span>
+              {customer.sms_consent_status === 'opted_in' && (
+                <div className='space-y-2'>
+                  <div className='flex items-center gap-2 text-sm text-success'>
+                    <CheckCircle className='h-4 w-4' />
+                    <span>Consented</span>
+                    {customer.sms_consent_at && (
+                      <span className='text-muted-foreground'>
+                        ({new Date(customer.sms_consent_at).toLocaleDateString()})
+                      </span>
+                    )}
+                  </div>
+                  {customer.sms_consent_method && (
+                    <div className='text-xs text-muted-foreground space-y-1'>
+                      <p>Method: {formatConsentMethod(customer.sms_consent_method)}</p>
+                      {customer.sms_consent_notes && <p>Notes: {customer.sms_consent_notes}</p>}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {customer.sms_consent_status === 'opted_out' && (
+                <div className='flex items-center gap-2 text-sm text-destructive'>
+                  <Warning className='h-4 w-4' />
+                  <span>Opted out</span>
+                </div>
+              )}
+
+              {customer.sms_consent_status === 'unknown' && (
+                <div className='space-y-3'>
+                  <div className='flex items-center gap-2 text-sm text-warning'>
+                    <Question className='h-4 w-4' />
+                    <span>SMS: Consent needed</span>
+                  </div>
+                  <SmsConsentForm
+                    customerId={customer.id}
+                    mode='standalone'
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Activity Summary */}
+            <div>
+              <h3 className='text-sm font-medium mb-3'>Activity</h3>
+              <div className='space-y-2 text-sm'>
+                <div className='flex justify-between'>
+                  <span className='text-muted-foreground'>Last sent:</span>
+                  <span className='font-medium'>
+                    {customer.last_sent_at
+                      ? format(new Date(customer.last_sent_at), 'MMM d, yyyy')
+                      : 'Never'}
+                  </span>
+                </div>
+                <div className='flex justify-between'>
+                  <span className='text-muted-foreground'>Total sent:</span>
+                  <span className='font-medium'>{customer.send_count}</span>
+                </div>
+                <div className='flex justify-between'>
+                  <span className='text-muted-foreground'>Status:</span>
+                  <span className='font-medium capitalize'>{customer.status}</span>
+                </div>
               </div>
             </div>
           </div>
+        </SheetBody>
 
-          <Separator />
-
-          {/* Action Buttons */}
-          <div className='space-y-2'>
-            <Button
-              onClick={() => onSend(customer)}
-              className='w-full justify-start'
-            >
-              <PaperPlaneRight className='mr-2 h-4 w-4' />
-              Send Message
-            </Button>
-            <Button
-              onClick={() => onEdit(customer)}
-              variant='outline'
-              className='w-full justify-start'
-            >
-              <PencilSimple className='mr-2 h-4 w-4' />
-              Edit Customer
-            </Button>
-            <Button
-              onClick={() => onArchive(customer.id)}
-              variant='outline'
-              className='w-full justify-start'
-            >
-              <Archive className='mr-2 h-4 w-4' />
-              Archive
-            </Button>
-            <Button
-              onClick={() => onViewHistory(customer.id)}
-              variant='ghost'
-              className='w-full justify-start'
-            >
-              <ClockCounterClockwise className='mr-2 h-4 w-4' />
-              View History
-            </Button>
-          </div>
-        </div>
+        <SheetFooter>
+          <Button
+            onClick={() => onSend(customer)}
+            className='w-full justify-start'
+          >
+            <PaperPlaneRight className='mr-2 h-4 w-4' />
+            Send Message
+          </Button>
+          <Button
+            onClick={() => onEdit(customer)}
+            variant='outline'
+            className='w-full justify-start'
+          >
+            <PencilSimple className='mr-2 h-4 w-4' />
+            Edit Customer
+          </Button>
+          <Button
+            onClick={() => onArchive(customer.id)}
+            variant='outline'
+            className='w-full justify-start'
+          >
+            <Archive className='mr-2 h-4 w-4' />
+            Archive
+          </Button>
+          <Button
+            onClick={() => onViewHistory(customer.id)}
+            variant='ghost'
+            className='w-full justify-start'
+          >
+            <ClockCounterClockwise className='mr-2 h-4 w-4' />
+            View History
+          </Button>
+        </SheetFooter>
       </SheetContent>
     </Sheet>
   )

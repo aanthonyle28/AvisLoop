@@ -32,7 +32,7 @@ interface CampaignFormProps {
 }
 
 export function CampaignForm({ campaign, templates, onSuccess }: CampaignFormProps) {
-  const { enabledServiceTypes } = useBusinessSettings()
+  const { enabledServiceTypes, customServiceNames } = useBusinessSettings()
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const isEditing = !!campaign
@@ -124,11 +124,16 @@ export function CampaignForm({ campaign, templates, onSuccess }: CampaignFormPro
               <SelectItem value="all">All Services</SelectItem>
               {Object.entries(SERVICE_TYPE_LABELS)
                 .filter(([value]) => enabledServiceTypes.length === 0 || enabledServiceTypes.includes(value as ServiceType))
-                .map(([value, label]) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
-                  </SelectItem>
-                ))}
+                .map(([value, label]) => {
+                  const displayLabel = value === 'other' && customServiceNames.length > 0
+                    ? customServiceNames.join(', ')
+                    : label
+                  return (
+                    <SelectItem key={value} value={value}>
+                      {displayLabel}
+                    </SelectItem>
+                  )
+                })}
             </SelectContent>
           </Select>
           <p className="text-sm text-muted-foreground">
