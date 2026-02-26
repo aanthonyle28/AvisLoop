@@ -2,8 +2,6 @@
 
 import { useState, useTransition } from 'react'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { EnvelopeSimple, ChatCircle } from '@phosphor-icons/react'
 import { createCampaignFromPreset } from '@/lib/actions/onboarding'
 import { CAMPAIGN_PRESETS } from '@/lib/constants/campaigns'
 import { toast } from 'sonner'
@@ -37,6 +35,13 @@ export function CampaignPresetStep({
     return { ...preset, meta }
   })
 
+  // Sort to match CAMPAIGN_PRESETS order: conservative → standard → aggressive
+  const sortedPresets = [...presetsWithMeta].sort((a, b) => {
+    const aIdx = CAMPAIGN_PRESETS.findIndex(p => p.id === a.meta?.id)
+    const bIdx = CAMPAIGN_PRESETS.findIndex(p => p.id === b.meta?.id)
+    return (aIdx === -1 ? 99 : aIdx) - (bIdx === -1 ? 99 : bIdx)
+  })
+
   const handleSelectPreset = (presetId: string) => {
     setSelectedPresetId(presetId)
   }
@@ -61,13 +66,13 @@ export function CampaignPresetStep({
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold">Choose your follow-up approach</h1>
         <p className="text-muted-foreground text-lg">
-          Select a campaign style. You can customize it later in Settings.
+          Select a campaign style. You can change this later in Campaigns.
         </p>
       </div>
 
-      {/* Preset cards grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4" role="radiogroup" aria-label="Campaign preset options">
-        {presetsWithMeta.map((preset) => {
+      {/* Preset cards — vertical stack */}
+      <div className="flex flex-col gap-3 max-w-lg mx-auto" role="radiogroup" aria-label="Campaign preset options">
+        {sortedPresets.map((preset) => {
           const isSelected = selectedPresetId === preset.id
           return (
             <div
@@ -89,52 +94,20 @@ export function CampaignPresetStep({
                 }
               }}
             >
-              {/* Title */}
-              <div className="mb-3">
-                <h3 className="font-semibold text-lg">
-                  {preset.meta?.name || preset.name}
-                </h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {preset.meta?.description || `${preset.campaign_touches.length} touches`}
-                </p>
-              </div>
-
-              {/* Touch visualization */}
-              <div className="flex items-center gap-2 flex-wrap">
-                {preset.campaign_touches.map((touch, idx) => (
-                  <div key={touch.id} className="flex items-center gap-1">
-                    {idx > 0 && (
-                      <span className="text-xs text-muted-foreground mx-1">→</span>
-                    )}
-                    <Badge
-                      variant={touch.channel === 'email' ? 'secondary' : 'default'}
-                      className="gap-1"
-                    >
-                      {touch.channel === 'email' ? (
-                        <EnvelopeSimple className="h-3 w-3" />
-                      ) : (
-                        <ChatCircle className="h-3 w-3" />
-                      )}
-                      <span className="text-xs">
-                        {(() => {
-                          const cumulativeHours = preset.campaign_touches
-                            .slice(0, idx + 1)
-                            .reduce((sum, t) => sum + t.delay_hours, 0)
-                          if (cumulativeHours < 24) return `${cumulativeHours}h`
-                          return `Day ${Math.round(cumulativeHours / 24)}`
-                        })()}
-                      </span>
-                    </Badge>
-                  </div>
-                ))}
-              </div>
+              {/* Title + description */}
+              <h3 className="font-semibold text-lg">
+                {preset.meta?.name || preset.name}
+              </h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                {preset.meta?.description || `${preset.campaign_touches.length} touches`}
+              </p>
             </div>
           )
         })}
       </div>
 
       {/* Button row */}
-      <div className="flex gap-3">
+      <div className="flex gap-3 max-w-lg mx-auto">
         <Button
           type="button"
           variant="outline"
