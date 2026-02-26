@@ -54,7 +54,7 @@ export function KPIWidgets({ data }: KPIWidgetsProps) {
       {/* Top row: Outcome metrics (large) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Reviews This Month */}
-        <Link href="/history?status=reviewed" className="block">
+        <Link href="/analytics" className="block">
           <InteractiveCard hoverAccent="amber" className="p-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-medium text-muted-foreground">
@@ -75,7 +75,7 @@ export function KPIWidgets({ data }: KPIWidgetsProps) {
         </Link>
 
         {/* Average Rating */}
-        <Link href="/feedback" className="block">
+        <Link href="/analytics" className="block">
           <InteractiveCard hoverAccent="green" className="p-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-medium text-muted-foreground">
@@ -96,7 +96,7 @@ export function KPIWidgets({ data }: KPIWidgetsProps) {
         </Link>
 
         {/* Conversion Rate */}
-        <Link href="/history" className="block">
+        <Link href="/analytics" className="block">
           <InteractiveCard hoverAccent="blue" className="p-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-medium text-muted-foreground">
