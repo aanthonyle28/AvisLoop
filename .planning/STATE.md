@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-25)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v2.5.2 UX Bugs & UI Fixes — Phase 45 complete, Phase 46 next
+**Current focus:** v2.5.4 UX Behavior Fixes — Phase 48 in progress
 
 ## Current Position
 
 Phase: 48 of 48 (Onboarding + Dashboard Behavior Fixes) — In progress
-Plan: 2/? complete
+Plan: 1/2 complete (48-01 done)
 Status: In progress
-Last activity: 2026-02-26 — Completed 48-02-PLAN.md (campaign preset picker redesign)
+Last activity: 2026-02-26 — Completed 48-01-PLAN.md (Getting Started trigger, KPI links, dismiss verify, campaign selector)
 
 Progress: [█████░░░░░] 50% (v2.5.4 milestone — phase 48 in progress)
 
@@ -25,6 +25,13 @@ Progress: [█████░░░░░] 50% (v2.5.4 milestone — phase 48 in
 *Updated after each plan completion*
 
 ## Accumulated Context
+
+### Key Decisions for v2.5.4
+
+- Getting Started step 2 (campaign_reviewed) triggers on campaign detail page visit — not list page
+- All dashboard KPI cards link to /analytics — no scattered destinations
+- CampaignSelector sentinel pattern: CAMPAIGN_CREATE = '__create_campaign__' intercepted in onChange before calling parent handler
+- "Create new campaign" navigates to /campaigns page (has New Campaign button) rather than inline dialog
 
 ### Key Decisions for v2.5.2
 
@@ -62,6 +69,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-26
-Stopped at: Completed 48-02-PLAN.md — campaign preset picker redesign
+Stopped at: Completed 48-01-PLAN.md — behavior fixes (GS-02, DASH-02, DASH-01, JOB-01)
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
