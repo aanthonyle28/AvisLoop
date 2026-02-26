@@ -4,6 +4,8 @@ import { useActionState, useEffect, useRef, useState } from 'react'
 import {
   Sheet,
   SheetContent,
+  SheetBody,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetDescription,
@@ -75,7 +77,7 @@ export function AddCustomerSheet({ open, onOpenChange }: AddCustomerSheetProps) 
 
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
-      <SheetContent side='right' className='w-[400px] sm:w-[540px] overflow-y-auto'>
+      <SheetContent side='right' className='sm:max-w-lg'>
         <SheetHeader>
           <SheetTitle>Add New Customer</SheetTitle>
           <SheetDescription>
@@ -83,99 +85,99 @@ export function AddCustomerSheet({ open, onOpenChange }: AddCustomerSheetProps) 
           </SheetDescription>
         </SheetHeader>
 
-        <div className='mt-6'>
-          {/* Success Message */}
-          {successMessage && (
-            <div className='mb-4 flex items-center gap-2 rounded-md bg-success-bg p-3 text-sm text-success-foreground'>
-              <CheckCircle size={16} />
-              {successMessage}
-            </div>
-          )}
+        <form ref={formRef} action={formAction} noValidate className='flex flex-col flex-1 min-h-0'>
+          <SheetBody>
+            <div className='space-y-4'>
+              {/* Success Message */}
+              {successMessage && (
+                <div className='flex items-center gap-2 rounded-md bg-success-bg p-3 text-sm text-success-foreground'>
+                  <CheckCircle size={16} />
+                  {successMessage}
+                </div>
+              )}
 
-          {/* Add Customer Form */}
-          <form ref={formRef} action={formAction} noValidate className='space-y-4'>
-            <div className='grid gap-2'>
-              <Label htmlFor='add-name'>Name</Label>
-              <Input
-                id='add-name'
-                name='name'
-                type='text'
-                placeholder='John Doe'
-                required
-                disabled={isPending}
-              />
-              {state?.fieldErrors?.name && (
-                <p className='text-sm text-error-text'>{state.fieldErrors.name[0]}</p>
+              <div className='grid gap-2'>
+                <Label htmlFor='add-name'>Name</Label>
+                <Input
+                  id='add-name'
+                  name='name'
+                  type='text'
+                  placeholder='John Doe'
+                  required
+                  disabled={isPending}
+                />
+                {state?.fieldErrors?.name && (
+                  <p className='text-sm text-error-text'>{state.fieldErrors.name[0]}</p>
+                )}
+              </div>
+
+              <div className='grid gap-2'>
+                <Label htmlFor='add-email'>Email</Label>
+                <Input
+                  id='add-email'
+                  name='email'
+                  type='email'
+                  placeholder='john@example.com'
+                  required
+                  disabled={isPending}
+                />
+                {state?.fieldErrors?.email && (
+                  <p className='text-sm text-error-text'>{state.fieldErrors.email[0]}</p>
+                )}
+              </div>
+
+              <div className='grid gap-2'>
+                <Label htmlFor='add-phone'>Phone (optional)</Label>
+                <Input
+                  id='add-phone'
+                  name='phone'
+                  type='tel'
+                  placeholder='+1 (555) 123-4567'
+                  disabled={isPending}
+                />
+                {state?.fieldErrors?.phone && (
+                  <p className='text-sm text-error-text'>{state.fieldErrors.phone[0]}</p>
+                )}
+              </div>
+
+              {/* SMS Consent Section */}
+              <div className='pt-2'>
+                <SmsConsentForm
+                  mode='inline'
+                  onConsentChange={(consented, method, notes) => {
+                    setSmsConsent({ consented, method: method || '', notes: notes || '' })
+                  }}
+                />
+              </div>
+
+              {/* Hidden fields for timezone and consent data */}
+              <input type='hidden' name='timezone' value={timezone} />
+              <input type='hidden' name='smsConsented' value={smsConsent.consented ? 'true' : 'false'} />
+              <input type='hidden' name='smsConsentMethod' value={smsConsent.method} />
+              <input type='hidden' name='smsConsentNotes' value={smsConsent.notes} />
+
+              {state?.error && (
+                <p className='text-sm text-error-text'>{state.error}</p>
               )}
             </div>
+          </SheetBody>
 
-            <div className='grid gap-2'>
-              <Label htmlFor='add-email'>Email</Label>
-              <Input
-                id='add-email'
-                name='email'
-                type='email'
-                placeholder='john@example.com'
-                required
-                disabled={isPending}
-              />
-              {state?.fieldErrors?.email && (
-                <p className='text-sm text-error-text'>{state.fieldErrors.email[0]}</p>
-              )}
-            </div>
-
-            <div className='grid gap-2'>
-              <Label htmlFor='add-phone'>Phone (optional)</Label>
-              <Input
-                id='add-phone'
-                name='phone'
-                type='tel'
-                placeholder='+1 (555) 123-4567'
-                disabled={isPending}
-              />
-              {state?.fieldErrors?.phone && (
-                <p className='text-sm text-error-text'>{state.fieldErrors.phone[0]}</p>
-              )}
-            </div>
-
-            {/* SMS Consent Section */}
-            <div className='pt-2'>
-              <SmsConsentForm
-                mode='inline'
-                onConsentChange={(consented, method, notes) => {
-                  setSmsConsent({ consented, method: method || '', notes: notes || '' })
-                }}
-              />
-            </div>
-
-            {/* Hidden fields for timezone and consent data */}
-            <input type='hidden' name='timezone' value={timezone} />
-            <input type='hidden' name='smsConsented' value={smsConsent.consented ? 'true' : 'false'} />
-            <input type='hidden' name='smsConsentMethod' value={smsConsent.method} />
-            <input type='hidden' name='smsConsentNotes' value={smsConsent.notes} />
-
-            {state?.error && (
-              <p className='text-sm text-error-text'>{state.error}</p>
-            )}
-
-            {/* Action Buttons */}
-            <div className='flex flex-col gap-2 pt-2'>
-              <Button type='submit' className='w-full' disabled={isPending}>
-                {isPending ? 'Adding...' : 'Add Customer'}
-              </Button>
-              <Button
-                type='submit'
-                variant='outline'
-                className='w-full'
-                disabled={isPending}
-                onClick={() => setAddAnother(true)}
-              >
-                <Plus size={16} className='mr-2' />
-                {isPending ? 'Adding...' : 'Save & Add Another'}
-              </Button>
-            </div>
-          </form>
-        </div>
+          <SheetFooter>
+            <Button type='submit' className='w-full' disabled={isPending}>
+              {isPending ? 'Adding...' : 'Add Customer'}
+            </Button>
+            <Button
+              type='submit'
+              variant='outline'
+              className='w-full'
+              disabled={isPending}
+              onClick={() => setAddAnother(true)}
+            >
+              <Plus size={16} className='mr-2' />
+              {isPending ? 'Adding...' : 'Save & Add Another'}
+            </Button>
+          </SheetFooter>
+        </form>
       </SheetContent>
     </Sheet>
   )
