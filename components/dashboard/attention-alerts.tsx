@@ -212,7 +212,7 @@ export function AttentionAlerts({ alerts, onSelectAlert, selectedAlertId }: Atte
       </div>
 
       {visibleAlerts.length === 0 ? (
-        <div className="flex items-center gap-3 py-8 text-center justify-center">
+        <div className="flex items-center gap-3 py-8 text-center justify-center rounded-lg border border-border bg-card">
           <CheckCircle weight="fill" className="size-5 text-success" />
           <p className="text-sm text-muted-foreground">
             No issues — everything is running smoothly
