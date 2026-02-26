@@ -701,12 +701,12 @@ Plans:
   3. Ready to Send and Needs Attention queue rows render as white card-like units with border-radius, not flat divide-y rows
   4. Ready to Send and Needs Attention empty states use a solid border with white background, not a dashed border
   5. Ready to Send empty state "Add Jobs" button opens the Add Job drawer directly, not navigate to /jobs
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 45-01-PLAN.md — Add `soft` button variant to CVA + dashboard button audit (BTN-01, BTN-02)
-- [ ] 45-02-PLAN.md — Rename "Activity" to "History" in sidebar and bottom nav (NAV-01)
-- [ ] 45-03-PLAN.md — Queue row card styling, empty state solid borders, Add Jobs drawer trigger (DQ-01, DQ-02, DQ-03, DQ-04)
+- [x] 45-01-PLAN.md — Add `soft` button variant to CVA + dashboard button audit (BTN-01, BTN-02)
+- [x] 45-02-PLAN.md — Rename "Activity" to "History" in sidebar and bottom nav (NAV-01)
+- [x] 45-03-PLAN.md — Queue row card styling, empty state solid borders, Add Jobs drawer trigger (DQ-01, DQ-02, DQ-03, DQ-04)
 
 ### Phase 46: Drawer Consistency + Campaign Freeze Fix
 **Goal**: All drawers use consistent white-background content grouping with sticky action buttons, and the campaign pause bug is fixed — pausing a campaign freezes enrollments in place instead of permanently destroying them.
@@ -871,7 +871,7 @@ See individual phase sections above for requirements, success criteria, and depe
 | **42** | **v2.5.1 Bug Fixes & Polish** | **2/2** | **Complete** | **2026-02-25** |
 | **43** | **v2.5.1 Bug Fixes & Polish** | **2/2** | **Complete** | **2026-02-25** |
 | **44** | **v2.5.1 Bug Fixes & Polish** | **2/2** | **Complete** | **2026-02-25** |
-| **45** | **v2.5.2 UX Bugs & UI Fixes** | **0/TBD** | **Not started** | - |
+| **45** | **v2.5.2 UX Bugs & UI Fixes** | **3/3** | **Complete** | **2026-02-26** |
 | **46** | **v2.5.2 UX Bugs & UI Fixes** | **0/TBD** | **Not started** | - |
 | **47** | **v2.5.2 UX Bugs & UI Fixes** | **0/TBD** | **Not started** | - |
 | **48** | **v2.5.3 UX Bugs Part 2** | **0/TBD** | **Not started** | - |
@@ -879,7 +879,7 @@ See individual phase sections above for requirements, success criteria, and depe
 | **50** | **v2.5.4 Code Review** | **0/TBD** | **Not started** | - |
 | **51** | **v2.5.4 Code Review** | **0/TBD** | **Not started** | - |
 
-**Total:** 211 plans complete across shipped phases.
+**Total:** 214 plans complete across shipped phases.
 
 ## What's Next
 
