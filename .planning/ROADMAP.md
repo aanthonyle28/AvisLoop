@@ -18,6 +18,7 @@ AvisLoop is a review follow-up system for home service businesses. v1.0 through 
 - **v2.6 Dashboard Command Center** - Phase 40 (complete 2026-02-25)
 - **v2.5.1 Bug Fixes & Polish** - Phases 41-44 (complete 2026-02-25)
 - **v2.5.2 UX Bugs & UI Fixes** - Phases 45-47 (in progress)
+- **v2.5.3 UX Bugs & UI Fixes Part 2** - Phases 48-49 (in progress)
 
 ## Phases
 
@@ -748,6 +749,45 @@ Plans:
 - [ ] 47-04-PLAN.md — Radix Select migration in add-job-sheet and edit-job-sheet with full submit test (DRW-05)
 
 
+### v2.5.3 UX Bugs & UI Fixes Part 2 (Phases 48-49)
+
+**Milestone Goal:** Fix Getting Started step 2 logic, campaign preset picker UX, custom service name propagation, Needs Attention dismiss, KPI navigation, page subtitle consistency, QuickSendModal redesign, and visual polish (white table rows, service pills).
+
+**Coverage:** 15 requirements across 6 categories (GS, ONB, SVC, DASH, JOB, SUB, VIS)
+
+**Build order rationale:** Behavior/logic fixes first (onboarding tracking, dashboard dismiss, KPI navigation, campaign dropdown) because they change how things work. Visual/propagation fixes second (custom service pills, page subtitles, white rows, QuickSendModal) because they change how things look and touch more files.
+
+---
+
+### Phase 48: Onboarding & Dashboard Behavior Fixes
+**Goal**: Getting Started step 2 correctly tracks campaign page visits, campaign preset picker is clear and approachable, dashboard Needs Attention dismiss works, KPI cards navigate consistently, and Add Job offers a campaign creation path.
+**Depends on**: Phase 44 (v2.5.1 complete)
+**Requirements**: GS-01, GS-02, ONB-01, ONB-02, ONB-03, DASH-01, DASH-02, JOB-01
+**Success Criteria** (what must be TRUE):
+  1. Getting Started step 2 marks complete only after the user visits a campaign detail page — not when a campaign merely exists in the database
+  2. If the onboarding-created campaign is deleted, visiting any other campaign detail page still marks step 2 complete
+  3. Campaign preset picker during onboarding shows three options stacked vertically with Standard in the middle position, using plain-English descriptions (no "multi-touch sequence" or "touch #1/2/3" jargon)
+  4. Campaign preset picker subtitle reads "You can change this later in Campaigns" (not "in Settings")
+  5. Clicking the X dismiss button on a Needs Attention item removes it from the dashboard list immediately
+  6. All three KPI stat cards on the dashboard navigate to /analytics when clicked (not split between /history and /analytics)
+  7. Add Job campaign dropdown includes a "Create new campaign" option that opens the campaign creation flow when no campaigns exist for the selected service type
+**Plans**: TBD
+
+### Phase 49: Custom Services, Visual Polish & Page Subtitles
+**Goal**: Custom service names render correctly and propagate to all service selectors across the app, all pages have consistent subtitles, table rows have white backgrounds, and QuickSendModal matches the current design language.
+**Depends on**: Phase 48 (behavior fixes landed)
+**Requirements**: SVC-01, SVC-02, SVC-03, SUB-01, VIS-01, VIS-02, VIS-03
+**Success Criteria** (what must be TRUE):
+  1. Custom service name pills in onboarding and settings render at readable size without clipping or overflow
+  2. Custom service names appear in the Add Job service type dropdown alongside standard service types
+  3. Custom service names propagate to job filters, campaign service targeting selector, and any other service type selector in the app
+  4. All app pages display a consistent subtitle pattern: static description followed by a centered dot and dynamic count (e.g., "Track your service jobs · 12 this month")
+  5. Jobs table rows have white background (not transparent/gray alternating)
+  6. Activity/history page rows have white background matching Jobs table treatment
+  7. QuickSendModal has updated layout, spacing, and visual styling consistent with the current warm design system
+**Plans**: TBD
+
+
 ---
 
 ## Phase Details
@@ -798,23 +838,25 @@ See individual phase sections above for requirements, success criteria, and depe
 | **45** | **v2.5.2 UX Bugs & UI Fixes** | **0/TBD** | **Not started** | - |
 | **46** | **v2.5.2 UX Bugs & UI Fixes** | **0/TBD** | **Not started** | - |
 | **47** | **v2.5.2 UX Bugs & UI Fixes** | **0/TBD** | **Not started** | - |
+| **48** | **v2.5.3 UX Bugs Part 2** | **0/TBD** | **Not started** | - |
+| **49** | **v2.5.3 UX Bugs Part 2** | **0/TBD** | **Not started** | - |
 
 **Total:** 211 plans complete across shipped phases.
 
 ## What's Next
 
-**v2.5.2 UX Bugs & UI Fixes:** Phases 45-47 — in progress.
+**v2.5.3 UX Bugs & UI Fixes Part 2:** Phases 48-49 — in progress.
 
 **Blockers:**
 - Twilio A2P 10DLC registration required before Phase 21-08 execution (webhook verification)
 
-After v2.5.2:
+After v2.5.3:
+- **v2.5.2 UX Bugs & UI Fixes** — Phases 45-47 (unexecuted, separate scope)
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
-- **v2.6 Dashboard Command Center** — Resume from plan 5/8 after v2.5.2 complete
 - **v2.1 Integrations** — ServiceTitan/Jobber/Housecall Pro API integrations for auto job import
 - **v2.2 Review Inbox** — Ingest reviews from Google Business Profile, AI reply suggestions
 - **v3.0 Agency Mode** — Multi-business management UI, white-label option, client reporting portal
 
 ---
-*Last updated: 2026-02-25 — v2.5.2 UX Bugs & UI Fixes milestone roadmap created (Phases 45-47)*
+*Last updated: 2026-02-25 — v2.5.3 UX Bugs & UI Fixes Part 2 milestone roadmap created (Phases 48-49)*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*

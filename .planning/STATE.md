@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-25)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v2.5.3 UX Bugs & UI Fixes Part 2 — defining requirements
+**Current focus:** v2.5.3 UX Bugs & UI Fixes Part 2 — Phase 48 (Onboarding & Dashboard Behavior Fixes)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 48 of 49 (Onboarding & Dashboard Behavior Fixes)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-02-25 — Milestone v2.5.3 started
+Status: Ready to plan
+Last activity: 2026-02-25 — Roadmap created for v2.5.3 (Phases 48-49)
 
 Progress: [░░░░░░░░░░] 0% (v2.5.3 milestone)
 
@@ -35,6 +35,13 @@ Progress: [░░░░░░░░░░] 0% (v2.5.3 milestone)
 - Custom service names must propagate to all service selectors (Add Job, filters, etc.)
 - Needs Attention dismiss must actually remove items (UI-only hide)
 
+### Cross-Cutting Concerns (apply to every plan)
+
+- **Design system**: Use existing semantic tokens and design system patterns. If new tokens/patterns needed, add to globals.css / tailwind.config.ts — no one-off inline overrides
+- **Code scalability**: Consolidate, don't duplicate. Remove replaced/dead code when shipping new patterns
+- **Dead code removal**: Audit for unused imports, unused components, dead branches after each change
+- **Security**: No new client-exposed secrets, validate all user inputs server-side, maintain RLS discipline
+
 ### Key Decisions (Inherited from v2.5.2/v2.5.1)
 
 - Activity page status options: pending, sent, delivered, bounced, complained, failed, opened
@@ -56,6 +63,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Defining requirements for v2.5.3
+Stopped at: Roadmap created for v2.5.3 — ready to plan Phase 48
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!

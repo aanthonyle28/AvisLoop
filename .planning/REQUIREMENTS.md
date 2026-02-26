@@ -2,7 +2,7 @@
 
 **Milestone:** v2.5.3 — UX Bugs & UI Fixes Part 2
 **Created:** 2026-02-25
-**Status:** Scoped
+**Status:** Roadmap Complete
 
 ---
 
@@ -57,27 +57,27 @@
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| GS-01 | TBD | Pending |
-| GS-02 | TBD | Pending |
-| ONB-01 | TBD | Pending |
-| ONB-02 | TBD | Pending |
-| ONB-03 | TBD | Pending |
-| SVC-01 | TBD | Pending |
-| SVC-02 | TBD | Pending |
-| SVC-03 | TBD | Pending |
-| DASH-01 | TBD | Pending |
-| DASH-02 | TBD | Pending |
-| JOB-01 | TBD | Pending |
-| SUB-01 | TBD | Pending |
-| VIS-01 | TBD | Pending |
-| VIS-02 | TBD | Pending |
-| VIS-03 | TBD | Pending |
+| GS-01 | Phase 48 | Pending |
+| GS-02 | Phase 48 | Pending |
+| ONB-01 | Phase 48 | Pending |
+| ONB-02 | Phase 48 | Pending |
+| ONB-03 | Phase 48 | Pending |
+| SVC-01 | Phase 49 | Pending |
+| SVC-02 | Phase 49 | Pending |
+| SVC-03 | Phase 49 | Pending |
+| DASH-01 | Phase 48 | Pending |
+| DASH-02 | Phase 48 | Pending |
+| JOB-01 | Phase 48 | Pending |
+| SUB-01 | Phase 49 | Pending |
+| VIS-01 | Phase 49 | Pending |
+| VIS-02 | Phase 49 | Pending |
+| VIS-03 | Phase 49 | Pending |
 
 **Coverage:**
 - v2.5.3 requirements: 15 total
-- Mapped to phases: 0
-- Unmapped: 15
+- Mapped to phases: 15
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-25*
-*Last updated: 2026-02-25 after initial definition*
+*Last updated: 2026-02-25 after roadmap creation (all 15 requirements mapped to Phases 48-49)*
