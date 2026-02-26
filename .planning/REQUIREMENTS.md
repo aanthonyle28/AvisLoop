@@ -2,7 +2,7 @@
 
 **Milestone:** v2.5.4 — Code Review (Phases 41-44)
 **Created:** 2026-02-25
-**Status:** Defining requirements
+**Status:** Roadmap created
 
 ---
 
@@ -75,4 +75,4 @@
 
 ---
 *Requirements defined: 2026-02-25*
-*Last updated: 2026-02-25 after initial definition*
+*Last updated: 2026-02-25 — roadmap created, traceability confirmed*

@@ -19,6 +19,7 @@ AvisLoop is a review follow-up system for home service businesses. v1.0 through 
 - **v2.5.1 Bug Fixes & Polish** - Phases 41-44 (complete 2026-02-25)
 - **v2.5.2 UX Bugs & UI Fixes** - Phases 45-47 (in progress)
 - **v2.5.3 UX Bugs & UI Fixes Part 2** - Phases 48-49 (in progress)
+- **v2.5.4 Code Review (Phases 41-44)** - Phases 50-51 (in progress)
 
 ## Phases
 
@@ -788,6 +789,41 @@ Plans:
 **Plans**: TBD
 
 
+### v2.5.4 Code Review (Phases 41-44) (Phases 50-51)
+
+**Milestone Goal:** Systematic code review of all changes shipped in Phases 41-44 (v2.5.1 Bug Fixes & Polish), followed by remediation of all findings. Covers security, performance, V2 alignment, design system compliance, accessibility, and dead code.
+
+**Coverage:** 15 requirements across 2 categories (AUD, FIX)
+
+**Build order rationale:** Audit must complete before remediation can begin — Phase 50 produces the findings report that Phase 51 consumes. No parallelization possible between the two phases.
+
+---
+
+### Phase 50: Code Review & Audit
+**Goal**: All code changes from Phases 41-44 are systematically reviewed across security, performance, V2 alignment, design system, accessibility, and code hygiene dimensions, with a severity-rated findings report ready for remediation.
+**Depends on**: Phases 41-44 (v2.5.1 complete, code under review)
+**Requirements**: AUD-01, AUD-02, AUD-03, AUD-04, AUD-05, AUD-06, AUD-07, AUD-08, AUD-09, AUD-10, AUD-11
+**Success Criteria** (what must be TRUE):
+  1. Every file modified in Phase 41 (Activity Page Overhaul) has been reviewed for correctness, security, and design system compliance — resend logic, chip filters, date presets, and page header
+  2. Every file modified in Phase 42 (Dashboard & Navigation Polish) has been reviewed — queue styling, dismiss button, empty state, and sidebar active state
+  3. Every file modified in Phase 43 (Cross-Page Consistency) has been reviewed — loading skeletons and empty states across all pages
+  4. Every file modified in Phase 44 (Onboarding & Services) has been reviewed — CRM platform step and custom services
+  5. A findings report exists at docs/CODE-REVIEW-41-44.md with every finding categorized by severity (Critical/High/Medium/Low), file location, line number, and fix recommendation
+**Plans**: TBD
+
+### Phase 51: Audit Remediation
+**Goal**: All Critical, High, and Medium findings from the Phase 50 code review are resolved, and Low findings are either fixed or documented with deferral rationale.
+**Depends on**: Phase 50 (findings report produced)
+**Requirements**: FIX-01, FIX-02, FIX-03, FIX-04
+**Success Criteria** (what must be TRUE):
+  1. Zero Critical findings remain open — all resolved with code changes verified by lint and typecheck
+  2. Zero High findings remain open — all resolved with code changes verified by lint and typecheck
+  3. Zero Medium findings remain open — all resolved with code changes verified by lint and typecheck
+  4. Every Low finding is either fixed or has a documented deferral reason in the findings report
+  5. Lint (`pnpm lint`) and typecheck (`pnpm typecheck`) pass with zero errors after all fixes applied
+**Plans**: TBD
+
+
 ---
 
 ## Phase Details
@@ -840,23 +876,26 @@ See individual phase sections above for requirements, success criteria, and depe
 | **47** | **v2.5.2 UX Bugs & UI Fixes** | **0/TBD** | **Not started** | - |
 | **48** | **v2.5.3 UX Bugs Part 2** | **0/TBD** | **Not started** | - |
 | **49** | **v2.5.3 UX Bugs Part 2** | **0/TBD** | **Not started** | - |
+| **50** | **v2.5.4 Code Review** | **0/TBD** | **Not started** | - |
+| **51** | **v2.5.4 Code Review** | **0/TBD** | **Not started** | - |
 
 **Total:** 211 plans complete across shipped phases.
 
 ## What's Next
 
-**v2.5.3 UX Bugs & UI Fixes Part 2:** Phases 48-49 — in progress.
+**v2.5.4 Code Review (Phases 41-44):** Phases 50-51 — ready to plan.
 
 **Blockers:**
 - Twilio A2P 10DLC registration required before Phase 21-08 execution (webhook verification)
 
-After v2.5.3:
+After v2.5.4:
 - **v2.5.2 UX Bugs & UI Fixes** — Phases 45-47 (unexecuted, separate scope)
+- **v2.5.3 UX Bugs & UI Fixes Part 2** — Phases 48-49 (unexecuted, separate scope)
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 - **v2.1 Integrations** — ServiceTitan/Jobber/Housecall Pro API integrations for auto job import
 - **v2.2 Review Inbox** — Ingest reviews from Google Business Profile, AI reply suggestions
 - **v3.0 Agency Mode** — Multi-business management UI, white-label option, client reporting portal
 
 ---
-*Last updated: 2026-02-25 — v2.5.3 UX Bugs & UI Fixes Part 2 milestone roadmap created (Phases 48-49)*
+*Last updated: 2026-02-25 — v2.5.4 Code Review milestone roadmap created (Phases 50-51)*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
