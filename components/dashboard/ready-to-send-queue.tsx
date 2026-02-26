@@ -50,6 +50,7 @@ import { getJobDetail, dismissJobFromQueue, markOneOffSent } from '@/lib/actions
 import { markJobComplete, deleteJob } from '@/lib/actions/job'
 import { resolveEnrollmentConflict, revertConflictResolution } from '@/lib/actions/conflict-resolution'
 import { getSendOneOffData, type SendOneOffData } from '@/lib/actions/send-one-off-data'
+import { useAddJob } from '@/components/jobs/add-job-provider'
 import { cn } from '@/lib/utils'
 import type { ReadyToSendJob } from '@/lib/types/dashboard'
 import type { JobWithEnrollment } from '@/lib/types/database'
@@ -64,6 +65,7 @@ interface ReadyToSendQueueProps {
 }
 
 export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJobId }: ReadyToSendQueueProps) {
+  const { openAddJob } = useAddJob()
   const [isPending, startTransition] = useTransition()
   const [activeAction, setActiveAction] = useState<{ jobId: string; action: string } | null>(null)
 
@@ -487,18 +489,16 @@ export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJob
         )}
 
         {jobs.length === 0 && !hasJobHistory && (
-          <div className="flex flex-col items-center justify-center py-8 text-center rounded-lg border-2 border-dashed border-border">
+          <div className="flex flex-col items-center justify-center py-8 text-center rounded-lg border border-border bg-card">
             <div className="rounded-full bg-muted p-3 mb-3">
               <Briefcase className="h-6 w-6 text-muted-foreground" />
             </div>
             <p className="text-sm text-muted-foreground mb-3">
               No jobs yet — add a completed job to get started
             </p>
-            <Button asChild size="sm">
-              <Link href="/jobs">
-                <Plus className="h-4 w-4 mr-1" />
-                Add Job
-              </Link>
+            <Button size="sm" onClick={openAddJob}>
+              <Plus className="h-4 w-4 mr-1" />
+              Add Jobs
             </Button>
           </div>
         )}
