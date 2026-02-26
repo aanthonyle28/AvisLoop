@@ -939,7 +939,7 @@ export async function optOutCustomerEmail(
     return { error: 'Failed to opt out customer. Please try again.' }
   }
 
-  // Stop any active campaign enrollments for this customer
+  // Stop any active or frozen campaign enrollments for this customer
   const { error: enrollmentError } = await supabase
     .from('campaign_enrollments')
     .update({
@@ -948,7 +948,7 @@ export async function optOutCustomerEmail(
       stopped_at: new Date().toISOString(),
     })
     .eq('customer_id', customerId)
-    .eq('status', 'active')
+    .in('status', ['active', 'frozen'])
 
   if (enrollmentError) {
     console.error('Failed to stop enrollments:', enrollmentError)

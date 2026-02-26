@@ -48,13 +48,13 @@ export async function checkEnrollmentConflict(
 ): Promise<ConflictCheckResult> {
   const supabase = await createClient()
 
-  // 1. Check for active enrollment
+  // 1. Check for active or frozen enrollment (frozen = paused campaign, still in-progress)
   const { data: activeEnrollment } = await supabase
     .from('campaign_enrollments')
     .select('id, current_touch, campaigns:campaign_id(name)')
     .eq('customer_id', customerId)
     .eq('business_id', businessId)
-    .eq('status', 'active')
+    .in('status', ['active', 'frozen'])
     .limit(1)
     .maybeSingle()
 
@@ -113,7 +113,7 @@ async function cancelActiveEnrollments(
       stopped_at: new Date().toISOString(),
     })
     .eq('customer_id', customerId)
-    .eq('status', 'active')
+    .in('status', ['active', 'frozen'])
     .select('id')
 
   return data?.length || 0
@@ -141,7 +141,7 @@ export async function stopEnrollmentsForJob(
       stopped_at: new Date().toISOString(),
     })
     .eq('job_id', jobId)
-    .eq('status', 'active')
+    .in('status', ['active', 'frozen'])
     .select('id')
 
   if (error) {
