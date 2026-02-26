@@ -789,7 +789,12 @@ Plans:
   5. Jobs table rows have white background (not transparent/gray alternating)
   6. Activity/history page rows have white background matching Jobs table treatment
   7. QuickSendModal has updated layout, spacing, and visual styling consistent with the current warm design system
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
+
+Plans:
+- [x] 49-01-PLAN.md — Custom service name pill sizing and propagation to selectors
+- [x] 49-02-PLAN.md — QuickSendModal visual redesign
+- [x] 49-03-PLAN.md — Page subtitle normalization and white table rows
 
 
 ### v2.5.4 Code Review (Phases 41-44) (Phases 50-51)
@@ -812,7 +817,11 @@ Plans:
   3. Every file modified in Phase 43 (Cross-Page Consistency) has been reviewed — loading skeletons and empty states across all pages
   4. Every file modified in Phase 44 (Onboarding & Services) has been reviewed — CRM platform step and custom services
   5. A findings report exists at docs/CODE-REVIEW-41-44.md with every finding categorized by severity (Critical/High/Medium/Low), file location, line number, and fix recommendation
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
+Plans:
+- [x] 50-01-PLAN.md — UI component review (Phases 41-43, 22 files)
+- [x] 50-02-PLAN.md — Onboarding & data layer review (Phase 44, 19 files)
+- [x] 50-03-PLAN.md — Cross-cutting audit and consolidated findings report
 
 ### Phase 51: Audit Remediation
 **Goal**: All Critical, High, and Medium findings from the Phase 50 code review are resolved, and Low findings are either fixed or documented with deferral rationale.
@@ -878,11 +887,11 @@ See individual phase sections above for requirements, success criteria, and depe
 | **46** | **v2.5.2 UX Bugs & UI Fixes** | **5/5** | **Complete** | **2026-02-26** |
 | **47** | **v2.5.2 UX Bugs & UI Fixes** | **0/TBD** | **Not started** | - |
 | **48** | **v2.5.3 UX Bugs Part 2** | **2/2** | **Complete** | **2026-02-25** |
-| **49** | **v2.5.3 UX Bugs Part 2** | **0/TBD** | **Not started** | - |
-| **50** | **v2.5.4 Code Review** | **0/TBD** | **Not started** | - |
+| **49** | **v2.5.3 UX Bugs Part 2** | **3/3** | **Complete** | **2026-02-26** |
+| **50** | **v2.5.4 Code Review** | **3/3** | **Complete** | **2026-02-26** |
 | **51** | **v2.5.4 Code Review** | **0/TBD** | **Not started** | - |
 
-**Total:** 221 plans complete across shipped phases.
+**Total:** 227 plans complete across shipped phases.
 
 ## What's Next
 
