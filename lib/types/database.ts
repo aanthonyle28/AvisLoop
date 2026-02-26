@@ -308,7 +308,7 @@ export interface CampaignWithTouches extends Campaign {
 }
 
 // Enrollment status state machine
-export type EnrollmentStatus = 'active' | 'completed' | 'stopped'
+export type EnrollmentStatus = 'active' | 'completed' | 'stopped' | 'frozen'
 
 // Stop reason when enrollment ends
 export type EnrollmentStopReason =
