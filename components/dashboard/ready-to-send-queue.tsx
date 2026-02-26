@@ -268,7 +268,7 @@ export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJob
           </Button>
           <Button
             size="sm"
-            variant="outline"
+            variant="soft"
             onClick={() => handleResolveConflict(job.id, 'skip')}
             disabled={busy}
           >
@@ -281,7 +281,7 @@ export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJob
           </Button>
           <Button
             size="sm"
-            variant="outline"
+            variant="soft"
             onClick={() => handleResolveConflict(job.id, 'queue_after')}
             disabled={busy}
           >
@@ -301,7 +301,7 @@ export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJob
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button size="sm" variant="outline" disabled={busy}>
+            <Button size="sm" variant="soft" disabled={busy}>
               <Clock className="h-4 w-4 mr-1" />
               Queued
             </Button>
@@ -325,7 +325,7 @@ export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJob
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button size="sm" variant="outline" disabled={busy}>
+            <Button size="sm" variant="soft" disabled={busy}>
               <ArrowsClockwise className="h-4 w-4 mr-1" />
               Will Replace
             </Button>
@@ -359,7 +359,7 @@ export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJob
           </Button>
           <Button
             size="sm"
-            variant="outline"
+            variant="soft"
             onClick={() => handleResolveConflict(job.id, 'skip')}
             disabled={busy}
           >
@@ -372,7 +372,7 @@ export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJob
           </Button>
           <Button
             size="sm"
-            variant="outline"
+            variant="soft"
             onClick={() => handleResolveConflict(job.id, 'queue_after')}
             disabled={busy}
           >

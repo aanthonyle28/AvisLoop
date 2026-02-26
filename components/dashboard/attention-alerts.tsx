@@ -100,7 +100,7 @@ function AlertRow({ alert, isSelected, onSelect, onDismiss }: AlertRowProps) {
         {alert.type === 'failed_send' && alert.retryable && (
           <Button
             size="sm"
-            variant="outline"
+            variant="soft"
             onClick={handleRetry}
             disabled={isPending}
           >
@@ -109,7 +109,7 @@ function AlertRow({ alert, isSelected, onSelect, onDismiss }: AlertRowProps) {
         )}
 
         {alert.type === 'bounced_email' && (
-          <Button size="sm" variant="outline" asChild>
+          <Button size="sm" variant="soft" asChild>
             <Link href={alert.contextualAction.href}>
               {alert.contextualAction.label}
             </Link>
@@ -117,7 +117,7 @@ function AlertRow({ alert, isSelected, onSelect, onDismiss }: AlertRowProps) {
         )}
 
         {alert.type === 'unresolved_feedback' && (
-          <Button size="sm" variant="outline" asChild>
+          <Button size="sm" variant="soft" asChild>
             <Link href={alert.contextualAction.href}>
               {alert.contextualAction.label}
             </Link>
