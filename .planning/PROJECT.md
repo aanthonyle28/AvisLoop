@@ -116,29 +116,26 @@ Turn job completions into Google reviews automatically — multi-touch follow-up
 | Dashboard test step cards | Guided walkthrough instead of checklist | Good — auto-detection of completion |
 | Test sends excluded from quota | Fair for users learning the product | Good — is_test flag in database |
 
-## Current Milestone: v2.5.2 UX Bugs & UI Fixes
+## Current Milestone: v2.5.3 UX Bugs & UI Fixes Part 2
 
-**Goal:** Drawer consistency overhaul, dashboard right panel KPI/activity redesign, dashboard queue row styling, campaign pause/resume bug fix, button hierarchy cleanup, touch template previews, and navigation rename.
+**Goal:** Fix getting started step 2 logic, Needs Attention dismiss, custom service propagation, campaign preset picker UX, page subtitle consistency, KPI navigation, QuickSendModal redesign, and visual polish (white table rows, service pills).
 
 **Target features:**
-- Drawers: consistent white-background content grouping, sticky bottom action buttons, wider Add Job drawer, Radix selects (no native HTML)
-- Dashboard right panel: KPI cards with light gray background + sparkline graphs, recent activity with distinct icons + spacing (per reference image)
-- Dashboard queue: white background + border-radius rows, solid border empty states, Add Jobs opens drawer
-- Campaign fixes: pause/re-enable bug (completed jobs stuck as stopped), freeze-in-place pause behavior for mid-sequence enrollments
-- Campaign page: touch sequence template preview (email/SMS, including defaults)
-- Button hierarchy: new softer variant for secondary actions, dashboard button audit
-- Navigation: rename "Activity" to "History"
+- Getting Started step 2: track campaign page visit (not campaign existence), mark complete only when user opens campaign detail page
+- Add Job drawer: "Create new campaign" option in campaign dropdown when no campaigns exist
+- Page subtitles: consistent "static description · dynamic count" pattern across all pages
+- Needs Attention dismiss: fix X button to actually remove items from dashboard queue
+- Campaign preset picker: vertical stack layout, plain-English descriptions, Standard in middle position, fix subtitle "settings" → "campaigns"
+- Custom services: fix pill sizing, propagate custom service names to Add Job dropdown and all service selectors
+- Jobs table + activity rows: white background
+- QuickSendModal: visual refresh to match current design style
+- KPI stat cards: all three navigate to /analytics
 
 **Key decisions:**
-- v2.6 Dashboard Command Center still paused at plan 5/8 — resume after this patch
-- Campaign pause = freeze enrollments in place, resume from same touch on un-pause
-- Button variant needed: softer styling so secondary actions don't compete with primary CTAs
-
-## Paused: v2.6 Dashboard Command Center
-
-**Status:** Paused at plan 5 of ~8 (~62% complete). Resume after v2.5.1.
-
-**Goal:** Transform the dashboard into a task-oriented command center with persistent two-column layout, contextual right panel, and consolidated getting-started experience.
+- v2.5.2 (Phases 45-47) remains in roadmap but unexecuted — separate scope
+- v2.6 Dashboard Command Center paused — resume after patch series
+- Getting Started step 2 tracks campaign detail page visit, not campaign existence
+- All KPI cards → /analytics (unified destination)
 
 ---
-*Last updated: 2026-02-25 after v2.5.2 UX Bugs & UI Fixes milestone started*
+*Last updated: 2026-02-25 after v2.5.3 UX Bugs & UI Fixes Part 2 milestone started*
