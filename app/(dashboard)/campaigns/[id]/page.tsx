@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { getCampaign, getCampaignEnrollments, getCampaignEnrollmentCounts, getCampaignAnalytics } from '@/lib/data/campaign'
 import { getAvailableTemplates } from '@/lib/data/message-template'
 import { getBusiness } from '@/lib/actions/business'
+import { markCampaignReviewed } from '@/lib/actions/checklist'
 import { CampaignStats } from '@/components/campaigns/campaign-stats'
 import { CampaignDetailShell } from './campaign-detail-shell'
 import { Badge } from '@/components/ui/badge'
@@ -41,6 +42,7 @@ export default async function CampaignDetailPage({ params, searchParams }: Campa
     getCampaignAnalytics(id),
     getAvailableTemplates(),
     getBusiness(),
+    markCampaignReviewed(),
   ])
 
   const { enrollments, total } = enrollmentsResult
