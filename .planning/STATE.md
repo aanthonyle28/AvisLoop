@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-25)
 ## Current Position
 
 Phase: 46 (Drawer Consistency + Campaign Freeze Fix) — In progress
-Plan: 46-03 of 5 complete (46-01 also complete)
+Plan: 46-01, 46-03 of 5 complete
 Status: In progress
-Last activity: 2026-02-25 — Completed 46-03-PLAN.md (SheetBody + shrink-0 foundation)
+Last activity: 2026-02-26 — Completed 46-01-PLAN.md (frozen enrollment status migration + types + deleteCampaign)
 
 Progress: [██████░░░░] ~60% (v2.5.3+ — phases 46, 49, 50 queued)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 219
-- Phase 46 plans completed: 3 (46-01, 46-03)
+- Total plans completed (project): 220
+- Phase 46 plans completed: 2 (46-01, 46-03)
 
 *Updated after each plan completion*
 
@@ -33,6 +33,8 @@ Progress: [██████░░░░] ~60% (v2.5.3+ — phases 46, 49, 50 q
 - CampaignSelector sentinel pattern: CAMPAIGN_CREATE = '__create_campaign__' intercepted in onChange before calling parent handler
 - "Create new campaign" navigates to /campaigns page (has New Campaign button) rather than inline dialog
 - Campaign preset picker: vertical stack (flex-col), sorted by CAMPAIGN_PRESETS index, no touch badges
+- Frozen enrollment status: treated as "in-progress" in all deletion, reassignment, and conflict queries (use `.in('status', ['active', 'frozen'])`)
+- stopEnrollment (single enrollment by ID) keeps `.eq('status', 'active')` — frozen enrollments are unfrozen via campaign resume, not individually stopped
 
 ### Key Decisions for v2.5.2
 
@@ -69,7 +71,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-25
-Stopped at: Completed 46-03-PLAN.md (SheetBody + shrink-0 foundation)
+Last session: 2026-02-26
+Stopped at: Completed 46-01-PLAN.md (frozen enrollment status migration + types + deleteCampaign)
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
