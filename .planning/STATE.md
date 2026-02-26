@@ -5,22 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-02-25)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v2.5.3 UX Bugs & UI Fixes Part 2 — Phase 48 complete, Phase 49 next
+**Current focus:** Phase 46 — Drawer Consistency + Campaign Freeze Fix (in progress)
 
 ## Current Position
 
-Phase: 48 of 49 (Onboarding & Dashboard Behavior Fixes) — COMPLETE
-Plan: 2/2 complete
-Status: Phase verified ✓
-Last activity: 2026-02-25 — Phase 48 executed and verified (2 plans, 1 wave)
+Phase: 46 (Drawer Consistency + Campaign Freeze Fix) — In progress
+Plan: 46-03 of 5 complete (46-01 also complete)
+Status: In progress
+Last activity: 2026-02-25 — Completed 46-03-PLAN.md (SheetBody + shrink-0 foundation)
 
-Progress: [█████░░░░░] 50% (v2.5.3 milestone — 1/2 phases)
+Progress: [██████░░░░] ~60% (v2.5.3+ — phases 46, 49, 50 queued)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 216
-- v2.5.3 plans completed: 2
+- Total plans completed (project): 219
+- Phase 46 plans completed: 3 (46-01, 46-03)
 
 *Updated after each plan completion*
 
@@ -70,6 +70,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Phase 48 complete — ready to plan Phase 49
+Stopped at: Completed 46-03-PLAN.md (SheetBody + shrink-0 foundation)
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
