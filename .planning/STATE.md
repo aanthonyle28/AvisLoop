@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-25)
 ## Current Position
 
 Phase: 46 (Drawer Consistency & Campaign Freeze Fix) — In progress
-Plan: 46-04 of 5 complete (46-01, 46-03, 46-04 done; 46-02, 46-05 in progress)
-Status: In progress — 46-04 complete, continuing Wave 2
-Last activity: 2026-02-26 — Completed 46-04-PLAN.md (drawer consistency for 4 form sheets)
+Plan: 46-05 of 5 complete (46-01, 46-03, 46-04, 46-05 done; 46-02 remaining)
+Status: In progress — 46-05 complete, only 46-02 remaining
+Last activity: 2026-02-26 — Completed 46-05-PLAN.md (drawer consistency for Job Detail + Customer Detail)
 
-Progress: [██████░░░░] ~66% (v2.5.3+ — phases 46 in progress, 49 complete, 50 in progress)
+Progress: [██████░░░░] ~68% (v2.5.3+ — phases 46 near-complete, 49 complete, 50 in progress)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 224
-- Phase 46 plans completed: 3 (46-01, 46-03, 46-04)
+- Total plans completed (project): 225
+- Phase 46 plans completed: 4 (46-01, 46-03, 46-04, 46-05)
 
 *Updated after each plan completion*
 
@@ -32,6 +32,8 @@ Progress: [██████░░░░] ~66% (v2.5.3+ — phases 46 in progre
 - Edit Customer exception: uses form id attribute (form='edit-customer-form') because non-form content (SMS consent, activity) sits between form fields and footer
 - All form sheets normalized to sm:max-w-lg width (512px)
 - Separator components removed from Edit Customer (replaced by natural space-y-6 spacing)
+- Job Detail "Complete" button normalized to default variant (primary CTA) — removed outline + custom color overrides
+- Conflict resolution buttons stay in SheetBody (contextual), not SheetFooter (global actions)
 
 ### Key Decisions for Phase 49 (Visual Polish)
 
@@ -98,6 +100,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-26
-Stopped at: Completed 46-04-PLAN.md (drawer consistency for Add Job, Edit Job, Add Customer, Edit Customer)
+Stopped at: Completed 46-05-PLAN.md (drawer consistency for Job Detail + Customer Detail drawers)
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
