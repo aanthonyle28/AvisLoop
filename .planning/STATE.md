@@ -5,22 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-02-25)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** Phase 46 — Drawer Consistency + Campaign Freeze Fix (in progress)
+**Current focus:** Phase 49 — Custom Services Visual Polish (in progress)
 
 ## Current Position
 
-Phase: 46 (Drawer Consistency + Campaign Freeze Fix) — In progress
-Plan: 46-01, 46-03 of 5 complete
+Phase: 49 (Custom Services Visual Polish) — In progress
+Plan: 1 of N complete (49-01 done)
 Status: In progress
-Last activity: 2026-02-26 — Completed 46-01-PLAN.md (frozen enrollment status migration + types + deleteCampaign)
+Last activity: 2026-02-26 — Completed 49-01-PLAN.md (customServiceNames threaded to ServiceTypeSelect)
 
-Progress: [██████░░░░] ~60% (v2.5.3+ — phases 46, 49, 50 queued)
+Progress: [██████░░░░] ~62% (v2.5.3+ — phases 46, 49, 50 in progress)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 220
-- Phase 46 plans completed: 2 (46-01, 46-03)
+- Total plans completed (project): 221
+- Phase 49 plans completed: 1 (49-01)
 
 *Updated after each plan completion*
 
@@ -35,6 +35,8 @@ Progress: [██████░░░░] ~60% (v2.5.3+ — phases 46, 49, 50 q
 - Campaign preset picker: vertical stack (flex-col), sorted by CAMPAIGN_PRESETS index, no touch badges
 - Frozen enrollment status: treated as "in-progress" in all deletion, reassignment, and conflict queries (use `.in('status', ['active', 'frozen'])`)
 - stopEnrollment (single enrollment by ID) keeps `.eq('status', 'active')` — frozen enrollments are unfrozen via campaign resume, not individually stopped
+- Custom service names use `value="other"` in ServiceTypeSelect — DB stores enum 'other', display names are cosmetic only
+- flatMap used on availableTypes array to allow returning arrays for the 'other' custom names case
 
 ### Key Decisions for v2.5.2
 
@@ -72,6 +74,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-26
-Stopped at: Completed 46-01-PLAN.md (frozen enrollment status migration + types + deleteCampaign)
+Stopped at: Completed 49-01-PLAN.md (customServiceNames threaded to ServiceTypeSelect)
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
