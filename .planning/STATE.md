@@ -5,59 +5,60 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.0 Agency Mode — defining requirements
+**Current focus:** v2.5.4 Code Review milestone (Phases 50-51) — Phase 51 COMPLETE
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-02-26 — Milestone v3.0 Agency Mode started
+Phase: 51 of 51 (Audit Remediation) — COMPLETE
+Plan: 3/3 complete (51-01 ✓, 51-02 ✓, 51-03 ✓)
+Milestone: v2.5.4 Code Review (Phases 50-51) — ALL COMPLETE
+Status: Milestone complete
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██████████] 100% (Phase 51)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 228
-- v3.0 plans completed: 0
+- Total plans completed (project): 231
+- Phase 51 plans completed: 3/3
 
 *Updated after each plan completion*
 
 ## Accumulated Context
 
-### Cross-Cutting Concerns (apply to every plan)
+### Key Decisions for Phase 51 (Audit Remediation)
 
-- **Design system**: Use existing semantic tokens and design system patterns. If new tokens/patterns needed, add to globals.css / tailwind.config.ts — no one-off inline overrides
-- **Code scalability**: Consolidate, don't duplicate. Remove replaced/dead code when shipping new patterns
-- **Dead code removal**: Audit for unused imports, unused components, dead branches after each change
-- **Security**: No new client-exposed secrets, validate all user inputs server-side, maintain RLS discipline
+- Skeleton component pattern: <Skeleton className="h-X w-Y [structural-classes]" /> — drop bg-muted/animate-pulse/rounded
+- Page spacing standardized to space-y-8 across all 6 dashboard pages
+- Settings page uses single skeleton from loading.tsx (inline duplicate removed)
+- handleDismiss calls acknowledgeAlert for bounced_email/stop_request types
+- updateServiceTypeSettings uses fetch-first defense-in-depth pattern
+- getBusiness() returns explicit BusinessWithTemplates type
+- feedback-list.tsx SSR import documented (required for Server Components)
+- SendLogWithCustomer is the canonical joined type — includes name, email, last_sent_at from customers
+- Cooldown anchor: use customers.last_sent_at with fallback to created_at (not created_at unconditionally)
+- Stub UI removal: no-op buttons replaced with TODO comments until server-side implementation exists
+- custom_service_names typed string[] | null — all consumers use || [] defensively
+- F-08 deferred: RESENDABLE_STATUSES export IS used by history-table.tsx — finding was incorrect
 
-### Key Decisions (Inherited)
+### Cross-Cutting Concerns
 
-- Activity page status options: pending, sent, delivered, bounced, complained, failed, opened
-- Sidebar active state: filled icon + brand orange text, no left border, same background
-- Design changes must update globals.css / design system tokens — no one-off inline overrides
-- Empty state pattern (canonical): rounded-full bg-muted p-6 mb-6 circle, h-8 w-8 icon, text-2xl font-semibold tracking-tight mb-2 title, max-w-md subtitle
-- Loading skeleton pattern: always use Skeleton component, container py-6 space-y-8 for full-width pages
-- custom_service_names stored as TEXT[] — simple array, no metadata needed
-- Enter key in sub-input must call e.preventDefault() to prevent parent form submission
-- soft button variant: bg-muted/text-muted-foreground — use for secondary actions alongside a primary default CTA
-- SheetBody/SheetFooter pattern: form wraps both SheetBody and SheetFooter (flex flex-col flex-1 min-h-0)
-- Subtitle canonical pattern: text-2xl font-semibold tracking-tight h1 + text-muted-foreground subtitle
-- Skeleton component pattern: <Skeleton className="h-X w-Y [structural-classes]" /> — drop bg-muted/animate-pulse/rounded from className
+- **Design system**: Use existing semantic tokens
+- **Dead code removal**: Audit for unused imports after each change
+- **Security**: Validate all user inputs server-side, maintain RLS discipline
 
-### Pending Todos
-
-None.
-
-### Blockers/Concerns
-
-- Phase 21-08: Twilio A2P campaign approval required for production SMS testing (brand approved, campaign pending)
+Config:
+{
+  "mode": "yolo",
+  "depth": "standard",
+  "parallelization": true,
+  "commit_docs": true,
+  "model_profile": "balanced"
+}
 
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Phase 51 Plan 02 complete — security, validation, accessibility, type correctness
+Stopped at: Phase 51 Plan 03 complete — history type migration, UI correctness, dead code cleanup
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
