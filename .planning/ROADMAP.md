@@ -912,9 +912,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 55-01-PLAN.md — businesses table migration (10 agency metadata columns) + data functions
-- [ ] 55-02-PLAN.md — BusinessCard component and /businesses page grid
-- [ ] 55-03-PLAN.md — BusinessDetailDrawer with all metadata fields, edit mode, auto-save notes
+- [x] 55-01-PLAN.md — businesses table migration (10 agency metadata columns) + data functions
+- [x] 55-02-PLAN.md — BusinessCard component and /businesses page grid
+- [x] 55-03-PLAN.md — BusinessDetailDrawer with all metadata fields, edit mode, auto-save notes
 
 ### Phase 56: Additional Business Creation
 **Goal**: Agency owners can create additional client businesses from the Clients page using a safe insert-only code path that never overwrites existing businesses, with the new business going through the full onboarding wizard and becoming the active business on completion.
@@ -1016,9 +1016,9 @@ See individual phase sections above for requirements, success criteria, and depe
 | **52** | **v3.0 Agency Mode** | **2/2** | **Complete** | **2026-02-27** |
 | **53** | **v3.0 Agency Mode** | **2/2** | **Complete** | **2026-02-27** |
 | **54** | **v3.0 Agency Mode** | **2/2** | **Complete** | **2026-02-27** |
-| 55 | v3.0 Agency Mode | 0/TBD | Not started | - |
+| **55** | **v3.0 Agency Mode** | **3/3** | **Complete** | **2026-02-27** |
 | 56 | v3.0 Agency Mode | 0/TBD | Not started | - |
 | 57 | v3.0 Agency Mode | 0/TBD | Not started | - |
 | 58 | v3.0 Agency Mode | 0/TBD | Not started | - |
 
-**Total:** 234 plans complete across shipped phases.
+**Total:** 239 plans complete across shipped phases.
