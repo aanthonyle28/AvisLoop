@@ -17,9 +17,10 @@ AvisLoop is a review follow-up system for home service businesses. v1.0 through 
 - **v2.5 UI/UX Redesign** - Phases 33-39 (complete 2026-02-20)
 - **v2.6 Dashboard Command Center** - Phase 40 (complete 2026-02-25)
 - **v2.5.1 Bug Fixes & Polish** - Phases 41-44 (complete 2026-02-25)
-- **v2.5.2 UX Bugs & UI Fixes** - Phases 45-47 (in progress)
-- **v2.5.3 UX Bugs & UI Fixes Part 2** - Phases 48-49 (in progress)
+- **v2.5.2 UX Bugs & UI Fixes** - Phases 45-47 (complete 2026-02-27)
+- **v2.5.3 UX Bugs & UI Fixes Part 2** - Phases 48-49 (complete 2026-02-26)
 - **v2.5.4 Code Review (Phases 41-44)** - Phases 50-51 (complete 2026-02-27)
+- **v3.0 Agency Mode** - Phases 52-58 (in progress)
 
 ## Phases
 
@@ -840,6 +841,124 @@ Plans:
 - [x] 51-03-PLAN.md — History type migration, UI correctness, and dead code cleanup
 
 
+### v3.0 Agency Mode (Phases 52-57)
+
+**Milestone Goal:** Enable one user to own and manage multiple client businesses from a single account. A cookie-based active business resolver powers context switching across all pages. A new /businesses Clients page gives agency owners an at-a-glance view of every client with key metrics and an editable detail drawer. Each new business goes through the full onboarding wizard via a separate insert-only code path (never upsert). Unified billing pools send counts across all businesses.
+
+**Coverage:** 23 requirements across 5 categories (FOUND, SWITCH, CLIENT, CREATE, BILL)
+
+**Build order rationale:** Foundation before everything (resolver, provider, redirect logic must exist before data refactor begins). Data refactor before any UI (pages crash without it). Switcher UI after data is safe. Clients page after switcher exists (drawer uses Switch to Business button). Business creation after Clients page exists as the natural entry point. Billing last (requires real businesses with real sends to verify pooled limits).
+
+---
+
+### Phase 52: Multi-Business Foundation
+**Goal**: The app has a single reliable entry point for resolving the active business — a cookie-based resolver, an extended provider, and correct redirect logic — so that every subsequent phase can build on a stable foundation.
+**Depends on**: Phase 51 (v2.5.4 complete)
+**Requirements**: FOUND-01, FOUND-04, FOUND-05
+**Success Criteria** (what must be TRUE):
+  1. A user with one business lands on the dashboard normally — no visible change from today
+  2. A user with zero businesses is redirected to /onboarding — the existing behavior is preserved
+  3. A user with multiple businesses and no active_business_id cookie is automatically assigned their first business and lands on the dashboard (no crash, no redirect to onboarding)
+  4. BusinessSettingsProvider exposes businessId, businessName, and a businesses list — client components can read these without additional data fetching or prop drilling
+  5. Lint and typecheck pass with zero errors
+**Plans**: TBD
+
+Plans:
+- [ ] 52-01-PLAN.md — getActiveBusiness() resolver, switchBusiness() action, getUserBusinesses() query
+- [ ] 52-02-PLAN.md — Extend BusinessSettingsProvider with business identity + dashboard redirect logic fix
+
+### Phase 53: Data Function Refactor
+**Goal**: Every data function and server action in the app reads the active business from the explicit businessId parameter rather than deriving it from user_id — eliminating the PGRST116 crash that occurs when a second business exists.
+**Depends on**: Phase 52 (getActiveBusiness() resolver exists)
+**Requirements**: FOUND-02, FOUND-03
+**Success Criteria** (what must be TRUE):
+  1. Zero instances of `.eq('user_id', ...).single()` remain in lib/data/ or lib/actions/ — verified by grep
+  2. All page-level Server Components call getActiveBusiness() once and pass the result to downstream data functions as an explicit businessId parameter
+  3. Creating a second test business and navigating to every dashboard page produces no PGRST116 errors and shows the correct business's data
+  4. Lint and typecheck pass with zero errors
+**Plans**: TBD
+
+Plans:
+- [ ] 53-01-PLAN.md — Enumerate all .single() instances, refactor lib/data/ files
+- [ ] 53-02-PLAN.md — Refactor lib/actions/ files and page-level Server Components
+
+### Phase 54: Business Switcher UI
+**Goal**: Users can switch between their businesses using a dropdown at the top of the sidebar (desktop) and in the mobile header — the selected business name is always visible and all dashboard pages reflect the switch immediately.
+**Depends on**: Phase 53 (data functions safe for multi-business)
+**Requirements**: SWITCH-01, SWITCH-02, SWITCH-03, SWITCH-04
+**Success Criteria** (what must be TRUE):
+  1. A dropdown at the top of the sidebar shows the current business name and a chevron — clicking it reveals a list of all businesses the user owns
+  2. Selecting a different business from the dropdown sets the active_business_id cookie and refreshes all dashboard pages to show that business's data
+  3. The current business name is always visible in the sidebar at a glance — no interaction required to see which business is active
+  4. On mobile, a business switcher is accessible from the header area above page content — agency owners can switch businesses without a desktop sidebar
+**Plans**: TBD
+
+Plans:
+- [ ] 54-01-PLAN.md — BusinessSwitcher component (desktop sidebar integration)
+- [ ] 54-02-PLAN.md — Mobile header switcher + visual polish
+
+### Phase 55: Clients Page
+**Goal**: Agency owners can see all their client businesses at a glance on /businesses, open a detail drawer with full agency metadata for each client, edit that metadata inline, and see competitive positioning at a glance.
+**Depends on**: Phase 54 (switcher exists; "Switch to this business" button in drawer works)
+**Requirements**: CLIENT-01, CLIENT-02, CLIENT-03, CLIENT-04, CLIENT-05, CLIENT-06, CLIENT-07, CLIENT-08
+**Success Criteria** (what must be TRUE):
+  1. Navigating to /businesses shows a responsive card grid — one card per client business
+  2. Each card displays the business name, service type, Google rating, and reviews gained (current minus start count)
+  3. Each card shows a visual indicator of the competitive gap — the difference between the client's review count and the competitor's review count
+  4. Clicking a card opens a detail drawer showing: Google ratings (start vs current), review counts (start vs current), reviews gained, monthly fee, start date, GBP access status, competitor name and review count, and notes
+  5. User can edit all agency metadata fields (ratings, fee, competitor info, dates) directly in the drawer — changes persist to the database
+  6. Notes field in the drawer auto-saves with a debounce (no save button required for notes)
+  7. The detail drawer includes a side-by-side competitive analysis section highlighting the gap between client and competitor review counts
+**Plans**: TBD
+
+Plans:
+- [ ] 55-01-PLAN.md — businesses table migration (10 agency metadata columns) + data functions
+- [ ] 55-02-PLAN.md — BusinessCard component and /businesses page grid
+- [ ] 55-03-PLAN.md — BusinessDetailDrawer with all metadata fields, edit mode, auto-save notes
+
+### Phase 56: Additional Business Creation
+**Goal**: Agency owners can create additional client businesses from the Clients page using a safe insert-only code path that never overwrites existing businesses, with the new business going through the full onboarding wizard and becoming the active business on completion.
+**Depends on**: Phase 55 (Clients page exists as the entry point for Add Business)
+**Requirements**: CREATE-01, CREATE-02, CREATE-03, CREATE-04
+**Success Criteria** (what must be TRUE):
+  1. An "Add Business" button on the /businesses page initiates new business creation
+  2. Creating a second (or third) business via the wizard leaves existing businesses completely unchanged — verified by checking that Business A's name, Google link, campaigns, and jobs are identical before and after creating Business B
+  3. The new business creation flow uses the same 3-step onboarding wizard (business basics, campaign preset, SMS consent) — no wizard redesign required
+  4. After completing the wizard for a new business, that business becomes the active business and the user is redirected to /dashboard showing the new business's data
+**Plans**: TBD
+
+Plans:
+- [ ] 56-01-PLAN.md — createAdditionalBusiness() server action (insert-only) + onboarding routing
+- [ ] 56-02-PLAN.md — Add Business button on Clients page + post-creation redirect
+
+### Phase 57: Agency Billing
+**Goal**: Send limits are enforced against the total sends across all businesses owned by the user — an agency owner cannot circumvent plan limits by distributing sends across multiple businesses.
+**Depends on**: Phase 56 (multiple real businesses exist to test against)
+**Requirements**: BILL-01, BILL-02
+**Success Criteria** (what must be TRUE):
+  1. Sending from Business A and Business B in the same billing period counts toward a single shared limit — verified by sending until the combined total reaches the plan limit and confirming the paywall triggers
+  2. The Settings/Billing page displays pooled usage — the sends shown are the sum across all businesses the user owns, not just the currently active business
+**Plans**: TBD
+
+Plans:
+- [ ] 57-01-PLAN.md — Pooled usage query (sum across all user's businesses) + billing page update
+
+
+### Phase 58: Job Completion Form
+**Goal**: Each business has a unique, public, mobile-optimized "Complete Job" form URL that technicians use on-site to submit customer info and complete a job — creating the customer record and auto-enrolling in the matching campaign without needing an AvisLoop account.
+**Depends on**: Phase 52 (business resolver — form must resolve business from token), Phase 53 (data functions accept businessId)
+**Requirements**: FORM-01, FORM-02, FORM-03, FORM-04
+**Success Criteria** (what must be TRUE):
+  1. Each business has a unique token-secured URL (e.g., `/complete/[token]`) that loads without authentication — a technician with only the link can access the form
+  2. The form collects customer name, at least one of phone or email, and service type from the business's enabled types — and validates all fields before submission
+  3. Submitting the form creates a completed job + customer record (or links to existing customer) and auto-enrolls in the matching campaign — identical to the owner completing a job in the dashboard
+  4. The form is mobile-optimized with large touch targets, minimal fields, and a fast success confirmation — usable by a technician on-site in under 30 seconds
+**Plans**: TBD
+
+Plans:
+- [ ] 58-01-PLAN.md — Token generation, storage, and public route with business resolution
+- [ ] 58-02-PLAN.md — Mobile-optimized form UI and server action for job creation + campaign enrollment
+
 ---
 
 ## Phase Details
@@ -894,23 +1013,12 @@ See individual phase sections above for requirements, success criteria, and depe
 | **49** | **v2.5.3 UX Bugs Part 2** | **3/3** | **Complete** | **2026-02-26** |
 | **50** | **v2.5.4 Code Review** | **3/3** | **Complete** | **2026-02-26** |
 | **51** | **v2.5.4 Code Review** | **3/3** | **Complete** | **2026-02-27** |
+| 52 | v3.0 Agency Mode | 0/TBD | Not started | - |
+| 53 | v3.0 Agency Mode | 0/TBD | Not started | - |
+| 54 | v3.0 Agency Mode | 0/TBD | Not started | - |
+| 55 | v3.0 Agency Mode | 0/TBD | Not started | - |
+| 56 | v3.0 Agency Mode | 0/TBD | Not started | - |
+| 57 | v3.0 Agency Mode | 0/TBD | Not started | - |
+| 58 | v3.0 Agency Mode | 0/TBD | Not started | - |
 
 **Total:** 230 plans complete across shipped phases.
-
-## What's Next
-
-**v2.5.4 Code Review (Phases 41-44):** COMPLETE (2026-02-27) — 27 findings resolved, all Critical/High/Medium fixed, Low deferred with rationale.
-
-**Blockers:**
-- Twilio A2P 10DLC registration required before Phase 21-08 execution (webhook verification)
-
-**Up next:**
-- **v2.5.2 UX Bugs & UI Fixes** — Phase 47 (unexecuted, separate scope)
-- **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
-- **v2.1 Integrations** — ServiceTitan/Jobber/Housecall Pro API integrations for auto job import
-- **v2.2 Review Inbox** — Ingest reviews from Google Business Profile, AI reply suggestions
-- **v3.0 Agency Mode** — Multi-business management UI, white-label option, client reporting portal
-
----
-*Last updated: 2026-02-27 — v2.5.4 Code Review milestone complete (Phases 50-51)*
-*v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*

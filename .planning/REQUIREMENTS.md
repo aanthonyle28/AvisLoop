@@ -2,7 +2,7 @@
 
 **Milestone:** v3.0 — Agency Mode
 **Created:** 2026-02-26
-**Status:** Requirements defined
+**Status:** Roadmap created — phases assigned
 
 ---
 
@@ -44,6 +44,13 @@
 - [ ] **BILL-01**: Usage limits are enforced against the sum of sends across all businesses owned by the user
 - [ ] **BILL-02**: Settings/billing page displays pooled usage across all businesses
 
+## Job Completion Form
+
+- [ ] **FORM-01**: Each business has a unique shareable "Complete Job" form URL secured by a token (e.g., `/complete/[token]`)
+- [ ] **FORM-02**: The form collects customer name, phone or email (at least one), and service type from the enabled types for that business
+- [ ] **FORM-03**: Submitting the form creates a completed job + customer record and auto-enrolls in the matching campaign
+- [ ] **FORM-04**: The form is mobile-optimized for on-site technician use (large touch targets, minimal fields, fast submission confirmation)
+
 ---
 
 ## Out of Scope
@@ -67,34 +74,39 @@
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| FOUND-01 | — | Pending |
-| FOUND-02 | — | Pending |
-| FOUND-03 | — | Pending |
-| FOUND-04 | — | Pending |
-| FOUND-05 | — | Pending |
-| SWITCH-01 | — | Pending |
-| SWITCH-02 | — | Pending |
-| SWITCH-03 | — | Pending |
-| SWITCH-04 | — | Pending |
-| CLIENT-01 | — | Pending |
-| CLIENT-02 | — | Pending |
-| CLIENT-03 | — | Pending |
-| CLIENT-04 | — | Pending |
-| CLIENT-05 | — | Pending |
-| CLIENT-06 | — | Pending |
-| CLIENT-07 | — | Pending |
-| CLIENT-08 | — | Pending |
-| CREATE-01 | — | Pending |
-| CREATE-02 | — | Pending |
-| CREATE-03 | — | Pending |
-| CREATE-04 | — | Pending |
-| BILL-01 | — | Pending |
-| BILL-02 | — | Pending |
+| FOUND-01 | Phase 52 | Pending |
+| FOUND-02 | Phase 53 | Pending |
+| FOUND-03 | Phase 53 | Pending |
+| FOUND-04 | Phase 52 | Pending |
+| FOUND-05 | Phase 52 | Pending |
+| SWITCH-01 | Phase 54 | Pending |
+| SWITCH-02 | Phase 54 | Pending |
+| SWITCH-03 | Phase 54 | Pending |
+| SWITCH-04 | Phase 54 | Pending |
+| CLIENT-01 | Phase 55 | Pending |
+| CLIENT-02 | Phase 55 | Pending |
+| CLIENT-03 | Phase 55 | Pending |
+| CLIENT-04 | Phase 55 | Pending |
+| CLIENT-05 | Phase 55 | Pending |
+| CLIENT-06 | Phase 55 | Pending |
+| CLIENT-07 | Phase 55 | Pending |
+| CLIENT-08 | Phase 55 | Pending |
+| CREATE-01 | Phase 56 | Pending |
+| CREATE-02 | Phase 56 | Pending |
+| CREATE-03 | Phase 56 | Pending |
+| CREATE-04 | Phase 56 | Pending |
+| BILL-01 | Phase 57 | Pending |
+| BILL-02 | Phase 57 | Pending |
+| FORM-01 | Phase 58 | Pending |
+| FORM-02 | Phase 58 | Pending |
+| FORM-03 | Phase 58 | Pending |
+| FORM-04 | Phase 58 | Pending |
 
 **Coverage:**
-- v3.0 requirements: 23 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 23
+- v3.0 requirements: 27 total
+- Mapped to phases: 27/27
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-26*
+*Traceability updated: 2026-02-26 (roadmap created)*

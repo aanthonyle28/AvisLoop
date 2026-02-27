@@ -5,50 +5,49 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v2.5.2 UX Bugs & UI Fixes (Phases 45-47) — Phase 47 COMPLETE
+**Current focus:** v3.0 Agency Mode (Phases 52-58) — Phase 52 ready to plan
 
 ## Current Position
 
-Phase: 47 of 47 (Dashboard Right Panel + Campaign Polish) — COMPLETE
-Plan: 4/4 complete (47-01 ✓, 47-02 ✓, 47-03 ✓, 47-04 ✓)
-Milestone: v2.5.2 UX Bugs & UI Fixes (Phases 45-47) — ALL COMPLETE
-Status: Milestone complete
+Phase: 52 of 58 (Multi-Business Foundation) — NOT STARTED
+Plan: 0/TBD in current phase
+Milestone: v3.0 Agency Mode (Phases 52-58) — roadmap created, ready to plan
+Status: Ready to plan
 
-Progress: [██████████] 100% (Phase 47)
+Progress: [░░░░░░░░░░] 0% (Phase 52)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 234
-- Phase 47 plans completed: 4/4
+- Total plans completed (project): 230
+- v3.0 plans completed: 0/TBD
 
 *Updated after each plan completion*
 
 ## Accumulated Context
 
-### Key Decisions for Phase 47 (Dashboard Right Panel + Campaign Polish)
+### Key Architecture Decisions for v3.0
 
-- DayBucket type: { date: string, value: number } — 14 entries sorted oldest-first
-- bucketByDay() is module-internal (not exported) — dashboard-specific utility
-- Ratings history uses daily average (not count) to match KPI semantics
-- Pipeline metrics do NOT get history arrays — only 3 outcome KPIs
-- Error fallback includes history: [] for safe consumer .map() calls
-- Sparkline SVG: viewBox="0 0 100 36", dashed line for empty state, gradient fill for normal
-- KPI_COLORS: reviews=#F59E0B (amber), rating=#008236 (green), conversion=#2C879F (teal)
-- Activity feed icons: getEventStyle() returns { Icon, bg, text } for colored circles
-- Activity items are Link elements navigating to /history, /feedback, /campaigns
-- Template preview: resolveTemplate() finds by template_id or falls back to system default by channel
-- Radix Select: use value || undefined to trigger placeholder (empty string doesn't work)
-- Custom service names: single SelectItem with joined names (Radix requires unique values)
-- Campaign detail stats: flat CardContent with bg-muted/40 (no CardHeader/CardTitle overhead)
-- Enrollment rows: Touch N/M using Math.max(0, current_touch - 1)
+- Active business resolved via httpOnly cookie (`active_business_id`) — no URL restructuring
+- `getActiveBusiness()` is the single resolution point: reads cookie, verifies ownership, falls back to first business
+- Agency metadata (10 columns) added to existing `businesses` table — no new table, inherits existing RLS
+- `BusinessSettingsProvider` extended with businessId, businessName, businesses[] — no prop drilling
+- First-business onboarding: existing upsert path (unchanged). Additional businesses: new `createAdditionalBusiness()` insert-only path
+- Cron endpoints unaffected — they use service role and query by business_id directly
+- `reviews_gained` computed at read time (current - start), never stored
+
+### Critical Pitfall Reminders (Phase 53)
+
+- 86 instances of `.eq('user_id', ...).single()` crash with PGRST116 when 2nd business exists — must enumerate exhaustively at plan time
+- Dashboard redirect: "zero businesses" goes to onboarding; "no cookie but has businesses" auto-selects first (stays on dashboard)
+- Onboarding upsert silently destroys first business if reused — Phase 56 must use insert-only path
 
 ### Cross-Cutting Concerns (apply to every plan)
 
-- **Design system**: Use existing semantic tokens and design system patterns
-- **Code scalability**: Consolidate, don't duplicate
-- **Dead code removal**: Audit for unused imports after each change
-- **Security**: Validate all user inputs server-side, maintain RLS discipline
+- Design system: use existing semantic tokens and design system patterns
+- Code scalability: consolidate, don't duplicate
+- Dead code removal: audit for unused imports after each change
+- Security: validate all user inputs server-side, maintain RLS discipline
 
 ### Pending Todos
 
@@ -58,23 +57,9 @@ None.
 
 - Phase 21-08: Twilio A2P campaign approval required for production SMS testing (brand approved, campaign pending)
 
-Config:
-{
-  "mode": "yolo",
-  "depth": "standard",
-  "parallelization": true,
-  "commit_docs": true,
-  "model_profile": "balanced",
-  "workflow": {
-    "research": true,
-    "plan_check": true,
-    "verifier": true
-  }
-}
-
 ## Session Continuity
 
-Last session: 2026-02-27
-Stopped at: Phase 47 complete — all 4 plans executed, verification passed (human_needed for visual checks)
+Last session: 2026-02-26
+Stopped at: v3.0 roadmap created — Phase 52 ready to plan
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
