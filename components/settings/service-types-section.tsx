@@ -164,6 +164,7 @@ export function ServiceTypesSection({
           </div>
           <div className="flex gap-2">
             <Input
+              aria-label="Custom service name"
               value={customServiceInput}
               onChange={(e) => setCustomServiceInput(e.target.value)}
               onKeyDown={(e) => {

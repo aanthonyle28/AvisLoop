@@ -193,6 +193,7 @@ export function HistoryFilters() {
               key={preset.label}
               type="button"
               onClick={() => applyPreset(preset)}
+              aria-pressed={activePreset === preset.label}
               className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium transition-colors ${
                 activePreset === preset.label
                   ? 'bg-primary text-primary-foreground'

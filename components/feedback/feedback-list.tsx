@@ -1,5 +1,6 @@
 import type { FeedbackWithCustomer } from '@/lib/types/feedback'
 import { FeedbackCard } from './feedback-card'
+// SSR subpath required for Server Components — standard import causes hydration mismatch
 import { ChatCircle } from '@phosphor-icons/react/dist/ssr'
 
 interface FeedbackListProps {

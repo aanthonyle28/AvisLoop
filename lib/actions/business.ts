@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { businessSchema } from '@/lib/validations/business'
 import { MIN_ENROLLMENT_COOLDOWN_DAYS, MAX_ENROLLMENT_COOLDOWN_DAYS } from '@/lib/constants/campaigns'
+import type { BusinessWithTemplates } from '@/lib/data/business'
+
 
 export type BusinessActionState = {
   error?: string
@@ -144,7 +146,7 @@ export async function saveReviewLink(
  * For use in Server Components to load initial form data.
  * Returns null if no business exists yet.
  */
-export async function getBusiness() {
+export async function getBusiness(): Promise<BusinessWithTemplates | null> {
   const supabase = await createClient()
 
   const { data: { user }, error: authError } = await supabase.auth.getUser()

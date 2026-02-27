@@ -20,11 +20,11 @@ export default async function CustomersPage() {
 
   // Email-only templates for the QuickSendModal
   const sendTemplates = (business.message_templates || []).filter(
-    (t: { channel: string }) => t.channel === 'email'
+    (t) => t.channel === 'email'
   )
 
   return (
-    <div className="container py-6 space-y-6">
+    <div className="container py-6 space-y-8">
       <CustomersClient
         initialCustomers={customers}
         business={business}

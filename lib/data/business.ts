@@ -1,11 +1,17 @@
 import { createClient } from '@/lib/supabase/server'
+import type { Business, MessageTemplate } from '@/lib/types/database'
+
+/** Business row with nested message_templates (subset of fields selected from DB) */
+export type BusinessWithTemplates = Business & {
+  message_templates: MessageTemplate[]
+}
 
 /**
  * Fetch current user's business with all templates.
  * For use in Server Components to load initial form data.
  * Returns null if no business exists yet.
  */
-export async function getBusiness() {
+export async function getBusiness(): Promise<BusinessWithTemplates | null> {
   const supabase = await createClient()
 
   const { data: { user }, error: authError } = await supabase.auth.getUser()

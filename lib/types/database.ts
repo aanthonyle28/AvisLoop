@@ -40,6 +40,8 @@ export interface Business {
   onboarding_checklist: OnboardingChecklist | null
   review_cooldown_days: number
   custom_service_names: string[]
+  service_types_enabled: string[] | null
+  service_type_timing: Record<string, number> | null
   created_at: string
   updated_at: string
 }
