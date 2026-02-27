@@ -12,6 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-26)
 Phase: 47 of 51 (Dashboard Right Panel + Campaign Polish)
 Plan: 4/4 complete (47-01 ✓, 47-02 ✓, 47-03 ✓, 47-04 ✓)
 Status: Phase complete
+Last activity: 2026-02-27 - Completed 47-02-PLAN.md (sparklines + activity feed polish)
 
 Progress: [████░░░░░░] Phase 47 complete
 
@@ -42,6 +43,10 @@ Progress: [████░░░░░░] Phase 47 complete
 - Radix Select empty placeholder: use value={value || undefined} — empty string suppresses placeholder display
 - Multiple custom 'other' service names: join into single SelectItem to avoid duplicate value constraint
 - Status selects (always have default): no placeholder needed, no value || undefined workaround
+- Sparkline SVG: hand-rolled polyline + linearGradient fill, no charting library — gradientId from color.replace(/[^a-z0-9]/gi, '')
+- Sparkline empty state: data.length < 2 renders dashed horizontal line; parent adds "Not enough data" label
+- Activity feed icons: getEventStyle() returns { Icon, bg, text } for colored circle badges (green/blue/orange/muted)
+- KPI_COLORS constants: reviews=#F59E0B, rating=#008236, conversion=#2C879F — match icon accent colors
 
 ### Key Decisions for Phase 51 (Audit Remediation)
 
@@ -76,6 +81,6 @@ Config:
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Phase 47 Plan 04 complete — migrated all native HTML select elements in job forms to Radix Select
+Stopped at: Phase 47 Plan 02 complete — SVG sparklines + colored activity icons + clickable feed items
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
