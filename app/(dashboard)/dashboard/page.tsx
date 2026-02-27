@@ -1,4 +1,4 @@
-import { getBusiness } from '@/lib/actions/business'
+import { getActiveBusiness } from '@/lib/data/active-business'
 import { getServiceTypeSettings } from '@/lib/data/business'
 import {
   getDashboardKPIs,
@@ -26,7 +26,7 @@ function getGreeting(): string {
 }
 
 export default async function DashboardPage() {
-  const business = await getBusiness()
+  const business = await getActiveBusiness()
 
   if (!business) {
     redirect('/onboarding')
