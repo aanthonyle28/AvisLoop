@@ -7,8 +7,9 @@ import { resend, RESEND_FROM_EMAIL } from '@/lib/email/resend'
 import { ReviewRequestEmail } from '@/lib/email/templates/review-request'
 import { checkSendRateLimit } from '@/lib/rate-limit'
 import { sendRequestSchema, batchSendSchema } from '@/lib/validations/send'
-import { COOLDOWN_DAYS, MONTHLY_SEND_LIMITS } from '@/lib/constants/billing'
+import { COOLDOWN_DAYS } from '@/lib/constants/billing'
 import { getActiveBusiness } from '@/lib/data/active-business'
+import { getPooledMonthlyUsage } from '@/lib/data/send-logs'
 import type { BatchSendActionState } from '@/lib/types/database'
 
 export type SendActionState = {
@@ -119,13 +120,12 @@ export async function sendReviewRequest(
     return { error: 'Cannot send to archived contacts' }
   }
 
-  // === 6. Check monthly limit ===
-  const monthlyLimit = MONTHLY_SEND_LIMITS[bizData.tier] || MONTHLY_SEND_LIMITS.basic
-  const { count: monthlyCount } = await getMonthlyCount(supabase, business.id)
+  // === 6. Check monthly limit (pooled across all user's businesses) ===
+  const pooledUsage = await getPooledMonthlyUsage(user.id)
 
-  if (monthlyCount >= monthlyLimit) {
+  if (pooledUsage.count >= pooledUsage.limit) {
     return {
-      error: `Monthly send limit reached (${monthlyLimit}). Upgrade your plan for more sends.`
+      error: `Monthly send limit reached (${pooledUsage.limit}). Upgrade your plan for more sends.`
     }
   }
 
@@ -222,29 +222,6 @@ export async function sendReviewRequest(
 }
 
 /**
- * Helper to get monthly send count for a business.
- * Counts sends from the first of the current month.
- */
-async function getMonthlyCount(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  businessId: string
-): Promise<{ count: number }> {
-  const startOfMonth = new Date()
-  startOfMonth.setDate(1)
-  startOfMonth.setHours(0, 0, 0, 0)
-
-  const { count } = await supabase
-    .from('send_logs')
-    .select('*', { count: 'exact', head: true })
-    .eq('business_id', businessId)
-    .eq('is_test', false) // Exclude test sends from quota
-    .gte('created_at', startOfMonth.toISOString())
-    .in('status', ['sent', 'delivered', 'opened']) // Only count successful sends
-
-  return { count: count || 0 }
-}
-
-/**
  * Send review requests to multiple contacts in a batch.
  * Validates all contacts, checks quota fits full batch, categorizes eligible/skipped contacts.
  *
@@ -317,10 +294,9 @@ export async function batchSendReviewRequest(
     return { error: 'Please create a business profile first' }
   }
 
-  // === 4. Check monthly quota (full batch must fit) ===
-  const monthlyLimit = MONTHLY_SEND_LIMITS[bizData.tier] || MONTHLY_SEND_LIMITS.basic
-  const { count: monthlyCount } = await getMonthlyCount(supabase, business.id)
-  const remainingQuota = monthlyLimit - monthlyCount
+  // === 4. Check monthly quota (pooled across all user's businesses) ===
+  const pooledUsage = await getPooledMonthlyUsage(user.id)
+  const remainingQuota = pooledUsage.limit - pooledUsage.count
 
   if (validatedContactIds.length > remainingQuota) {
     return {
