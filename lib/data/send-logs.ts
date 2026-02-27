@@ -4,35 +4,22 @@ import type { SendLogWithCustomer } from '@/lib/types/database'
 import { COOLDOWN_DAYS, MONTHLY_SEND_LIMITS } from '@/lib/constants/billing'
 
 /**
- * Get send logs for the current user's business.
- * For Server Components - handles auth internally.
+ * Get send logs for the given business.
+ * Caller is responsible for providing a verified businessId (from getActiveBusiness()).
  */
-export async function getSendLogs(options?: {
-  limit?: number
-  offset?: number
-  contactId?: string
-  query?: string          // NEW: Search by contact name or email
-  status?: string         // NEW: Filter by status (pending, sent, delivered, etc.)
-  dateFrom?: string       // NEW: Filter by date range start (ISO string)
-  dateTo?: string         // NEW: Filter by date range end (ISO string)
-}): Promise<{ logs: SendLogWithCustomer[]; total: number }> {
+export async function getSendLogs(
+  businessId: string,
+  options?: {
+    limit?: number
+    offset?: number
+    contactId?: string
+    query?: string          // Search by contact name or email
+    status?: string         // Filter by status (pending, sent, delivered, etc.)
+    dateFrom?: string       // Filter by date range start (ISO string)
+    dateTo?: string         // Filter by date range end (ISO string)
+  }
+): Promise<{ logs: SendLogWithCustomer[]; total: number }> {
   const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return { logs: [], total: 0 }
-  }
-
-  // Get user's business
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
-  if (!business) {
-    return { logs: [], total: 0 }
-  }
 
   const limit = options?.limit ?? 50
   const offset = options?.offset ?? 0
@@ -41,7 +28,7 @@ export async function getSendLogs(options?: {
   let query = supabase
     .from('send_logs')
     .select('*, customers!send_logs_customer_id_fkey!inner(name, email, last_sent_at)', { count: 'exact' })
-    .eq('business_id', business.id)
+    .eq('business_id', businessId)
     .order('created_at', { ascending: false })
 
   if (options?.contactId) {
@@ -89,23 +76,20 @@ export async function getSendLogs(options?: {
 
 /**
  * Get monthly send count for usage display.
+ * Caller is responsible for providing a verified businessId (from getActiveBusiness()).
  */
-export async function getMonthlyUsage(): Promise<{
+export async function getMonthlyUsage(businessId: string): Promise<{
   count: number
   limit: number
   tier: string
 }> {
   const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return { count: 0, limit: 0, tier: 'none' }
-  }
-
+  // Fetch tier for limit calculation
   const { data: business } = await supabase
     .from('businesses')
-    .select('id, tier')
-    .eq('user_id', user.id)
+    .select('tier')
+    .eq('id', businessId)
     .single()
 
   if (!business) {
@@ -119,7 +103,7 @@ export async function getMonthlyUsage(): Promise<{
   const { count } = await supabase
     .from('send_logs')
     .select('*', { count: 'exact', head: true })
-    .eq('business_id', business.id)
+    .eq('business_id', businessId)
     .eq('is_test', false) // Exclude test sends from quota
     .gte('created_at', startOfMonth.toISOString())
     .in('status', ['sent', 'delivered', 'opened'])
@@ -179,43 +163,29 @@ export async function getContactSendStats(contactId: string): Promise<{
 }
 
 /**
- * Get response rate for the current user's business.
+ * Get response rate for the given business.
  * Returns the percentage of delivered review requests that received a response.
+ * Caller is responsible for providing a verified businessId (from getActiveBusiness()).
  */
-export async function getResponseRate(): Promise<{
+export async function getResponseRate(businessId: string): Promise<{
   total: number
   responded: number
   rate: number
 }> {
   const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return { total: 0, responded: 0, rate: 0 }
-  }
-
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
-  if (!business) {
-    return { total: 0, responded: 0, rate: 0 }
-  }
-
   // Count total sends that actually reached the contact
   const { count: totalCount } = await supabase
     .from('send_logs')
     .select('*', { count: 'exact', head: true })
-    .eq('business_id', business.id)
+    .eq('business_id', businessId)
     .in('status', ['sent', 'delivered', 'opened'])
 
   // Count sends where the contact responded (reviewed_at is set)
   const { count: respondedCount } = await supabase
     .from('send_logs')
     .select('*', { count: 'exact', head: true })
-    .eq('business_id', business.id)
+    .eq('business_id', businessId)
     .not('reviewed_at', 'is', null)
 
   const total = totalCount || 0
@@ -269,41 +239,27 @@ export async function getResendReadyCustomers(
 /**
  * Get count of sends needing attention (pending + failed).
  * For dashboard "Needs Attention" card.
+ * Caller is responsible for providing a verified businessId (from getActiveBusiness()).
  */
-export async function getNeedsAttentionCount(): Promise<{
+export async function getNeedsAttentionCount(businessId: string): Promise<{
   total: number
   pending: number
   failed: number
 }> {
   const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return { total: 0, pending: 0, failed: 0 }
-  }
-
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
-  if (!business) {
-    return { total: 0, pending: 0, failed: 0 }
-  }
-
   // Count pending
   const { count: pendingCount } = await supabase
     .from('send_logs')
     .select('*', { count: 'exact', head: true })
-    .eq('business_id', business.id)
+    .eq('business_id', businessId)
     .eq('status', 'pending')
 
   // Count failed (failed + bounced)
   const { count: failedCount } = await supabase
     .from('send_logs')
     .select('*', { count: 'exact', head: true })
-    .eq('business_id', business.id)
+    .eq('business_id', businessId)
     .in('status', ['failed', 'bounced'])
 
   const pending = pendingCount || 0
@@ -319,8 +275,9 @@ export async function getNeedsAttentionCount(): Promise<{
 /**
  * Get recent send activity with contact info.
  * For dashboard "Recent Activity" table.
+ * Caller is responsible for providing a verified businessId (from getActiveBusiness()).
  */
-export async function getRecentActivity(limit: number = 5): Promise<Array<{
+export async function getRecentActivity(businessId: string, limit: number = 5): Promise<Array<{
   id: string
   contact_name: string
   contact_email: string
@@ -330,25 +287,10 @@ export async function getRecentActivity(limit: number = 5): Promise<Array<{
 }>> {
   const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return []
-  }
-
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
-  if (!business) {
-    return []
-  }
-
   const { data, error } = await supabase
     .from('send_logs')
     .select('id, subject, status, created_at, customers!send_logs_customer_id_fkey(name, email)')
-    .eq('business_id', business.id)
+    .eq('business_id', businessId)
     .order('created_at', { ascending: false })
     .limit(limit)
 
@@ -385,29 +327,15 @@ export async function getRecentActivity(limit: number = 5): Promise<Array<{
 /**
  * Get recent send activity with full details for drawer display.
  * Returns full SendLogWithCustomer objects for the most recent sends.
+ * Caller is responsible for providing a verified businessId (from getActiveBusiness()).
  */
-export async function getRecentActivityFull(limit: number = 5): Promise<SendLogWithCustomer[]> {
+export async function getRecentActivityFull(businessId: string, limit: number = 5): Promise<SendLogWithCustomer[]> {
   const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return []
-  }
-
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
-  if (!business) {
-    return []
-  }
 
   const { data, error } = await supabase
     .from('send_logs')
     .select('*, customers!send_logs_customer_id_fkey(name, email, last_sent_at)')
-    .eq('business_id', business.id)
+    .eq('business_id', businessId)
     .order('created_at', { ascending: false })
     .limit(limit)
 

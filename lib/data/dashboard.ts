@@ -632,29 +632,12 @@ export async function getAttentionAlerts(businessId: string): Promise<AttentionA
 
 /**
  * Get dashboard counts for banner and nav badge.
- * Handles auth internally (no businessId parameter).
- * Follows pattern from getMonthlyUsage() in send-logs.ts.
+ * Caller is responsible for providing a verified businessId (from getActiveBusiness()).
  */
-export async function getDashboardCounts(): Promise<DashboardCounts> {
+export async function getDashboardCounts(businessId: string): Promise<DashboardCounts> {
   const supabase = await createClient()
 
   try {
-    // Get authenticated user and business
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      return { readyToSend: 0, attentionAlerts: 0, total: 0 }
-    }
-
-    const { data: business } = await supabase
-      .from('businesses')
-      .select('id, service_type_timing')
-      .eq('user_id', user.id)
-      .single()
-
-    if (!business) {
-      return { readyToSend: 0, attentionAlerts: 0, total: 0 }
-    }
-
     const [
       // Count scheduled + completed jobs (queue candidates)
       { count: queueCandidateCount },
@@ -668,25 +651,25 @@ export async function getDashboardCounts(): Promise<DashboardCounts> {
       supabase
         .from('jobs')
         .select('*', { count: 'exact', head: true })
-        .eq('business_id', business.id)
+        .eq('business_id', businessId)
         .in('status', ['scheduled', 'completed']),
 
       supabase
         .from('campaign_enrollments')
         .select('job_id')
-        .eq('business_id', business.id),
+        .eq('business_id', businessId),
 
       supabase
         .from('send_logs')
         .select('*', { count: 'exact', head: true })
-        .eq('business_id', business.id)
+        .eq('business_id', businessId)
         .in('status', ['failed', 'bounced'])
         .not('error_message', 'like', '[ACK]%'),
 
       supabase
         .from('customer_feedback')
         .select('*', { count: 'exact', head: true })
-        .eq('business_id', business.id)
+        .eq('business_id', businessId)
         .is('resolved_at', null),
     ])
 

@@ -113,30 +113,16 @@ function estimateMonthlyCost(weeklySends: number): number {
 }
 
 /**
- * Get personalization stats for the current user's business.
+ * Get personalization stats for the given business.
  * MVP: Estimates personalization rate at 95% since we don't track
  * per-send personalization status yet.
+ * Caller is responsible for providing a verified businessId (from getActiveBusiness()).
  *
  * TODO: Replace estimation with actual data once send_logs has
  * a `personalized` boolean column.
  */
-export async function getPersonalizationStats(): Promise<PersonalizationStats> {
+export async function getPersonalizationStats(businessId: string): Promise<PersonalizationStats> {
   const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return emptyStats()
-  }
-
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
-  if (!business) {
-    return emptyStats()
-  }
 
   // Get campaign sends from the last 7 days
   const weekAgo = new Date()
@@ -145,7 +131,7 @@ export async function getPersonalizationStats(): Promise<PersonalizationStats> {
   const { count } = await supabase
     .from('send_logs')
     .select('*', { count: 'exact', head: true })
-    .eq('business_id', business.id)
+    .eq('business_id', businessId)
     .not('campaign_id', 'is', null) // Only campaign sends (not manual)
     .gte('created_at', weekAgo.toISOString())
     .in('status', ['sent', 'delivered', 'opened'])
@@ -171,28 +157,12 @@ export async function getPersonalizationStats(): Promise<PersonalizationStats> {
 }
 
 /**
- * Get LLM usage stats for the current user's business.
+ * Get LLM usage stats for the given business.
  * Wraps getLLMUsage from rate-limit.ts with percentage calculation.
+ * Caller is responsible for providing a verified businessId (from getActiveBusiness()).
  */
-export async function getLLMUsageStats(): Promise<LLMUsageStats> {
-  const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return emptyUsage()
-  }
-
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
-  if (!business) {
-    return emptyUsage()
-  }
-
-  const usage = await getLLMUsage(business.id)
+export async function getLLMUsageStats(businessId: string): Promise<LLMUsageStats> {
+  const usage = await getLLMUsage(businessId)
 
   if (!usage) {
     // Rate limiting not configured (dev mode or missing Redis)
@@ -214,11 +184,12 @@ export async function getLLMUsageStats(): Promise<LLMUsageStats> {
 /**
  * Get combined personalization summary for dashboard/settings.
  * Merges stats + usage into a single object with health assessment.
+ * Caller is responsible for providing a verified businessId (from getActiveBusiness()).
  */
-export async function getPersonalizationSummary(): Promise<PersonalizationSummary> {
+export async function getPersonalizationSummary(businessId: string): Promise<PersonalizationSummary> {
   const [stats, usage] = await Promise.all([
-    getPersonalizationStats(),
-    getLLMUsageStats(),
+    getPersonalizationStats(businessId),
+    getLLMUsageStats(businessId),
   ])
 
   // Determine health based on personalization rate and usage
@@ -257,17 +228,6 @@ export async function getPersonalizationSummary(): Promise<PersonalizationSummar
     health,
     healthMessage,
     costEstimate,
-  }
-}
-
-/** Empty stats for unauthenticated or missing business. */
-function emptyStats(): PersonalizationStats {
-  return {
-    personalizationRate: 0,
-    isEstimated: true,
-    campaignSendsThisWeek: 0,
-    personalizedSendsThisWeek: 0,
-    fallbackRate: 0,
   }
 }
 
