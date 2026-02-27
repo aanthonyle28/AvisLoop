@@ -2,6 +2,13 @@
 
 import { SERVICE_TYPES, SERVICE_TYPE_LABELS } from '@/lib/validations/job'
 import type { ServiceType } from '@/lib/types/database'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 interface ServiceTypeSelectProps {
   value: ServiceType | ''
@@ -25,31 +32,29 @@ export function ServiceTypeSelect({
 
   return (
     <div className="space-y-1">
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value as ServiceType)}
-        className={`w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring ${
-          error ? 'border-destructive' : 'border-input'
-        }`}
+      <Select
+        value={value || undefined}
+        onValueChange={(val) => onChange(val as ServiceType)}
       >
-        <option value="">Select service type...</option>
-        {availableTypes.flatMap(type => {
-          // For 'other' with custom names, render each custom name as a separate option
-          // All use value="other" since the DB only stores 'other'
-          if (type === 'other' && customServiceNames && customServiceNames.length > 0) {
-            return customServiceNames.map(name => (
-              <option key={`other-${name}`} value="other">
-                {name}
-              </option>
-            ))
-          }
-          return (
-            <option key={type} value={type}>
-              {SERVICE_TYPE_LABELS[type]}
-            </option>
-          )
-        })}
-      </select>
+        <SelectTrigger className={error ? 'border-destructive' : ''}>
+          <SelectValue placeholder="Select service type..." />
+        </SelectTrigger>
+        <SelectContent>
+          {availableTypes.flatMap(type => {
+            if (type === 'other' && customServiceNames && customServiceNames.length > 0) {
+              if (customServiceNames.length === 1) {
+                return [<SelectItem key="other" value="other">{customServiceNames[0]}</SelectItem>]
+              }
+              return [<SelectItem key="other" value="other">{customServiceNames.join(', ')}</SelectItem>]
+            }
+            return [
+              <SelectItem key={type} value={type}>
+                {SERVICE_TYPE_LABELS[type]}
+              </SelectItem>
+            ]
+          })}
+        </SelectContent>
+      </Select>
       {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   )
