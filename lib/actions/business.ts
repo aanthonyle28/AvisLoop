@@ -226,6 +226,17 @@ export async function updateServiceTypeSettings(settings: {
     return { error: 'You must be logged in' }
   }
 
+  // Fetch business ID first (defense-in-depth pattern — scope update by PK, not user_id)
+  const { data: business } = await supabase
+    .from('businesses')
+    .select('id')
+    .eq('user_id', user.id)
+    .single()
+
+  if (!business) {
+    return { error: 'Business not found' }
+  }
+
   // Validate service types (8 valid types)
   const validTypes = ['hvac', 'plumbing', 'electrical', 'cleaning', 'roofing', 'painting', 'handyman', 'other']
   const filteredEnabled = settings.serviceTypesEnabled.filter(t => validTypes.includes(t))
@@ -258,7 +269,7 @@ export async function updateServiceTypeSettings(settings: {
       service_type_timing: finalTiming,
       custom_service_names: validatedCustomNames,
     })
-    .eq('user_id', user.id)
+    .eq('id', business.id)
 
   if (error) {
     return { error: error.message }

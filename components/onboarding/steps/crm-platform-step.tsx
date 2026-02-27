@@ -197,7 +197,7 @@ export function CRMPlatformStep({
           disabled={isPending}
           className="text-sm text-muted-foreground hover:text-foreground underline"
         >
-          Skip for now
+          Skip without saving
         </button>
       </div>
     </div>

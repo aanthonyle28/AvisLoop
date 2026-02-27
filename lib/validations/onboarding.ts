@@ -56,7 +56,7 @@ export const CRM_SPECIAL_OPTIONS = [
 ] as const
 
 export const softwareUsedSchema = z.object({
-  softwareUsed: z.string().optional().or(z.literal('')),
+  softwareUsed: z.string().max(100).optional().or(z.literal('')),
 })
 
 // Step 7: SMS Consent (required)
