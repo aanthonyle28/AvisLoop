@@ -10,16 +10,16 @@ See: .planning/PROJECT.md (updated 2026-02-26)
 ## Current Position
 
 Phase: 47 of 51 (Dashboard Right Panel + Campaign Polish)
-Plan: 1/4 complete (47-01 ✓)
+Plan: 3/4 complete (47-01 ✓, 47-02 ✓, 47-03 ✓)
 Status: In progress
 
-Progress: [░░░░░░░░░░] Phase 47 plan 1/4
+Progress: [███░░░░░░░] Phase 47 plan 3/4
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 232
-- Phase 47 plans completed: 1/4
+- Total plans completed (project): 234
+- Phase 47 plans completed: 3/4
 
 *Updated after each plan completion*
 
@@ -35,6 +35,10 @@ Progress: [░░░░░░░░░░] Phase 47 plan 1/4
 - Pipeline metrics (requestsSentThisWeek, activeSequences, pendingQueued) do NOT get history
 - Error fallback history: [] on outcome metrics — safe for .map() without null checks
 - Promise.all in getDashboardKPIs now has 14 parallel queries (11 existing + 3 history)
+- TemplatePreviewModal null state: show "AI-generated default" message (expected, not an error)
+- resolveTemplate() falls back to first system template (is_default=true) matching channel when template_id is null
+- Touch progress: Math.max(0, enrollment.current_touch - 1) — current_touch is NEXT to send, so subtract 1
+- Campaign detail stats cards: flat CardContent (no CardHeader/CardTitle) + bg-muted/40 for warm weight
 
 ### Key Decisions for Phase 51 (Audit Remediation)
 
@@ -69,6 +73,6 @@ Config:
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Phase 47 Plan 01 complete — DayBucket type, KPIMetric.history, bucketByDay utility, 14-day history queries
+Stopped at: Phase 47 Plan 03 complete — TemplatePreviewModal, Preview buttons in TouchSequenceEditor, campaign detail page visual polish
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
