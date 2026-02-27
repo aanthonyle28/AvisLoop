@@ -116,6 +116,65 @@ export async function getMonthlyUsage(businessId: string): Promise<{
 }
 
 /**
+ * Get pooled monthly send count across ALL businesses the user owns.
+ * Used for billing enforcement (BILL-01) and billing page display (BILL-02).
+ *
+ * Unlike getMonthlyUsage(businessId) which counts per-business, this function
+ * aggregates across every business owned by the user — preventing agency owners
+ * from circumventing plan limits by distributing sends across multiple businesses.
+ *
+ * Effective tier is derived as the BEST tier across all user's businesses,
+ * so the user always gets the highest tier they've paid for.
+ *
+ * Caller is responsible for providing a verified userId (from supabase.auth.getUser()).
+ */
+export async function getPooledMonthlyUsage(userId: string): Promise<{
+  count: number
+  limit: number
+  tier: string
+}> {
+  const supabase = await createClient()
+
+  // Fetch all business IDs + tiers for this user
+  const { data: userBusinesses } = await supabase
+    .from('businesses')
+    .select('id, tier')
+    .eq('user_id', userId)
+
+  if (!userBusinesses || userBusinesses.length === 0) {
+    return { count: 0, limit: 0, tier: 'none' }
+  }
+
+  const businessIds = userBusinesses.map(b => b.id)
+
+  // Derive effective tier: use best tier across all businesses (trial < basic < pro)
+  const TIER_PRIORITY: Record<string, number> = { trial: 0, basic: 1, pro: 2 }
+  const effectiveTier = userBusinesses.reduce(
+    (best, b) => ((TIER_PRIORITY[b.tier] ?? 0) > (TIER_PRIORITY[best] ?? 0) ? b.tier : best),
+    'trial'
+  )
+
+  const startOfMonth = new Date()
+  startOfMonth.setDate(1)
+  startOfMonth.setHours(0, 0, 0, 0)
+
+  // Count sends across ALL user's businesses
+  const { count } = await supabase
+    .from('send_logs')
+    .select('*', { count: 'exact', head: true })
+    .in('business_id', businessIds)
+    .eq('is_test', false)
+    .gte('created_at', startOfMonth.toISOString())
+    .in('status', ['sent', 'delivered', 'opened'])
+
+  return {
+    count: count || 0,
+    limit: MONTHLY_SEND_LIMITS[effectiveTier] || MONTHLY_SEND_LIMITS.basic,
+    tier: effectiveTier,
+  }
+}
+
+/**
  * Get send stats for a specific contact.
  */
 export async function getContactSendStats(contactId: string): Promise<{

@@ -29,7 +29,7 @@ export type SendActionState = {
  * 3. Get business + contact + template
  * 4. Check cooldown (14 days since last send)
  * 5. Check opt-out status
- * 6. Check monthly limit
+ * 6. Check monthly limit (pooled across all user's businesses)
  * 7. Create send_log (status: 'pending')
  * 8. Send via Resend
  * 9. Update send_log (status: 'sent' or 'failed')
@@ -78,7 +78,7 @@ export async function sendReviewRequest(
   // Fetch additional business fields needed for sending
   const { data: bizData, error: businessError } = await supabase
     .from('businesses')
-    .select('name, google_review_link, default_sender_name, tier')
+    .select('name, google_review_link, default_sender_name')
     .eq('id', business.id)
     .single()
 
@@ -228,17 +228,16 @@ export async function sendReviewRequest(
  * Flow:
  * 1. Authenticate user
  * 2. Parse and validate input (contactIds array, templateId, customSubject)
- * 3. Get business + tier
- * 4. Check business has google_review_link
- * 5. Check monthly quota (full batch must fit in remaining quota)
- * 6. Fetch all requested contacts in ONE query
- * 7. Categorize contacts: eligible vs skipped (cooldown, opted_out, archived, not_found)
- * 8. Loop through eligible contacts:
+ * 3. Get business
+ * 4. Check monthly quota (pooled across all user's businesses, full batch must fit)
+ * 5. Fetch all requested contacts in ONE query
+ * 6. Categorize contacts: eligible vs skipped (cooldown, opted_out, archived, not_found)
+ * 7. Loop through eligible contacts:
  *    - Create send_log (status: 'pending')
  *    - Render and send email via Resend
  *    - Update send_log (status: 'sent' or 'failed')
  *    - Update contact tracking fields
- * 9. Return structured results with sent/skipped/failed counts and details
+ * 8. Return structured results with sent/skipped/failed counts and details
  *
  * Note: No rate limit applied (batch has its own 25-cap control)
  */
@@ -286,7 +285,7 @@ export async function batchSendReviewRequest(
 
   const { data: bizData, error: businessError } = await supabase
     .from('businesses')
-    .select('name, google_review_link, default_sender_name, tier')
+    .select('name, google_review_link, default_sender_name')
     .eq('id', business.id)
     .single()
 
@@ -304,7 +303,7 @@ export async function batchSendReviewRequest(
     }
   }
 
-  // === 6. Fetch all requested contacts in ONE query ===
+  // === 5. Fetch all requested contacts in ONE query ===
   const { data: contacts, error: contactsError } = await supabase
     .from('customers')
     .select('id, name, email, status, opted_out, last_sent_at, send_count')
@@ -315,7 +314,7 @@ export async function batchSendReviewRequest(
     return { error: 'Failed to fetch contacts' }
   }
 
-  // === 7. Categorize contacts: eligible vs skipped ===
+  // === 6. Categorize contacts: eligible vs skipped ===
   const cooldownDate = new Date(Date.now() - COOLDOWN_DAYS * 24 * 60 * 60 * 1000)
   const contactMap = new Map(contacts.map(c => [c.id, c]))
 
@@ -383,7 +382,7 @@ export async function batchSendReviewRequest(
   const defaultSubject = customSubject || template?.subject || `${bizData.name} would love your feedback!`
   const senderName = bizData.default_sender_name || bizData.name
 
-  // === 8. Loop through eligible contacts and send ===
+  // === 7. Loop through eligible contacts and send ===
   const results: Array<{
     contactId: string
     contactName: string
@@ -486,7 +485,7 @@ export async function batchSendReviewRequest(
     }
   }
 
-  // === 9. Build structured response ===
+  // === 8. Build structured response ===
   const sent = results.filter(r => r.status === 'sent').length
   const failed = results.filter(r => r.status === 'failed').length
 

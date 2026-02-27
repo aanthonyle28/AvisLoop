@@ -8,7 +8,7 @@
  * - Rate limiting (per-user)
  * - Consent checking (must be 'opted_in')
  * - Quiet hours enforcement (8am-9pm customer local time)
- * - Monthly quota enforcement
+ * - Monthly quota enforcement (pooled across all user's businesses)
  * - Retry queue for transient failures
  *
  * @module lib/actions/send-sms.action
@@ -21,8 +21,8 @@ import { checkQuietHours } from '@/lib/sms/quiet-hours'
 import { queueSmsRetry } from '@/lib/actions/sms-retry'
 import { smsMessageSchema } from '@/lib/validations/sms'
 import { checkSendRateLimit } from '@/lib/rate-limit'
-import { MONTHLY_SEND_LIMITS } from '@/lib/constants/billing'
 import { getActiveBusiness } from '@/lib/data/active-business'
+import { getPooledMonthlyUsage } from '@/lib/data/send-logs'
 
 export type SmsActionState = {
   error?: string
@@ -44,7 +44,7 @@ export type SmsActionState = {
  * 4. Check customer has phone number (fallback info if not)
  * 5. Check SMS consent (must be 'opted_in')
  * 6. Check quiet hours (queue if outside 8am-9pm local)
- * 7. Check monthly limit
+ * 7. Check monthly limit (pooled across all user's businesses)
  * 8. Create send_log (channel: 'sms', status: 'pending')
  * 9. Send via Twilio (or queue for retry)
  * 10. Update send_log with result
@@ -92,7 +92,7 @@ export async function sendSmsRequest(
   // Fetch additional business fields needed for sending
   const { data: bizData, error: businessError } = await supabase
     .from('businesses')
-    .select('name, google_review_link, default_sender_name, tier')
+    .select('name, google_review_link, default_sender_name')
     .eq('id', business.id)
     .single()
 
@@ -137,13 +137,12 @@ export async function sendSmsRequest(
   const timezone = customer.timezone || 'America/New_York'
   const quietHoursCheck = checkQuietHours(timezone)
 
-  // === 7. Check monthly limit ===
-  const monthlyLimit = MONTHLY_SEND_LIMITS[bizData.tier] || MONTHLY_SEND_LIMITS.basic
-  const { count: monthlyCount } = await getMonthlyCount(supabase, business.id)
+  // === 7. Check monthly limit (pooled across all user's businesses) ===
+  const pooledUsage = await getPooledMonthlyUsage(user.id)
 
-  if (monthlyCount >= monthlyLimit) {
+  if (pooledUsage.count >= pooledUsage.limit) {
     return {
-      error: `Monthly send limit reached (${monthlyLimit}). Upgrade your plan for more sends.`,
+      error: `Monthly send limit reached (${pooledUsage.limit}). Upgrade your plan for more sends.`,
     }
   }
 
@@ -234,26 +233,4 @@ export async function sendSmsRequest(
     error: `Failed to send SMS: ${result.error}. Message queued for retry.`,
     data: { sendLogId: sendLog.id },
   }
-}
-
-/**
- * Helper to get monthly send count for a business.
- * Counts sends from the first of the current month.
- */
-async function getMonthlyCount(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  businessId: string
-): Promise<{ count: number }> {
-  const startOfMonth = new Date()
-  startOfMonth.setDate(1)
-  startOfMonth.setHours(0, 0, 0, 0)
-
-  const { count } = await supabase
-    .from('send_logs')
-    .select('*', { count: 'exact', head: true })
-    .eq('business_id', businessId)
-    .gte('created_at', startOfMonth.toISOString())
-    .in('status', ['sent', 'delivered', 'opened'])
-
-  return { count: count || 0 }
 }
