@@ -9,18 +9,18 @@ See: .planning/PROJECT.md (updated 2026-02-25)
 
 ## Current Position
 
-Phase: 50 of 51 (Code Review & Audit) — COMPLETE
-Plan: 3/3 complete
-Status: Phase verified ✓
-Last activity: 2026-02-26 — Phase 50 executed and verified (3 plans, 2 waves)
+Phase: 51 of 51 (Audit Remediation) — In progress
+Plan: 1/3 complete
+Status: In progress
+Last activity: 2026-02-27 — Completed 51-01-PLAN.md (dashboard fixes, page spacing, settings dedup)
 
-Progress: [█████░░░░░] 50% (v2.5.4 milestone — 1/2 phases)
+Progress: [████████░░] 80% (v2.5.4 milestone — Phase 51 underway)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 227
-- v2.5.4 plans completed: 3
+- Total plans completed (project): 228
+- v2.5.4 plans completed: 4
 
 *Updated after each plan completion*
 
@@ -45,6 +45,13 @@ Progress: [█████░░░░░] 50% (v2.5.4 milestone — 1/2 phases)
 - Campaigns subtitle: static description only (count not available in shell without new prop threading)
 - bg-card applied to table body rows at call site only (ui/table.tsx NOT modified)
 - QuickSendModal spacing: DialogContent base already has gap-4 (grid layout) — no change needed
+
+### Key Decisions for Phase 51 Plan 01 (Dashboard Fixes + Spacing)
+
+- acknowledgeAlert called directly (module-level import) in handleDismiss — no prop threading needed
+- Empty state border pattern: rounded-lg border border-border bg-card for ALL queue empty states (including "all caught up")
+- customers/page.tsx spacing deferred to Plan 02 (avoids file conflict with F-16 changes)
+- Skeleton component pattern: <Skeleton className="h-X w-Y [structural-classes]" /> — drop bg-muted/animate-pulse/rounded from className
 
 ### Key Decisions for Phase 50 (Code Review) — COMPLETE
 
@@ -104,7 +111,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-26
-Stopped at: Phase 50 complete — ready to plan Phase 51 (Audit Remediation)
+Last session: 2026-02-27
+Stopped at: Completed 51-01-PLAN.md — Plan 02 (customers spacing + F-16) is next
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
