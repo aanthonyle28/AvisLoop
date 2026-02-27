@@ -16,10 +16,10 @@
 
 ## Business Switching
 
-- [ ] **SWITCH-01**: User can switch between businesses via dropdown at top of sidebar
-- [ ] **SWITCH-02**: Switching business updates all dashboard pages to show selected business's data
-- [ ] **SWITCH-03**: Current business name is displayed in the sidebar next to the switcher
-- [ ] **SWITCH-04**: Business switching is accessible on mobile via header area
+- [x] **SWITCH-01**: User can switch between businesses via dropdown at top of sidebar
+- [x] **SWITCH-02**: Switching business updates all dashboard pages to show selected business's data
+- [x] **SWITCH-03**: Current business name is displayed in the sidebar next to the switcher
+- [x] **SWITCH-04**: Business switching is accessible on mobile via header area
 
 ## Clients Management
 
@@ -79,10 +79,10 @@
 | FOUND-03 | Phase 53 | Complete |
 | FOUND-04 | Phase 52 | Complete |
 | FOUND-05 | Phase 52 | Complete |
-| SWITCH-01 | Phase 54 | Pending |
-| SWITCH-02 | Phase 54 | Pending |
-| SWITCH-03 | Phase 54 | Pending |
-| SWITCH-04 | Phase 54 | Pending |
+| SWITCH-01 | Phase 54 | Complete |
+| SWITCH-02 | Phase 54 | Complete |
+| SWITCH-03 | Phase 54 | Complete |
+| SWITCH-04 | Phase 54 | Complete |
 | CLIENT-01 | Phase 55 | Pending |
 | CLIENT-02 | Phase 55 | Pending |
 | CLIENT-03 | Phase 55 | Pending |

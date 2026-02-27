@@ -894,8 +894,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 54-01-PLAN.md — BusinessSwitcher component (desktop sidebar integration)
-- [ ] 54-02-PLAN.md — Mobile header switcher + visual polish
+- [x] 54-01-PLAN.md — BusinessSwitcher component (desktop sidebar integration)
+- [x] 54-02-PLAN.md — Mobile header switcher + visual polish
 
 ### Phase 55: Clients Page
 **Goal**: Agency owners can see all their client businesses at a glance on /businesses, open a detail drawer with full agency metadata for each client, edit that metadata inline, and see competitive positioning at a glance.
@@ -1015,10 +1015,10 @@ See individual phase sections above for requirements, success criteria, and depe
 | **51** | **v2.5.4 Code Review** | **3/3** | **Complete** | **2026-02-27** |
 | **52** | **v3.0 Agency Mode** | **2/2** | **Complete** | **2026-02-27** |
 | **53** | **v3.0 Agency Mode** | **2/2** | **Complete** | **2026-02-27** |
-| 54 | v3.0 Agency Mode | 0/TBD | Not started | - |
+| **54** | **v3.0 Agency Mode** | **2/2** | **Complete** | **2026-02-27** |
 | 55 | v3.0 Agency Mode | 0/TBD | Not started | - |
 | 56 | v3.0 Agency Mode | 0/TBD | Not started | - |
 | 57 | v3.0 Agency Mode | 0/TBD | Not started | - |
 | 58 | v3.0 Agency Mode | 0/TBD | Not started | - |
 
-**Total:** 232 plans complete across shipped phases.
+**Total:** 234 plans complete across shipped phases.
