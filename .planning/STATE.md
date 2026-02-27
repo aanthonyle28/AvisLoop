@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.0 Agency Mode (Phases 52-58) — Phase 52 complete, Phase 53 next
+**Current focus:** v3.0 Agency Mode (Phases 52-58) — Phase 53 in progress
 
 ## Current Position
 
-Phase: 52 of 58 (Multi-Business Foundation) — COMPLETE
-Plan: 2/2 in current phase
-Milestone: v3.0 Agency Mode (Phases 52-58) — Phase 52 verified
-Status: Phase 52 complete — ready to plan Phase 53
+Phase: 53 of 58 (Data Function Refactor) — In Progress
+Plan: 1/2 in current phase
+Milestone: v3.0 Agency Mode (Phases 52-58) — Phase 52 complete, Phase 53-01 complete
+Status: In progress — 53-01 done, 53-02 next (update call sites)
 
-Progress: [██░░░░░░░░] ~14% (Phase 52 of 7 phases)
+Progress: [███░░░░░░░] ~21% (Phase 53-01 of 7 phases)
 
-Last activity: 2026-02-27 — Phase 52 verified, all must-haves passed
+Last activity: 2026-02-27 — Completed 53-01-PLAN.md (data layer refactor)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 232
-- v3.0 plans completed: 2/TBD
+- Total plans completed (project): 233
+- v3.0 plans completed: 3/TBD
 
 *Updated after each plan completion*
 
@@ -52,12 +52,22 @@ Last activity: 2026-02-27 — Phase 52 verified, all must-haves passed
 - `BusinessIdentity` type exported from provider — Phase 54 switcher imports from there, not redefined
 - Tasks 1+2 committed together: required props in provider + layout passing them must be atomic for always-green typecheck
 
-### Critical Pitfall Reminders (Phase 53)
+### Decisions from Phase 53-01
 
-- 86 instances of `.eq('user_id', ...).single()` crash with PGRST116 when 2nd business exists — must enumerate exhaustively at plan time
-- Dashboard redirect: "zero businesses" goes to onboarding; "no cookie but has businesses" auto-selects first (stays on dashboard)
-- Onboarding upsert silently destroys first business if reused — Phase 56 must use insert-only path
-- Phase 53 template: use `getActiveBusiness()` + `Promise.all` pattern from layout.tsx as the reference
+- All lib/data/ functions accept `businessId: string` as first param — callers (layout, server actions) are responsible for passing a verified businessId from `getActiveBusiness()`
+- `getJobs` return type drops `businessId: string | null` field — callers already have it from `getActiveBusiness()`
+- `getDashboardCounts` removes intermediate business query entirely — `service_type_timing` was selected but never used in count queries
+- `getSetupProgress` simplified to a single `getChecklistState(businessId)` call — no intermediate business query needed
+- `getLLMUsageStats` no longer creates supabase client — passes `businessId` directly to `getLLMUsage(businessId)` (Redis-based)
+- `lib/data/customer.ts` deleted — zero importers confirmed; would have broken after `getBusiness()` signature change anyway
+- Pattern established: all remaining `.single()` in lib/data/ are safe PK-based queries; no `.eq('user_id', ...).single()` remains outside active-business.ts
+
+### Critical Pitfall Reminders (Phase 53-02)
+
+- ~25 call sites in pages/actions/layout still use old 0-arg signatures — they must all be updated to pass `businessId` from `getActiveBusiness()`
+- `app/(dashboard)/jobs/page.tsx` references `result.businessId` from `getJobs()` — this field no longer exists in return type; caller already has businessId
+- Some pages call multiple data functions — use `Promise.all` for parallel fetching efficiency
+- After 53-02, `pnpm typecheck` must pass with zero errors (not just call-site fixes)
 
 ### Cross-Cutting Concerns (apply to every plan)
 
@@ -77,6 +87,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Phase 52 complete and verified — ready to plan Phase 53 (Data Function Refactor)
+Stopped at: Completed 53-01-PLAN.md — data layer refactored, 53-02 (call site updates) is next
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
