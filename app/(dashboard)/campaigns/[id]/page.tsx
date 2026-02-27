@@ -9,7 +9,8 @@ import { CampaignDetailShell } from './campaign-detail-shell'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { EnvelopeSimple, ChatCircle, ArrowLeft, Sparkle, CaretLeft, CaretRight } from '@phosphor-icons/react/dist/ssr'
+import { ArrowLeft, Sparkle, CaretLeft, CaretRight } from '@phosphor-icons/react/dist/ssr'
+import { TouchSequenceDisplay } from '@/components/campaigns/touch-sequence-display'
 import { SERVICE_TYPE_LABELS } from '@/lib/validations/job'
 import { ENROLLMENT_STATUS_LABELS, STOP_REASON_LABELS } from '@/lib/constants/campaigns'
 import { formatDistanceToNow } from 'date-fns'
@@ -129,30 +130,10 @@ export default async function CampaignDetailPage({ params, searchParams }: Campa
           <CardTitle>Touch Sequence</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-4 flex-wrap">
-            {campaign.campaign_touches.map((touch, idx) => (
-              <div key={touch.id} className="flex items-center gap-2">
-                {idx > 0 && (
-                  <span className="text-muted-foreground">→</span>
-                )}
-                <div className="flex flex-col items-center gap-1 p-3 rounded-lg border bg-muted/30">
-                  <div className="flex items-center gap-2">
-                    {touch.channel === 'email' ? (
-                      <EnvelopeSimple className="h-5 w-5" />
-                    ) : (
-                      <ChatCircle className="h-5 w-5" />
-                    )}
-                    <span className="font-medium capitalize">{touch.channel}</span>
-                  </div>
-                  <span className="text-sm text-muted-foreground">
-                    {touch.delay_hours < 24
-                      ? `${touch.delay_hours}h after ${idx === 0 ? 'job' : `touch ${idx}`}`
-                      : `${Math.round(touch.delay_hours / 24)}d after ${idx === 0 ? 'job' : `touch ${idx}`}`}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
+          <TouchSequenceDisplay
+            touches={campaign.campaign_touches}
+            templates={templates}
+          />
         </CardContent>
       </Card>
 

@@ -11,8 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Card, CardContent } from '@/components/ui/card'
-import { Plus, Trash, EnvelopeSimple, ChatCircle, Eye } from '@phosphor-icons/react'
+import { Plus, Trash, EnvelopeSimple, ChatCircle, Eye, ArrowDown } from '@phosphor-icons/react'
 import { TemplatePreviewModal } from '@/components/campaigns/template-preview-modal'
 import type { CampaignTouchFormData } from '@/lib/validations/campaign'
 import type { MessageTemplate, MessageChannel } from '@/lib/types/database'
@@ -76,7 +75,6 @@ export function TouchSequenceEditor({
         ? { name: found.name, subject: found.subject, body: found.body, channel: touch.channel }
         : null
     }
-    // For default (null template_id), find the matching system template by channel
     const systemTemplate = templates.find(
       t => t.is_default && t.channel === touch.channel
     )
@@ -91,20 +89,66 @@ export function TouchSequenceEditor({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {touches.map((touch, index) => (
-        <Card key={index}>
-          <CardContent className="pt-4">
-            <div className="flex items-start gap-4">
-              {/* Touch number indicator */}
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground font-medium shrink-0">
-                {touch.touch_number}
+        <div key={index}>
+          <div className="rounded-lg border bg-card">
+            {/* Touch header */}
+            <div className="flex items-center justify-between px-4 py-3 border-b bg-muted/20">
+              <div className="flex items-center gap-2.5">
+                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-semibold">
+                  {touch.touch_number}
+                </div>
+                <div className="flex items-center gap-1.5 text-sm">
+                  {touch.channel === 'email' ? (
+                    <EnvelopeSimple className="h-3.5 w-3.5 text-muted-foreground" />
+                  ) : (
+                    <ChatCircle className="h-3.5 w-3.5 text-muted-foreground" />
+                  )}
+                  <span className="font-medium capitalize">{touch.channel}</span>
+                  <span className="text-muted-foreground">·</span>
+                  <span className="text-muted-foreground">
+                    {touch.delay_hours < 24
+                      ? `${touch.delay_hours}h`
+                      : `${Math.round(touch.delay_hours / 24)}d`}
+                    {' '}
+                    {index === 0 ? 'after job' : `after touch ${index}`}
+                  </span>
+                </div>
               </div>
+              <div className="flex items-center gap-1">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={() => {
+                    setPreviewTemplate(resolveTemplate(touch))
+                    setPreviewOpen(true)
+                  }}
+                  aria-label={`Preview touch ${index + 1} template`}
+                >
+                  <Eye className="h-3.5 w-3.5" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={() => removeTouch(index)}
+                  disabled={touches.length <= 1}
+                  aria-label={`Remove touch ${index + 1}`}
+                  className="text-muted-foreground hover:text-destructive"
+                >
+                  <Trash className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            </div>
 
-              <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Channel */}
-                <div className="space-y-2">
-                  <Label>Channel</Label>
+            {/* Touch fields */}
+            <div className="p-4 space-y-4">
+              {/* Channel + Delay row */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground">Channel</Label>
                   <Select
                     value={touch.channel}
                     onValueChange={(value: MessageChannel) => {
@@ -131,12 +175,11 @@ export function TouchSequenceEditor({
                   </Select>
                 </div>
 
-                {/* Delay */}
-                <div className="space-y-2">
-                  <Label>
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground">
                     {index === 0 ? 'Delay after job' : `Delay after touch ${index}`}
                   </Label>
-                  <div className="flex gap-2">
+                  <div className="flex items-center gap-2">
                     <Input
                       type="number"
                       min={1}
@@ -147,71 +190,43 @@ export function TouchSequenceEditor({
                       }
                       className="w-20"
                     />
-                    <span className="flex items-center text-sm text-muted-foreground">
-                      hours
-                    </span>
+                    <span className="text-sm text-muted-foreground">hours</span>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    {touch.delay_hours < 24
-                      ? `${touch.delay_hours} hours`
-                      : `${Math.round(touch.delay_hours / 24)} days`}
-                  </p>
-                </div>
-
-                {/* Template */}
-                <div className="space-y-2">
-                  <Label>Template</Label>
-                  <Select
-                    value={touch.template_id || 'default'}
-                    onValueChange={(value) =>
-                      updateTouch(index, { template_id: value === 'default' ? null : value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Use default" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="default">Use default template</SelectItem>
-                      {getTemplatesForChannel(touch.channel).map((template) => (
-                        <SelectItem key={template.id} value={template.id}>
-                          {template.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
                 </div>
               </div>
 
-              {/* Preview button */}
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => {
-                  setPreviewTemplate(resolveTemplate(touch))
-                  setPreviewOpen(true)
-                }}
-                className="shrink-0"
-                aria-label={`Preview touch ${index + 1} template`}
-              >
-                <Eye className="h-4 w-4" />
-              </Button>
-
-              {/* Remove button */}
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => removeTouch(index)}
-                disabled={touches.length <= 1}
-                className="shrink-0"
-                aria-label={`Remove touch ${index + 1}`}
-              >
-                <Trash className="h-4 w-4" />
-              </Button>
+              {/* Template — full width */}
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">Template</Label>
+                <Select
+                  value={touch.template_id || 'default'}
+                  onValueChange={(value) =>
+                    updateTouch(index, { template_id: value === 'default' ? null : value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Use default" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="default">Use default template</SelectItem>
+                    {getTemplatesForChannel(touch.channel).map((template) => (
+                      <SelectItem key={template.id} value={template.id}>
+                        {template.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+
+          {/* Timeline connector */}
+          {index < touches.length - 1 && (
+            <div className="flex justify-center py-1">
+              <ArrowDown className="h-3 w-3 text-muted-foreground/30" />
+            </div>
+          )}
+        </div>
       ))}
 
       {touches.length < 4 && (
