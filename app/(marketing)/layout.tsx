@@ -151,12 +151,22 @@ export default function MarketingLayout({
             {/* Legal links */}
             <div>
               <h3 className="font-semibold mb-4">Legal</h3>
-              <ul className="space-y-3 text-sm text-muted-foreground">
+              <ul className="space-y-3 text-sm">
                 <li>
-                  <span className="cursor-not-allowed">Privacy Policy</span>
+                  <Link
+                    href="/privacy"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Privacy Policy
+                  </Link>
                 </li>
                 <li>
-                  <span className="cursor-not-allowed">Terms of Service</span>
+                  <Link
+                    href="/terms"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Terms of Service
+                  </Link>
                 </li>
               </ul>
             </div>
