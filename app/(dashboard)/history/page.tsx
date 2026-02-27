@@ -44,7 +44,7 @@ export default async function HistoryPage(props: HistoryPageProps) {
   })
 
   return (
-    <div className="container py-6 space-y-6">
+    <div className="container py-6 space-y-8">
       <HistoryClient
         initialLogs={logs}
         total={total}

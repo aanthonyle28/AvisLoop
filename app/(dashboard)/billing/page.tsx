@@ -62,7 +62,7 @@ export default async function BillingPage({
   const contactLimit = CONTACT_LIMITS[business.tier]
 
   return (
-    <div className="container max-w-4xl py-6 space-y-6">
+    <div className="container max-w-4xl py-6 space-y-8">
       <h1 className="text-2xl font-bold mb-6">Billing</h1>
 
       {/* Success message after checkout */}

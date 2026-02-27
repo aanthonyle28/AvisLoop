@@ -34,7 +34,7 @@ export default async function JobsPage() {
     : new Map<string, { campaignName: string; firstTouchDelay: number }>()
 
   return (
-    <div className="container py-6 space-y-6">
+    <div className="container py-6 space-y-8">
       <JobsClient
         initialJobs={jobs}
         totalJobs={total}

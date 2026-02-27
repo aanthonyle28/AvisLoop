@@ -8,34 +8,11 @@ import { getPersonalizationSummary } from '@/lib/data/personalization'
 import { hasApiKey } from '@/lib/actions/api-key'
 import { getCustomers } from '@/lib/actions/customer'
 import { getMonthlyUsage } from '@/lib/data/send-logs'
-import { Skeleton } from '@/components/ui/skeleton'
+import SettingsLoading from './loading'
 import type { MessageTemplate } from '@/lib/types/database'
 
 export const metadata = {
   title: 'Settings',
-}
-
-// Loading skeleton for inline Suspense boundary within page
-function SettingsLoadingSkeleton() {
-  return (
-    <div className="max-w-4xl mx-auto">
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border px-6 py-4">
-        <Skeleton className="h-9 w-32 mb-1" />
-        <Skeleton className="h-5 w-80" />
-      </div>
-      <div className="p-6 space-y-8">
-        <Skeleton className="h-10 w-full rounded-md" />
-        <div className="border rounded-lg p-6 bg-card shadow-sm">
-          <Skeleton className="h-6 w-40 mb-4" />
-          <div className="space-y-4">
-            <Skeleton className="h-10 rounded" />
-            <Skeleton className="h-10 rounded" />
-            <Skeleton className="h-10 rounded" />
-          </div>
-        </div>
-      </div>
-    </div>
-  )
 }
 
 // Async component that fetches and renders settings content
@@ -96,7 +73,7 @@ async function SettingsContent() {
 
 export default function SettingsPage() {
   return (
-    <Suspense fallback={<SettingsLoadingSkeleton />}>
+    <Suspense fallback={<SettingsLoading />}>
       <SettingsContent />
     </Suspense>
   )

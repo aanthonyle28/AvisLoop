@@ -18,7 +18,7 @@ export default async function AnalyticsPage() {
   const analyticsData = await getServiceTypeAnalytics(business.id)
 
   return (
-    <div className="container py-6 space-y-6">
+    <div className="container py-6 space-y-8">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Analytics</h1>
         <p className="text-muted-foreground">

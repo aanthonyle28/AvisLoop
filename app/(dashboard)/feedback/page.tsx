@@ -38,7 +38,7 @@ export default async function FeedbackPage() {
   ])
 
   return (
-    <div className="container max-w-4xl py-6 space-y-6">
+    <div className="container max-w-4xl py-6 space-y-8">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Customer Feedback</h1>

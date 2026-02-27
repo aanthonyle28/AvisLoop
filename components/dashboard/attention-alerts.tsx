@@ -200,6 +200,11 @@ export function AttentionAlerts({ alerts, onSelectAlert, selectedAlertId }: Atte
 
   const handleDismiss = (id: string) => {
     setDismissedIds(prev => new Set([...prev, id]))
+    // Persist dismissal for permanent alert types so they don't reappear on navigation
+    const alert = alerts.find(a => a.id === id)
+    if (alert?.sendLogId && (alert.type === 'bounced_email' || alert.type === 'stop_request')) {
+      acknowledgeAlert(alert.sendLogId)
+    }
   }
 
   return (
