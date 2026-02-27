@@ -44,6 +44,17 @@ export interface Business {
   service_type_timing: Record<string, number> | null
   created_at: string
   updated_at: string
+  // Agency metadata (all nullable -- only populated for agency-managed businesses)
+  google_rating_start: number | null
+  google_rating_current: number | null
+  review_count_start: number | null
+  review_count_current: number | null
+  monthly_fee: number | null
+  start_date: string | null         // DATE stored as ISO string
+  gbp_access: boolean | null
+  competitor_name: string | null
+  competitor_review_count: number | null
+  agency_notes: string | null
 }
 
 // Message channel literal union
