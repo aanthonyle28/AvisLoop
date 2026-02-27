@@ -47,12 +47,14 @@ export async function personalizeMessage(
     businessName: ctx.businessName,
     serviceType: ctx.serviceType,
     technicianName: ctx.technicianName,
+    notes: ctx.jobNotes,
   })
 
   // Build context with sanitized inputs
   const sanitizedCtx: PersonalizationContext = {
     ...ctx,
     ...sanitized,
+    jobNotes: sanitized.notes,
   }
 
   // Select system prompt based on channel

@@ -103,7 +103,7 @@ export async function GET(request: Request) {
             .single(),
           supabase
             .from('jobs')
-            .select('service_type')
+            .select('service_type, notes')
             .eq('id', touch.job_id)
             .single(),
           supabase
@@ -178,7 +178,8 @@ export async function GET(request: Request) {
             business,
             customer,
             job?.service_type,
-            campaign?.personalization_enabled !== false
+            campaign?.personalization_enabled !== false,
+            job?.notes
           )
           if (sendResult.success) {
             sent++
@@ -222,7 +223,8 @@ async function sendEmailTouch(
   business: { id: string; name: string; google_review_link: string | null; default_sender_name: string | null },
   customer: { id: string; name: string; email: string; send_count: number | null },
   serviceType: string | undefined,
-  personalizationEnabled: boolean
+  personalizationEnabled: boolean,
+  jobNotes?: string | null
 ): Promise<{ success: boolean; error?: string }> {
   if (!business.google_review_link) {
     await markTouchFailed(supabase, touch, 'No review link configured')
@@ -259,6 +261,7 @@ async function sendEmailTouch(
         customerName: customer.name,
         businessName: business.name,
         serviceType,
+        jobNotes: jobNotes || undefined,
         touchNumber: (touch.touch_number as 1 | 2 | 3 | 4),
         channel: 'email',
         reviewLink: business.google_review_link,

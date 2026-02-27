@@ -65,6 +65,7 @@ export const PersonalizationInputSchema = z.object({
   // Optional context enrichment
   serviceType: z.string().optional(),
   technicianName: z.string().optional(),
+  jobNotes: z.string().max(500).optional(),
   isRepeatCustomer: z.boolean().optional(),
 
   // Campaign context
