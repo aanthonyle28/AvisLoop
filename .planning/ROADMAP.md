@@ -741,13 +741,13 @@ Plans:
   5. Each touch in the campaign touch sequence editor shows an inline collapsible preview of the email or SMS template body, including system default templates
   6. Campaign detail page has received a visual retouch consistent with overall app design
   7. Add Job and Edit Job forms use Radix Select components with `onValueChange` (not `onChange`), and full form submit is verified end-to-end in Supabase
-**Plans**: TBD
+**Plans**: 4 plans in 2 waves
 
 Plans:
-- [ ] 47-01-PLAN.md — Sparkline data pipeline: extend KPIMetric type with history[], add daily-bucket queries to getDashboardKPIs() with performance benchmark (DRKP-01, DRKP-02)
-- [ ] 47-02-PLAN.md — Sparkline component with dynamic+ssr:false guard, KPI card gray background, colored activity icons, pipeline row retention (DRKP-01, DRKP-02, DRKP-03, DRKP-04)
-- [ ] 47-03-PLAN.md — Touch sequence template preview per touch + campaign page visual retouch (CAMP-04, CUI-01)
-- [ ] 47-04-PLAN.md — Radix Select migration in add-job-sheet and edit-job-sheet with full submit test (DRW-05)
+- [ ] 47-01-PLAN.md — Sparkline data pipeline: extend KPIMetric type with DayBucket history, add 14-day daily-bucket queries to getDashboardKPIs()
+- [ ] 47-02-PLAN.md — SVG sparkline component, KPI card gray backgrounds, colored activity feed icons, clickable activity items, pipeline row retention
+- [ ] 47-03-PLAN.md — Template preview modal per touch + campaign detail page visual retouch with richer enrollment rows
+- [ ] 47-04-PLAN.md — Radix Select migration in ServiceTypeSelect, AddJobSheet, and EditJobSheet with onValueChange
 
 
 ### v2.5.3 UX Bugs & UI Fixes Part 2 (Phases 48-49)
