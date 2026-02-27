@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { UserCircle, ArrowsClockwise } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { AccountMenu } from './account-menu'
+import { BusinessSwitcher } from './business-switcher'
 
 interface PageHeaderProps {
   title?: string
@@ -12,9 +13,9 @@ interface PageHeaderProps {
 export function PageHeader({ title }: PageHeaderProps) {
   return (
     <header className="md:hidden bg-card border-b border-border">
-      <div className="h-16 px-4 flex items-center justify-between">
+      <div className="h-16 px-4 flex items-center gap-3">
         {/* Left side: Page title or logo */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           {title ? (
             <h1 className="font-semibold text-lg">{title}</h1>
           ) : (
@@ -25,8 +26,13 @@ export function PageHeader({ title }: PageHeaderProps) {
           )}
         </div>
 
+        {/* Center: Business context — takes remaining space, truncates gracefully */}
+        <div className="flex-1 min-w-0 flex justify-end">
+          <BusinessSwitcher />
+        </div>
+
         {/* Right side: Account */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center shrink-0">
           <AccountMenu
             side="bottom"
             align="end"
