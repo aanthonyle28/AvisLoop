@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBusiness } from '@/lib/data/active-business'
 import {
   personalizeWithFallback,
   personalizePreviewBatch,
@@ -63,24 +64,21 @@ export async function personalizePreview(input: {
   touchNumber?: number
   serviceType?: string
 }): Promise<PersonalizePreviewResult> {
-  const supabase = await createClient()
-
-  // === Auth check ===
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
-
-  // === Get business ===
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id, name, google_review_link')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) return { error: 'Business not found' }
 
-  if (!business.google_review_link) {
+  const supabase = await createClient()
+
+  // Fetch additional business fields needed for personalization
+  const { data: bizData } = await supabase
+    .from('businesses')
+    .select('name, google_review_link')
+    .eq('id', business.id)
+    .single()
+
+  if (!bizData) return { error: 'Business not found' }
+
+  if (!bizData.google_review_link) {
     return { error: 'Google review link not configured. Set it in business settings.' }
   }
 
@@ -98,11 +96,11 @@ export async function personalizePreview(input: {
   const ctx: PersonalizationContext & { businessId: string } = {
     template: input.templateBody,
     customerName: customer.name,
-    businessName: business.name,
+    businessName: bizData.name,
     serviceType: input.serviceType,
     touchNumber: (input.touchNumber || 1) as 1 | 2 | 3 | 4,
     channel: input.channel,
-    reviewLink: business.google_review_link,
+    reviewLink: bizData.google_review_link,
     isRepeatCustomer: (customer.send_count || 0) > 1,
     businessId: business.id,
   }
@@ -141,24 +139,21 @@ export async function personalizePreviewBatchAction(input: {
   touchNumber?: number
   serviceType?: string
 }): Promise<PersonalizePreviewBatchResult> {
-  const supabase = await createClient()
-
-  // === Auth check ===
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
-
-  // === Get business ===
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id, name, google_review_link')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) return { error: 'Business not found' }
 
-  if (!business.google_review_link) {
+  const supabase = await createClient()
+
+  // Fetch additional business fields needed for personalization
+  const { data: bizData } = await supabase
+    .from('businesses')
+    .select('name, google_review_link')
+    .eq('id', business.id)
+    .single()
+
+  if (!bizData) return { error: 'Business not found' }
+
+  if (!bizData.google_review_link) {
     return { error: 'Google review link not configured. Set it in business settings.' }
   }
 
@@ -198,11 +193,11 @@ export async function personalizePreviewBatchAction(input: {
     sampleCustomers.map((customer) => ({
       template: input.templateBody,
       customerName: customer.name,
-      businessName: business.name,
+      businessName: bizData.name,
       serviceType: input.serviceType,
       touchNumber: (input.touchNumber || 1) as 1 | 2 | 3 | 4,
       channel: input.channel,
-      reviewLink: business.google_review_link!,
+      reviewLink: bizData.google_review_link!,
       isRepeatCustomer: (customer.send_count || 0) > 1,
       businessId: business.id,
     }))

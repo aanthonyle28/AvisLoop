@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { getActiveBusiness } from '@/lib/data/active-business'
 
 /**
  * Dismiss or collapse the Getting Started checklist
@@ -16,26 +17,22 @@ export async function updateChecklistState(
   }
 
   try {
-    const supabase = await createClient()
-
-    // Get current user's business
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      return { success: false, error: 'Not authenticated' }
-    }
-
-    const { data: business } = await supabase
-      .from('businesses')
-      .select('id, onboarding_checklist')
-      .eq('user_id', user.id)
-      .single()
-
+    const business = await getActiveBusiness()
     if (!business) {
       return { success: false, error: 'Business not found' }
     }
 
+    const supabase = await createClient()
+
+    // Fetch current checklist state
+    const { data: bizData } = await supabase
+      .from('businesses')
+      .select('onboarding_checklist')
+      .eq('id', business.id)
+      .single()
+
     // Update checklist based on action
-    const currentChecklist = (business.onboarding_checklist || {}) as Record<string, unknown>
+    const currentChecklist = (bizData?.onboarding_checklist || {}) as Record<string, unknown>
     const now = new Date().toISOString()
 
     const updatedChecklist = { ...currentChecklist }
@@ -91,19 +88,18 @@ export async function updateChecklistState(
  */
 export async function markCampaignReviewed(): Promise<{ success: boolean }> {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return { success: false }
-
-    const { data: business } = await supabase
-      .from('businesses')
-      .select('id, onboarding_checklist')
-      .eq('user_id', user.id)
-      .single()
-
+    const business = await getActiveBusiness()
     if (!business) return { success: false }
 
-    const current = (business.onboarding_checklist || {}) as Record<string, unknown>
+    const supabase = await createClient()
+
+    const { data: bizData } = await supabase
+      .from('businesses')
+      .select('onboarding_checklist')
+      .eq('id', business.id)
+      .single()
+
+    const current = (bizData?.onboarding_checklist || {}) as Record<string, unknown>
 
     // Short-circuit if already marked — avoids unnecessary DB write
     if (current.campaign_reviewed === true) return { success: true }

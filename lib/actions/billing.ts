@@ -2,6 +2,7 @@
 
 import { stripe } from '@/lib/stripe/client'
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBusiness } from '@/lib/data/active-business'
 import { redirect } from 'next/navigation'
 
 /**
@@ -10,20 +11,22 @@ import { redirect } from 'next/navigation'
  * Creates Stripe customer if none exists for the business.
  */
 export async function createCheckoutSession(priceId: string): Promise<never> {
+  const business = await getActiveBusiness()
+  if (!business) throw new Error('No business found')
+
+  // Need user.email for Stripe customer metadata
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Not authenticated')
 
-  // Get business, create Stripe customer if needed
-  const { data: business } = await supabase
+  // Fetch stripe_customer_id for the active business
+  const { data: bizData } = await supabase
     .from('businesses')
-    .select('id, stripe_customer_id')
-    .eq('user_id', user.id)
+    .select('stripe_customer_id')
+    .eq('id', business.id)
     .single()
 
-  if (!business) throw new Error('No business found')
-
-  let customerId = business.stripe_customer_id
+  let customerId = bizData?.stripe_customer_id
   if (!customerId) {
     // Create Stripe customer
     const customer = await stripe.customers.create({
@@ -63,22 +66,22 @@ export async function createCheckoutSession(priceId: string): Promise<never> {
  * Requires existing stripe_customer_id (user must have subscribed before).
  */
 export async function createPortalSession(): Promise<never> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Not authenticated')
+  const business = await getActiveBusiness()
+  if (!business) throw new Error('No business found')
 
-  const { data: business } = await supabase
+  const supabase = await createClient()
+  const { data: bizData } = await supabase
     .from('businesses')
     .select('stripe_customer_id')
-    .eq('user_id', user.id)
+    .eq('id', business.id)
     .single()
 
-  if (!business?.stripe_customer_id) {
+  if (!bizData?.stripe_customer_id) {
     throw new Error('No billing account found. Please subscribe first.')
   }
 
   const session = await stripe.billingPortal.sessions.create({
-    customer: business.stripe_customer_id,
+    customer: bizData.stripe_customer_id,
     return_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/billing`
   })
 

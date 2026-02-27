@@ -8,6 +8,7 @@ import { ReviewRequestEmail } from '@/lib/email/templates/review-request'
 import { checkSendRateLimit } from '@/lib/rate-limit'
 import { sendRequestSchema, batchSendSchema } from '@/lib/validations/send'
 import { COOLDOWN_DAYS, MONTHLY_SEND_LIMITS } from '@/lib/constants/billing'
+import { getActiveBusiness } from '@/lib/data/active-business'
 import type { BatchSendActionState } from '@/lib/types/database'
 
 export type SendActionState = {
@@ -68,13 +69,19 @@ export async function sendReviewRequest(
   const { contactId, templateId, customSubject } = parsed.data
 
   // === 3. Get business ===
-  const { data: business, error: businessError } = await supabase
+  const business = await getActiveBusiness()
+  if (!business) {
+    return { error: 'Please create a business profile first' }
+  }
+
+  // Fetch additional business fields needed for sending
+  const { data: bizData, error: businessError } = await supabase
     .from('businesses')
-    .select('id, name, google_review_link, default_sender_name, tier')
-    .eq('user_id', user.id)
+    .select('name, google_review_link, default_sender_name, tier')
+    .eq('id', business.id)
     .single()
 
-  if (businessError || !business) {
+  if (businessError || !bizData) {
     return { error: 'Please create a business profile first' }
   }
 
@@ -113,7 +120,7 @@ export async function sendReviewRequest(
   }
 
   // === 6. Check monthly limit ===
-  const monthlyLimit = MONTHLY_SEND_LIMITS[business.tier] || MONTHLY_SEND_LIMITS.basic
+  const monthlyLimit = MONTHLY_SEND_LIMITS[bizData.tier] || MONTHLY_SEND_LIMITS.basic
   const { count: monthlyCount } = await getMonthlyCount(supabase, business.id)
 
   if (monthlyCount >= monthlyLimit) {
@@ -137,7 +144,7 @@ export async function sendReviewRequest(
   }
 
   // Use custom subject or template subject or default
-  const subject = customSubject || template?.subject || `${business.name} would love your feedback!`
+  const subject = customSubject || template?.subject || `${bizData.name} would love your feedback!`
 
   // === 7. Create send_log (status: 'pending') BEFORE calling API ===
   const { data: sendLog, error: logError } = await supabase
@@ -158,13 +165,13 @@ export async function sendReviewRequest(
   }
 
   // === 8. Render email and send via Resend ===
-  const senderName = business.default_sender_name || business.name
+  const senderName = bizData.default_sender_name || bizData.name
 
   const html = await render(
     ReviewRequestEmail({
       customerName: contact.name,
-      businessName: business.name,
-      reviewLink: business.google_review_link || '',
+      businessName: bizData.name,
+      reviewLink: bizData.google_review_link || '',
       senderName,
     })
   )
@@ -295,18 +302,23 @@ export async function batchSendReviewRequest(
   const { contactIds: validatedContactIds, templateId, customSubject } = parsed.data
 
   // === 3. Get business ===
-  const { data: business, error: businessError } = await supabase
+  const business = await getActiveBusiness()
+  if (!business) {
+    return { error: 'Please create a business profile first' }
+  }
+
+  const { data: bizData, error: businessError } = await supabase
     .from('businesses')
-    .select('id, name, google_review_link, default_sender_name, tier')
-    .eq('user_id', user.id)
+    .select('name, google_review_link, default_sender_name, tier')
+    .eq('id', business.id)
     .single()
 
-  if (businessError || !business) {
+  if (businessError || !bizData) {
     return { error: 'Please create a business profile first' }
   }
 
   // === 4. Check monthly quota (full batch must fit) ===
-  const monthlyLimit = MONTHLY_SEND_LIMITS[business.tier] || MONTHLY_SEND_LIMITS.basic
+  const monthlyLimit = MONTHLY_SEND_LIMITS[bizData.tier] || MONTHLY_SEND_LIMITS.basic
   const { count: monthlyCount } = await getMonthlyCount(supabase, business.id)
   const remainingQuota = monthlyLimit - monthlyCount
 
@@ -392,8 +404,8 @@ export async function batchSendReviewRequest(
     template = tpl
   }
 
-  const defaultSubject = customSubject || template?.subject || `${business.name} would love your feedback!`
-  const senderName = business.default_sender_name || business.name
+  const defaultSubject = customSubject || template?.subject || `${bizData.name} would love your feedback!`
+  const senderName = bizData.default_sender_name || bizData.name
 
   // === 8. Loop through eligible contacts and send ===
   const results: Array<{
@@ -433,8 +445,8 @@ export async function batchSendReviewRequest(
       const html = await render(
         ReviewRequestEmail({
           customerName: contact.name,
-          businessName: business.name,
-          reviewLink: business.google_review_link || '',
+          businessName: bizData.name,
+          reviewLink: bizData.google_review_link || '',
           senderName,
         })
       )

@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { getActiveBusiness } from '@/lib/data/active-business'
 import { contactSchema } from '@/lib/validations/contact'
 import { escapeLikePattern } from '@/lib/utils'
 import type { Contact } from '@/lib/types/database'
@@ -26,6 +27,7 @@ export type BulkCreateResult = {
 /**
  * Find or create a contact by email.
  * Used by Quick Send to auto-create contacts on-the-fly.
+ * businessId is passed explicitly by caller — safe pattern.
  */
 export async function findOrCreateContact({
   email,
@@ -89,24 +91,12 @@ export async function createContact(
   _prevState: ContactActionState | null,
   formData: FormData
 ): Promise<ContactActionState> {
-  const supabase = await createClient()
-
-  // Validate user authentication using getUser() (not getSession - security best practice)
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'You must be logged in to create contacts' }
-  }
-
-  // Get user's business (required - must have business before creating contacts)
-  const { data: business, error: businessError } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
-  if (businessError || !business) {
+  const business = await getActiveBusiness()
+  if (!business) {
     return { error: 'Please create a business profile first' }
   }
+
+  const supabase = await createClient()
 
   // Parse and validate input
   const parsed = contactSchema.safeParse({
@@ -170,24 +160,12 @@ export async function updateContact(
   _prevState: ContactActionState | null,
   formData: FormData
 ): Promise<ContactActionState> {
-  const supabase = await createClient()
-
-  // Validate user authentication
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'You must be logged in to update contacts' }
-  }
-
-  // Get user's business
-  const { data: business, error: businessError } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
-  if (businessError || !business) {
+  const business = await getActiveBusiness()
+  if (!business) {
     return { error: 'Please create a business profile first' }
   }
+
+  const supabase = await createClient()
 
   // Extract contact ID
   const contactId = formData.get('contactId') as string
@@ -409,24 +387,12 @@ export async function bulkDeleteContacts(
 export async function bulkCreateContacts(
   contacts: Array<{ name: string; email: string; phone?: string }>
 ): Promise<BulkCreateResult> {
-  const supabase = await createClient()
-
-  // Validate user authentication
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'You must be logged in to import contacts' }
-  }
-
-  // Get user's business
-  const { data: business, error: businessError } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
-  if (businessError || !business) {
+  const business = await getActiveBusiness()
+  if (!business) {
     return { error: 'Please create a business profile first' }
   }
+
+  const supabase = await createClient()
 
   if (!contacts || contacts.length === 0) {
     return { error: 'No contacts provided' }
@@ -501,23 +467,12 @@ export async function getContacts(options?: {
   limit?: number
   offset?: number
 }): Promise<{ contacts: Contact[]; total: number }> {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { contacts: [], total: 0 }
-  }
-
-  // Get user's business first
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) {
     return { contacts: [], total: 0 }
   }
+
+  const supabase = await createClient()
 
   const limit = options?.limit ?? 50
   const offset = options?.offset ?? 0
@@ -588,23 +543,12 @@ export async function searchContacts(
     dateTo?: Date
   }
 ): Promise<Contact[]> {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return []
-  }
-
-  // Get user's business first
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) {
     return []
   }
+
+  const supabase = await createClient()
 
   // Build query
   let queryBuilder = supabase

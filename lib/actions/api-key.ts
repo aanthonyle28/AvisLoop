@@ -9,6 +9,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBusiness } from '@/lib/data/active-business'
 import { generateApiKey } from '@/lib/crypto/api-key'
 
 export type ApiKeyActionState = {
@@ -24,28 +25,12 @@ export type ApiKeyActionState = {
  */
 export async function generateApiKeyAction(): Promise<ApiKeyActionState> {
   try {
-    const supabase = await createClient()
-
-    // Authenticate user
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return { error: 'Unauthorized' }
-    }
-
-    // Get user's business
-    const { data: business, error: businessError } = await supabase
-      .from('businesses')
-      .select('id')
-      .eq('user_id', user.id)
-      .single()
-
-    if (businessError || !business) {
+    const business = await getActiveBusiness()
+    if (!business) {
       return { error: 'Business not found' }
     }
+
+    const supabase = await createClient()
 
     // Generate new API key
     const { key, hash } = await generateApiKey()
@@ -77,26 +62,18 @@ export async function generateApiKeyAction(): Promise<ApiKeyActionState> {
  */
 export async function hasApiKey(): Promise<boolean> {
   try {
+    const business = await getActiveBusiness()
+    if (!business) return false
+
     const supabase = await createClient()
 
-    // Authenticate user
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return false
-    }
-
-    // Get user's business
-    const { data: business } = await supabase
+    const { data: bizData } = await supabase
       .from('businesses')
       .select('api_key_hash')
-      .eq('user_id', user.id)
+      .eq('id', business.id)
       .single()
 
-    return !!business?.api_key_hash
+    return !!bizData?.api_key_hash
   } catch {
     return false
   }

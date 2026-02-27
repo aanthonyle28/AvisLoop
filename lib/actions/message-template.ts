@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { getActiveBusiness } from '@/lib/data/active-business'
 import { messageTemplateSchema } from '@/lib/validations/message-template'
 
 export type MessageTemplateActionState = {
@@ -22,24 +23,12 @@ export async function createMessageTemplate(
   _prevState: MessageTemplateActionState | null,
   formData: FormData
 ): Promise<MessageTemplateActionState> {
-  const supabase = await createClient()
-
-  // Validate user authentication
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'You must be logged in to create templates' }
-  }
-
-  // Get user's business
-  const { data: business, error: businessError } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
-  if (businessError || !business) {
+  const business = await getActiveBusiness()
+  if (!business) {
     return { error: 'Please create a business profile first' }
   }
+
+  const supabase = await createClient()
 
   // Parse form data
   const channel = formData.get('channel') as string
@@ -96,11 +85,6 @@ export async function updateMessageTemplate(
 ): Promise<MessageTemplateActionState> {
   const supabase = await createClient()
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'You must be logged in' }
-  }
-
   // Verify template exists and belongs to user (RLS handles security)
   const { data: template } = await supabase
     .from('message_templates')
@@ -154,11 +138,6 @@ export async function deleteMessageTemplate(
 ): Promise<MessageTemplateActionState> {
   const supabase = await createClient()
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'You must be logged in' }
-  }
-
   // Check if template is a default (RLS handles ownership)
   const { data: template } = await supabase
     .from('message_templates')
@@ -195,22 +174,12 @@ export async function copySystemTemplate(
   templateId: string,
   newName?: string
 ): Promise<MessageTemplateActionState> {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'You must be logged in' }
-  }
-
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) {
     return { error: 'Please create a business profile first' }
   }
+
+  const supabase = await createClient()
 
   // Get the template to copy
   const { data: original } = await supabase

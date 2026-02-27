@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { getActiveBusiness } from '@/lib/data/active-business'
 import {
   businessBasicsSchema,
   reviewDestinationSchema,
@@ -27,21 +28,19 @@ export async function markOnboardingComplete(): Promise<{
   success: boolean
   error?: string
 }> {
-  const supabase = await createClient()
-
-  // Validate user authentication
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { success: false, error: 'You must be logged in to complete onboarding' }
+  const business = await getActiveBusiness()
+  if (!business) {
+    return { success: false, error: 'Business not found' }
   }
 
-  // Update business with completion timestamp
+  const supabase = await createClient()
+
   const { error } = await supabase
     .from('businesses')
     .update({
       onboarding_completed_at: new Date().toISOString()
     })
-    .eq('user_id', user.id)
+    .eq('id', business.id)
 
   if (error) {
     return { success: false, error: error.message }
@@ -64,23 +63,20 @@ export async function markOnboardingComplete(): Promise<{
 export async function markOnboardingCardStep(
   step: 'contact_created' | 'template_created' | 'test_sent'
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { success: false, error: 'Not authenticated' }
-  }
-
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id, onboarding_steps_completed')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) {
     return { success: false, error: 'No business found' }
   }
 
-  const current = (business.onboarding_steps_completed || {}) as Record<string, boolean>
+  const supabase = await createClient()
+
+  const { data: bizData } = await supabase
+    .from('businesses')
+    .select('onboarding_steps_completed')
+    .eq('id', business.id)
+    .single()
+
+  const current = (bizData?.onboarding_steps_completed || {}) as Record<string, boolean>
   current[step] = true
 
   const { error } = await supabase
@@ -99,6 +95,7 @@ export async function markOnboardingCardStep(
 /**
  * Save business basics for onboarding step 1.
  * Creates or updates business with name, phone, and optional Google review link.
+ * SPECIAL: This function must handle both create (new user) and update (existing user) paths.
  *
  * @param input - Business basics data (name, phone, googleReviewLink)
  * @returns Success or error object
@@ -106,15 +103,7 @@ export async function markOnboardingCardStep(
 export async function saveBusinessBasics(
   input: BusinessBasicsInput
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createClient()
-
-  // Validate user authentication
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { success: false, error: 'You must be logged in' }
-  }
-
-  // Validate input
+  // Validate input first
   const parsed = businessBasicsSchema.safeParse(input)
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0]?.message || 'Invalid input' }
@@ -122,12 +111,10 @@ export async function saveBusinessBasics(
 
   const { name, phone, googleReviewLink } = parsed.data
 
-  // Check for existing business
-  const { data: existingBusiness } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
+  // Try to get existing business
+  const existingBusiness = await getActiveBusiness()
+
+  const supabase = await createClient()
 
   if (existingBusiness) {
     // Update existing business
@@ -144,7 +131,12 @@ export async function saveBusinessBasics(
       return { success: false, error: error.message }
     }
   } else {
-    // Create new business
+    // Create new business — need user_id for INSERT
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return { success: false, error: 'You must be logged in' }
+    }
+
     const { error } = await supabase
       .from('businesses')
       .insert({
@@ -174,13 +166,6 @@ export async function saveBusinessBasics(
 export async function saveReviewDestination(
   input: ReviewDestinationInput
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { success: false, error: 'You must be logged in' }
-  }
-
   // Validate input
   const parsed = reviewDestinationSchema.safeParse(input)
   if (!parsed.success) {
@@ -189,18 +174,13 @@ export async function saveReviewDestination(
 
   const { googleReviewLink } = parsed.data
 
-  // Get business
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) {
     return { success: false, error: 'Business not found' }
   }
 
-  // Update google_review_link
+  const supabase = await createClient()
+
   const { error } = await supabase
     .from('businesses')
     .update({ google_review_link: googleReviewLink || null })
@@ -223,13 +203,6 @@ export async function saveReviewDestination(
 export async function saveServicesOffered(
   input: ServicesOfferedInput
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { success: false, error: 'You must be logged in' }
-  }
-
   // Validate input
   const parsed = servicesOfferedSchema.safeParse(input)
   if (!parsed.success) {
@@ -238,13 +211,7 @@ export async function saveServicesOffered(
 
   const { serviceTypes, customServiceNames } = parsed.data
 
-  // Get business
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) {
     return { success: false, error: 'Business not found' }
   }
@@ -254,6 +221,8 @@ export async function saveServicesOffered(
   for (const serviceType of serviceTypes) {
     timingMap[serviceType] = DEFAULT_TIMING_HOURS[serviceType]
   }
+
+  const supabase = await createClient()
 
   // Update business with BOTH service_types_enabled AND service_type_timing
   const { error } = await supabase
@@ -283,13 +252,6 @@ export async function saveServicesOffered(
 export async function saveSoftwareUsed(
   input: SoftwareUsedInput
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { success: false, error: 'You must be logged in' }
-  }
-
   // Validate input
   const parsed = softwareUsedSchema.safeParse(input)
   if (!parsed.success) {
@@ -298,11 +260,17 @@ export async function saveSoftwareUsed(
 
   const { softwareUsed } = parsed.data
 
-  // Update business
+  const business = await getActiveBusiness()
+  if (!business) {
+    return { success: false, error: 'Business not found' }
+  }
+
+  const supabase = await createClient()
+
   const { error } = await supabase
     .from('businesses')
     .update({ software_used: softwareUsed || null })
-    .eq('user_id', user.id)
+    .eq('id', business.id)
 
   if (error) {
     return { success: false, error: error.message }
@@ -334,27 +302,26 @@ export async function createCampaignFromPreset(
 export async function acknowledgeSMSConsent(
   input: SMSConsentInput
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { success: false, error: 'You must be logged in' }
-  }
-
   // Validate input
   const parsed = smsConsentSchema.safeParse(input)
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0]?.message || 'You must acknowledge SMS consent requirements' }
   }
 
-  // Update business with consent flag and timestamp
+  const business = await getActiveBusiness()
+  if (!business) {
+    return { success: false, error: 'Business not found' }
+  }
+
+  const supabase = await createClient()
+
   const { error } = await supabase
     .from('businesses')
     .update({
       sms_consent_acknowledged: true,
       sms_consent_acknowledged_at: new Date().toISOString(),
     })
-    .eq('user_id', user.id)
+    .eq('id', business.id)
 
   if (error) {
     return { success: false, error: error.message }

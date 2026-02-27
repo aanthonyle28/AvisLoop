@@ -1,5 +1,6 @@
 'use server'
 
+import { getActiveBusiness } from '@/lib/data/active-business'
 import { getBusiness } from '@/lib/data/business'
 import { getAvailableTemplates } from '@/lib/data/message-template'
 import { getMonthlyUsage } from '@/lib/data/send-logs'
@@ -19,10 +20,15 @@ export interface SendOneOffData {
  * Called on-demand when user clicks "Send One-Off" in the job table.
  */
 export async function getSendOneOffData(): Promise<SendOneOffData | null> {
+  const activeBusiness = await getActiveBusiness()
+  if (!activeBusiness) return null
+
+  const businessId = activeBusiness.id
+
   const [business, templates, monthlyUsage, customerResult] = await Promise.all([
-    getBusiness(),
-    getAvailableTemplates('email'),
-    getMonthlyUsage(),
+    getBusiness(businessId),
+    getAvailableTemplates(businessId, 'email'),
+    getMonthlyUsage(businessId),
     getCustomers({ limit: 200 }),
   ])
 

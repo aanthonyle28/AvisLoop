@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBusiness } from '@/lib/data/active-business'
 
 interface AddJobCustomer {
   id: string
@@ -19,22 +20,12 @@ export interface AddJobData {
  * Note: enabledServiceTypes is provided by BusinessSettingsProvider context.
  */
 export async function getAddJobData(): Promise<AddJobData> {
-  const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return { customers: [] }
-  }
-
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) {
     return { customers: [] }
   }
+
+  const supabase = await createClient()
 
   // Fetch active customers for autocomplete (limit 200)
   const { data: customers } = await supabase

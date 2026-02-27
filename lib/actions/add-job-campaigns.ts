@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBusiness } from '@/lib/data/active-business'
 import type { ServiceType } from '@/lib/types/database'
 
 export interface AvailableCampaign {
@@ -20,18 +21,10 @@ export interface AvailableCampaign {
 export async function getAvailableCampaignsForJob(
   serviceType: ServiceType
 ): Promise<AvailableCampaign[]> {
-  const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return []
-
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) return []
+
+  const supabase = await createClient()
 
   // Fetch active campaigns matching service type OR all-services
   const { data: campaigns } = await supabase

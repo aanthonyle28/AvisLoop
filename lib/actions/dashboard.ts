@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBusiness } from '@/lib/data/active-business'
 import { getReadyToSendJobWithCampaign } from '@/lib/data/dashboard'
 import type { JobPanelDetail } from '@/lib/types/dashboard'
 import type { JobWithEnrollment } from '@/lib/types/database'
@@ -132,18 +133,10 @@ export async function acknowledgeAlert(sendLogId: string): Promise<{ success: bo
  */
 export async function getJobDetail(jobId: string): Promise<JobWithEnrollment | null> {
   try {
-    const supabase = await createClient()
-
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return null
-
-    const { data: business } = await supabase
-      .from('businesses')
-      .select('id')
-      .eq('user_id', user.id)
-      .single()
-
+    const business = await getActiveBusiness()
     if (!business) return null
+
+    const supabase = await createClient()
 
     const { data: job, error } = await supabase
       .from('jobs')
@@ -176,18 +169,10 @@ export async function getJobDetail(jobId: string): Promise<JobWithEnrollment | n
  */
 export async function dismissJobFromQueue(jobId: string): Promise<{ success: boolean; error?: string }> {
   try {
-    const supabase = await createClient()
-
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return { success: false, error: 'Not authenticated' }
-
-    const { data: business } = await supabase
-      .from('businesses')
-      .select('id')
-      .eq('user_id', user.id)
-      .single()
-
+    const business = await getActiveBusiness()
     if (!business) return { success: false, error: 'Business not found' }
+
+    const supabase = await createClient()
 
     const { error } = await supabase
       .from('jobs')
@@ -206,10 +191,6 @@ export async function dismissJobFromQueue(jobId: string): Promise<{ success: boo
 }
 
 /**
- * Mark a one-off job as sent after the user successfully sends a one-off request.
- * Sets campaign_override = 'one_off_sent' to remove it from the ready-to-send queue.
- */
-/**
  * Server action wrapper for getReadyToSendJobWithCampaign.
  * Callable from client components (unlike the data function which uses server-only imports).
  */
@@ -220,20 +201,16 @@ export async function fetchJobPanelDetail(
   return getReadyToSendJobWithCampaign(jobId, businessId)
 }
 
+/**
+ * Mark a one-off job as sent after the user successfully sends a one-off request.
+ * Sets campaign_override = 'one_off_sent' to remove it from the ready-to-send queue.
+ */
 export async function markOneOffSent(jobId: string): Promise<{ success: boolean; error?: string }> {
   try {
-    const supabase = await createClient()
-
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return { success: false, error: 'Not authenticated' }
-
-    const { data: business } = await supabase
-      .from('businesses')
-      .select('id')
-      .eq('user_id', user.id)
-      .single()
-
+    const business = await getActiveBusiness()
     if (!business) return { success: false, error: 'Business not found' }
+
+    const supabase = await createClient()
 
     const { error } = await supabase
       .from('jobs')

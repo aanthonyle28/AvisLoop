@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { getActiveBusiness } from '@/lib/data/active-business'
 import { scheduleSendSchema } from '@/lib/validations/schedule'
 import type { ScheduleActionState, ScheduledSend } from '@/lib/types/database'
 
@@ -13,14 +14,6 @@ export async function scheduleReviewRequest(
   _prevState: ScheduleActionState | null,
   formData: FormData
 ): Promise<ScheduleActionState> {
-  const supabase = await createClient()
-
-  // Authenticate
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'You must be logged in to schedule review requests' }
-  }
-
   // Parse contact IDs
   const contactIdsRaw = formData.get('contactIds')
   let contactIds: string[] = []
@@ -50,16 +43,12 @@ export async function scheduleReviewRequest(
     return { error: 'Scheduled time must be at least 1 minute in the future' }
   }
 
-  // Get business
-  const { data: business, error: businessError } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
-  if (businessError || !business) {
+  const business = await getActiveBusiness()
+  if (!business) {
     return { error: 'Please create a business profile first' }
   }
+
+  const supabase = await createClient()
 
   // Insert scheduled send
   const { data: scheduled, error: insertError } = await supabase
@@ -96,23 +85,12 @@ export async function scheduleReviewRequest(
  * Only allows cancellation if the send is still pending.
  */
 export async function cancelScheduledSend(id: string): Promise<{ error?: string; success?: boolean }> {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'You must be logged in' }
-  }
-
-  // Get business
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) {
     return { error: 'Business not found' }
   }
+
+  const supabase = await createClient()
 
   // Update only if pending and belongs to this business
   const { data: updated, error: updateError } = await supabase
@@ -136,18 +114,10 @@ export async function cancelScheduledSend(id: string): Promise<{ error?: string;
  * Get scheduled sends for the current user's business.
  */
 export async function getScheduledSends(): Promise<ScheduledSend[]> {
-  const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return []
-
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) return []
+
+  const supabase = await createClient()
 
   const { data } = await supabase
     .from('scheduled_sends')
@@ -165,8 +135,6 @@ export async function getScheduledSends(): Promise<ScheduledSend[]> {
 export async function bulkCancelScheduledSends(
   ids: string[]
 ): Promise<{ error?: string; success?: boolean; count?: number }> {
-  const supabase = await createClient()
-
   // Validate ids array
   if (!ids || ids.length === 0) {
     return { error: 'No scheduled sends selected' }
@@ -175,22 +143,12 @@ export async function bulkCancelScheduledSends(
     return { error: 'Cannot cancel more than 50 scheduled sends at once' }
   }
 
-  // Authenticate
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'You must be logged in' }
-  }
-
-  // Get business
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) {
     return { error: 'Business not found' }
   }
+
+  const supabase = await createClient()
 
   // Update only pending sends that belong to this business
   const { data: updated, error: updateError } = await supabase
@@ -222,8 +180,6 @@ export async function bulkRescheduleScheduledSends(
   ids: string[],
   newScheduledFor: string
 ): Promise<{ error?: string; success?: boolean; count?: number }> {
-  const supabase = await createClient()
-
   // Validate ids array
   if (!ids || ids.length === 0) {
     return { error: 'No scheduled sends selected' }
@@ -238,22 +194,12 @@ export async function bulkRescheduleScheduledSends(
     return { error: 'New scheduled time must be at least 1 minute in the future' }
   }
 
-  // Authenticate
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'You must be logged in' }
-  }
-
-  // Get business
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) {
     return { error: 'Business not found' }
   }
+
+  const supabase = await createClient()
 
   // Update only pending sends that belong to this business
   const { data: updated, error: updateError } = await supabase

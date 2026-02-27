@@ -22,6 +22,7 @@ import { queueSmsRetry } from '@/lib/actions/sms-retry'
 import { smsMessageSchema } from '@/lib/validations/sms'
 import { checkSendRateLimit } from '@/lib/rate-limit'
 import { MONTHLY_SEND_LIMITS } from '@/lib/constants/billing'
+import { getActiveBusiness } from '@/lib/data/active-business'
 
 export type SmsActionState = {
   error?: string
@@ -83,13 +84,19 @@ export async function sendSmsRequest(
   const { body, customerId, templateId } = parsed.data
 
   // === 3. Get business ===
-  const { data: business, error: businessError } = await supabase
+  const business = await getActiveBusiness()
+  if (!business) {
+    return { error: 'Please create a business profile first' }
+  }
+
+  // Fetch additional business fields needed for sending
+  const { data: bizData, error: businessError } = await supabase
     .from('businesses')
-    .select('id, name, google_review_link, default_sender_name, tier')
-    .eq('user_id', user.id)
+    .select('name, google_review_link, default_sender_name, tier')
+    .eq('id', business.id)
     .single()
 
-  if (businessError || !business) {
+  if (businessError || !bizData) {
     return { error: 'Please create a business profile first' }
   }
 
@@ -131,7 +138,7 @@ export async function sendSmsRequest(
   const quietHoursCheck = checkQuietHours(timezone)
 
   // === 7. Check monthly limit ===
-  const monthlyLimit = MONTHLY_SEND_LIMITS[business.tier] || MONTHLY_SEND_LIMITS.basic
+  const monthlyLimit = MONTHLY_SEND_LIMITS[bizData.tier] || MONTHLY_SEND_LIMITS.basic
   const { count: monthlyCount } = await getMonthlyCount(supabase, business.id)
 
   if (monthlyCount >= monthlyLimit) {

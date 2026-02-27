@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { campaignWithTouchesSchema } from '@/lib/validations/campaign'
+import { getActiveBusiness } from '@/lib/data/active-business'
 import type { CampaignWithTouchesFormData } from '@/lib/validations/campaign'
 import type { CampaignTouch } from '@/lib/types/database'
 
@@ -19,20 +20,10 @@ type ActionState = {
 export async function createCampaign(
   formData: CampaignWithTouchesFormData
 ): Promise<ActionState> {
-  const supabase = await createClient()
-
-  // Validate auth
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
-
-  // Get business
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) return { error: 'Business not found' }
+
+  const supabase = await createClient()
 
   // Validate form data
   const parsed = campaignWithTouchesSchema.safeParse(formData)
@@ -98,9 +89,6 @@ export async function updateCampaign(
   formData: CampaignWithTouchesFormData
 ): Promise<ActionState> {
   const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
 
   // Verify ownership and not preset
   const { data: existing } = await supabase
@@ -170,19 +158,11 @@ export async function getCampaignDeletionInfo(campaignId: string): Promise<{
   error?: string
 }> {
   const empty = { activeEnrollments: 0, affectedJobs: 0, availableCampaigns: [] }
-  const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { ...empty, error: 'Not authenticated' }
-
-  // Verify campaign belongs to user's business
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) return { ...empty, error: 'Business not found' }
+
+  const supabase = await createClient()
 
   // Verify campaign ownership
   const { data: campaign } = await supabase
@@ -230,19 +210,10 @@ export async function deleteCampaign(
   campaignId: string,
   reassignCampaignId?: string | null
 ): Promise<ActionState> {
-  const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
-
-  // Verify ownership
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) return { error: 'Business not found' }
+
+  const supabase = await createClient()
 
   // Verify not preset and belongs to user's business
   const { data: campaign } = await supabase
@@ -368,18 +339,10 @@ export async function duplicateCampaign(
   sourceCampaignId: string,
   newName?: string
 ): Promise<ActionState> {
-  const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
-
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) return { error: 'Business not found' }
+
+  const supabase = await createClient()
 
   // Fetch source campaign with touches
   const { data: source } = await supabase
@@ -434,9 +397,6 @@ export async function duplicateCampaign(
  */
 export async function toggleCampaignStatus(campaignId: string): Promise<ActionState> {
   const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
 
   // Get current status
   const { data: campaign } = await supabase

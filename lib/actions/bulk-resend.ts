@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { getActiveBusiness } from '@/lib/data/active-business'
 import { sendReviewRequest } from './send'
 
 const MAX_BATCH_SIZE = 25
@@ -12,14 +13,6 @@ export async function bulkResendRequests(sendLogIds: string[]): Promise<{
   totalSuccess: number
   totalFailed: number
 }> {
-  const supabase = await createClient()
-
-  // Auth check
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { success: false, error: 'You must be logged in', totalSuccess: 0, totalFailed: 0 }
-  }
-
   if (!sendLogIds.length) {
     return { success: false, error: 'No messages selected', totalSuccess: 0, totalFailed: 0 }
   }
@@ -28,16 +21,12 @@ export async function bulkResendRequests(sendLogIds: string[]): Promise<{
     return { success: false, error: `Maximum ${MAX_BATCH_SIZE} messages at a time`, totalSuccess: 0, totalFailed: 0 }
   }
 
-  // Get user's business
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) {
     return { success: false, error: 'Business not found', totalSuccess: 0, totalFailed: 0 }
   }
+
+  const supabase = await createClient()
 
   // Fetch send logs to get customer_id and template_id, scoped to business
   const { data: logs, error: logsError } = await supabase

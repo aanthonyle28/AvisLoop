@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { businessSchema } from '@/lib/validations/business'
 import { MIN_ENROLLMENT_COOLDOWN_DAYS, MAX_ENROLLMENT_COOLDOWN_DAYS } from '@/lib/constants/campaigns'
+import { getActiveBusiness } from '@/lib/data/active-business'
+import { getBusiness as getBusinessData } from '@/lib/data/business'
 import type { BusinessWithTemplates } from '@/lib/data/business'
 
 
@@ -21,14 +23,6 @@ export async function updateBusiness(
   _prevState: BusinessActionState | null,
   formData: FormData
 ): Promise<BusinessActionState> {
-  const supabase = await createClient()
-
-  // Validate user authentication using getUser() (not getSession - security best practice)
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'You must be logged in to update business settings' }
-  }
-
   // Parse and validate input
   const parsed = businessSchema.safeParse({
     name: formData.get('name'),
@@ -44,15 +38,12 @@ export async function updateBusiness(
 
   const { name, phone, googleReviewLink, defaultSenderName, defaultTemplateId } = parsed.data
 
-  // Check for existing business (one per user for MVP)
-  const { data: existingBusiness } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
+  const existingBusiness = await getActiveBusiness()
+
+  const supabase = await createClient()
 
   if (existingBusiness) {
-    // Update existing business
+    // Update existing business (scoped by PK — safe)
     const { error } = await supabase
       .from('businesses')
       .update({
@@ -68,7 +59,12 @@ export async function updateBusiness(
       return { error: error.message }
     }
   } else {
-    // Create new business
+    // Create new business — need user_id for INSERT
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return { error: 'You must be logged in to update business settings' }
+    }
+
     const { error } = await supabase
       .from('businesses')
       .insert({
@@ -97,11 +93,9 @@ export async function updateBusiness(
 export async function saveReviewLink(
   link: string
 ): Promise<BusinessActionState> {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'You must be logged in' }
+  const business = await getActiveBusiness()
+  if (!business) {
+    return { error: 'Please create a business profile first' }
   }
 
   // Validate URL if provided
@@ -116,16 +110,7 @@ export async function saveReviewLink(
     }
   }
 
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
-  if (!business) {
-    return { error: 'Please create a business profile first' }
-  }
-
+  const supabase = await createClient()
   const { error } = await supabase
     .from('businesses')
     .update({ google_review_link: link.trim() || null })
@@ -145,35 +130,12 @@ export async function saveReviewLink(
  * Fetch current user's business with all templates.
  * For use in Server Components to load initial form data.
  * Returns null if no business exists yet.
+ * @deprecated Use getActiveBusiness() + getBusiness(id) from lib/data/business instead.
  */
 export async function getBusiness(): Promise<BusinessWithTemplates | null> {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return null
-  }
-
-  // Use explicit FK hint to resolve ambiguity from circular relationship
-  const { data: business } = await supabase
-    .from('businesses')
-    .select(`
-      *,
-      message_templates!message_templates_business_id_fkey (
-        id,
-        name,
-        subject,
-        body,
-        channel,
-        service_type,
-        is_default,
-        created_at
-      )
-    `)
-    .eq('user_id', user.id)
-    .single()
-
-  return business
+  const business = await getActiveBusiness()
+  if (!business) return null
+  return getBusinessData(business.id)
 }
 
 /**
@@ -183,24 +145,10 @@ export async function getBusiness(): Promise<BusinessWithTemplates | null> {
  * This function is maintained for backward compatibility only.
  */
 export async function getEmailTemplates() {
+  const business = await getActiveBusiness()
+  if (!business) return []
+
   const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return []
-  }
-
-  // Get user's business first
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
-  if (!business) {
-    return []
-  }
-
   const { data: templates } = await supabase
     .from('message_templates')
     .select('*')
@@ -221,20 +169,7 @@ export async function updateServiceTypeSettings(settings: {
   serviceTypeTiming: Record<string, number>
   customServiceNames?: string[]
 }): Promise<{ error?: string; success?: boolean }> {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'You must be logged in' }
-  }
-
-  // Fetch business ID first (defense-in-depth pattern — scope update by PK, not user_id)
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) {
     return { error: 'Business not found' }
   }
@@ -264,6 +199,7 @@ export async function updateServiceTypeSettings(settings: {
     .filter(n => n.length > 0 && n.length <= 50)
     .slice(0, 10)
 
+  const supabase = await createClient()
   const { error } = await supabase
     .from('businesses')
     .update({
@@ -289,22 +225,21 @@ export async function updateServiceTypeSettings(settings: {
 export async function updateReviewCooldown(
   days: number
 ): Promise<{ error?: string; success?: boolean }> {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'You must be logged in' }
-  }
-
   // Validate range
   if (days < MIN_ENROLLMENT_COOLDOWN_DAYS || days > MAX_ENROLLMENT_COOLDOWN_DAYS) {
     return { error: `Cooldown must be between ${MIN_ENROLLMENT_COOLDOWN_DAYS} and ${MAX_ENROLLMENT_COOLDOWN_DAYS} days` }
   }
 
+  const business = await getActiveBusiness()
+  if (!business) {
+    return { error: 'Business not found' }
+  }
+
+  const supabase = await createClient()
   const { error } = await supabase
     .from('businesses')
     .update({ review_cooldown_days: days })
-    .eq('user_id', user.id)
+    .eq('id', business.id)
 
   if (error) {
     return { error: error.message }

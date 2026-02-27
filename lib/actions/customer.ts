@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { customerSchema } from '@/lib/validations/customer'
 import { escapeLikePattern } from '@/lib/utils'
+import { getActiveBusiness } from '@/lib/data/active-business'
 import type { Customer } from '@/lib/types/database'
 
 export type CustomerActionState = {
@@ -110,23 +111,17 @@ export async function createCustomer(
   _prevState: CustomerActionState | null,
   formData: FormData
 ): Promise<CustomerActionState> {
-  const supabase = await createClient()
-
-  // Validate user authentication using getUser() (not getSession - security best practice)
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'You must be logged in to create customers' }
+  const business = await getActiveBusiness()
+  if (!business) {
+    return { error: 'Please create a business profile first' }
   }
 
-  // Get user's business (required - must have business before creating customers)
-  const { data: business, error: businessError } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
+  const supabase = await createClient()
 
-  if (businessError || !business) {
-    return { error: 'Please create a business profile first' }
+  // Need user.id for sms_consent_captured_by
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return { error: 'You must be logged in to create customers' }
   }
 
   // Parse and validate input
@@ -212,24 +207,12 @@ export async function updateCustomer(
   _prevState: CustomerActionState | null,
   formData: FormData
 ): Promise<CustomerActionState> {
-  const supabase = await createClient()
-
-  // Validate user authentication
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'You must be logged in to update customers' }
-  }
-
-  // Get user's business
-  const { data: business, error: businessError } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
-  if (businessError || !business) {
+  const business = await getActiveBusiness()
+  if (!business) {
     return { error: 'Please create a business profile first' }
   }
+
+  const supabase = await createClient()
 
   // Extract customer ID
   const customerId = formData.get('customerId') as string
@@ -470,24 +453,12 @@ export async function bulkCreateCustomers(
     phoneStatus?: 'valid' | 'invalid' | 'missing'
   }>
 ): Promise<BulkCreateResult> {
-  const supabase = await createClient()
-
-  // Validate user authentication
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'You must be logged in to import customers' }
-  }
-
-  // Get user's business (with timezone)
-  const { data: business, error: businessError } = await supabase
-    .from('businesses')
-    .select('id, timezone')
-    .eq('user_id', user.id)
-    .single()
-
-  if (businessError || !business) {
+  const business = await getActiveBusiness()
+  if (!business) {
     return { error: 'Please create a business profile first' }
   }
+
+  const supabase = await createClient()
 
   if (!customers || customers.length === 0) {
     return { error: 'No customers provided' }
@@ -542,7 +513,7 @@ export async function bulkCreateCustomers(
           email: c.email,
           phone: c.phoneE164 || null,
           phone_status: c.phoneStatus || 'missing',
-          timezone: business.timezone || 'America/New_York',
+          timezone: (business as { timezone?: string }).timezone || 'America/New_York',
           status: 'active',
           send_count: 0,
           tags: [],
@@ -592,24 +563,12 @@ export async function getCustomers(options?: {
   limit?: number
   offset?: number
 }): Promise<{ customers: Customer[]; total: number }> {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { customers: [], total: 0 }
-  }
-
-  // Get user's business first
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) {
     return { customers: [], total: 0 }
   }
 
+  const supabase = await createClient()
   const limit = options?.limit ?? 50
   const offset = options?.offset ?? 0
 
@@ -679,23 +638,12 @@ export async function searchCustomers(
     dateTo?: Date
   }
 ): Promise<Customer[]> {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return []
-  }
-
-  // Get user's business first
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) {
     return []
   }
+
+  const supabase = await createClient()
 
   // Build query
   let queryBuilder = supabase
@@ -883,23 +831,12 @@ export async function getCustomersWithPhoneIssues(): Promise<Array<{
   email: string
   rawPhone: string
 }>> {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return []
-  }
-
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) {
     return []
   }
 
+  const supabase = await createClient()
   const { data: customers } = await supabase
     .from('customers')
     .select('id, name, email, phone')

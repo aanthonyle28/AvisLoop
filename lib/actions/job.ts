@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { jobSchema, type CSVJobRow } from '@/lib/validations/job'
 import { enrollJobInCampaign, stopEnrollmentsForJob } from '@/lib/actions/enrollment'
 import { parseAndValidatePhone } from '@/lib/utils/phone'
+import { getActiveBusiness } from '@/lib/data/active-business'
 
 export type JobActionState = {
   error?: string
@@ -34,24 +35,12 @@ export async function createJob(
   _prevState: JobActionState | null,
   formData: FormData
 ): Promise<JobActionState> {
-  const supabase = await createClient()
-
-  // Validate user authentication
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'You must be logged in to create jobs' }
-  }
-
-  // Get user's business
-  const { data: business, error: businessError } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
-  if (businessError || !business) {
+  const business = await getActiveBusiness()
+  if (!business) {
     return { error: 'Please create a business profile first' }
   }
+
+  const supabase = await createClient()
 
   // Extract form data
   const customerId = formData.get('customerId') as string | null
@@ -197,24 +186,12 @@ export async function updateJob(
   _prevState: JobActionState | null,
   formData: FormData
 ): Promise<JobActionState> {
-  const supabase = await createClient()
-
-  // Validate user authentication
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'You must be logged in to update jobs' }
-  }
-
-  // Get user's business
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) {
     return { error: 'Please create a business profile first' }
   }
+
+  const supabase = await createClient()
 
   // Extract job ID
   const jobId = formData.get('jobId') as string
@@ -384,24 +361,12 @@ export async function updateJob(
  * Delete a job.
  */
 export async function deleteJob(jobId: string): Promise<JobActionState> {
-  const supabase = await createClient()
-
-  // Validate user authentication
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'You must be logged in to delete jobs' }
-  }
-
-  // Get user's business
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) {
     return { error: 'Business not found' }
   }
+
+  const supabase = await createClient()
 
   // Delete job scoped to business
   const { error } = await supabase
@@ -429,23 +394,12 @@ export async function markJobComplete(
   jobId: string,
   enrollInCampaign: boolean = true
 ): Promise<JobActionState> {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'You must be logged in' }
-  }
-
-  // Get user's business
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) {
     return { error: 'Business not found' }
   }
+
+  const supabase = await createClient()
 
   // Fetch the job's campaign_override and enrollment_resolution before updating
   const { data: currentJob } = await supabase
@@ -515,23 +469,12 @@ export const markJobCompleted = markJobComplete
  * Mark job as do-not-send.
  */
 export async function markJobDoNotSend(jobId: string): Promise<JobActionState> {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { error: 'You must be logged in' }
-  }
-
-  // Get user's business
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) {
     return { error: 'Business not found' }
   }
+
+  const supabase = await createClient()
 
   const { error } = await supabase
     .from('jobs')
@@ -563,23 +506,12 @@ export async function markJobDoNotSend(jobId: string): Promise<JobActionState> {
 export async function bulkCreateJobsWithCustomers(
   rows: CSVJobRow[]
 ): Promise<BulkJobCreateResult> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) {
-    return { success: false, error: 'Unauthorized' }
-  }
-
-  // Get user's business
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) {
     return { success: false, error: 'Business not found' }
   }
+
+  const supabase = await createClient()
 
   // Fetch existing customers by email for deduplication
   const { data: existingCustomers } = await supabase

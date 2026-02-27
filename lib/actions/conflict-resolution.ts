@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBusiness } from '@/lib/data/active-business'
 import { enrollJobInCampaign } from '@/lib/actions/enrollment'
 
 export type ConflictResolutionResult = {
@@ -22,24 +23,12 @@ export async function resolveEnrollmentConflict(
   jobId: string,
   action: 'replace' | 'skip' | 'queue_after'
 ): Promise<ConflictResolutionResult> {
-  const supabase = await createClient()
-
-  // Auth check
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { success: false, error: 'Not authenticated' }
-  }
-
-  // Verify job belongs to user's business
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) {
     return { success: false, error: 'Business not found' }
   }
+
+  const supabase = await createClient()
 
   const { data: job } = await supabase
     .from('jobs')
@@ -138,22 +127,12 @@ export async function resolveEnrollmentConflict(
 export async function revertConflictResolution(
   jobId: string
 ): Promise<ConflictResolutionResult> {
-  const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return { success: false, error: 'Not authenticated' }
-  }
-
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
+  const business = await getActiveBusiness()
   if (!business) {
     return { success: false, error: 'Business not found' }
   }
+
+  const supabase = await createClient()
 
   const { data: job } = await supabase
     .from('jobs')
