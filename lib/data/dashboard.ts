@@ -7,7 +7,29 @@ import type {
   DashboardCounts,
   CampaignEvent,
   JobPanelDetail,
+  DayBucket,
 } from '@/lib/types/dashboard'
+
+/**
+ * Buckets an array of ISO timestamp strings into N daily count buckets.
+ * Returns DayBucket[] sorted ascending (oldest first), with 0 for empty days.
+ */
+function bucketByDay(timestamps: string[], days: number): DayBucket[] {
+  const now = new Date()
+  const buckets: Record<string, number> = {}
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(now)
+    d.setDate(d.getDate() - i)
+    buckets[d.toISOString().slice(0, 10)] = 0
+  }
+  for (const ts of timestamps) {
+    const day = new Date(ts).toISOString().slice(0, 10)
+    if (day in buckets) buckets[day]++
+  }
+  return Object.entries(buckets)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, value]) => ({ date, value }))
+}
 
 /**
  * Calculate trend percentage between current and previous value.
@@ -40,6 +62,9 @@ export async function getDashboardKPIs(businessId: string): Promise<DashboardKPI
   const lastWeekStart = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000)
   const lastWeekEnd = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
 
+  // 14-day window for sparkline history
+  const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000)
+
   try {
     const [
       // Outcome metrics (monthly)
@@ -56,6 +81,11 @@ export async function getDashboardKPIs(businessId: string): Promise<DashboardKPI
       activeEnrollmentsResult,
       activeEnrollmentsLastWeekResult,
       pendingNowResult,
+
+      // History queries (14-day sparklines)
+      reviewsHistoryResult,
+      ratingsHistoryResult,
+      sendsHistoryResult,
     ] = await Promise.all([
       // Reviews this month (send_logs with reviewed_at)
       supabase
@@ -144,6 +174,29 @@ export async function getDashboardKPIs(businessId: string): Promise<DashboardKPI
         .select('*', { count: 'exact', head: true })
         .eq('business_id', businessId)
         .eq('status', 'pending'),
+
+      // Reviews history (14 days) — for sparkline
+      supabase
+        .from('send_logs')
+        .select('reviewed_at')
+        .eq('business_id', businessId)
+        .not('reviewed_at', 'is', null)
+        .gte('reviewed_at', fourteenDaysAgo.toISOString()),
+
+      // Ratings history (14 days) — for sparkline
+      supabase
+        .from('customer_feedback')
+        .select('rating, submitted_at')
+        .eq('business_id', businessId)
+        .gte('submitted_at', fourteenDaysAgo.toISOString()),
+
+      // Sends history (14 days) — for conversion rate sparkline
+      supabase
+        .from('send_logs')
+        .select('created_at, reviewed_at')
+        .eq('business_id', businessId)
+        .in('status', ['sent', 'delivered', 'opened'])
+        .gte('created_at', fourteenDaysAgo.toISOString()),
     ])
 
     // Calculate outcome metrics
@@ -176,6 +229,52 @@ export async function getDashboardKPIs(businessId: string): Promise<DashboardKPI
     const activeLastWeek = activeEnrollmentsLastWeekResult.count || 0
     const pendingNow = pendingNowResult.count || 0
 
+    // Compute 14-day sparkline histories for outcome metrics
+
+    // Reviews history — daily count of reviews received
+    const reviewsHistory = bucketByDay(
+      (reviewsHistoryResult.data || []).map(r => r.reviewed_at!),
+      14
+    )
+
+    // Average rating history — daily average rating (0 for days with no feedback)
+    const ratingsHistoryRaw = ratingsHistoryResult.data || []
+    const ratingsByDay: Record<string, number[]> = {}
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(now)
+      d.setDate(d.getDate() - i)
+      ratingsByDay[d.toISOString().slice(0, 10)] = []
+    }
+    for (const r of ratingsHistoryRaw) {
+      const day = new Date(r.submitted_at).toISOString().slice(0, 10)
+      if (day in ratingsByDay) ratingsByDay[day].push(r.rating)
+    }
+    const ratingsHistory: DayBucket[] = Object.entries(ratingsByDay)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, ratings]) => ({
+        date,
+        value: ratings.length > 0
+          ? Math.round((ratings.reduce((s, r) => s + r, 0) / ratings.length) * 10) / 10
+          : 0,
+      }))
+
+    // Conversion rate history — daily conversion % (reviews / sends * 100)
+    const sendsHistoryRaw = sendsHistoryResult.data || []
+    const sendsByDay = bucketByDay(
+      sendsHistoryRaw.map(r => r.created_at),
+      14
+    )
+    const reviewsByDayHistory = bucketByDay(
+      sendsHistoryRaw.filter(r => r.reviewed_at != null).map(r => r.created_at),
+      14
+    )
+    const conversionHistory: DayBucket[] = sendsByDay.map((dayBucket, i) => ({
+      date: dayBucket.date,
+      value: dayBucket.value > 0
+        ? Math.round((reviewsByDayHistory[i].value / dayBucket.value) * 100)
+        : 0,
+    }))
+
     return {
       // Outcome metrics (monthly comparison)
       reviewsThisMonth: {
@@ -183,6 +282,7 @@ export async function getDashboardKPIs(businessId: string): Promise<DashboardKPI
         previousValue: reviewsLastMonth,
         trend: calculateTrend(reviewsThisMonth, reviewsLastMonth),
         trendPeriod: 'vs last month',
+        history: reviewsHistory,
       },
       averageRating: {
         value: Math.round(avgRatingThisMonth * 10) / 10, // Round to 1 decimal
@@ -192,12 +292,14 @@ export async function getDashboardKPIs(businessId: string): Promise<DashboardKPI
           Math.round(avgRatingLastMonth * 10)
         ),
         trendPeriod: 'vs last month',
+        history: ratingsHistory,
       },
       conversionRate: {
         value: conversionRateThisMonth,
         previousValue: conversionRateLastMonth,
         trend: calculateTrend(conversionRateThisMonth, conversionRateLastMonth),
         trendPeriod: 'vs last month',
+        history: conversionHistory,
       },
 
       // Pipeline metrics (weekly comparison)
@@ -230,9 +332,9 @@ export async function getDashboardKPIs(businessId: string): Promise<DashboardKPI
       trendPeriod: 'vs last week' as const,
     }
     return {
-      reviewsThisMonth: { ...zeroMetric, trendPeriod: 'vs last month' },
-      averageRating: { ...zeroMetric, trendPeriod: 'vs last month' },
-      conversionRate: { ...zeroMetric, trendPeriod: 'vs last month' },
+      reviewsThisMonth: { ...zeroMetric, trendPeriod: 'vs last month', history: [] },
+      averageRating: { ...zeroMetric, trendPeriod: 'vs last month', history: [] },
+      conversionRate: { ...zeroMetric, trendPeriod: 'vs last month', history: [] },
       requestsSentThisWeek: zeroMetric,
       activeSequences: zeroMetric,
       pendingQueued: zeroMetric,
