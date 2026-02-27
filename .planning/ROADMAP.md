@@ -928,8 +928,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 56-01-PLAN.md — createAdditionalBusiness() server action (insert-only) + onboarding routing
-- [ ] 56-02-PLAN.md — Add Business button on Clients page + post-creation redirect
+- [x] 56-01-PLAN.md — createAdditionalBusiness() server action (insert-only) + onboarding routing
+- [x] 56-02-PLAN.md — Add Business button on Clients page + post-creation redirect
 
 ### Phase 57: Agency Billing
 **Goal**: Send limits are enforced against the total sends across all businesses owned by the user — an agency owner cannot circumvent plan limits by distributing sends across multiple businesses.
@@ -941,7 +941,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 57-01-PLAN.md — Pooled usage query (sum across all user's businesses) + billing page update
+- [x] 57-01-PLAN.md — Pooled usage query (sum across all user's businesses) + billing page update
 
 
 ### Phase 58: Job Completion Form
@@ -1017,8 +1017,8 @@ See individual phase sections above for requirements, success criteria, and depe
 | **53** | **v3.0 Agency Mode** | **2/2** | **Complete** | **2026-02-27** |
 | **54** | **v3.0 Agency Mode** | **2/2** | **Complete** | **2026-02-27** |
 | **55** | **v3.0 Agency Mode** | **3/3** | **Complete** | **2026-02-27** |
-| 56 | v3.0 Agency Mode | 0/TBD | Not started | - |
-| 57 | v3.0 Agency Mode | 0/TBD | Not started | - |
+| **56** | **v3.0 Agency Mode** | **2/2** | **Complete** | **2026-02-27** |
+| **57** | **v3.0 Agency Mode** | **1/1** | **Complete** | **2026-02-27** |
 | 58 | v3.0 Agency Mode | 0/TBD | Not started | - |
 
-**Total:** 239 plans complete across shipped phases.
+**Total:** 243 plans complete across shipped phases.

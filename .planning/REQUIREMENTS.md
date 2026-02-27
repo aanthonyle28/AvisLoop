@@ -41,8 +41,8 @@
 
 ## Agency Billing
 
-- [ ] **BILL-01**: Usage limits are enforced against the sum of sends across all businesses owned by the user
-- [ ] **BILL-02**: Settings/billing page displays pooled usage across all businesses
+- [x] **BILL-01**: Usage limits are enforced against the sum of sends across all businesses owned by the user
+- [x] **BILL-02**: Settings/billing page displays pooled usage across all businesses
 
 ## Job Completion Form
 
@@ -95,8 +95,8 @@
 | CREATE-02 | Phase 56 | Pending |
 | CREATE-03 | Phase 56 | Pending |
 | CREATE-04 | Phase 56 | Pending |
-| BILL-01 | Phase 57 | Pending |
-| BILL-02 | Phase 57 | Pending |
+| BILL-01 | Phase 57 | Complete |
+| BILL-02 | Phase 57 | Complete |
 | FORM-01 | Phase 58 | Pending |
 | FORM-02 | Phase 58 | Pending |
 | FORM-03 | Phase 58 | Pending |
