@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.0 Agency Mode (Phases 52-58) — Phase 53 complete, Phase 54 next
+**Current focus:** v3.0 Agency Mode (Phases 52-58) — Phase 54 in progress (Plan 1/2 complete)
 
 ## Current Position
 
-Phase: 53 of 58 (Data Function Refactor) — COMPLETE
-Plan: 2/2 in current phase
-Milestone: v3.0 Agency Mode (Phases 52-58) — Phase 53 verified
-Status: Phase 53 complete — ready to plan Phase 54
+Phase: 54 of 58 (Business Switcher UI) — In progress
+Plan: 1/2 in current phase
+Milestone: v3.0 Agency Mode (Phases 52-58)
+Status: In progress — 54-01 complete, 54-02 next
 
-Progress: [███░░░░░░░] ~29% (Phase 53 of 7 phases)
+Progress: [████░░░░░░] ~36% (Phase 54 of 7 phases, plan 1/2)
 
-Last activity: 2026-02-27 — Phase 53 verified, all must-haves passed
+Last activity: 2026-02-27 — Completed 54-01-PLAN.md (BusinessSwitcher + sidebar integration)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 234
-- v3.0 plans completed: 4/TBD
+- Total plans completed (project): 235
+- v3.0 plans completed: 5/TBD
 
 *Updated after each plan completion*
 
@@ -38,6 +38,7 @@ Last activity: 2026-02-27 — Phase 53 verified, all must-haves passed
 - Cron endpoints unaffected — they use service role and query by business_id directly
 - `reviews_gained` computed at read time (current - start), never stored
 - **Phase 53 complete:** All data functions and server actions use explicit `businessId` parameter — zero PGRST116 crash risk
+- **Phase 54-01 complete:** BusinessSwitcher component in sidebar — single-business plain text, multi-business Radix dropdown
 
 ### Decisions from Phase 52-01
 
@@ -65,6 +66,13 @@ Last activity: 2026-02-27 — Phase 53 verified, all must-haves passed
 - Billing actions keep `getUser()` for email (Stripe) but use `getActiveBusiness()` for business
 - Safe patterns left unchanged: `retrySend`, `acknowledgeAlert`, `dismissFeedbackAlert` (ownership via entity PK)
 
+### Decisions from Phase 54-01
+
+- BusinessSwitcher reads zero props — gets `businesses`, `businessId`, `businessName` entirely from `useBusinessSettings()` context
+- No `router.refresh()` after `switchBusiness()` — `revalidatePath('/', 'layout')` inside action handles re-render
+- `isPending` guard uses `opacity-60 pointer-events-none` CSS rather than `disabled` attribute for smoother pending UX
+- Business context strip hidden when sidebar collapsed — consistent with nav label hiding pattern
+
 ### Cross-Cutting Concerns (apply to every plan)
 
 - Design system: use existing semantic tokens and design system patterns
@@ -83,6 +91,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Phase 53 complete and verified — ready to plan Phase 54 (Business Switcher UI)
+Stopped at: Completed 54-01-PLAN.md — BusinessSwitcher + sidebar integration
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
