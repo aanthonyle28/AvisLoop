@@ -179,6 +179,7 @@ Added in Phase 22 for service-specific campaign timing:
 | service_types_enabled | TEXT[] | Array of service types this business offers |
 | service_type_timing | JSONB | Map of service type to hours until first campaign touch |
 | review_cooldown_days | INT | Days after review before customer can be re-enrolled (default: 30, range: 7-90) |
+| custom_service_names | TEXT[] | Display-only custom service names when "other" is enabled (max 10, default '{}') |
 
 Default timing values:
 - hvac: 24 hours
@@ -189,6 +190,46 @@ Default timing values:
 - painting: 48 hours
 - handyman: 24 hours
 - other: 24 hours
+
+### Custom Service Names (Added Phase 44)
+
+The `custom_service_names` column stores user-defined service name labels (up to 10) that display when the "other" service type is enabled. These are display-only and do NOT affect campaign matching — campaigns still use the fixed `service_types_enabled` set. Captured during onboarding and editable in Settings.
+
+## Business Agency Metadata
+
+Added in Phase 55 for agency client tracking. All columns are nullable — only populated for agency-managed businesses.
+
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| google_rating_start | NUMERIC(2,1) | YES | - | Google review rating at client onboarding (e.g., 4.5) |
+| google_rating_current | NUMERIC(2,1) | YES | - | Current Google rating (manually updated) |
+| review_count_start | INTEGER | YES | - | Number of Google reviews at onboarding |
+| review_count_current | INTEGER | YES | - | Current review count (manually updated) |
+| monthly_fee | NUMERIC(10,2) | YES | - | Monthly retainer/service fee in USD |
+| start_date | DATE | YES | - | When agency relationship began |
+| gbp_access | BOOLEAN | YES | - | Whether agency has access to client's Google Business Profile |
+| competitor_name | TEXT | YES | - | Primary competitor business name |
+| competitor_review_count | INTEGER | YES | - | Competitor's current Google review count |
+| agency_notes | TEXT | YES | - | Free-form internal notes (not visible to client) |
+
+### Purpose
+
+Enables agency users to track per-client performance metrics:
+- Review growth since onboarding (rating + count deltas)
+- Revenue management (monthly fees per client)
+- Competitive positioning (competitor review count vs client)
+- Relationship dating for reporting
+
+### Data Functions
+
+- `getUserBusinessesWithMetadata()` — fetches all user-owned businesses with agency metadata
+- `updateBusinessMetadata()` — server action with Zod validation, triggers revalidatePath
+- `updateBusinessNotes()` — fire-and-forget server action (no revalidation needed)
+
+### UI
+
+- `BusinessDetailDrawer` in `/businesses` page shows all agency metadata with edit capability
+- Auto-save notes with debounce, GBP access toggle, competitor tracking fields
 
 ## Table: message_templates
 
@@ -359,7 +400,7 @@ Tracks job progression through campaign touch sequences. Denormalized touch time
 | campaign_id | UUID | NO | - | FK to campaigns |
 | job_id | UUID | NO | - | FK to jobs |
 | customer_id | UUID | NO | - | FK to customers |
-| status | TEXT | NO | 'active' | State: 'active', 'completed', 'stopped' |
+| status | TEXT | NO | 'active' | State: 'active', 'completed', 'stopped', 'frozen' |
 | stop_reason | TEXT | YES | - | Why stopped (if stopped) |
 | current_touch | INT | NO | 1 | Next touch to send (1-4) |
 | touch_1_scheduled_at | TIMESTAMPTZ | YES | - | When touch 1 should send |
@@ -385,6 +426,7 @@ Tracks job progression through campaign touch sequences. Denormalized touch time
 - `active`: Campaign is running, touches will be sent
 - `completed`: All touches sent successfully
 - `stopped`: Campaign stopped early (see stop_reason)
+- `frozen`: Campaign paused — touch position preserved, resumes when campaign reactivated
 
 ### Stop Reasons
 
@@ -397,17 +439,26 @@ Tracks job progression through campaign touch sequences. Denormalized touch time
 - `campaign_deleted`: Campaign was deleted
 - `repeat_job`: New job for same customer (old enrollment canceled)
 
+### Frozen Enrollments (Added Phase 46)
+
+When a campaign is paused via `toggleCampaignStatus()`, all active enrollments are set to `frozen` instead of `stopped`. This preserves the customer's position in the touch sequence. When the campaign is resumed:
+- Frozen enrollments are restored to `active`
+- Scheduled touch times are recalculated based on the time the campaign was paused
+- No touches are lost or skipped
+
+The partial unique index covers both `active` and `frozen` states to prevent duplicate enrollments.
+
 ### Denormalization Strategy
 
 Touch timestamps are denormalized (duplicated from campaign_touches + calculated timing) to enable fast due-touch queries without joins. Cron processor can query `WHERE status='active' AND touch_1_scheduled_at <= NOW() AND touch_1_sent_at IS NULL` using partial indexes.
 
 ### Constraints
 
-- `status IN ('active', 'completed', 'stopped')`
+- `status IN ('active', 'completed', 'stopped', 'frozen')`
 - `stop_reason` must be valid enum or NULL
 - `current_touch BETWEEN 1 AND 4`
 - `touch_N_status IN ('pending', 'sent', 'skipped', 'failed')` or NULL
-- Partial unique: (customer_id, campaign_id) WHERE status = 'active' - one active enrollment per customer per campaign
+- Partial unique: (customer_id, campaign_id) WHERE status IN ('active', 'frozen') - prevents duplicate active/frozen enrollments per customer per campaign
 
 ### RLS Policies
 
@@ -422,7 +473,7 @@ Touch timestamps are denormalized (duplicated from campaign_touches + calculated
 - idx_enrollments_business_campaign (btree on business_id, campaign_id, status)
 - idx_enrollments_customer (btree on customer_id, status)
 - idx_enrollments_job (btree on job_id)
-- idx_enrollments_unique_active (partial unique on customer_id, campaign_id WHERE status='active')
+- idx_enrollments_unique_active (partial unique on customer_id, campaign_id WHERE status IN ('active', 'frozen'))
 
 ### Foreign Keys
 
