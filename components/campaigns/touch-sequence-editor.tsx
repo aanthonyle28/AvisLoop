@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -11,7 +12,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Card, CardContent } from '@/components/ui/card'
-import { Plus, Trash, EnvelopeSimple, ChatCircle } from '@phosphor-icons/react'
+import { Plus, Trash, EnvelopeSimple, ChatCircle, Eye } from '@phosphor-icons/react'
+import { TemplatePreviewModal } from '@/components/campaigns/template-preview-modal'
 import type { CampaignTouchFormData } from '@/lib/validations/campaign'
 import type { MessageTemplate, MessageChannel } from '@/lib/types/database'
 
@@ -26,6 +28,14 @@ export function TouchSequenceEditor({
   templates,
   onChange,
 }: TouchSequenceEditorProps) {
+  const [previewTemplate, setPreviewTemplate] = useState<{
+    name: string
+    subject: string
+    body: string
+    channel: 'email' | 'sms'
+  } | null>(null)
+  const [previewOpen, setPreviewOpen] = useState(false)
+
   const addTouch = () => {
     if (touches.length >= 4) return
 
@@ -58,6 +68,27 @@ export function TouchSequenceEditor({
 
   const getTemplatesForChannel = (channel: MessageChannel) =>
     templates.filter(t => t.channel === channel)
+
+  const resolveTemplate = (touch: CampaignTouchFormData) => {
+    if (touch.template_id) {
+      const found = templates.find(t => t.id === touch.template_id)
+      return found
+        ? { name: found.name, subject: found.subject, body: found.body, channel: touch.channel }
+        : null
+    }
+    // For default (null template_id), find the matching system template by channel
+    const systemTemplate = templates.find(
+      t => t.is_default && t.channel === touch.channel
+    )
+    return systemTemplate
+      ? {
+          name: systemTemplate.name,
+          subject: systemTemplate.subject,
+          body: systemTemplate.body,
+          channel: touch.channel,
+        }
+      : null
+  }
 
   return (
     <div className="space-y-4">
@@ -151,6 +182,21 @@ export function TouchSequenceEditor({
                 </div>
               </div>
 
+              {/* Preview button */}
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  setPreviewTemplate(resolveTemplate(touch))
+                  setPreviewOpen(true)
+                }}
+                className="shrink-0"
+                aria-label={`Preview touch ${index + 1} template`}
+              >
+                <Eye className="h-4 w-4" />
+              </Button>
+
               {/* Remove button */}
               <Button
                 type="button"
@@ -174,6 +220,12 @@ export function TouchSequenceEditor({
           Add Touch ({touches.length}/4)
         </Button>
       )}
+
+      <TemplatePreviewModal
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+        template={previewTemplate}
+      />
     </div>
   )
 }
