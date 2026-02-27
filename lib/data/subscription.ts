@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { getMonthlyUsage } from '@/lib/data/send-logs'
+import { getPooledMonthlyUsage } from '@/lib/data/send-logs'
 import type { Subscription } from '@/lib/types/database'
 
 /**
@@ -28,7 +28,8 @@ export async function getSubscription(businessId: string): Promise<Subscription 
 
 /**
  * Get combined billing info for the billing page.
- * Includes business tier, subscription status, monthly usage, and contact count.
+ * Includes business tier, subscription status, monthly usage (pooled), and contact count.
+ * Usage is pooled across all user-owned businesses (BILL-02) to prevent agency loophole.
  * Optimized: runs subscription, usage, and contact queries in parallel (PERF-01)
  * Caller is responsible for providing a verified businessId (from getActiveBusiness()).
  */
@@ -39,6 +40,17 @@ export async function getBusinessBillingInfo(businessId: string): Promise<{
   contactCount: number  // For BILL-07 contact limit display
 }> {
   const supabase = await createClient()
+
+  // Get authenticated user for pooled usage query
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return {
+      business: null,
+      subscription: null,
+      usage: { count: 0, limit: 0 },
+      contactCount: 0,
+    }
+  }
 
   // Fetch business to confirm existence and get billing fields
   const { data: business } = await supabase
@@ -65,7 +77,7 @@ export async function getBusinessBillingInfo(businessId: string): Promise<{
       .order('created_at', { ascending: false })
       .limit(1)
       .single(),
-    getMonthlyUsage(businessId),
+    getPooledMonthlyUsage(user.id),
     supabase
       .from('customers')
       .select('*', { count: 'exact', head: true })
@@ -76,7 +88,7 @@ export async function getBusinessBillingInfo(businessId: string): Promise<{
   return {
     business: {
       id: business.id,
-      tier: business.tier,
+      tier: usageData.tier !== 'none' ? usageData.tier : business.tier,
       stripe_customer_id: business.stripe_customer_id,
     },
     subscription: subscriptionResult.data as Subscription | null,

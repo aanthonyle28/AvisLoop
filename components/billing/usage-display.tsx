@@ -22,7 +22,7 @@ export function UsageDisplay({ sendCount, sendLimit, contactCount, contactLimit,
       {/* Send usage */}
       <div className="space-y-3">
         <div className="flex justify-between text-sm">
-          <span className="text-muted-foreground">Sends this month</span>
+          <span className="text-muted-foreground">Sends this month (all businesses)</span>
           <span className="font-medium">{sendCount} / {sendLimit}</span>
         </div>
         <div className="h-2 bg-muted rounded-full overflow-hidden">
