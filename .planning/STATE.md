@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.0 Agency Mode (Phases 52-58) — Phase 56 in progress (1/2 plans done)
+**Current focus:** v3.0 Agency Mode (Phases 52-58) — Phase 57 in progress (1/1 plans done)
 
 ## Current Position
 
-Phase: 56 of 58 (Additional Business Creation) — In progress
-Plan: 1/2 in current phase
+Phase: 57 of 58 (Agency Billing) — Plan 1 complete
+Plan: 1/1 in current phase
 Milestone: v3.0 Agency Mode (Phases 52-58)
-Status: Phase 56-01 complete — data foundation done, UI plan (56-02) next
+Status: Phase 57-01 complete — pooled billing enforcement done
 
-Progress: [█████░░░░░] ~59% (Phase 56 plan 1 of 2 complete)
+Progress: [██████░░░░] ~64% (Phase 57 plan 1 of 1 complete)
 
-Last activity: 2026-02-27 — Completed 56-01-PLAN.md (server actions + onboarding routing)
+Last activity: 2026-02-27 — Completed 57-01-PLAN.md (pooled usage enforcement + billing page)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 240
-- v3.0 plans completed: 10/TBD
+- Total plans completed (project): 241
+- v3.0 plans completed: 11/TBD
 
 *Updated after each plan completion*
 
@@ -43,6 +43,7 @@ Last activity: 2026-02-27 — Completed 56-01-PLAN.md (server actions + onboardi
 - **Phase 55-02 complete:** Businesses card grid — /businesses route (Server Component), BusinessCard with agency metadata display, BusinessesClient with drawer state pre-wired for Plan 55-03, BusinessCardSkeleton + loading.tsx
 - **Phase 55-03 complete:** Business detail drawer — BusinessDetailDrawer with view/edit modes, notes auto-save (CustomerDetailDrawer pattern), competitive analysis, Switch business button; BusinessesClient fully wired with optimistic update on save
 - **Phase 56-01 complete:** Insert-only server actions (createAdditionalBusiness, saveNewBusinessServices, createNewBusinessCampaign, completeNewBusinessOnboarding) + /onboarding?mode=new routing + /businesses middleware guard
+- **Phase 57-01 complete:** Pooled billing enforcement — getPooledMonthlyUsage(userId) aggregates across all user-owned businesses; all 3 send actions use pooled count; billing page shows pooled total with "(all businesses)" label; effective tier = best tier across all businesses
 
 ### Decisions from Phase 52-01
 
@@ -106,6 +107,13 @@ Last activity: 2026-02-27 — Completed 56-01-PLAN.md (server actions + onboardi
 - `isSwitching` state guards Switch button against double-clicks during server action
 - `localBusinesses` synced from prop via `useEffect([businesses])` — grid updates automatically after server revalidation
 
+### Decisions from Phase 57-01
+
+- `getPooledMonthlyUsage(userId)` — billing enforcement is now user-scoped, not business-scoped. Prevents N x limit loophole for agency owners with multiple businesses.
+- Effective tier = BEST tier (TIER_PRIORITY: trial=0, basic=1, pro=2, reduce to max). User gets the tier they paid for.
+- `getMonthlyUsage(businessId)` preserved — still used for per-business warning banners on campaigns/customers/settings pages (correct per-business context there).
+- `bizData.tier` removed from select in send action files — no longer needed after pooled migration.
+
 ### Decisions from Phase 56-01
 
 - `createAdditionalBusiness` uses `.insert()` only — never `.upsert()`, never conditional create-or-update. Critical safety invariant for multi-business creation.
@@ -132,6 +140,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 56-01-PLAN.md — insert-only server actions + onboarding routing done
+Stopped at: Completed 57-01-PLAN.md — pooled billing enforcement + billing page display done
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
