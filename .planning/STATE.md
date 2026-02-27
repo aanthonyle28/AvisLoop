@@ -2,53 +2,31 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-26)
+See: .planning/PROJECT.md (updated 2026-02-25)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** Phase 47 — Dashboard Right Panel + Campaign Polish
+**Current focus:** v2.5.4 Code Review (Phases 41-44) — MILESTONE COMPLETE
 
 ## Current Position
 
-Phase: 47 of 51 (Dashboard Right Panel + Campaign Polish)
-Plan: 4/4 complete (47-01 ✓, 47-02 ✓, 47-03 ✓, 47-04 ✓)
-Status: Phase complete
-Last activity: 2026-02-27 - Completed 47-02-PLAN.md (sparklines + activity feed polish)
+Phase: 51 of 51 (Audit Remediation) — COMPLETE
+Plan: 3/3 complete
+Status: Milestone complete ✓
+Last activity: 2026-02-27 — Phase 51 executed and verified (3 plans, 2 waves)
 
-Progress: [████░░░░░░] Phase 47 complete
+Progress: [██████████] 100% (v2.5.4 milestone — 2/2 phases)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 235
-- Phase 47 plans completed: 4/4
+- Total plans completed (project): 230
+- v2.5.4 plans completed: 6
 
 *Updated after each plan completion*
 
 ## Accumulated Context
 
-### Key Decisions for Phase 47 (Dashboard Right Panel + Campaign Polish)
-
-- DayBucket: { date: string (YYYY-MM-DD), value: number } — exported from lib/types/dashboard.ts
-- KPIMetric.history is optional (history?: DayBucket[]) — won't break existing consumers
-- bucketByDay() is module-internal (not exported) — dashboard-specific utility
-- Ratings history uses daily average (not count) — matches averageRating KPI semantics (1-5 scale)
-- Conversion history derived from sendsHistoryResult.reviewed_at — avoids extra DB query
-- Pipeline metrics (requestsSentThisWeek, activeSequences, pendingQueued) do NOT get history
-- Error fallback history: [] on outcome metrics — safe for .map() without null checks
-- Promise.all in getDashboardKPIs now has 14 parallel queries (11 existing + 3 history)
-- TemplatePreviewModal null state: show "AI-generated default" message (expected, not an error)
-- resolveTemplate() falls back to first system template (is_default=true) matching channel when template_id is null
-- Touch progress: Math.max(0, enrollment.current_touch - 1) — current_touch is NEXT to send, so subtract 1
-- Campaign detail stats cards: flat CardContent (no CardHeader/CardTitle) + bg-muted/40 for warm weight
-- Radix Select empty placeholder: use value={value || undefined} — empty string suppresses placeholder display
-- Multiple custom 'other' service names: join into single SelectItem to avoid duplicate value constraint
-- Status selects (always have default): no placeholder needed, no value || undefined workaround
-- Sparkline SVG: hand-rolled polyline + linearGradient fill, no charting library — gradientId from color.replace(/[^a-z0-9]/gi, '')
-- Sparkline empty state: data.length < 2 renders dashed horizontal line; parent adds "Not enough data" label
-- Activity feed icons: getEventStyle() returns { Icon, bg, text } for colored circle badges (green/blue/orange/muted)
-- KPI_COLORS constants: reviews=#F59E0B, rating=#008236, conversion=#2C879F — match icon accent colors
-
-### Key Decisions for Phase 51 (Audit Remediation)
+### Key Decisions for Phase 51 (Audit Remediation) — COMPLETE
 
 - Skeleton component pattern: <Skeleton className="h-X w-Y [structural-classes]" /> — drop bg-muted/animate-pulse/rounded
 - Page spacing standardized to space-y-8 across all 6 dashboard pages
@@ -63,24 +41,40 @@ Progress: [████░░░░░░] Phase 47 complete
 - custom_service_names typed string[] | null — all consumers use || [] defensively
 - F-08 deferred: RESENDABLE_STATUSES export IS used by history-table.tsx — finding was incorrect
 
-### Cross-Cutting Concerns
+### Key Decisions for Phase 50 (Code Review) — COMPLETE
 
-- **Design system**: Use existing semantic tokens
-- **Dead code removal**: Audit for unused imports after each change
-- **Security**: Validate all user inputs server-side, maintain RLS discipline
+- Phase 50 deliverable: docs/CODE-REVIEW-41-44.md — 27 findings (0 Critical, 5 High, 11 Medium, 10 Low, 1 Info)
+- All Critical/High/Medium resolved in Phase 51
+- Low findings: 5 fixed, 5 deferred with documented rationale
 
-Config:
-{
-  "mode": "yolo",
-  "depth": "standard",
-  "parallelization": true,
-  "commit_docs": true,
-  "model_profile": "balanced"
-}
+### Cross-Cutting Concerns (apply to every plan)
+
+- **Design system**: Use existing semantic tokens and design system patterns. If new tokens/patterns needed, add to globals.css / tailwind.config.ts — no one-off inline overrides
+- **Code scalability**: Consolidate, don't duplicate. Remove replaced/dead code when shipping new patterns
+- **Dead code removal**: Audit for unused imports, unused components, dead branches after each change
+- **Security**: No new client-exposed secrets, validate all user inputs server-side, maintain RLS discipline
+
+### Key Decisions (Inherited)
+
+- Activity page status options: pending, sent, delivered, bounced, complained, failed, opened
+- Sidebar active state: filled icon + brand orange text, no left border, same background
+- Design changes must update globals.css / design system tokens — no one-off inline overrides
+- Empty state pattern (canonical): rounded-full bg-muted p-6 mb-6 circle, h-8 w-8 icon, text-2xl font-semibold tracking-tight mb-2 title, max-w-md subtitle
+- Loading skeleton pattern: always use Skeleton component, container py-6 space-y-8 for full-width pages
+- custom_service_names stored as TEXT[] — simple array, no metadata needed
+- Enter key in sub-input must call e.preventDefault() to prevent parent form submission
+
+### Pending Todos
+
+None.
+
+### Blockers/Concerns
+
+- Phase 21-08: Twilio A2P campaign approval required for production SMS testing (brand approved, campaign pending)
 
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Phase 47 Plan 02 complete — SVG sparklines + colored activity icons + clickable feed items
+Stopped at: v2.5.4 milestone complete — ready for /gsd:complete-milestone or next milestone
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!

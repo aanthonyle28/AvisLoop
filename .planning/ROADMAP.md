@@ -19,7 +19,7 @@ AvisLoop is a review follow-up system for home service businesses. v1.0 through 
 - **v2.5.1 Bug Fixes & Polish** - Phases 41-44 (complete 2026-02-25)
 - **v2.5.2 UX Bugs & UI Fixes** - Phases 45-47 (in progress)
 - **v2.5.3 UX Bugs & UI Fixes Part 2** - Phases 48-49 (in progress)
-- **v2.5.4 Code Review (Phases 41-44)** - Phases 50-51 (in progress)
+- **v2.5.4 Code Review (Phases 41-44)** - Phases 50-51 (complete 2026-02-27)
 
 ## Phases
 
@@ -833,7 +833,11 @@ Plans:
   3. Zero Medium findings remain open — all resolved with code changes verified by lint and typecheck
   4. Every Low finding is either fixed or has a documented deferral reason in the findings report
   5. Lint (`pnpm lint`) and typecheck (`pnpm typecheck`) pass with zero errors after all fixes applied
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
+Plans:
+- [x] 51-01-PLAN.md — Dashboard skeleton fixes, page spacing standardization, settings dedup
+- [x] 51-02-PLAN.md — Security, validation, accessibility, and type correctness
+- [x] 51-03-PLAN.md — History type migration, UI correctness, and dead code cleanup
 
 
 ---
@@ -889,25 +893,24 @@ See individual phase sections above for requirements, success criteria, and depe
 | **48** | **v2.5.3 UX Bugs Part 2** | **2/2** | **Complete** | **2026-02-25** |
 | **49** | **v2.5.3 UX Bugs Part 2** | **3/3** | **Complete** | **2026-02-26** |
 | **50** | **v2.5.4 Code Review** | **3/3** | **Complete** | **2026-02-26** |
-| **51** | **v2.5.4 Code Review** | **0/TBD** | **Not started** | - |
+| **51** | **v2.5.4 Code Review** | **3/3** | **Complete** | **2026-02-27** |
 
-**Total:** 227 plans complete across shipped phases.
+**Total:** 230 plans complete across shipped phases.
 
 ## What's Next
 
-**v2.5.4 Code Review (Phases 41-44):** Phases 50-51 — ready to plan.
+**v2.5.4 Code Review (Phases 41-44):** COMPLETE (2026-02-27) — 27 findings resolved, all Critical/High/Medium fixed, Low deferred with rationale.
 
 **Blockers:**
 - Twilio A2P 10DLC registration required before Phase 21-08 execution (webhook verification)
 
-After v2.5.4:
-- **v2.5.2 UX Bugs & UI Fixes** — Phases 45-47 (unexecuted, separate scope)
-- **v2.5.3 UX Bugs & UI Fixes Part 2** — Phases 48-49 (unexecuted, separate scope)
+**Up next:**
+- **v2.5.2 UX Bugs & UI Fixes** — Phase 47 (unexecuted, separate scope)
 - **Production deployment** — Configure Twilio, Resend, Google OAuth, Stripe, OpenAI/Anthropic for production
 - **v2.1 Integrations** — ServiceTitan/Jobber/Housecall Pro API integrations for auto job import
 - **v2.2 Review Inbox** — Ingest reviews from Google Business Profile, AI reply suggestions
 - **v3.0 Agency Mode** — Multi-business management UI, white-label option, client reporting portal
 
 ---
-*Last updated: 2026-02-25 — v2.5.4 Code Review milestone roadmap created (Phases 50-51)*
+*Last updated: 2026-02-27 — v2.5.4 Code Review milestone complete (Phases 50-51)*
 *v2.0 phases replace old v1.3/v1.4 phases 20-26 per user request*
