@@ -21,6 +21,7 @@ import {
 } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { AccountMenu } from './account-menu'
+import { BusinessSwitcher } from './business-switcher'
 
 interface NavItem {
   icon: React.ElementType
@@ -136,6 +137,13 @@ export function Sidebar({ dashboardBadge }: SidebarProps = {}) {
           )}
         </Button>
       </div>
+
+      {/* Business context — shows active business name / switcher */}
+      {!collapsed && (
+        <div className="px-4 py-2 border-b border-border">
+          <BusinessSwitcher />
+        </div>
+      )}
 
       {/* Main navigation */}
       <nav className="flex-1 p-3 space-y-1">
