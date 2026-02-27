@@ -10,19 +10,19 @@ See: .planning/PROJECT.md (updated 2026-02-26)
 ## Current Position
 
 Phase: 52 of 58 (Multi-Business Foundation) — In progress
-Plan: 1/TBD in current phase
-Milestone: v3.0 Agency Mode (Phases 52-58) — Phase 52-01 complete
+Plan: 2/2 in current phase (52-02 complete — phase 52 complete)
+Milestone: v3.0 Agency Mode (Phases 52-58) — Phase 52 complete
 Status: In progress
 
-Progress: [█░░░░░░░░░] ~2% (1 plan done)
+Progress: [█░░░░░░░░░] ~3% (2 plans done)
 
-Last activity: 2026-02-27 — Completed 52-01-PLAN.md
+Last activity: 2026-02-27 — Completed 52-02-PLAN.md
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 231
-- v3.0 plans completed: 1/TBD
+- Total plans completed (project): 232
+- v3.0 plans completed: 2/TBD
 
 *Updated after each plan completion*
 
@@ -45,11 +45,19 @@ Last activity: 2026-02-27 — Completed 52-01-PLAN.md
 - No `domain` attribute on business cookie — scoped to current host only (differs from Supabase auth cookie which uses `.avisloop.com`)
 - `ACTIVE_BUSINESS_COOKIE` exported from `lib/data/active-business.ts` — single source of truth, imported by action module
 
+### Decisions from Phase 52-02
+
+- New `BusinessSettingsProvider` props (businessId, businessName, businesses) are required (not optional) — fails at compile time rather than silently passing wrong business ID at runtime
+- Empty-string fallback (`businessId = business?.id ?? ''`) in layout is safe: zero-business users redirect before any code uses the ID
+- `BusinessIdentity` type exported from provider — Phase 54 switcher imports from there, not redefined
+- Tasks 1+2 committed together: required props in provider + layout passing them must be atomic for always-green typecheck
+
 ### Critical Pitfall Reminders (Phase 53)
 
 - 86 instances of `.eq('user_id', ...).single()` crash with PGRST116 when 2nd business exists — must enumerate exhaustively at plan time
 - Dashboard redirect: "zero businesses" goes to onboarding; "no cookie but has businesses" auto-selects first (stays on dashboard)
 - Onboarding upsert silently destroys first business if reused — Phase 56 must use insert-only path
+- Phase 53 template: use `getActiveBusiness()` + `Promise.all` pattern from layout.tsx as the reference
 
 ### Cross-Cutting Concerns (apply to every plan)
 
@@ -68,7 +76,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-27T04:19:37Z
-Stopped at: Completed 52-01-PLAN.md — active business resolver and switcher action created
+Last session: 2026-02-27T04:24:17Z
+Stopped at: Completed 52-02-PLAN.md — provider extended with business identity, layout and dashboard page updated
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
