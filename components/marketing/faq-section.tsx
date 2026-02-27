@@ -6,34 +6,44 @@ import { cn } from "@/lib/utils";
 
 const faqs = [
   {
-    question: "How is AvisLoop different from other review platforms?",
+    question: "How does AvisLoop's managed review service work?",
     answer:
-      "Other platforms require you to manually send each review request. AvisLoop is automation-first: complete a job, and the system handles everything—multi-touch follow-ups, timing optimization, review funnels. You spend 10 seconds per job, not 10 minutes per customer.",
+      "We handle everything. After your free audit, we connect your Google Business Profile, build your review campaigns, and map your competitors. You just submit a quick form after each job — name, contact info, service type. We take it from there: automated follow-ups, AI review responses, and monthly performance reports.",
   },
   {
-    question: "What happens after I complete a job?",
+    question: "What do I actually need to do as a business owner?",
     answer:
-      "AvisLoop automatically creates a customer record (if new) or links to existing customer, finds the campaign matching your service type (HVAC, plumbing, etc.), and schedules 2-3 follow-up touches over 3-5 days. The first message sends 24-72 hours after job completion (varies by service). You don't do anything else.",
+      "One thing: fill out a short form after each job. It takes about ten seconds. That's your only involvement. We handle the campaigns, the timing, the follow-ups, and the review responses. You focus on running your business.",
   },
   {
-    question: "What's a campaign and do I need to set one up?",
+    question: "How does the review funnel protect my Google rating?",
     answer:
-      "Campaigns are pre-built multi-touch sequences. During onboarding, you choose a preset (Gentle, Standard, or Aggressive) and AvisLoop creates campaigns for each service type you offer. These run automatically—you never manually trigger a campaign. Just complete jobs.",
+      "When a customer clicks the review link, they rate their experience privately first. If they give 4-5 stars, they're redirected to leave a public Google review. If they give 1-3 stars, they see a private feedback form instead — so you can address the issue before it goes public. Only your best reviews make it to Google.",
   },
   {
-    question: "What's the review funnel and why does it matter?",
+    question: "How many Google reviews can I expect?",
     answer:
-      "The review funnel protects your Google rating. When a customer clicks your review link, they rate their experience 1-5 stars privately first. 4-5 stars redirects to Google for a public review. 1-3 stars shows a private feedback form so you can fix the issue before it goes public.",
+      "Most businesses see new Google reviews within the first week. Our multi-touch campaigns follow up 2-3 times over several days, so response rates are significantly higher than a single ask. On average, clients triple their review count within 90 days.",
   },
   {
-    question: "Do I need to import my customer list?",
+    question: "Do you respond to Google reviews on my behalf?",
     answer:
-      "No. AvisLoop creates customers automatically when you complete jobs. Most businesses start with zero customers and build their list organically as they work. Customer import is optional—not the primary workflow.",
+      "Yes. Every review — positive or negative — gets a personalized, on-brand response drafted by AI and posted to your profile. Responding to reviews signals to Google that your business is active, which helps with local search rankings.",
   },
   {
-    question: "Is my customer data safe?",
+    question: "How is this different from other review management tools?",
     answer:
-      "Absolutely. All data is encrypted in transit and at rest. We never share or sell your customer information. Your data stays yours.",
+      "Most review tools are software you have to learn and run yourself. AvisLoop is a fully managed service — we set up your campaigns, configure your review funnel, track your competitors, and respond to every Google review. You never log into a dashboard or manage templates. We do it all for $149/month.",
+  },
+  {
+    question: "What types of home service businesses do you work with?",
+    answer:
+      "We work with HVAC companies, plumbers, electricians, roofers, painters, cleaning services, and general handyman businesses. Our campaigns and timing are configured specifically for each service type because a plumbing emergency and a routine AC maintenance need different follow-up strategies.",
+  },
+  {
+    question: "Can I cancel anytime?",
+    answer:
+      "Yes. No contracts, no commitments. It's $149/month and you can cancel whenever you want. We keep it simple because we'd rather earn your business every month with results than lock you into an agreement.",
   },
 ];
 

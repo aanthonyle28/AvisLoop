@@ -1,99 +1,98 @@
 'use client';
 
+import {
+  Wrench,
+  ClipboardText,
+  RocketLaunch,
+} from '@phosphor-icons/react';
 import { FadeIn } from '@/components/ui/fade-in';
-import { GeometricMarker } from '@/components/ui/geometric-marker';
 
 const steps = [
   {
-    number: 1,
-    title: 'Complete a Job',
-    description: 'Enter customer name, phone, and service type. Takes 10 seconds—do it right after the call.',
-    color: 'lime' as const,
+    icon: Wrench,
+    step: '01',
+    title: 'We Set Everything Up',
+    description:
+      'Book your free audit. We connect your Google profile, configure your campaigns, and map your competitors.',
   },
   {
-    number: 2,
-    title: 'System Auto-Enrolls',
-    description: 'AvisLoop creates the customer record, finds the matching campaign for that service type, and schedules 3 follow-up touches.',
-    color: 'coral' as const,
+    icon: ClipboardText,
+    step: '02',
+    title: 'You Submit a Quick Form',
+    description:
+      'Finish a job? Fill out a short form with the customer\'s name and contact info. Takes ten seconds. That\'s it.',
   },
   {
-    number: 3,
-    title: 'Automation Runs',
-    description: 'Multi-touch sequence sends over 3-5 days. Customer rates experience. 4-5 stars go to Google. 1-3 stars go to private feedback. Campaign stops automatically.',
-    color: 'lime' as const,
+    icon: RocketLaunch,
+    step: '03',
+    title: 'We Handle the Rest',
+    description:
+      'Review requests go out automatically. AI responds to every review. Monthly report lands in your inbox.',
   },
 ];
 
 export function HowItWorksSection() {
   return (
-    <section className="py-20 md:py-28">
-      <div className="container mx-auto max-w-5xl px-4">
-        {/* Header */}
+    <section id="how-it-works" className="py-24 md:py-32 scroll-mt-20">
+      <div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        {/* Section label */}
         <FadeIn direction="up">
-          <h2 className="text-3xl md:text-4xl font-bold text-balance text-center mb-4 text-foreground">
+          <p className="text-center text-xs font-medium uppercase tracking-widest text-accent mb-4">
             How It Works
+          </p>
+        </FadeIn>
+
+        {/* Headline */}
+        <FadeIn direction="up" delay={80}>
+          <h2 className="text-center text-4xl md:text-5xl font-extrabold tracking-tight text-foreground text-balance">
+            Three steps. Five minutes a week.
           </h2>
-          <p className="text-lg text-muted-foreground text-center">
-            One action. Complete automation. More reviews.
+        </FadeIn>
+
+        {/* Subtitle */}
+        <FadeIn direction="up" delay={160}>
+          <p className="mt-4 text-center text-lg text-muted-foreground max-w-xl mx-auto">
+            We designed this to take almost none of your time.
           </p>
         </FadeIn>
 
         {/* Steps */}
-        <div className="space-y-16 md:space-y-24 mt-16">
-          {steps.map((step, i) => {
-            const isOdd = i % 2 === 1;
-            return (
-              <FadeIn key={step.number} direction="up" delay={i * 200}>
-                <div
-                  className={`grid md:grid-cols-2 gap-8 items-center ${
-                    isOdd ? 'md:grid-flow-dense' : ''
-                  }`}
-                >
-                  {/* Text content */}
-                  <div className={isOdd ? 'md:col-start-2' : ''}>
-                    {/* Step indicator */}
-                    <div className="flex items-center gap-3 mb-4">
-                      <GeometricMarker
-                        variant="circle"
-                        color={step.color}
-                        size="md"
-                      />
-                      <span className="text-5xl font-bold text-muted-foreground/20">
-                        {step.number}
-                      </span>
+        <div className="mt-16 relative">
+          {/* Connecting line (desktop only) */}
+          <div className="hidden md:block absolute top-8 left-[16.67%] right-[16.67%] h-px bg-border/60" />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
+            {steps.map((step, i) => {
+              const Icon = step.icon;
+              return (
+                <FadeIn key={step.step} direction="up" delay={240 + i * 120}>
+                  <div className="text-center">
+                    {/* Icon */}
+                    <div className="inline-flex flex-col items-center">
+                      <div className="relative z-10 flex h-16 w-16 items-center justify-center rounded-2xl bg-card border border-border/40 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
+                        <Icon weight="light" className="h-7 w-7 text-accent" />
+                      </div>
                     </div>
 
+                    {/* Step label */}
+                    <p className="mt-4 text-xs font-semibold uppercase tracking-widest text-accent">
+                      Step {step.step}
+                    </p>
+
                     {/* Title */}
-                    <h3 className="text-2xl font-bold mb-3 text-foreground">
+                    <h3 className="mt-3 text-base font-semibold text-foreground">
                       {step.title}
                     </h3>
 
                     {/* Description */}
-                    <p className="text-lg text-muted-foreground">
+                    <p className="mt-2 text-sm text-muted-foreground leading-relaxed max-w-xs mx-auto">
                       {step.description}
                     </p>
                   </div>
-
-                  {/* Screenshot placeholder */}
-                  <div
-                    className={
-                      isOdd ? 'md:col-start-1 md:row-start-1' : ''
-                    }
-                  >
-                    <div className="rounded-xl border border-border/50 bg-card shadow-lg overflow-hidden">
-                      <div className="relative aspect-[4/3] bg-muted/30">
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-sm text-muted-foreground">
-                            Screenshot: {step.title}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </FadeIn>
-            );
-          })}
+                </FadeIn>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>

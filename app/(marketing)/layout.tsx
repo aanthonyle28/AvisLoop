@@ -5,7 +5,7 @@ import { ThemeSwitcher } from "@/components/theme-switcher";
 import { UserMenu } from "@/components/marketing/user-menu";
 import { MobileNav } from "@/components/marketing/mobile-nav";
 import { createClient } from "@/lib/supabase/server";
-import { Star } from "lucide-react";
+import { Star } from "@phosphor-icons/react/dist/ssr";
 
 async function AuthButtons() {
   const supabase = await createClient();
@@ -23,14 +23,9 @@ async function AuthButtons() {
   return userMenuData ? (
     <UserMenu user={userMenuData} />
   ) : (
-    <>
-      <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex">
-        <Link href="/auth/login">Log in</Link>
-      </Button>
-      <Button size="sm" asChild>
-        <Link href="/auth/sign-up">Start Free</Link>
-      </Button>
-    </>
+    <Button size="sm" asChild>
+      <Link href="/#pricing">Book a Call</Link>
+    </Button>
   );
 }
 
@@ -48,16 +43,19 @@ export default function MarketingLayout({
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center gap-2 font-bold text-xl">
               <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
-                <Star className="w-4 h-4 text-primary-foreground fill-current" />
+                <Star weight="fill" className="w-4 h-4 text-primary-foreground" />
               </div>
               <span>AvisLoop</span>
             </Link>
             <div className="hidden md:flex items-center gap-1">
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/#features">Features</Link>
+                <Link href="/#features">Services</Link>
               </Button>
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/pricing">Pricing</Link>
+                <Link href="/#how-it-works">How It Works</Link>
+              </Button>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/#pricing">Pricing</Link>
               </Button>
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/#faq">FAQ</Link>
@@ -70,7 +68,7 @@ export default function MarketingLayout({
             <ThemeSwitcher />
             <Suspense fallback={
               <Button size="sm" asChild>
-                <Link href="/auth/sign-up">Start Free</Link>
+                <Link href="/#pricing">Book a Call</Link>
               </Button>
             }>
               <AuthButtons />
@@ -91,30 +89,38 @@ export default function MarketingLayout({
             <div className="col-span-2 md:col-span-1">
               <Link href="/" className="flex items-center gap-2 font-bold text-lg mb-4">
                 <div className="w-7 h-7 rounded-lg bg-accent flex items-center justify-center">
-                  <Star className="w-3.5 h-3.5 text-primary-foreground fill-current" />
+                  <Star weight="fill" className="w-3.5 h-3.5 text-primary-foreground" />
                 </div>
                 <span>AvisLoop</span>
               </Link>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Automated review follow-ups for home service businesses. More reviews, less work.
+                Managed Google review service for HVAC, plumbing, electrical, and home service businesses. More reviews, better ratings, zero effort.
               </p>
             </div>
 
             {/* Product links */}
             <div>
-              <h3 className="font-semibold mb-4">Product</h3>
+              <h3 className="font-semibold mb-4">Service</h3>
               <ul className="space-y-3 text-sm">
                 <li>
                   <Link
                     href="/#features"
                     className="text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    Features
+                    What We Do
                   </Link>
                 </li>
                 <li>
                   <Link
-                    href="/pricing"
+                    href="/#how-it-works"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    How It Works
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/#pricing"
                     className="text-muted-foreground hover:text-foreground transition-colors"
                   >
                     Pricing
@@ -137,18 +143,10 @@ export default function MarketingLayout({
               <ul className="space-y-3 text-sm">
                 <li>
                   <Link
-                    href="/auth/sign-up"
+                    href="/#pricing"
                     className="text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    Get Started
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/auth/login"
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    Log In
+                    Book a Call
                   </Link>
                 </li>
               </ul>
@@ -173,7 +171,7 @@ export default function MarketingLayout({
               &copy; 2026 AvisLoop. All rights reserved.
             </p>
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <span>Made for local businesses</span>
+              <span>Google review management for home service businesses</span>
             </div>
           </div>
         </div>

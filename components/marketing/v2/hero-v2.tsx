@@ -7,69 +7,60 @@ import { AnimatedProductDemo } from './animated-demo';
 
 export function HeroV2() {
   return (
-    <section className="relative overflow-hidden py-20 md:py-28 lg:py-32">
-      {/* Background gradient layer */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-[hsl(var(--accent-lime))/0.05] dark:from-primary/10 dark:via-background dark:to-[hsl(var(--accent-lime))/0.1]" />
-
-      {/* Content container */}
-      <div className="container relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-[55%_45%] gap-12 lg:gap-8 items-center">
+    <section className="py-24 md:py-32">
+      <div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div className="grid items-center gap-16 lg:grid-cols-[1fr_1fr] lg:gap-20">
           {/* Left column */}
           <FadeIn direction="up">
-            <div className="text-center lg:text-left">
-              {/* Trust badge */}
-              <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/80 px-4 py-1.5 text-sm font-medium text-muted-foreground backdrop-blur-sm mb-6">
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
-                </span>
-                Built for home service businesses
-              </div>
+            <div>
+              {/* Section label */}
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-accent mb-6">
+                Managed Reputation Service for Home Services
+              </p>
 
               {/* Headline */}
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-balance text-foreground">
-                3× More Reviews
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight !leading-[1.3] text-foreground">
+                They&apos;re getting
                 <br />
-                Without Lifting a Finger
+                reviews. <span className="text-accent">Are you?</span>
               </h1>
 
-              {/* Subheadline */}
-              <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-xl mx-auto lg:mx-0">
-                Complete jobs in 10 seconds. AvisLoop handles multi-touch follow-ups,
-                timing, and review funnels automatically.
+              {/* Subtitle */}
+              <p className="mt-6 text-lg text-muted-foreground max-w-md leading-relaxed">
+                We manage your entire Google review strategy for $149/mo.
+                You fill out a 10-second form after each job. We handle
+                the rest.
               </p>
 
               {/* CTA buttons */}
-              <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <div className="mt-10 flex flex-col sm:flex-row gap-3">
                 <Button
                   asChild
                   size="lg"
-                  className="text-base px-8 bg-foreground text-background hover:bg-foreground/90"
+                  className="bg-accent hover:bg-accent/90 text-white"
                 >
-                  <Link href="/auth/sign-up">Start My Free Trial</Link>
+                  <Link href="/#pricing">Book Your Free Reputation Audit</Link>
                 </Button>
                 <Button
                   asChild
                   size="lg"
                   variant="outline"
-                  className="text-base border-border/60 hover:bg-muted/50"
                 >
-                  <Link href="/pricing">See Pricing</Link>
+                  <Link href="#how-it-works">See How It Works</Link>
                 </Button>
               </div>
 
-              {/* Trust indicators */}
-              <p className="mt-6 text-sm text-muted-foreground">
-                10-second job entry • Automated follow-ups • Cancel anytime
+              {/* Trust line */}
+              <p className="mt-5 text-xs text-muted-foreground/70 tracking-wide">
+                No software to learn &middot; Setup in 24 hours &middot; Cancel
+                anytime
               </p>
             </div>
           </FadeIn>
 
           {/* Right column */}
           <FadeIn direction="up" delay={200}>
-            <div className="relative lg:pl-8">
-              <AnimatedProductDemo />
-            </div>
+            <AnimatedProductDemo />
           </FadeIn>
         </div>
       </div>
