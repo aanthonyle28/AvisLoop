@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.0 Agency Mode (Phases 52-58) — Phase 57 in progress (1/1 plans done)
+**Current focus:** v3.0 Agency Mode (Phases 52-58) — Phase 56 + 57 complete
 
 ## Current Position
 
-Phase: 57 of 58 (Agency Billing) — Plan 1 complete
-Plan: 1/1 in current phase
+Phase: 56 of 58 (Additional Business Creation) — Phase complete (both plans done)
+Plan: 2/2 in current phase
 Milestone: v3.0 Agency Mode (Phases 52-58)
-Status: Phase 57-01 complete — pooled billing enforcement done
+Status: Phase 56 fully complete — CreateBusinessWizard + Add Business button live
 
-Progress: [██████░░░░] ~64% (Phase 57 plan 1 of 1 complete)
+Progress: [████████░░] ~78% (Phase 56 plan 2 of 2 complete; Phase 57 also complete)
 
-Last activity: 2026-02-27 — Completed 57-01-PLAN.md (pooled usage enforcement + billing page)
+Last activity: 2026-02-27 — Completed 56-02-PLAN.md (CreateBusinessWizard UI + wiring)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed (project): 241
-- v3.0 plans completed: 11/TBD
+- v3.0 plans completed: 12/TBD
 
 *Updated after each plan completion*
 
@@ -43,6 +43,7 @@ Last activity: 2026-02-27 — Completed 57-01-PLAN.md (pooled usage enforcement 
 - **Phase 55-02 complete:** Businesses card grid — /businesses route (Server Component), BusinessCard with agency metadata display, BusinessesClient with drawer state pre-wired for Plan 55-03, BusinessCardSkeleton + loading.tsx
 - **Phase 55-03 complete:** Business detail drawer — BusinessDetailDrawer with view/edit modes, notes auto-save (CustomerDetailDrawer pattern), competitive analysis, Switch business button; BusinessesClient fully wired with optimistic update on save
 - **Phase 56-01 complete:** Insert-only server actions (createAdditionalBusiness, saveNewBusinessServices, createNewBusinessCampaign, completeNewBusinessOnboarding) + /onboarding?mode=new routing + /businesses middleware guard
+- **Phase 56-02 complete:** CreateBusinessWizard 3-step UI (inline sub-components) wired into /onboarding?mode=new; Add Business button on /businesses page; full end-to-end flow live
 - **Phase 57-01 complete:** Pooled billing enforcement — getPooledMonthlyUsage(userId) aggregates across all user-owned businesses; all 3 send actions use pooled count; billing page shows pooled total with "(all businesses)" label; effective tier = best tier across all businesses
 
 ### Decisions from Phase 52-01
@@ -107,6 +108,12 @@ Last activity: 2026-02-27 — Completed 57-01-PLAN.md (pooled usage enforcement 
 - `isSwitching` state guards Switch button against double-clicks during server action
 - `localBusinesses` synced from prop via `useEffect([businesses])` — grid updates automatically after server revalidation
 
+### Decisions from Phase 56-02
+
+- Inline sub-components (BusinessSetupStep, CampaignPresetStep, SMSConsentStep) defined within create-business-wizard.tsx — avoids adding callback props to existing step components that hardcode the onboarding-specific server actions
+- No localStorage draft persistence for the 3-step wizard — intentional, avoids 'onboarding-draft-v3' key collision and is appropriate for a short 3-step flow
+- switchBusiness() called ONLY after completeNewBusinessOnboarding() succeeds — never mid-wizard
+
 ### Decisions from Phase 57-01
 
 - `getPooledMonthlyUsage(userId)` — billing enforcement is now user-scoped, not business-scoped. Prevents N x limit loophole for agency owners with multiple businesses.
@@ -140,6 +147,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 57-01-PLAN.md — pooled billing enforcement + billing page display done
+Stopped at: Completed 56-02-PLAN.md — CreateBusinessWizard UI + Add Business button + post-creation redirect done
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
