@@ -14,6 +14,8 @@ import {
 } from '@phosphor-icons/react'
 import { Card } from '@/components/ui/card'
 import { TrendIndicator } from '@/components/dashboard/kpi-widgets'
+import { Sparkline } from '@/components/dashboard/sparkline'
+import { cn } from '@/lib/utils'
 import type { DashboardKPIs, PipelineSummary, CampaignEvent } from '@/lib/types/dashboard'
 
 interface RightPanelDefaultProps {
@@ -21,6 +23,13 @@ interface RightPanelDefaultProps {
   pipelineSummary: PipelineSummary
   events: CampaignEvent[]
 }
+
+// KPI accent colors — match the icon colors used per card
+const KPI_COLORS = {
+  reviews: '#F59E0B',    // amber — matches Star icon color
+  rating: '#008236',     // green — matches ChartBar icon color
+  conversion: '#2C879F', // teal — matches Target icon color
+} as const
 
 // ─── KPISummaryBar ────────────────────────────────────────────────────────────
 
@@ -64,16 +73,29 @@ export function KPISummaryBar({ kpiData, onClick }: KPISummaryBarProps) {
   )
 }
 
-function getEventIcon(type: CampaignEvent['type']) {
+function getEventStyle(type: CampaignEvent['type']) {
   switch (type) {
-    case 'touch_sent':
-      return PaperPlaneTilt
     case 'review_click':
-      return Star
+      return { Icon: Star, bg: 'bg-success-bg', text: 'text-success' }
+    case 'touch_sent':
+      return { Icon: PaperPlaneTilt, bg: 'bg-info-bg', text: 'text-info' }
     case 'feedback_submitted':
-      return ChatCircleText
+      return { Icon: ChatCircleText, bg: 'bg-warning-bg', text: 'text-warning' }
     case 'enrollment':
-      return UserPlus
+      return { Icon: UserPlus, bg: 'bg-muted', text: 'text-muted-foreground' }
+  }
+}
+
+function getEventHref(event: CampaignEvent): string {
+  switch (event.type) {
+    case 'review_click':
+      return '/history?status=reviewed'
+    case 'touch_sent':
+      return '/history'
+    case 'feedback_submitted':
+      return '/feedback'
+    case 'enrollment':
+      return '/campaigns'
   }
 }
 
@@ -107,7 +129,7 @@ export function RightPanelDefault({
       <div className="space-y-2">
         {/* Reviews This Month */}
         <Link href="/history?status=reviewed" className="block">
-          <Card className="p-4 hover:bg-muted/30 transition-colors cursor-pointer">
+          <Card className="p-4 bg-muted/40 hover:bg-muted/60 transition-colors cursor-pointer">
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-xs text-muted-foreground font-medium">Reviews This Month</span>
               <Star size={14} weight="fill" className="text-amber-500 dark:text-amber-400" />
@@ -120,12 +142,22 @@ export function RightPanelDefault({
                 size="sm"
               />
             </div>
+            <div className="mt-2">
+              <Sparkline
+                data={(kpiData.reviewsThisMonth.history || []).map(d => d.value)}
+                color={KPI_COLORS.reviews}
+                height={32}
+              />
+              {(!kpiData.reviewsThisMonth.history || kpiData.reviewsThisMonth.history.length < 2) && (
+                <p className="text-[10px] text-muted-foreground/50 text-center mt-0.5">Not enough data</p>
+              )}
+            </div>
           </Card>
         </Link>
 
         {/* Average Rating */}
         <Link href="/feedback" className="block">
-          <Card className="p-4 hover:bg-muted/30 transition-colors cursor-pointer">
+          <Card className="p-4 bg-muted/40 hover:bg-muted/60 transition-colors cursor-pointer">
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-xs text-muted-foreground font-medium">Average Rating</span>
               <ChartBar size={14} weight="fill" className="text-[#008236] dark:text-[#00B84B]" />
@@ -138,12 +170,22 @@ export function RightPanelDefault({
                 size="sm"
               />
             </div>
+            <div className="mt-2">
+              <Sparkline
+                data={(kpiData.averageRating.history || []).map(d => d.value)}
+                color={KPI_COLORS.rating}
+                height={32}
+              />
+              {(!kpiData.averageRating.history || kpiData.averageRating.history.length < 2) && (
+                <p className="text-[10px] text-muted-foreground/50 text-center mt-0.5">Not enough data</p>
+              )}
+            </div>
           </Card>
         </Link>
 
         {/* Conversion Rate */}
         <Link href="/history" className="block">
-          <Card className="p-4 hover:bg-muted/30 transition-colors cursor-pointer">
+          <Card className="p-4 bg-muted/40 hover:bg-muted/60 transition-colors cursor-pointer">
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-xs text-muted-foreground font-medium">Conversion Rate</span>
               <Target size={14} weight="fill" className="text-[#2C879F] dark:text-[#38A9C5]" />
@@ -155,6 +197,16 @@ export function RightPanelDefault({
                 period="vs last month"
                 size="sm"
               />
+            </div>
+            <div className="mt-2">
+              <Sparkline
+                data={(kpiData.conversionRate.history || []).map(d => d.value)}
+                color={KPI_COLORS.conversion}
+                height={32}
+              />
+              {(!kpiData.conversionRate.history || kpiData.conversionRate.history.length < 2) && (
+                <p className="text-[10px] text-muted-foreground/50 text-center mt-0.5">Not enough data</p>
+              )}
             </div>
           </Card>
         </Link>
@@ -194,22 +246,25 @@ export function RightPanelDefault({
             No activity yet — complete a job to get started
           </p>
         ) : (
-          <div className="space-y-0.5">
+          <div className="space-y-2">
             {events.slice(0, 5).map((event) => {
-              const Icon = getEventIcon(event.type)
+              const style = getEventStyle(event.type)
               const description = getEventDescription(event)
 
               return (
-                <div
+                <Link
                   key={event.id}
-                  className="flex items-center gap-2 rounded px-2 py-1.5"
+                  href={getEventHref(event)}
+                  className="flex items-center gap-3 rounded-md px-2 py-2 hover:bg-muted/50 transition-colors"
                 >
-                  <Icon size={13} className="text-muted-foreground shrink-0" />
+                  <div className={cn('flex items-center justify-center rounded-full w-7 h-7 shrink-0', style.bg)}>
+                    <style.Icon size={14} weight="fill" className={style.text} />
+                  </div>
                   <span className="text-xs truncate flex-1 text-foreground/80">{description}</span>
-                  <span className="text-xs text-muted-foreground whitespace-nowrap">
+                  <span className="text-[11px] text-muted-foreground whitespace-nowrap">
                     {formatDistanceToNow(new Date(event.timestamp), { addSuffix: true })}
                   </span>
-                </div>
+                </Link>
               )
             })}
           </div>
