@@ -72,6 +72,7 @@ async function SettingsContent() {
           customers={customersResult.customers}
           monthlyUsage={monthlyUsage}
           hasPasswordAuth={hasPasswordAuth}
+          formToken={business?.form_token ?? null}
         />
       </div>
     </div>

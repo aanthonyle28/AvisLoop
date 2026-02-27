@@ -8,6 +8,7 @@ import { ServiceTypesSection } from '@/components/settings/service-types-section
 import { PersonalizationSection } from '@/components/settings/personalization-section'
 import { IntegrationsSection } from '@/components/settings/integrations-section'
 import { DeleteAccountDialog } from '@/components/settings/delete-account-dialog'
+import { FormLinkSection } from '@/components/settings/form-link-section'
 import { CustomersClient } from '@/components/customers/customers-client'
 import type { Business, MessageTemplate, Customer } from '@/lib/types/database'
 import type { PersonalizationSummary } from '@/lib/data/personalization'
@@ -25,6 +26,7 @@ interface SettingsTabsProps {
   customers?: Customer[]
   monthlyUsage?: { count: number; limit: number; tier: string }
   hasPasswordAuth?: boolean
+  formToken?: string | null
 }
 
 export function SettingsTabs({
@@ -36,6 +38,7 @@ export function SettingsTabs({
   customers,
   monthlyUsage,
   hasPasswordAuth = true,
+  formToken,
 }: SettingsTabsProps) {
   // Email-only templates for the customers QuickSendModal
   const emailTemplates = templates.filter((t) => t.channel === 'email')
@@ -52,12 +55,21 @@ export function SettingsTabs({
         <TabsTrigger value="account">Account</TabsTrigger>
       </TabsList>
 
-      {/* General — Business Profile */}
+      {/* General — Business Profile + Job Completion Form */}
       <TabsContent value="general">
         <section className="border border-border rounded-lg p-6 bg-card shadow-sm">
           <h2 className="text-xl font-semibold mb-4">Business Profile</h2>
           <BusinessSettingsForm initialData={business} templates={templates} />
         </section>
+
+        {business && (
+          <div className="mt-6">
+            <FormLinkSection
+              formToken={formToken ?? null}
+              businessName={business.name}
+            />
+          </div>
+        )}
       </TabsContent>
 
       {/* Templates — Message Templates */}
