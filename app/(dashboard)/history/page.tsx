@@ -1,5 +1,6 @@
-import { getSendLogs } from '@/lib/data/send-logs'
+import { getActiveBusiness } from '@/lib/data/active-business'
 import { getBusiness } from '@/lib/data/business'
+import { getSendLogs } from '@/lib/data/send-logs'
 import { HistoryClient } from '@/components/history/history-client'
 import { redirect } from 'next/navigation'
 
@@ -28,20 +29,29 @@ export default async function HistoryPage(props: HistoryPageProps) {
   const page = Number(params.page) || 1
   const limit = 50
 
-  // Fetch business and templates for drawer
-  const businessWithTemplates = await getBusiness()
-  if (!businessWithTemplates) {
+  const activeBusiness = await getActiveBusiness()
+  if (!activeBusiness) {
     redirect('/onboarding')
   }
 
-  const { logs, total } = await getSendLogs({
-    query: query || undefined,
-    status: status && status !== 'all' ? status : undefined,
-    dateFrom: dateFrom || undefined,
-    dateTo: dateTo || undefined,
-    limit,
-    offset: (page - 1) * limit,
-  })
+  const businessId = activeBusiness.id
+
+  // Fetch business (for templates in drawer) and send logs in parallel
+  const [businessWithTemplates, { logs, total }] = await Promise.all([
+    getBusiness(businessId),
+    getSendLogs(businessId, {
+      query: query || undefined,
+      status: status && status !== 'all' ? status : undefined,
+      dateFrom: dateFrom || undefined,
+      dateTo: dateTo || undefined,
+      limit,
+      offset: (page - 1) * limit,
+    }),
+  ])
+
+  if (!businessWithTemplates) {
+    redirect('/onboarding')
+  }
 
   return (
     <div className="container py-6 space-y-8">

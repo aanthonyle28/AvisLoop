@@ -1,4 +1,5 @@
 import { getBusinessBillingInfo } from '@/lib/data/subscription'
+import { getActiveBusiness } from '@/lib/data/active-business'
 import { redirect } from 'next/navigation'
 import { PlanCard } from '@/components/billing/plan-card'
 import { UsageDisplay } from '@/components/billing/usage-display'
@@ -50,7 +51,12 @@ export default async function BillingPage({
 }: {
   searchParams: Promise<{ success?: string; canceled?: string }>
 }) {
-  const { business, subscription, usage, contactCount } = await getBusinessBillingInfo()
+  const activeBusiness = await getActiveBusiness()
+  if (!activeBusiness) {
+    redirect('/settings')
+  }
+
+  const { business, subscription, usage, contactCount } = await getBusinessBillingInfo(activeBusiness.id)
   const params = await searchParams
 
   if (!business) {

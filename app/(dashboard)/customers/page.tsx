@@ -1,5 +1,6 @@
+import { getActiveBusiness } from '@/lib/data/active-business'
+import { getBusiness } from '@/lib/data/business'
 import { getCustomers } from '@/lib/actions/customer'
-import { getBusiness } from '@/lib/actions/business'
 import { getMonthlyUsage } from '@/lib/data/send-logs'
 import { CustomersClient } from '@/components/customers/customers-client'
 import { redirect } from 'next/navigation'
@@ -10,13 +11,18 @@ export const metadata = {
 }
 
 export default async function CustomersPage() {
-  const business = await getBusiness()
-  if (!business) redirect('/onboarding')
+  const activeBusiness = await getActiveBusiness()
+  if (!activeBusiness) redirect('/onboarding')
 
-  const [{ customers }, monthlyUsage] = await Promise.all([
+  const businessId = activeBusiness.id
+
+  const [business, { customers }, monthlyUsage] = await Promise.all([
+    getBusiness(businessId),
     getCustomers(),
-    getMonthlyUsage(),
+    getMonthlyUsage(businessId),
   ])
+
+  if (!business) redirect('/onboarding')
 
   // Email-only templates for the QuickSendModal
   const sendTemplates = (business.message_templates || []).filter(

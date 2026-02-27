@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
+import { getActiveBusiness } from '@/lib/data/active-business'
 import { SettingsTabs } from '@/components/settings/settings-tabs'
 import { getServiceTypeSettings } from '@/lib/data/business'
 import { getAvailableTemplates } from '@/lib/data/message-template'
@@ -25,21 +26,27 @@ async function SettingsContent() {
     redirect('/login')
   }
 
-  // Fetch business data
+  // Resolve active business
+  const activeBusiness = await getActiveBusiness()
+  if (!activeBusiness) {
+    redirect('/onboarding')
+  }
+
+  // Fetch full business data (with all columns for settings form)
   const { data: business } = await supabase
     .from('businesses')
     .select('*')
-    .eq('user_id', user.id)
+    .eq('id', activeBusiness.id)
     .single()
 
   // Get message templates, service types, personalization stats, API key status, and customers in parallel
   const [templates, serviceTypeSettings, personalizationSummary, hasKey, customersResult, monthlyUsage] = await Promise.all([
-    business ? getAvailableTemplates() : Promise.resolve([] as MessageTemplate[]),
-    getServiceTypeSettings(),
-    getPersonalizationSummary(),
+    business ? getAvailableTemplates(activeBusiness.id) : Promise.resolve([] as MessageTemplate[]),
+    getServiceTypeSettings(activeBusiness.id),
+    getPersonalizationSummary(activeBusiness.id),
     hasApiKey(),
     getCustomers(),
-    getMonthlyUsage(),
+    getMonthlyUsage(activeBusiness.id),
   ])
 
   // Check if user signed in with email/password (vs OAuth-only)

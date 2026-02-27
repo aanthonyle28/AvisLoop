@@ -11,10 +11,6 @@ export default async function DashboardGroupLayout({
 }: {
   children: React.ReactNode
 }) {
-  const serviceSettings = await getServiceTypeSettings()
-  const enabledServiceTypes = (serviceSettings?.serviceTypesEnabled || []) as ServiceType[]
-  const customServiceNames = serviceSettings?.customServiceNames || []
-
   const [business, businesses] = await Promise.all([
     getActiveBusiness(),
     getUserBusinesses(),
@@ -23,13 +19,19 @@ export default async function DashboardGroupLayout({
   const businessId = business?.id ?? ''
   const businessName = business?.name ?? ''
 
-  // Get badge count for nav (lightweight query)
+  // Fetch service settings and badge count in parallel (only if business exists)
+  let enabledServiceTypes: ServiceType[] = []
+  let customServiceNames: string[] = []
   let dashboardBadge = 0
-  try {
-    const counts = await getDashboardCounts()
+
+  if (business) {
+    const [serviceSettings, counts] = await Promise.all([
+      getServiceTypeSettings(business.id),
+      getDashboardCounts(business.id).catch(() => ({ total: 0 })),
+    ])
+    enabledServiceTypes = (serviceSettings?.serviceTypesEnabled || []) as ServiceType[]
+    customServiceNames = serviceSettings?.customServiceNames || []
     dashboardBadge = counts.total
-  } catch {
-    // Non-critical, badge just shows 0
   }
 
   return (

@@ -1,8 +1,9 @@
+import { getActiveBusiness } from '@/lib/data/active-business'
 import { getCampaigns, getCampaignPresets } from '@/lib/data/campaign'
 import { getAvailableTemplates } from '@/lib/data/message-template'
 import { getMonthlyUsage } from '@/lib/data/send-logs'
+import { getBusiness } from '@/lib/data/business'
 import { getCustomers } from '@/lib/actions/customer'
-import { getBusiness } from '@/lib/actions/business'
 import { CampaignList } from '@/components/campaigns/campaign-list'
 import { CampaignsPageShell } from './campaigns-shell'
 import { redirect } from 'next/navigation'
@@ -12,16 +13,21 @@ export const metadata = {
 }
 
 export default async function CampaignsPage() {
-  const business = await getBusiness()
-  if (!business) redirect('/onboarding')
+  const activeBusiness = await getActiveBusiness()
+  if (!activeBusiness) redirect('/onboarding')
 
-  const [campaigns, presets, campaignTemplates, { customers }, monthlyUsage] = await Promise.all([
-    getCampaigns({ includePresets: false }),
+  const businessId = activeBusiness.id
+
+  const [business, campaigns, presets, campaignTemplates, { customers }, monthlyUsage] = await Promise.all([
+    getBusiness(businessId),
+    getCampaigns(businessId, { includePresets: false }),
     getCampaignPresets(),
-    getAvailableTemplates(),
+    getAvailableTemplates(businessId),
     getCustomers({ limit: 200 }),
-    getMonthlyUsage(),
+    getMonthlyUsage(businessId),
   ])
+
+  if (!business) redirect('/onboarding')
 
   // Email-only templates for the QuickSendModal
   const sendTemplates = (business.message_templates || []).filter(

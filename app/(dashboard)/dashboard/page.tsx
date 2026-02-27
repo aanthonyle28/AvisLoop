@@ -25,6 +25,17 @@ function getGreeting(): string {
   return 'Good evening'
 }
 
+const DEFAULT_SERVICE_TIMING = {
+  hvac: 24,
+  plumbing: 48,
+  electrical: 24,
+  cleaning: 4,
+  roofing: 72,
+  painting: 48,
+  handyman: 24,
+  other: 24,
+}
+
 export default async function DashboardPage() {
   const business = await getActiveBusiness()
 
@@ -38,27 +49,18 @@ export default async function DashboardPage() {
   const fullName = (user?.user_metadata?.full_name as string | undefined) ?? ''
   const firstName = fullName.split(' ')[0] || ''
 
-  // Get service type settings for urgency calculation
-  const serviceSettings = await getServiceTypeSettings()
-  const serviceTypeTiming = serviceSettings?.serviceTypeTiming || {
-    hvac: 24,
-    plumbing: 48,
-    electrical: 24,
-    cleaning: 4,
-    roofing: 72,
-    painting: 48,
-    handyman: 24,
-    other: 24,
-  }
+  // Fetch service settings first to get timing for ready jobs calculation
+  const serviceSettings = await getServiceTypeSettings(business.id)
+  const serviceTypeTiming = serviceSettings?.serviceTypeTiming || DEFAULT_SERVICE_TIMING
 
-  // Fetch all dashboard data in parallel
+  // Fetch all remaining dashboard data in parallel
   const [kpiData, readyJobs, alerts, jobCounts, recentEvents, setupProgress] = await Promise.all([
     getDashboardKPIs(business.id),
     getReadyToSendJobs(business.id, serviceTypeTiming),
     getAttentionAlerts(business.id),
-    getJobCounts(),
+    getJobCounts(business.id),
     getRecentCampaignEvents(business.id),
-    getSetupProgress(),
+    getSetupProgress(business.id),
   ])
 
   const pipelineSummary: PipelineSummary = {

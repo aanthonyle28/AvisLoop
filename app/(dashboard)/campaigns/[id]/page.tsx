@@ -1,8 +1,8 @@
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
+import { getActiveBusiness } from '@/lib/data/active-business'
 import { getCampaign, getCampaignEnrollments, getCampaignEnrollmentCounts, getCampaignAnalytics } from '@/lib/data/campaign'
 import { getAvailableTemplates } from '@/lib/data/message-template'
-import { getBusiness } from '@/lib/actions/business'
 import { markCampaignReviewed } from '@/lib/actions/checklist'
 import { CampaignStats } from '@/components/campaigns/campaign-stats'
 import { CampaignDetailShell } from './campaign-detail-shell'
@@ -36,13 +36,15 @@ export default async function CampaignDetailPage({ params, searchParams }: Campa
   const pageSize = 20
   const offset = (currentPage - 1) * pageSize
 
-  const [campaign, enrollmentsResult, counts, analytics, templates, business] = await Promise.all([
+  const business = await getActiveBusiness()
+  if (!business) redirect('/onboarding')
+
+  const [campaign, enrollmentsResult, counts, analytics, templates] = await Promise.all([
     getCampaign(id),
     getCampaignEnrollments(id, { limit: pageSize, offset }),
     getCampaignEnrollmentCounts(id),
     getCampaignAnalytics(id),
-    getAvailableTemplates(),
-    getBusiness(),
+    getAvailableTemplates(business.id),
     markCampaignReviewed(),
   ])
 
@@ -52,8 +54,6 @@ export default async function CampaignDetailPage({ params, searchParams }: Campa
   if (!campaign) {
     notFound()
   }
-
-  if (!business) redirect('/onboarding')
 
   const totalTouches = campaign.campaign_touches.length
 

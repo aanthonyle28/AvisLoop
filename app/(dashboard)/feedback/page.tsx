@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { getActiveBusiness } from '@/lib/data/active-business'
 import { getFeedbackForBusiness, getFeedbackStats } from '@/lib/data/feedback'
 import { FeedbackList } from '@/components/feedback/feedback-list'
 import type { Metadata } from 'next'
@@ -9,23 +9,7 @@ export const metadata: Metadata = {
 }
 
 export default async function FeedbackPage() {
-  const supabase = await createClient()
-
-  // Get current user
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/login')
-  }
-
-  // Get user's business
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
+  const business = await getActiveBusiness()
 
   if (!business) {
     redirect('/onboarding')

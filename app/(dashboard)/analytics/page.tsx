@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { getBusiness } from '@/lib/data/business'
+import { getActiveBusiness } from '@/lib/data/active-business'
 import { getServiceTypeAnalytics } from '@/lib/data/analytics'
 import { ServiceTypeBreakdown } from '@/components/dashboard/analytics-service-breakdown'
 import type { Metadata } from 'next'
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 }
 
 export default async function AnalyticsPage() {
-  const business = await getBusiness()
+  const business = await getActiveBusiness()
 
   if (!business) {
     redirect('/onboarding')

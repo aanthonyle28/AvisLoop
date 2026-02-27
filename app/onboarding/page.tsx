@@ -1,7 +1,8 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getOnboardingStatus } from '@/lib/data/onboarding'
-import { getBusiness } from '@/lib/actions/business'
+import { getActiveBusiness } from '@/lib/data/active-business'
+import { getBusiness } from '@/lib/data/business'
 import { OnboardingWizard } from '@/components/onboarding/onboarding-wizard'
 
 /**
@@ -33,8 +34,11 @@ export default async function OnboardingPage({
     redirect('/login')
   }
 
-  // Check onboarding status
-  const status = await getOnboardingStatus()
+  // Get active business (may be null for brand-new users)
+  const activeBusiness = await getActiveBusiness()
+
+  // Check onboarding status (handles null business gracefully)
+  const status = activeBusiness ? await getOnboardingStatus(activeBusiness.id) : null
 
   // If already complete, go to dashboard
   if (status?.completed) {
@@ -48,8 +52,8 @@ export default async function OnboardingPage({
   // Validate step range (1-4), clamp if out of range
   const currentStep = Math.min(Math.max(1, stepParam), 4)
 
-  // Fetch business data for step components
-  const business = await getBusiness()
+  // Fetch full business data for step components
+  const business = activeBusiness ? await getBusiness(activeBusiness.id) : null
 
   // Fetch campaign presets for step 3 (system presets available to all users)
   const { data: presets } = await supabase

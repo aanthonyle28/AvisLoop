@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Lightbulb, ArrowRight, ArrowLeft } from '@phosphor-icons/react/dist/ssr'
 import { getAvailableTemplates } from '@/lib/data/message-template'
-import { getBusiness } from '@/lib/actions/business'
+import { getActiveBusiness } from '@/lib/data/active-business'
 import { CampaignForm } from '@/components/campaigns/campaign-form'
 import { redirect } from 'next/navigation'
 
@@ -10,11 +10,10 @@ export const metadata = {
 }
 
 export default async function NewCampaignPage() {
-  const [templates, business] = await Promise.all([
-    getAvailableTemplates(),
-    getBusiness(),
-  ])
-  if (!business) redirect('/onboarding')
+  const activeBusiness = await getActiveBusiness()
+  if (!activeBusiness) redirect('/onboarding')
+
+  const templates = await getAvailableTemplates(activeBusiness.id)
 
   return (
     <div className="container max-w-3xl py-6 space-y-6">
