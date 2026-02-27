@@ -55,6 +55,8 @@ export interface Business {
   competitor_name: string | null
   competitor_review_count: number | null
   agency_notes: string | null
+  // Public job completion form token (generated on demand via Settings)
+  form_token: string | null
 }
 
 // Message channel literal union
