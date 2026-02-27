@@ -54,8 +54,10 @@ export default async function CampaignDetailPage({ params, searchParams }: Campa
 
   if (!business) redirect('/onboarding')
 
+  const totalTouches = campaign.campaign_touches.length
+
   return (
-    <div className="container py-6 space-y-6">
+    <div className="container py-6 space-y-8">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
@@ -67,7 +69,7 @@ export default async function CampaignDetailPage({ params, searchParams }: Campa
             Back to campaigns
           </Link>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-semibold">{campaign.name}</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">{campaign.name}</h1>
             {campaign.personalization_enabled && (
               <Badge variant="secondary" className="gap-1">
                 <Sparkle weight="fill" className="h-3 w-3 text-amber-500" />
@@ -92,34 +94,22 @@ export default async function CampaignDetailPage({ params, searchParams }: Campa
 
       {/* Stats cards */}
       <div className="grid grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Active Enrollments
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{counts.active}</div>
+        <Card className="bg-muted/40">
+          <CardContent className="pt-5 pb-4 px-5">
+            <p className="text-xs text-muted-foreground font-medium mb-1">Active</p>
+            <p className="text-2xl font-bold">{counts.active}</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Completed
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{counts.completed}</div>
+        <Card className="bg-muted/40">
+          <CardContent className="pt-5 pb-4 px-5">
+            <p className="text-xs text-muted-foreground font-medium mb-1">Completed</p>
+            <p className="text-2xl font-bold">{counts.completed}</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Stopped
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{counts.stopped}</div>
+        <Card className="bg-muted/40">
+          <CardContent className="pt-5 pb-4 px-5">
+            <p className="text-xs text-muted-foreground font-medium mb-1">Stopped</p>
+            <p className="text-2xl font-bold">{counts.stopped}</p>
           </CardContent>
         </Card>
       </div>
@@ -145,7 +135,7 @@ export default async function CampaignDetailPage({ params, searchParams }: Campa
                 {idx > 0 && (
                   <span className="text-muted-foreground">→</span>
                 )}
-                <div className="flex flex-col items-center gap-1 p-3 rounded-lg border bg-muted/50">
+                <div className="flex flex-col items-center gap-1 p-3 rounded-lg border bg-muted/30">
                   <div className="flex items-center gap-2">
                     {touch.channel === 'email' ? (
                       <EnvelopeSimple className="h-5 w-5" />
@@ -181,20 +171,27 @@ export default async function CampaignDetailPage({ params, searchParams }: Campa
               {enrollments.map((enrollment) => (
                 <div
                   key={enrollment.id}
-                  className="flex items-center justify-between p-3 rounded-lg border"
+                  className="flex items-center justify-between p-3 rounded-lg border bg-card"
                 >
-                  <div>
-                    <div className="font-medium">
+                  <div className="min-w-0 flex-1">
+                    <div className="font-medium truncate">
                       {enrollment.customers?.name || 'Unknown customer'}
                     </div>
-                    <div className="text-sm text-muted-foreground">
-                      Enrolled {formatDistanceToNow(new Date(enrollment.enrolled_at), { addSuffix: true })}
-                      {enrollment.jobs?.service_type && (
-                        <> · {SERVICE_TYPE_LABELS[enrollment.jobs.service_type]}</>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground mt-0.5">
+                      <span>
+                        {formatDistanceToNow(new Date(enrollment.enrolled_at), { addSuffix: true })}
+                      </span>
+                      {enrollment.status === 'active' && enrollment.current_touch && (
+                        <>
+                          <span className="text-muted-foreground/40">·</span>
+                          <span>
+                            Touch {Math.max(0, enrollment.current_touch - 1)}/{totalTouches}
+                          </span>
+                        </>
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 shrink-0 ml-3">
                     <Badge
                       variant={
                         enrollment.status === 'active' ? 'default' :
