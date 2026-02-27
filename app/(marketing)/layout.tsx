@@ -5,7 +5,23 @@ import { ThemeSwitcher } from "@/components/theme-switcher";
 import { UserMenu } from "@/components/marketing/user-menu";
 import { MobileNav } from "@/components/marketing/mobile-nav";
 import { createClient } from "@/lib/supabase/server";
-import { Star } from "@phosphor-icons/react/dist/ssr";
+function LogoMark({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 28 28"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-hidden="true"
+    >
+      <path
+        d="M13.9614 13.9428C13.9614 13.9428 15.6661 8.28761 13.1687 5.6657C9.39938 1.70861 2.46616 5.36825 1.25864 10.7178C1.06397 11.5803 0.964999 12.4675 1.01126 13.3511C1.39358 20.6533 9.24432 25.3666 16.2932 23.6446C17.7686 23.2841 19.1513 22.7512 20.2657 21.9762C27.8097 16.7301 26.9724 8.28761 26.9724 8.28761"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+    </svg>
+  );
+}
 
 async function AuthButtons() {
   const supabase = await createClient();
@@ -42,9 +58,7 @@ export default function MarketingLayout({
           {/* Logo and nav links */}
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-              <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
-                <Star weight="fill" className="w-4 h-4 text-primary-foreground" />
-              </div>
+              <LogoMark className="w-7 h-7 text-accent" />
               <span>AvisLoop</span>
             </Link>
             <div className="hidden md:flex items-center gap-1">
@@ -88,9 +102,7 @@ export default function MarketingLayout({
             {/* Company info */}
             <div className="col-span-2 md:col-span-1">
               <Link href="/" className="flex items-center gap-2 font-bold text-lg mb-4">
-                <div className="w-7 h-7 rounded-lg bg-accent flex items-center justify-center">
-                  <Star weight="fill" className="w-3.5 h-3.5 text-primary-foreground" />
-                </div>
+                <LogoMark className="w-6 h-6 text-accent" />
                 <span>AvisLoop</span>
               </Link>
               <p className="text-sm text-muted-foreground leading-relaxed">
