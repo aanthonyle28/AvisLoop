@@ -38,7 +38,7 @@ export default async function FeedbackPage() {
   ])
 
   return (
-    <div className="container max-w-4xl py-6 space-y-8">
+    <div className="container py-6 space-y-8">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Customer Feedback</h1>
@@ -49,7 +49,7 @@ export default async function FeedbackPage() {
 
       {/* Stats */}
       {stats.total > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div className="bg-card border rounded-lg p-4">
             <p className="text-sm text-muted-foreground">Total</p>
             <p className="text-2xl font-semibold">{stats.total}</p>
