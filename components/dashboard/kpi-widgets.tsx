@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { Star, ChartBar, Target, TrendUp, TrendDown } from '@phosphor-icons/react'
+import { ChartBar, Target, TrendUp, TrendDown } from '@phosphor-icons/react'
+import { LogoMark } from '@/components/ui/logomark'
 import { Card, InteractiveCard } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
@@ -60,7 +61,7 @@ export function KPIWidgets({ data }: KPIWidgetsProps) {
               <h3 className="text-sm font-medium text-muted-foreground">
                 Reviews This Month
               </h3>
-              <Star size={20} weight="fill" className="text-amber-500 dark:text-amber-400" />
+              <LogoMark className="w-5 h-5 text-amber-500 dark:text-amber-400" />
             </div>
             <div className="flex items-baseline gap-2 mb-1">
               <span className="text-4xl font-bold">

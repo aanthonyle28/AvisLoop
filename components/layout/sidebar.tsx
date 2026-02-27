@@ -11,7 +11,6 @@ import {
   UserCircle,
   CaretLeft,
   CaretRight,
-  ArrowsClockwise,
   Briefcase,
   Megaphone,
   ChatCircleText,
@@ -20,6 +19,7 @@ import {
   Plus,
 } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
+import { LogoMark } from '@/components/ui/logomark'
 import { AccountMenu } from './account-menu'
 import { BusinessSwitcher } from './business-switcher'
 
@@ -119,7 +119,7 @@ export function Sidebar({ dashboardBadge }: SidebarProps = {}) {
       )}>
         {!collapsed && (
           <Link href="/dashboard" className="flex items-center gap-2">
-            <ArrowsClockwise size={24} weight="regular" className="text-accent" />
+            <LogoMark className="w-6 h-6 text-accent" />
             <span className="font-bold text-lg">AvisLoop</span>
           </Link>
         )}
