@@ -23,21 +23,21 @@
 
 ## Clients Management
 
-- [ ] **CLIENT-01**: User can view all client businesses as a card grid on `/businesses` page
-- [ ] **CLIENT-02**: Each client card shows business name, type, Google rating, and reviews gained
-- [ ] **CLIENT-03**: User can click a card to open a detail drawer with full agency metadata
-- [ ] **CLIENT-04**: Detail drawer shows Google ratings (start vs current), review count (start vs current), reviews gained (computed), monthly fee, start date, GBP access, competitor name + count, notes
-- [ ] **CLIENT-05**: User can edit agency metadata fields in the detail drawer
-- [ ] **CLIENT-06**: Notes field auto-saves (debounced, matching existing customer detail drawer pattern)
-- [ ] **CLIENT-07**: Client card shows competitive review gap (difference between client and competitor review counts) as a visual indicator
-- [ ] **CLIENT-08**: Detail drawer includes a competitive analysis section showing side-by-side comparison: client reviews vs competitor reviews with the gap highlighted
+- [x] **CLIENT-01**: User can view all client businesses as a card grid on `/businesses` page
+- [x] **CLIENT-02**: Each client card shows business name, type, Google rating, and reviews gained
+- [x] **CLIENT-03**: User can click a card to open a detail drawer with full agency metadata
+- [x] **CLIENT-04**: Detail drawer shows Google ratings (start vs current), review count (start vs current), reviews gained (computed), monthly fee, start date, GBP access, competitor name + count, notes
+- [x] **CLIENT-05**: User can edit agency metadata fields in the detail drawer
+- [x] **CLIENT-06**: Notes field auto-saves (debounced, matching existing customer detail drawer pattern)
+- [x] **CLIENT-07**: Client card shows competitive review gap (difference between client and competitor review counts) as a visual indicator
+- [x] **CLIENT-08**: Detail drawer includes a competitive analysis section showing side-by-side comparison: client reviews vs competitor reviews with the gap highlighted
 
 ## Additional Business Creation
 
-- [ ] **CREATE-01**: User can create additional businesses via "Add Business" on the Clients page
-- [ ] **CREATE-02**: Additional business creation uses INSERT (not UPSERT), preserving existing businesses
-- [ ] **CREATE-03**: Each new business goes through the full onboarding wizard (business basics, campaign preset, SMS consent)
-- [ ] **CREATE-04**: After creating a new business, it is set as the active business and user is redirected to dashboard
+- [x] **CREATE-01**: User can create additional businesses via "Add Business" on the Clients page
+- [x] **CREATE-02**: Additional business creation uses INSERT (not UPSERT), preserving existing businesses
+- [x] **CREATE-03**: Each new business goes through the full onboarding wizard (business basics, campaign preset, SMS consent)
+- [x] **CREATE-04**: After creating a new business, it is set as the active business and user is redirected to dashboard
 
 ## Agency Billing
 
@@ -83,18 +83,18 @@
 | SWITCH-02 | Phase 54 | Complete |
 | SWITCH-03 | Phase 54 | Complete |
 | SWITCH-04 | Phase 54 | Complete |
-| CLIENT-01 | Phase 55 | Pending |
-| CLIENT-02 | Phase 55 | Pending |
-| CLIENT-03 | Phase 55 | Pending |
-| CLIENT-04 | Phase 55 | Pending |
-| CLIENT-05 | Phase 55 | Pending |
-| CLIENT-06 | Phase 55 | Pending |
-| CLIENT-07 | Phase 55 | Pending |
-| CLIENT-08 | Phase 55 | Pending |
-| CREATE-01 | Phase 56 | Pending |
-| CREATE-02 | Phase 56 | Pending |
-| CREATE-03 | Phase 56 | Pending |
-| CREATE-04 | Phase 56 | Pending |
+| CLIENT-01 | Phase 55 | Complete |
+| CLIENT-02 | Phase 55 | Complete |
+| CLIENT-03 | Phase 55 | Complete |
+| CLIENT-04 | Phase 55 | Complete |
+| CLIENT-05 | Phase 55 | Complete |
+| CLIENT-06 | Phase 55 | Complete |
+| CLIENT-07 | Phase 55 | Complete |
+| CLIENT-08 | Phase 55 | Complete |
+| CREATE-01 | Phase 56 | Complete |
+| CREATE-02 | Phase 56 | Complete |
+| CREATE-03 | Phase 56 | Complete |
+| CREATE-04 | Phase 56 | Complete |
 | BILL-01 | Phase 57 | Complete |
 | BILL-02 | Phase 57 | Complete |
 | FORM-01 | Phase 58 | Pending |
