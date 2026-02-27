@@ -1,55 +1,152 @@
-# Requirements: v3.0 Agency Mode
+# Requirements: v3.1 QA E2E Audit
 
-**Milestone:** v3.0 — Agency Mode
-**Created:** 2026-02-26
-**Status:** Roadmap created — phases assigned
+**Milestone:** v3.1 — QA E2E Audit
+**Created:** 2026-02-27
+**Status:** Defining requirements
 
 ---
 
-## Multi-Business Foundation
+## Auth Flows
 
-- [x] **FOUND-01**: User's active business is resolved via httpOnly cookie, with fallback to first business if no cookie set
-- [x] **FOUND-02**: All data functions accept explicit businessId parameter instead of deriving from `.eq('user_id').single()`
-- [x] **FOUND-03**: All server actions accept explicit businessId or resolve from active business cookie
-- [x] **FOUND-04**: BusinessSettingsProvider carries businessId, businessName, and full businesses list for client components
-- [x] **FOUND-05**: Dashboard redirect logic distinguishes "no businesses" (→ onboarding) from "no active selection" (→ auto-select first)
+- [ ] **AUTH-01**: Login with email/password succeeds and lands on dashboard with correct business data
+- [ ] **AUTH-02**: Signup creates account, redirects to onboarding, and session is established
+- [ ] **AUTH-03**: Password reset sends email, reset link works, new password accepted
+- [ ] **AUTH-04**: Session persists across page refresh, tab switch, and browser navigation (back/forward)
+- [ ] **AUTH-05**: Invalid credentials show clear error messages (not generic server errors)
 
-## Business Switching
+## Onboarding
 
-- [x] **SWITCH-01**: User can switch between businesses via dropdown at top of sidebar
-- [x] **SWITCH-02**: Switching business updates all dashboard pages to show selected business's data
-- [x] **SWITCH-03**: Current business name is displayed in the sidebar next to the switcher
-- [x] **SWITCH-04**: Business switching is accessible on mobile via header area
+- [ ] **ONB-01**: First-business onboarding wizard completes all 4 steps and creates business + campaign
+- [ ] **ONB-02**: Additional business creation (?mode=new) completes 3-step wizard without affecting existing businesses
+- [ ] **ONB-03**: Onboarding draft persistence works (refresh mid-wizard retains entered data)
 
-## Clients Management
+## Dashboard
 
-- [x] **CLIENT-01**: User can view all client businesses as a card grid on `/businesses` page
-- [x] **CLIENT-02**: Each client card shows business name, type, Google rating, and reviews gained
-- [x] **CLIENT-03**: User can click a card to open a detail drawer with full agency metadata
-- [x] **CLIENT-04**: Detail drawer shows Google ratings (start vs current), review count (start vs current), reviews gained (computed), monthly fee, start date, GBP access, competitor name + count, notes
-- [x] **CLIENT-05**: User can edit agency metadata fields in the detail drawer
-- [x] **CLIENT-06**: Notes field auto-saves (debounced, matching existing customer detail drawer pattern)
-- [x] **CLIENT-07**: Client card shows competitive review gap (difference between client and competitor review counts) as a visual indicator
-- [x] **CLIENT-08**: Detail drawer includes a competitive analysis section showing side-by-side comparison: client reviews vs competitor reviews with the gap highlighted
+- [ ] **DASH-01**: KPI widgets show correct numbers matching database counts
+- [ ] **DASH-02**: Sparkline charts render with data (not empty/broken when data exists)
+- [ ] **DASH-03**: Ready-to-Send queue populates with completed jobs awaiting enrollment
+- [ ] **DASH-04**: Needs Attention alerts show failed sends/unresolved feedback with dismiss working
+- [ ] **DASH-05**: Recent activity feed shows latest campaign events with correct timestamps
+- [ ] **DASH-06**: Clicking KPI cards navigates to correct destination (/analytics)
+- [ ] **DASH-07**: Getting Started card/components are NOT visible (hidden for production)
+- [ ] **DASH-08**: Dashboard empty state renders correctly for a business with zero data
+- [ ] **DASH-09**: Loading skeletons display during data fetch (not blank screen)
+- [ ] **DASH-10**: Mobile layout renders correctly (bottom sheet, compact KPI bar)
+- [ ] **DASH-11**: Dark mode renders without visual artifacts (no muddy colors, correct contrast)
 
-## Additional Business Creation
+## Jobs
 
-- [x] **CREATE-01**: User can create additional businesses via "Add Business" on the Clients page
-- [x] **CREATE-02**: Additional business creation uses INSERT (not UPSERT), preserving existing businesses
-- [x] **CREATE-03**: Each new business goes through the full onboarding wizard (business basics, campaign preset, SMS consent)
-- [x] **CREATE-04**: After creating a new business, it is set as the active business and user is redirected to dashboard
+- [ ] **JOBS-01**: Jobs table displays with correct columns, sorting, and pagination
+- [ ] **JOBS-02**: Add Job drawer opens, form validates, and creates job successfully
+- [ ] **JOBS-03**: Edit Job drawer loads existing data and saves changes
+- [ ] **JOBS-04**: Job detail drawer shows complete information
+- [ ] **JOBS-05**: Service type filter only shows business's enabled service types
+- [ ] **JOBS-06**: Status filter works (scheduled/completed/do_not_send)
+- [ ] **JOBS-07**: Mark Complete action transitions job from scheduled to completed
+- [ ] **JOBS-08**: Completing a job with a matching campaign triggers enrollment (verify in DB)
+- [ ] **JOBS-09**: Campaign selector dropdown shows available campaigns + "one-off" option
+- [ ] **JOBS-10**: Empty state renders correctly for business with zero jobs
 
-## Agency Billing
+## Campaigns
 
-- [x] **BILL-01**: Usage limits are enforced against the sum of sends across all businesses owned by the user
-- [x] **BILL-02**: Settings/billing page displays pooled usage across all businesses
+- [ ] **CAMP-01**: Campaign list displays all campaigns with correct status badges
+- [ ] **CAMP-02**: Campaign detail page shows touch sequence, enrollment list, and analytics
+- [ ] **CAMP-03**: Campaign edit sheet opens and saves changes (touch timing, templates)
+- [ ] **CAMP-04**: Campaign preset picker shows 3 options with correct descriptions
+- [ ] **CAMP-05**: Pausing a campaign sets enrollments to "frozen" (not "stopped") — verify in DB
+- [ ] **CAMP-06**: Resuming a paused campaign restores frozen enrollments to "active" — verify in DB
+- [ ] **CAMP-07**: Template preview modal shows correct template content per touch
+- [ ] **CAMP-08**: Campaign analytics show correct enrollment/send/conversion counts
+- [ ] **CAMP-09**: Enrollment conflict states display correctly (conflict, queue_after, skipped badges)
+- [ ] **CAMP-10**: Creating a new campaign from preset works end-to-end
 
-## Job Completion Form
+## History & Activity
 
-- [x] **FORM-01**: Each business has a unique shareable "Complete Job" form URL secured by a token (e.g., `/complete/[token]`)
-- [x] **FORM-02**: The form collects customer name, phone or email (at least one), and service type from the enabled types for that business
-- [x] **FORM-03**: Submitting the form creates a completed job + customer record and auto-enrolls in the matching campaign
-- [x] **FORM-04**: The form is mobile-optimized for on-site technician use (large touch targets, minimal fields, fast submission confirmation)
+- [ ] **HIST-01**: History page displays send logs with correct status badges
+- [ ] **HIST-02**: Status chip filter works (filter by delivered/failed/bounced/etc.)
+- [ ] **HIST-03**: Date preset chips work (Today, Week, Month, 3 Months)
+- [ ] **HIST-04**: Resend button only appears on failed/bounced rows
+- [ ] **HIST-05**: Bulk select only selects failed/bounced rows
+
+## Analytics
+
+- [ ] **ANLYT-01**: Analytics page shows metrics with correct numbers
+- [ ] **ANLYT-02**: Service type breakdown table displays with correct data
+- [ ] **ANLYT-03**: Empty state renders correctly when no data exists
+
+## Feedback
+
+- [ ] **FDBK-01**: Feedback page lists submitted feedback with ratings
+- [ ] **FDBK-02**: Feedback resolution workflow works (mark resolved, add notes)
+- [ ] **FDBK-03**: Empty state renders correctly when no feedback exists
+
+## Billing
+
+- [ ] **BILL-01**: Billing page shows current plan tier and pooled usage count
+- [ ] **BILL-02**: Usage count reflects sends across ALL user-owned businesses (pooled)
+- [ ] **BILL-03**: Plan comparison section displays correctly
+
+## Settings
+
+- [ ] **SETT-01**: General tab: business name, Google review link, sender name editable and save
+- [ ] **SETT-02**: General tab: form link section shows shareable URL with copy button
+- [ ] **SETT-03**: Templates tab: template list displays with channel badges (email/SMS)
+- [ ] **SETT-04**: Templates tab: create/edit/delete template works
+- [ ] **SETT-05**: Services tab: service type toggles work and save
+- [ ] **SETT-06**: Services tab: custom service names display and are editable
+- [ ] **SETT-07**: Customers tab: customer list displays with search and filters
+- [ ] **SETT-08**: Customers tab: add/edit/archive customer works
+- [ ] **SETT-09**: All settings changes persist after page refresh
+
+## Businesses (Agency)
+
+- [ ] **BIZ-01**: Businesses page shows card grid with all user-owned businesses
+- [ ] **BIZ-02**: Business cards display name, service type, Google rating, reviews gained
+- [ ] **BIZ-03**: Business detail drawer opens with all agency metadata fields
+- [ ] **BIZ-04**: Editing metadata in drawer persists to database
+- [ ] **BIZ-05**: Notes auto-save works (type, wait, refresh — notes retained)
+- [ ] **BIZ-06**: "Switch to this business" button in drawer works correctly
+- [ ] **BIZ-07**: "Add Business" button initiates new business creation flow
+
+## Business Switcher & Data Isolation
+
+- [ ] **MULTI-01**: Business switcher dropdown shows all user-owned businesses
+- [ ] **MULTI-02**: Selecting a different business updates all page data to show that business's data
+- [ ] **MULTI-03**: Mobile business switcher is accessible and functional
+- [ ] **MULTI-04**: Business A's jobs do NOT appear when Business B is active (SQL verification)
+- [ ] **MULTI-05**: Business A's customers do NOT appear when Business B is active
+- [ ] **MULTI-06**: Business A's campaigns do NOT appear when Business B is active
+- [ ] **MULTI-07**: Business A's send logs do NOT appear when Business B is active
+- [ ] **MULTI-08**: Rapid business switching (5+ times in 10 seconds) doesn't break state
+- [ ] **MULTI-09**: Two different users cannot see each other's businesses or data
+
+## Public Job Completion Form
+
+- [ ] **FORM-01**: Form loads at /complete/[token] without authentication
+- [ ] **FORM-02**: Form shows business name and enabled service types
+- [ ] **FORM-03**: Form validates required fields (name, phone or email, service type)
+- [ ] **FORM-04**: Successful submission creates job + customer record in database
+- [ ] **FORM-05**: Mobile layout has large touch targets and is usable on phone viewport
+- [ ] **FORM-06**: Invalid/missing token shows 404 page (not crash or blank)
+
+## Cross-Cutting Edge Cases
+
+- [ ] **EDGE-01**: Long business name (50+ chars) displays correctly in sidebar, switcher, cards (truncated, no overflow)
+- [ ] **EDGE-02**: Long customer name (50+ chars) displays correctly in tables and drawers
+- [ ] **EDGE-03**: Special characters in all text fields (quotes, ampersands, < >) display correctly (no XSS, no broken rendering)
+- [ ] **EDGE-04**: Every page renders correctly at mobile viewport (375px width)
+- [ ] **EDGE-05**: Every page renders correctly at tablet viewport (768px width)
+- [ ] **EDGE-06**: Loading skeletons appear on all data pages during fetch
+- [ ] **EDGE-07**: Empty states render correctly on all pages when no data exists
+- [ ] **EDGE-08**: Form validation errors display clearly on all forms (red borders, error messages)
+- [ ] **EDGE-09**: Dark mode renders without artifacts on all tested pages
+
+## Report Deliverables
+
+- [ ] **RPT-01**: Per-page findings file exists for each tested route (docs/qa-v3.1/)
+- [ ] **RPT-02**: Each finding has severity (Critical/High/Medium/Low), location, and description
+- [ ] **RPT-03**: Summary report exists with overall health scorecard and priority fix list
+- [ ] **RPT-04**: Screenshots captured for every finding (desktop + mobile where relevant)
 
 ---
 
@@ -57,16 +154,14 @@
 
 | Feature | Reason |
 |---------|--------|
-| Client self-service portal | Agency owner manages everything — no client login |
-| White-label branding per business | Overkill for 2-5 clients |
-| Live Google API sync | Adds API dependency, rate limits, cost; manual entry sufficient |
-| Cross-business analytics dashboard | Different product; each business has its own dashboard |
-| Per-business billing (N subscriptions) | Major complexity with no business reason |
-| Role-based access / team members | Future milestone per CLAUDE.md |
-| Business archiving / deletion | Edge cases with active enrollments; defer |
-| Business settings cloning | Run full wizard; setup is fast |
-| Client reporting / PDF exports | Future scope |
-| Automated Google review scraping | Fragile, against Google ToS |
+| Marketing pages (landing, pricing) | Dashboard-only scope for this milestone |
+| Google OAuth end-to-end | Requires Google consent screen, untestable in Playwright |
+| Email/SMS delivery | External service dependency (Resend, Twilio) |
+| Stripe payment processing | Requires real Stripe test environment |
+| Cron job execution | Server-side automation, not UI-testable |
+| Accessibility (a11y) | Explicitly excluded from scope |
+| Performance/load testing | Separate concern, not in QA audit |
+| Review funnel public page (/r/[token]) | Depends on cron having sent campaign touches |
 
 ---
 
@@ -74,39 +169,13 @@
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| FOUND-01 | Phase 52 | Complete |
-| FOUND-02 | Phase 53 | Complete |
-| FOUND-03 | Phase 53 | Complete |
-| FOUND-04 | Phase 52 | Complete |
-| FOUND-05 | Phase 52 | Complete |
-| SWITCH-01 | Phase 54 | Complete |
-| SWITCH-02 | Phase 54 | Complete |
-| SWITCH-03 | Phase 54 | Complete |
-| SWITCH-04 | Phase 54 | Complete |
-| CLIENT-01 | Phase 55 | Complete |
-| CLIENT-02 | Phase 55 | Complete |
-| CLIENT-03 | Phase 55 | Complete |
-| CLIENT-04 | Phase 55 | Complete |
-| CLIENT-05 | Phase 55 | Complete |
-| CLIENT-06 | Phase 55 | Complete |
-| CLIENT-07 | Phase 55 | Complete |
-| CLIENT-08 | Phase 55 | Complete |
-| CREATE-01 | Phase 56 | Complete |
-| CREATE-02 | Phase 56 | Complete |
-| CREATE-03 | Phase 56 | Complete |
-| CREATE-04 | Phase 56 | Complete |
-| BILL-01 | Phase 57 | Complete |
-| BILL-02 | Phase 57 | Complete |
-| FORM-01 | Phase 58 | Complete |
-| FORM-02 | Phase 58 | Complete |
-| FORM-03 | Phase 58 | Complete |
-| FORM-04 | Phase 58 | Complete |
+| (to be filled by roadmap) |
 
 **Coverage:**
-- v3.0 requirements: 27 total
-- Mapped to phases: 27/27
-- Unmapped: 0
+- v3.1 requirements: 74 total
+- Mapped to phases: 0 (awaiting roadmap)
+- Unmapped: 74
 
 ---
-*Requirements defined: 2026-02-26*
-*Traceability updated: 2026-02-26 (roadmap created)*
+*Requirements defined: 2026-02-27*
+*Last updated: 2026-02-27 after scoping complete*
