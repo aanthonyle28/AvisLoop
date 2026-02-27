@@ -864,8 +864,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 52-01-PLAN.md — getActiveBusiness() resolver, switchBusiness() action, getUserBusinesses() query
-- [ ] 52-02-PLAN.md — Extend BusinessSettingsProvider with business identity + dashboard redirect logic fix
+- [x] 52-01-PLAN.md — getActiveBusiness() resolver, switchBusiness() action, getUserBusinesses() query
+- [x] 52-02-PLAN.md — Extend BusinessSettingsProvider with business identity + dashboard redirect logic fix
 
 ### Phase 53: Data Function Refactor
 **Goal**: Every data function and server action in the app reads the active business from the explicit businessId parameter rather than deriving it from user_id — eliminating the PGRST116 crash that occurs when a second business exists.
@@ -1013,7 +1013,7 @@ See individual phase sections above for requirements, success criteria, and depe
 | **49** | **v2.5.3 UX Bugs Part 2** | **3/3** | **Complete** | **2026-02-26** |
 | **50** | **v2.5.4 Code Review** | **3/3** | **Complete** | **2026-02-26** |
 | **51** | **v2.5.4 Code Review** | **3/3** | **Complete** | **2026-02-27** |
-| 52 | v3.0 Agency Mode | 0/2 | Planned | - |
+| **52** | **v3.0 Agency Mode** | **2/2** | **Complete** | **2026-02-27** |
 | 53 | v3.0 Agency Mode | 0/TBD | Not started | - |
 | 54 | v3.0 Agency Mode | 0/TBD | Not started | - |
 | 55 | v3.0 Agency Mode | 0/TBD | Not started | - |
@@ -1021,4 +1021,4 @@ See individual phase sections above for requirements, success criteria, and depe
 | 57 | v3.0 Agency Mode | 0/TBD | Not started | - |
 | 58 | v3.0 Agency Mode | 0/TBD | Not started | - |
 
-**Total:** 230 plans complete across shipped phases.
+**Total:** 232 plans complete across shipped phases.

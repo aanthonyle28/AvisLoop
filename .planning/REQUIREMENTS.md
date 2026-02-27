@@ -8,11 +8,11 @@
 
 ## Multi-Business Foundation
 
-- [ ] **FOUND-01**: User's active business is resolved via httpOnly cookie, with fallback to first business if no cookie set
+- [x] **FOUND-01**: User's active business is resolved via httpOnly cookie, with fallback to first business if no cookie set
 - [ ] **FOUND-02**: All data functions accept explicit businessId parameter instead of deriving from `.eq('user_id').single()`
 - [ ] **FOUND-03**: All server actions accept explicit businessId or resolve from active business cookie
-- [ ] **FOUND-04**: BusinessSettingsProvider carries businessId, businessName, and full businesses list for client components
-- [ ] **FOUND-05**: Dashboard redirect logic distinguishes "no businesses" (→ onboarding) from "no active selection" (→ auto-select first)
+- [x] **FOUND-04**: BusinessSettingsProvider carries businessId, businessName, and full businesses list for client components
+- [x] **FOUND-05**: Dashboard redirect logic distinguishes "no businesses" (→ onboarding) from "no active selection" (→ auto-select first)
 
 ## Business Switching
 
@@ -74,11 +74,11 @@
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| FOUND-01 | Phase 52 | Pending |
+| FOUND-01 | Phase 52 | Complete |
 | FOUND-02 | Phase 53 | Pending |
 | FOUND-03 | Phase 53 | Pending |
-| FOUND-04 | Phase 52 | Pending |
-| FOUND-05 | Phase 52 | Pending |
+| FOUND-04 | Phase 52 | Complete |
+| FOUND-05 | Phase 52 | Complete |
 | SWITCH-01 | Phase 54 | Pending |
 | SWITCH-02 | Phase 54 | Pending |
 | SWITCH-03 | Phase 54 | Pending |
