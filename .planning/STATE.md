@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.0 Agency Mode (Phases 52-58) — Phase 55 in progress (Plan 2 of 3 complete)
+**Current focus:** v3.0 Agency Mode (Phases 52-58) — Phase 55 complete (all 3 plans done)
 
 ## Current Position
 
-Phase: 55 of 58 (Clients Page) — In progress
-Plan: 2/3 in current phase
+Phase: 55 of 58 (Clients Page) — Phase complete
+Plan: 3/3 in current phase
 Milestone: v3.0 Agency Mode (Phases 52-58)
-Status: Plan 55-02 complete — card grid done, Plan 55-03 (detail drawer) next
+Status: Phase 55 fully complete — data layer + card grid + detail drawer all done
 
-Progress: [████░░░░░░] ~47% (Phase 55 Plan 2 of 3 complete)
+Progress: [█████░░░░░] ~53% (Phase 55 complete — 3 of 3 plans)
 
-Last activity: 2026-02-27 — Completed 55-02-PLAN.md (businesses card grid UI)
+Last activity: 2026-02-27 — Completed 55-03-PLAN.md (business detail drawer)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 237
-- v3.0 plans completed: 7/TBD
+- Total plans completed (project): 238
+- v3.0 plans completed: 8/TBD
 
 *Updated after each plan completion*
 
@@ -41,6 +41,7 @@ Last activity: 2026-02-27 — Completed 55-02-PLAN.md (businesses card grid UI)
 - **Phase 54 complete:** BusinessSwitcher in desktop sidebar AND mobile page header — zero code duplication, same component both surfaces
 - **Phase 55-01 complete:** Agency metadata data layer — 10 nullable columns on businesses table, extended Business interface, getUserBusinessesWithMetadata(), updateBusinessMetadata(), updateBusinessNotes(), businessMetadataSchema
 - **Phase 55-02 complete:** Businesses card grid — /businesses route (Server Component), BusinessCard with agency metadata display, BusinessesClient with drawer state pre-wired for Plan 55-03, BusinessCardSkeleton + loading.tsx
+- **Phase 55-03 complete:** Business detail drawer — BusinessDetailDrawer with view/edit modes, notes auto-save (CustomerDetailDrawer pattern), competitive analysis, Switch business button; BusinessesClient fully wired with optimistic update on save
 
 ### Decisions from Phase 52-01
 
@@ -97,6 +98,13 @@ Last activity: 2026-02-27 — Completed 55-02-PLAN.md (businesses card grid UI)
 - `competitor_name` included in competitive gap text when available — "3 ahead of ABC Plumbing" more informative than "3 ahead of competitor"
 - `Star weight="fill"` for Google rating — filled star communicates current rating; outline star would suggest empty/missing
 
+### Decisions from Phase 55-03
+
+- Gap indicator uses `gap !== null` guard (computed only when both `review_count_current` and `competitor_review_count` are non-null) — both fields required for a meaningful gap value
+- `isEditing` reset to `false` on drawer close via `useEffect([open])` — drawer always opens in view mode
+- `isSwitching` state guards Switch button against double-clicks during server action
+- `localBusinesses` synced from prop via `useEffect([businesses])` — grid updates automatically after server revalidation
+
 ### Cross-Cutting Concerns (apply to every plan)
 
 - Design system: use existing semantic tokens and design system patterns
@@ -115,6 +123,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 55-02-PLAN.md — businesses card grid UI done
+Stopped at: Completed 55-03-PLAN.md — business detail drawer done, Phase 55 complete
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
