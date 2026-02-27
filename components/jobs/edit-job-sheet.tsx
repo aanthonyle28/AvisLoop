@@ -15,13 +15,6 @@ import {
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { CustomerSelector } from './customer-selector'
 import { ServiceTypeSelect } from './service-type-select'
 import { CampaignSelector, CAMPAIGN_DO_NOT_SEND, CAMPAIGN_ONE_OFF } from './campaign-selector'
@@ -206,18 +199,22 @@ export function EditJobSheet({ open, onOpenChange, job, customers }: EditJobShee
               {/* Status */}
               <div className="space-y-2">
                 <Label>Status</Label>
-                <Select value={status} onValueChange={(val) => setStatus(val as JobStatus)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {EDIT_JOB_STATUSES.map(s => (
-                      <SelectItem key={s} value={s}>
-                        {JOB_STATUS_LABELS[s]}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex rounded-md border border-input">
+                  {EDIT_JOB_STATUSES.map(s => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => setStatus(s)}
+                      className={`flex-1 px-3 py-2 text-sm font-medium transition-colors first:rounded-l-md last:rounded-r-md ${
+                        status === s
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-background text-muted-foreground hover:bg-muted'
+                      }`}
+                    >
+                      {JOB_STATUS_LABELS[s]}
+                    </button>
+                  ))}
+                </div>
                 <p className="text-xs text-muted-foreground">
                   {JOB_STATUS_DESCRIPTIONS[status]}
                 </p>

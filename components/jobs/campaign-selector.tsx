@@ -4,6 +4,14 @@ import { useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Info } from '@phosphor-icons/react'
 import { Skeleton } from '@/components/ui/skeleton'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { getAvailableCampaignsForJob, type AvailableCampaign } from '@/lib/actions/add-job-campaigns'
 import type { ServiceType } from '@/lib/types/database'
 
@@ -68,31 +76,15 @@ export function CampaignSelector({
     return <Skeleton className="h-9 w-full" />
   }
 
-  // Build all options
-  const options: Array<{ value: string; label: string }> = []
-
-  // Campaign options
-  for (const c of campaigns) {
-    let label = c.name
-    if (c.isRecommended && campaigns.length > 1) label += ' (Recommended)'
-    label += ` \u2014 ${c.touchCount} ${c.touchCount === 1 ? 'touch' : 'touches'}`
-    label += `, starts ${formatDelay(c.firstTouchDelayHours)}`
-    options.push({ value: c.id, label })
-  }
-
-  // Create new campaign option
-  options.push({ value: CAMPAIGN_CREATE, label: '+ Create new campaign' })
-
-  // One-off option
-  if (showOneOff) {
-    options.push({ value: CAMPAIGN_ONE_OFF, label: 'Send one-off review request' })
-  }
-
-  // Do not send option (always available)
-  options.push({ value: CAMPAIGN_DO_NOT_SEND, label: 'Do not send' })
-
-  // No campaigns info message
   const noCampaigns = campaigns.length === 0
+
+  const handleValueChange = (value: string) => {
+    if (value === CAMPAIGN_CREATE) {
+      router.push('/campaigns')
+      return
+    }
+    onCampaignChange(value || null)
+  }
 
   return (
     <div className={noCampaigns ? 'space-y-1.5' : undefined}>
@@ -102,25 +94,43 @@ export function CampaignSelector({
           <span>No active campaign for this service type.</span>
         </div>
       )}
-      <select
-        value={selectedCampaignId || ''}
-        onChange={(e) => {
-          const val = e.target.value
-          if (val === CAMPAIGN_CREATE) {
-            router.push('/campaigns')
-            return
-          }
-          onCampaignChange(val || null)
-        }}
-        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+      <Select
+        value={selectedCampaignId || undefined}
+        onValueChange={handleValueChange}
       >
-        {noCampaigns && <option value="">No campaign</option>}
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+        <SelectTrigger>
+          <SelectValue placeholder="No campaign" />
+        </SelectTrigger>
+        <SelectContent>
+          {campaigns.map((c) => {
+            let label = c.name
+            if (c.isRecommended && campaigns.length > 1) label += ' (Recommended)'
+            label += ` \u2014 ${c.touchCount} ${c.touchCount === 1 ? 'touch' : 'touches'}, starts ${formatDelay(c.firstTouchDelayHours)}`
+            return (
+              <SelectItem key={c.id} value={c.id}>
+                {label}
+              </SelectItem>
+            )
+          })}
+
+          {campaigns.length > 0 && <SelectSeparator />}
+
+          {showOneOff && (
+            <SelectItem value={CAMPAIGN_ONE_OFF}>
+              Send one-off review request
+            </SelectItem>
+          )}
+          <SelectItem value={CAMPAIGN_DO_NOT_SEND}>
+            Do not send
+          </SelectItem>
+
+          <SelectSeparator />
+
+          <SelectItem value={CAMPAIGN_CREATE}>
+            + Create new campaign
+          </SelectItem>
+        </SelectContent>
+      </Select>
     </div>
   )
 }
