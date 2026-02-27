@@ -1,159 +1,379 @@
-# Technology Stack: v3.0 Agency Mode
+# Technology Stack: Playwright E2E QA Audit
 
-**Project:** AvisLoop v3.0 — Multi-Business Agency Mode
-**Researched:** 2026-02-26
-**Milestone Type:** Subsequent — adding multi-business management to existing Next.js + Supabase app
-**Confidence:** HIGH (based on direct codebase inspection)
+**Project:** AvisLoop — Comprehensive E2E QA audit milestone
+**Researched:** 2026-02-27
+**Milestone Type:** Subsequent — adding Playwright test suite to existing Next.js 15 + Supabase app
+**Confidence:** HIGH (Playwright 1.58.1 already installed; patterns verified against official docs + community)
 
 ---
 
 ## Executive Summary
 
-**Zero new npm dependencies needed.** Agency mode is purely a data architecture and UI composition change using existing stack components.
+**One new dev dependency needed: `@axe-core/playwright`.** Playwright 1.58.1 is already in `package.json`. Everything else — screenshot capture, visual diff, device emulation, cookie manipulation, accessibility scanning — is available via built-in Playwright APIs or that single axe package. Do not add Cypress, Percy, or any additional test runner.
 
 ---
 
-## Existing Stack (Validated — Do Not Change)
+## Core Tooling
 
-| Technology | Version | Role |
-|------------|---------|------|
-| Next.js | 15 (App Router) | Framework |
-| TypeScript | 5.x | Type safety |
-| Tailwind CSS | 3.4.1 | Utility classes |
-| Supabase | latest | Database + auth |
-| @radix-ui/react-dropdown-menu | ^2.1.14 | Already installed — use for business switcher |
-| @radix-ui/react-dialog | ^1.1.15 | Already installed — use for detail drawer |
-| @phosphor-icons/react | ^2.1.10 | Icons |
-| next/headers cookies() | built-in | Cookie-based business context |
+### Already Installed
 
----
+| Package | Version | Role |
+|---------|---------|------|
+| `playwright` | 1.58.1 | Browser automation, test runner, assertions, screenshot |
 
-## Area 1: Business Context Switching
+Playwright includes: `@playwright/test` runner, `expect` with visual matchers (`toHaveScreenshot`), device emulation dictionary, cookie/storage APIs, and accessibility tree snapshots.
 
-### Recommendation: Cookie-based via `cookies()` from `next/headers`
+### Add One Dev Dependency
 
-**Why cookies over URL segments:**
-- No route restructuring needed
-- Works with existing middleware
-- Persists across navigation
-- Simple for 2-5 client scale
+| Package | Version | Role | Why |
+|---------|---------|------|-----|
+| `@axe-core/playwright` | latest | WCAG accessibility scan | Playwright's built-in `page.accessibility.snapshot()` gives tree structure only. `@axe-core/playwright` runs the full axe-core engine against the live DOM, catching color contrast, missing labels, duplicate IDs, and 50+ other WCAG 2.1 AA rules automatically. |
 
-**Implementation:**
-- `active_business_id` httpOnly cookie set via server action
-- `revalidatePath('/', 'layout')` refreshes all pages
-- `cookies()` reads in Server Components
-- Fallback: first business if no cookie set
-
-**No new dependency needed.** `next/headers` is built into Next.js.
-
----
-
-## Area 2: Business Switcher UI
-
-### Recommendation: Use existing `@radix-ui/react-dropdown-menu`
-
-The sidebar already imports DropdownMenu for the account menu. The business switcher uses the same component pattern — a trigger button showing current business name with a dropdown list of all businesses.
-
-**No new dependency needed.**
-
----
-
-## Area 3: Clients Page Card Grid
-
-### Recommendation: Use existing Card component + Sheet for detail drawer
-
-The codebase already has:
-- `components/ui/card.tsx` with InteractiveCard variant
-- `components/ui/sheet.tsx` for drawers
-- Card grid patterns (used on campaigns page, dashboard KPIs)
-
-**No new dependency needed.**
-
----
-
-## Area 4: Database Schema Changes
-
-### Recommendation: Supabase migration — add columns to `businesses` table
-
-10 new columns for agency metadata. All nullable (existing businesses won't have this data).
-
-```sql
-ALTER TABLE businesses ADD COLUMN google_rating_start DECIMAL(2,1);
-ALTER TABLE businesses ADD COLUMN google_review_count_start INT;
-ALTER TABLE businesses ADD COLUMN google_rating_current DECIMAL(2,1);
-ALTER TABLE businesses ADD COLUMN google_review_count_current INT;
-ALTER TABLE businesses ADD COLUMN monthly_fee DECIMAL(10,2);
-ALTER TABLE businesses ADD COLUMN start_date DATE;
-ALTER TABLE businesses ADD COLUMN gbp_access BOOLEAN DEFAULT false;
-ALTER TABLE businesses ADD COLUMN competitor_name TEXT;
-ALTER TABLE businesses ADD COLUMN competitor_review_count INT;
-ALTER TABLE businesses ADD COLUMN agency_notes TEXT;
+**Install:**
+```bash
+pnpm add -D @axe-core/playwright
 ```
 
-**No separate `agency_clients` table needed.** The businesses table already has all the relational hooks (user_id FK, RLS policies). Agency metadata is just additional columns.
+### Do NOT Add
 
-**`reviews_gained` is computed:** `google_review_count_current - google_review_count_start`. Not stored.
+| Package | Reason |
+|---------|--------|
+| Cypress | Already have Playwright; two E2E runners is pure overhead |
+| Percy / Chromatic | `toHaveScreenshot()` built into Playwright — no external service needed for an audit |
+| Vitest / Jest | Audit tests are E2E by nature; unit test runner adds no value here |
+| `playwright-testing-library` | Playwright 1.5x has `getByRole`, `getByLabel`, `getByText` built in — no wrapper needed |
+| `faker` / `@faker-js/faker` | Audit is read-heavy; data generation only needed if writing mutations, which this audit avoids |
 
 ---
 
-## Area 5: Data Function Refactoring
+## Authentication Pattern
 
-### The `.single()` Problem
+### The Right Approach: UI Login + storageState
 
-~86 instances of `.eq('user_id', user.id).single()` across 20+ files. With multiple businesses, `.single()` throws `PGRST116` (multiple rows returned).
+**Use UI-based login stored to a JSON file, not API-based token injection.**
 
-**Fix pattern:**
+Rationale: AvisLoop uses Supabase's `@supabase/ssr` package, which stores auth tokens in cookies managed by the server. `context.addCookies()` can set Playwright-visible cookies, but Supabase's SSR library re-validates and re-issues session cookies on each server request. The only reliable way to get a fully valid, server-accepted Supabase session in a Playwright browser context is to perform the actual UI login flow once and capture the resulting cookie jar via `storageState`.
+
+**Setup file (`e2e/auth.setup.ts`):**
 ```typescript
-// Before (breaks with 2+ businesses)
-const { data: business } = await supabase
-  .from('businesses')
-  .select('*')
-  .eq('user_id', user.id)
-  .single()
+import { test as setup, expect } from '@playwright/test'
+import path from 'path'
 
-// After (works with any number of businesses)
-const business = await getActiveBusiness() // reads cookie, returns specific business
+const authFile = path.join(__dirname, '.auth/user.json')
+
+setup('authenticate', async ({ page }) => {
+  await page.goto('/auth/login')
+  await page.getByLabel('Email').fill(process.env.E2E_TEST_EMAIL!)
+  await page.getByLabel('Password').fill(process.env.E2E_TEST_PASSWORD!)
+  await page.getByRole('button', { name: 'Sign in' }).click()
+  // Wait for redirect to dashboard — confirms cookies are set
+  await expect(page).toHaveURL('/dashboard')
+  await page.context().storageState({ path: authFile })
+})
 ```
 
-**No new dependency needed.** This is a mechanical refactor using existing Supabase client APIs.
+**`playwright.config.ts` projects:**
+```typescript
+projects: [
+  { name: 'setup', testMatch: /.*\.setup\.ts/ },
+  {
+    name: 'chromium',
+    use: {
+      ...devices['Desktop Chrome'],
+      storageState: 'e2e/.auth/user.json',
+    },
+    dependencies: ['setup'],
+  },
+  {
+    name: 'mobile',
+    use: {
+      ...devices['iPhone 14'],
+      storageState: 'e2e/.auth/user.json',
+    },
+    dependencies: ['setup'],
+  },
+],
+```
+
+**Security:** Add `e2e/.auth/` to `.gitignore` immediately. These JSON files contain live Supabase session cookies.
+
+### Multi-Business Context Switching
+
+The `active_business_id` cookie is set by a Next.js server action (`switchBusiness()`). It is NOT a Supabase auth cookie — it is application-level. Playwright **can** inject this cookie directly via `context.addCookies()` because it only needs to survive the HTTP request to the Next.js server (not round-trip through Supabase's SSR validation).
+
+**Pattern for switching business context in tests:**
+```typescript
+// In a test or beforeEach
+await context.addCookies([{
+  name: 'active_business_id',
+  value: BUSINESS_B_UUID,
+  domain: 'localhost',
+  path: '/',
+  httpOnly: true,
+  sameSite: 'Lax',
+}])
+await page.reload() // Server re-renders with new active business
+await expect(page.getByText('Business B Name')).toBeVisible()
+```
+
+This works because `cookies()` from `next/headers` reads the cookie from the incoming HTTP request, which Playwright sets correctly at the browser level.
 
 ---
 
-## Area 6: Onboarding for Additional Businesses
+## Selector Strategy
 
-### The upsert danger
+**Priority order (most to least preferred):**
 
-`saveBusinessBasics()` uses `.upsert()` keyed on `user_id`. Creating a second business would OVERWRITE the first.
+1. `getByRole()` — semantic, accessibility-aligned, resilient
+2. `getByLabel()` — for form inputs
+3. `getByText()` — for unique visible text
+4. `getByTestId()` — add `data-testid` attributes only where semantic selectors are genuinely ambiguous
+5. CSS selectors — last resort; never use nth-child or positional selectors
 
-**Fix:** Separate insert path for additional businesses (no upsert). Use standard `.insert()`.
+**Why this order:** The audit's own accessibility findings (see UX-AUDIT.md) flag missing aria-labels as High severity. Tests that use `getByRole()` simultaneously verify semantic HTML is correct. If `getByRole('button', { name: 'Complete Job' })` fails to find the button, that is itself an accessibility bug.
 
-**No new dependency needed.**
-
----
-
-## Area 7: Billing — Pooled Usage
-
-### Current billing
-One Stripe customer per user. Usage tracked per business.
-
-### Agency billing
-Pool usage limits across all businesses. Sum sends across all businesses vs plan limit.
-
-**No new dependency needed.** Stripe integration already exists. The change is in usage counting logic, not Stripe APIs.
+**Never use:**
+- XPath
+- CSS attribute selectors based on class names (`[class*="btn-primary"]`)
+- Positional locators (`nth(0)`)
 
 ---
 
-## Summary: What Changes
+## Screenshot Strategy
 
-| Area | Change | New npm dep? |
-|------|--------|-------------|
-| Business context switching | Cookie via next/headers | No |
-| Business switcher | Radix DropdownMenu (already installed) | No |
-| Clients page | Card + Sheet (already installed) | No |
-| Agency metadata | Supabase migration (new columns) | No |
-| Data refactor | Replace .single() with explicit businessId | No |
-| Onboarding | Separate insert path | No |
-| Billing | Pool usage counting | No |
+### viewport sizes to capture
+
+```typescript
+// Desktop: 1280x800 (standard audit baseline)
+// Mobile: 390x844 (iPhone 14 — representative of real usage)
+// Tablet: 768x1024 (iPad — catches layout breakpoints)
+```
+
+### Light + Dark mode
+
+```typescript
+// In playwright.config.ts, define two project variants
+{
+  name: 'chromium-dark',
+  use: {
+    ...devices['Desktop Chrome'],
+    colorScheme: 'dark',
+    storageState: 'e2e/.auth/user.json',
+  },
+  dependencies: ['setup'],
+},
+```
+
+### Screenshot configuration for audit (not visual regression)
+
+For an audit, screenshots are **evidence documents**, not regression baselines. Avoid `toHaveScreenshot()` pixel-diff assertions for the audit — they create maintenance overhead. Instead:
+
+```typescript
+// Capture for documentation, not assertion
+await page.screenshot({
+  path: `e2e/screenshots/${pageName}-desktop-light.png`,
+  fullPage: true,
+})
+```
+
+Use `toHaveScreenshot()` assertions only for specific components where pixel-exact regression is explicitly desired (e.g., KPI chart rendering). For an audit, prefer behavioral assertions.
+
+### Animation control
+
+Disable CSS animations globally to get stable screenshots:
+
+```typescript
+// playwright.config.ts
+use: {
+  actionTimeout: 10_000,
+  screenshot: 'on',
+  // Disable animations for stable screenshots
+}
+
+// Or in test
+await page.emulateMedia({ reducedMotion: 'reduce' })
+```
+
+---
+
+## Accessibility Testing
+
+### Pattern: @axe-core/playwright
+
+```typescript
+import { checkA11y } from '@axe-core/playwright'
+// OR use the AxeBuilder class from @axe-core/playwright
+
+import AxeBuilder from '@axe-core/playwright'
+
+test('dashboard has no WCAG 2.1 AA violations', async ({ page }) => {
+  await page.goto('/dashboard')
+  await page.waitForLoadState('networkidle')
+
+  const results = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+    .analyze()
+
+  // Log violations with context for the audit report
+  if (results.violations.length > 0) {
+    console.log(JSON.stringify(results.violations, null, 2))
+  }
+
+  expect(results.violations).toHaveLength(0)
+})
+```
+
+### Known limitations of automated accessibility testing
+
+Automated axe scans catch ~30-40% of WCAG issues: color contrast, missing labels, duplicate IDs, invalid ARIA roles. They do NOT catch: keyboard trap detection, logical reading order, focus management quality, or screen reader announcement content. Axe is a filter, not a complete audit.
+
+For AvisLoop specifically, the UX-AUDIT.md identified:
+- Icon buttons missing `aria-label` (High) — axe catches this
+- Checkbox 16px touch target (High) — axe does NOT catch this (size is not a WCAG violation, just WCAG mobile guidance)
+- Input height 36px (Medium) — axe does NOT catch this
+
+---
+
+## Test Configuration
+
+### playwright.config.ts skeleton
+
+```typescript
+import { defineConfig, devices } from '@playwright/test'
+
+export default defineConfig({
+  testDir: './e2e',
+  fullyParallel: false, // Serial for Supabase connection limit sanity
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : 2, // Supabase free tier: limit connections
+  reporter: [
+    ['html', { outputFolder: 'e2e/report' }],
+    ['list'],
+  ],
+  use: {
+    baseURL: 'http://localhost:3000',
+    trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
+  },
+  projects: [
+    { name: 'setup', testMatch: /.*\.setup\.ts/ },
+    {
+      name: 'desktop',
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'e2e/.auth/user.json',
+      },
+      dependencies: ['setup'],
+    },
+    {
+      name: 'mobile',
+      use: {
+        ...devices['iPhone 14'],
+        storageState: 'e2e/.auth/user.json',
+      },
+      dependencies: ['setup'],
+    },
+  ],
+  webServer: {
+    command: 'pnpm dev',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+  },
+})
+```
+
+**Why `workers: 1` in CI:** Supabase free tier limits concurrent DB connections. Parallel workers each open their own connection pool. Running serially avoids `FATAL: remaining connection slots are reserved` errors.
+
+---
+
+## Test Directory Structure
+
+```
+e2e/
+├── .auth/                    # gitignored — storageState JSON files
+│   └── user.json
+├── auth.setup.ts             # Auth setup project
+├── fixtures/
+│   └── index.ts              # Shared fixtures (page factory, context with business cookie)
+├── pages/                    # Page Object classes (optional — use for complex pages)
+│   ├── dashboard.page.ts
+│   └── jobs.page.ts
+├── tests/
+│   ├── auth/
+│   │   ├── login.spec.ts
+│   │   ├── signup.spec.ts
+│   │   └── password-reset.spec.ts
+│   ├── dashboard/
+│   │   └── dashboard.spec.ts
+│   ├── jobs/
+│   │   └── jobs.spec.ts
+│   ├── campaigns/
+│   │   └── campaigns.spec.ts
+│   ├── businesses/           # Multi-business / agency tests
+│   │   └── businesses.spec.ts
+│   ├── settings/
+│   │   └── settings.spec.ts
+│   └── public/
+│       ├── review-funnel.spec.ts  # /r/[token]
+│       └── complete-form.spec.ts  # /complete/[token]
+├── screenshots/              # Captured screenshots for audit report
+└── report/                   # HTML report output
+```
+
+---
+
+## Routes Under Test
+
+Full inventory of AvisLoop routes to cover:
+
+### Public (no auth)
+| Route | Notes |
+|-------|-------|
+| `/` | Marketing landing |
+| `/pricing` | Pricing page |
+| `/auth/login` | Login form |
+| `/auth/sign-up` | Sign up form |
+| `/auth/forgot-password` | Password reset |
+| `/r/[token]` | Review funnel (HMAC token required) |
+| `/complete/[token]` | Job completion form (HMAC token required) |
+
+### Authenticated (dashboard group)
+| Route | Key Things to Test |
+|-------|-------------------|
+| `/dashboard` | KPIs load, Ready-to-Send queue, Attention alerts |
+| `/jobs` | Table loads, Add Job sheet, status toggle |
+| `/campaigns` | Campaign cards, touch editor, pause/resume |
+| `/campaigns/[id]` | Campaign detail, enrollment list |
+| `/analytics` | Charts render, service type breakdown |
+| `/history` | Filter controls, status badges, resend action |
+| `/feedback` | Feedback list, resolution workflow |
+| `/customers` | Table, search, tags, CSV import |
+| `/businesses` | Agency card grid, detail drawer |
+| `/billing` | Plan info, usage meter |
+| `/settings` | All tabs render, form saves |
+| `/onboarding` | Multi-step wizard completes |
+
+### Edge Cases to Cover
+- Business switcher: switch from Business A to Business B, verify all pages reflect new context
+- Empty states: fresh business with no data
+- Long data: customer name 80+ chars, business name 60+ chars
+- Quota limits: behavior when send limit reached
+- Mobile layout: all dashboard pages at 390px width
+
+---
+
+## Environment Variables for Tests
+
+```bash
+# .env.test (gitignored)
+E2E_TEST_EMAIL=test@example.com
+E2E_TEST_PASSWORD=testpassword123
+E2E_TEST_BUSINESS_ID_A=uuid-for-business-a
+E2E_TEST_BUSINESS_ID_B=uuid-for-business-b
+```
+
+**Strategy:** Use a dedicated Supabase test account with pre-seeded data. Do NOT use production accounts. Create seed data once (jobs, customers, campaigns) and treat it as stable read-only fixtures for the audit.
 
 ---
 
@@ -161,15 +381,45 @@ Pool usage limits across all businesses. Sum sends across all businesses vs plan
 
 | Considered | Decision | Reason |
 |------------|----------|--------|
-| URL segments (`/[businessId]/...`) | No | Requires route restructuring; overkill for 2-5 clients |
-| Separate `agency_clients` table | No | Businesses table already serves this role |
-| React Context for business_id | No | Server Components read from cookie directly; only client components need the provider |
-| Multi-tenant library | No | This is single-user multi-business, not multi-tenant SaaS |
-| White-label/branding per business | No | Out of scope for v3.0 |
-| Client self-signup/portal | No | Agency owner creates all businesses |
+| `playwright-testing-library` | No | Playwright 1.5x has `getByRole/Label/Text` natively |
+| Cypress | No | Playwright already installed |
+| Percy / Chromatic | No | `toHaveScreenshot()` is sufficient for this audit |
+| `msw` (Mock Service Worker) | No | Audit should test real app behavior, not mocked |
+| `@playwright/test-ct` (Component Testing) | No | E2E audit tests full pages, not isolated components |
+| Visual regression CI pipeline | No | Out of scope for audit milestone; screenshots are evidence docs |
+| Database seeding scripts (complex) | No | Use Supabase UI to create stable test data once |
+| Separate staging database | No | Local dev against local Supabase is sufficient for audit |
 
 ---
 
-*Stack research for: v3.0 Agency Mode*
-*Researched: 2026-02-26*
-*Confidence: HIGH — zero new dependencies confirmed via codebase analysis*
+## Scripts to Add to package.json
+
+```json
+{
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report e2e/report",
+    "test:e2e:update": "playwright test --update-snapshots"
+  }
+}
+```
+
+---
+
+## Sources
+
+- Playwright 1.58 auth patterns: [playwright.dev/docs/auth](https://playwright.dev/docs/auth) — HIGH confidence (official docs)
+- Playwright visual comparisons: [playwright.dev/docs/test-snapshots](https://playwright.dev/docs/test-snapshots) — HIGH confidence (official docs)
+- Playwright emulation: [playwright.dev/docs/emulation](https://playwright.dev/docs/emulation) — HIGH confidence (official docs)
+- Playwright accessibility: [playwright.dev/docs/accessibility-testing](https://playwright.dev/docs/accessibility-testing) — HIGH confidence (official docs)
+- Next.js Playwright guide: [nextjs.org/docs/app/guides/testing/playwright](https://nextjs.org/docs/app/guides/testing/playwright) — HIGH confidence (official, fetched 2026-02-27)
+- Supabase REST auth in Playwright: [mokkapps.de/blog/login-at-supabase-via-rest-api-in-playwright-e2e-test](https://mokkapps.de/blog/login-at-supabase-via-rest-api-in-playwright-e2e-test) — MEDIUM confidence (third-party, verified against Playwright auth docs)
+- Next.js cookies() + Playwright compatibility: [github.com/vercel/next.js/discussions/62254](https://github.com/vercel/next.js/discussions/62254) — HIGH confidence (explains why UI login + storageState is required over API injection)
+- axe-core/playwright npm: [npmjs.com/package/axe-playwright](https://www.npmjs.com/package/axe-playwright) — MEDIUM confidence (package exists, API confirmed via official Playwright a11y docs)
+
+---
+
+*Stack research for: Playwright E2E QA Audit milestone*
+*Researched: 2026-02-27*
+*Confidence: HIGH — Playwright 1.58.1 confirmed installed; auth + cookie patterns verified against official sources*

@@ -1,245 +1,313 @@
-# Research Summary: v3.0 Agency Mode
+# Research Summary: v3.1 QA E2E Audit
 
-**Synthesized:** 2026-02-26
-**Sources:** STACK.md, FEATURES.md, ARCHITECTURE.md, PITFALLS.md
-**Overall Confidence:** HIGH — all four dimensions researched via direct codebase inspection
+**Project:** AvisLoop — Comprehensive Pre-Production QA Audit
+**Domain:** Multi-tenant SaaS — E2E functional + accessibility audit before first production deployment
+**Researched:** 2026-02-27
+**Confidence:** HIGH (all four research dimensions grounded in direct codebase analysis + official sources)
+
+---
+
+## Executive Summary
+
+AvisLoop is preparing for its first production deployment after completing v3.0 Agency Mode (Phases 52-58). The v3.1 milestone is not a feature build — it is a structured QA audit that produces a **findings report** per page/category, screenshots as evidence, and a consolidated summary report. The audit covers 15+ routes across 9 phases, ordered by data dependency rather than navigation order: auth first, public pages last.
+
+The recommended approach is Playwright-driven browser automation supplemented by direct database verification. Playwright 1.58.1 is already installed; the only addition needed is `@axe-core/playwright` for WCAG scanning. Authentication uses UI-based login with `storageState` (not API cookie injection) because Supabase's SSR package revalidates sessions server-side on every request. Multi-business context switching uses direct `context.addCookies()` for the `active_business_id` cookie, which is an application-level cookie distinct from the Supabase auth session.
+
+The three highest-risk audit areas are: (1) multi-tenant data isolation under business switching, which is never fully exercised by single-business tests; (2) the enrollment conflict state machine, which has six transition paths only some of which are reachable via UI alone; and (3) the dual-subdomain middleware, which is entirely bypassed on localhost and has never been tested end-to-end in a real domain configuration. The audit must explicitly address these gaps with scenarios beyond the happy path — and critically, must supplement Playwright UI observation with direct Supabase SQL queries to verify server-side automation pipeline state.
 
 ---
 
 ## Key Findings
 
-- **Zero new npm dependencies required.** Every UI component needed (DropdownMenu, Card, Sheet) is already installed. The entire milestone is a data architecture refactor plus new UI composition.
-- **The single most dangerous line of code is `.eq('user_id', user.id).single()`.** It appears ~86 times across 20+ files and crashes with PGRST116 the moment a second business is created. This must be eliminated before any multi-business UI is exposed to users.
-- **RLS already supports multi-business.** Policies use `business_id IN (SELECT id FROM businesses WHERE user_id = auth.uid())` — no RLS changes needed, which significantly reduces security risk.
-- **Onboarding contains a silent data-destruction bug.** `saveBusinessBasics()` uses `.upsert()` keyed on `user_id`. Running the wizard a second time silently overwrites the first business with no error. A dedicated `.insert()` path is required for additional businesses.
-- **Cookie-based context switching is the right call for 2-5 businesses.** URL segments (`/[businessId]/dashboard`) would require restructuring every route, link, and middleware rule — 3-5x the engineering effort for a use case that doesn't justify it.
-- **Cron endpoints are unaffected.** They use the service role and query by `business_id` directly, so they already process all businesses correctly. Do not touch them.
-- **Agency metadata requires no new table.** 10 columns added directly to the existing `businesses` table, inheriting existing RLS automatically.
-- **The data refactor is the longest phase by file count** but is mechanical in nature — the same three-line pattern replaced with `getActiveBusiness()` everywhere.
+### 1. Stack Additions
+
+Playwright 1.58.1 is already installed and sufficient for the audit. Add exactly one dev dependency.
+
+| Tool | Version | Role | Rationale |
+|------|---------|------|-----------|
+| `@axe-core/playwright` | latest | WCAG 2.1 AA scanning | Playwright's built-in `page.accessibility.snapshot()` gives tree structure only; axe-core runs the full rule engine against the live DOM, catching color contrast, missing labels, and 50+ WCAG rules |
+
+**Do NOT add:** Cypress, Percy/Chromatic, Vitest, `playwright-testing-library`, Faker. All needed capabilities are built into Playwright 1.5x. `toHaveScreenshot()` replaces Percy; `getByRole/Label/Text` replaces testing-library; screenshots are evidence docs, not pixel-diff regression baselines.
+
+**Auth pattern:** UI login + `storageState` JSON file. API cookie injection does not work because Supabase SSR re-validates and re-issues session cookies on each server request. `e2e/.auth/` must be gitignored immediately.
+
+**Parallelism:** `workers: 1` in CI. Supabase free tier limits concurrent DB connections; parallel workers each open their own connection pool and cause `FATAL: remaining connection slots are reserved` errors.
+
+**New scripts to add to `package.json`:**
+```json
+"test:e2e": "playwright test",
+"test:e2e:ui": "playwright test --ui",
+"test:e2e:report": "playwright show-report e2e/report",
+"test:e2e:update": "playwright test --update-snapshots"
+```
 
 ---
 
-## Stack Additions
+### 2. Audit Categories
 
-No new npm packages. Changes are confined to existing stack capabilities:
+#### Table Stakes (must pass before production)
 
-| Area | Technology | Change Type |
-|------|-----------|-------------|
-| Business context switching | `next/headers cookies()` | New usage of built-in |
-| Business switcher dropdown | `@radix-ui/react-dropdown-menu` (already installed) | New component using existing dep |
-| Clients page grid | `components/ui/card.tsx` + `sheet.tsx` (already exist) | New page using existing components |
-| Agency metadata | Supabase migration — 10 columns on `businesses` | Schema change only |
-| Data refactor | `lib/data/*.ts` + `lib/actions/*.ts` | Code change, no new dep |
-| Billing pooling | Existing Stripe integration | Logic change only |
+| Category | Code | Why It Blocks Production |
+|----------|------|--------------------------|
+| Authentication and Session Management | A | Broken auth means no one can use the app |
+| Multi-Tenant Data Isolation | B | Cross-tenant data leak is a production-blocking security issue |
+| Core V2 Workflow — Job Completion to Enrollment | C | If "complete job" doesn't trigger enrollment, the product does not work |
+| Enrollment Conflict Handling | D | Most common edge case; broken conflict detection causes double-emails or silent failure |
+| Review Funnel (`/r/[token]`) | E | The money path — broken funnel means zero reviews collected |
+| Public Job Completion Form (`/complete/[token]`) | F | Technician tool; Phase 58 deliverable |
+| History / Send Logs | G | Operators troubleshoot from here; broken filters block recovery from failures |
+| Billing and Send Limit Enforcement | H | Pooled agency billing is new in v3.0; broken enforcement means revenue leakage |
+| Settings — All 7 Tabs | I | Settings configures the entire automation pipeline |
 
-**Rationale:** The app is already well-equipped. Adding dependencies for this milestone would be over-engineering.
+#### Differentiators (thorough but not deployment-blocking)
 
----
+| Category | Code | Why It Warrants Thorough Testing |
+|----------|------|----------------------------------|
+| Multi-Business and Agency Workflow | J | Entire v3.0 built this; non-trivial state under context switching |
+| Campaign Management | K | Pause/resume with frozen enrollment preservation is complex state machine |
+| Dashboard | L | First thing users see; wrong KPIs erode trust immediately |
+| Feedback Resolution Workflow | M | Resolution state must persist or owners re-see resolved issues |
+| Analytics | N | Wrong numbers break the value story |
+| Customers Page (Settings Escape Hatch) | O | De-emphasized in V2 but cannot be broken |
+| Onboarding Flow | P | First user experience; two distinct flows (first vs additional business) both need verification |
 
-## Feature Priorities
+#### Anti-Features (explicitly excluded from this milestone)
 
-### Table Stakes (required for multi-business to function)
-
-| Feature | Why Non-Negotiable |
-|---------|--------------------|
-| Cookie-based active business resolver (`getActiveBusiness()`) | Foundation — every data function depends on it |
-| `.single()` refactor across all 86 instances | Without this, the app crashes after business 2 is created |
-| Business switcher in sidebar | Users need a way to change the active business |
-| Separate onboarding path for additional businesses | Protects first business data from silent overwrite |
-| Full onboarding per new business | Each client needs complete setup to function |
-
-### Differentiators (make the feature actually useful)
-
-| Feature | Value |
-|---------|-------|
-| Clients page (`/businesses`) with card grid | At-a-glance view of all clients, Google metrics, reviews gained |
-| Client detail drawer | Editable profile with Google ratings (start vs current), monthly fee, competitor, GBP access, notes |
-| `reviews_gained` computed display | The key outcome metric for proving agency value |
-| Business name shown in sidebar | Constant awareness of which business is active |
-| Unified billing with pooled usage | One subscription, no per-client billing complexity |
-
-### Anti-Features (explicitly excluded from v3.0)
-
-| Feature | Reason Excluded |
-|---------|----------------|
-| Client self-service portal | Out of scope — agency owner manages everything |
-| White-label branding per business | Overkill for 2-5 clients |
-| Live Google API sync | Adds API dependency, rate limits, and cost; manual entry sufficient |
-| Cross-business analytics dashboard | Different product; each business has its own dashboard |
-| Per-business billing (N subscriptions) | Major complexity with no business reason |
-| Role-based access / team members | Future milestone per CLAUDE.md |
-| Business archiving/deletion | Edge cases with active enrollments; defer |
-| Business settings cloning | Run full wizard; setup is fast |
+| Item | Reason |
+|------|--------|
+| Cron job end-to-end execution | Timing-dependent; requires production Vercel schedule or manual trigger |
+| Email/SMS delivery confirmation | Requires live Resend/Twilio API with real addresses |
+| Stripe payment processing end-to-end | Requires live Stripe keys; test webhook handler logic only |
+| Google OAuth interactive flow | Requires Supabase redirect URI configured for production domain |
+| Marketing / public pages deep audit | Explicitly out of scope for this milestone |
+| Performance/load testing | No user load to measure yet |
+| WCAG AA full compliance certification | Carry UX Audit findings forward as backlog items; axe scan is sufficient |
+| Persistent Playwright test suite | This milestone produces a findings report, not a maintained test suite |
 
 ---
 
-## Architecture Decisions
+### 3. Architecture Decisions
 
-### Decision 1: Cookie over URL segments
+#### Phase Grouping: 9 Phases in Data-Dependency Order
 
-Cookie (`active_business_id` httpOnly) is set via server action; Server Components read it via `cookies()` from `next/headers`. All data functions receive explicit `businessId`.
+The audit is structured around data dependency, not page navigation order. Each phase produces data that downstream phases depend on.
 
-**Why:** No route restructuring. Works with existing middleware. Right-sized for 2-5 businesses. Known limitation (multi-tab): acceptable and documented.
+```
+QA-01 (Auth) → QA-02 (Onboarding) → QA-03 (Dashboard) → QA-04 (Jobs)
+     ↓
+QA-05 (Campaigns) → QA-06 (History + Analytics + Feedback)
+     ↓
+QA-07 (Settings) → QA-08 (Businesses + Switcher) → QA-09 (Public Pages)
+```
 
-### Decision 2: `getActiveBusiness()` as the single resolution point
+**The data dependency chain:**
+- QA-01 creates the authenticated session
+- QA-02 creates the first business with a campaign preset
+- QA-04 creates 3 test jobs (AUDIT_Patricia Johnson, AUDIT_Marcus Rodriguez, AUDIT_Sarah Chen) that trigger campaign enrollment
+- QA-05 reads the enrollments from QA-04
+- QA-06 reads send logs and analytics produced by QA-05
+- QA-07 generates the `form_token` needed by QA-09
+- QA-08 creates a second business needed for multi-business switcher testing
+- QA-09 uses the `form_token` from QA-07 for the `/complete/[token]` test
 
-New function in `lib/data/business.ts`. Reads cookie, verifies ownership, falls back to first business. Every page-level Server Component calls this once and threads `businessId` to all downstream data functions.
+#### Data Strategy: Use Existing Test Account + Progressive Creation
 
-### Decision 3: Agency metadata on `businesses` table, not a new table
+- Primary test account: `audit-test@avisloop.com / AuditTest123!`
+- Do NOT create test data speculatively — survey existing data first, document it, then create only what is needed
+- Prefix all created customers with `AUDIT_` for recognizability and cleanup
+- Never delete data that later phases depend on; create throwaway items specifically for destructive-action tests
 
-10 nullable columns added to `businesses`. Inherits existing RLS with zero additional policy work. `reviews_gained` is computed at read time (`current - start`), never stored.
+#### Report Format: Per-Page Findings Files + Summary Report
 
-### Decision 4: Extend `BusinessSettingsProvider` to carry business identity
+| Location | Format |
+|----------|--------|
+| `.planning/qa-audit/findings/qa0X-pagename.md` | Per-page findings with severity-tagged issues, passed checks table, screenshots index |
+| `.planning/qa-audit/SUMMARY-REPORT.md` | Consolidated report: findings by severity/category, phase results table, V2 philosophy check, top 10 issues |
+| `.planning/qa-audit/screenshots/qa0X-pagename/` | Screenshots organized by phase |
 
-Current provider only has `enabledServiceTypes` and `customServiceNames`. Must be extended with `businessId`, `businessName`, and `businesses[]` list so client components (sidebar switcher) can access context without prop drilling or additional fetches.
+**Screenshot naming convention:** `[phase]-[route-slug]-[state]-[viewport]-[theme].png`
 
-### Decision 5: Separate onboarding code paths
+**Viewport set:** desktop (1440×900), tablet (768×1024), mobile (390×844)
 
-First business: existing upsert (preserves current onboarding behavior). Additional businesses: new `createAdditionalBusiness()` server action using `.insert()` only. After creation, `switchBusiness()` sets the new business as active.
+**Theme coverage:** light always; dark for landing page, dashboard, jobs, settings General tab
 
-### Component Map (new vs modified)
+**Findings severity levels:** Critical / High / Medium / Low / Info
 
-**New:**
-- `components/layout/business-switcher.tsx`
-- `components/businesses/business-card.tsx`
-- `components/businesses/business-detail-drawer.tsx`
-- `components/businesses/businesses-client.tsx`
-- `app/(dashboard)/businesses/page.tsx`
+#### Selector Priority (most to least preferred)
 
-**Modified (key files):**
-- `lib/data/business.ts` — add `getActiveBusiness()`, `getUserBusinesses()`
-- `lib/actions/business.ts` — add `switchBusiness()`, `createAdditionalBusiness()`
-- `app/(dashboard)/layout.tsx` — use `getActiveBusiness()`, thread to provider
-- `components/providers/business-settings-provider.tsx` — extend with business identity
-- `components/layout/sidebar.tsx` — add BusinessSwitcher at top
-- Every `lib/data/*.ts` and `lib/actions/*.ts` — remove `.single()`, accept explicit `businessId`
+1. `getByRole()` — semantic and accessibility-aligned; finding failures here are accessibility bugs
+2. `getByLabel()` — for form inputs
+3. `getByText()` — for unique visible text
+4. `getByTestId()` — add `data-testid` only where semantic selectors are genuinely ambiguous
+5. CSS selectors — last resort only; never use positional or class-based selectors
 
----
+#### What Cannot Be Tested via Playwright
 
-## Critical Pitfalls
-
-### Pitfall 1 — The `.single()` Cascade (CRITICAL)
-
-86 instances of `.eq('user_id', user.id).single()` across 20+ files throw PGRST116 the moment a second business exists. This crashes every page.
-
-**Must be fully resolved before enabling multi-business creation. No exceptions.**
-
-**Mitigation:** Create `getActiveBusiness()` first, then grep exhaustively and refactor all instances. Run with 2 real businesses in staging to verify before shipping.
-
-### Pitfall 2 — Onboarding Upsert Destroys First Business (CRITICAL)
-
-`saveBusinessBasics()` upserts on `user_id` — silently overwrites first business with no error. The damage is discovered only when checking the first client's settings.
-
-**Mitigation:** Create `createAdditionalBusiness()` using `.insert()` only. Gate old upsert path to first-business only. Verify by creating business A then B and confirming A is unchanged.
-
-### Pitfall 3 — Dashboard Redirect Logic Breaks (HIGH)
-
-`dashboard/page.tsx` redirects to `/onboarding` when `getBusiness()` returns null. After the refactor, `getActiveBusiness()` returning null (no cookie) must NOT trigger onboarding redirect if the user has businesses.
-
-**Mitigation:** Two separate checks — "user has zero businesses" goes to onboarding; "user has businesses but no cookie" auto-selects first business and stays on dashboard.
-
-### Pitfall 4 — Billing Counts Per-Business, Not Total (MEDIUM)
-
-Current billing checks sends for one business. Agency owner could distribute sending across N businesses and never hit plan limits.
-
-**Mitigation:** Usage query must sum sends across all `business_id` values owned by `user_id`. Verify by sending from two businesses and checking combined limit enforcement.
-
-### Pitfall 5 — Mobile Has No Business Switcher (MEDIUM)
-
-Desktop sidebar gets the switcher. Mobile bottom nav has no room. Agency owners on mobile cannot switch businesses.
-
-**Mitigation:** Add business switcher to mobile header area (above page content). Sheet-based approach works within existing mobile patterns.
+| Feature | Why Not Testable | How to Document |
+|---------|-----------------|-----------------|
+| Google OAuth full flow | Requires interactive OAuth | Note: "Button present, interactive flow not automatable" |
+| Email/SMS delivery | No real Twilio/Resend in test env | Note: "Send action triggers correctly, delivery not verifiable" |
+| Stripe checkout completion | Redirects to external Stripe | Note: "Checkout button navigates to Stripe; webhook logic tested separately" |
+| Password reset (full flow) | Requires email inbox access | Note: "Form submission confirmed; link delivery not verifiable" |
+| Cron touch processing end-to-end | Requires Vercel cron schedule | Note: "Endpoint auth verified; touch scheduling verified via DB query after enrollment" |
 
 ---
 
-## Recommended Build Order
+### 4. Critical Pitfalls
 
-The dependency chain is strict. Phases must execute in this order.
+**1. Single-business testing passes while multi-tenant isolation is untested**
+All 22 `lib/data/` functions use the caller-provides-businessId pattern. A test with one user and one business never exercises whether the cookie-based switcher actually scopes data correctly. Supabase RLS policies and application-level scoping are both tested only under multi-user, multi-business conditions.
+**Mitigation:** Require 2 user accounts + 2 businesses per user in all multi-tenant scenarios. Run dedicated cross-contamination checks: create a job in Business B, switch to Business A, confirm it does not appear.
 
-### Phase 1: Foundation (Schema + Business Resolver)
+**2. RLS verified for CRUD but not for secondary query paths**
+Analytics aggregations, count queries, autocomplete endpoints, and public-form writes (`/complete/[token]` via service-role) bypass RLS. Service-role means every query in cron and public endpoints must include explicit `business_id` scoping. Standard RLS testing misses these paths.
+**Mitigation:** Audit every `lib/data/` function and cron endpoint file for `business_id` filter presence. Supplement UI testing with direct SQL queries using Supabase's role-switching test utility.
 
-Add 10 agency metadata columns to `businesses` table. Create `getActiveBusiness()`, `getUserBusinesses()`, `switchBusiness()`. Extend `BusinessSettingsProvider` with business identity.
+**3. Cron idempotency never tested under double-fire**
+Vercel guarantees at-least-once delivery. `process-campaign-touches` uses an atomic claim RPC. `resolve-enrollment-conflicts` does NOT — it loops over conflicted jobs without atomic claiming, creating a race condition under simultaneous double-fire. Passing tests that only fire the cron once provide false confidence.
+**Mitigation:** Trigger each cron twice in rapid succession; verify no duplicate enrollments or sends. Verify Resend's `idempotencyKey` (`campaign-touch-${enrollment_id}-${touch_number}`) actually prevents duplicate emails.
 
-**Rationale:** Every subsequent phase depends on the resolver. Extend the provider here so the sidebar switcher does not require additional prop drilling later. No UI visible yet — purely infrastructure.
+**4. Dual-subdomain middleware entirely bypassed on localhost**
+`middleware.ts` has an `isLocalhost` check that skips all domain-routing logic. Auth cookie cross-subdomain sharing, business-switcher cookie scoping, and marketing↔app redirect rules have never been tested end-to-end. A misconfiguration produces infinite redirect loops that only appear in production.
+**Mitigation:** Set up a staging subdomain or Vercel preview URL with actual domain config. Run the full V2 smoke test there before production traffic. Explicitly test `/complete/[token]` with no auth cookies present (unauthenticated technician scenario).
 
-**Pitfalls to avoid:** Pitfall 3 (cookie architecture decision — commit to it here), Pitfall 4 (no new tables needed — columns only, existing RLS covers it).
+**5. Playwright-only audit misses server-side automation pipeline state**
+Playwright proves the UI renders correctly but cannot verify whether campaign enrollment was created, touches were scheduled at the right time, or HMAC token expiry fires. A Playwright test that confirms "the job appears in the list" does NOT confirm the automation pipeline is working.
+**Mitigation:** After every key UI action, query Supabase directly to verify expected DB state: enrollment row exists with correct `touch_1_scheduled_at`, `reviewed_at` set after funnel completion, enrollment `status='stopped'` after rating click.
 
-**Research flag:** Standard patterns; no additional research needed.
+---
 
-### Phase 2: Data Function Refactor
+## Implications for Roadmap
 
-Grep all 86 `.eq('user_id').single()` instances. Replace with explicit `businessId` from `getActiveBusiness()`. Fix dashboard redirect logic (separate "no businesses" from "no selection"). Update all page-level server components.
+The audit milestone is 9 sequential phases. They must not be parallelized because each phase creates data that downstream phases depend on.
 
-**Rationale:** Must be complete before any business switching UI is exposed. A partial refactor means some pages crash and some work — worse than the status quo. This is the highest-risk phase by volume.
+### Phase QA-01: Authentication Flows
+**Rationale:** Auth is the prerequisite for every other phase. Failing auth blocks the entire audit. Establish a working authenticated session before anything else.
+**Delivers:** Login, signup, password reset, sign-out, session expiry, protected route redirect all confirmed
+**Covers categories:** A (Auth and Session Management)
+**Pitfall to watch:** Google OAuth cannot be fully automated; document as "button present, interactive flow not automatable via Playwright"
+**Research flag:** Standard Supabase auth patterns; well-documented; low surprise risk
 
-**Pitfalls to avoid:** Pitfall 1 (missing instances — grep exhaustively, produce a file checklist in the plan), Pitfall 3 (dashboard redirect), Pitfall 8 (cron endpoints — leave alone, they already work correctly).
+### Phase QA-02: Onboarding Wizard
+**Rationale:** Dashboard and all pages redirect to `/onboarding` if business is missing. Both flows (first business 4-step, additional business 3-step) must be audited. `?mode=new` also creates the second business needed for Phase 8.
+**Delivers:** Both onboarding paths confirmed. LocalStorage draft persistence verified. Campaign preset selection creates correct touch sequences.
+**Covers categories:** P (Onboarding)
+**Pitfall to watch:** Primary test account is already onboarded. `?mode=new` wizard tests additional-business creation without destroying existing data. A second test account is needed for the true first-run flow — or document the gap explicitly.
+**Research flag:** Two distinct code paths (upsert vs insert-only); verify both paths separately
 
-**Research flag:** At plan time, run a complete grep to enumerate every file affected. The "86 instances" count is an estimate. The plan must list every file explicitly before coding begins.
+### Phase QA-03: Dashboard
+**Rationale:** Dashboard is the first thing users see. Test it in empty-state first (documents zero-state UX), then revisit after Phase 4 populates data if needed.
+**Delivers:** KPI cards, sparklines, ReadyToSendQueue, AttentionAlerts, WelcomeCard, business switcher, mobile layout all confirmed
+**Covers categories:** L (Dashboard)
+**Pitfall to watch:** Sparklines require real historical data; empty-state documents the zero-data experience separately
 
-### Phase 3: Business Switcher UI
+### Phase QA-04: Jobs
+**Rationale:** Jobs is the V2 core action. Test it thoroughly. The 3 test jobs created here (AUDIT_Patricia Johnson, AUDIT_Marcus Rodriguez, AUDIT_Sarah Chen) power all downstream phases.
+**Delivers:** AddJobSheet, inline customer creation, status toggle, conflict detection dialog (Replace/Skip/Queue), MarkComplete, CampaignSelector all confirmed
+**Covers categories:** C (Core V2 Workflow), D (Conflict Handling — initial scenarios)
+**Pitfall to watch:** Enrollment conflict dialog requires a customer already in an active campaign — create this scenario explicitly
+**Research flag:** Supplement every MarkComplete action with a DB query confirming `campaign_enrollments` row exists
 
-Build `BusinessSwitcher` component. Add to sidebar (desktop). Add to mobile header area. Wire to `switchBusiness()` server action. Show current business name in sidebar.
+### Phase QA-05: Campaigns
+**Rationale:** Campaign enrollment happens on job completion. Phase 4 jobs triggered enrollment — Phase 5 observes and exercises the result. Enrollment data is present when auditing campaign detail pages.
+**Delivers:** Campaign list, preset picker, touch sequence editor, pause/resume with frozen enrollment, delete with reassignment, template preview, campaign detail stats all confirmed
+**Covers categories:** K (Campaign Management), D (Conflict Handling — frozen/resume paths)
+**Pitfall to watch:** Frozen enrollment state machine is the most complex logic in the codebase; verify all frozen → active transitions, not just the happy path. Test campaign pause idempotency.
 
-**Rationale:** First user-visible multi-business feature. Requires Phase 1 (resolver + provider) and Phase 2 (data functions do not crash on business switch).
+### Phase QA-06: History, Analytics, and Feedback
+**Rationale:** All three are downstream consumers of jobs + campaigns data. Read-heavy with few interactions — grouping is efficient. No ordering dependency between these three pages.
+**Delivers:** History filters + date presets + bulk retry, analytics service-type breakdown, feedback resolution workflow all confirmed
+**Covers categories:** G (History), N (Analytics), M (Feedback)
+**Research flag:** Standard CRUD + filter patterns; low risk of surprises. Main verification is that data is correctly scoped to active business.
 
-**Pitfalls to avoid:** Pitfall 5 (mobile switcher — add to header area in this phase), Pitfall 9 (long business names — use `truncate` class + tooltip).
+### Phase QA-07: Settings
+**Rationale:** Settings modifies business configuration. Auditing it after core workflows prevents configuration changes from affecting earlier phases. The `form_token` generated here is required by Phase 9.
+**Delivers:** All 7 tabs (General, Templates, Services, Messaging, Integrations, Customers, Account) confirmed. Form token URL captured for use in Phase 9.
+**Covers categories:** I (Settings), O (Customers)
+**Pitfall to watch:** Settings is the most complex single page — each tab is functionally independent and warrants its own checklist section. Copy the form token URL at end of phase for use in QA-09.
 
-### Phase 4: Clients Page
+### Phase QA-08: Businesses Page and Business Switcher
+**Rationale:** Creating a second business in Phase 8 (rather than earlier) avoids complicating single-business phases with multi-business context. All single-business flows must be confirmed before exercising the switcher.
+**Delivers:** BusinessDetailDrawer metadata editing, notes auto-save, business switcher (desktop sidebar + mobile header), data isolation between businesses confirmed
+**Covers categories:** J (Multi-Business), B (Tenant Isolation — full cross-business verification)
+**Pitfall to watch:** This is the highest-risk phase for the single-business testing trap (Pitfall 1). Run dedicated cross-contamination scenarios: create job in Business B, switch to Business A, confirm it does not appear. Verify KPIs, campaigns, and history all change after switch.
 
-Build `/businesses` route with responsive card grid. Build `BusinessDetailDrawer` with all agency metadata fields (auto-save notes, editable ratings/fees/competitor). Display `reviews_gained` as computed field (`current - start`).
+### Phase QA-09: Public Pages and Review Funnel
+**Rationale:** No auth dependency. `/r/[token]` requires a sent touch (available after Phase 5) and `/complete/[token]` requires the `form_token` captured in Phase 7. Test last so all prerequisites are met.
+**Delivers:** Marketing landing page, pricing, review funnel (valid/invalid token, 4-5 star → Google, 1-3 star → feedback form), public job completion form confirmed
+**Covers categories:** E (Review Funnel), F (Public Job Form)
+**Pitfall to watch:** `/complete/[token]` is the only write-accepting public route. Test with invalid tokens (expect 404, not 500), missing required fields (expect server-side validation error), and verify rate limiting applies. Test at 390px mobile — this form is used by technicians on phones in the field.
 
-**Rationale:** Requires Phase 1 (agency columns), Phase 2 (data functions), Phase 3 (switcher wired so "Switch to Business" button in the drawer works).
+### Phase Ordering Rationale
 
-**Pitfalls to avoid:** Pitfall 9 (long business names in cards — truncate + tooltip).
+- **Data builds progressively:** Each phase creates data consumed by downstream phases; no redundant setup
+- **Risk-first:** Auth and tenant isolation are highest-risk; audited in the first two meaningful phases
+- **No destructive actions in early phases:** Settings changes (Phase 7) and second business creation (Phase 8) are deferred until single-business flows are confirmed
+- **Public routes last:** No auth dependency; all token and form-link prerequisites are available by Phase 9
+- **Read-heavy pages grouped:** History, Analytics, and Feedback share Phase 6 because they are read-only consumers of the same upstream data
 
-### Phase 5: Additional Business Onboarding
+### Research Flags
 
-Create `createAdditionalBusiness()` server action using `.insert()`. Add "Add Business" button on Clients page. Reuse the 3-step wizard with the new insert path. After completion, call `switchBusiness()` to activate the new business and redirect to dashboard.
+**Phases needing deeper investigation during execution:**
+- **Phase QA-05 (Campaigns):** Frozen enrollment state machine is the most complex logic in the codebase; all 6 transition paths should be explicitly exercised, not just Replace and Skip
+- **Phase QA-08 (Businesses):** Multi-business data isolation under switching is the highest-risk audit scenario; requires a two-user, two-business test matrix plus direct SQL verification at each switch
+- **Phase QA-09 (Public Form):** `/complete/[token]` is the only write-accepting public route; warrants explicit adversarial testing: invalid tokens, missing fields, rate limiting
 
-**Rationale:** The most dangerous phase for data integrity. Must never reuse the upsert-based onboarding path. Placed last among feature phases so Clients page already exists as the natural entry point.
-
-**Pitfalls to avoid:** Pitfall 2 (upsert destroys first business — this phase is specifically designed to prevent it). Audit all 3 onboarding steps for upsert patterns, not just step 1.
-
-### Phase 6: Billing
-
-Update usage counting to sum sends across all `business_id` values owned by `user_id`. Verify limit enforcement works when sends span multiple businesses.
-
-**Rationale:** Independent of UX. Placed last because testing requires real businesses with real sends — all other phases must be complete first.
-
-**Pitfalls to avoid:** Pitfall 6 (per-business counting — change to user-level sum).
+**Phases with standard patterns (low surprise risk):**
+- **Phase QA-01 (Auth):** Supabase handles session management; standard patterns well-documented; main work is methodical scenario coverage
+- **Phase QA-06 (History/Analytics/Feedback):** Standard CRUD + filter patterns; well-tested in prior audits; main check is business-scoping correctness
+- **Phase QA-07 (Settings):** Known entity from prior UX audit; main risk is completeness across 7 tabs, not unexpected behavior
 
 ---
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
-|------|-----------|-------|
-| Stack (zero new deps) | HIGH | Verified by direct codebase inspection of `package.json` and installed components |
-| Features (table stakes + differentiators) | HIGH | Clear requirements, no ambiguity about scope or anti-features |
-| Architecture (cookie approach, resolver pattern) | HIGH | Standard Next.js pattern; RLS compatibility verified against actual policies |
-| Data refactor scope (86 instances) | HIGH | Grep-estimated count; mechanical work; known risk is incompleteness — fix with full file enumeration at plan time |
-| Onboarding separation | MEDIUM | Logic is clear but all 3 onboarding steps need upsert audit, not just step 1 |
-| Billing pooling | MEDIUM | Logic is clear; Stripe integration details need verification during implementation |
-| Mobile switcher UX | MEDIUM | Approach decided (header area), exact component and placement is a design decision at build time |
+|------|------------|-------|
+| Stack (Playwright tooling) | HIGH | Playwright 1.58.1 confirmed installed; auth + cookie patterns verified against official Playwright docs and Next.js App Router guide |
+| Features (audit category scope) | HIGH | Derived from full codebase review of all routes, actions, and data functions; categories map directly to shipped code |
+| Architecture (phase grouping + report format) | HIGH | Data dependency analysis from actual `page.tsx` files; report template derived from existing UX-AUDIT.md conventions |
+| Pitfalls (failure modes) | HIGH | Critical pitfalls grounded in direct code inspection of cron endpoints, middleware, public routes; external sources used for verification only |
 
-### Gaps to Address During Planning
+**Overall confidence:** HIGH
 
-1. **Exhaustive .single() file list** — Grep at plan time to produce a complete file-by-file checklist. The "86 instances" is an estimate; the Phase 2 plan must enumerate every file explicitly before any coding begins.
-2. **Full onboarding upsert audit** — Each of the 3 onboarding steps may use upsert-style saves independently. Verify all steps, not just `saveBusinessBasics()`.
-3. **Mobile business switcher placement** — Decided in principle (header area above page content) but the exact component and layout require a design decision before Phase 3 coding.
+### Gaps to Address During Execution
+
+1. **Second test account for first-run onboarding:** Primary account (`audit-test@avisloop.com`) already has a completed business. Testing the true first-run onboarding flow requires either a second account (`audit-test2@avisloop.com`) or explicit documentation that this scenario is environment-dependent. Decide before Phase QA-02 begins.
+
+2. **Review funnel token availability:** The `/r/[token]` test requires a valid HMAC-signed review token from a sent campaign touch. If the test environment has not run the cron processor, construct a token manually using `lib/review/token.ts` test helpers. Document which approach was used in the Phase QA-09 findings file.
+
+3. **Staging subdomain for middleware testing:** The dual-subdomain routing is entirely bypassed on localhost. Full middleware validation requires a staging subdomain or Vercel preview URL with the actual domain configuration. If unavailable during the audit, document explicitly in findings as "middleware cross-subdomain behavior not verified — requires staging environment."
+
+4. **Real device for mobile form testing:** Playwright device emulation does not replicate iOS Safari viewport behavior, system keyboard layout changes, or actual touch target sizes. The `/complete/[token]` technician form is the highest-risk mobile flow. Use a real device or BrowserStack if available; document the testing method in findings.
+
+5. **Database state verification procedure:** The audit execution plan must include explicit DB verification steps after key UI actions. Before execution begins, confirm Supabase dashboard access (or a SQL client) is available for direct table queries. The pitfall research is explicit: Playwright-only testing misses the server-side automation pipeline.
 
 ---
 
 ## Sources
 
-- `STACK.md` — Technology stack and dependency analysis via direct codebase inspection (2026-02-26)
-- `FEATURES.md` — Feature scope, table stakes, anti-features via user requirements + codebase analysis (2026-02-26)
-- `ARCHITECTURE.md` — Integration patterns, component map, build order via direct codebase analysis (2026-02-26)
-- `PITFALLS.md` — Risk register with mitigations via codebase pattern analysis (2026-02-26)
+### Primary (HIGH confidence — official documentation)
+- [playwright.dev/docs/auth](https://playwright.dev/docs/auth) — storageState pattern, project dependencies
+- [playwright.dev/docs/accessibility-testing](https://playwright.dev/docs/accessibility-testing) — axe-core/playwright integration
+- [playwright.dev/docs/emulation](https://playwright.dev/docs/emulation) — device emulation, color scheme
+- [nextjs.org/docs/app/guides/testing/playwright](https://nextjs.org/docs/app/guides/testing/playwright) — Next.js App Router + Playwright config
+- [github.com/vercel/next.js/discussions/62254](https://github.com/vercel/next.js/discussions/62254) — why UI login + storageState is required over API cookie injection
+- [docs.stripe.com/billing/testing](https://docs.stripe.com/billing/testing) — Stripe test clocks for subscription lifecycle
+- [vercel.com/blog/common-mistakes-with-the-next-js-app-router](https://vercel.com/blog/common-mistakes-with-the-next-js-app-router-and-how-to-fix-them) — stale GET cache in production
+- Direct codebase inspection of all routes, `lib/data/`, `lib/actions/`, `app/api/cron/`, `middleware.ts`, `app/complete/`, `lib/review/` (2026-02-27)
+
+### Secondary (MEDIUM confidence — third-party, verified against codebase)
+- [mokkapps.de — Supabase REST auth in Playwright](https://mokkapps.de/blog/login-at-supabase-via-rest-api-in-playwright-e2e-test) — why API token injection fails with Supabase SSR
+- [fixmymess.ai — Tenant isolation checklist](https://fixmymess.ai/blog/tenant-isolation-checklist-saas-prototypes) — secondary query path gaps, cache key scoping
+- [launchdarkly.com — Stripe webhook best practices](https://launchdarkly.com/blog/best-practices-for-testing-stripe-webhook-event-processing/) — duplicate event handling, idempotency
+- [medium.com/cyberark-engineering — Multi-tenant SaaS with Playwright](https://medium.com/cyberark-engineering/scaling-e2e-tests-for-multi-tenant-saas-with-playwright-c85f50e6c2ae) — context isolation patterns
+- [betterstack.com — Playwright best practices](https://betterstack.com/community/guides/testing/playwright-best-practices/) — test isolation, cookie/storage state
+- [prosperasoft.com — RLS misconfigurations](https://prosperasoft.com/blog/database/supabase/supabase-rls-issues/) — insufficient role-based testing, nested policy overrides
 
 ---
 
-*Research completed: 2026-02-26*
+*Research completed: 2026-02-27*
 *Ready for roadmap: yes*
 *Files synthesized: STACK.md, FEATURES.md, ARCHITECTURE.md, PITFALLS.md*
-*Next step: Roadmap creation (use suggested 6-phase structure as starting point)*
+*Next step: Roadmap creation (use suggested 9-phase QA structure as starting point)*
