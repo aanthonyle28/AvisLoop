@@ -2,7 +2,7 @@
 
 **Milestone:** v3.1 — QA E2E Audit
 **Created:** 2026-02-27
-**Status:** Defining requirements
+**Status:** Roadmap complete — phases assigned
 
 ---
 
@@ -169,13 +169,109 @@
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| (to be filled by roadmap) |
+| AUTH-01 | Phase 59 | Pending |
+| AUTH-02 | Phase 59 | Pending |
+| AUTH-03 | Phase 59 | Pending |
+| AUTH-04 | Phase 59 | Pending |
+| AUTH-05 | Phase 59 | Pending |
+| ONB-01 | Phase 60 | Pending |
+| ONB-02 | Phase 60 | Pending |
+| ONB-03 | Phase 60 | Pending |
+| DASH-01 | Phase 61 | Pending |
+| DASH-02 | Phase 61 | Pending |
+| DASH-03 | Phase 61 | Pending |
+| DASH-04 | Phase 61 | Pending |
+| DASH-05 | Phase 61 | Pending |
+| DASH-06 | Phase 61 | Pending |
+| DASH-07 | Phase 61 | Pending |
+| DASH-08 | Phase 61 | Pending |
+| DASH-09 | Phase 61 | Pending |
+| DASH-10 | Phase 61 | Pending |
+| DASH-11 | Phase 61 | Pending |
+| JOBS-01 | Phase 62 | Pending |
+| JOBS-02 | Phase 62 | Pending |
+| JOBS-03 | Phase 62 | Pending |
+| JOBS-04 | Phase 62 | Pending |
+| JOBS-05 | Phase 62 | Pending |
+| JOBS-06 | Phase 62 | Pending |
+| JOBS-07 | Phase 62 | Pending |
+| JOBS-08 | Phase 62 | Pending |
+| JOBS-09 | Phase 62 | Pending |
+| JOBS-10 | Phase 62 | Pending |
+| CAMP-01 | Phase 63 | Pending |
+| CAMP-02 | Phase 63 | Pending |
+| CAMP-03 | Phase 63 | Pending |
+| CAMP-04 | Phase 63 | Pending |
+| CAMP-05 | Phase 63 | Pending |
+| CAMP-06 | Phase 63 | Pending |
+| CAMP-07 | Phase 63 | Pending |
+| CAMP-08 | Phase 63 | Pending |
+| CAMP-09 | Phase 63 | Pending |
+| CAMP-10 | Phase 63 | Pending |
+| HIST-01 | Phase 64 | Pending |
+| HIST-02 | Phase 64 | Pending |
+| HIST-03 | Phase 64 | Pending |
+| HIST-04 | Phase 64 | Pending |
+| HIST-05 | Phase 64 | Pending |
+| ANLYT-01 | Phase 64 | Pending |
+| ANLYT-02 | Phase 64 | Pending |
+| ANLYT-03 | Phase 64 | Pending |
+| FDBK-01 | Phase 64 | Pending |
+| FDBK-02 | Phase 64 | Pending |
+| FDBK-03 | Phase 64 | Pending |
+| BILL-01 | Phase 65 | Pending |
+| BILL-02 | Phase 65 | Pending |
+| BILL-03 | Phase 65 | Pending |
+| SETT-01 | Phase 65 | Pending |
+| SETT-02 | Phase 65 | Pending |
+| SETT-03 | Phase 65 | Pending |
+| SETT-04 | Phase 65 | Pending |
+| SETT-05 | Phase 65 | Pending |
+| SETT-06 | Phase 65 | Pending |
+| SETT-07 | Phase 65 | Pending |
+| SETT-08 | Phase 65 | Pending |
+| SETT-09 | Phase 65 | Pending |
+| BIZ-01 | Phase 66 | Pending |
+| BIZ-02 | Phase 66 | Pending |
+| BIZ-03 | Phase 66 | Pending |
+| BIZ-04 | Phase 66 | Pending |
+| BIZ-05 | Phase 66 | Pending |
+| BIZ-06 | Phase 66 | Pending |
+| BIZ-07 | Phase 66 | Pending |
+| MULTI-01 | Phase 66 | Pending |
+| MULTI-02 | Phase 66 | Pending |
+| MULTI-03 | Phase 66 | Pending |
+| MULTI-04 | Phase 66 | Pending |
+| MULTI-05 | Phase 66 | Pending |
+| MULTI-06 | Phase 66 | Pending |
+| MULTI-07 | Phase 66 | Pending |
+| MULTI-08 | Phase 66 | Pending |
+| MULTI-09 | Phase 66 | Pending |
+| FORM-01 | Phase 67 | Pending |
+| FORM-02 | Phase 67 | Pending |
+| FORM-03 | Phase 67 | Pending |
+| FORM-04 | Phase 67 | Pending |
+| FORM-05 | Phase 67 | Pending |
+| FORM-06 | Phase 67 | Pending |
+| EDGE-01 | Phase 67 | Pending |
+| EDGE-02 | Phase 67 | Pending |
+| EDGE-03 | Phase 67 | Pending |
+| EDGE-04 | Phase 67 | Pending |
+| EDGE-05 | Phase 67 | Pending |
+| EDGE-06 | Phase 67 | Pending |
+| EDGE-07 | Phase 67 | Pending |
+| EDGE-08 | Phase 67 | Pending |
+| EDGE-09 | Phase 67 | Pending |
+| RPT-01 | Phase 67 | Pending |
+| RPT-02 | Phase 67 | Pending |
+| RPT-03 | Phase 67 | Pending |
+| RPT-04 | Phase 67 | Pending |
 
 **Coverage:**
-- v3.1 requirements: 74 total
-- Mapped to phases: 0 (awaiting roadmap)
-- Unmapped: 74
+- v3.1 requirements: 97 total (note: initial estimate was 74; final count from listed requirements is 97)
+- Mapped to phases: 97/97
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-27*
-*Last updated: 2026-02-27 after scoping complete*
+*Last updated: 2026-02-27 — traceability table complete, all 97 requirements mapped to phases 59-67*

@@ -5,24 +5,25 @@
 See: .planning/PROJECT.md (updated 2026-02-27)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.1 QA E2E Audit — defining requirements
+**Current focus:** v3.1 QA E2E Audit — Phase 59 (Auth Flows) — ready to execute
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
+Phase: 59 (QA-01: Auth Flows)
+Plan: 59-01-PLAN.md (not yet created)
 Milestone: v3.1 QA E2E Audit
-Status: Defining requirements
+Status: Roadmap complete, ready for plan-phase
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [░░░░░░░░░░] 0% (0/9 phases complete)
 
-Last activity: 2026-02-27 — Milestone v3.1 started (v3.0 Agency Mode complete)
+Last activity: 2026-02-27 — Roadmap created for v3.1 QA E2E Audit (9 phases, 97 requirements mapped)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed (project): 245
 - v3.0 plans completed: 15/15
+- v3.1 plans completed: 0/17
 
 *Updated after each plan completion*
 
@@ -47,6 +48,40 @@ Last activity: 2026-02-27 — Milestone v3.1 started (v3.0 Agency Mode complete)
 - **Phase 57-01 complete:** Pooled billing enforcement — getPooledMonthlyUsage(userId) aggregates across all user-owned businesses; all 3 send actions use pooled count; billing page shows pooled total with "(all businesses)" label; effective tier = best tier across all businesses
 - **Phase 58-01 complete:** Job completion form backend — form_token migration + partial index, Business.form_token type, publicJobSchema (email-or-phone cross-field), generateFormToken/regenerateFormToken server actions, createPublicJob() (service-role: customer upsert, job creation, conflict-aware enrollment), POST /api/complete (rate-limited, service type validation), FormLinkSection in Settings General tab
 - **Phase 58-02 complete:** Public form UI — Server Component token resolution via service-role, mobile-optimized JobCompletionForm (react-hook-form + zod, 48px inputs, 56px submit, 16px text), custom not-found page, success state with "Submit Another Job"
+
+### Key Context for v3.1 QA Audit
+
+**Test account:** audit-test@avisloop.com / AuditTest123!
+
+**Output location:** docs/qa-v3.1/ (per-page findings files) + docs/qa-v3.1/SUMMARY-REPORT.md
+
+**Phase ordering (data-dependency chain):**
+- Phase 59 (Auth) creates the authenticated session
+- Phase 60 (Onboarding) creates the first business with a campaign preset
+- Phase 61 (Dashboard) tests the dashboard with the business from Phase 60
+- Phase 62 (Jobs) creates 3 test jobs (AUDIT_Patricia Johnson, AUDIT_Marcus Rodriguez, AUDIT_Sarah Chen) that trigger enrollment
+- Phase 63 (Campaigns) reads enrollments created by Phase 62
+- Phase 64 (History/Analytics/Feedback) reads send logs and analytics from Phase 63
+- Phase 65 (Settings/Billing) captures the form_token URL needed by Phase 67
+- Phase 66 (Businesses/Isolation) creates a second business for multi-business testing
+- Phase 67 (Public Form + Edge Cases + Report) uses the form_token from Phase 65
+
+**Critical pitfalls to watch:**
+- Playwright-only testing misses server-side pipeline state — supplement with direct DB queries after every key action
+- Multi-business isolation is never exercised by single-business tests — run dedicated cross-contamination checks in Phase 66
+- Google OAuth cannot be fully automated — document as "button present, interactive flow not automatable via Playwright"
+- Do NOT create test data speculatively — survey existing data first, then create only what is needed
+- Prefix all created test customers with AUDIT_ for recognizability and cleanup
+
+**Selectors (priority order):**
+1. `getByRole()` — semantic, accessibility-aligned
+2. `getByLabel()` — for form inputs
+3. `getByText()` — for unique visible text
+4. `getByTestId()` — add data-testid only where semantic selectors are ambiguous
+5. CSS selectors — last resort only
+
+**Viewports:** desktop (1440x900), tablet (768x1024), mobile (390x844)
+**Themes:** light always; dark for dashboard, jobs, settings General tab
 
 ### Decisions from Phase 52-01
 
@@ -162,10 +197,14 @@ None.
 ### Blockers/Concerns
 
 - Phase 21-08: Twilio A2P campaign approval required for production SMS testing (brand approved, campaign pending)
+- v3.1 QA: Second test account needed for true first-run onboarding flow (primary account already has a completed business). Options: create audit-test2@avisloop.com, or document gap in Phase 60 findings.
+- v3.1 QA: Review funnel token (/r/[token]) requires a live sent touch or manually constructed HMAC token — decide approach before Phase 64.
+- v3.1 QA: Dual-subdomain middleware is bypassed on localhost — document explicitly as "middleware cross-subdomain behavior not verified — requires staging environment."
 
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed Phase 58 — v3.0 Agency Mode milestone complete
+Stopped at: Roadmap created for v3.1 QA E2E Audit — ready to plan Phase 59
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
+Next action: `/gsd:plan-phase 59`
