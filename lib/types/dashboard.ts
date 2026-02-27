@@ -1,11 +1,18 @@
 import type { ServiceType, EnrollmentResolution } from './database'
 
+// A single daily data point for sparkline rendering
+export interface DayBucket {
+  date: string   // YYYY-MM-DD
+  value: number  // count or average for that day
+}
+
 // KPI data with trend comparisons
 export interface KPIMetric {
   value: number
   previousValue: number
   trend: number          // percentage change (positive = up, negative = down)
   trendPeriod: string    // "vs last week" or "vs last month"
+  history?: DayBucket[]  // 14 daily data points, oldest first (outcome KPIs only)
 }
 
 export interface DashboardKPIs {
