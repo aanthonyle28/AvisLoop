@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.0 Agency Mode (Phases 52-58) — Phase 54 in progress (Plan 1/2 complete)
+**Current focus:** v3.0 Agency Mode (Phases 52-58) — Phase 54 COMPLETE, Phase 55 next
 
 ## Current Position
 
-Phase: 54 of 58 (Business Switcher UI) — In progress
-Plan: 1/2 in current phase
+Phase: 54 of 58 (Business Switcher UI) — COMPLETE
+Plan: 2/2 in current phase (phase complete)
 Milestone: v3.0 Agency Mode (Phases 52-58)
-Status: In progress — 54-01 complete, 54-02 next
+Status: Phase 54 complete — ready for Phase 55 (business creation UI)
 
-Progress: [████░░░░░░] ~36% (Phase 54 of 7 phases, plan 1/2)
+Progress: [████░░░░░░] ~43% (Phase 54 of 7 phases, all plans complete)
 
-Last activity: 2026-02-27 — Completed 54-01-PLAN.md (BusinessSwitcher + sidebar integration)
+Last activity: 2026-02-27 — Completed 54-02-PLAN.md (mobile page header BusinessSwitcher integration)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 235
-- v3.0 plans completed: 5/TBD
+- Total plans completed (project): 236
+- v3.0 plans completed: 6/TBD
 
 *Updated after each plan completion*
 
@@ -38,7 +38,7 @@ Last activity: 2026-02-27 — Completed 54-01-PLAN.md (BusinessSwitcher + sideba
 - Cron endpoints unaffected — they use service role and query by business_id directly
 - `reviews_gained` computed at read time (current - start), never stored
 - **Phase 53 complete:** All data functions and server actions use explicit `businessId` parameter — zero PGRST116 crash risk
-- **Phase 54-01 complete:** BusinessSwitcher component in sidebar — single-business plain text, multi-business Radix dropdown
+- **Phase 54 complete:** BusinessSwitcher in desktop sidebar AND mobile page header — zero code duplication, same component both surfaces
 
 ### Decisions from Phase 52-01
 
@@ -73,6 +73,13 @@ Last activity: 2026-02-27 — Completed 54-01-PLAN.md (BusinessSwitcher + sideba
 - `isPending` guard uses `opacity-60 pointer-events-none` CSS rather than `disabled` attribute for smoother pending UX
 - Business context strip hidden when sidebar collapsed — consistent with nav label hiding pattern
 
+### Decisions from Phase 54-02
+
+- Mobile header uses three-section flex layout: left shrink-0 | center flex-1 min-w-0 | right shrink-0
+- Center section uses `justify-end` — business name right-aligned near account button, away from logo
+- `min-w-0` on center section required for BusinessSwitcher's `truncate` class to work (flex items don't shrink below content size without it)
+- No props, state, or hooks added to page-header.tsx — purely layout restructure + import
+
 ### Cross-Cutting Concerns (apply to every plan)
 
 - Design system: use existing semantic tokens and design system patterns
@@ -91,6 +98,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 54-01-PLAN.md — BusinessSwitcher + sidebar integration
+Stopped at: Completed 54-02-PLAN.md — mobile page header BusinessSwitcher integration (Phase 54 complete)
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
