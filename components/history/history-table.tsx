@@ -19,15 +19,15 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { createColumns, RESENDABLE_STATUSES } from './history-columns'
-import type { SendLogWithContact } from '@/lib/types/database'
+import type { SendLogWithCustomer } from '@/lib/types/database'
 import { TableSkeleton } from '@/components/ui/table-skeleton'
 
 interface HistoryTableProps {
-  data: SendLogWithContact[]
+  data: SendLogWithCustomer[]
   /** Show skeleton loading state */
   loading?: boolean
-  onRowClick?: (request: SendLogWithContact) => void
-  onResend?: (request: SendLogWithContact) => void
+  onRowClick?: (request: SendLogWithCustomer) => void
+  onResend?: (request: SendLogWithCustomer) => void
   rowSelection?: RowSelectionState
   onRowSelectionChange?: (selection: RowSelectionState) => void
 }

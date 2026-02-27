@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { escapeLikePattern } from '@/lib/utils'
-import type { SendLogWithContact } from '@/lib/types/database'
+import type { SendLogWithCustomer } from '@/lib/types/database'
 import { COOLDOWN_DAYS, MONTHLY_SEND_LIMITS } from '@/lib/constants/billing'
 
 /**
@@ -15,7 +15,7 @@ export async function getSendLogs(options?: {
   status?: string         // NEW: Filter by status (pending, sent, delivered, etc.)
   dateFrom?: string       // NEW: Filter by date range start (ISO string)
   dateTo?: string         // NEW: Filter by date range end (ISO string)
-}): Promise<{ logs: SendLogWithContact[]; total: number }> {
+}): Promise<{ logs: SendLogWithCustomer[]; total: number }> {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -40,7 +40,7 @@ export async function getSendLogs(options?: {
   // Build query
   let query = supabase
     .from('send_logs')
-    .select('*, customers!send_logs_customer_id_fkey!inner(name, email)', { count: 'exact' })
+    .select('*, customers!send_logs_customer_id_fkey!inner(name, email, last_sent_at)', { count: 'exact' })
     .eq('business_id', business.id)
     .order('created_at', { ascending: false })
 
@@ -82,7 +82,7 @@ export async function getSendLogs(options?: {
   }
 
   return {
-    logs: data as SendLogWithContact[],
+    logs: data as SendLogWithCustomer[],
     total: count || 0,
   }
 }
@@ -384,9 +384,9 @@ export async function getRecentActivity(limit: number = 5): Promise<Array<{
 
 /**
  * Get recent send activity with full details for drawer display.
- * Returns full SendLogWithContact objects for the most recent sends.
+ * Returns full SendLogWithCustomer objects for the most recent sends.
  */
-export async function getRecentActivityFull(limit: number = 5): Promise<SendLogWithContact[]> {
+export async function getRecentActivityFull(limit: number = 5): Promise<SendLogWithCustomer[]> {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -406,7 +406,7 @@ export async function getRecentActivityFull(limit: number = 5): Promise<SendLogW
 
   const { data, error } = await supabase
     .from('send_logs')
-    .select('*, customers!send_logs_customer_id_fkey(name, email)')
+    .select('*, customers!send_logs_customer_id_fkey(name, email, last_sent_at)')
     .eq('business_id', business.id)
     .order('created_at', { ascending: false })
     .limit(limit)
@@ -416,5 +416,5 @@ export async function getRecentActivityFull(limit: number = 5): Promise<SendLogW
     return []
   }
 
-  return (data || []) as SendLogWithContact[]
+  return (data || []) as SendLogWithCustomer[]
 }

@@ -5,17 +5,17 @@ import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { HistoryTable } from './history-table'
 import { HistoryFilters } from './history-filters'
-import { EmptyState } from './empty-state'
+import { HistoryEmptyState } from './empty-state'
 import { RequestDetailDrawer } from './request-detail-drawer'
 import { Button } from '@/components/ui/button'
 import { CaretLeft, CaretRight, ArrowClockwise } from '@phosphor-icons/react'
 import { sendReviewRequest } from '@/lib/actions/send'
 import { bulkResendRequests } from '@/lib/actions/bulk-resend'
 import type { RowSelectionState } from '@tanstack/react-table'
-import type { SendLogWithContact, Business, MessageTemplate } from '@/lib/types/database'
+import type { SendLogWithCustomer, Business, MessageTemplate } from '@/lib/types/database'
 
 interface HistoryClientProps {
-  initialLogs: SendLogWithContact[]
+  initialLogs: SendLogWithCustomer[]
   total: number
   currentPage: number
   pageSize: number
@@ -28,7 +28,7 @@ export function HistoryClient({ initialLogs, total, currentPage, pageSize, busin
   const pathname = usePathname()
   const { replace, refresh } = useRouter()
   const [isPending, startTransition] = useTransition()
-  const [selectedRequest, setSelectedRequest] = useState<SendLogWithContact | null>(null)
+  const [selectedRequest, setSelectedRequest] = useState<SendLogWithCustomer | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [isRetrying, setIsRetrying] = useState(false)
@@ -60,7 +60,7 @@ export function HistoryClient({ initialLogs, total, currentPage, pageSize, busin
   const hasLogs = initialLogs.length > 0
 
   // Handle row click to open drawer
-  const handleRowClick = (request: SendLogWithContact) => {
+  const handleRowClick = (request: SendLogWithCustomer) => {
     setSelectedRequest(request)
     setDrawerOpen(true)
   }
@@ -91,7 +91,7 @@ export function HistoryClient({ initialLogs, total, currentPage, pageSize, busin
   }
 
   // Handle inline retry from table row — direct resend, no drawer
-  const handleInlineRetry = async (request: SendLogWithContact) => {
+  const handleInlineRetry = async (request: SendLogWithCustomer) => {
     setIsRetrying(true)
     try {
       const result = await bulkResendRequests([request.id])
@@ -151,7 +151,7 @@ export function HistoryClient({ initialLogs, total, currentPage, pageSize, busin
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Send History</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Send History</h1>
         <p className="text-muted-foreground">
           Track delivery status of your sent messages &middot; {total} total
         </p>
@@ -221,7 +221,7 @@ export function HistoryClient({ initialLogs, total, currentPage, pageSize, busin
           )}
         </div>
       ) : (
-        <EmptyState hasFilters={hasFilters} />
+        <HistoryEmptyState hasFilters={hasFilters} />
       )}
 
       {/* Detail Drawer */}
@@ -232,10 +232,6 @@ export function HistoryClient({ initialLogs, total, currentPage, pageSize, busin
         business={business}
         templates={templates}
         onResend={handleResend}
-        onCancel={async () => {
-          // Cancel for pending sends is not yet implemented server-side
-          setDrawerOpen(false)
-        }}
       />
     </div>
   )

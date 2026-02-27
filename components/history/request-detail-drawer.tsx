@@ -18,20 +18,19 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { StatusBadge } from './status-badge'
 import { MessagePreview } from '@/components/send/message-preview'
-import { ArrowClockwise, X, Link as LinkIcon, CaretDown } from '@phosphor-icons/react'
+import { ArrowClockwise, Link as LinkIcon, CaretDown } from '@phosphor-icons/react'
 import { format } from 'date-fns'
-import type { SendLogWithContact, Business, MessageTemplate } from '@/lib/types/database'
+import type { SendLogWithCustomer, Business, MessageTemplate } from '@/lib/types/database'
 import type { SendStatus } from './status-badge'
 import { COOLDOWN_DAYS } from '@/lib/constants/billing'
 
 interface RequestDetailDrawerProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  request: SendLogWithContact | null
+  request: SendLogWithCustomer | null
   business: Business
   templates: MessageTemplate[]
   onResend: (contactId: string, templateId: string | null) => Promise<void>
-  onCancel?: (requestId: string) => Promise<void>
 }
 
 export function RequestDetailDrawer({
@@ -41,27 +40,25 @@ export function RequestDetailDrawer({
   business,
   templates,
   onResend,
-  onCancel,
 }: RequestDetailDrawerProps) {
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null)
   const [isResending, setIsResending] = useState(false)
-  const [isCanceling, setIsCanceling] = useState(false)
 
   if (!request) return null
 
-  // Determine if contact is on cooldown
+  // Determine if contact is on cooldown using customers.last_sent_at for accuracy
   const isOnCooldown = request.customers && (() => {
-    // We don't have last_sent_at on SendLogWithContact, so check request created_at
-    const lastSent = new Date(request.created_at)
+    const lastSent = request.customers.last_sent_at
+      ? new Date(request.customers.last_sent_at)
+      : new Date(request.created_at) // Fallback to send log date if no last_sent_at
     const cooldownEnd = new Date(lastSent.getTime() + COOLDOWN_DAYS * 24 * 60 * 60 * 1000)
     return new Date() < cooldownEnd
   })()
 
-  // For now, we don't have opted_out on SendLogWithContact, so we'll default to false
+  // TODO: Extend SendLogWithCustomer to include customers.opted_out for accurate status
   const isOptedOut = false
 
   const canResend = !isOnCooldown && !isOptedOut && request.status !== 'pending'
-  const canCancel = request.status === 'pending'
 
   // Mock customer object for MessagePreview
   const mockCustomer = {
@@ -83,7 +80,7 @@ export function RequestDetailDrawer({
     sms_consent_notes: null,
     sms_consent_ip: null,
     sms_consent_captured_by: null,
-    last_sent_at: request.created_at,
+    last_sent_at: request.customers.last_sent_at || request.created_at,
     send_count: 1,
     created_at: request.created_at,
     updated_at: request.updated_at,
@@ -98,18 +95,6 @@ export function RequestDetailDrawer({
       await onResend(request.customer_id, selectedTemplateId || request.template_id)
     } finally {
       setIsResending(false)
-    }
-  }
-
-  const handleCancel = async () => {
-    setIsCanceling(true)
-    try {
-      if (onCancel) {
-        await onCancel(request.id)
-      }
-      onOpenChange(false)
-    } finally {
-      setIsCanceling(false)
     }
   }
 
@@ -252,24 +237,7 @@ export function RequestDetailDrawer({
             </div>
           )}
 
-          {/* Cancel Section for Pending */}
-          {canCancel && (
-            <div className="border-t pt-6">
-              <h3 className="text-sm font-medium mb-3 text-destructive">Cancel Message</h3>
-              <p className="text-sm text-muted-foreground mb-3">
-                This message is still pending. You can cancel it before it&apos;s sent.
-              </p>
-              <Button
-                onClick={handleCancel}
-                disabled={isCanceling}
-                variant="destructive"
-                className="w-full"
-              >
-                <X className="h-4 w-4 mr-2" />
-                {isCanceling ? 'Canceling...' : 'Cancel Message'}
-              </Button>
-            </div>
-          )}
+          {/* TODO: Implement server-side message cancellation. Until then, no cancel UI shown. */}
 
           {/* Copy Review Link */}
           {business.google_review_link && (

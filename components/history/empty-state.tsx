@@ -39,6 +39,3 @@ export function HistoryEmptyState({ hasFilters = false }: HistoryEmptyStateProps
     </div>
   )
 }
-
-// Backward compatibility: export both names
-export { HistoryEmptyState as EmptyState }

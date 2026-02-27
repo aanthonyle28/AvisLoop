@@ -39,7 +39,7 @@ export interface Business {
   stripe_customer_id: string | null
   onboarding_checklist: OnboardingChecklist | null
   review_cooldown_days: number
-  custom_service_names: string[]
+  custom_service_names: string[] | null
   service_types_enabled: string[] | null
   service_type_timing: Record<string, number> | null
   created_at: string
@@ -189,12 +189,10 @@ export type SendLogInsert = Omit<SendLog, 'id' | 'created_at' | 'updated_at' | '
 export type SendLogUpdate = Partial<Pick<SendLog, 'status' | 'provider_id' | 'error_message'>>
 
 // Combined type for send history display with customer info
+// Includes last_sent_at for cooldown calculations in the request detail drawer
 export interface SendLogWithCustomer extends SendLog {
-  customers: Pick<Customer, 'name' | 'email'>
+  customers: Pick<Customer, 'name' | 'email' | 'last_sent_at'>
 }
-
-/** @deprecated Use SendLogWithCustomer instead */
-export type SendLogWithContact = SendLogWithCustomer
 
 // Subscription types for Stripe billing
 export interface Subscription {
