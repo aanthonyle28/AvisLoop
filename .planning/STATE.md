@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.0 Agency Mode (Phases 52-58) — Phases 52-58-01 complete
+**Current focus:** v3.0 Agency Mode (Phases 52-58) — COMPLETE
 
 ## Current Position
 
-Phase: 58 of 58 (Job Completion Form) — In progress
-Plan: 1/2 in current phase (58-01 complete, 58-02 remaining)
-Milestone: v3.0 Agency Mode (Phases 52-58)
-Status: Phases 52-57 complete + 58-01 complete — 58-02 (Public Form UI) remaining
+Phase: 58 of 58 (Job Completion Form) — Complete
+Plan: 2/2 in current phase (all complete)
+Milestone: v3.0 Agency Mode (Phases 52-58) — COMPLETE
+Status: All phases complete, milestone verified
 
-Progress: [█████████░] ~93% (Phases 52-57 + 58-01 complete, 58-02 remaining)
+Progress: [██████████] 100% (All v3.0 phases complete)
 
-Last activity: 2026-02-27 — Completed 58-01 (Job Completion Form backend: migration, token actions, validation, service-role createPublicJob, rate-limited API route, Settings UI)
+Last activity: 2026-02-27 — Completed Phase 58 (Job Completion Form: backend + public form UI, verified via Playwright)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 242
-- v3.0 plans completed: 13/TBD
+- Total plans completed (project): 245
+- v3.0 plans completed: 15/15
 
 *Updated after each plan completion*
 
@@ -46,6 +46,7 @@ Last activity: 2026-02-27 — Completed 58-01 (Job Completion Form backend: migr
 - **Phase 56-02 complete:** CreateBusinessWizard 3-step UI (inline sub-components) wired into /onboarding?mode=new; Add Business button on /businesses page; full end-to-end flow live
 - **Phase 57-01 complete:** Pooled billing enforcement — getPooledMonthlyUsage(userId) aggregates across all user-owned businesses; all 3 send actions use pooled count; billing page shows pooled total with "(all businesses)" label; effective tier = best tier across all businesses
 - **Phase 58-01 complete:** Job completion form backend — form_token migration + partial index, Business.form_token type, publicJobSchema (email-or-phone cross-field), generateFormToken/regenerateFormToken server actions, createPublicJob() (service-role: customer upsert, job creation, conflict-aware enrollment), POST /api/complete (rate-limited, service type validation), FormLinkSection in Settings General tab
+- **Phase 58-02 complete:** Public form UI — Server Component token resolution via service-role, mobile-optimized JobCompletionForm (react-hook-form + zod, 48px inputs, 56px submit, 16px text), custom not-found page, success state with "Submit Another Job"
 
 ### Decisions from Phase 52-01
 
@@ -141,6 +142,12 @@ Last activity: 2026-02-27 — Completed 58-01 (Job Completion Form backend: migr
 - `/complete` correctly absent from `APP_ROUTES` in middleware — public route passes through without auth redirect (verified).
 - Phone dedup added before create-new in `createPublicJob()` — if no email match but phone provided, check existing customers by E.164 phone. Prevents duplicate records for phone-only submissions.
 
+### Decisions from Phase 58-02
+
+- Client-side form schema separate from `publicJobSchema` — omits `token` field (injected from props during submission, not a user-entered field).
+- Single enabled service type auto-selected and dropdown hidden — fewer fields = faster on-site completion.
+- Success state replaces form in-place (not a separate route) — faster than navigation; "Submit Another Job" resets without reload.
+
 ### Cross-Cutting Concerns (apply to every plan)
 
 - Design system: use existing semantic tokens and design system patterns
@@ -159,6 +166,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 58-01-PLAN.md — job completion form backend complete
+Stopped at: Completed Phase 58 — v3.0 Agency Mode milestone complete
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!

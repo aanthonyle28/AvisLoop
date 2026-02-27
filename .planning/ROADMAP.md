@@ -20,7 +20,7 @@ AvisLoop is a review follow-up system for home service businesses. v1.0 through 
 - **v2.5.2 UX Bugs & UI Fixes** - Phases 45-47 (complete 2026-02-27)
 - **v2.5.3 UX Bugs & UI Fixes Part 2** - Phases 48-49 (complete 2026-02-26)
 - **v2.5.4 Code Review (Phases 41-44)** - Phases 50-51 (complete 2026-02-27)
-- **v3.0 Agency Mode** - Phases 52-58 (in progress)
+- **v3.0 Agency Mode** - Phases 52-58 (complete 2026-02-27)
 
 ## Phases
 
@@ -841,9 +841,9 @@ Plans:
 - [x] 51-03-PLAN.md — History type migration, UI correctness, and dead code cleanup
 
 
-### v3.0 Agency Mode (Phases 52-57)
+### v3.0 Agency Mode (Phases 52-58) — COMPLETE
 
-**Milestone Goal:** Enable one user to own and manage multiple client businesses from a single account. A cookie-based active business resolver powers context switching across all pages. A new /businesses Clients page gives agency owners an at-a-glance view of every client with key metrics and an editable detail drawer. Each new business goes through the full onboarding wizard via a separate insert-only code path (never upsert). Unified billing pools send counts across all businesses.
+**Milestone Goal:** Enable one user to own and manage multiple client businesses from a single account. A cookie-based active business resolver powers context switching across all pages. A new /businesses Clients page gives agency owners an at-a-glance view of every client with key metrics and an editable detail drawer. Each new business goes through the full onboarding wizard via a separate insert-only code path (never upsert). Unified billing pools send counts across all businesses. Each business has a unique public job completion form URL for on-site technician use.
 
 **Coverage:** 23 requirements across 5 categories (FOUND, SWITCH, CLIENT, CREATE, BILL)
 
@@ -956,8 +956,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 58-01-PLAN.md — Token generation, storage, and public route with business resolution
-- [ ] 58-02-PLAN.md — Mobile-optimized form UI and server action for job creation + campaign enrollment
+- [x] 58-01-PLAN.md — Token generation, storage, and public route with business resolution
+- [x] 58-02-PLAN.md — Mobile-optimized form UI and server action for job creation + campaign enrollment
 
 ---
 
@@ -1019,6 +1019,6 @@ See individual phase sections above for requirements, success criteria, and depe
 | **55** | **v3.0 Agency Mode** | **3/3** | **Complete** | **2026-02-27** |
 | **56** | **v3.0 Agency Mode** | **2/2** | **Complete** | **2026-02-27** |
 | **57** | **v3.0 Agency Mode** | **1/1** | **Complete** | **2026-02-27** |
-| 58 | v3.0 Agency Mode | 0/TBD | Not started | - |
+| **58** | **v3.0 Agency Mode** | **2/2** | **Complete** | **2026-02-27** |
 
-**Total:** 243 plans complete across shipped phases.
+**Total:** 245 plans complete across shipped phases.

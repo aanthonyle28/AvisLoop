@@ -46,10 +46,10 @@
 
 ## Job Completion Form
 
-- [ ] **FORM-01**: Each business has a unique shareable "Complete Job" form URL secured by a token (e.g., `/complete/[token]`)
-- [ ] **FORM-02**: The form collects customer name, phone or email (at least one), and service type from the enabled types for that business
-- [ ] **FORM-03**: Submitting the form creates a completed job + customer record and auto-enrolls in the matching campaign
-- [ ] **FORM-04**: The form is mobile-optimized for on-site technician use (large touch targets, minimal fields, fast submission confirmation)
+- [x] **FORM-01**: Each business has a unique shareable "Complete Job" form URL secured by a token (e.g., `/complete/[token]`)
+- [x] **FORM-02**: The form collects customer name, phone or email (at least one), and service type from the enabled types for that business
+- [x] **FORM-03**: Submitting the form creates a completed job + customer record and auto-enrolls in the matching campaign
+- [x] **FORM-04**: The form is mobile-optimized for on-site technician use (large touch targets, minimal fields, fast submission confirmation)
 
 ---
 
@@ -97,10 +97,10 @@
 | CREATE-04 | Phase 56 | Complete |
 | BILL-01 | Phase 57 | Complete |
 | BILL-02 | Phase 57 | Complete |
-| FORM-01 | Phase 58 | Pending |
-| FORM-02 | Phase 58 | Pending |
-| FORM-03 | Phase 58 | Pending |
-| FORM-04 | Phase 58 | Pending |
+| FORM-01 | Phase 58 | Complete |
+| FORM-02 | Phase 58 | Complete |
+| FORM-03 | Phase 58 | Complete |
+| FORM-04 | Phase 58 | Complete |
 
 **Coverage:**
 - v3.0 requirements: 27 total
