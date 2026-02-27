@@ -744,10 +744,10 @@ Plans:
 **Plans**: 4 plans in 2 waves
 
 Plans:
-- [ ] 47-01-PLAN.md — Sparkline data pipeline: extend KPIMetric type with DayBucket history, add 14-day daily-bucket queries to getDashboardKPIs()
-- [ ] 47-02-PLAN.md — SVG sparkline component, KPI card gray backgrounds, colored activity feed icons, clickable activity items, pipeline row retention
-- [ ] 47-03-PLAN.md — Template preview modal per touch + campaign detail page visual retouch with richer enrollment rows
-- [ ] 47-04-PLAN.md — Radix Select migration in ServiceTypeSelect, AddJobSheet, and EditJobSheet with onValueChange
+- [x] 47-01-PLAN.md — Sparkline data pipeline: extend KPIMetric type with DayBucket history, add 14-day daily-bucket queries to getDashboardKPIs()
+- [x] 47-02-PLAN.md — SVG sparkline component, KPI card gray backgrounds, colored activity feed icons, clickable activity items, pipeline row retention
+- [x] 47-03-PLAN.md — Template preview modal per touch + campaign detail page visual retouch with richer enrollment rows
+- [x] 47-04-PLAN.md — Radix Select migration in ServiceTypeSelect, AddJobSheet, and EditJobSheet with onValueChange
 
 
 ### v2.5.3 UX Bugs & UI Fixes Part 2 (Phases 48-49)
@@ -889,7 +889,7 @@ See individual phase sections above for requirements, success criteria, and depe
 | **44** | **v2.5.1 Bug Fixes & Polish** | **2/2** | **Complete** | **2026-02-25** |
 | **45** | **v2.5.2 UX Bugs & UI Fixes** | **3/3** | **Complete** | **2026-02-26** |
 | **46** | **v2.5.2 UX Bugs & UI Fixes** | **5/5** | **Complete** | **2026-02-26** |
-| **47** | **v2.5.2 UX Bugs & UI Fixes** | **0/TBD** | **Not started** | - |
+| **47** | **v2.5.2 UX Bugs & UI Fixes** | **4/4** | **Complete** | **2026-02-27** |
 | **48** | **v2.5.3 UX Bugs Part 2** | **2/2** | **Complete** | **2026-02-25** |
 | **49** | **v2.5.3 UX Bugs Part 2** | **3/3** | **Complete** | **2026-02-26** |
 | **50** | **v2.5.4 Code Review** | **3/3** | **Complete** | **2026-02-26** |
