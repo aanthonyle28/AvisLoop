@@ -12,7 +12,6 @@ import {
   ArrowRight,
   CaretRight,
 } from '@phosphor-icons/react'
-import { Card } from '@/components/ui/card'
 import { TrendIndicator } from '@/components/dashboard/kpi-widgets'
 import { Sparkline } from '@/components/dashboard/sparkline'
 import { cn } from '@/lib/utils'
@@ -129,7 +128,7 @@ export function RightPanelDefault({
       <div className="space-y-2">
         {/* Reviews This Month */}
         <Link href="/history?status=reviewed" className="block">
-          <Card className="p-4 bg-muted/40 hover:bg-muted/60 transition-colors cursor-pointer">
+          <div className="p-4 bg-muted/40 hover:bg-muted/60 transition-colors cursor-pointer rounded-lg">
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-xs text-muted-foreground font-medium">Reviews This Month</span>
               <Star size={14} weight="fill" className="text-amber-500 dark:text-amber-400" />
@@ -152,12 +151,12 @@ export function RightPanelDefault({
                 <p className="text-[10px] text-muted-foreground/50 text-center mt-0.5">Not enough data</p>
               )}
             </div>
-          </Card>
+          </div>
         </Link>
 
         {/* Average Rating */}
         <Link href="/feedback" className="block">
-          <Card className="p-4 bg-muted/40 hover:bg-muted/60 transition-colors cursor-pointer">
+          <div className="p-4 bg-muted/40 hover:bg-muted/60 transition-colors cursor-pointer rounded-lg">
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-xs text-muted-foreground font-medium">Average Rating</span>
               <ChartBar size={14} weight="fill" className="text-[#008236] dark:text-[#00B84B]" />
@@ -180,12 +179,12 @@ export function RightPanelDefault({
                 <p className="text-[10px] text-muted-foreground/50 text-center mt-0.5">Not enough data</p>
               )}
             </div>
-          </Card>
+          </div>
         </Link>
 
         {/* Conversion Rate */}
         <Link href="/history" className="block">
-          <Card className="p-4 bg-muted/40 hover:bg-muted/60 transition-colors cursor-pointer">
+          <div className="p-4 bg-muted/40 hover:bg-muted/60 transition-colors cursor-pointer rounded-lg">
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-xs text-muted-foreground font-medium">Conversion Rate</span>
               <Target size={14} weight="fill" className="text-[#2C879F] dark:text-[#38A9C5]" />
@@ -208,7 +207,7 @@ export function RightPanelDefault({
                 <p className="text-[10px] text-muted-foreground/50 text-center mt-0.5">Not enough data</p>
               )}
             </div>
-          </Card>
+          </div>
         </Link>
       </div>
 

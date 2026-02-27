@@ -506,7 +506,7 @@ export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJob
 
         {/* Job list */}
         {displayJobs.length > 0 && (
-          <div className="space-y-2">
+          <div className="bg-card divide-y divide-border rounded-lg border border-border">
             {displayJobs.map((job) => {
               const busy = isJobBusy(job.id)
               const isSelected = selectedJobId === job.id
@@ -515,8 +515,8 @@ export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJob
                 <div
                   key={job.id}
                   className={cn(
-                    'flex items-center justify-between transition-colors rounded-lg border border-border',
-                    isSelected ? 'bg-muted' : 'bg-card hover:bg-muted/50',
+                    'flex items-center justify-between transition-colors',
+                    isSelected ? 'bg-muted' : 'hover:bg-muted/50',
                   )}
                 >
                   {/* Left side: clickable row to open right panel */}
@@ -849,11 +849,11 @@ export function ReadyToSendQueueSkeleton() {
         <Skeleton className="h-8 w-24" />
       </div>
       {/* Row skeletons */}
-      <div className="space-y-2">
+      <div className="bg-card divide-y divide-border rounded-lg border border-border">
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="flex items-center justify-between py-2.5 px-3 rounded-lg border border-border bg-card"
+            className="flex items-center justify-between py-2.5 px-3"
           >
             <div className="flex items-start gap-3 flex-1">
               <Skeleton className="h-5 w-5 rounded-full mt-0.5" />

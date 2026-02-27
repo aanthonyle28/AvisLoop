@@ -13,7 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { retrySend, acknowledgeAlert } from '@/lib/actions/dashboard'
+import { retrySend, acknowledgeAlert, dismissFeedbackAlert } from '@/lib/actions/dashboard'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import type { AttentionAlert } from '@/lib/types/dashboard'
@@ -78,8 +78,8 @@ function AlertRow({ alert, isSelected, onSelect, onDismiss }: AlertRowProps) {
   return (
     <div
       className={cn(
-        'flex items-start justify-between gap-3 px-3 py-2.5 cursor-pointer transition-colors rounded-lg border border-border',
-        isSelected ? 'bg-muted' : 'bg-card hover:bg-muted/50',
+        'flex items-start justify-between gap-3 px-3 py-2.5 cursor-pointer transition-colors',
+        isSelected ? 'bg-muted' : 'hover:bg-muted/50',
       )}
       onClick={onSelect}
       role="button"
@@ -200,10 +200,13 @@ export function AttentionAlerts({ alerts, onSelectAlert, selectedAlertId }: Atte
 
   const handleDismiss = (id: string) => {
     setDismissedIds(prev => new Set([...prev, id]))
-    // Persist dismissal for permanent alert types so they don't reappear on navigation
+    // Persist dismissal so alerts don't reappear on navigation/refresh
     const alert = alerts.find(a => a.id === id)
-    if (alert?.sendLogId && (alert.type === 'bounced_email' || alert.type === 'stop_request')) {
+    if (alert?.sendLogId && (alert.type === 'failed_send' || alert.type === 'bounced_email' || alert.type === 'stop_request')) {
       acknowledgeAlert(alert.sendLogId)
+    }
+    if (alert?.type === 'unresolved_feedback' && alert.feedbackId) {
+      dismissFeedbackAlert(alert.feedbackId)
     }
   }
 
@@ -226,7 +229,7 @@ export function AttentionAlerts({ alerts, onSelectAlert, selectedAlertId }: Atte
         </div>
       ) : (
         <>
-          <div className="space-y-2">
+          <div className="bg-card divide-y divide-border rounded-lg border border-border">
             {displayedAlerts.map((alert) => (
               <AlertRow
                 key={alert.id}
@@ -263,9 +266,9 @@ export function AttentionAlertsSkeleton() {
         <Skeleton className="h-5 w-8" />
       </div>
       {/* Row skeletons */}
-      <div className="space-y-2">
+      <div className="bg-card divide-y divide-border rounded-lg border border-border">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="flex items-start justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2.5">
+          <div key={i} className="flex items-start justify-between gap-3 px-3 py-2.5">
             <div className="flex items-start gap-2 min-w-0 flex-1">
               <Skeleton className="size-5 rounded-full shrink-0" />
               <div className="space-y-1.5 flex-1">

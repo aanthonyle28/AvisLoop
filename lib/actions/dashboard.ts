@@ -250,3 +250,57 @@ export async function markOneOffSent(jobId: string): Promise<{ success: boolean;
     return { success: false, error: 'An error occurred' }
   }
 }
+
+/**
+ * Dismiss an unresolved feedback alert by marking it as resolved.
+ * Sets resolved_at so the dashboard query (which filters `is('resolved_at', null)`)
+ * won't surface it again.
+ */
+export async function dismissFeedbackAlert(feedbackId: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createClient()
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'Not authenticated' }
+
+    // Fetch feedback and verify ownership
+    const { data: feedback, error: fetchError } = await supabase
+      .from('customer_feedback')
+      .select('id, business_id')
+      .eq('id', feedbackId)
+      .single()
+
+    if (fetchError || !feedback) {
+      return { success: false, error: 'Feedback not found' }
+    }
+
+    const { data: business } = await supabase
+      .from('businesses')
+      .select('id')
+      .eq('id', feedback.business_id)
+      .eq('user_id', user.id)
+      .single()
+
+    if (!business) {
+      return { success: false, error: 'Unauthorized' }
+    }
+
+    const { error: updateError } = await supabase
+      .from('customer_feedback')
+      .update({
+        resolved_at: new Date().toISOString(),
+        internal_notes: 'Dismissed from dashboard',
+      })
+      .eq('id', feedbackId)
+
+    if (updateError) {
+      return { success: false, error: 'Failed to dismiss feedback alert' }
+    }
+
+    revalidatePath('/dashboard')
+    return { success: true }
+  } catch (error) {
+    console.error('Error dismissing feedback alert:', error)
+    return { success: false, error: 'An error occurred' }
+  }
+}
