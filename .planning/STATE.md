@@ -5,18 +5,18 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.0 Agency Mode (Phases 52-58) — Phase 55 in progress (Plan 1 of 3 complete)
+**Current focus:** v3.0 Agency Mode (Phases 52-58) — Phase 55 in progress (Plan 2 of 3 complete)
 
 ## Current Position
 
 Phase: 55 of 58 (Clients Page) — In progress
-Plan: 1/3 in current phase
+Plan: 2/3 in current phase
 Milestone: v3.0 Agency Mode (Phases 52-58)
-Status: Plan 55-01 complete — data layer done, Plans 55-02 and 55-03 next
+Status: Plan 55-02 complete — card grid done, Plan 55-03 (detail drawer) next
 
-Progress: [████░░░░░░] ~45% (Phase 55 Plan 1 of 3 complete)
+Progress: [████░░░░░░] ~47% (Phase 55 Plan 2 of 3 complete)
 
-Last activity: 2026-02-27 — Completed 55-01-PLAN.md (agency metadata data layer)
+Last activity: 2026-02-27 — Completed 55-02-PLAN.md (businesses card grid UI)
 
 ## Performance Metrics
 
@@ -40,6 +40,7 @@ Last activity: 2026-02-27 — Completed 55-01-PLAN.md (agency metadata data laye
 - **Phase 53 complete:** All data functions and server actions use explicit `businessId` parameter — zero PGRST116 crash risk
 - **Phase 54 complete:** BusinessSwitcher in desktop sidebar AND mobile page header — zero code duplication, same component both surfaces
 - **Phase 55-01 complete:** Agency metadata data layer — 10 nullable columns on businesses table, extended Business interface, getUserBusinessesWithMetadata(), updateBusinessMetadata(), updateBusinessNotes(), businessMetadataSchema
+- **Phase 55-02 complete:** Businesses card grid — /businesses route (Server Component), BusinessCard with agency metadata display, BusinessesClient with drawer state pre-wired for Plan 55-03, BusinessCardSkeleton + loading.tsx
 
 ### Decisions from Phase 52-01
 
@@ -89,6 +90,13 @@ Last activity: 2026-02-27 — Completed 55-01-PLAN.md (agency metadata data laye
 - `updateBusinessNotes` omits `revalidatePath` — auto-save notes is fire-and-forget, no page re-render needed
 - `getUserBusinessesWithMetadata` does NOT use `getActiveBusiness()` — Clients Page shows ALL businesses
 
+### Decisions from Phase 55-02
+
+- `void selectedBusiness` / `void drawerOpen` in BusinessesClient — suppresses ESLint no-unused-vars for state pre-wired for Plan 55-03 drawer integration
+- Competitive gap tie case (`gap === 0`) shows "Tied with [competitor]" as muted text, distinct from positive (green) and negative (red)
+- `competitor_name` included in competitive gap text when available — "3 ahead of ABC Plumbing" more informative than "3 ahead of competitor"
+- `Star weight="fill"` for Google rating — filled star communicates current rating; outline star would suggest empty/missing
+
 ### Cross-Cutting Concerns (apply to every plan)
 
 - Design system: use existing semantic tokens and design system patterns
@@ -107,6 +115,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 55-01-PLAN.md — agency metadata data layer done
+Stopped at: Completed 55-02-PLAN.md — businesses card grid UI done
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
