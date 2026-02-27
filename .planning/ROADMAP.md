@@ -323,7 +323,7 @@ Plans:
   1. Multi-location data model schema added (business has location_id column, queries scoped by location_id) — no UI yet, schema-only
   2. Weekly performance report auto-generated every Monday (sends count, opens count, reviews count, response rate) and emailed to business owner
   3. Campaign playbooks exportable (download campaign config as JSON template, shareable across businesses)
-**Plans**: TBD
+**Plans**: 2 plans
 
 ### Phase 30: V2 Alignment & Audit Remediation
 **Goal**: Complete V2 philosophy transformation where jobs are the primary entry point and customers are created as side effects. Add scheduled job status for dispatch workflow. Fix remaining audit issues: icon consistency, accessibility, empty states.
@@ -861,7 +861,7 @@ Plans:
   3. A user with multiple businesses and no active_business_id cookie is automatically assigned their first business and lands on the dashboard (no crash, no redirect to onboarding)
   4. BusinessSettingsProvider exposes businessId, businessName, and a businesses list — client components can read these without additional data fetching or prop drilling
   5. Lint and typecheck pass with zero errors
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 52-01-PLAN.md — getActiveBusiness() resolver, switchBusiness() action, getUserBusinesses() query
@@ -876,7 +876,7 @@ Plans:
   2. All page-level Server Components call getActiveBusiness() once and pass the result to downstream data functions as an explicit businessId parameter
   3. Creating a second test business and navigating to every dashboard page produces no PGRST116 errors and shows the correct business's data
   4. Lint and typecheck pass with zero errors
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 53-01-PLAN.md — Enumerate all .single() instances, refactor lib/data/ files
@@ -891,7 +891,7 @@ Plans:
   2. Selecting a different business from the dropdown sets the active_business_id cookie and refreshes all dashboard pages to show that business's data
   3. The current business name is always visible in the sidebar at a glance — no interaction required to see which business is active
   4. On mobile, a business switcher is accessible from the header area above page content — agency owners can switch businesses without a desktop sidebar
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 54-01-PLAN.md — BusinessSwitcher component (desktop sidebar integration)
@@ -909,7 +909,7 @@ Plans:
   5. User can edit all agency metadata fields (ratings, fee, competitor info, dates) directly in the drawer — changes persist to the database
   6. Notes field in the drawer auto-saves with a debounce (no save button required for notes)
   7. The detail drawer includes a side-by-side competitive analysis section highlighting the gap between client and competitor review counts
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 55-01-PLAN.md — businesses table migration (10 agency metadata columns) + data functions
@@ -925,7 +925,7 @@ Plans:
   2. Creating a second (or third) business via the wizard leaves existing businesses completely unchanged — verified by checking that Business A's name, Google link, campaigns, and jobs are identical before and after creating Business B
   3. The new business creation flow uses the same 3-step onboarding wizard (business basics, campaign preset, SMS consent) — no wizard redesign required
   4. After completing the wizard for a new business, that business becomes the active business and the user is redirected to /dashboard showing the new business's data
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 56-01-PLAN.md — createAdditionalBusiness() server action (insert-only) + onboarding routing
@@ -938,7 +938,7 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. Sending from Business A and Business B in the same billing period counts toward a single shared limit — verified by sending until the combined total reaches the plan limit and confirming the paywall triggers
   2. The Settings/Billing page displays pooled usage — the sends shown are the sum across all businesses the user owns, not just the currently active business
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 57-01-PLAN.md — Pooled usage query (sum across all user's businesses) + billing page update
@@ -953,7 +953,7 @@ Plans:
   2. The form collects customer name, at least one of phone or email, and service type from the business's enabled types — and validates all fields before submission
   3. Submitting the form creates a completed job + customer record (or links to existing customer) and auto-enrolls in the matching campaign — identical to the owner completing a job in the dashboard
   4. The form is mobile-optimized with large touch targets, minimal fields, and a fast success confirmation — usable by a technician on-site in under 30 seconds
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 58-01-PLAN.md — Token generation, storage, and public route with business resolution
@@ -1013,7 +1013,7 @@ See individual phase sections above for requirements, success criteria, and depe
 | **49** | **v2.5.3 UX Bugs Part 2** | **3/3** | **Complete** | **2026-02-26** |
 | **50** | **v2.5.4 Code Review** | **3/3** | **Complete** | **2026-02-26** |
 | **51** | **v2.5.4 Code Review** | **3/3** | **Complete** | **2026-02-27** |
-| 52 | v3.0 Agency Mode | 0/TBD | Not started | - |
+| 52 | v3.0 Agency Mode | 0/2 | Planned | - |
 | 53 | v3.0 Agency Mode | 0/TBD | Not started | - |
 | 54 | v3.0 Agency Mode | 0/TBD | Not started | - |
 | 55 | v3.0 Agency Mode | 0/TBD | Not started | - |
