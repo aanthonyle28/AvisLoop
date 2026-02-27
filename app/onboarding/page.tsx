@@ -22,7 +22,7 @@ import { OnboardingWizard } from '@/components/onboarding/onboarding-wizard'
 export default async function OnboardingPage({
   searchParams,
 }: {
-  searchParams: Promise<{ step?: string }>
+  searchParams: Promise<{ step?: string; mode?: string }>
 }) {
   // Auth check
   const supabase = await createClient()
@@ -34,19 +34,22 @@ export default async function OnboardingPage({
     redirect('/login')
   }
 
+  // Parse params early — mode=new bypasses the "already completed" redirect
+  const params = await searchParams
+  const isNewBusinessMode = params.mode === 'new'
+
   // Get active business (may be null for brand-new users)
   const activeBusiness = await getActiveBusiness()
 
   // Check onboarding status (handles null business gracefully)
   const status = activeBusiness ? await getOnboardingStatus(activeBusiness.id) : null
 
-  // If already complete, go to dashboard
-  if (status?.completed) {
+  // If already complete, go to dashboard — UNLESS we're creating a new business
+  if (status?.completed && !isNewBusinessMode) {
     redirect('/dashboard')
   }
 
   // Parse step from URL params
-  const params = await searchParams
   const stepParam = parseInt(params.step || '1', 10) || 1
 
   // Validate step range (1-4), clamp if out of range
