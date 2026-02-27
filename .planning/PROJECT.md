@@ -32,16 +32,12 @@ Turn job completions into Google reviews automatically — multi-touch follow-up
 
 ### Active
 
-**v2.0 Review Follow-Up System Redesign**
-- Rename Contacts to Customers; add phone number, service history, tags
-- Jobs: basic CRUD with service type, status, tied to customer
-- Campaigns: preset sequences (conservative/standard/aggressive) + duplicate & customize; multi-touch with channel + timing per touch; stop conditions
-- SMS sending via Twilio with quiet hours, STOP compliance, fallback logic (no phone -> email)
-- LLM personalization via Vercel AI SDK (GPT-4o-mini primary, Haiku fallback on constraint violations); personalization slider, QA checks
-- Dashboard redesign: pipeline KPIs, ready-to-send queue, needs attention, quick actions
-- Onboarding redesign: services offered (timing defaults), software used, review destination, default campaign
-- Navigation: Send/Queue, Customers, Jobs, Campaigns, Activity/History
-- Landing page redesign for home services positioning
+**v3.0 Agency Mode**
+- Multi-business support: one user can own and manage multiple businesses
+- Business switcher dropdown at top of sidebar for quick switching
+- Full onboarding wizard for each new business creation
+- All existing pages (dashboard, jobs, campaigns, etc.) scope to selected business
+- Unified agency billing: one subscription covers all client businesses
 
 ### Out of Scope
 
@@ -116,25 +112,23 @@ Turn job completions into Google reviews automatically — multi-touch follow-up
 | Dashboard test step cards | Guided walkthrough instead of checklist | Good — auto-detection of completion |
 | Test sends excluded from quota | Fair for users learning the product | Good — is_test flag in database |
 
-## Current Milestone: v2.5.4 Code Review (Phases 41-44)
+## Current Milestone: v3.0 Agency Mode
 
-**Goal:** Full quality audit of v2.5.1 Bug Fixes & Polish code (Phases 41-44), covering bugs, dead code, security, performance, V2 alignment, design system compliance, and accessibility — then fix all findings.
+**Goal:** Enable one user to own and manage multiple client businesses from a single account, with a sidebar business switcher for quick context switching and unified billing.
 
 **Target features:**
-- Systematic code review of all files modified in Phases 41-44
-- Security review of user input handling, RLS policies, and server actions
-- Performance review of queries, data fetching, and rendering patterns
-- V2 philosophy alignment check on all user-facing changes
-- Design system compliance check (semantic tokens, consistent patterns)
-- Accessibility audit (aria labels, touch targets, keyboard navigation)
-- Dead code and unused import cleanup
-- Findings report with severity ratings and fix recommendations
-- Remediation of all Critical, High, and Medium findings
+- Multi-business ownership (one user, many businesses)
+- Business switcher dropdown at top of sidebar
+- Clients page (/businesses) with card grid showing all client businesses
+- Client detail drawer with full profile: Google ratings (start vs now), reviews gained, monthly fee, GBP access, competitor info, notes
+- Full onboarding wizard for each new business
+- All app pages scope to currently selected business
+- Unified agency subscription tier
 
 **Key decisions:**
-- v2.5.2 (Phases 45-47) remains in roadmap but unexecuted — separate scope
-- v2.5.3 (Phases 48-49) remains in roadmap but unexecuted — separate scope
-- v2.6 Dashboard Command Center paused — resume after patch series
+- v2.5.4 Phase 51 (Audit Remediation) deferred — separate scope
+- v2.5.2 (Phases 45-47) and v2.5.3 (Phases 48-49) remain unexecuted — separate scope
+- No white-label or client reporting portal in v3.0 — future scope
 
 ---
-*Last updated: 2026-02-25 after v2.5.4 Code Review milestone started*
+*Last updated: 2026-02-26 after v3.0 Agency Mode milestone started*

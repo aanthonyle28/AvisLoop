@@ -2,87 +2,29 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-25)
+See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v2.5.4 Code Review (Phases 41-44) — Phase 50 complete, Phase 51 next
+**Current focus:** v3.0 Agency Mode — defining requirements
 
 ## Current Position
 
-Phase: 51 of 51 (Audit Remediation) — In progress
-Plan: 1/3 complete
-Status: In progress
-Last activity: 2026-02-27 — Completed 51-01-PLAN.md (dashboard fixes, page spacing, settings dedup)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-26 — Milestone v3.0 Agency Mode started
 
-Progress: [████████░░] 80% (v2.5.4 milestone — Phase 51 underway)
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed (project): 228
-- v2.5.4 plans completed: 4
+- v3.0 plans completed: 0
 
 *Updated after each plan completion*
 
 ## Accumulated Context
-
-### Key Decisions for Phase 46 (Drawer Consistency + Campaign Freeze)
-
-- SheetBody/SheetFooter pattern: form wraps both SheetBody and SheetFooter (flex flex-col flex-1 min-h-0) so submit buttons are native form children
-- Edit Customer exception: uses form id attribute (form='edit-customer-form') because non-form content (SMS consent, activity) sits between form fields and footer
-- All form sheets normalized to sm:max-w-lg width (512px)
-- Separator components removed from Edit Customer (replaced by natural space-y-6 spacing)
-- Job Detail "Complete" button normalized to default variant (primary CTA) — removed outline + custom color overrides
-- Conflict resolution buttons stay in SheetBody (contextual), not SheetFooter (global actions)
-- Campaign pause freezes enrollments (status='frozen') instead of stopping them -- non-terminal, preserves touch position
-- Campaign resume unfreezes frozen enrollments back to 'active' and bumps stale scheduled times to NOW
-- getCampaignEnrollmentCounts returns frozen count alongside active/completed/stopped
-
-### Key Decisions for Phase 49 (Visual Polish)
-
-- Subtitle canonical pattern: text-2xl font-semibold tracking-tight h1 + text-muted-foreground subtitle with static description + optional middot + count total
-- Analytics subtitle: static description only (service type count not meaningful)
-- Campaigns subtitle: static description only (count not available in shell without new prop threading)
-- bg-card applied to table body rows at call site only (ui/table.tsx NOT modified)
-- QuickSendModal spacing: DialogContent base already has gap-4 (grid layout) — no change needed
-
-### Key Decisions for Phase 51 Plan 01 (Dashboard Fixes + Spacing)
-
-- acknowledgeAlert called directly (module-level import) in handleDismiss — no prop threading needed
-- Empty state border pattern: rounded-lg border border-border bg-card for ALL queue empty states (including "all caught up")
-- customers/page.tsx spacing deferred to Plan 02 (avoids file conflict with F-16 changes)
-- Skeleton component pattern: <Skeleton className="h-X w-Y [structural-classes]" /> — drop bg-muted/animate-pulse/rounded from className
-
-### Key Decisions for Phase 50 (Code Review) — COMPLETE
-
-- Phase 50 deliverable: docs/CODE-REVIEW-41-44.md — 27 findings (0 Critical, 5 High, 11 Medium, 10 Low, 1 Info)
-- F-44-01 (MEDIUM): updateServiceTypeSettings uses user_id directly — should fetch business.id first for defense-in-depth
-- F-44-03 (LOW): CRM step saves empty string instead of null when no selection — normalize to null in server action
-- F-44-04 (LOW): Business.custom_service_names typed as non-nullable but DB may return null — type vs runtime mismatch
-- F-44-08 (LOW): CRM brand colors (bg-emerald-500 etc.) documented as acceptable exception to semantic tokens rule
-- F-CC-01 (MEDIUM): space-y-6 (page content) vs space-y-8 (loading skeleton) mismatch on 6 pages — systemic fix needed
-- F-01/F-02/F-03: SendLogWithContact deprecated alias in 3 history files + lib/data/send-logs.ts — must migrate together
-- arrow key navigation not implemented for custom CRM radiogroup — minor accessibility gap (Tab works, arrow keys don't)
-
-### Key Decisions for v2.5.3
-
-- Getting Started step 2 (campaign_reviewed) triggers on campaign detail page visit — not list page
-- All dashboard KPI cards link to /analytics — no scattered destinations
-- CampaignSelector sentinel pattern: CAMPAIGN_CREATE = '__create_campaign__' intercepted in onChange before calling parent handler
-- "Create new campaign" navigates to /campaigns page (has New Campaign button) rather than inline dialog
-- Campaign preset picker: vertical stack (flex-col), sorted by CAMPAIGN_PRESETS index, no touch badges
-- Frozen enrollment status: treated as "in-progress" in all deletion, reassignment, and conflict queries (use .in('status', ['active', 'frozen']))
-- stopEnrollment (single enrollment by ID) keeps .eq('status', 'active') — frozen enrollments are unfrozen via campaign resume, not individually stopped
-- Custom service names use value="other" in ServiceTypeSelect — DB stores enum 'other', display names are cosmetic only
-- flatMap used on availableTypes array to allow returning arrays for the 'other' custom names case
-
-### Key Decisions for v2.5.2
-
-- soft button variant: bg-muted/text-muted-foreground — use for secondary actions alongside a primary default CTA
-- outline button retained for primary-action-among-equals (e.g., Send One-Off — no competing default CTA present)
-- Queue row card pattern: space-y-2 container + rounded-lg border border-border bg-card per row (not divide-y)
-- Empty state border pattern: border border-border bg-card (1px solid, white bg — no dashed borders in dashboard queues)
-- "Activity" renamed to "History" in navigation — route /history unchanged
 
 ### Cross-Cutting Concerns (apply to every plan)
 
@@ -100,6 +42,10 @@ Progress: [████████░░] 80% (v2.5.4 milestone — Phase 51 un
 - Loading skeleton pattern: always use Skeleton component, container py-6 space-y-8 for full-width pages
 - custom_service_names stored as TEXT[] — simple array, no metadata needed
 - Enter key in sub-input must call e.preventDefault() to prevent parent form submission
+- soft button variant: bg-muted/text-muted-foreground — use for secondary actions alongside a primary default CTA
+- SheetBody/SheetFooter pattern: form wraps both SheetBody and SheetFooter (flex flex-col flex-1 min-h-0)
+- Subtitle canonical pattern: text-2xl font-semibold tracking-tight h1 + text-muted-foreground subtitle
+- Skeleton component pattern: <Skeleton className="h-X w-Y [structural-classes]" /> — drop bg-muted/animate-pulse/rounded from className
 
 ### Pending Todos
 
@@ -111,7 +57,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-27
-Stopped at: Completed 51-01-PLAN.md — Plan 02 (customers spacing + F-16) is next
+Last session: 2026-02-26
+Stopped at: Milestone v3.0 started — defining requirements
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
