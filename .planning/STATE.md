@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.0 Agency Mode (Phases 52-58) — Phase 54 COMPLETE, Phase 55 next
+**Current focus:** v3.0 Agency Mode (Phases 52-58) — Phase 55 in progress (Plan 1 of 3 complete)
 
 ## Current Position
 
-Phase: 54 of 58 (Business Switcher UI) — COMPLETE
-Plan: 2/2 in current phase (phase complete)
+Phase: 55 of 58 (Clients Page) — In progress
+Plan: 1/3 in current phase
 Milestone: v3.0 Agency Mode (Phases 52-58)
-Status: Phase 54 complete and verified — ready to plan Phase 55
+Status: Plan 55-01 complete — data layer done, Plans 55-02 and 55-03 next
 
-Progress: [████░░░░░░] ~43% (Phase 54 of 7 phases, all plans complete)
+Progress: [████░░░░░░] ~45% (Phase 55 Plan 1 of 3 complete)
 
-Last activity: 2026-02-27 — Phase 54 verified, all must-haves passed
+Last activity: 2026-02-27 — Completed 55-01-PLAN.md (agency metadata data layer)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 236
-- v3.0 plans completed: 6/TBD
+- Total plans completed (project): 237
+- v3.0 plans completed: 7/TBD
 
 *Updated after each plan completion*
 
@@ -39,6 +39,7 @@ Last activity: 2026-02-27 — Phase 54 verified, all must-haves passed
 - `reviews_gained` computed at read time (current - start), never stored
 - **Phase 53 complete:** All data functions and server actions use explicit `businessId` parameter — zero PGRST116 crash risk
 - **Phase 54 complete:** BusinessSwitcher in desktop sidebar AND mobile page header — zero code duplication, same component both surfaces
+- **Phase 55-01 complete:** Agency metadata data layer — 10 nullable columns on businesses table, extended Business interface, getUserBusinessesWithMetadata(), updateBusinessMetadata(), updateBusinessNotes(), businessMetadataSchema
 
 ### Decisions from Phase 52-01
 
@@ -80,6 +81,14 @@ Last activity: 2026-02-27 — Phase 54 verified, all must-haves passed
 - `min-w-0` on center section required for BusinessSwitcher's `truncate` class to work (flex items don't shrink below content size without it)
 - No props, state, or hooks added to page-header.tsx — purely layout restructure + import
 
+### Decisions from Phase 55-01
+
+- `NUMERIC(2,1)` for rating columns — avoids floating point issues (4.3 not 4.299999)
+- `NUMERIC(10,2)` for monthly_fee — standard currency column precision
+- `agency_notes` excluded from `businessMetadataSchema` — has its own `updateBusinessNotes()` action with simple length check and no revalidatePath
+- `updateBusinessNotes` omits `revalidatePath` — auto-save notes is fire-and-forget, no page re-render needed
+- `getUserBusinessesWithMetadata` does NOT use `getActiveBusiness()` — Clients Page shows ALL businesses
+
 ### Cross-Cutting Concerns (apply to every plan)
 
 - Design system: use existing semantic tokens and design system patterns
@@ -98,6 +107,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Phase 54 complete and verified — ready to plan Phase 55 (Clients Page)
+Stopped at: Completed 55-01-PLAN.md — agency metadata data layer done
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
