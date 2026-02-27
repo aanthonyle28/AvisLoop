@@ -4,6 +4,7 @@ import { getOnboardingStatus } from '@/lib/data/onboarding'
 import { getActiveBusiness } from '@/lib/data/active-business'
 import { getBusiness } from '@/lib/data/business'
 import { OnboardingWizard } from '@/components/onboarding/onboarding-wizard'
+import { CreateBusinessWizard } from '@/components/onboarding/create-business-wizard'
 
 /**
  * Onboarding page - standalone full-screen experience (no dashboard shell).
@@ -75,6 +76,14 @@ export default async function OnboardingPage({
     custom_service_names: business.custom_service_names || null,
     sms_consent_acknowledged: business.sms_consent_acknowledged || false,
   } : null
+
+  if (isNewBusinessMode) {
+    return (
+      <CreateBusinessWizard
+        campaignPresets={presets || []}
+      />
+    )
+  }
 
   return (
     <OnboardingWizard

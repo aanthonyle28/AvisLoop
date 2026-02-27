@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Buildings } from '@phosphor-icons/react'
+import Link from 'next/link'
+import { Buildings, Plus } from '@phosphor-icons/react'
+import { Button } from '@/components/ui/button'
 import { BusinessCard } from '@/components/businesses/business-card'
 import { BusinessDetailDrawer } from '@/components/businesses/business-detail-drawer'
 import type { Business } from '@/lib/types/database'
@@ -31,9 +33,17 @@ export function BusinessesClient({ businesses, activeBusinessId }: BusinessesCli
   return (
     <div className='space-y-6'>
       {/* Page header */}
-      <div>
-        <h1 className='text-3xl font-bold tracking-tight'>Businesses</h1>
-        <p className='text-muted-foreground mt-1'>Manage your client businesses</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className='text-3xl font-bold tracking-tight'>Businesses</h1>
+          <p className='text-muted-foreground mt-1'>Manage your client businesses</p>
+        </div>
+        <Button asChild>
+          <Link href="/onboarding?mode=new">
+            <Plus size={16} weight="bold" />
+            Add Business
+          </Link>
+        </Button>
       </div>
 
       {/* Empty state */}
