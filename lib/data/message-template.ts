@@ -2,34 +2,20 @@ import { createClient } from '@/lib/supabase/server'
 import type { MessageTemplate, MessageChannel } from '@/lib/types/database'
 
 /**
- * Fetch all message templates for the current user's business.
+ * Fetch all message templates for the given business.
  * Optionally filter by channel (email/sms).
+ * Caller is responsible for providing a verified businessId (from getActiveBusiness()).
  */
 export async function getMessageTemplates(
+  businessId: string,
   channel?: MessageChannel
 ): Promise<MessageTemplate[]> {
   const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return []
-  }
-
-  // Get user's business
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
-  if (!business) {
-    return []
-  }
-
   let query = supabase
     .from('message_templates')
     .select('*')
-    .eq('business_id', business.id)
+    .eq('business_id', businessId)
     .order('is_default', { ascending: false })
     .order('created_at', { ascending: true })
 
@@ -94,32 +80,26 @@ export async function getDefaultMessageTemplates(
  * Includes both user-created and default templates.
  * System templates are filtered to only include those matching the business's enabled service types.
  * Useful for template selectors in send forms.
+ * Caller is responsible for providing a verified businessId (from getActiveBusiness()).
  */
 export async function getAvailableTemplates(
+  businessId: string,
   channel?: MessageChannel
 ): Promise<MessageTemplate[]> {
   const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return []
-  }
-
+  // Fetch service_types_enabled for this business to filter system templates
   const { data: business } = await supabase
     .from('businesses')
-    .select('id, service_types_enabled')
-    .eq('user_id', user.id)
+    .select('service_types_enabled')
+    .eq('id', businessId)
     .single()
-
-  if (!business) {
-    return []
-  }
 
   // Get user's templates + defaults
   let query = supabase
     .from('message_templates')
     .select('*')
-    .or(`business_id.eq.${business.id},is_default.eq.true`)
+    .or(`business_id.eq.${businessId},is_default.eq.true`)
     .order('is_default', { ascending: false })
     .order('name', { ascending: true })
 
@@ -130,7 +110,7 @@ export async function getAvailableTemplates(
   const { data } = await query
 
   // Filter system templates to only include enabled service types
-  const enabledTypes = business.service_types_enabled as string[] | null
+  const enabledTypes = business?.service_types_enabled as string[] | null
   if (enabledTypes && enabledTypes.length > 0) {
     return (data || []).filter(template => {
       // User-created templates always show

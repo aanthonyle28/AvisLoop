@@ -2,32 +2,20 @@ import { createClient } from '@/lib/supabase/server'
 import type { JobWithCustomer, JobWithEnrollment, ConflictDetail } from '@/lib/types/database'
 
 /**
- * Fetch jobs for the current user's business with pagination and filters.
+ * Fetch jobs for the given business with pagination and filters.
  * Includes enrollment data for campaign preview.
+ * Caller is responsible for providing a verified businessId (from getActiveBusiness()).
  */
-export async function getJobs(options?: {
-  limit?: number
-  offset?: number
-  serviceType?: string
-  status?: string
-}): Promise<{ jobs: JobWithEnrollment[]; total: number; businessId: string | null }> {
+export async function getJobs(
+  businessId: string,
+  options?: {
+    limit?: number
+    offset?: number
+    serviceType?: string
+    status?: string
+  }
+): Promise<{ jobs: JobWithEnrollment[]; total: number }> {
   const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return { jobs: [], total: 0, businessId: null }
-  }
-
-  // Get user's business
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
-  if (!business) {
-    return { jobs: [], total: 0, businessId: null }
-  }
 
   const limit = options?.limit ?? 50
   const offset = options?.offset ?? 0
@@ -40,7 +28,7 @@ export async function getJobs(options?: {
       customers!inner(id, name, email, phone),
       campaign_enrollments(id, status, campaigns:campaign_id(id, name))
     `, { count: 'exact' })
-    .eq('business_id', business.id)
+    .eq('business_id', businessId)
     .order('created_at', { ascending: false })
 
   // Apply service type filter
@@ -60,7 +48,7 @@ export async function getJobs(options?: {
 
   if (error) {
     console.error('Error fetching jobs:', error)
-    return { jobs: [], total: 0, businessId: business.id }
+    return { jobs: [], total: 0 }
   }
 
   const jobs = data as JobWithEnrollment[]
@@ -78,7 +66,7 @@ export async function getJobs(options?: {
       .from('campaign_enrollments')
       .select('customer_id, current_touch, campaigns:campaign_id(name, campaign_touches(touch_number))')
       .in('customer_id', Array.from(conflictCustomerIds))
-      .eq('business_id', business.id)
+      .eq('business_id', businessId)
       .eq('status', 'active')
 
     for (const enrollment of activeEnrollments || []) {
@@ -119,7 +107,7 @@ export async function getJobs(options?: {
       .from('campaign_enrollments')
       .select('customer_id, current_touch, campaigns:campaign_id(name, campaign_touches(touch_number))')
       .in('customer_id', Array.from(preflightCustomerIds))
-      .eq('business_id', business.id)
+      .eq('business_id', businessId)
       .eq('status', 'active')
 
     const preflightMap = new Map<string, ConflictDetail>()
@@ -151,7 +139,6 @@ export async function getJobs(options?: {
   return {
     jobs,
     total: count || 0,
-    businessId: business.id,
   }
 }
 
@@ -181,48 +168,33 @@ export async function getJob(jobId: string): Promise<JobWithCustomer | null> {
 }
 
 /**
- * Get job counts by status for the current business.
+ * Get job counts by status for the given business.
  */
-export async function getJobCounts(): Promise<{
+export async function getJobCounts(businessId: string): Promise<{
   total: number
   completed: number
   doNotSend: number
 }> {
   const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return { total: 0, completed: 0, doNotSend: 0 }
-  }
-
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
-  if (!business) {
-    return { total: 0, completed: 0, doNotSend: 0 }
-  }
-
   // Get total count
   const { count: total } = await supabase
     .from('jobs')
     .select('*', { count: 'exact', head: true })
-    .eq('business_id', business.id)
+    .eq('business_id', businessId)
 
   // Get completed count
   const { count: completed } = await supabase
     .from('jobs')
     .select('*', { count: 'exact', head: true })
-    .eq('business_id', business.id)
+    .eq('business_id', businessId)
     .eq('status', 'completed')
 
   // Get do_not_send count
   const { count: doNotSend } = await supabase
     .from('jobs')
     .select('*', { count: 'exact', head: true })
-    .eq('business_id', business.id)
+    .eq('business_id', businessId)
     .eq('status', 'do_not_send')
 
   return {

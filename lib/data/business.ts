@@ -7,17 +7,12 @@ export type BusinessWithTemplates = Business & {
 }
 
 /**
- * Fetch current user's business with all templates.
- * For use in Server Components to load initial form data.
- * Returns null if no business exists yet.
+ * Fetch business with all templates by businessId.
+ * Caller is responsible for providing a verified businessId (from getActiveBusiness()).
+ * Returns null if business not found.
  */
-export async function getBusiness(): Promise<BusinessWithTemplates | null> {
+export async function getBusiness(businessId: string): Promise<BusinessWithTemplates | null> {
   const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return null
-  }
 
   // Use explicit FK hint to resolve ambiguity from circular relationship
   // (businesses.default_template_id -> message_templates, message_templates.business_id -> businesses)
@@ -36,41 +31,25 @@ export async function getBusiness(): Promise<BusinessWithTemplates | null> {
         created_at
       )
     `)
-    .eq('user_id', user.id)
+    .eq('id', businessId)
     .single()
 
   return business
 }
 
 /**
- * Fetch all email templates for the current user's business.
+ * Fetch all email templates for the given business.
  * Includes both system defaults and user-created templates.
  * @deprecated Use getMessageTemplates from lib/data/message-template.ts with channel='email' instead.
  * This function is maintained for backward compatibility only.
  */
-export async function getEmailTemplates() {
+export async function getEmailTemplates(businessId: string) {
   const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return []
-  }
-
-  // Get user's business first
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
-  if (!business) {
-    return []
-  }
 
   const { data: templates } = await supabase
     .from('message_templates')
     .select('*')
-    .eq('business_id', business.id)
+    .eq('business_id', businessId)
     .eq('channel', 'email') // Filter for email templates only
     .order('is_default', { ascending: false }) // System defaults first
     .order('created_at', { ascending: true })
@@ -82,20 +61,17 @@ export async function getEmailTemplates() {
  * Get business service type settings.
  * Returns which service types are enabled and their timing defaults.
  */
-export async function getServiceTypeSettings(): Promise<{
+export async function getServiceTypeSettings(businessId: string): Promise<{
   serviceTypesEnabled: string[]
   serviceTypeTiming: Record<string, number>
   customServiceNames: string[]
 } | null> {
   const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return null
-
   const { data: business } = await supabase
     .from('businesses')
     .select('service_types_enabled, service_type_timing, custom_service_names')
-    .eq('user_id', user.id)
+    .eq('id', businessId)
     .single()
 
   if (!business) return null

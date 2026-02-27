@@ -9,24 +9,15 @@ import type {
 } from '@/lib/types/database'
 
 /**
- * Get all campaigns for current user's business, optionally filtered by service type.
+ * Get all campaigns for the given business, optionally filtered by service type.
  * Includes system presets (is_preset=true) which have business_id=NULL.
+ * Caller is responsible for providing a verified businessId (from getActiveBusiness()).
  */
 export async function getCampaigns(
+  businessId: string,
   options?: { serviceType?: ServiceType | null; includePresets?: boolean }
 ): Promise<CampaignWithTouches[]> {
   const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return []
-
-  const { data: business } = await supabase
-    .from('businesses')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
-  if (!business) return []
 
   let query = supabase
     .from('campaigns')
@@ -38,9 +29,9 @@ export async function getCampaigns(
 
   // Filter: business campaigns OR presets (if requested)
   if (options?.includePresets !== false) {
-    query = query.or(`business_id.eq.${business.id},is_preset.eq.true`)
+    query = query.or(`business_id.eq.${businessId},is_preset.eq.true`)
   } else {
-    query = query.eq('business_id', business.id)
+    query = query.eq('business_id', businessId)
   }
 
   // Optional service type filter
