@@ -17,6 +17,13 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Skeleton } from '@/components/ui/skeleton'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { CustomerAutocomplete } from './customer-autocomplete'
 import { ServiceTypeSelect } from './service-type-select'
 import { CampaignSelector, CAMPAIGN_DO_NOT_SEND, CAMPAIGN_ONE_OFF } from './campaign-selector'
@@ -279,17 +286,18 @@ export function AddJobSheet({ open, onOpenChange, customers, isLoadingData }: Ad
               {/* Status */}
               <div className="space-y-2">
                 <Label>Status</Label>
-                <select
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value as JobStatus)}
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                >
-                  {ADD_JOB_STATUSES.map(s => (
-                    <option key={s} value={s}>
-                      {JOB_STATUS_LABELS[s]}
-                    </option>
-                  ))}
-                </select>
+                <Select value={status} onValueChange={(val) => setStatus(val as JobStatus)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ADD_JOB_STATUSES.map(s => (
+                      <SelectItem key={s} value={s}>
+                        {JOB_STATUS_LABELS[s]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <p className="text-xs text-muted-foreground">
                   {JOB_STATUS_DESCRIPTIONS[status]}
                 </p>
