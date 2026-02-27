@@ -5,26 +5,36 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v2.5.4 Code Review milestone (Phases 50-51) — Phase 51 COMPLETE
+**Current focus:** Phase 47 — Dashboard Right Panel + Campaign Polish
 
 ## Current Position
 
-Phase: 51 of 51 (Audit Remediation) — COMPLETE
-Plan: 3/3 complete (51-01 ✓, 51-02 ✓, 51-03 ✓)
-Milestone: v2.5.4 Code Review (Phases 50-51) — ALL COMPLETE
-Status: Milestone complete
+Phase: 47 of 51 (Dashboard Right Panel + Campaign Polish)
+Plan: 1/4 complete (47-01 ✓)
+Status: In progress
 
-Progress: [██████████] 100% (Phase 51)
+Progress: [░░░░░░░░░░] Phase 47 plan 1/4
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 231
-- Phase 51 plans completed: 3/3
+- Total plans completed (project): 232
+- Phase 47 plans completed: 1/4
 
 *Updated after each plan completion*
 
 ## Accumulated Context
+
+### Key Decisions for Phase 47 (Dashboard Right Panel + Campaign Polish)
+
+- DayBucket: { date: string (YYYY-MM-DD), value: number } — exported from lib/types/dashboard.ts
+- KPIMetric.history is optional (history?: DayBucket[]) — won't break existing consumers
+- bucketByDay() is module-internal (not exported) — dashboard-specific utility
+- Ratings history uses daily average (not count) — matches averageRating KPI semantics (1-5 scale)
+- Conversion history derived from sendsHistoryResult.reviewed_at — avoids extra DB query
+- Pipeline metrics (requestsSentThisWeek, activeSequences, pendingQueued) do NOT get history
+- Error fallback history: [] on outcome metrics — safe for .map() without null checks
+- Promise.all in getDashboardKPIs now has 14 parallel queries (11 existing + 3 history)
 
 ### Key Decisions for Phase 51 (Audit Remediation)
 
@@ -59,6 +69,6 @@ Config:
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Phase 51 Plan 03 complete — history type migration, UI correctness, dead code cleanup
+Stopped at: Phase 47 Plan 01 complete — DayBucket type, KPIMetric.history, bucketByDay utility, 14-day history queries
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
