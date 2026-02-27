@@ -30,14 +30,22 @@ Turn job completions into Google reviews automatically — multi-touch follow-up
 - Cron processes due sends every minute with re-validation of business rules
 - Navigation badges show pending scheduled count
 
-### Active
-
 **v3.0 Agency Mode**
 - Multi-business support: one user can own and manage multiple businesses
 - Business switcher dropdown at top of sidebar for quick switching
 - Full onboarding wizard for each new business creation
 - All existing pages (dashboard, jobs, campaigns, etc.) scope to selected business
 - Unified agency billing: one subscription covers all client businesses
+- Public job completion form with token-secured URL for technician on-site use
+
+### Active
+
+**v3.1 QA E2E Audit**
+- Full Playwright-driven E2E audit of all authenticated app pages
+- Page-by-page findings reports with severity ratings
+- Edge case testing: empty states, data isolation, responsive, rapid switching
+- Cross-cutting checks: loading states, error handling, form validation
+- v3.0 agency feature regression: multi-business, switcher, clients page, billing
 
 ### Out of Scope
 
@@ -112,23 +120,22 @@ Turn job completions into Google reviews automatically — multi-touch follow-up
 | Dashboard test step cards | Guided walkthrough instead of checklist | Good — auto-detection of completion |
 | Test sends excluded from quota | Fair for users learning the product | Good — is_test flag in database |
 
-## Current Milestone: v3.0 Agency Mode
+## Current Milestone: v3.1 QA E2E Audit
 
-**Goal:** Enable one user to own and manage multiple client businesses from a single account, with a sidebar business switcher for quick context switching and unified billing.
+**Goal:** Comprehensive Playwright-driven E2E audit of all authenticated app pages and v3.0 agency features, producing page-by-page findings reports before production deployment.
 
-**Target features:**
-- Multi-business ownership (one user, many businesses)
-- Business switcher dropdown at top of sidebar
-- Clients page (/businesses) with card grid showing all client businesses
-- Client detail drawer with full profile: Google ratings (start vs now), reviews gained, monthly fee, GBP access, competitor info, notes
-- Full onboarding wizard for each new business
-- All app pages scope to currently selected business
-- Unified agency subscription tier
+**Target scope:**
+- All dashboard routes tested: dashboard, jobs, campaigns, analytics, history, feedback, billing, settings
+- Auth flows: login, signup, password reset, Google OAuth
+- Onboarding: first business wizard + additional business creation
+- v3.0 agency features: business switcher, clients page, detail drawer, data isolation
+- Edge cases: empty states, long names, rapid switching, mobile responsive, quota limits
+- Output: per-page findings files + severity-rated summary report
 
 **Key decisions:**
-- v2.5.4 Phase 51 (Audit Remediation) deferred — separate scope
-- v2.5.2 (Phases 45-47) and v2.5.3 (Phases 48-49) remain unexecuted — separate scope
-- No white-label or client reporting portal in v3.0 — future scope
+- Findings only — no fixes in this milestone (separate remediation pass)
+- Dashboard + agency focus — marketing/public pages excluded
+- v3.0 must be complete (Phase 58-02) before QA begins
 
 ---
-*Last updated: 2026-02-26 after v3.0 Agency Mode milestone started*
+*Last updated: 2026-02-27 after v3.1 QA E2E Audit milestone started*

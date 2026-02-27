@@ -2,21 +2,21 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-26)
+See: .planning/PROJECT.md (updated 2026-02-27)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.0 Agency Mode (Phases 52-58) — COMPLETE
+**Current focus:** v3.1 QA E2E Audit — defining requirements
 
 ## Current Position
 
-Phase: 58 of 58 (Job Completion Form) — Complete
-Plan: 2/2 in current phase (all complete)
-Milestone: v3.0 Agency Mode (Phases 52-58) — COMPLETE
-Status: All phases complete, milestone verified
+Phase: Not started (defining requirements)
+Plan: —
+Milestone: v3.1 QA E2E Audit
+Status: Defining requirements
 
-Progress: [██████████] 100% (All v3.0 phases complete)
+Progress: [░░░░░░░░░░] 0%
 
-Last activity: 2026-02-27 — Completed Phase 58 (Job Completion Form: backend + public form UI, verified via Playwright)
+Last activity: 2026-02-27 — Milestone v3.1 started (v3.0 Agency Mode complete)
 
 ## Performance Metrics
 
