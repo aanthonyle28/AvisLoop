@@ -202,11 +202,8 @@ function DashboardContent({
     return parts.join(' · ')
   })()
 
-  // Show Getting Started in left column on mobile (right panel is hidden on mobile)
-  const showGettingStartedMobile =
-    setupProgress &&
-    !setupProgress.dismissed &&
-    !setupProgress.allComplete
+  // Getting Started hidden for now — re-enable by restoring the setupProgress checks
+  const showGettingStartedMobile = false
 
   const selectableAlerts = toSelectableAlerts(alerts)
 
@@ -405,20 +402,8 @@ export function DashboardClient({
     />
   )
 
-  // Getting Started content for right panel — persistent card at top
-  const showGettingStarted =
-    setupProgress &&
-    !setupProgress.dismissed
-
-  const gettingStartedContent = showGettingStarted ? (
-    <RightPanelGettingStarted
-      items={setupProgress!.items}
-      completedCount={setupProgress!.completedCount}
-      allComplete={setupProgress!.allComplete}
-      initialCollapsed={setupProgress!.collapsed}
-      initialDismissed={setupProgress!.dismissed}
-    />
-  ) : undefined
+  // Getting Started hidden for now — re-enable by restoring the setupProgress checks
+  const gettingStartedContent = undefined
 
   return (
     <DashboardShell

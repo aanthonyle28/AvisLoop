@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { CampaignCard } from './campaign-card'
 import { CampaignForm } from './campaign-form'
-import { FirstVisitHint } from '@/components/onboarding/first-visit-hint'
 import {
   Sheet,
   SheetContent,
@@ -30,29 +29,12 @@ export function CampaignList({ campaigns, templates }: CampaignListProps) {
   return (
     <>
       <div className="space-y-4">
-        {campaigns.map((campaign, index) => (
-          index === 0 ? (
-            <FirstVisitHint
-              key={campaign.id}
-              hintId="campaigns-overview"
-              title="Review your campaign settings"
-              description="Campaigns run automatically when jobs are completed. Check your timing and message sequence to match your business."
-              side="bottom"
-            >
-              <div>
-                <CampaignCard
-                  campaign={campaign}
-                  onEdit={(id) => setEditingCampaignId(id)}
-                />
-              </div>
-            </FirstVisitHint>
-          ) : (
-            <CampaignCard
-              key={campaign.id}
-              campaign={campaign}
-              onEdit={(id) => setEditingCampaignId(id)}
-            />
-          )
+        {campaigns.map((campaign) => (
+          <CampaignCard
+            key={campaign.id}
+            campaign={campaign}
+            onEdit={(id) => setEditingCampaignId(id)}
+          />
         ))}
       </div>
 
