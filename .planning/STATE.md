@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.0 Agency Mode (Phases 52-58) — Phase 53 in progress
+**Current focus:** v3.0 Agency Mode (Phases 52-58) — Phase 53 complete, Phase 54 next
 
 ## Current Position
 
-Phase: 53 of 58 (Data Function Refactor) — In Progress
-Plan: 1/2 in current phase
-Milestone: v3.0 Agency Mode (Phases 52-58) — Phase 52 complete, Phase 53-01 complete
-Status: In progress — 53-01 done, 53-02 next (update call sites)
+Phase: 53 of 58 (Data Function Refactor) — COMPLETE
+Plan: 2/2 in current phase
+Milestone: v3.0 Agency Mode (Phases 52-58) — Phase 53 verified
+Status: Phase 53 complete — ready to plan Phase 54
 
-Progress: [███░░░░░░░] ~21% (Phase 53-01 of 7 phases)
+Progress: [███░░░░░░░] ~29% (Phase 53 of 7 phases)
 
-Last activity: 2026-02-27 — Completed 53-01-PLAN.md (data layer refactor)
+Last activity: 2026-02-27 — Phase 53 verified, all must-haves passed
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 233
-- v3.0 plans completed: 3/TBD
+- Total plans completed (project): 234
+- v3.0 plans completed: 4/TBD
 
 *Updated after each plan completion*
 
@@ -37,6 +37,7 @@ Last activity: 2026-02-27 — Completed 53-01-PLAN.md (data layer refactor)
 - First-business onboarding: existing upsert path (unchanged). Additional businesses: new `createAdditionalBusiness()` insert-only path
 - Cron endpoints unaffected — they use service role and query by business_id directly
 - `reviews_gained` computed at read time (current - start), never stored
+- **Phase 53 complete:** All data functions and server actions use explicit `businessId` parameter — zero PGRST116 crash risk
 
 ### Decisions from Phase 52-01
 
@@ -50,24 +51,19 @@ Last activity: 2026-02-27 — Completed 53-01-PLAN.md (data layer refactor)
 - New `BusinessSettingsProvider` props (businessId, businessName, businesses) are required (not optional) — fails at compile time rather than silently passing wrong business ID at runtime
 - Empty-string fallback (`businessId = business?.id ?? ''`) in layout is safe: zero-business users redirect before any code uses the ID
 - `BusinessIdentity` type exported from provider — Phase 54 switcher imports from there, not redefined
-- Tasks 1+2 committed together: required props in provider + layout passing them must be atomic for always-green typecheck
 
-### Decisions from Phase 53-01
+### Decisions from Phase 53
 
-- All lib/data/ functions accept `businessId: string` as first param — callers (layout, server actions) are responsible for passing a verified businessId from `getActiveBusiness()`
-- `getJobs` return type drops `businessId: string | null` field — callers already have it from `getActiveBusiness()`
-- `getDashboardCounts` removes intermediate business query entirely — `service_type_timing` was selected but never used in count queries
-- `getSetupProgress` simplified to a single `getChecklistState(businessId)` call — no intermediate business query needed
-- `getLLMUsageStats` no longer creates supabase client — passes `businessId` directly to `getLLMUsage(businessId)` (Redis-based)
-- `lib/data/customer.ts` deleted — zero importers confirmed; would have broken after `getBusiness()` signature change anyway
-- Pattern established: all remaining `.single()` in lib/data/ are safe PK-based queries; no `.eq('user_id', ...).single()` remains outside active-business.ts
-
-### Critical Pitfall Reminders (Phase 53-02)
-
-- ~25 call sites in pages/actions/layout still use old 0-arg signatures — they must all be updated to pass `businessId` from `getActiveBusiness()`
-- `app/(dashboard)/jobs/page.tsx` references `result.businessId` from `getJobs()` — this field no longer exists in return type; caller already has businessId
-- Some pages call multiple data functions — use `Promise.all` for parallel fetching efficiency
-- After 53-02, `pnpm typecheck` must pass with zero errors (not just call-site fixes)
+- All lib/data/ functions accept `businessId: string` as first param — callers responsible for passing verified businessId
+- All lib/actions/ functions call `getActiveBusiness()` at top — no manual `.eq('user_id', ...).single()` business lookup
+- All page Server Components call `getActiveBusiness()` once and thread `business.id` to data functions
+- `getJobs` return type drops `businessId` field — callers already have it
+- `getDashboardCounts` uses businessId directly without intermediate query
+- `getSetupProgress` simplified to single `getChecklistState(businessId)` call
+- `lib/data/customer.ts` deleted — dead code with zero importers
+- Onboarding page handles null business: `getActiveBusiness()` may return null for new users
+- Billing actions keep `getUser()` for email (Stripe) but use `getActiveBusiness()` for business
+- Safe patterns left unchanged: `retrySend`, `acknowledgeAlert`, `dismissFeedbackAlert` (ownership via entity PK)
 
 ### Cross-Cutting Concerns (apply to every plan)
 
@@ -87,6 +83,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 53-01-PLAN.md — data layer refactored, 53-02 (call site updates) is next
+Stopped at: Phase 53 complete and verified — ready to plan Phase 54 (Business Switcher UI)
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!

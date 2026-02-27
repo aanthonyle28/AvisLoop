@@ -879,8 +879,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 53-01-PLAN.md — Enumerate all .single() instances, refactor lib/data/ files
-- [ ] 53-02-PLAN.md — Refactor lib/actions/ files and page-level Server Components
+- [x] 53-01-PLAN.md — Enumerate all .single() instances, refactor lib/data/ files
+- [x] 53-02-PLAN.md — Refactor lib/actions/ files and page-level Server Components
 
 ### Phase 54: Business Switcher UI
 **Goal**: Users can switch between their businesses using a dropdown at the top of the sidebar (desktop) and in the mobile header — the selected business name is always visible and all dashboard pages reflect the switch immediately.
@@ -1014,7 +1014,7 @@ See individual phase sections above for requirements, success criteria, and depe
 | **50** | **v2.5.4 Code Review** | **3/3** | **Complete** | **2026-02-26** |
 | **51** | **v2.5.4 Code Review** | **3/3** | **Complete** | **2026-02-27** |
 | **52** | **v3.0 Agency Mode** | **2/2** | **Complete** | **2026-02-27** |
-| 53 | v3.0 Agency Mode | 0/TBD | Not started | - |
+| **53** | **v3.0 Agency Mode** | **2/2** | **Complete** | **2026-02-27** |
 | 54 | v3.0 Agency Mode | 0/TBD | Not started | - |
 | 55 | v3.0 Agency Mode | 0/TBD | Not started | - |
 | 56 | v3.0 Agency Mode | 0/TBD | Not started | - |
