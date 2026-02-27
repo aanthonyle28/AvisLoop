@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
-import { Checkbox } from '@/components/ui/checkbox'
 import { TagBadge } from '@/components/ui/tag-badge'
 import { OnboardingProgress } from '@/components/onboarding/onboarding-progress'
 import {
@@ -376,120 +375,10 @@ function CampaignPresetStep({ newBusinessId, campaignPresets, onComplete, onGoBa
   )
 }
 
-// ─── Step 3: SMS Consent ──────────────────────────────────────────────────────
-
-interface Step3Props {
-  newBusinessId: string
-  onGoBack: () => void
-}
-
-function SMSConsentStep({ newBusinessId, onGoBack }: Step3Props) {
-  const router = useRouter()
-  const [acknowledged, setAcknowledged] = useState(false)
-  const [isPending, startTransition] = useTransition()
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!acknowledged) {
-      toast.error('You must acknowledge SMS consent requirements to continue')
-      return
-    }
-
-    startTransition(async () => {
-      // Complete onboarding for the new business (sets SMS consent + onboarding_completed_at)
-      const result = await completeNewBusinessOnboarding(newBusinessId)
-
-      if (!result.success) {
-        toast.error(result.error || 'Failed to complete setup')
-        return
-      }
-
-      // Switch active business cookie to the new business
-      const switchResult = await switchBusiness(newBusinessId)
-
-      if (switchResult.error) {
-        toast.error(switchResult.error || 'Failed to switch business')
-        return
-      }
-
-      // Redirect to dashboard — now showing the newly created business
-      router.push('/dashboard')
-    })
-  }
-
-  const isDisabled = isPending || !acknowledged
-
-  return (
-    <div className="space-y-8">
-      {/* Heading */}
-      <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold">SMS consent requirements</h1>
-        <p className="text-muted-foreground text-lg">
-          Important information about sending text messages to customers
-        </p>
-      </div>
-
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Info card with TCPA requirements */}
-        <div className="border rounded-lg p-6 bg-card space-y-4">
-          <h3 className="font-semibold text-lg">Key requirements:</h3>
-          <ul className="space-y-3 list-disc list-inside text-sm">
-            <li>You must have written consent from customers before sending SMS messages</li>
-            <li>Customers can opt out at any time by replying STOP</li>
-            <li>
-              You must keep records of when and how consent was obtained (TCPA compliance)
-            </li>
-            <li>Messages will only be sent during business hours (8 AM - 9 PM local time)</li>
-          </ul>
-        </div>
-
-        {/* Acknowledgment checkbox */}
-        <div className="border border-info-border bg-info-bg rounded-lg p-4">
-          <div className="flex items-start gap-3">
-            <Checkbox
-              id="sms-consent-acknowledgment"
-              checked={acknowledged}
-              onCheckedChange={(checked) => setAcknowledged(checked === true)}
-              className="mt-0.5"
-            />
-            <Label
-              htmlFor="sms-consent-acknowledgment"
-              className="text-sm cursor-pointer leading-relaxed"
-            >
-              I understand that I must obtain written consent from customers before sending them
-              SMS messages, and I will maintain records of consent as required by TCPA
-              regulations.
-            </Label>
-          </div>
-        </div>
-
-        {/* Back button (text link) */}
-        <div className="text-center">
-          <button
-            type="button"
-            onClick={onGoBack}
-            disabled={isPending}
-            className="text-sm text-muted-foreground hover:text-foreground underline"
-          >
-            Back
-          </button>
-        </div>
-
-        {/* Complete button */}
-        <Button type="submit" disabled={isDisabled} className="w-full h-12 text-base">
-          {isPending ? 'Completing...' : 'Complete Setup'}
-        </Button>
-      </form>
-    </div>
-  )
-}
-
 // ─── Wizard Shell ─────────────────────────────────────────────────────────────
 
 /**
- * CreateBusinessWizard — 3-step wizard for adding a second/nth business.
+ * CreateBusinessWizard — 2-step wizard for adding a second/nth business.
  *
  * Calls ONLY the scoped server actions from create-additional-business.ts.
  * NEVER calls saveBusinessBasics, saveServicesOffered, createCampaignFromPreset,
@@ -498,7 +387,8 @@ function SMSConsentStep({ newBusinessId, onGoBack }: Step3Props) {
  * No localStorage draft persistence (intentional — wizard is only 3 steps).
  */
 export function CreateBusinessWizard({ campaignPresets }: CreateBusinessWizardProps) {
-  const [step, setStep] = useState<1 | 2 | 3>(1)
+  const router = useRouter()
+  const [step, setStep] = useState<1 | 2>(1)
   const [newBusinessId, setNewBusinessId] = useState<string | null>(null)
 
   const handleStep1Complete = (businessId: string) => {
@@ -507,15 +397,27 @@ export function CreateBusinessWizard({ campaignPresets }: CreateBusinessWizardPr
   }
 
   const handleStep2Complete = () => {
-    setStep(3)
+    // Skip SMS consent step — auto-complete onboarding
+    if (!newBusinessId) return
+    handleAutoComplete(newBusinessId)
+  }
+
+  const handleAutoComplete = async (businessId: string) => {
+    const result = await completeNewBusinessOnboarding(businessId)
+    if (!result.success) {
+      toast.error(result.error || 'Failed to complete setup')
+      return
+    }
+    const switchResult = await switchBusiness(businessId)
+    if (switchResult.error) {
+      toast.error(switchResult.error || 'Failed to switch business')
+      return
+    }
+    router.push('/dashboard')
   }
 
   const handleGoBackToStep1 = () => {
     setStep(1)
-  }
-
-  const handleGoBackToStep2 = () => {
-    setStep(2)
   }
 
   return (
@@ -531,14 +433,10 @@ export function CreateBusinessWizard({ campaignPresets }: CreateBusinessWizardPr
             onGoBack={handleGoBackToStep1}
           />
         )}
-
-        {step === 3 && newBusinessId && (
-          <SMSConsentStep newBusinessId={newBusinessId} onGoBack={handleGoBackToStep2} />
-        )}
       </div>
 
       {/* Progress bar fixed at bottom */}
-      <OnboardingProgress currentStep={step} totalSteps={3} />
+      <OnboardingProgress currentStep={step} totalSteps={2} />
     </div>
   )
 }

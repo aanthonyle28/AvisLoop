@@ -1,11 +1,13 @@
 "use client"
 
 import { useTransition } from 'react'
-import { CaretUpDown, Check } from '@phosphor-icons/react'
+import { useRouter } from 'next/navigation'
+import { CaretUpDown, Check, ListBullets } from '@phosphor-icons/react'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useBusinessSettings } from '@/components/providers/business-settings-provider'
@@ -16,6 +18,7 @@ import { toast } from 'sonner'
 export function BusinessSwitcher() {
   const { businesses, businessId, businessName } = useBusinessSettings()
   const [isPending, startTransition] = useTransition()
+  const router = useRouter()
 
   // Single-business: plain text only, no interactive affordance
   if (businesses.length <= 1) {
@@ -64,6 +67,14 @@ export function BusinessSwitcher() {
             )}
           </DropdownMenuItem>
         ))}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onSelect={() => router.push('/businesses')}
+          className="flex items-center gap-2 cursor-pointer"
+        >
+          <ListBullets size={14} className="shrink-0" />
+          <span>View all clients</span>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )
