@@ -6,6 +6,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { XCircle, WarningCircle, Info, CheckCircle, DotsThree, DotsThreeVertical, X } from '@phosphor-icons/react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -253,21 +254,21 @@ export function AttentionAlertsSkeleton() {
     <div>
       {/* Header skeleton */}
       <div className="flex items-center gap-2 mb-2">
-        <div className="h-5 w-32 bg-muted animate-pulse rounded" />
-        <div className="h-5 w-8 bg-muted animate-pulse rounded" />
+        <Skeleton className="h-5 w-32" />
+        <Skeleton className="h-5 w-8" />
       </div>
       {/* Row skeletons */}
       <div className="space-y-2">
         {[1, 2, 3].map((i) => (
           <div key={i} className="flex items-start justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2.5">
             <div className="flex items-start gap-2 min-w-0 flex-1">
-              <div className="size-5 bg-muted animate-pulse rounded-full shrink-0" />
+              <Skeleton className="size-5 rounded-full shrink-0" />
               <div className="space-y-1.5 flex-1">
-                <div className="h-4 w-48 bg-muted animate-pulse rounded" />
-                <div className="h-3 w-64 bg-muted animate-pulse rounded" />
+                <Skeleton className="h-4 w-48" />
+                <Skeleton className="h-3 w-64" />
               </div>
             </div>
-            <div className="h-8 w-20 bg-muted animate-pulse rounded shrink-0" />
+            <Skeleton className="h-8 w-20 shrink-0" />
           </div>
         ))}
       </div>

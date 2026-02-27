@@ -44,6 +44,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from '@/components/ui/alert-dialog'
+import { Skeleton } from '@/components/ui/skeleton'
 import { JobDetailDrawer } from '@/components/jobs/job-detail-drawer'
 import { QuickSendModal } from '@/components/send/quick-send-modal'
 import { getJobDetail, dismissJobFromQueue, markOneOffSent } from '@/lib/actions/dashboard'
@@ -480,7 +481,7 @@ export function ReadyToSendQueue({ jobs, hasJobHistory, onSelectJob, selectedJob
 
         {/* Empty states */}
         {jobs.length === 0 && hasJobHistory && (
-          <div className="flex flex-col items-center justify-center py-8 text-center">
+          <div className="flex flex-col items-center justify-center py-8 text-center rounded-lg border border-border bg-card">
             <CheckCircle className="h-10 w-10 text-success mb-3" weight="fill" />
             <p className="text-sm text-muted-foreground">
               All caught up — no jobs waiting for enrollment
@@ -842,10 +843,10 @@ export function ReadyToSendQueueSkeleton() {
       {/* Header skeleton */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <div className="h-5 w-32 bg-muted animate-pulse rounded" />
-          <div className="h-5 w-8 bg-muted animate-pulse rounded-full" />
+          <Skeleton className="h-5 w-32" />
+          <Skeleton className="h-5 w-8 rounded-full" />
         </div>
-        <div className="h-8 w-24 bg-muted animate-pulse rounded" />
+        <Skeleton className="h-8 w-24" />
       </div>
       {/* Row skeletons */}
       <div className="space-y-2">
@@ -855,15 +856,15 @@ export function ReadyToSendQueueSkeleton() {
             className="flex items-center justify-between py-2.5 px-3 rounded-lg border border-border bg-card"
           >
             <div className="flex items-start gap-3 flex-1">
-              <div className="h-5 w-5 bg-muted animate-pulse rounded-full mt-0.5" />
+              <Skeleton className="h-5 w-5 rounded-full mt-0.5" />
               <div className="flex-1 space-y-1.5">
-                <div className="h-4 w-40 bg-muted animate-pulse rounded" />
-                <div className="h-3 w-52 bg-muted animate-pulse rounded" />
+                <Skeleton className="h-4 w-40" />
+                <Skeleton className="h-3 w-52" />
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <div className="h-8 w-20 bg-muted animate-pulse rounded" />
-              <div className="h-8 w-8 bg-muted animate-pulse rounded" />
+              <Skeleton className="h-8 w-20" />
+              <Skeleton className="h-8 w-8" />
             </div>
           </div>
         ))}
