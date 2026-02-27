@@ -909,7 +909,7 @@ Plans:
   5. User can edit all agency metadata fields (ratings, fee, competitor info, dates) directly in the drawer — changes persist to the database
   6. Notes field in the drawer auto-saves with a debounce (no save button required for notes)
   7. The detail drawer includes a side-by-side competitive analysis section highlighting the gap between client and competitor review counts
-**Plans**: 2 plans
+**Plans**: 3 plans
 
 Plans:
 - [ ] 55-01-PLAN.md — businesses table migration (10 agency metadata columns) + data functions
