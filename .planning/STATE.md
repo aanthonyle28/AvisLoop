@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.0 Agency Mode (Phases 52-58) — Phase 56 + 57 complete
+**Current focus:** v3.0 Agency Mode (Phases 52-58) — Phases 52-58-01 complete
 
 ## Current Position
 
-Phase: 57 of 58 (Agency Billing) — Phase complete
-Plan: 1/1 in current phase
+Phase: 58 of 58 (Job Completion Form) — In progress
+Plan: 1/2 in current phase (58-01 complete, 58-02 remaining)
 Milestone: v3.0 Agency Mode (Phases 52-58)
-Status: Phases 52-57 complete — Phase 58 (Job Completion Form) remaining
+Status: Phases 52-57 complete + 58-01 complete — 58-02 (Public Form UI) remaining
 
-Progress: [████████░░] ~86% (Phases 52-57 complete, Phase 58 remaining)
+Progress: [█████████░] ~93% (Phases 52-57 + 58-01 complete, 58-02 remaining)
 
-Last activity: 2026-02-27 — Completed Phase 57 (Agency Billing) — pooled send limits verified
+Last activity: 2026-02-27 — Completed 58-01 (Job Completion Form backend: migration, token actions, validation, service-role createPublicJob, rate-limited API route, Settings UI)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 241
-- v3.0 plans completed: 12/TBD
+- Total plans completed (project): 242
+- v3.0 plans completed: 13/TBD
 
 *Updated after each plan completion*
 
@@ -45,6 +45,7 @@ Last activity: 2026-02-27 — Completed Phase 57 (Agency Billing) — pooled sen
 - **Phase 56-01 complete:** Insert-only server actions (createAdditionalBusiness, saveNewBusinessServices, createNewBusinessCampaign, completeNewBusinessOnboarding) + /onboarding?mode=new routing + /businesses middleware guard
 - **Phase 56-02 complete:** CreateBusinessWizard 3-step UI (inline sub-components) wired into /onboarding?mode=new; Add Business button on /businesses page; full end-to-end flow live
 - **Phase 57-01 complete:** Pooled billing enforcement — getPooledMonthlyUsage(userId) aggregates across all user-owned businesses; all 3 send actions use pooled count; billing page shows pooled total with "(all businesses)" label; effective tier = best tier across all businesses
+- **Phase 58-01 complete:** Job completion form backend — form_token migration + partial index, Business.form_token type, publicJobSchema (email-or-phone cross-field), generateFormToken/regenerateFormToken server actions, createPublicJob() (service-role: customer upsert, job creation, conflict-aware enrollment), POST /api/complete (rate-limited, service type validation), FormLinkSection in Settings General tab
 
 ### Decisions from Phase 52-01
 
@@ -129,6 +130,17 @@ Last activity: 2026-02-27 — Completed Phase 57 (Agency Billing) — pooled sen
 - `isNewBusinessMode` derived from `params.mode === 'new'` before the completed-onboarding redirect check.
 - `/businesses` added to `APP_ROUTES` in middleware — auth protection consistent with all other dashboard routes.
 
+### Decisions from Phase 58-01
+
+- Persistent DB token (`form_token` column) for public form URL — HMAC tokens expire; form URL must be permanent and printable.
+- API Route Handler (`POST /api/complete`) not Server Action — Server Actions use auth-scoped `createClient()` which returns anonymous session for unauthenticated pages. Route Handler uses `createServiceRoleClient()` directly.
+- Public form conflict defaults to `enrollment_resolution: 'conflict'` (job created, enrollment skipped) — technicians lack context for Replace/Skip/Queue; owner resolves from dashboard.
+- `createPublicJob()` inlines conflict detection (not reusing `checkEnrollmentConflict()`) — existing function uses auth-scoped client; inlining avoids refactoring auth-coupled functions.
+- `generateFormToken()` is idempotent — returns existing token if already set; prevents accidental churn on Settings re-render.
+- No `revalidatePath()` in `createPublicJob()` or `POST /api/complete` — no auth context in public endpoint; dashboard user sees updates on next load.
+- `/complete` correctly absent from `APP_ROUTES` in middleware — public route passes through without auth redirect (verified).
+- Phone dedup added before create-new in `createPublicJob()` — if no email match but phone provided, check existing customers by E.164 phone. Prevents duplicate records for phone-only submissions.
+
 ### Cross-Cutting Concerns (apply to every plan)
 
 - Design system: use existing semantic tokens and design system patterns
@@ -147,6 +159,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Phase 57 complete — pooled billing enforcement verified
+Stopped at: Completed 58-01-PLAN.md — job completion form backend complete
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
