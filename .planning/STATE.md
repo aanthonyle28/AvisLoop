@@ -9,14 +9,14 @@ See: .planning/PROJECT.md (updated 2026-02-27)
 
 ## Current Position
 
-Phase: 61 (QA-03: Dashboard)
-Plan: 60-01-PLAN.md COMPLETE
+Phase: 62 (QA-04: Jobs)
+Plan: 61-01-PLAN.md COMPLETE
 Milestone: v3.1 QA E2E Audit
-Status: Phase 60 complete, Phase 61 ready to execute
+Status: Phase 61 complete, Phase 62 ready to execute
 
-Progress: [██░░░░░░░░] 22% (2/9 phases complete)
+Progress: [███░░░░░░░] 33% (3/9 phases complete)
 
-Last activity: 2026-02-28 — Completed 60-01 Onboarding Wizard QA (ONB-01 PASS, ONB-02 PASS, ONB-03 PASS, BUG-ONB-01 documented)
+Last activity: 2026-02-28 — Completed 61-01 Dashboard QA (DASH-01 through DASH-11: 7 PASS / 1 FAIL / 3 PARTIAL; DASH-06 bug: KPIWidgets removed; DASH-10 bug: mobile overflow)
 
 ## Performance Metrics
 
@@ -212,6 +212,18 @@ Last activity: 2026-02-28 — Completed 60-01 Onboarding Wizard QA (ONB-01 PASS,
 - Service role DELETE requires `id=eq.<specific-id>` filter, not user_id-scoped filter, to bypass RLS in test cleanup
 - QA test scripts use Node.js ESM with playwright-core direct import (no global playwright CLI needed)
 
+### Decisions from Phase 61-01 (Dashboard QA)
+
+- **DASH-06 FAIL (Medium Bug):** `KPIWidgets` component (3 large left-column cards linking to /analytics) is defined in `components/dashboard/kpi-widgets.tsx` but NOT imported/rendered in dashboard. Removed between Phase 40 and current state. Right panel compact cards link to /history, /feedback instead.
+- **DASH-10 PARTIAL (Medium Bug):** Mobile header overflow 17px at 375px viewport — "View Campaigns" button in dashboard header extends beyond viewport. Fix: hide secondary button on mobile (`hidden sm:flex`).
+- **DASH-08 PARTIAL:** React hydration mismatch from Radix UI internal ID generation (business switcher, account menu, job action menus). Non-functional — framework-level known issue.
+- **DASH-09 PARTIAL:** No `loading.tsx` for /dashboard route — only major route without one. Skeleton components (KPIWidgetsSkeleton, ReadyToSendQueueSkeleton, AttentionAlertsSkeleton) defined but not auto-rendered during SSR.
+- Right panel compact KPI cards link to /history?status=reviewed, /feedback, /history (NOT /analytics) — context-specific navigation, not analytics hub
+- `getSetupProgress(business.id)` called on every dashboard load but result never used — wasted DB query (Getting Started hard-disabled)
+- Dark mode: theme toggle button has no aria-label — not discoverable by aria role; tested via JS evaluation as workaround
+- Test account was NOT in pure zero-data state at Phase 61 — 4 jobs + 1 enrollment from Phase 60; Phase 62 data was concurrently created during QA run
+- QA scripts use Windows-format paths (`C:\\AvisLoop\\`) for Playwright screenshot saves — Unix paths fail on win32
+
 ### Pending Todos
 
 None.
@@ -223,12 +235,15 @@ None.
 - v3.1 QA: Dual-subdomain middleware is bypassed on localhost — document explicitly as "middleware cross-subdomain behavior not verified — requires staging environment."
 - v3.1 QA Phase 59: AUTH-03 "Check Your Email" success state not visually confirmed due to Supabase rate limiting; re-verify in Phase 67 cleanup if needed.
 - BUG-ONB-01: `software_used` column missing from businesses table (medium severity) — fix before production with `ALTER TABLE businesses ADD COLUMN software_used TEXT;`
+- BUG-DASH-06: KPIWidgets removed from dashboard — no 3 large KPI cards linking to /analytics (medium severity) — fix before production: re-add KPIWidgets to dashboard-client.tsx or update right panel card destinations to /analytics
+- BUG-DASH-10: Mobile header overflow 17px at 375px — "View Campaigns" button partially clipped (medium severity) — fix: `hidden sm:flex` on secondary header button
 
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Completed 60-01-PLAN.md (Onboarding Wizard QA) — ONB-01/02/03 all PASS, BUG-ONB-01 documented
+Stopped at: Completed 61-01-PLAN.md (Dashboard QA) — 7 PASS / 1 FAIL / 3 PARTIAL; DASH-06 and DASH-10 bugs documented
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
-Active business: Audit Test HVAC (reset to pre-onboarding state: onboarding_completed_at=null)
-Next action: `/gsd:execute-phase 61` (Dashboard QA)
+Active business: Audit Test HVAC (businessId: 6ed94b54-6f35-4ede-8dcb-28f562052042)
+Current DB state: 4 jobs (John Smith HVAC, Jane Doe Plumbing, Bob Wilson Electrical, Test Technician HVAC), 1 enrollment (Test Technician in HVAC Follow-up), 0 send logs
+Next action: `/gsd:execute-phase 62` (Jobs QA)
