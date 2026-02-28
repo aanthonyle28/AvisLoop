@@ -22,17 +22,17 @@
 
 ## Dashboard
 
-- [ ] **DASH-01**: KPI widgets show correct numbers matching database counts
-- [ ] **DASH-02**: Sparkline charts render with data (not empty/broken when data exists)
-- [ ] **DASH-03**: Ready-to-Send queue populates with completed jobs awaiting enrollment
-- [ ] **DASH-04**: Needs Attention alerts show failed sends/unresolved feedback with dismiss working
-- [ ] **DASH-05**: Recent activity feed shows latest campaign events with correct timestamps
-- [ ] **DASH-06**: Clicking KPI cards navigates to correct destination (/analytics)
-- [ ] **DASH-07**: Getting Started card/components are NOT visible (hidden for production)
-- [ ] **DASH-08**: Dashboard empty state renders correctly for a business with zero data
-- [ ] **DASH-09**: Loading skeletons display during data fetch (not blank screen)
-- [ ] **DASH-10**: Mobile layout renders correctly (bottom sheet, compact KPI bar)
-- [ ] **DASH-11**: Dark mode renders without visual artifacts (no muddy colors, correct contrast)
+- [x] **DASH-01**: KPI widgets show correct numbers matching database counts
+- [x] **DASH-02**: Sparkline charts render with data (not empty/broken when data exists)
+- [x] **DASH-03**: Ready-to-Send queue populates with completed jobs awaiting enrollment
+- [x] **DASH-04**: Needs Attention alerts show failed sends/unresolved feedback with dismiss working
+- [x] **DASH-05**: Recent activity feed shows latest campaign events with correct timestamps
+- [ ] **DASH-06**: Clicking KPI cards navigates to correct destination (/analytics) — FAIL: KPIWidgets removed from dashboard
+- [x] **DASH-07**: Getting Started card/components are NOT visible (hidden for production)
+- [x] **DASH-08**: Dashboard empty state renders correctly for a business with zero data
+- [x] **DASH-09**: Loading skeletons display during data fetch (not blank screen) — PARTIAL: no loading.tsx
+- [x] **DASH-10**: Mobile layout renders correctly (bottom sheet, compact KPI bar) — PARTIAL: 17px overflow
+- [x] **DASH-11**: Dark mode renders without visual artifacts (no muddy colors, correct contrast)
 
 ## Jobs
 
@@ -177,17 +177,17 @@
 | ONB-01 | Phase 60 | Complete |
 | ONB-02 | Phase 60 | Complete |
 | ONB-03 | Phase 60 | Complete |
-| DASH-01 | Phase 61 | Pending |
-| DASH-02 | Phase 61 | Pending |
-| DASH-03 | Phase 61 | Pending |
-| DASH-04 | Phase 61 | Pending |
-| DASH-05 | Phase 61 | Pending |
-| DASH-06 | Phase 61 | Pending |
-| DASH-07 | Phase 61 | Pending |
-| DASH-08 | Phase 61 | Pending |
-| DASH-09 | Phase 61 | Pending |
-| DASH-10 | Phase 61 | Pending |
-| DASH-11 | Phase 61 | Pending |
+| DASH-01 | Phase 61 | Complete |
+| DASH-02 | Phase 61 | Complete |
+| DASH-03 | Phase 61 | Complete |
+| DASH-04 | Phase 61 | Complete |
+| DASH-05 | Phase 61 | Complete |
+| DASH-06 | Phase 61 | FAIL — KPIWidgets removed |
+| DASH-07 | Phase 61 | Complete |
+| DASH-08 | Phase 61 | Complete (partial) |
+| DASH-09 | Phase 61 | Complete (partial) |
+| DASH-10 | Phase 61 | Complete (partial) |
+| DASH-11 | Phase 61 | Complete |
 | JOBS-01 | Phase 62 | Pending |
 | JOBS-02 | Phase 62 | Pending |
 | JOBS-03 | Phase 62 | Pending |

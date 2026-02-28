@@ -816,7 +816,7 @@ Plans:
   11. Dark mode renders without muddy colors, incorrect contrast, or visual artifacts
 
 Plans:
-- [ ] 61-01-PLAN.md — Dashboard audit: KPIs, sparklines, queue, alerts, activity, empty state, mobile, dark mode
+- [x] 61-01-PLAN.md — Dashboard audit: KPIs, sparklines, queue, alerts, activity, empty state, mobile, dark mode
 
 ### Phase 62: Jobs
 **Goal**: The Jobs page is fully functional — creating, editing, filtering, and completing jobs all work correctly, and completing a job triggers campaign enrollment.
@@ -1013,7 +1013,7 @@ See individual phase sections above for requirements, success criteria, and depe
 | **58** | **v3.0 Agency Mode** | **2/2** | **Complete** | **2026-02-27** |
 | **59** | **v3.1 QA E2E Audit** | **1/1** | **Complete** | **2026-02-28** |
 | **60** | **v3.1 QA E2E Audit** | **1/1** | **Complete** | **2026-02-28** |
-| 61 | v3.1 QA E2E Audit | 0/1 | Not started | - |
+| **61** | **v3.1 QA E2E Audit** | **1/1** | **Complete** | **2026-02-28** |
 | 62 | v3.1 QA E2E Audit | 0/1 | Not started | - |
 | 63 | v3.1 QA E2E Audit | 0/1 | Not started | - |
 | 64 | v3.1 QA E2E Audit | 0/3 | Not started | - |
@@ -1021,4 +1021,4 @@ See individual phase sections above for requirements, success criteria, and depe
 | 66 | v3.1 QA E2E Audit | 0/3 | Not started | - |
 | 67 | v3.1 QA E2E Audit | 0/3 | Not started | - |
 
-**Total:** 247 plans complete across shipped phases.
+**Total:** 248 plans complete across shipped phases.
