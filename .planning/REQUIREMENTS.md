@@ -8,11 +8,11 @@
 
 ## Auth Flows
 
-- [ ] **AUTH-01**: Login with email/password succeeds and lands on dashboard with correct business data
-- [ ] **AUTH-02**: Signup creates account, redirects to onboarding, and session is established
-- [ ] **AUTH-03**: Password reset sends email, reset link works, new password accepted
-- [ ] **AUTH-04**: Session persists across page refresh, tab switch, and browser navigation (back/forward)
-- [ ] **AUTH-05**: Invalid credentials show clear error messages (not generic server errors)
+- [x] **AUTH-01**: Login with email/password succeeds and lands on dashboard with correct business data
+- [x] **AUTH-02**: Signup creates account, redirects to onboarding, and session is established
+- [x] **AUTH-03**: Password reset sends email, reset link works, new password accepted
+- [x] **AUTH-04**: Session persists across page refresh, tab switch, and browser navigation (back/forward)
+- [x] **AUTH-05**: Invalid credentials show clear error messages (not generic server errors)
 
 ## Onboarding
 
@@ -169,11 +169,11 @@
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| AUTH-01 | Phase 59 | Pending |
-| AUTH-02 | Phase 59 | Pending |
-| AUTH-03 | Phase 59 | Pending |
-| AUTH-04 | Phase 59 | Pending |
-| AUTH-05 | Phase 59 | Pending |
+| AUTH-01 | Phase 59 | Complete |
+| AUTH-02 | Phase 59 | Complete |
+| AUTH-03 | Phase 59 | Complete |
+| AUTH-04 | Phase 59 | Complete |
+| AUTH-05 | Phase 59 | Complete |
 | ONB-01 | Phase 60 | Pending |
 | ONB-02 | Phase 60 | Pending |
 | ONB-03 | Phase 60 | Pending |

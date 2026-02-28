@@ -784,7 +784,7 @@ Plans:
   5. Submitting invalid credentials shows a clear, user-readable error message (not a raw server error or blank page)
 
 Plans:
-- [ ] 59-01-PLAN.md — Auth flows audit: login, signup, password reset, session durability, error messages
+- [x] 59-01-PLAN.md — Auth flows audit: login, signup, password reset, session durability, error messages
 
 ### Phase 60: Onboarding Wizard
 **Goal**: Both onboarding paths are confirmed functional — first-business wizard and additional-business wizard — and draft persistence is verified.
@@ -1011,7 +1011,7 @@ See individual phase sections above for requirements, success criteria, and depe
 | **56** | **v3.0 Agency Mode** | **2/2** | **Complete** | **2026-02-27** |
 | **57** | **v3.0 Agency Mode** | **1/1** | **Complete** | **2026-02-27** |
 | **58** | **v3.0 Agency Mode** | **2/2** | **Complete** | **2026-02-27** |
-| 59 | v3.1 QA E2E Audit | 0/1 | Not started | - |
+| **59** | **v3.1 QA E2E Audit** | **1/1** | **Complete** | **2026-02-28** |
 | 60 | v3.1 QA E2E Audit | 0/1 | Not started | - |
 | 61 | v3.1 QA E2E Audit | 0/1 | Not started | - |
 | 62 | v3.1 QA E2E Audit | 0/1 | Not started | - |
