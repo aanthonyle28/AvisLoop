@@ -5,25 +5,25 @@
 See: .planning/PROJECT.md (updated 2026-02-27)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.1 QA E2E Audit — Phase 59 (Auth Flows) — ready to execute
+**Current focus:** v3.1 QA E2E Audit — Phase 60 (Onboarding) — auth gate confirmed, ready to execute
 
 ## Current Position
 
-Phase: 59 (QA-01: Auth Flows)
-Plan: 59-01-PLAN.md (not yet created)
+Phase: 60 (QA-02: Onboarding)
+Plan: 59-01-PLAN.md COMPLETE
 Milestone: v3.1 QA E2E Audit
-Status: Roadmap complete, ready for plan-phase
+Status: Phase 59 complete, Phase 60 ready to execute
 
-Progress: [░░░░░░░░░░] 0% (0/9 phases complete)
+Progress: [█░░░░░░░░░] 11% (1/9 phases complete)
 
-Last activity: 2026-02-27 — Roadmap created for v3.1 QA E2E Audit (9 phases, 97 requirements mapped)
+Last activity: 2026-02-28 — Completed 59-01 Auth Flows QA (AUTH-01 PASS, AUTH-04 PASS, AUTH-05 PASS, AUTH-02/03 PARTIAL PASS due to Supabase email rate limits)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 245
+- Total plans completed (project): 246
 - v3.0 plans completed: 15/15
-- v3.1 plans completed: 0/17
+- v3.1 plans completed: 1/17
 
 *Updated after each plan completion*
 
@@ -190,6 +190,16 @@ Last activity: 2026-02-27 — Roadmap created for v3.1 QA E2E Audit (9 phases, 9
 - Dead code removal: audit for unused imports after each change
 - Security: validate all user inputs server-side, maintain RLS discipline
 
+### Decisions from Phase 59-01 (Auth Flows QA)
+
+- AUTH-01 PASS: audit-test@avisloop.com login confirmed working; active business "Audit Test HVAC" with businessId confirmed
+- AUTH-04 PASS: Supabase SSR cookie-based session survives page refresh, cross-route navigation, and browser back
+- AUTH-05 PASS: Zod client-side validation produces field-level errors; Supabase error passthrough shows "Invalid login credentials" (no raw errors)
+- Playwright invoked via `./node_modules/playwright/index.mjs` (ES module) — not global install
+- Supabase email rate limit hit during testing — space out auth email tests across sessions
+- `@test.com` domain blocked by Supabase domain policy — use real-format emails (e.g. @gmail.com) for future signup tests
+- Logout via Account menu -> Logout menuitem; after logout, /dashboard redirects to /auth/login
+
 ### Pending Todos
 
 None.
@@ -200,11 +210,14 @@ None.
 - v3.1 QA: Second test account needed for true first-run onboarding flow (primary account already has a completed business). Options: create audit-test2@avisloop.com, or document gap in Phase 60 findings.
 - v3.1 QA: Review funnel token (/r/[token]) requires a live sent touch or manually constructed HMAC token — decide approach before Phase 64.
 - v3.1 QA: Dual-subdomain middleware is bypassed on localhost — document explicitly as "middleware cross-subdomain behavior not verified — requires staging environment."
+- v3.1 QA Phase 59: AUTH-03 "Check Your Email" success state not visually confirmed due to Supabase rate limiting; re-verify in Phase 67 cleanup if needed.
 
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Roadmap created for v3.1 QA E2E Audit — ready to plan Phase 59
+Last session: 2026-02-28
+Stopped at: Completed 59-01-PLAN.md (Auth Flows QA) — AUTH gate confirmed open
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
-Next action: `/gsd:plan-phase 59`
+Active business: Audit Test HVAC
+Next action: `/gsd:execute-phase 60` (Onboarding QA)
