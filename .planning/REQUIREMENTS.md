@@ -16,9 +16,9 @@
 
 ## Onboarding
 
-- [ ] **ONB-01**: First-business onboarding wizard completes all 4 steps and creates business + campaign
-- [ ] **ONB-02**: Additional business creation (?mode=new) completes 3-step wizard without affecting existing businesses
-- [ ] **ONB-03**: Onboarding draft persistence works (refresh mid-wizard retains entered data)
+- [x] **ONB-01**: First-business onboarding wizard completes all 4 steps and creates business + campaign
+- [x] **ONB-02**: Additional business creation (?mode=new) completes 3-step wizard without affecting existing businesses
+- [x] **ONB-03**: Onboarding draft persistence works (refresh mid-wizard retains entered data)
 
 ## Dashboard
 
@@ -174,9 +174,9 @@
 | AUTH-03 | Phase 59 | Complete |
 | AUTH-04 | Phase 59 | Complete |
 | AUTH-05 | Phase 59 | Complete |
-| ONB-01 | Phase 60 | Pending |
-| ONB-02 | Phase 60 | Pending |
-| ONB-03 | Phase 60 | Pending |
+| ONB-01 | Phase 60 | Complete |
+| ONB-02 | Phase 60 | Complete |
+| ONB-03 | Phase 60 | Complete |
 | DASH-01 | Phase 61 | Pending |
 | DASH-02 | Phase 61 | Pending |
 | DASH-03 | Phase 61 | Pending |

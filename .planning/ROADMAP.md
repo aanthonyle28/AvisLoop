@@ -796,7 +796,7 @@ Plans:
   3. Refreshing the browser mid-wizard retains the data entered in completed steps (localStorage draft persistence verified)
 
 Plans:
-- [ ] 60-01-PLAN.md — Onboarding audit: first-business 4-step wizard, additional-business 3-step wizard, draft persistence
+- [x] 60-01-PLAN.md — Onboarding audit: first-business 4-step wizard, additional-business 3-step wizard, draft persistence
 
 ### Phase 61: Dashboard
 **Goal**: The dashboard accurately reflects the active business's data across all widgets — in both empty-state and populated-state conditions.
@@ -1012,7 +1012,7 @@ See individual phase sections above for requirements, success criteria, and depe
 | **57** | **v3.0 Agency Mode** | **1/1** | **Complete** | **2026-02-27** |
 | **58** | **v3.0 Agency Mode** | **2/2** | **Complete** | **2026-02-27** |
 | **59** | **v3.1 QA E2E Audit** | **1/1** | **Complete** | **2026-02-28** |
-| 60 | v3.1 QA E2E Audit | 0/1 | Not started | - |
+| **60** | **v3.1 QA E2E Audit** | **1/1** | **Complete** | **2026-02-28** |
 | 61 | v3.1 QA E2E Audit | 0/1 | Not started | - |
 | 62 | v3.1 QA E2E Audit | 0/1 | Not started | - |
 | 63 | v3.1 QA E2E Audit | 0/1 | Not started | - |
@@ -1021,4 +1021,4 @@ See individual phase sections above for requirements, success criteria, and depe
 | 66 | v3.1 QA E2E Audit | 0/3 | Not started | - |
 | 67 | v3.1 QA E2E Audit | 0/3 | Not started | - |
 
-**Total:** 245 plans complete across shipped phases.
+**Total:** 247 plans complete across shipped phases.
