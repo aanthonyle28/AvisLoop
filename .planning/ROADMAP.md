@@ -835,7 +835,7 @@ Plans:
   10. A business with zero jobs renders the empty state without errors
 
 Plans:
-- [ ] 62-01-PLAN.md — Jobs audit: table, add/edit/detail drawers, filters, mark complete, enrollment trigger, empty state
+- [x] 62-01-PLAN.md — Jobs audit: table, add/edit/detail drawers, filters, mark complete, enrollment trigger, empty state
 
 ### Phase 63: Campaigns
 **Goal**: Campaign management is fully functional — the list, detail, edit, preset picker, pause/resume, template preview, and conflict states all work correctly.
@@ -1014,11 +1014,11 @@ See individual phase sections above for requirements, success criteria, and depe
 | **59** | **v3.1 QA E2E Audit** | **1/1** | **Complete** | **2026-02-28** |
 | **60** | **v3.1 QA E2E Audit** | **1/1** | **Complete** | **2026-02-28** |
 | **61** | **v3.1 QA E2E Audit** | **1/1** | **Complete** | **2026-02-28** |
-| 62 | v3.1 QA E2E Audit | 0/1 | Not started | - |
+| **62** | **v3.1 QA E2E Audit** | **1/1** | **Complete** | **2026-02-28** |
 | 63 | v3.1 QA E2E Audit | 0/1 | Not started | - |
 | 64 | v3.1 QA E2E Audit | 0/3 | Not started | - |
 | 65 | v3.1 QA E2E Audit | 0/3 | Not started | - |
 | 66 | v3.1 QA E2E Audit | 0/3 | Not started | - |
 | 67 | v3.1 QA E2E Audit | 0/3 | Not started | - |
 
-**Total:** 248 plans complete across shipped phases.
+**Total:** 249 plans complete across shipped phases.

@@ -36,16 +36,16 @@
 
 ## Jobs
 
-- [ ] **JOBS-01**: Jobs table displays with correct columns, sorting, and pagination
-- [ ] **JOBS-02**: Add Job drawer opens, form validates, and creates job successfully
-- [ ] **JOBS-03**: Edit Job drawer loads existing data and saves changes
-- [ ] **JOBS-04**: Job detail drawer shows complete information
-- [ ] **JOBS-05**: Service type filter only shows business's enabled service types
-- [ ] **JOBS-06**: Status filter works (scheduled/completed/do_not_send)
-- [ ] **JOBS-07**: Mark Complete action transitions job from scheduled to completed
-- [ ] **JOBS-08**: Completing a job with a matching campaign triggers enrollment (verify in DB)
-- [ ] **JOBS-09**: Campaign selector dropdown shows available campaigns + "one-off" option
-- [ ] **JOBS-10**: Empty state renders correctly for business with zero jobs
+- [x] **JOBS-01**: Jobs table displays with correct columns, sorting, and pagination
+- [x] **JOBS-02**: Add Job drawer opens, form validates, and creates job successfully
+- [x] **JOBS-03**: Edit Job drawer loads existing data and saves changes
+- [x] **JOBS-04**: Job detail drawer shows complete information
+- [x] **JOBS-05**: Service type filter only shows business's enabled service types
+- [x] **JOBS-06**: Status filter works (scheduled/completed/do_not_send)
+- [x] **JOBS-07**: Mark Complete action transitions job from scheduled to completed
+- [x] **JOBS-08**: Completing a job with a matching campaign triggers enrollment (verify in DB)
+- [x] **JOBS-09**: Campaign selector dropdown shows available campaigns + "one-off" option
+- [x] **JOBS-10**: Empty state renders correctly for business with zero jobs
 
 ## Campaigns
 
@@ -188,16 +188,16 @@
 | DASH-09 | Phase 61 | Complete (partial) |
 | DASH-10 | Phase 61 | Complete (partial) |
 | DASH-11 | Phase 61 | Complete |
-| JOBS-01 | Phase 62 | Pending |
-| JOBS-02 | Phase 62 | Pending |
-| JOBS-03 | Phase 62 | Pending |
-| JOBS-04 | Phase 62 | Pending |
-| JOBS-05 | Phase 62 | Pending |
-| JOBS-06 | Phase 62 | Pending |
-| JOBS-07 | Phase 62 | Pending |
-| JOBS-08 | Phase 62 | Pending |
-| JOBS-09 | Phase 62 | Pending |
-| JOBS-10 | Phase 62 | Pending |
+| JOBS-01 | Phase 62 | Complete |
+| JOBS-02 | Phase 62 | Complete |
+| JOBS-03 | Phase 62 | Complete |
+| JOBS-04 | Phase 62 | Complete |
+| JOBS-05 | Phase 62 | Complete |
+| JOBS-06 | Phase 62 | Complete |
+| JOBS-07 | Phase 62 | Complete |
+| JOBS-08 | Phase 62 | Complete |
+| JOBS-09 | Phase 62 | Complete |
+| JOBS-10 | Phase 62 | Complete |
 | CAMP-01 | Phase 63 | Pending |
 | CAMP-02 | Phase 63 | Pending |
 | CAMP-03 | Phase 63 | Pending |
