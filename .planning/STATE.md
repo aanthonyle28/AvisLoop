@@ -5,25 +5,25 @@
 See: .planning/PROJECT.md (updated 2026-02-27)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.1 QA E2E Audit — Phase 61 (Dashboard) — onboarding QA complete
+**Current focus:** v3.1 QA E2E Audit — Phase 62 (Jobs) — COMPLETE
 
 ## Current Position
 
 Phase: 62 (QA-04: Jobs)
-Plan: 61-01-PLAN.md COMPLETE
+Plan: 62-01-PLAN.md COMPLETE
 Milestone: v3.1 QA E2E Audit
-Status: Phase 61 complete, Phase 62 ready to execute
+Status: Phase 62 complete, Phase 63 ready to execute
 
-Progress: [███░░░░░░░] 33% (3/9 phases complete)
+Progress: [████░░░░░░] 44% (4/9 phases complete)
 
-Last activity: 2026-02-28 — Completed 61-01 Dashboard QA (DASH-01 through DASH-11: 7 PASS / 1 FAIL / 3 PARTIAL; DASH-06 bug: KPIWidgets removed; DASH-10 bug: mobile overflow)
+Last activity: 2026-02-28 — Completed 62-01 Jobs QA (JOBS-01 through JOBS-10: 9 PASS / 1 PARTIAL; BUG-01 column headers not sortable; 3 AUDIT_ enrollments created for Phase 63)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 247
+- Total plans completed (project): 248
 - v3.0 plans completed: 15/15
-- v3.1 plans completed: 2/17
+- v3.1 plans completed: 3/17
 
 *Updated after each plan completion*
 
@@ -224,6 +224,17 @@ Last activity: 2026-02-28 — Completed 61-01 Dashboard QA (DASH-01 through DASH
 - Test account was NOT in pure zero-data state at Phase 61 — 4 jobs + 1 enrollment from Phase 60; Phase 62 data was concurrently created during QA run
 - QA scripts use Windows-format paths (`C:\\AvisLoop\\`) for Playwright screenshot saves — Unix paths fail on win32
 
+### Decisions from Phase 62-01 (Jobs QA)
+
+- **JOBS-01 PARTIAL PASS (Low Bug BUG-01):** Column headers are string literals in job-columns.tsx; `getSortedRowModel()` + `onSortingChange` are wired in job-table.tsx but no onClick on `<th>` — clicking headers has no effect. Fix: wrap `header` in sort-button component or use TanStack `header.column.getToggleSortingHandler()`.
+- **JOBS-02 PASS:** "+ Create new customer" div triggers inline create mode; `customerName` input pre-filled, email/phone inputs expand. Existing customer lookup via partial name works in autocomplete.
+- **JOBS-08 PASS (critical):** Enrollment is synchronous on `markJobComplete()` — DB query immediately after confirms `campaign_enrollments` row with correct `touch_1_scheduled_at`. All 3 AUDIT_ HVAC jobs enrolled with exactly 24.0h delay.
+- **JOBS-09 PASS:** Campaign selector appears after service type change, renders from Radix Select portal at page level. Options: "HVAC Follow-up — 2 touches, starts 1d", "Send one-off review request", "Do not send", "+ Create new campaign".
+- Playwright selector fix: Radix Select option portal — use page-level `[role="option"]` not dialog-scoped.
+- Playwright selector fix: PasswordInput show/hide button has `aria-label="Show password"` causing `getByLabel(/password/i)` strict mode failure. Use `getByRole('textbox', { name: /password/i })`.
+- `MarkCompleteButton` renders as text "Complete" (size="xs") inside the Actions column for scheduled jobs on desktop — locator: `button:has-text("Complete")`.
+- Current DB state post-62: 7 jobs (4 existing + 3 AUDIT_), 4 active enrollments (Test Technician + AUDIT_Patricia + AUDIT_Marcus + AUDIT_Sarah all in HVAC Follow-up)
+
 ### Pending Todos
 
 None.
@@ -237,13 +248,14 @@ None.
 - BUG-ONB-01: `software_used` column missing from businesses table (medium severity) — fix before production with `ALTER TABLE businesses ADD COLUMN software_used TEXT;`
 - BUG-DASH-06: KPIWidgets removed from dashboard — no 3 large KPI cards linking to /analytics (medium severity) — fix before production: re-add KPIWidgets to dashboard-client.tsx or update right panel card destinations to /analytics
 - BUG-DASH-10: Mobile header overflow 17px at 375px — "View Campaigns" button partially clipped (medium severity) — fix: `hidden sm:flex` on secondary header button
+- BUG-JOBS-01: Column header clicks don't sort rows (low severity) — fix: wrap header strings in sort button components using `header.column.getToggleSortingHandler()`
 
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Completed 61-01-PLAN.md (Dashboard QA) — 7 PASS / 1 FAIL / 3 PARTIAL; DASH-06 and DASH-10 bugs documented
+Stopped at: Completed 62-01-PLAN.md (Jobs QA) — 9/10 PASS, BUG-01 documented, 3 AUDIT_ enrollments created
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
 Active business: Audit Test HVAC (businessId: 6ed94b54-6f35-4ede-8dcb-28f562052042)
-Current DB state: 4 jobs (John Smith HVAC, Jane Doe Plumbing, Bob Wilson Electrical, Test Technician HVAC), 1 enrollment (Test Technician in HVAC Follow-up), 0 send logs
-Next action: `/gsd:execute-phase 62` (Jobs QA)
+Current DB state: 7 jobs (John Smith HVAC, Jane Doe Plumbing, Bob Wilson Electrical, Test Technician HVAC, AUDIT_Patricia HVAC, AUDIT_Marcus HVAC, AUDIT_Sarah HVAC), 4 active enrollments in HVAC Follow-up, 0 send logs
+Next action: `/gsd:execute-phase 63` (Campaigns QA)
