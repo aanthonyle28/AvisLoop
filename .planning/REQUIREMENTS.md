@@ -49,16 +49,16 @@
 
 ## Campaigns
 
-- [ ] **CAMP-01**: Campaign list displays all campaigns with correct status badges
-- [ ] **CAMP-02**: Campaign detail page shows touch sequence, enrollment list, and analytics
-- [ ] **CAMP-03**: Campaign edit sheet opens and saves changes (touch timing, templates)
-- [ ] **CAMP-04**: Campaign preset picker shows 3 options with correct descriptions
-- [ ] **CAMP-05**: Pausing a campaign sets enrollments to "frozen" (not "stopped") — verify in DB
-- [ ] **CAMP-06**: Resuming a paused campaign restores frozen enrollments to "active" — verify in DB
-- [ ] **CAMP-07**: Template preview modal shows correct template content per touch
-- [ ] **CAMP-08**: Campaign analytics show correct enrollment/send/conversion counts
-- [ ] **CAMP-09**: Enrollment conflict states display correctly (conflict, queue_after, skipped badges)
-- [ ] **CAMP-10**: Creating a new campaign from preset works end-to-end
+- [x] **CAMP-01**: Campaign list displays all campaigns with correct status badges
+- [x] **CAMP-02**: Campaign detail page shows touch sequence, enrollment list, and analytics
+- [x] **CAMP-03**: Campaign edit sheet opens and saves changes (touch timing, templates)
+- [x] **CAMP-04**: Campaign preset picker shows 3 options with correct descriptions
+- [x] **CAMP-05**: Pausing a campaign sets enrollments to "frozen" (not "stopped") — verify in DB
+- [x] **CAMP-06**: Resuming a paused campaign restores frozen enrollments to "active" — verify in DB
+- [x] **CAMP-07**: Template preview modal shows correct template content per touch
+- [x] **CAMP-08**: Campaign analytics show correct enrollment/send/conversion counts
+- [x] **CAMP-09**: Enrollment conflict states display correctly (conflict, queue_after, skipped badges)
+- [x] **CAMP-10**: Creating a new campaign from preset works end-to-end
 
 ## History & Activity
 
@@ -198,16 +198,16 @@
 | JOBS-08 | Phase 62 | Complete |
 | JOBS-09 | Phase 62 | Complete |
 | JOBS-10 | Phase 62 | Complete |
-| CAMP-01 | Phase 63 | Pending |
-| CAMP-02 | Phase 63 | Pending |
-| CAMP-03 | Phase 63 | Pending |
-| CAMP-04 | Phase 63 | Pending |
-| CAMP-05 | Phase 63 | Pending |
-| CAMP-06 | Phase 63 | Pending |
-| CAMP-07 | Phase 63 | Pending |
-| CAMP-08 | Phase 63 | Pending |
-| CAMP-09 | Phase 63 | Pending |
-| CAMP-10 | Phase 63 | Pending |
+| CAMP-01 | Phase 63 | Complete |
+| CAMP-02 | Phase 63 | Complete |
+| CAMP-03 | Phase 63 | Complete |
+| CAMP-04 | Phase 63 | Complete |
+| CAMP-05 | Phase 63 | Complete |
+| CAMP-06 | Phase 63 | Complete |
+| CAMP-07 | Phase 63 | Complete |
+| CAMP-08 | Phase 63 | Complete |
+| CAMP-09 | Phase 63 | Complete |
+| CAMP-10 | Phase 63 | Complete |
 | HIST-01 | Phase 64 | Pending |
 | HIST-02 | Phase 64 | Pending |
 | HIST-03 | Phase 64 | Pending |

@@ -854,7 +854,7 @@ Plans:
   10. Creating a new campaign from a preset completes end-to-end and the campaign appears in the campaign list
 
 Plans:
-- [ ] 63-01-PLAN.md — Campaigns audit: list, detail, edit, preset picker, pause/resume freeze, template preview, analytics, conflict states
+- [x] 63-01-PLAN.md — Campaigns audit: list, detail, edit, preset picker, pause/resume freeze, template preview, analytics, conflict states
 
 ### Phase 64: History, Analytics, and Feedback
 **Goal**: All three read-heavy downstream pages display correctly scoped data with working filters, and the feedback resolution workflow persists correctly.
@@ -1015,10 +1015,10 @@ See individual phase sections above for requirements, success criteria, and depe
 | **60** | **v3.1 QA E2E Audit** | **1/1** | **Complete** | **2026-02-28** |
 | **61** | **v3.1 QA E2E Audit** | **1/1** | **Complete** | **2026-02-28** |
 | **62** | **v3.1 QA E2E Audit** | **1/1** | **Complete** | **2026-02-28** |
-| 63 | v3.1 QA E2E Audit | 0/1 | Not started | - |
+| **63** | **v3.1 QA E2E Audit** | **1/1** | **Complete** | **2026-03-02** |
 | 64 | v3.1 QA E2E Audit | 0/3 | Not started | - |
 | 65 | v3.1 QA E2E Audit | 0/3 | Not started | - |
 | 66 | v3.1 QA E2E Audit | 0/3 | Not started | - |
 | 67 | v3.1 QA E2E Audit | 0/3 | Not started | - |
 
-**Total:** 249 plans complete across shipped phases.
+**Total:** 250 plans complete across shipped phases.
