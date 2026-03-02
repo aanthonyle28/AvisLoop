@@ -5,18 +5,18 @@
 See: .planning/PROJECT.md (updated 2026-02-27)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.1 QA E2E Audit — Phase 62 (Jobs) — COMPLETE
+**Current focus:** v3.1 QA E2E Audit — Phase 63 (Campaigns) — COMPLETE
 
 ## Current Position
 
-Phase: 62 (QA-04: Jobs)
-Plan: 62-01-PLAN.md COMPLETE
+Phase: 63 (QA-05: Campaigns)
+Plan: 63-01-PLAN.md COMPLETE
 Milestone: v3.1 QA E2E Audit
-Status: Phase 62 complete, Phase 63 ready to execute
+Status: Phase 63 complete, Phase 64 ready to execute
 
-Progress: [████░░░░░░] 44% (4/9 phases complete)
+Progress: [█████░░░░░] 55% (5/9 phases complete)
 
-Last activity: 2026-02-28 — Completed 62-01 Jobs QA (JOBS-01 through JOBS-10: 9 PASS / 1 PARTIAL; BUG-01 column headers not sortable; 3 AUDIT_ enrollments created for Phase 63)
+Last activity: 2026-03-02 — Completed 63-01 Campaigns QA (CAMP-01 through CAMP-10: 10/10 PASS; 3 bugs documented: BUG-01 missing frozen label, BUG-02 no frozen stat card, BUG-03 wrong service type in template preview)
 
 ## Performance Metrics
 
@@ -224,6 +224,18 @@ Last activity: 2026-02-28 — Completed 62-01 Jobs QA (JOBS-01 through JOBS-10: 
 - Test account was NOT in pure zero-data state at Phase 61 — 4 jobs + 1 enrollment from Phase 60; Phase 62 data was concurrently created during QA run
 - QA scripts use Windows-format paths (`C:\\AvisLoop\\`) for Playwright screenshot saves — Unix paths fail on win32
 
+### Decisions from Phase 63-01 (Campaigns QA)
+
+- **CAMP-01 through CAMP-10: All 10 PASS** — Campaigns automation engine fully verified
+- **CAMP-BUG-01 (Medium):** `ENROLLMENT_STATUS_LABELS` in `lib/constants/campaigns.ts` missing 'frozen' key — badge shows empty text when campaign paused; fix: add `frozen: 'Frozen'`
+- **CAMP-BUG-02 (Low):** Campaign detail page has no "Frozen" stat card — frozen count invisible in UI when campaign paused
+- **CAMP-BUG-03 (Low):** `resolveTemplate()` in touch-sequence-display.tsx falls back to first system template by channel (alphabetically Cleaning) rather than filtering by campaign service type (HVAC) — cosmetic, actual sends use correct template
+- **Frozen enrollment verified at DB level:** Pause sets all enrollments to `status='frozen'` (NOT 'stopped'); resume restores all to `status='active'` — V2 Phase 46 behavior confirmed correct
+- **Conflict detection:** Second HVAC job for AUDIT_Patricia Johnson correctly sets `enrollment_resolution='conflict'`; conflict badge visible in dashboard Ready-to-Send queue
+- **CAMP-10:** "Standard Follow-Up" campaign created (id: b81f6b2f, service_type=null, 3 touches) — available for Phase 64 testing
+- **DB verification pattern:** Use Supabase REST API directly for enrollment state queries — not relying on UI toast alone for CAMP-05/CAMP-06
+- **Current DB state post-63:** 2 user campaigns (HVAC Follow-up 2-touch, Standard Follow-Up 3-touch), 4+ active enrollments, 0 send logs; conflict job for AUDIT_Patricia may need resolution before Phase 64
+
 ### Decisions from Phase 62-01 (Jobs QA)
 
 - **JOBS-01 PARTIAL PASS (Low Bug BUG-01):** Column headers are string literals in job-columns.tsx; `getSortedRowModel()` + `onSortingChange` are wired in job-table.tsx but no onClick on `<th>` — clicking headers has no effect. Fix: wrap `header` in sort-button component or use TanStack `header.column.getToggleSortingHandler()`.
@@ -249,13 +261,16 @@ None.
 - BUG-DASH-06: KPIWidgets removed from dashboard — no 3 large KPI cards linking to /analytics (medium severity) — fix before production: re-add KPIWidgets to dashboard-client.tsx or update right panel card destinations to /analytics
 - BUG-DASH-10: Mobile header overflow 17px at 375px — "View Campaigns" button partially clipped (medium severity) — fix: `hidden sm:flex` on secondary header button
 - BUG-JOBS-01: Column header clicks don't sort rows (low severity) — fix: wrap header strings in sort button components using `header.column.getToggleSortingHandler()`
+- BUG-CAMP-01: ENROLLMENT_STATUS_LABELS missing 'frozen' key in lib/constants/campaigns.ts (medium severity) — fix: add `frozen: 'Frozen'` entry
+- BUG-CAMP-02: No "Frozen" stat card on campaign detail page (low severity) — fix: add 4th stat card for frozen count
+- BUG-CAMP-03: resolveTemplate() shows wrong service type in preview (low severity) — fix: filter system templates by service_type before channel-only fallback
 
 ## Session Continuity
 
-Last session: 2026-02-28
-Stopped at: Completed 62-01-PLAN.md (Jobs QA) — 9/10 PASS, BUG-01 documented, 3 AUDIT_ enrollments created
+Last session: 2026-03-02
+Stopped at: Completed 63-01-PLAN.md (Campaigns QA) — 10/10 PASS, 3 bugs documented, Standard Follow-Up campaign created
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
 Active business: Audit Test HVAC (businessId: 6ed94b54-6f35-4ede-8dcb-28f562052042)
-Current DB state: 7 jobs (John Smith HVAC, Jane Doe Plumbing, Bob Wilson Electrical, Test Technician HVAC, AUDIT_Patricia HVAC, AUDIT_Marcus HVAC, AUDIT_Sarah HVAC), 4 active enrollments in HVAC Follow-up, 0 send logs
-Next action: `/gsd:execute-phase 63` (Campaigns QA)
+Current DB state: 7 jobs + 1 conflict job for AUDIT_Patricia; 2 user campaigns (HVAC Follow-up, Standard Follow-Up); 4+ active enrollments, 0 send logs
+Next action: `/gsd:execute-phase 64` (History/Analytics/Feedback QA)
