@@ -5,25 +5,25 @@
 See: .planning/PROJECT.md (updated 2026-02-27)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.1 QA E2E Audit — Phase 63 (Campaigns) — COMPLETE
+**Current focus:** v3.1 QA E2E Audit — Phase 65 (Settings/Billing) Plan 01 — COMPLETE
 
 ## Current Position
 
-Phase: 63 (QA-05: Campaigns)
-Plan: 63-01-PLAN.md COMPLETE
+Phase: 65 (QA-07: Settings/Billing)
+Plan: 65-01-PLAN.md COMPLETE
 Milestone: v3.1 QA E2E Audit
-Status: Phase 63 complete, Phase 64 ready to execute
+Status: Phase 65 plan 01 complete, plan 02 ready to execute
 
-Progress: [█████░░░░░] 55% (5/9 phases complete)
+Progress: [██████░░░░] 66% (6/9 phases complete)
 
-Last activity: 2026-03-02 — Completed 63-01 Campaigns QA (8/10 PASS, 2 FAIL; CRITICAL BUG-04: frozen migration unapplied; 4 bugs total: BUG-04 critical, BUG-01 medium, BUG-02/03 low)
+Last activity: 2026-03-02 — Completed 65-01 Settings General + Templates QA (SETT-01, SETT-02, SETT-03, SETT-04, SETT-09 partial: 5/5 PASS; form_token NCuKdh6JvBMsKSNtyLvWl8DnimHtIYIW captured for Phase 67)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed (project): 250
 - v3.0 plans completed: 15/15
-- v3.1 plans completed: 5/17
+- v3.1 plans completed: 6/17
 
 *Updated after each plan completion*
 
@@ -247,6 +247,17 @@ Last activity: 2026-03-02 — Completed 63-01 Campaigns QA (8/10 PASS, 2 FAIL; C
 - `MarkCompleteButton` renders as text "Complete" (size="xs") inside the Actions column for scheduled jobs on desktop — locator: `button:has-text("Complete")`.
 - Current DB state post-62: 7 jobs (4 existing + 3 AUDIT_), 4 active enrollments (Test Technician + AUDIT_Patricia + AUDIT_Marcus + AUDIT_Sarah all in HVAC Follow-up)
 
+### Decisions from Phase 65-01 (Settings General + Templates QA)
+
+- **SETT-01 PASS:** General tab fields pre-populated from DB, edit/save works with "Settings saved successfully!" inline confirmation; business name change propagates to sidebar BusinessSwitcher immediately
+- **SETT-02 PASS:** FormLinkSection displays existing form_token URL `http://localhost:3000/complete/NCuKdh6JvBMsKSNtyLvWl8DnimHtIYIW`; copy button has aria-label="Copy form URL"; clipboard API fails in headless Playwright (expected test env limitation)
+- **SETT-03 PASS:** 16 templates (8 email + 8 SMS) grouped by channel with blue Email badges (EnvelopeSimple icon) and green SMS badges (ChatCircle icon); all 16 are system templates with "System Template" badge and "Use this template" button
+- **SETT-04 PASS:** Created AUDIT_Test Email Template (count 8->9), appeared in list immediately; deleted via confirmation dialog (count 9->8), "Template deleted" toast shown; both create and delete DB-verified
+- **SETT-09 PASS (partial):** Business name and sender name persist after full page reload
+- **form_token for Phase 67:** `NCuKdh6JvBMsKSNtyLvWl8DnimHtIYIW` — persistent DB token, does not expire
+- **Test business state (no user templates):** All 16 templates are system defaults; test business has zero user-created templates
+- **Sidebar business name update:** revalidatePath in updateBusiness server action triggers sidebar re-render on save — sidebar shows new name immediately
+
 ### Pending Todos
 
 None.
@@ -269,9 +280,10 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 63-01-PLAN.md (Campaigns QA) — 10/10 PASS, 3 bugs documented, Standard Follow-Up campaign created
+Stopped at: Completed 65-01-PLAN.md (Settings General + Templates QA) — 5/5 PASS, 0 bugs, form_token captured
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
 Active business: Audit Test HVAC (businessId: 6ed94b54-6f35-4ede-8dcb-28f562052042)
-Current DB state: 7 jobs + 1 conflict job for AUDIT_Patricia; 2 user campaigns (HVAC Follow-up, Standard Follow-Up); 4+ active enrollments, 0 send logs
-Next action: `/gsd:execute-phase 64` (History/Analytics/Feedback QA)
+form_token: NCuKdh6JvBMsKSNtyLvWl8DnimHtIYIW (for Phase 67)
+Current DB state: 7 jobs + 1 conflict job for AUDIT_Patricia; 2 user campaigns (HVAC Follow-up, Standard Follow-Up); 4+ active enrollments, 0 send logs; 16 system templates, 0 user templates
+Next action: `/gsd:execute-phase 65-02` (Settings Services + Customers tabs QA)
