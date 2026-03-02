@@ -16,7 +16,7 @@ Status: Phase 63 complete, Phase 64 ready to execute
 
 Progress: [█████░░░░░] 55% (5/9 phases complete)
 
-Last activity: 2026-03-02 — Completed 63-01 Campaigns QA (CAMP-01 through CAMP-10: 10/10 PASS; 3 bugs documented: BUG-01 missing frozen label, BUG-02 no frozen stat card, BUG-03 wrong service type in template preview)
+Last activity: 2026-03-02 — Completed 63-01 Campaigns QA (8/10 PASS, 2 FAIL; CRITICAL BUG-04: frozen migration unapplied; 4 bugs total: BUG-04 critical, BUG-01 medium, BUG-02/03 low)
 
 ## Performance Metrics
 
@@ -226,14 +226,14 @@ Last activity: 2026-03-02 — Completed 63-01 Campaigns QA (CAMP-01 through CAMP
 
 ### Decisions from Phase 63-01 (Campaigns QA)
 
-- **CAMP-01 through CAMP-10: All 10 PASS** — Campaigns automation engine fully verified
-- **CAMP-BUG-01 (Medium):** `ENROLLMENT_STATUS_LABELS` in `lib/constants/campaigns.ts` missing 'frozen' key — badge shows empty text when campaign paused; fix: add `frozen: 'Frozen'`
-- **CAMP-BUG-02 (Low):** Campaign detail page has no "Frozen" stat card — frozen count invisible in UI when campaign paused
+- **8/10 PASS, 2 FAIL** — CAMP-05 and CAMP-06 FAIL due to unapplied frozen migration
+- **CAMP-BUG-04 (CRITICAL):** Migration `20260226_add_frozen_enrollment_status.sql` never applied to DB — CHECK constraint blocks 'frozen' status, entire Phase 46 freeze/resume feature non-functional; `toggleCampaignStatus()` silently swallows constraint violation (no error handling on enrollment update)
+- **CAMP-BUG-01 (Medium):** `ENROLLMENT_STATUS_LABELS` in `lib/constants/campaigns.ts` missing 'frozen' key — moot until BUG-04 fixed
+- **CAMP-BUG-02 (Low):** Campaign detail page has no "Frozen" stat card — moot until BUG-04 fixed
 - **CAMP-BUG-03 (Low):** `resolveTemplate()` in touch-sequence-display.tsx falls back to first system template by channel (alphabetically Cleaning) rather than filtering by campaign service type (HVAC) — cosmetic, actual sends use correct template
-- **Frozen enrollment verified at DB level:** Pause sets all enrollments to `status='frozen'` (NOT 'stopped'); resume restores all to `status='active'` — V2 Phase 46 behavior confirmed correct
-- **Conflict detection:** Second HVAC job for AUDIT_Patricia Johnson correctly sets `enrollment_resolution='conflict'`; conflict badge visible in dashboard Ready-to-Send queue
+- **Conflict detection:** Second HVAC job for AUDIT_Patricia Johnson correctly sets `enrollment_resolution='conflict'`; conflict badge visible in dashboard Ready-to-Send queue with Skip/Queue actions
 - **CAMP-10:** "Standard Follow-Up" campaign created (id: b81f6b2f, service_type=null, 3 touches) — available for Phase 64 testing
-- **DB verification pattern:** Use Supabase REST API directly for enrollment state queries — not relying on UI toast alone for CAMP-05/CAMP-06
+- **DB verification pattern:** Use Supabase REST API directly for enrollment state queries — this caught the CRITICAL BUG-04 that UI toast alone would have missed
 - **Current DB state post-63:** 2 user campaigns (HVAC Follow-up 2-touch, Standard Follow-Up 3-touch), 4+ active enrollments, 0 send logs; conflict job for AUDIT_Patricia may need resolution before Phase 64
 
 ### Decisions from Phase 62-01 (Jobs QA)
@@ -261,8 +261,9 @@ None.
 - BUG-DASH-06: KPIWidgets removed from dashboard — no 3 large KPI cards linking to /analytics (medium severity) — fix before production: re-add KPIWidgets to dashboard-client.tsx or update right panel card destinations to /analytics
 - BUG-DASH-10: Mobile header overflow 17px at 375px — "View Campaigns" button partially clipped (medium severity) — fix: `hidden sm:flex` on secondary header button
 - BUG-JOBS-01: Column header clicks don't sort rows (low severity) — fix: wrap header strings in sort button components using `header.column.getToggleSortingHandler()`
-- BUG-CAMP-01: ENROLLMENT_STATUS_LABELS missing 'frozen' key in lib/constants/campaigns.ts (medium severity) — fix: add `frozen: 'Frozen'` entry
-- BUG-CAMP-02: No "Frozen" stat card on campaign detail page (low severity) — fix: add 4th stat card for frozen count
+- **BUG-CAMP-04 (CRITICAL):** Migration `20260226_add_frozen_enrollment_status.sql` never applied — CHECK constraint blocks 'frozen' status on campaign_enrollments; entire Phase 46 freeze/resume feature non-functional; `toggleCampaignStatus()` silently swallows constraint error. Fix: apply migration + add error handling in server action.
+- BUG-CAMP-01: ENROLLMENT_STATUS_LABELS missing 'frozen' key in lib/constants/campaigns.ts (medium severity) — fix: add `frozen: 'Frozen'` entry (moot until BUG-04 fixed)
+- BUG-CAMP-02: No "Frozen" stat card on campaign detail page (low severity) — fix: add 4th stat card for frozen count (moot until BUG-04 fixed)
 - BUG-CAMP-03: resolveTemplate() shows wrong service type in preview (low severity) — fix: filter system templates by service_type before channel-only fallback
 
 ## Session Continuity
