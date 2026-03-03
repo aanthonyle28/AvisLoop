@@ -925,9 +925,9 @@ Plans:
 **Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 66-01-PLAN.md — Businesses page audit: card grid, detail drawer, metadata editing, notes auto-save, switcher button
-- [ ] 66-02-PLAN.md — Business switcher audit: desktop, mobile, data refresh on switch
-- [ ] 66-03-PLAN.md — Data isolation audit: cross-business contamination checks + rapid switching + cross-user isolation
+- [x] 66-01-PLAN.md — Businesses page audit: card grid, detail drawer, metadata editing, notes auto-save, switcher button
+- [x] 66-02-PLAN.md — Business switcher audit: desktop, mobile, data refresh on switch
+- [x] 66-03-PLAN.md — Data isolation audit: cross-business contamination checks + rapid switching + cross-user isolation
 
 ### Phase 67: Public Form, Edge Cases, and Report Compilation
 **Goal**: The public job completion form is verified functional and adversarially tested; all cross-cutting edge cases are documented; and the final QA summary report is compiled.
