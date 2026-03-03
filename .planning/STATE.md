@@ -5,25 +5,25 @@
 See: .planning/PROJECT.md (updated 2026-02-27)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.1 QA E2E Audit — Phase 65 (Settings/Billing) Plan 01 — COMPLETE
+**Current focus:** v3.1 QA E2E Audit — Phase 65 (Settings/Billing) Plan 02 — COMPLETE
 
 ## Current Position
 
 Phase: 65 (QA-07: Settings/Billing)
-Plan: 65-01-PLAN.md COMPLETE
+Plan: 65-02-PLAN.md COMPLETE
 Milestone: v3.1 QA E2E Audit
-Status: Phase 65 plan 01 complete, plan 02 ready to execute
+Status: Phase 65 plan 02 complete, plan 03 ready to execute
 
-Progress: [██████░░░░] 66% (6/9 phases complete)
+Progress: [███████░░░] 70% (7/9 phases complete -- counting plans)
 
-Last activity: 2026-03-02 — Completed 65-01 Settings General + Templates QA (SETT-01, SETT-02, SETT-03, SETT-04, SETT-09 partial: 5/5 PASS; form_token NCuKdh6JvBMsKSNtyLvWl8DnimHtIYIW captured for Phase 67)
+Last activity: 2026-03-02 — Completed 65-02 Settings Services + Customers QA (SETT-05, SETT-06, SETT-07, SETT-08, SETT-09 partial: 5/5 PASS)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 250
+- Total plans completed (project): 251
 - v3.0 plans completed: 15/15
-- v3.1 plans completed: 6/17
+- v3.1 plans completed: 7/17
 
 *Updated after each plan completion*
 
@@ -268,6 +268,15 @@ Last activity: 2026-03-02 — Completed 65-01 Settings General + Templates QA (S
 - **Test business state (no user templates):** All 16 templates are system defaults; test business has zero user-created templates
 - **Sidebar business name update:** revalidatePath in updateBusiness server action triggers sidebar re-render on save — sidebar shows new name immediately
 
+### Decisions from Phase 65-02 (Settings Services + Customers QA)
+
+- **SETT-05 PASS:** All 8 service type toggles work: toggle on highlights card (border-primary bg-primary/5), shows timing input with service-specific defaults (HVAC=24h, Plumbing=48h, Cleaning=4h, Roofing=72h). Toggle off removes highlight and timing. Save Changes button appears only when hasChanges=true. DB verified.
+- **SETT-06 PASS:** Custom service names section appears only when "Other" is enabled. TagBadge pills with `aria-label="Remove {name} tag"` for precise accessibility targeting. Add/remove tested, DB verified.
+- **SETT-07 PASS:** Customers tab renders 7 rows (Test Technician, Bob Wilson, Jane Doe, John Smith, AUDIT_Patricia, AUDIT_Marcus, AUDIT_Sarah). Search debounces, status filter (All/Active/Archived) works, tag filter UI present with 4 presets (VIP, repeat, commercial, residential).
+- **SETT-08 PASS with V2 note:** No "Add Customer" button exists in Customers tab — intentional V2 design. Customers come from job completion only. Import CSV exists for migration. Edit via drawer auto-save notes works (debounce). Archive from drawer works (no confirmation dialog). Restore available via row action menu for archived customers.
+- **SETT-09 PASS (Services partial):** Full page reload preserves enabled services, timing values, and toggle states.
+- Review cooldown has its own separate Save button (independent of service type Save Changes) — changing cooldown does not require saving service types and vice versa.
+
 ### Pending Todos
 
 None.
@@ -291,10 +300,10 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 65-01-PLAN.md (Settings General + Templates QA) — 5/5 PASS, 0 bugs, form_token captured
+Stopped at: Completed 65-02-PLAN.md (Settings Services + Customers QA) — 5/5 PASS, 0 bugs
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
 Active business: Audit Test HVAC (businessId: 6ed94b54-6f35-4ede-8dcb-28f562052042)
 form_token: NCuKdh6JvBMsKSNtyLvWl8DnimHtIYIW (for Phase 67)
-Current DB state: 7 jobs + 1 conflict job for AUDIT_Patricia; 2 user campaigns (HVAC Follow-up, Standard Follow-Up); 4+ active enrollments, 0 send logs; 16 system templates, 0 user templates
-Next action: `/gsd:execute-phase 65-02` (Settings Services + Customers tabs QA)
+Current DB state: 7 jobs + 1 conflict job for AUDIT_Patricia; 2 user campaigns (HVAC Follow-up, Standard Follow-Up); 4+ active enrollments, 0 send logs; 16 system templates, 0 user templates; AUDIT_Sarah Chen has notes from Phase 65 audit
+Next action: `/gsd:execute-phase 65-03` (Settings Billing tab QA)
