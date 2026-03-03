@@ -5,18 +5,18 @@
 See: .planning/PROJECT.md (updated 2026-02-27)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.1 QA E2E Audit — Phase 65 (Settings/Billing) Plan 03 — COMPLETE
+**Current focus:** v3.1 QA E2E Audit — Phase 64 Plan 03 (Feedback QA) COMPLETE
 
 ## Current Position
 
-Phase: 65 (QA-07: Settings/Billing)
-Plan: 65-03-PLAN.md COMPLETE
+Phase: 64 (QA-06: History, Analytics, Feedback)
+Plan: 64-03-PLAN.md COMPLETE
 Milestone: v3.1 QA E2E Audit
-Status: Phase 65 complete (all 3 plans), Phase 66 ready to execute
+Status: Phase 64 all 3 plans complete, Phase 65 and 66 also complete (parallel tracks)
 
-Progress: [████████░░] 80% (8/10 plans complete)
+Progress: [████████░░] 80% (8/10 phases complete — estimated)
 
-Last activity: 2026-03-02 — Completed 65-03 Billing Page QA (BILL-01, BILL-02, BILL-03: 3/3 PASS, 0 bugs)
+Last activity: 2026-03-03 — Completed 64-03 Feedback Page QA (FDBK-01, FDBK-02, FDBK-03: 3/3 PASS, 0 bugs)
 
 ## Performance Metrics
 
@@ -234,6 +234,15 @@ Last activity: 2026-03-02 — Completed 65-03 Billing Page QA (BILL-01, BILL-02,
 - **10 send_log rows seeded** in Supabase for Audit Test HVAC business — available for Phase 64-02 Analytics testing
 - **DB verification pattern:** Supabase REST API `gte/lte` on date string `2026-03-02` works correctly at DB level; bug is in Next.js server component's `endOfDay` computation
 
+### Decisions from Phase 64-03 (Feedback QA)
+
+- **FDBK-01 through FDBK-03:** 3/3 PASS — Feedback page fully functional, 0 bugs found
+- **Empty state tested first:** FDBK-03 verified before seeding (0 rows = "No feedback yet" heading shown, stats bar hidden). Then 3 rows seeded via Supabase REST API.
+- **unresolveFeedbackAction behavioral note (not a bug):** Clears resolved_at and resolved_by but retains internal_notes in DB. UI hides notes via `isResolved && feedback.internal_notes` guard. No user-facing defect.
+- **Radix DialogTitle heading selector:** `[role="dialog"] [role="heading"]` returns empty — DialogTitle renders as `h2`. Use `[role="dialog"] h2` for title text.
+- **Resolution workflow full lifecycle confirmed:** resolve → notes visible → navigate away → persist → reopen → stats reset → re-resolve. All DB mutations verified via REST API.
+- **Final feedback DB state:** 3 rows (Marcus 1-star resolved, Patricia 3-star resolved, Sarah 2-star unresolved)
+
 ### Decisions from Phase 64-02 (Analytics QA)
 
 - **ANLYT-01 through ANLYT-03:** 3/3 PASS — Analytics page fully functional, 0 bugs found
@@ -319,11 +328,11 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-02
-Stopped at: Completed 65-03-PLAN.md (Billing Page QA) — 3/3 PASS, 0 bugs; Phase 65 complete (13/13)
+Last session: 2026-03-03
+Stopped at: Completed 64-03-PLAN.md (Feedback Page QA) — 3/3 PASS, 0 bugs; Phase 64 complete (all 3 plans)
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
 Active business: Audit Test HVAC (businessId: 6ed94b54-6f35-4ede-8dcb-28f562052042)
 form_token: NCuKdh6JvBMsKSNtyLvWl8DnimHtIYIW (for Phase 67)
-Current DB state: 8 jobs; 2 user campaigns (HVAC Follow-up, Standard Follow-Up); 4 active enrollments; 4 send_logs this month (1 delivered, 1 pending, 1 failed, 1 bounced); 16 system templates, 0 user templates
-Next action: `/gsd:execute-phase 66` (Businesses/Isolation QA)
+Current DB state: 8 jobs; 2 user campaigns (HVAC Follow-up, Standard Follow-Up); 4 active enrollments; 10 send_logs; 3 customer_feedback rows (Marcus 1-star resolved, Patricia 3-star resolved, Sarah 2-star unresolved); 16 system templates, 0 user templates
+Next action: Phase 67 (Public Form + Edge Cases + Final Report) — phases 65 and 66 already complete
