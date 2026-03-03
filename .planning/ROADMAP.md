@@ -947,8 +947,8 @@ Plans:
   11. A consolidated summary report exists at docs/qa-v3.1/SUMMARY-REPORT.md with an overall health scorecard and a prioritized top-10 fix list
 
 Plans:
-- [ ] 67-01-PLAN.md — Public form audit: happy path, validation, mobile, invalid token (adversarial)
-- [ ] 67-02-PLAN.md — Edge case audit: long names, special characters, viewport tests (375px, 768px), loading states, empty states, dark mode
+- [x] 67-01-PLAN.md — Public form audit: happy path, validation, mobile, invalid token (adversarial)
+- [x] 67-02-PLAN.md — Edge case audit: long names, special characters, viewport tests (375px, 768px), loading states, empty states, dark mode
 - [ ] 67-03-PLAN.md — Report compilation: per-page findings review, summary report, health scorecard, priority fix list
 
 ---

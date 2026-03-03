@@ -122,24 +122,24 @@
 
 ## Public Job Completion Form
 
-- [ ] **FORM-01**: Form loads at /complete/[token] without authentication
-- [ ] **FORM-02**: Form shows business name and enabled service types
-- [ ] **FORM-03**: Form validates required fields (name, phone or email, service type)
-- [ ] **FORM-04**: Successful submission creates job + customer record in database
-- [ ] **FORM-05**: Mobile layout has large touch targets and is usable on phone viewport
-- [ ] **FORM-06**: Invalid/missing token shows 404 page (not crash or blank)
+- [x] **FORM-01**: Form loads at /complete/[token] without authentication
+- [x] **FORM-02**: Form shows business name and enabled service types
+- [x] **FORM-03**: Form validates required fields (name, phone or email, service type)
+- [x] **FORM-04**: Successful submission creates job + customer record in database
+- [x] **FORM-05**: Mobile layout has large touch targets and is usable on phone viewport
+- [x] **FORM-06**: Invalid/missing token shows 404 page (not crash or blank)
 
 ## Cross-Cutting Edge Cases
 
-- [ ] **EDGE-01**: Long business name (50+ chars) displays correctly in sidebar, switcher, cards (truncated, no overflow)
-- [ ] **EDGE-02**: Long customer name (50+ chars) displays correctly in tables and drawers
-- [ ] **EDGE-03**: Special characters in all text fields (quotes, ampersands, < >) display correctly (no XSS, no broken rendering)
-- [ ] **EDGE-04**: Every page renders correctly at mobile viewport (375px width)
-- [ ] **EDGE-05**: Every page renders correctly at tablet viewport (768px width)
-- [ ] **EDGE-06**: Loading skeletons appear on all data pages during fetch
-- [ ] **EDGE-07**: Empty states render correctly on all pages when no data exists
-- [ ] **EDGE-08**: Form validation errors display clearly on all forms (red borders, error messages)
-- [ ] **EDGE-09**: Dark mode renders without artifacts on all tested pages
+- [x] **EDGE-01**: Long business name (50+ chars) displays correctly in sidebar, switcher, cards (truncated, no overflow)
+- [x] **EDGE-02**: Long customer name (50+ chars) displays correctly in tables and drawers
+- [x] **EDGE-03**: Special characters in all text fields (quotes, ampersands, < >) display correctly (no XSS, no broken rendering)
+- [x] **EDGE-04**: Every page renders correctly at mobile viewport (375px width)
+- [x] **EDGE-05**: Every page renders correctly at tablet viewport (768px width)
+- [x] **EDGE-06**: Loading skeletons appear on all data pages during fetch
+- [x] **EDGE-07**: Empty states render correctly on all pages when no data exists
+- [x] **EDGE-08**: Form validation errors display clearly on all forms (red borders, error messages)
+- [x] **EDGE-09**: Dark mode renders without artifacts on all tested pages
 
 ## Report Deliverables
 
@@ -247,21 +247,21 @@
 | MULTI-07 | Phase 66 | Complete |
 | MULTI-08 | Phase 66 | Complete |
 | MULTI-09 | Phase 66 | Complete |
-| FORM-01 | Phase 67 | Pending |
-| FORM-02 | Phase 67 | Pending |
-| FORM-03 | Phase 67 | Pending |
-| FORM-04 | Phase 67 | Pending |
-| FORM-05 | Phase 67 | Pending |
-| FORM-06 | Phase 67 | Pending |
-| EDGE-01 | Phase 67 | Pending |
-| EDGE-02 | Phase 67 | Pending |
-| EDGE-03 | Phase 67 | Pending |
-| EDGE-04 | Phase 67 | Pending |
-| EDGE-05 | Phase 67 | Pending |
-| EDGE-06 | Phase 67 | Pending |
-| EDGE-07 | Phase 67 | Pending |
-| EDGE-08 | Phase 67 | Pending |
-| EDGE-09 | Phase 67 | Pending |
+| FORM-01 | Phase 67 | Complete |
+| FORM-02 | Phase 67 | Complete |
+| FORM-03 | Phase 67 | Complete |
+| FORM-04 | Phase 67 | Complete |
+| FORM-05 | Phase 67 | Complete |
+| FORM-06 | Phase 67 | Complete |
+| EDGE-01 | Phase 67 | Complete |
+| EDGE-02 | Phase 67 | Complete |
+| EDGE-03 | Phase 67 | Complete |
+| EDGE-04 | Phase 67 | Complete |
+| EDGE-05 | Phase 67 | Complete |
+| EDGE-06 | Phase 67 | Complete |
+| EDGE-07 | Phase 67 | Complete |
+| EDGE-08 | Phase 67 | Complete |
+| EDGE-09 | Phase 67 | Complete |
 | RPT-01 | Phase 67 | Pending |
 | RPT-02 | Phase 67 | Pending |
 | RPT-03 | Phase 67 | Pending |
