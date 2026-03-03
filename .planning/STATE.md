@@ -5,18 +5,18 @@
 See: .planning/PROJECT.md (updated 2026-02-27)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.1 QA E2E Audit — Phase 65 (Settings/Billing) Plan 02 — COMPLETE
+**Current focus:** v3.1 QA E2E Audit — Phase 64 (History, Analytics, Feedback) Plan 02 — COMPLETE
 
 ## Current Position
 
-Phase: 65 (QA-07: Settings/Billing)
-Plan: 65-02-PLAN.md COMPLETE
+Phase: 64 (QA-06: History, Analytics, Feedback)
+Plan: 64-02-PLAN.md COMPLETE
 Milestone: v3.1 QA E2E Audit
-Status: Phase 65 plan 02 complete, plan 03 ready to execute
+Status: Phase 64 plan 02 complete, plan 03 ready to execute
 
-Progress: [███████░░░] 70% (7/9 phases complete -- counting plans)
+Progress: [███████░░░] 70% (7/9 phases complete)
 
-Last activity: 2026-03-02 — Completed 65-02 Settings Services + Customers QA (SETT-05, SETT-06, SETT-07, SETT-08, SETT-09 partial: 5/5 PASS)
+Last activity: 2026-03-03 — Completed 64-02 Analytics Page QA (ANLYT-01, ANLYT-02, ANLYT-03: 3/3 PASS, 0 bugs)
 
 ## Performance Metrics
 
@@ -234,6 +234,17 @@ Last activity: 2026-03-02 — Completed 65-02 Settings Services + Customers QA (
 - **10 send_log rows seeded** in Supabase for Audit Test HVAC business — available for Phase 64-02 Analytics testing
 - **DB verification pattern:** Supabase REST API `gte/lte` on date string `2026-03-02` works correctly at DB level; bug is in Next.js server component's `endOfDay` computation
 
+### Decisions from Phase 64-02 (Analytics QA)
+
+- **ANLYT-01 through ANLYT-03:** 3/3 PASS — Analytics page fully functional, 0 bugs found
+- **Analytics RPC join path:** `jobs → campaign_enrollments → send_logs` — only campaign-linked send_logs count; 7 manual sends (campaign_enrollment_id=null) are excluded. This is by design — analytics tracks campaign performance, not manual sends.
+- **3 send_logs with campaign_enrollment_id** (all HVAC): delivered, failed, bounced. RPC counts: total_sent=3, delivered=1 (delivered status only), reviewed=0, feedback=0
+- **All 3 service types appear in breakdown:** RPC LEFT JOINs from jobs outward — plumbing and electrical show 0-count rows even with no sends. Correct behavior.
+- **ANLYT-03 empty state:** Verified by code inspection only — `byServiceType.length === 0` condition confirmed in component source; test business has jobs so live trigger not available
+- **RPC direct call blocked:** `get_service_type_analytics` SECURITY DEFINER has internal auth check blocking service-role REST calls; UI verification via Playwright used instead
+- **`delivered` count logic:** `COUNT(sl.id) FILTER (WHERE sl.status IN ('sent', 'delivered', 'opened'))` — only these 3 statuses count as delivered; `bounced` and `failed` do not
+- **Playwright button selector fix:** Use `button[type="submit"]` not `getByRole('button', { name: /sign in/ })` for login page submit button
+
 ### Decisions from Phase 63-01 (Campaigns QA)
 
 - **8/10 PASS, 2 FAIL** — CAMP-05 and CAMP-06 FAIL due to unapplied frozen migration
@@ -299,11 +310,11 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-02
-Stopped at: Completed 65-02-PLAN.md (Settings Services + Customers QA) — 5/5 PASS, 0 bugs
+Last session: 2026-03-03
+Stopped at: Completed 64-02-PLAN.md (Analytics Page QA) — 3/3 PASS, 0 bugs
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
 Active business: Audit Test HVAC (businessId: 6ed94b54-6f35-4ede-8dcb-28f562052042)
 form_token: NCuKdh6JvBMsKSNtyLvWl8DnimHtIYIW (for Phase 67)
-Current DB state: 7 jobs + 1 conflict job for AUDIT_Patricia; 2 user campaigns (HVAC Follow-up, Standard Follow-Up); 4+ active enrollments, 0 send logs; 16 system templates, 0 user templates; AUDIT_Sarah Chen has notes from Phase 65 audit
-Next action: `/gsd:execute-phase 65-03` (Settings Billing tab QA)
+Current DB state: 8 jobs (6 HVAC completed, 1 HVAC conflict, 1 Plumbing, 1 Electrical); 2 user campaigns (HVAC Follow-up, Standard Follow-Up); 4 active enrollments; 10 send_logs (3 with campaign_enrollment_id); 0 customer_feedback rows; 16 system templates, 0 user templates
+Next action: `/gsd:execute-phase 64-03` (Feedback page QA)
