@@ -874,9 +874,9 @@ Plans:
   11. Feedback empty state renders correctly when no feedback has been submitted
 
 Plans:
-- [ ] 64-01-PLAN.md — History audit: send logs, status filters, date presets, resend, bulk select
-- [ ] 64-02-PLAN.md — Analytics audit: metrics, service type breakdown, empty state
-- [ ] 64-03-PLAN.md — Feedback audit: list, resolution workflow, empty state
+- [x] 64-01-PLAN.md — History audit: send logs, status filters, date presets, resend, bulk select
+- [x] 64-02-PLAN.md — Analytics audit: metrics, service type breakdown, empty state
+- [x] 64-03-PLAN.md — Feedback audit: list, resolution workflow, empty state
 
 ### Phase 65: Settings and Billing
 **Goal**: All Settings tabs function correctly and persist changes after page refresh; the Billing page reflects pooled usage across all businesses.
@@ -1017,7 +1017,7 @@ See individual phase sections above for requirements, success criteria, and depe
 | **61** | **v3.1 QA E2E Audit** | **1/1** | **Complete** | **2026-02-28** |
 | **62** | **v3.1 QA E2E Audit** | **1/1** | **Complete** | **2026-02-28** |
 | **63** | **v3.1 QA E2E Audit** | **1/1** | **Complete** | **2026-03-02** |
-| 64 | v3.1 QA E2E Audit | 0/3 | Not started | - |
+| **64** | **v3.1 QA E2E Audit** | **3/3** | **Complete** | **2026-03-02** |
 | 65 | v3.1 QA E2E Audit | 0/3 | Not started | - |
 | 66 | v3.1 QA E2E Audit | 0/3 | Not started | - |
 | 67 | v3.1 QA E2E Audit | 0/3 | Not started | - |
