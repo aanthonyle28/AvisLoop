@@ -224,6 +224,16 @@ Last activity: 2026-03-02 — Completed 65-01 Settings General + Templates QA (S
 - Test account was NOT in pure zero-data state at Phase 61 — 4 jobs + 1 enrollment from Phase 60; Phase 62 data was concurrently created during QA run
 - QA scripts use Windows-format paths (`C:\\AvisLoop\\`) for Playwright screenshot saves — Unix paths fail on win32
 
+### Decisions from Phase 64-01 (History QA)
+
+- **HIST-01 through HIST-05:** 4/5 PASS — History page core functionality verified
+- **BUG-HIST-01 (Medium):** `getSendLogs` timezone bug — `setHours(23,59,59,999)` uses local machine time, not UTC. On UTC-6 machine, endOfDay for `2026-03-02` = `2026-03-02T05:59Z`, excluding today's rows at `2026-03-02T19-22Z`. Fix: `new Date(dateTo + 'T23:59:59.999Z')`
+- **complained status (by design):** Not in `RESENDABLE_STATUSES = ['failed', 'bounced']` — shows "Failed" badge but no Retry button (spam complaint)
+- **Status filter uses raw DB values:** `bounced` filter shows 1 row; `failed` filter shows 2 rows — correct, even though both display as "Failed" badge
+- **HIST-05 bulk select confirmed:** `Select All` header selects exactly 3 rows (2 failed + 1 bounced), "3 messages selected" text appears, Retry Selected button appears
+- **10 send_log rows seeded** in Supabase for Audit Test HVAC business — available for Phase 64-02 Analytics testing
+- **DB verification pattern:** Supabase REST API `gte/lte` on date string `2026-03-02` works correctly at DB level; bug is in Next.js server component's `endOfDay` computation
+
 ### Decisions from Phase 63-01 (Campaigns QA)
 
 - **8/10 PASS, 2 FAIL** — CAMP-05 and CAMP-06 FAIL due to unapplied frozen migration
@@ -276,6 +286,7 @@ None.
 - BUG-CAMP-01: ENROLLMENT_STATUS_LABELS missing 'frozen' key in lib/constants/campaigns.ts (medium severity) — fix: add `frozen: 'Frozen'` entry (moot until BUG-04 fixed)
 - BUG-CAMP-02: No "Frozen" stat card on campaign detail page (low severity) — fix: add 4th stat card for frozen count (moot until BUG-04 fixed)
 - BUG-CAMP-03: resolveTemplate() shows wrong service type in preview (low severity) — fix: filter system templates by service_type before channel-only fallback
+- BUG-HIST-01: getSendLogs timezone bug — setHours(23,59,59,999) uses local time; date range filter broken on non-UTC machines (medium severity) — fix: `new Date(dateTo + 'T23:59:59.999Z')` in lib/data/send-logs.ts
 
 ## Session Continuity
 
