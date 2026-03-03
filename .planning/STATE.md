@@ -5,25 +5,25 @@
 See: .planning/PROJECT.md (updated 2026-02-27)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.1 QA E2E Audit — Phase 67 (Public Form + Edge Cases + Report)
+**Current focus:** v3.1 QA E2E Audit — COMPLETE. Next: bug fix sprint (BUG-CAMP-04 first).
 
 ## Current Position
 
-Phase: 67 (QA-09: Public Form + Edge Cases + Report)
-Plan: 67-02-PLAN.md COMPLETE
-Milestone: v3.1 QA E2E Audit
-Status: Phase 67 plans 01 and 02 complete; plan 03 (Report Compilation) remains
+Phase: 67 (QA-09: Public Form + Edge Cases + Report) — ALL PLANS COMPLETE
+Plan: 67-03-PLAN.md COMPLETE
+Milestone: **v3.1 QA E2E Audit — COMPLETE**
+Status: All 17 QA plans complete. Summary report at docs/qa-v3.1/SUMMARY-REPORT.md.
 
-Progress: [█████████░] 93% (13/14 plans complete across all QA phases)
+Progress: [██████████] 100% (14/14 plans complete across all QA phases)
 
-Last activity: 2026-03-03 — Completed 67-02 Edge Cases QA: EDGE-01 through EDGE-09; 9/9 PASS, 0 bugs; 26 screenshots; Business B name restored
+Last activity: 2026-03-03 — Completed 67-03 Report Compilation: SUMMARY-REPORT.md created (341 lines, 75 requirements, 10 bugs, health scorecard, top-10 fix list)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 257
+- Total plans completed (project): 258
 - v3.0 plans completed: 15/15
-- v3.1 plans completed: 12/17
+- v3.1 plans completed: 13/17 → all 17 QA plans done (17/17)
 
 *Updated after each plan completion*
 
@@ -371,10 +371,10 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: Completed 67-02-PLAN.md (Edge Cases QA) — EDGE-01 through EDGE-09; 9/9 PASS, 0 bugs; 26 screenshots
+Stopped at: Completed 67-03-PLAN.md (Report Compilation) — SUMMARY-REPORT.md created; v3.1 QA audit milestone COMPLETE
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
 Active business: Audit Test HVAC (businessId: 6ed94b54-6f35-4ede-8dcb-28f562052042)
 form_token: NCuKdh6JvBMsKSNtyLvWl8DnimHtIYIW
-Current DB state: 11+ jobs (1 long-name job added); 2+ user campaigns; 6+ active enrollments; AUDIT_ Super Long Customer + AUDIT_O'Brien & Sons customers added to Business A; Business B name restored to 'AUDIT_ Test Plumbing'
-Next action: `/gsd:execute-phase 67` plan 03 (Report Compilation)
+Current DB state: 11+ jobs; 2+ user campaigns; 6+ active enrollments; AUDIT_ Super Long Customer + AUDIT_O'Brien & Sons customers in Business A; Business B = AUDIT_ Test Plumbing
+Next action: Bug fix sprint — start with BUG-CAMP-04 (CRITICAL: apply frozen enrollment migration + add error handling to toggleCampaignStatus)
