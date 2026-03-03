@@ -15,7 +15,7 @@
 |-------------|--------|-------|
 | MULTI-01: Switcher shows all businesses | **PASS** | Both businesses visible, checkmark on active, "View all clients" link present |
 | MULTI-02: Switch updates all page data | **PASS** | Dashboard, Jobs, Campaigns all reflect correct business after switch in both directions |
-| MULTI-03: Mobile switcher functional | pending | Tested in Task 2 |
+| MULTI-03: Mobile switcher functional | **PASS** | Dropdown opens, both businesses listed, switch updates header and data |
 
 ---
 
@@ -136,7 +136,49 @@
 
 ## MULTI-03: Mobile switcher functional
 
-**Status:** pending -- tested in Task 2
+**Status: PASS**
+
+### Mobile viewport (375x844)
+
+**Steps:**
+1. Resized viewport to 375x844 (iPhone 14 equivalent)
+2. Navigated to http://localhost:3000/dashboard
+3. Verified mobile layout renders correctly
+4. Clicked business switcher in mobile header
+5. Dropdown opened with both businesses
+6. Switched to "AUDIT_ Test Plumbing"
+7. Verified header updated and data changed
+8. Switched back to "Audit Test HVAC"
+9. Restored viewport to 1440x900
+
+| Check | Expected | Actual |
+|-------|----------|--------|
+| Desktop sidebar hidden | Yes | Yes -- not present in DOM at 375px |
+| Mobile header visible | Yes | Yes -- AvisLoop logo + business name + account menu |
+| Business name in header | Yes | Yes -- "Audit Test HVAC" displayed in header |
+| Bottom navigation visible | Yes | Yes -- Dashboard, Jobs, Campaigns, History |
+| FAB Add Job button visible | Yes | Yes -- orange circle button at bottom-right |
+| Switcher dropdown opens | Yes | Yes -- opens same Radix DropdownMenu as desktop |
+| Both businesses listed | Yes | Yes -- "Audit Test HVAC" (checkmark) + "AUDIT_ Test Plumbing" + "View all clients" |
+| Switch works | Yes | Yes -- header updated to "AUDIT_ Test Plumbing", data changed |
+| Header updates after switch | Yes | Yes -- business name in header reflects switched business |
+| Data changes after switch | Yes | Yes -- dashboard showed Business B data (1 job ready, 0 reviews, 0.0 avg) |
+| Switch back works | Yes | Yes -- header returned to "Audit Test HVAC" with Business A data |
+
+### Observations
+- Mobile switcher uses the same `BusinessSwitcher` component as desktop (same aria-labels, same menu structure)
+- Dropdown renders correctly at 375px -- no overflow or clipping issues
+- Business name text fits within the mobile header without truncation
+- Touch targets are adequate for mobile interaction
+- Switch triggers same `revalidatePath` flow as desktop -- data refresh is complete
+
+### Evidence
+- `qa-66-mobile-dashboard.png` -- Mobile dashboard at 375px showing Business A
+- `qa-66-mobile-switcher-open.png` -- Mobile switcher dropdown open with both businesses
+- `qa-66-mobile-switcher-switched.png` -- Mobile dashboard after switching to Business B
+
+### Bugs found
+- None
 
 ---
 
@@ -144,7 +186,7 @@
 
 | Bug ID | Severity | Requirement | Description |
 |--------|----------|-------------|-------------|
-| (none) | -- | -- | No bugs found in MULTI-01 or MULTI-02 |
+| (none) | -- | -- | No bugs found across MULTI-01, MULTI-02, or MULTI-03 |
 
 ---
 
@@ -158,7 +200,18 @@
 | qa-66-jobs-business-b.png | Jobs page for Business B (1 job, Plumbing/Handyman filters) |
 | qa-66-campaigns-business-b.png | Campaigns page for Business B (1 campaign: Standard) |
 | qa-66-dashboard-business-a-restored.png | Dashboard after switching back to A (3 ready, 3 attention, 2.0 rating) |
+| qa-66-mobile-dashboard.png | Mobile dashboard at 375px showing Business A |
+| qa-66-mobile-switcher-open.png | Mobile switcher dropdown open with both businesses |
+| qa-66-mobile-switcher-switched.png | Mobile dashboard after switching to Business B |
 
 ---
 
-*MULTI-01 and MULTI-02 complete. MULTI-03 pending Task 2 (mobile viewport test).*
+## Final State
+
+- Active business: **Audit Test HVAC** (restored)
+- Viewport: 1440x900 (restored to desktop)
+- All 3 MULTI requirements: **PASS**
+
+---
+
+*QA audit complete. MULTI-01, MULTI-02, MULTI-03 all PASS. Business switcher works correctly on desktop and mobile, with proper data isolation on switch.*
