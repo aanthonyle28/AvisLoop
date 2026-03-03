@@ -922,6 +922,7 @@ Plans:
   14. Send logs from Business B do NOT appear in History when Business A is active
   15. Rapid business switching (5+ switches in 10 seconds) leaves the UI in a correct, non-broken state
   16. Two different user accounts cannot see each other's businesses, jobs, or customers (cross-user isolation verified)
+**Plans**: 3 plans in 2 waves
 
 Plans:
 - [ ] 66-01-PLAN.md — Businesses page audit: card grid, detail drawer, metadata editing, notes auto-save, switcher button
