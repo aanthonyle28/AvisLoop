@@ -5,25 +5,25 @@
 See: .planning/PROJECT.md (updated 2026-02-27)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.1 QA E2E Audit — Phase 64 (History, Analytics, Feedback) — COMPLETE
+**Current focus:** v3.1 QA E2E Audit — Phase 65 (Settings & Billing) — COMPLETE
 
 ## Current Position
 
-Phase: 64 (QA-06: History, Analytics, Feedback)
+Phase: 65 (QA-07: Settings & Billing)
 Plan: All 3 plans COMPLETE
 Milestone: v3.1 QA E2E Audit
-Status: Phase 64 complete, Phase 65 ready to execute
+Status: Phase 65 complete, Phase 66 ready to execute
 
-Progress: [██████░░░░] 67% (6/9 phases complete)
+Progress: [████████░░] 78% (7/9 phases complete)
 
-Last activity: 2026-03-02 — Completed Phase 64 (History/Analytics/Feedback QA): 64-01 History 4/5 PASS (BUG-HIST-01 timezone), 64-02 Analytics 3/3 PASS, 64-03 Feedback 3/3 PASS
+Last activity: 2026-03-02 — Completed Phase 65 (Settings & Billing QA): 65-01 General+Templates 5/5 PASS, 65-02 Services+Customers 5/5 PASS, 65-03 Billing 3/3 PASS; 13/13 total PASS, 0 bugs
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 253
+- Total plans completed (project): 256
 - v3.0 plans completed: 15/15
-- v3.1 plans completed: 8/17
+- v3.1 plans completed: 11/17
 
 *Updated after each plan completion*
 
@@ -254,6 +254,19 @@ Last activity: 2026-03-02 — Completed Phase 64 (History/Analytics/Feedback QA)
 - **`delivered` count logic:** `COUNT(sl.id) FILTER (WHERE sl.status IN ('sent', 'delivered', 'opened'))` — only these 3 statuses count as delivered; `bounced` and `failed` do not
 - **Playwright button selector fix:** Use `button[type="submit"]` not `getByRole('button', { name: /sign in/ })` for login page submit button
 
+### Decisions from Phase 65 (Settings & Billing QA)
+
+- **SETT-01 through SETT-09, BILL-01 through BILL-03: 13/13 PASS** — Settings and Billing fully verified, 0 bugs
+- **form_token captured:** `NCuKdh6JvBMsKSNtyLvWl8DnimHtIYIW` — Phase 67 dependency satisfied
+- **V2-aligned Customers tab:** No "Add Customer" button in Settings > Customers tab (intentional V2 behavior). Customer creation only via job completion. Edit via drawer auto-save notes, archive/restore via row actions.
+- **Pooled billing verified:** UsageDisplay shows "Sends this month (all businesses)" label. DB arithmetic: 1 delivered send_log = UI "1 / 25" (trial tier). `getPooledMonthlyUsage()` aggregates across all user businesses.
+- **Service type toggles:** All 8 types render with button-based toggles (not native checkboxes). Timing inputs (1-168h) appear/hide on toggle. Save/restore cycle DB-verified.
+- **Custom service names:** TagBadge pills with accessible remove buttons (aria-label="Remove {name} tag"). Max 10 limit enforced. Section only visible when "Other" enabled.
+- **Review cooldown:** Independent Save button separate from service type Save Changes. Range 7-90 days enforced.
+- **Template CRUD:** 16 system templates (8 email + 8 SMS) with channel badges (blue Email, green SMS). Create/delete DB-verified. System templates have "Use this template" button; user templates have "Delete".
+- **Plan comparison:** Basic ($49/mo, 200 requests, 200 customers, Email support) + Pro ($99/mo, 500 requests, Unlimited customers, Priority support, "Recommended" badge). Trial user sees 2 Subscribe buttons.
+- **Test data created:** AUDIT_Settings Test Customer (archived). AUDIT Pest Control custom service (cleaned up). All service type mutations restored.
+
 ### Decisions from Phase 63-01 (Campaigns QA)
 
 - **8/10 PASS, 2 FAIL** — CAMP-05 and CAMP-06 FAIL due to unapplied frozen migration
@@ -329,9 +342,10 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed Phase 64 (History/Analytics/Feedback QA) — 10/11 PASS, 1 BUG-HIST-01 (timezone)
+Stopped at: Completed Phase 65 (Settings & Billing QA) — 13/13 PASS, 0 bugs, form_token captured
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
 Active business: Audit Test HVAC (businessId: 6ed94b54-6f35-4ede-8dcb-28f562052042)
-Current DB state: 8 jobs; 2 user campaigns (HVAC Follow-up, Standard Follow-Up); 4 active enrollments; 10 send_logs; 3 customer_feedback rows (Marcus 1-star resolved, Patricia 3-star unresolved, Sarah 2-star unresolved)
-Next action: `/gsd:execute-phase 65` (Settings and Billing QA)
+form_token: NCuKdh6JvBMsKSNtyLvWl8DnimHtIYIW (for Phase 67)
+Current DB state: 8 jobs; 2 user campaigns (HVAC Follow-up, Standard Follow-Up); 4 active enrollments; 10 send_logs; 3 customer_feedback rows; AUDIT_Settings Test Customer (archived)
+Next action: `/gsd:execute-phase 66` (Businesses Page and Data Isolation QA)

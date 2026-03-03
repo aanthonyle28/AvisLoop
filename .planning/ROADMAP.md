@@ -897,9 +897,9 @@ Plans:
   12. Plan comparison section renders all tiers with correct feature lists and pricing
 
 Plans:
-- [ ] 65-01-PLAN.md — Settings General + Templates tabs audit
-- [ ] 65-02-PLAN.md — Settings Services + Customers tabs audit; capture form_token URL for Phase 67
-- [ ] 65-03-PLAN.md — Billing page audit: plan tier, pooled usage, plan comparison
+- [x] 65-01-PLAN.md — Settings General + Templates tabs audit
+- [x] 65-02-PLAN.md — Settings Services + Customers tabs audit; capture form_token URL for Phase 67
+- [x] 65-03-PLAN.md — Billing page audit: plan tier, pooled usage, plan comparison
 
 ### Phase 66: Businesses Page and Data Isolation
 **Goal**: The Businesses (Clients) page and business switcher are fully functional; multi-business data isolation is verified end-to-end — no cross-contamination under switching.
@@ -1018,8 +1018,8 @@ See individual phase sections above for requirements, success criteria, and depe
 | **62** | **v3.1 QA E2E Audit** | **1/1** | **Complete** | **2026-02-28** |
 | **63** | **v3.1 QA E2E Audit** | **1/1** | **Complete** | **2026-03-02** |
 | **64** | **v3.1 QA E2E Audit** | **3/3** | **Complete** | **2026-03-02** |
-| 65 | v3.1 QA E2E Audit | 0/3 | Not started | - |
+| **65** | **v3.1 QA E2E Audit** | **3/3** | **Complete** | **2026-03-02** |
 | 66 | v3.1 QA E2E Audit | 0/3 | Not started | - |
 | 67 | v3.1 QA E2E Audit | 0/3 | Not started | - |
 
-**Total:** 250 plans complete across shipped phases.
+**Total:** 253 plans complete across shipped phases.
