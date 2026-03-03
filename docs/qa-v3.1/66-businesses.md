@@ -4,7 +4,7 @@
 **Tester:** Claude Code (Playwright MCP + Supabase MCP)
 **Account:** audit-test@avisloop.com
 **Business A:** Audit Test HVAC (id: `6ed94b54-6f35-4ede-8dcb-28f562052042`)
-**Business B:** AUDIT_ Test Plumbing (id: TBD — created in BIZ-07)
+**Business B:** AUDIT_ Test Plumbing (id: `ba41879d-7458-4d47-909f-1dce6ddd0e69`)
 **App URL:** http://localhost:3000
 
 ---
@@ -199,19 +199,100 @@ WHERE id = '6ed94b54-6f35-4ede-8dcb-28f562052042';
 
 **Requirement:** "Switch to this business" button in the drawer for the non-active business changes the active business — sidebar shows new business name after switch.
 
-**Status:** Pending — requires second business (created in BIZ-07)
+**Precondition:** Active business is "AUDIT_ Test Plumbing" (set by wizard completion in BIZ-07). User has 2 businesses.
 
-**Result: TBD**
+**Steps:**
+1. Navigated to /businesses
+2. Verified 2 cards visible (Audit Test HVAC + AUDIT_ Test Plumbing)
+3. Sidebar shows "AUDIT_ Test Plumbing" as current business (with dropdown chevron)
+4. Clicked "Audit Test HVAC" card to open its drawer
+5. Drawer shows all metadata from BIZ-04, notes from BIZ-05
+6. **"Switch to this business" button visible** in the drawer footer (only appears for non-active businesses)
+7. Clicked "Switch to this business"
+
+**Observations:**
+- Toast notification: "Switched to Audit Test HVAC"
+- Sidebar business name updated immediately: "AUDIT_ Test Plumbing" -> "Audit Test HVAC"
+- Dashboard badge count changed: 0 -> 3 (reflecting Audit Test HVAC's ready-to-send queue)
+- "Active" badge moved from AUDIT_ Test Plumbing card to Audit Test HVAC card
+- Drawer closed automatically after switch
+- Page did not reload — UI updated via revalidatePath
+
+**Screenshot:** `qa-66-switched-business.png`
+
+**Result: PASS**
 
 ---
 
 ## BIZ-07: Add Business Wizard
 
-**Requirement:** "Add Business" button navigates to /onboarding?mode=new and loads the CreateBusinessWizard. Completing wizard creates new business with correct data.
+**Requirement:** "Add Business" button navigates to /onboarding?mode=new and loads the CreateBusinessWizard (2-step: Business Setup + Campaign Preset). Completing wizard creates new business with correct data.
 
-**Status:** Pending
+**Steps:**
+1. Clicked "Add Business" button on /businesses page
+2. Navigated to `/onboarding?mode=new`
+3. CreateBusinessWizard loaded with Step 1 of 2: "Set up your new business"
 
-**Result: TBD**
+**Step 1 — Business Setup:**
+- Filled: Business name = "AUDIT_ Test Plumbing"
+- Filled: Phone number = "(555) 987-6543"
+- Google review link: left empty
+- Selected service types: Plumbing (checkmark shown) + Handyman (checkmark shown)
+- "Continue" button enabled after name + at least 1 service type selected
+- Clicked Continue
+
+**Step 2 — Campaign Preset:**
+- Page: "Choose your follow-up approach"
+- 3 preset options displayed:
+  - Gentle Follow-Up: Two emails over 3 days
+  - Standard Follow-Up: Two emails and a text message over 7 days
+  - Aggressive Follow-Up: A text within hours, then email and SMS reminders
+- Selected "Standard Follow-Up"
+- "Continue" button enabled after selection
+- Clicked Continue
+
+**After Wizard Completion:**
+- Redirected to /dashboard
+- Active business switched to "AUDIT_ Test Plumbing" (sidebar shows new business name with dropdown chevron)
+- Dashboard shows fresh state (0 jobs, 0 messages, 0 reviews)
+- Business switcher is now a dropdown (user has 2 businesses)
+
+**DB Verification:**
+```sql
+SELECT id, name, service_types_enabled, onboarding_completed_at
+FROM businesses
+WHERE user_id = (SELECT id FROM auth.users WHERE email = 'audit-test@avisloop.com')
+ORDER BY created_at;
+
+-- Result:
+-- 1. id: 6ed94b54-..., name: "Audit Test HVAC", service_types_enabled: [], onboarding_completed_at: null
+-- 2. id: ba41879d-..., name: "AUDIT_ Test Plumbing", service_types_enabled: ["plumbing","handyman"], onboarding_completed_at: 2026-03-03T00:13:44
+
+-- Campaign created for new business:
+SELECT id, name, service_type, status
+FROM campaigns
+WHERE business_id = 'ba41879d-7458-4d47-909f-1dce6ddd0e69';
+
+-- Result: id: 35125091-..., name: "Standard (Email + SMS)", service_type: null, status: "active"
+```
+
+- New business created with correct name and service types (plumbing + handyman)
+- onboarding_completed_at is set (wizard completed successfully)
+- Campaign "Standard (Email + SMS)" created with service_type=null (targets all services), status=active
+
+**Screenshots:** `qa-66-add-business-wizard.png`, `qa-66-wizard-step1-filled.png`, `qa-66-wizard-completed.png`
+
+**Result: PASS**
+
+---
+
+## Post-Test State
+
+- Active business: **Audit Test HVAC** (restored via BIZ-06 switch)
+- Business count: 2 (Audit Test HVAC + AUDIT_ Test Plumbing)
+- Business B ID: `ba41879d-7458-4d47-909f-1dce6ddd0e69`
+- Business B service_types_enabled: `["plumbing", "handyman"]`
+- Business B campaign: "Standard (Email + SMS)" (id: `35125091-96af-4427-b381-86f2378aede6`)
 
 ---
 
@@ -224,13 +305,29 @@ WHERE id = '6ed94b54-6f35-4ede-8dcb-28f562052042';
 | BIZ-03 | Detail drawer 4 sections | **PASS** | qa-66-detail-drawer.png |
 | BIZ-04 | Metadata edit + DB verify | **PASS** | qa-66-metadata-edit-filled.png, SQL verification |
 | BIZ-05 | Notes auto-save | **PASS** | qa-66-notes-retained.png, SQL verification |
-| BIZ-06 | Switch to this business | **TBD** | Pending BIZ-07 |
-| BIZ-07 | Add Business wizard | **TBD** | Pending |
+| BIZ-06 | Switch to this business | **PASS** | qa-66-switched-business.png |
+| BIZ-07 | Add Business wizard | **PASS** | qa-66-add-business-wizard.png, qa-66-wizard-step1-filled.png, qa-66-wizard-completed.png, SQL verification |
+
+**Overall: 7/7 PASS**
 
 ## Bugs Found
 
-None so far.
+None. All 7 requirements passed without issues.
+
+## Screenshots Index
+
+| File | Description |
+|------|-------------|
+| `qa-66-businesses-page.png` | Initial businesses page with 1 card |
+| `qa-66-detail-drawer.png` | Detail drawer with 4 sections (empty state) |
+| `qa-66-metadata-edit-filled.png` | Edit form with all metadata fields populated |
+| `qa-66-notes-retained.png` | Drawer after page refresh showing retained notes + all metadata |
+| `qa-66-add-business-wizard.png` | CreateBusinessWizard Step 1 empty state |
+| `qa-66-wizard-step1-filled.png` | Wizard Step 1 with business details + services selected |
+| `qa-66-wizard-completed.png` | Dashboard after wizard completion showing new active business |
+| `qa-66-two-cards.png` | Businesses page with 2 cards after wizard completion |
+| `qa-66-switched-business.png` | Businesses page after switching back to Audit Test HVAC |
 
 ---
 
-*Document will be updated after BIZ-06 and BIZ-07 testing.*
+*QA audit complete. All 7 BIZ requirements verified. Second business "AUDIT_ Test Plumbing" created as prerequisite for Plans 66-02 (switcher) and 66-03 (data isolation).*
