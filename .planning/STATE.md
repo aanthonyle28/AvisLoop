@@ -5,25 +5,25 @@
 See: .planning/PROJECT.md (updated 2026-02-27)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.1 QA E2E Audit — Phase 64 (History, Analytics, Feedback) Plan 02 — COMPLETE
+**Current focus:** v3.1 QA E2E Audit — Phase 65 (Settings/Billing) Plan 03 — COMPLETE
 
 ## Current Position
 
-Phase: 64 (QA-06: History, Analytics, Feedback)
-Plan: 64-02-PLAN.md COMPLETE
+Phase: 65 (QA-07: Settings/Billing)
+Plan: 65-03-PLAN.md COMPLETE
 Milestone: v3.1 QA E2E Audit
-Status: Phase 64 plan 02 complete, plan 03 ready to execute
+Status: Phase 65 complete (all 3 plans), Phase 66 ready to execute
 
-Progress: [███████░░░] 70% (7/9 phases complete)
+Progress: [████████░░] 80% (8/10 plans complete)
 
-Last activity: 2026-03-03 — Completed 64-02 Analytics Page QA (ANLYT-01, ANLYT-02, ANLYT-03: 3/3 PASS, 0 bugs)
+Last activity: 2026-03-02 — Completed 65-03 Billing Page QA (BILL-01, BILL-02, BILL-03: 3/3 PASS, 0 bugs)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed (project): 251
 - v3.0 plans completed: 15/15
-- v3.1 plans completed: 7/17
+- v3.1 plans completed: 10/17
 
 *Updated after each plan completion*
 
@@ -288,6 +288,15 @@ Last activity: 2026-03-03 — Completed 64-02 Analytics Page QA (ANLYT-01, ANLYT
 - **SETT-09 PASS (Services partial):** Full page reload preserves enabled services, timing values, and toggle states.
 - Review cooldown has its own separate Save button (independent of service type Save Changes) — changing cooldown does not require saving service types and vice versa.
 
+### Decisions from Phase 65-03 (Billing Page QA)
+
+- **BILL-01 PASS:** SubscriptionStatus card shows "Free Trial" for trial tier; "Basic Plan" / "Pro Plan" for paid tiers with "Manage Subscription" button
+- **BILL-02 PASS:** UsageDisplay shows "Sends this month (all businesses)" with pooled count. DB verified: 1 delivered send_log matches UI "1 / 25". Progress bar uses `bg-primary` at 4% (<80% threshold).
+- **BILL-03 PASS:** Basic $49 + Pro $99 plan cards with correct features. Trial user sees 2 "Subscribe" buttons (no "Current Plan" since trial is not a plan card). "Recommended" badge on Pro card confirmed.
+- **Pooled count logic:** `getPooledMonthlyUsage(userId)` counts `status IN ('sent', 'delivered', 'opened')` and `is_test=false` across all user businesses. 4 send_logs existed but only 1 (delivered) qualified.
+- **Contact usage section:** Only renders for `basic` tier — hidden for trial and pro (correct behavior, pro has unlimited customers).
+- **Phase 65 overall: 13/13 PASS, 0 bugs** — Settings General, Templates, Services, Customers, and Billing all verified.
+
 ### Pending Todos
 
 None.
@@ -310,11 +319,11 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-03
-Stopped at: Completed 64-02-PLAN.md (Analytics Page QA) — 3/3 PASS, 0 bugs
+Last session: 2026-03-02
+Stopped at: Completed 65-03-PLAN.md (Billing Page QA) — 3/3 PASS, 0 bugs; Phase 65 complete (13/13)
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
 Active business: Audit Test HVAC (businessId: 6ed94b54-6f35-4ede-8dcb-28f562052042)
 form_token: NCuKdh6JvBMsKSNtyLvWl8DnimHtIYIW (for Phase 67)
-Current DB state: 8 jobs (6 HVAC completed, 1 HVAC conflict, 1 Plumbing, 1 Electrical); 2 user campaigns (HVAC Follow-up, Standard Follow-Up); 4 active enrollments; 10 send_logs (3 with campaign_enrollment_id); 0 customer_feedback rows; 16 system templates, 0 user templates
-Next action: `/gsd:execute-phase 64-03` (Feedback page QA)
+Current DB state: 8 jobs; 2 user campaigns (HVAC Follow-up, Standard Follow-Up); 4 active enrollments; 4 send_logs this month (1 delivered, 1 pending, 1 failed, 1 bounced); 16 system templates, 0 user templates
+Next action: `/gsd:execute-phase 66` (Businesses/Isolation QA)
