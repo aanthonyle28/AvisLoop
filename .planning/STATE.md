@@ -10,13 +10,13 @@ See: .planning/PROJECT.md (updated 2026-02-27)
 ## Current Position
 
 Phase: 67 (QA-09: Public Form + Edge Cases + Report)
-Plan: 67-01-PLAN.md COMPLETE
+Plan: 67-02-PLAN.md COMPLETE
 Milestone: v3.1 QA E2E Audit
-Status: Phase 67 plan 01 complete (public form QA); plans 02 and 03 remain
+Status: Phase 67 plans 01 and 02 complete; plan 03 (Report Compilation) remains
 
-Progress: [█████████░] 85% (12/14 plans complete across all QA phases)
+Progress: [█████████░] 93% (13/14 plans complete across all QA phases)
 
-Last activity: 2026-03-03 — Completed 67-01 Public Form QA: FORM-01 through FORM-06; 5/6 PASS, 1 PARTIAL PASS (BUG-FORM-01 Low); DB pipeline verified; 9 screenshots captured
+Last activity: 2026-03-03 — Completed 67-02 Edge Cases QA: EDGE-01 through EDGE-09; 9/9 PASS, 0 bugs; 26 screenshots; Business B name restored
 
 ## Performance Metrics
 
@@ -319,6 +319,22 @@ Last activity: 2026-03-03 — Completed 67-01 Public Form QA: FORM-01 through FO
 - **Contact usage section:** Only renders for `basic` tier — hidden for trial and pro (correct behavior, pro has unlimited customers).
 - **Phase 65 overall: 13/13 PASS, 0 bugs** — Settings General, Templates, Services, Customers, and Billing all verified.
 
+### Decisions from Phase 67-02 (Edge Cases QA)
+
+- **EDGE-01 through EDGE-09: 9/9 PASS, 0 bugs found** — all cross-cutting edge cases clean
+- **EDGE-01 PASS:** Business card h3 (truncate class): scrollWidth=541px > clientWidth=291px with overflow:hidden+ellipsis → visually truncated. Switcher dropdown span: scrollWidth=469px > clientWidth=198px → visually truncated. Both surfaces correct.
+- **EDGE-02 PASS:** Job table customer cell (min-w-0 parent + truncate child): scrollWidth=621px > clientWidth=197px with ellipsis. Detail drawer p.truncate: scrollWidth=621px > clientWidth=380px. Both truncate correctly.
+- **EDGE-03 PASS:** Special chars (`O'Brien & Sons <LLC>`) stored as literal text in DB; React renders as `&amp; &lt;LLC&gt;` HTML entities (correct escaping, no XSS). `pageHasUnescapedTags: false`.
+- **EDGE-04 PASS:** Zero overflow at 375px across 12 routes (9 dashboard + 3 auth + public form). Negative overflow amounts (-15px on /dashboard, /jobs) confirm no horizontal scroll.
+- **EDGE-05 PASS:** Zero overflow at 768px across all 9 dashboard routes. Layout transition at md: breakpoint (side nav appears) handled correctly.
+- **EDGE-06 PASS:** loading.tsx confirmed for 9 data routes: jobs (TableSkeleton), campaigns (card skeletons), analytics, history, feedback, settings, billing, businesses, customers. Dashboard absence intentional (inline DashboardShell skeletons).
+- **EDGE-07 PASS:** Business B used for empty state testing — /feedback shows "No feedback yet" (0 records). Analytics zero-metric state (0% rates) renders correctly. Other pages have data from Phase 66.
+- **EDGE-08 PASS:** Login form: react-hook-form inline errors "Email is required" + "Password is required"; HTML5 browser validation also fires. Add Job sheet: disabled-button pattern (Create Job disabled until isCustomerValid && serviceType) — no inline error text, valid but less explicit.
+- **EDGE-09 PASS:** Dark mode CSS vars: background=rgb(28,25,23), text=rgb(246,245,243) on all 5 dashboard routes + public form. Zero hardcoded color violations detected by class inspection.
+- Playwright `scrollWidth > clientWidth` is the correct truncation check — the value being >0 means overflow IS hidden (that's the truncation working), not that overflow exists on the page
+- Radix Sheet overlay intercepts pointer events; use `page.evaluate(() => button.click())` to submit from inside open sheets in Playwright
+- Business B name confirmed restored to 'AUDIT_ Test Plumbing' post-EDGE-01 testing
+
 ### Decisions from Phase 67-01 (Public Form QA)
 
 - **FORM-01 PASS:** No auth redirect — `/complete/NCuKdh6JvBMsKSNtyLvWl8DnimHtIYIW` loads without cookies; middleware APP_ROUTES excludes `/complete`
@@ -355,10 +371,10 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: Completed 67-01-PLAN.md (Public Form QA) — FORM-01 through FORM-06; 5/6 PASS, 1 PARTIAL PASS; BUG-FORM-01 (Low) documented
+Stopped at: Completed 67-02-PLAN.md (Edge Cases QA) — EDGE-01 through EDGE-09; 9/9 PASS, 0 bugs; 26 screenshots
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
 Active business: Audit Test HVAC (businessId: 6ed94b54-6f35-4ede-8dcb-28f562052042)
 form_token: NCuKdh6JvBMsKSNtyLvWl8DnimHtIYIW
-Current DB state: 10 jobs; 2 user campaigns (HVAC Follow-up, Standard Follow-Up); 6 active enrollments; 10 send_logs; 3 customer_feedback rows; 2 new AUDIT_PublicFormTest customers added
-Next action: `/gsd:execute-phase 67` plan 02 (Edge Cases QA)
+Current DB state: 11+ jobs (1 long-name job added); 2+ user campaigns; 6+ active enrollments; AUDIT_ Super Long Customer + AUDIT_O'Brien & Sons customers added to Business A; Business B name restored to 'AUDIT_ Test Plumbing'
+Next action: `/gsd:execute-phase 67` plan 03 (Report Compilation)
