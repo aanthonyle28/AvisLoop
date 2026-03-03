@@ -5,25 +5,25 @@
 See: .planning/PROJECT.md (updated 2026-02-27)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.1 QA E2E Audit — Phase 65 (Settings & Billing) — COMPLETE
+**Current focus:** v3.1 QA E2E Audit — Phase 67 (Public Form + Edge Cases + Report)
 
 ## Current Position
 
-Phase: 65 (QA-07: Settings & Billing)
-Plan: All 3 plans COMPLETE
+Phase: 67 (QA-09: Public Form + Edge Cases + Report)
+Plan: 67-01-PLAN.md COMPLETE
 Milestone: v3.1 QA E2E Audit
-Status: Phase 65 complete, Phase 66 ready to execute
+Status: Phase 67 plan 01 complete (public form QA); plans 02 and 03 remain
 
-Progress: [████████░░] 78% (7/9 phases complete)
+Progress: [█████████░] 85% (12/14 plans complete across all QA phases)
 
-Last activity: 2026-03-02 — Completed Phase 65 (Settings & Billing QA): 65-01 General+Templates 5/5 PASS, 65-02 Services+Customers 5/5 PASS, 65-03 Billing 3/3 PASS; 13/13 total PASS, 0 bugs
+Last activity: 2026-03-03 — Completed 67-01 Public Form QA: FORM-01 through FORM-06; 5/6 PASS, 1 PARTIAL PASS (BUG-FORM-01 Low); DB pipeline verified; 9 screenshots captured
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 256
+- Total plans completed (project): 257
 - v3.0 plans completed: 15/15
-- v3.1 plans completed: 11/17
+- v3.1 plans completed: 12/17
 
 *Updated after each plan completion*
 
@@ -319,6 +319,18 @@ Last activity: 2026-03-02 — Completed Phase 65 (Settings & Billing QA): 65-01 
 - **Contact usage section:** Only renders for `basic` tier — hidden for trial and pro (correct behavior, pro has unlimited customers).
 - **Phase 65 overall: 13/13 PASS, 0 bugs** — Settings General, Templates, Services, Customers, and Billing all verified.
 
+### Decisions from Phase 67-01 (Public Form QA)
+
+- **FORM-01 PASS:** No auth redirect — `/complete/NCuKdh6JvBMsKSNtyLvWl8DnimHtIYIW` loads without cookies; middleware APP_ROUTES excludes `/complete`
+- **FORM-02 PASS:** Business name "Audit Test HVAC" in `<p class="text-muted-foreground">` under h1; service_types_enabled=[] → all 8 types shown in Radix Select dropdown
+- **FORM-03 PASS:** "Name is required" under customerName; "Please provide an email address or phone number" under customerEmail (Zod refine path=['customerEmail']); "Invalid email address" for bad email; "Please select a service type" for empty dropdown
+- **FORM-04 PASS:** Full DB pipeline verified — customer + job (status=completed, completed_at set) + campaign enrollment (status=active, touch_1_scheduled_at set); 2 test submissions created (AUDIT_PublicFormTest, AUDIT_PublicFormTest2)
+- **FORM-05 PARTIAL PASS:** Text inputs (h-12=48px) and submit (h-14=56px) pass; ServiceTypeSelect combobox trigger (h-10=40px) fails 44px minimum — BUG-FORM-01 Low
+- **FORM-06 PASS:** INVALID_TOKEN_12345 → custom "Form Not Found" not-found.tsx (not login redirect, not crash); /complete/ no segment → Next.js standard 404 (acceptable); XSS token URL-encoded → safe notFound() → 404
+- **BUG-FORM-01 (Low):** ServiceTypeSelect trigger `h-10` (40px) in `components/ui/select.tsx` SelectTrigger default; fix: add `h-12` to SelectTrigger className in ServiceTypeSelect or job-completion-form.tsx
+- **Rate limiting (429):** checkPublicRateLimit bypasses when Upstash not configured (dev env); not testable in dev — known limitation, not a bug
+- **Public form DB state post-67-01:** 2 new AUDIT_ customers + 2 new completed jobs + 2 new active enrollments added to Audit Test HVAC
+
 ### Pending Todos
 
 None.
@@ -338,14 +350,15 @@ None.
 - BUG-CAMP-02: No "Frozen" stat card on campaign detail page (low severity) — fix: add 4th stat card for frozen count (moot until BUG-04 fixed)
 - BUG-CAMP-03: resolveTemplate() shows wrong service type in preview (low severity) — fix: filter system templates by service_type before channel-only fallback
 - BUG-HIST-01: getSendLogs timezone bug — setHours(23,59,59,999) uses local time; date range filter broken on non-UTC machines (medium severity) — fix: `new Date(dateTo + 'T23:59:59.999Z')` in lib/data/send-logs.ts
+- BUG-FORM-01: ServiceTypeSelect trigger h-10 (40px) below 44px touch target minimum (low severity) — fix: add className="h-12" to SelectTrigger in components/jobs/service-type-select.tsx or job-completion-form.tsx
 
 ## Session Continuity
 
-Last session: 2026-03-02
-Stopped at: Completed Phase 65 (Settings & Billing QA) — 13/13 PASS, 0 bugs, form_token captured
+Last session: 2026-03-03
+Stopped at: Completed 67-01-PLAN.md (Public Form QA) — FORM-01 through FORM-06; 5/6 PASS, 1 PARTIAL PASS; BUG-FORM-01 (Low) documented
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
 Active business: Audit Test HVAC (businessId: 6ed94b54-6f35-4ede-8dcb-28f562052042)
-form_token: NCuKdh6JvBMsKSNtyLvWl8DnimHtIYIW (for Phase 67)
-Current DB state: 8 jobs; 2 user campaigns (HVAC Follow-up, Standard Follow-Up); 4 active enrollments; 10 send_logs; 3 customer_feedback rows; AUDIT_Settings Test Customer (archived)
-Next action: `/gsd:execute-phase 66` (Businesses Page and Data Isolation QA)
+form_token: NCuKdh6JvBMsKSNtyLvWl8DnimHtIYIW
+Current DB state: 10 jobs; 2 user campaigns (HVAC Follow-up, Standard Follow-Up); 6 active enrollments; 10 send_logs; 3 customer_feedback rows; 2 new AUDIT_PublicFormTest customers added
+Next action: `/gsd:execute-phase 67` plan 02 (Edge Cases QA)
