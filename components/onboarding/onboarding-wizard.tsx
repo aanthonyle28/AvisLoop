@@ -23,10 +23,11 @@ const STEPS: StepConfig[] = [
   { id: 1, title: 'Business Setup', skippable: false },
   { id: 2, title: 'Campaign Preset', skippable: false },
   { id: 3, title: 'CRM Platform', skippable: true },
-  { id: 4, title: 'SMS Consent', skippable: false },
+  { id: 4, title: 'Brand Voice', skippable: true },
+  { id: 5, title: 'SMS Consent', skippable: false },
 ]
 
-const STORAGE_KEY = 'onboarding-draft-v3'
+const STORAGE_KEY = 'onboarding-draft-v4'
 
 interface OnboardingWizardProps {
   initialStep: number

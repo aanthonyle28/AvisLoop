@@ -9,11 +9,13 @@ import {
   servicesOfferedSchema,
   softwareUsedSchema,
   smsConsentSchema,
+  brandVoiceSchema,
   type BusinessBasicsInput,
   type ReviewDestinationInput,
   type ServicesOfferedInput,
   type SoftwareUsedInput,
   type SMSConsentInput,
+  type BrandVoiceInput,
 } from '@/lib/validations/onboarding'
 import { DEFAULT_TIMING_HOURS } from '@/lib/validations/job'
 import { duplicateCampaign } from '@/lib/actions/campaign'
@@ -276,6 +278,46 @@ export async function saveSoftwareUsed(
     return { success: false, error: error.message }
   }
 
+  return { success: true }
+}
+
+/**
+ * Save brand voice for onboarding step 4.
+ * Stores as "preset_key" or "preset_key|custom text" on business.
+ *
+ * @param input - Brand voice data (preset key + optional custom text)
+ * @returns Success or error object
+ */
+export async function saveBrandVoice(
+  input: BrandVoiceInput
+): Promise<{ success: boolean; error?: string }> {
+  const parsed = brandVoiceSchema.safeParse(input)
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message || 'Invalid input' }
+  }
+
+  const { preset, customText } = parsed.data
+
+  const business = await getActiveBusiness()
+  if (!business) {
+    return { success: false, error: 'Business not found' }
+  }
+
+  // Format: "preset_key" or "preset_key|custom description"
+  const brandVoice = customText ? `${preset}|${customText}` : preset
+
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from('businesses')
+    .update({ brand_voice: brandVoice })
+    .eq('id', business.id)
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  revalidatePath('/settings')
   return { success: true }
 }
 

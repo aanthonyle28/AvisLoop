@@ -13,12 +13,13 @@ import { CreateBusinessWizard } from '@/components/onboarding/create-business-wi
  * - Redirects to /login if not authenticated
  * - Redirects to /dashboard if onboarding already complete
  * - Fetches business data and campaign presets for step components
- * - Renders wizard shell with 4-step flow
+ * - Renders wizard shell with 5-step flow
  *
  * Step 1: Business Setup (basics + services)
  * Step 2: Campaign Preset (required)
  * Step 3: CRM Platform (skippable)
- * Step 4: SMS Consent (required)
+ * Step 4: Brand Voice (skippable)
+ * Step 5: SMS Consent (required)
  */
 export default async function OnboardingPage({
   searchParams,
@@ -53,8 +54,8 @@ export default async function OnboardingPage({
   // Parse step from URL params
   const stepParam = parseInt(params.step || '1', 10) || 1
 
-  // Validate step range (1-4), clamp if out of range
-  const currentStep = Math.min(Math.max(1, stepParam), 4)
+  // Validate step range (1-5), clamp if out of range
+  const currentStep = Math.min(Math.max(1, stepParam), 5)
 
   // Fetch full business data for step components
   const business = activeBusiness ? await getBusiness(activeBusiness.id) : null
@@ -75,6 +76,7 @@ export default async function OnboardingPage({
     service_types_enabled: business.service_types_enabled || null,
     custom_service_names: business.custom_service_names || null,
     sms_consent_acknowledged: business.sms_consent_acknowledged || false,
+    brand_voice: business.brand_voice || null,
   } : null
 
   if (isNewBusinessMode) {

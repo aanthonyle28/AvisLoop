@@ -93,7 +93,7 @@ export async function GET(request: Request) {
         const [{ data: business }, { data: customer }, { data: job }, { data: campaign }] = await Promise.all([
           supabase
             .from('businesses')
-            .select('id, name, google_review_link, default_sender_name')
+            .select('id, name, google_review_link, default_sender_name, brand_voice')
             .eq('id', touch.business_id)
             .single(),
           supabase
@@ -179,7 +179,8 @@ export async function GET(request: Request) {
             customer,
             job?.service_type,
             campaign?.personalization_enabled !== false,
-            job?.notes
+            job?.notes,
+            business.brand_voice
           )
           if (sendResult.success) {
             sent++
@@ -220,11 +221,12 @@ export async function GET(request: Request) {
 async function sendEmailTouch(
   supabase: ReturnType<typeof createServiceRoleClient>,
   touch: ClaimedCampaignTouch,
-  business: { id: string; name: string; google_review_link: string | null; default_sender_name: string | null },
+  business: { id: string; name: string; google_review_link: string | null; default_sender_name: string | null; brand_voice?: string | null },
   customer: { id: string; name: string; email: string; send_count: number | null },
   serviceType: string | undefined,
   personalizationEnabled: boolean,
-  jobNotes?: string | null
+  jobNotes?: string | null,
+  brandVoice?: string | null
 ): Promise<{ success: boolean; error?: string }> {
   if (!business.google_review_link) {
     await markTouchFailed(supabase, touch, 'No review link configured')
@@ -262,6 +264,7 @@ async function sendEmailTouch(
         businessName: business.name,
         serviceType,
         jobNotes: jobNotes || undefined,
+        brandVoice: brandVoice || undefined,
         touchNumber: (touch.touch_number as 1 | 2 | 3 | 4),
         channel: 'email',
         reviewLink: business.google_review_link,

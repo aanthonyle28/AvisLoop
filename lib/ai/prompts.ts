@@ -95,14 +95,42 @@ export interface PersonalizationContext {
   serviceType?: string
   technicianName?: string
   jobNotes?: string
+  brandVoice?: string
   touchNumber: 1 | 2 | 3 | 4
   channel: 'email' | 'sms'
   reviewLink: string
   isRepeatCustomer?: boolean
 }
 
+// Derive prompt lookup from the single source of truth in validations
+import { BRAND_VOICE_PRESETS } from '@/lib/validations/onboarding'
+
+const BRAND_VOICE_PROMPT_MAP: Record<string, string> = Object.fromEntries(
+  BRAND_VOICE_PRESETS.map(p => [p.value, p.prompt])
+)
+
+/**
+ * Parse brand_voice column value into an AI prompt directive.
+ * Format: "preset_key" or "preset_key|custom description"
+ * Returns empty string if no brand voice set.
+ */
+export function getBrandVoicePrompt(brandVoice: string | undefined | null): string {
+  if (!brandVoice) return ''
+
+  const pipeIndex = brandVoice.indexOf('|')
+  const presetKey = pipeIndex >= 0 ? brandVoice.slice(0, pipeIndex) : brandVoice
+  const customText = pipeIndex >= 0 ? brandVoice.slice(pipeIndex + 1).trim() : ''
+
+  const basePrompt = BRAND_VOICE_PROMPT_MAP[presetKey] || ''
+  if (!basePrompt && !customText) return ''
+
+  const parts = [basePrompt, customText].filter(Boolean)
+  return parts.join(' ')
+}
+
 export function buildPersonalizationPrompt(ctx: PersonalizationContext): string {
   const touchHint = TOUCH_PROMPTS[ctx.touchNumber]
+  const brandVoiceDirective = getBrandVoicePrompt(ctx.brandVoice)
 
   return `
 Personalize this ${ctx.channel} template for the customer.
@@ -117,6 +145,7 @@ ${ctx.jobNotes ? `- Job notes (INTERNAL context only — do NOT quote, paraphras
 - Touch: ${ctx.touchNumber} of campaign
 - ${touchHint}
 ${ctx.isRepeatCustomer ? '- Repeat customer (acknowledge their trust)' : ''}
+${brandVoiceDirective ? `\nBRAND VOICE:\n${brandVoiceDirective}` : ''}
 
 ORIGINAL TEMPLATE:
 <template>

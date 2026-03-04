@@ -6,6 +6,7 @@ import { Check } from '@phosphor-icons/react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
 import { TagBadge } from '@/components/ui/tag-badge'
 import { OnboardingProgress } from '@/components/onboarding/onboarding-progress'
@@ -13,6 +14,7 @@ import {
   createAdditionalBusiness,
   saveNewBusinessServices,
   createNewBusinessCampaign,
+  saveNewBusinessBrandVoice,
   completeNewBusinessOnboarding,
 } from '@/lib/actions/create-additional-business'
 import { switchBusiness } from '@/lib/actions/active-business'
@@ -22,6 +24,7 @@ import {
   SERVICE_TYPE_LABELS,
   type ServiceTypeValue,
 } from '@/lib/validations/job'
+import { BRAND_VOICE_PRESETS, type BrandVoicePresetKey } from '@/lib/validations/onboarding'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import type { CampaignWithTouches } from '@/lib/types/database'
@@ -375,10 +378,143 @@ function CampaignPresetStep({ newBusinessId, campaignPresets, onComplete, onGoBa
   )
 }
 
+// ─── Step 3: Brand Voice ─────────────────────────────────────────────────────
+
+interface Step3Props {
+  newBusinessId: string
+  onComplete: () => void
+  onGoBack: () => void
+}
+
+function BrandVoiceCreateStep({ newBusinessId, onComplete, onGoBack }: Step3Props) {
+  const [selected, setSelected] = useState<BrandVoicePresetKey | null>(null)
+  const [customText, setCustomText] = useState('')
+  const [isPending, startTransition] = useTransition()
+
+  const handleContinue = () => {
+    if (!selected) return
+
+    startTransition(async () => {
+      const result = await saveNewBusinessBrandVoice(newBusinessId, {
+        preset: selected,
+        customText: customText.trim() || '',
+      })
+      if (!result.success) {
+        toast.error(result.error || 'Failed to save brand voice')
+      } else {
+        onComplete()
+      }
+    })
+  }
+
+  const handleSkip = () => {
+    onComplete()
+  }
+
+  return (
+    <div className="space-y-8">
+      {/* Heading */}
+      <div className="text-center space-y-2">
+        <h1 className="text-3xl font-bold">How should your messages sound?</h1>
+        <p className="text-muted-foreground text-lg">
+          Pick a tone that matches your brand. You can customize this later.
+        </p>
+      </div>
+
+      {/* Preset chips grid */}
+      <div
+        className="grid grid-cols-2 sm:grid-cols-3 gap-3"
+        role="radiogroup"
+        aria-label="Brand voice options"
+      >
+        {BRAND_VOICE_PRESETS.map((preset) => {
+          const isSelected = selected === preset.value
+          return (
+            <button
+              key={preset.value}
+              type="button"
+              role="radio"
+              aria-checked={isSelected}
+              onClick={() => setSelected(preset.value)}
+              disabled={isPending}
+              className={cn(
+                'flex items-center justify-center px-4 py-3 border rounded-lg transition-all text-center',
+                isSelected
+                  ? 'border-primary ring-2 ring-primary bg-primary/5'
+                  : 'border-border hover:border-primary/50',
+                isPending && 'opacity-50 cursor-not-allowed'
+              )}
+            >
+              <span className="text-sm font-medium">{preset.label}</span>
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Optional custom textarea */}
+      {selected && (
+        <div className="space-y-2">
+          <label htmlFor="create-biz-brand-voice-custom" className="text-sm font-medium text-muted-foreground">
+            Add extra context (optional)
+          </label>
+          <Textarea
+            id="create-biz-brand-voice-custom"
+            placeholder="e.g. We're a family-owned shop in Texas, keep it southern and friendly"
+            value={customText}
+            onChange={(e) => setCustomText(e.target.value)}
+            disabled={isPending}
+            maxLength={300}
+            rows={3}
+            className="resize-none"
+          />
+          <p className="text-xs text-muted-foreground text-right">{customText.length}/300</p>
+        </div>
+      )}
+
+      {/* Button row */}
+      <div className="flex gap-3">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onGoBack}
+          disabled={isPending}
+          className="flex-1 h-12 text-base"
+        >
+          Back
+        </Button>
+        <Button
+          type="button"
+          onClick={handleContinue}
+          disabled={isPending || !selected}
+          className="flex-1 h-12 text-base"
+        >
+          {isPending ? 'Saving...' : 'Continue'}
+        </Button>
+      </div>
+
+      {/* Skip link */}
+      <div className="text-center">
+        <button
+          type="button"
+          onClick={handleSkip}
+          disabled={isPending}
+          className="text-sm text-muted-foreground hover:text-foreground underline"
+        >
+          Skip without saving
+        </button>
+      </div>
+    </div>
+  )
+}
+
 // ─── Wizard Shell ─────────────────────────────────────────────────────────────
 
 /**
- * CreateBusinessWizard — 2-step wizard for adding a second/nth business.
+ * CreateBusinessWizard — 3-step wizard for adding a second/nth business.
+ *
+ * Step 1: Business Setup (name, phone, services)
+ * Step 2: Campaign Preset
+ * Step 3: Brand Voice (skippable)
  *
  * Calls ONLY the scoped server actions from create-additional-business.ts.
  * NEVER calls saveBusinessBasics, saveServicesOffered, createCampaignFromPreset,
@@ -388,7 +524,7 @@ function CampaignPresetStep({ newBusinessId, campaignPresets, onComplete, onGoBa
  */
 export function CreateBusinessWizard({ campaignPresets }: CreateBusinessWizardProps) {
   const router = useRouter()
-  const [step, setStep] = useState<1 | 2>(1)
+  const [step, setStep] = useState<1 | 2 | 3>(1)
   const [newBusinessId, setNewBusinessId] = useState<string | null>(null)
 
   const handleStep1Complete = (businessId: string) => {
@@ -397,7 +533,10 @@ export function CreateBusinessWizard({ campaignPresets }: CreateBusinessWizardPr
   }
 
   const handleStep2Complete = () => {
-    // Skip SMS consent step — auto-complete onboarding
+    setStep(3)
+  }
+
+  const handleStep3Complete = () => {
     if (!newBusinessId) return
     handleAutoComplete(newBusinessId)
   }
@@ -420,6 +559,10 @@ export function CreateBusinessWizard({ campaignPresets }: CreateBusinessWizardPr
     setStep(1)
   }
 
+  const handleGoBackToStep2 = () => {
+    setStep(2)
+  }
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 pb-20">
       <div className="w-full max-w-lg space-y-8">
@@ -433,10 +576,18 @@ export function CreateBusinessWizard({ campaignPresets }: CreateBusinessWizardPr
             onGoBack={handleGoBackToStep1}
           />
         )}
+
+        {step === 3 && newBusinessId && (
+          <BrandVoiceCreateStep
+            newBusinessId={newBusinessId}
+            onComplete={handleStep3Complete}
+            onGoBack={handleGoBackToStep2}
+          />
+        )}
       </div>
 
       {/* Progress bar fixed at bottom */}
-      <OnboardingProgress currentStep={step} totalSteps={2} />
+      <OnboardingProgress currentStep={step} totalSteps={3} />
     </div>
   )
 }

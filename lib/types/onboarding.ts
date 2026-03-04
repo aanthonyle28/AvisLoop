@@ -9,6 +9,7 @@ export type OnboardingBusiness = {
   service_types_enabled: string[] | null
   custom_service_names: string[] | null
   sms_consent_acknowledged: boolean
+  brand_voice: string | null
 } | null
 
 export type OnboardingContact = {

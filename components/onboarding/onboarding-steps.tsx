@@ -3,6 +3,7 @@
 import { BusinessSetupStep } from './steps/business-setup-step'
 import { CampaignPresetStep } from './steps/campaign-preset-step'
 import { CRMPlatformStep } from './steps/crm-platform-step'
+import { BrandVoiceStep } from './steps/brand-voice-step'
 import { SMSConsentStep } from './steps/sms-consent-step'
 import type { OnboardingBusiness } from '@/lib/types/onboarding'
 import type { CampaignWithTouches } from '@/lib/types/database'
@@ -64,6 +65,15 @@ export function OnboardingSteps({
       )
 
     case 4:
+      return (
+        <BrandVoiceStep
+          onComplete={onGoToNext}
+          onGoBack={onGoBack}
+          defaultValue={business?.brand_voice || null}
+        />
+      )
+
+    case 5:
       return (
         <SMSConsentStep
           onComplete={onComplete}

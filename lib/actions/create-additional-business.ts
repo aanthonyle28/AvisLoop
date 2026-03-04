@@ -5,8 +5,10 @@ import { revalidatePath } from 'next/cache'
 import {
   businessBasicsSchema,
   servicesOfferedSchema,
+  brandVoiceSchema,
   type BusinessBasicsInput,
   type ServicesOfferedInput,
+  type BrandVoiceInput,
 } from '@/lib/validations/onboarding'
 import { DEFAULT_TIMING_HOURS } from '@/lib/validations/job'
 import type { CampaignTouch } from '@/lib/types/database'
@@ -229,6 +231,54 @@ export async function completeNewBusinessOnboarding(
       sms_consent_acknowledged_at: new Date().toISOString(),
       onboarding_completed_at: new Date().toISOString(),
     })
+    .eq('id', businessId)
+    .eq('user_id', user.id)
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  return { success: true }
+}
+
+/**
+ * Save brand voice for a newly created business (scoped by explicit businessId).
+ * Never calls getActiveBusiness() — businessId is passed explicitly.
+ *
+ * @param businessId - The newly created business ID
+ * @param input - Brand voice data (preset + optional custom text)
+ * @returns Success or error object
+ */
+export async function saveNewBusinessBrandVoice(
+  businessId: string,
+  input: BrandVoiceInput
+): Promise<{ success: boolean; error?: string }> {
+  if (!businessId) {
+    return { success: false, error: 'Business ID is required' }
+  }
+
+  const parsed = brandVoiceSchema.safeParse(input)
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message || 'Invalid input' }
+  }
+
+  const { preset, customText } = parsed.data
+
+  const supabase = await createClient()
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+
+  if (authError || !user) {
+    return { success: false, error: 'You must be logged in' }
+  }
+
+  const brandVoice = customText ? `${preset}|${customText}` : preset
+
+  const { error } = await supabase
+    .from('businesses')
+    .update({ brand_voice: brandVoice })
     .eq('id', businessId)
     .eq('user_id', user.id)
 

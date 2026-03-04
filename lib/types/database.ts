@@ -55,6 +55,8 @@ export interface Business {
   competitor_name: string | null
   competitor_review_count: number | null
   agency_notes: string | null
+  // AI personalization brand voice (preset key or "preset|custom text")
+  brand_voice: string | null
   // Public job completion form token (generated on demand via Settings)
   form_token: string | null
 }

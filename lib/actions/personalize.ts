@@ -72,7 +72,7 @@ export async function personalizePreview(input: {
   // Fetch additional business fields needed for personalization
   const { data: bizData } = await supabase
     .from('businesses')
-    .select('name, google_review_link')
+    .select('name, google_review_link, brand_voice')
     .eq('id', business.id)
     .single()
 
@@ -98,6 +98,7 @@ export async function personalizePreview(input: {
     customerName: customer.name,
     businessName: bizData.name,
     serviceType: input.serviceType,
+    brandVoice: bizData.brand_voice || undefined,
     touchNumber: (input.touchNumber || 1) as 1 | 2 | 3 | 4,
     channel: input.channel,
     reviewLink: bizData.google_review_link,
@@ -147,7 +148,7 @@ export async function personalizePreviewBatchAction(input: {
   // Fetch additional business fields needed for personalization
   const { data: bizData } = await supabase
     .from('businesses')
-    .select('name, google_review_link')
+    .select('name, google_review_link, brand_voice')
     .eq('id', business.id)
     .single()
 
@@ -195,6 +196,7 @@ export async function personalizePreviewBatchAction(input: {
       customerName: customer.name,
       businessName: bizData.name,
       serviceType: input.serviceType,
+      brandVoice: bizData.brand_voice || undefined,
       touchNumber: (input.touchNumber || 1) as 1 | 2 | 3 | 4,
       channel: input.channel,
       reviewLink: bizData.google_review_link!,

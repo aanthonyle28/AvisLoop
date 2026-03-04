@@ -16,10 +16,10 @@ interface BrandVoiceSectionProps {
  * Same chip grid + optional textarea as the onboarding step.
  */
 export function BrandVoiceSection({ currentValue }: BrandVoiceSectionProps) {
-  const defaultPreset = currentValue?.split('|')[0] || null
+  const defaultPreset = (currentValue?.split('|')[0] || null) as BrandVoicePresetKey | null
   const defaultCustom = currentValue?.includes('|') ? currentValue.split('|').slice(1).join('|') : ''
 
-  const [selected, setSelected] = useState<string | null>(defaultPreset)
+  const [selected, setSelected] = useState<BrandVoicePresetKey | null>(defaultPreset)
   const [customText, setCustomText] = useState(defaultCustom)
   const [isPending, startTransition] = useTransition()
   const [saved, setSaved] = useState(false)
@@ -35,7 +35,7 @@ export function BrandVoiceSection({ currentValue }: BrandVoiceSectionProps) {
     if (!selected) return
 
     startTransition(async () => {
-      await saveBrandVoice({ preset: selected as BrandVoicePresetKey, customText: customText.trim() || '' })
+      await saveBrandVoice({ preset: selected, customText: customText.trim() || '' })
       setSaved(true)
       setTimeout(() => setSaved(false), 2000)
     })

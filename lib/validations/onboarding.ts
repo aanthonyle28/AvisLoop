@@ -33,6 +33,29 @@ export const servicesOfferedSchema = z.object({
   ).max(10).optional().default([]),
 })
 
+// Brand voice presets for AI personalization tone
+export const BRAND_VOICE_PRESETS = [
+  { value: 'professional', label: 'Professional', prompt: 'Use a polished, professional tone. Formal but approachable.' },
+  { value: 'friendly', label: 'Friendly', prompt: 'Use a warm, friendly tone. Like talking to a neighbor.' },
+  { value: 'casual', label: 'Casual', prompt: 'Keep it relaxed and casual. Conversational, not corporate.' },
+  { value: 'warm', label: 'Warm & Personal', prompt: 'Be genuinely warm and personal. Empathetic, caring.' },
+  { value: 'direct', label: 'Direct & Confident', prompt: 'Be direct and confident. Get to the point, no fluff.' },
+  { value: 'enthusiastic', label: 'Enthusiastic', prompt: 'Be upbeat and enthusiastic. Show genuine excitement.' },
+] as const
+
+const BRAND_VOICE_KEYS = BRAND_VOICE_PRESETS.map(p => p.value) as [
+  (typeof BRAND_VOICE_PRESETS)[number]['value'],
+  ...(typeof BRAND_VOICE_PRESETS)[number]['value'][],
+]
+
+export const brandVoiceSchema = z.object({
+  preset: z.enum(BRAND_VOICE_KEYS, { message: 'Select a voice preset' }),
+  customText: z.string().max(300).trim().optional().or(z.literal('')),
+})
+
+export type BrandVoiceInput = z.infer<typeof brandVoiceSchema>
+export type BrandVoicePresetKey = (typeof BRAND_VOICE_PRESETS)[number]['value']
+
 // Step 4 (legacy): Software Used (skippable) — kept for backward compatibility
 export const SOFTWARE_OPTIONS = [
   { value: 'servicetitan', label: 'ServiceTitan' },

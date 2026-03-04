@@ -6,6 +6,7 @@ import { MessageTemplateForm } from '@/components/templates/message-template-for
 import { TemplateList } from '@/components/template-list'
 import { ServiceTypesSection } from '@/components/settings/service-types-section'
 import { PersonalizationSection } from '@/components/settings/personalization-section'
+import { BrandVoiceSection } from '@/components/settings/brand-voice-section'
 import { IntegrationsSection } from '@/components/settings/integrations-section'
 import { DeleteAccountDialog } from '@/components/settings/delete-account-dialog'
 import { FormLinkSection } from '@/components/settings/form-link-section'
@@ -114,15 +115,19 @@ export function SettingsTabs({
         </section>
       </TabsContent>
 
-      {/* Messaging — AI Personalization */}
+      {/* Messaging — Brand Voice + AI Personalization */}
       <TabsContent value="messaging">
-        <section className="border border-border rounded-lg p-6 bg-card shadow-sm">
-          <h2 className="text-xl font-semibold mb-4">AI Personalization</h2>
-          <p className="text-muted-foreground mb-4">
-            Messages are automatically personalized using AI before sending. View
-            performance stats and LLM usage for your account.
-          </p>
-          <PersonalizationSection summary={personalizationSummary} />
+        <section className="border border-border rounded-lg p-6 bg-card shadow-sm space-y-8">
+          <BrandVoiceSection currentValue={business?.brand_voice ?? null} />
+
+          <div className="border-t border-border pt-6">
+            <h2 className="text-xl font-semibold mb-4">AI Personalization</h2>
+            <p className="text-muted-foreground mb-4">
+              Messages are automatically personalized using AI before sending. View
+              performance stats and LLM usage for your account.
+            </p>
+            <PersonalizationSection summary={personalizationSummary} />
+          </div>
         </section>
       </TabsContent>
 
