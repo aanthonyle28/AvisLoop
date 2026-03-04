@@ -12,10 +12,10 @@ All requirements are bug fixes discovered during the v3.1 QA E2E Audit. Each has
 
 ### Campaigns
 
-- [ ] **CAMP-FIX-01**: Apply frozen enrollment migration to database and add error handling to `toggleCampaignStatus()` so constraint violations surface to the user instead of being silently swallowed *(Critical)*
-- [ ] **CAMP-FIX-02**: Add 'frozen' key to `ENROLLMENT_STATUS_LABELS` in `lib/constants/campaigns.ts` *(Medium)*
-- [ ] **CAMP-FIX-03**: Add "Frozen" stat card to campaign detail page showing count of frozen enrollments *(Low)*
-- [ ] **CAMP-FIX-04**: Fix `resolveTemplate()` in touch-sequence-display.tsx to filter system templates by campaign service type before falling back to channel-only match *(Low)*
+- [x] **CAMP-FIX-01**: Apply frozen enrollment migration to database and add error handling to `toggleCampaignStatus()` so constraint violations surface to the user instead of being silently swallowed *(Critical)*
+- [x] **CAMP-FIX-02**: Add 'frozen' key to `ENROLLMENT_STATUS_LABELS` in `lib/constants/campaigns.ts` *(Medium)*
+- [x] **CAMP-FIX-03**: Add "Frozen" stat card to campaign detail page showing count of frozen enrollments *(Low)*
+- [x] **CAMP-FIX-04**: Fix `resolveTemplate()` in touch-sequence-display.tsx to filter system templates by campaign service type before falling back to channel-only match *(Low)*
 
 ### Dashboard
 
@@ -51,10 +51,10 @@ All requirements are bug fixes discovered during the v3.1 QA E2E Audit. Each has
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CAMP-FIX-01 | Phase 68 | Pending |
-| CAMP-FIX-02 | Phase 68 | Pending |
-| CAMP-FIX-03 | Phase 68 | Pending |
-| CAMP-FIX-04 | Phase 68 | Pending |
+| CAMP-FIX-01 | Phase 68 | Complete |
+| CAMP-FIX-02 | Phase 68 | Complete |
+| CAMP-FIX-03 | Phase 68 | Complete |
+| CAMP-FIX-04 | Phase 68 | Complete |
 | DASH-FIX-01 | Phase 69 | Pending |
 | DASH-FIX-02 | Phase 69 | Pending |
 | HIST-FIX-01 | Phase 69 | Pending |
@@ -69,4 +69,4 @@ All requirements are bug fixes discovered during the v3.1 QA E2E Audit. Each has
 
 ---
 *Requirements defined: 2026-03-03*
-*Last updated: 2026-03-03 after roadmap creation*
+*Last updated: 2026-03-04 after Phase 68 execution*

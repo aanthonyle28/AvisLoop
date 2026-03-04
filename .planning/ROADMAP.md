@@ -977,7 +977,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 68-01-PLAN.md -- Apply frozen enrollment migration, add error handling to toggleCampaignStatus, add frozen label + stat card + template fallback fix
+- [x] 68-01-PLAN.md -- Apply frozen enrollment migration, add error handling to toggleCampaignStatus, add frozen label + stat card + template fallback fix
 
 ### Phase 69: Dashboard, History, and Miscellaneous Fixes
 **Goal**: All remaining QA bugs are resolved -- dashboard KPI navigation works, mobile header fits at 375px, history date filter uses UTC, the software_used column exists, job table columns sort on click, and service type select meets touch target minimums.
@@ -1066,6 +1066,6 @@ See individual phase sections above for requirements, success criteria, and depe
 | **66** | **v3.1 QA E2E Audit** | **3/3** | **Complete** | **2026-03-02** |
 | **67** | **v3.1 QA E2E Audit** | **3/3** | **Complete** | **2026-03-03** |
 
-| 68 | v3.1.1 QA Bug Fixes | 0/TBD | Not started | - |
+| **68** | **v3.1.1 QA Bug Fixes** | **1/1** | **Complete** | **2026-03-04** |
 | 69 | v3.1.1 QA Bug Fixes | 0/TBD | Not started | - |
 **Total:** 259 plans complete across shipped phases.
