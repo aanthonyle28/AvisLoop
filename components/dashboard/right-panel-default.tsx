@@ -183,7 +183,7 @@ export function RightPanelDefault({
         </Link>
 
         {/* Conversion Rate */}
-        <Link href="/history" className="block">
+        <Link href="/analytics" className="block">
           <div className="p-4 bg-muted/40 hover:bg-muted/60 transition-colors cursor-pointer rounded-lg">
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-xs text-muted-foreground font-medium">Conversion Rate</span>

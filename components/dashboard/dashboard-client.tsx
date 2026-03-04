@@ -255,7 +255,7 @@ function DashboardContent({
               <Plus size={16} weight="bold" className="mr-1.5" />
               Add Job
             </Button>
-            <Button variant="soft" asChild>
+            <Button variant="soft" asChild className="hidden sm:inline-flex">
               <Link href="/campaigns">
                 <Megaphone size={16} weight="regular" className="mr-1.5" />
                 View Campaigns
