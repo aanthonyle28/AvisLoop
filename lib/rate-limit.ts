@@ -149,3 +149,37 @@ export async function checkPublicRateLimit(ip: string): Promise<{
     remaining: result.remaining,
   }
 }
+
+/**
+ * Per-IP rate limit for the public audit endpoint.
+ * Allows 5 audits per day per IP to prevent abuse and control Google API costs.
+ * Uses fixedWindow (not slidingWindow) so daily budget resets at midnight UTC.
+ */
+export const auditRatelimit = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.fixedWindow(5, '1 d'),
+      prefix: 'ratelimit:audit',
+    })
+  : null
+
+/**
+ * Check rate limit for audit endpoint by IP address.
+ * Bypasses in development if Upstash not configured.
+ */
+export async function checkAuditRateLimit(ip: string): Promise<{
+  success: boolean
+  remaining?: number
+  reset?: number
+}> {
+  if (!auditRatelimit) {
+    return { success: true, remaining: 99 }
+  }
+
+  const result = await auditRatelimit.limit(ip)
+  return {
+    success: result.success,
+    remaining: result.remaining,
+    reset: result.reset,
+  }
+}
