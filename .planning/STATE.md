@@ -2,28 +2,29 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-27)
+See: .planning/PROJECT.md (updated 2026-03-03)
 
 **Core value:** Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.1 QA E2E Audit — COMPLETE. Next: bug fix sprint (BUG-CAMP-04 first).
+**Current focus:** v3.1.1 QA Bug Fixes — fix all 10 bugs from QA audit before production deployment.
 
 ## Current Position
 
-Phase: 67 (QA-09: Public Form + Edge Cases + Report) — ALL PLANS COMPLETE
-Plan: 67-03-PLAN.md COMPLETE
-Milestone: **v3.1 QA E2E Audit — COMPLETE**
-Status: All 17 QA plans complete. Summary report at docs/qa-v3.1/SUMMARY-REPORT.md.
+Phase: Not started (defining requirements)
+Plan: —
+Milestone: **v3.1.1 QA Bug Fixes**
+Status: Defining requirements and roadmap
 
-Progress: [██████████] 100% (14/14 plans complete across all QA phases)
+Progress: [░░░░░░░░░░] 0%
 
-Last activity: 2026-03-03 — Completed 67-03 Report Compilation: SUMMARY-REPORT.md created (341 lines, 75 requirements, 10 bugs, health scorecard, top-10 fix list)
+Last activity: 2026-03-03 — Milestone v3.1.1 started
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed (project): 259
 - v3.0 plans completed: 15/15
-- v3.1 plans completed: 13/17 → all 17 QA plans done (17/17)
+- v3.1 plans completed: 17/17
+- v3.1.1 plans completed: 0/TBD
 
 *Updated after each plan completion*
 

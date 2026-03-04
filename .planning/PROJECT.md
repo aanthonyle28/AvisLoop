@@ -38,14 +38,21 @@ Turn job completions into Google reviews automatically — multi-touch follow-up
 - Unified agency billing: one subscription covers all client businesses
 - Public job completion form with token-secured URL for technician on-site use
 
-### Active
-
 **v3.1 QA E2E Audit**
 - Full Playwright-driven E2E audit of all authenticated app pages
 - Page-by-page findings reports with severity ratings
 - Edge case testing: empty states, data isolation, responsive, rapid switching
 - Cross-cutting checks: loading states, error handling, form validation
 - v3.0 agency feature regression: multi-business, switcher, clients page, billing
+
+### Active
+
+**v3.1.1 QA Bug Fixes**
+- Fix all 10 bugs discovered during v3.1 QA E2E Audit
+- 1 Critical: frozen enrollment migration unapplied + silent error swallowing
+- 4 Medium: enrollment status labels, timezone bug, missing DB column, mobile overflow
+- 4 Low: missing stat card, template fallback, sort handlers, touch target size
+- 1 Medium (dashboard): KPIWidgets removed — navigation to /analytics broken
 
 ### Out of Scope
 
@@ -120,22 +127,26 @@ Turn job completions into Google reviews automatically — multi-touch follow-up
 | Dashboard test step cards | Guided walkthrough instead of checklist | Good — auto-detection of completion |
 | Test sends excluded from quota | Fair for users learning the product | Good — is_test flag in database |
 
-## Current Milestone: v3.1 QA E2E Audit
+## Current Milestone: v3.1.1 QA Bug Fixes
 
-**Goal:** Comprehensive Playwright-driven E2E audit of all authenticated app pages and v3.0 agency features, producing page-by-page findings reports before production deployment.
+**Goal:** Fix all 10 bugs discovered during the v3.1 QA E2E Audit — from the critical frozen enrollment migration to low-severity touch target sizing.
 
-**Target scope:**
-- All dashboard routes tested: dashboard, jobs, campaigns, analytics, history, feedback, billing, settings
-- Auth flows: login, signup, password reset, Google OAuth
-- Onboarding: first business wizard + additional business creation
-- v3.0 agency features: business switcher, clients page, detail drawer, data isolation
-- Edge cases: empty states, long names, rapid switching, mobile responsive, quota limits
-- Output: per-page findings files + severity-rated summary report
+**Bug inventory:**
+- **BUG-CAMP-04 (Critical):** Frozen enrollment migration unapplied + toggleCampaignStatus swallows errors
+- **BUG-CAMP-01 (Medium):** ENROLLMENT_STATUS_LABELS missing 'frozen' key
+- **BUG-CAMP-02 (Low):** No "Frozen" stat card on campaign detail page
+- **BUG-CAMP-03 (Low):** resolveTemplate() falls back to wrong service type
+- **BUG-HIST-01 (Medium):** getSendLogs timezone bug in date range filter
+- **BUG-ONB-01 (Medium):** software_used column missing from businesses table
+- **BUG-DASH-06 (Medium):** KPIWidgets removed from dashboard — no /analytics navigation
+- **BUG-DASH-10 (Medium):** Mobile header overflow 17px at 375px
+- **BUG-JOBS-01 (Low):** Column header clicks don't sort rows
+- **BUG-FORM-01 (Low):** ServiceTypeSelect trigger below 44px touch target
 
 **Key decisions:**
-- Findings only — no fixes in this milestone (separate remediation pass)
-- Dashboard + agency focus — marketing/public pages excluded
-- v3.0 must be complete (Phase 58-02) before QA begins
+- Fix all severities — ship clean before production
+- Group by area (campaigns, dashboard, misc) for efficient execution
+- Verify each fix against original QA finding
 
 ---
-*Last updated: 2026-02-27 after v3.1 QA E2E Audit milestone started*
+*Last updated: 2026-03-03 after v3.1.1 QA Bug Fixes milestone started*
