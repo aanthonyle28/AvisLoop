@@ -995,6 +995,26 @@ Plans:
 Plans:
 - [x] 69-01-PLAN.md -- Fix KPI navigation, mobile overflow, timezone bug, software_used column, sort handlers, touch target
 
+### Phase 70: Reputation Audit Lead-Gen Tool
+**Goal**: A public `/audit` page (no auth required) lets agency users and prospects enter a business name + city to receive a Google reputation score card. The tool uses Google Places API to pull ratings, review counts, and optionally compares against a competitor. It generates a letter-grade "Reputation Score" (A-F) with gap analysis and actionable recommendations. Email is required before showing results (lead capture). Rate-limited via Upstash (3-5 audits/day per IP). Shareable report URLs drive prospects to AvisLoop signup.
+**Depends on**: None (standalone marketing/sales feature, no dashboard dependencies)
+**Requirements**: AUDIT-01 (Places API integration), AUDIT-02 (scoring algorithm), AUDIT-03 (lead capture gate), AUDIT-04 (rate limiting), AUDIT-05 (shareable reports), AUDIT-06 (CTA to signup)
+**Success Criteria** (what must be TRUE):
+  1. A prospect can visit /audit, enter a business name + city, and receive a reputation score card without logging in
+  2. Google Places API returns real rating and review count data for the searched business
+  3. Email is required before the full report is displayed — the email is captured and stored
+  4. The report shows a letter grade (A-F), review count, rating, industry benchmarks, and actionable gap recommendations
+  5. Optional competitor comparison shows side-by-side metrics when a competitor name is provided
+  6. Rate limiting prevents more than 5 audits per IP per day via Upstash
+  7. Each report has a shareable URL that can be sent to prospects
+  8. The report includes a clear CTA driving to AvisLoop signup
+**Plans**: 3 plans
+
+Plans:
+- [ ] 70-01-PLAN.md -- Foundation: types, scoring algorithm, Places API client, rate limiting, DB migration
+- [ ] 70-02-PLAN.md -- API routes (search + submit) and audit form UI with email gate
+- [ ] 70-03-PLAN.md -- Shareable report page with results display, CTA, and OG metadata
+
 ---
 
 ## Phase Details
@@ -1068,4 +1088,5 @@ See individual phase sections above for requirements, success criteria, and depe
 
 | **68** | **v3.1.1 QA Bug Fixes** | **1/1** | **Complete** | **2026-03-04** |
 | **69** | **v3.1.1 QA Bug Fixes** | **1/1** | **Complete** | **2026-03-04** |
+| 70 | Reputation Audit Lead-Gen | 0/3 | Planned | - |
 **Total:** 261 plans complete across shipped phases.
