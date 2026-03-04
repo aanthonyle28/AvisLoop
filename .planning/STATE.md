@@ -5,26 +5,26 @@
 See: .planning/PROJECT.md (updated 2026-03-03)
 
 **Core value:** Turn job completions into Google reviews automatically -- multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.1.1 QA Bug Fixes -- fix all 10 bugs from QA audit before production deployment.
+**Current focus:** v3.1.1 QA Bug Fixes -- COMPLETE. All 10 bugs resolved. Ready for production deployment.
 
 ## Current Position
 
-Phase: 68 of 69 (Campaign Bug Fixes)
+Phase: 69 of 69 (Dashboard, History, and Misc Fixes)
 Plan: 1 of 1 COMPLETE
-Milestone: **v3.1.1 QA Bug Fixes**
-Status: Phase 68 complete and verified ✓, Phase 69 ready
+Milestone: **v3.1.1 QA Bug Fixes -- COMPLETE**
+Status: Phase 69 complete ✓ -- all v3.1.1 bug fixes done
 
-Progress: [█░░░░░░░░░] 50% (1 of 2 phases complete)
+Progress: [██████████] 100% (2 of 2 phases complete)
 
-Last activity: 2026-03-04 -- Phase 68 executed and verified (6/6 must-haves passed)
+Last activity: 2026-03-04 -- Phase 69 executed (6 bugs fixed, 3 commits)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 260
+- Total plans completed (project): 261
 - v3.0 plans completed: 15/15
 - v3.1 plans completed: 17/17
-- v3.1.1 plans completed: 1/TBD
+- v3.1.1 plans completed: 2/2 (COMPLETE)
 
 *Updated after each plan completion*
 
@@ -33,18 +33,28 @@ Last activity: 2026-03-04 -- Phase 68 executed and verified (6/6 must-haves pass
 ### Key Decisions for v3.1.1
 
 - Phase 68 (campaigns) complete -- code fixes applied, database migration still needs manual application
-- Phase 69 groups 6 independent fixes across dashboard, history, onboarding, jobs, and public form -- can proceed
-- All fixes have known solutions documented in QA findings (docs/qa-v3.1/)
+- Phase 69 (dashboard/history/misc) complete -- all 6 bugs fixed, pnpm lint + typecheck pass clean
+- v3.1.1 QA bug fix milestone fully complete
 
-### Key Context from v3.1 QA
+### Key Context from v3.1 QA -- RESOLVED
 
-- **BUG-CAMP-04 (CRITICAL) -- PARTIALLY FIXED:** Code error handling added to toggleCampaignStatus. Database migration `20260303_apply_frozen_enrollment_status.sql` must be applied via Supabase Dashboard SQL Editor (cannot apply programmatically -- no postgres credentials stored)
-- **BUG-HIST-01:** `setHours(23,59,59,999)` uses local time not UTC -- breaks date filter on non-UTC machines
-- **BUG-ONB-01:** `software_used` column missing from businesses table -- `saveSoftwareUsed()` silently fails
-- **BUG-DASH-06:** KPIWidgets removed from dashboard -- no navigation path to /analytics
-- **BUG-DASH-10:** Mobile header overflow 17px at 375px -- "View Campaigns" button extends beyond viewport
-- **BUG-JOBS-01:** Sort handlers not wired -- column headers are inert strings
-- **BUG-FORM-01:** ServiceTypeSelect trigger h-10 (40px) below 44px touch target
+- **BUG-CAMP-04 (CRITICAL) -- FIXED (code):** toggleCampaignStatus error handling added. DB migration pending manual application.
+- **BUG-HIST-01 -- FIXED:** UTC-explicit end-of-day construction (`dateTo + 'T23:59:59.999Z'`)
+- **BUG-ONB-01 -- FIXED (code):** Idempotent migration file created for Supabase Dashboard SQL Editor
+- **BUG-DASH-06 -- FIXED:** Conversion Rate KPI card now links to /analytics
+- **BUG-DASH-10 -- FIXED:** View Campaigns button hidden on mobile (hidden sm:inline-flex)
+- **BUG-JOBS-01 -- FIXED:** Job table headers now sortable (getToggleSortingHandler, ↑/↓ indicators)
+- **BUG-FORM-01 -- FIXED:** ServiceTypeSelect trigger h-11 (44px WCAG minimum)
+
+### Key Decisions Made in Phase 69
+
+| Decision | Rationale |
+|----------|-----------|
+| Only Conversion Rate card links to /analytics (not all 3 KPI cards) | Reviews->history and rating->feedback are semantically appropriate; conversion rate IS an analytics metric |
+| dateTo + 'T23:59:59.999Z' string concatenation for UTC end-of-day | Avoids setHours() local timezone dependency, cleaner pattern |
+| h-11 scoped to service-type-select.tsx only | Avoids cascade risk to all other SelectTrigger uses across the app |
+| enableSorting: false on Customer column | Nested accessor 'customers.name' requires custom sort function; flat accessorKeys sort automatically |
+| software_used migration requires manual Supabase Dashboard application | Same pattern as Phase 68 -- no local postgres credentials |
 
 ### Key Decisions Made in Phase 68
 
@@ -62,20 +72,28 @@ Last activity: 2026-03-04 -- Phase 68 executed and verified (6/6 must-haves pass
 - Dead code removal: audit for unused imports after each change
 - Security: validate all user inputs server-side, maintain RLS discipline
 
-### Pending Todos
+### Pending Todos (MANUAL - DB MIGRATIONS)
 
-- Apply database migration via Supabase Dashboard SQL Editor (see 68-01-SUMMARY.md User Setup Required section)
+Two idempotent migrations must be applied via Supabase Dashboard SQL Editor before production:
+
+1. **Phase 68:** `supabase/migrations/20260303_apply_frozen_enrollment_status.sql`
+   - Adds 'frozen' to campaign_enrollments status check constraint
+   - Required for campaign pause/resume to work correctly
+
+2. **Phase 69:** `supabase/migrations/20260304_add_software_used_column.sql`
+   - Adds software_used column to businesses table
+   - Required for onboarding CRM platform step to save
 
 ### Blockers/Concerns
 
 - Phase 21-08: Twilio A2P campaign approval required for production SMS testing (brand approved, campaign pending)
-- Frozen enrollment migration not yet applied to database -- campaign pause/resume will show user-facing error until applied
+- 2 DB migrations pending manual Supabase Dashboard SQL Editor application (see above)
 
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Phase 68 verified (6/6 must-haves). Ready to plan Phase 69.
+Stopped at: Phase 69 complete (all 6 bugs fixed). v3.1.1 milestone DONE.
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
 Active business: Audit Test HVAC (businessId: 6ed94b54-6f35-4ede-8dcb-28f562052042)
-Next action: Plan Phase 69 (Dashboard, History, and Miscellaneous Fixes) -- start with /gsd:plan-phase 69
+Next action: Apply 2 pending DB migrations via Supabase Dashboard, then production deployment
