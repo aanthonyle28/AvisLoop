@@ -974,7 +974,7 @@ Plans:
   4. Frozen enrollments display the label "Frozen" (not a missing-key fallback) in all enrollment status displays across the app
   5. The campaign detail page shows a "Frozen" stat card with the count of frozen enrollments alongside the existing Active/Completed/Stopped cards
   6. The touch sequence display resolves template names by filtering system templates to the campaign's service type before falling back to channel-only match -- an HVAC campaign does not show a Cleaning template name
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
 - [ ] 68-01-PLAN.md -- Apply frozen enrollment migration, add error handling to toggleCampaignStatus, add frozen label + stat card + template fallback fix
