@@ -10,13 +10,13 @@ See: .planning/PROJECT.md (updated 2026-03-03)
 ## Current Position
 
 Phase: 70 of 70 (Reputation Audit Lead-Gen Tool)
-Plan: 1 of 3 COMPLETE
+Plan: 2 of 3 COMPLETE
 Milestone: **Phase 70: Reputation Audit Lead-Gen Tool -- In Progress**
-Status: Plan 70-01 complete -- foundation layer done
+Status: Plan 70-02 complete -- API routes + UI components done
 
-Progress: [░░░░░░░░░░] ~33% of phase 70 (plan 1 of 3)
+Progress: [█████░░░░░] ~67% of phase 70 (plan 2 of 3)
 
-Last activity: 2026-03-04 -- Phase 70 Plan 01 executed (5 files, 2 commits)
+Last activity: 2026-03-04 -- Phase 70 Plan 02 executed (5 files created, 1 bug fix, 2 commits)
 
 ## Performance Metrics
 
@@ -25,7 +25,7 @@ Last activity: 2026-03-04 -- Phase 70 Plan 01 executed (5 files, 2 commits)
 - v3.0 plans completed: 15/15
 - v3.1 plans completed: 17/17
 - v3.1.1 plans completed: 2/2 (COMPLETE)
-- Phase 70 plans completed: 1/3
+- Phase 70 plans completed: 2/3
 
 *Updated after each plan completion*
 
@@ -40,6 +40,9 @@ Last activity: 2026-03-04 -- Phase 70 Plan 01 executed (5 files, 2 commits)
 | fixedWindow for audit rate limit | Daily budget resets at midnight UTC (vs slidingWindow inconsistent resets) |
 | Gap priority: critical/low-visibility before general gaps | Most severe issues should appear first in gaps array |
 | Idempotent policies with DO $$ IF NOT EXISTS guards | Migration safe to run multiple times without error |
+| Re-fetch Places API in submit route | Google TOS prohibits caching raw API responses; fresh fetch required |
+| Fire-and-forget lead insert | audit_leads is supplementary analytics; audit_report is the critical insert |
+| Inline red for validation errors, toast for server errors | Validation is local/actionable; server errors (rate limit, 500) warrant global notification |
 
 ### Key Decisions for v3.1.1
 
@@ -108,8 +111,8 @@ Three idempotent migrations must be applied via Supabase Dashboard SQL Editor be
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Phase 70 Plan 01 complete (foundation layer: types, scoring, places-client, rate-limit, migration).
+Stopped at: Phase 70 Plan 02 complete (API routes + UI: search/submit routes, audit-form, score-badge, landing page).
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
 Active business: Audit Test HVAC (businessId: 6ed94b54-6f35-4ede-8dcb-28f562052042)
-Next action: Execute Phase 70 Plan 02 (API routes: /api/audit/search and /api/audit/report)
+Next action: Execute Phase 70 Plan 03 (shareable report page /audit/[reportId])
