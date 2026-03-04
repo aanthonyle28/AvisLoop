@@ -422,11 +422,20 @@ export async function toggleCampaignStatus(campaignId: string): Promise<ActionSt
 
   // If pausing, freeze active enrollments (preserves touch position for later resume)
   if (newStatus === 'paused') {
-    await supabase
+    const { error: freezeError } = await supabase
       .from('campaign_enrollments')
       .update({ status: 'frozen' })
       .eq('campaign_id', campaignId)
       .eq('status', 'active')
+
+    if (freezeError) {
+      // Roll back campaign status to active since enrollments failed to freeze
+      await supabase
+        .from('campaigns')
+        .update({ status: 'active' })
+        .eq('id', campaignId)
+      return { error: 'Failed to pause campaign enrollments. Please try again.' }
+    }
   }
 
   // If resuming, unfreeze frozen enrollments and adjust stale scheduled times
@@ -450,10 +459,14 @@ export async function toggleCampaignStatus(campaignId: string): Promise<ActionSt
         updateData[`touch_${enrollment.current_touch}_scheduled_at`] = now
       }
 
-      await supabase
+      const { error: unfreezeError } = await supabase
         .from('campaign_enrollments')
         .update(updateData)
         .eq('id', enrollment.id)
+
+      if (unfreezeError) {
+        return { error: 'Failed to resume some enrollments. Please try again.' }
+      }
     }
   }
 
