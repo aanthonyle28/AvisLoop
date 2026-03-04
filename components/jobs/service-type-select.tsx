@@ -36,7 +36,7 @@ export function ServiceTypeSelect({
         value={value || undefined}
         onValueChange={(val) => onChange(val as ServiceType)}
       >
-        <SelectTrigger className={error ? 'border-destructive' : ''}>
+        <SelectTrigger className={`h-11 ${error ? 'border-destructive' : ''}`}>
           <SelectValue placeholder="Select service type..." />
         </SelectTrigger>
         <SelectContent>

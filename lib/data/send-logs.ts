@@ -53,9 +53,8 @@ export async function getSendLogs(
     query = query.gte('created_at', options.dateFrom)
   }
   if (options?.dateTo) {
-    // Add time component to include the entire end day
-    const endOfDay = new Date(options.dateTo)
-    endOfDay.setHours(23, 59, 59, 999)
+    // Explicit UTC to avoid timezone-dependent setHours()
+    const endOfDay = new Date(options.dateTo + 'T23:59:59.999Z')
     query = query.lte('created_at', endOfDay.toISOString())
   }
 
