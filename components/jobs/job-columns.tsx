@@ -35,6 +35,7 @@ export function columns({ onEdit, onDelete, onMarkComplete, onSendOneOff, onReso
       accessorKey: 'customers.name',
       header: 'Customer',
       meta: { width: '22%' },
+      enableSorting: false,
       cell: ({ row }) => {
         const customer = row.original.customers
         return (

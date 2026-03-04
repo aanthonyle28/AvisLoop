@@ -203,17 +203,32 @@ export function JobTable({ jobs, customers, campaignMap, campaignNames, loading 
           <thead className="bg-muted/50">
             {table.getHeaderGroups().map(headerGroup => (
               <tr key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
-                  <th
-                    key={header.id}
-                    className="h-10 px-4 text-left align-middle font-medium text-muted-foreground"
-                    style={{ width: (header.column.columnDef.meta as Record<string, string>)?.width }}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
-                  </th>
-                ))}
+                {headerGroup.headers.map(header => {
+                  const canSort = header.column.getCanSort()
+                  const sorted = header.column.getIsSorted()
+                  return (
+                    <th
+                      key={header.id}
+                      className="h-10 px-4 text-left align-middle font-medium text-muted-foreground"
+                      style={{ width: (header.column.columnDef.meta as Record<string, string>)?.width }}
+                    >
+                      {header.isPlaceholder ? null : canSort ? (
+                        <button
+                          type="button"
+                          className="flex items-center gap-1 hover:text-foreground transition-colors"
+                          onClick={header.column.getToggleSortingHandler()}
+                        >
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          <span className="inline-flex w-4" aria-hidden="true">
+                            {sorted === 'asc' ? '↑' : sorted === 'desc' ? '↓' : ''}
+                          </span>
+                        </button>
+                      ) : (
+                        flexRender(header.column.columnDef.header, header.getContext())
+                      )}
+                    </th>
+                  )
+                })}
               </tr>
             ))}
           </thead>
