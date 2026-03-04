@@ -2,7 +2,7 @@
 
 **Milestone:** v3.1.1 — QA Bug Fixes
 **Created:** 2026-03-03
-**Status:** Roadmap pending
+**Status:** Roadmap complete
 
 ---
 
@@ -51,22 +51,22 @@ All requirements are bug fixes discovered during the v3.1 QA E2E Audit. Each has
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CAMP-FIX-01 | TBD | Pending |
-| CAMP-FIX-02 | TBD | Pending |
-| CAMP-FIX-03 | TBD | Pending |
-| CAMP-FIX-04 | TBD | Pending |
-| DASH-FIX-01 | TBD | Pending |
-| DASH-FIX-02 | TBD | Pending |
-| HIST-FIX-01 | TBD | Pending |
-| ONB-FIX-01 | TBD | Pending |
-| JOBS-FIX-01 | TBD | Pending |
-| FORM-FIX-01 | TBD | Pending |
+| CAMP-FIX-01 | Phase 68 | Pending |
+| CAMP-FIX-02 | Phase 68 | Pending |
+| CAMP-FIX-03 | Phase 68 | Pending |
+| CAMP-FIX-04 | Phase 68 | Pending |
+| DASH-FIX-01 | Phase 69 | Pending |
+| DASH-FIX-02 | Phase 69 | Pending |
+| HIST-FIX-01 | Phase 69 | Pending |
+| ONB-FIX-01 | Phase 69 | Pending |
+| JOBS-FIX-01 | Phase 69 | Pending |
+| FORM-FIX-01 | Phase 69 | Pending |
 
 **Coverage:**
 - v3.1.1 requirements: 10 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 10
+- Mapped to phases: 10/10
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-03*
-*Last updated: 2026-03-03 after initial definition*
+*Last updated: 2026-03-03 after roadmap creation*

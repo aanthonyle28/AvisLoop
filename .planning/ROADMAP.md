@@ -22,6 +22,7 @@ AvisLoop is a review follow-up system for home service businesses. v1.0 through 
 - **v2.5.4 Code Review (Phases 41-44)** - Phases 50-51 (complete 2026-02-27)
 - **v3.0 Agency Mode** - Phases 52-58 (complete 2026-02-27)
 - **v3.1 QA E2E Audit** - Phases 59-67 (complete 2026-03-03)
+- **v3.1.1 QA Bug Fixes** - Phases 68-69 (in progress)
 
 ## Phases
 
@@ -951,6 +952,49 @@ Plans:
 - [x] 67-02-PLAN.md — Edge case audit: long names, special characters, viewport tests (375px, 768px), loading states, empty states, dark mode
 - [x] 67-03-PLAN.md — Report compilation: per-page findings review, summary report, health scorecard, priority fix list
 
+
+### v3.1.1 QA Bug Fixes (Phases 68-69)
+
+**Milestone Goal:** Fix all 10 bugs discovered during the v3.1 QA E2E Audit -- from the critical frozen enrollment migration to low-severity touch target sizing. Ship clean before production deployment.
+
+**Coverage:** 10 requirements across 6 categories (CAMP-FIX, DASH-FIX, HIST-FIX, ONB-FIX, JOBS-FIX, FORM-FIX)
+
+**Build order rationale:** Campaign bugs first because CAMP-FIX-01 (critical migration + error handling) must be applied before CAMP-FIX-02/03 can work (frozen status depends on the migration). All remaining fixes are independent and grouped into a single phase for efficiency.
+
+---
+
+### Phase 68: Campaign Bug Fixes
+**Goal**: Campaign pause/resume works end-to-end -- the frozen enrollment migration is applied, constraint violations surface to the user, frozen enrollments display correctly in labels and stat cards, and template fallback resolves to the correct service type.
+**Depends on**: Nothing (first phase in milestone)
+**Requirements**: CAMP-FIX-01, CAMP-FIX-02, CAMP-FIX-03, CAMP-FIX-04
+**Success Criteria** (what must be TRUE):
+  1. Pausing a campaign sets its active enrollments to 'frozen' status in the database -- the CHECK constraint no longer blocks the value
+  2. Resuming a paused campaign restores frozen enrollments to 'active' with recalculated scheduled times -- no enrollments are lost
+  3. If a constraint violation or database error occurs during pause/resume, a toast error message is shown to the user -- errors are not silently swallowed
+  4. Frozen enrollments display the label "Frozen" (not a missing-key fallback) in all enrollment status displays across the app
+  5. The campaign detail page shows a "Frozen" stat card with the count of frozen enrollments alongside the existing Active/Completed/Stopped cards
+  6. The touch sequence display resolves template names by filtering system templates to the campaign's service type before falling back to channel-only match -- an HVAC campaign does not show a Cleaning template name
+**Plans**: TBD
+
+Plans:
+- [ ] 68-01-PLAN.md -- Apply frozen enrollment migration, add error handling to toggleCampaignStatus, add frozen label + stat card + template fallback fix
+
+### Phase 69: Dashboard, History, and Miscellaneous Fixes
+**Goal**: All remaining QA bugs are resolved -- dashboard KPI navigation works, mobile header fits at 375px, history date filter uses UTC, the software_used column exists, job table columns sort on click, and service type select meets touch target minimums.
+**Depends on**: Phase 68 (campaign fixes applied first; these fixes are independent but sequenced after the critical bug)
+**Requirements**: DASH-FIX-01, DASH-FIX-02, HIST-FIX-01, ONB-FIX-01, JOBS-FIX-01, FORM-FIX-01
+**Success Criteria** (what must be TRUE):
+  1. At least one dashboard element links to /analytics -- either the KPI cards are restored or the right panel compact cards navigate there
+  2. The mobile header at 375px viewport width has zero horizontal overflow -- no content extends beyond the viewport edge
+  3. The history page date range filter returns correct results regardless of the server's local timezone -- end-of-day is computed in UTC
+  4. The onboarding CRM platform step successfully saves the selected software to the database -- the software_used column exists on the businesses table
+  5. Clicking a column header on the Jobs table toggles sort order for that column -- ascending, descending, and unsorted states cycle correctly
+  6. The ServiceTypeSelect trigger element has a minimum height of 44px -- meeting the WCAG touch target accessibility requirement
+**Plans**: TBD
+
+Plans:
+- [ ] 69-01-PLAN.md -- Fix KPI navigation, mobile overflow, timezone bug, software_used column, sort handlers, touch target
+
 ---
 
 ## Phase Details
@@ -1022,4 +1066,6 @@ See individual phase sections above for requirements, success criteria, and depe
 | **66** | **v3.1 QA E2E Audit** | **3/3** | **Complete** | **2026-03-02** |
 | **67** | **v3.1 QA E2E Audit** | **3/3** | **Complete** | **2026-03-03** |
 
+| 68 | v3.1.1 QA Bug Fixes | 0/TBD | Not started | - |
+| 69 | v3.1.1 QA Bug Fixes | 0/TBD | Not started | - |
 **Total:** 259 plans complete across shipped phases.
