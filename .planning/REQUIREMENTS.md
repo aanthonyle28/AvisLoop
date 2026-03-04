@@ -1,277 +1,72 @@
-# Requirements: v3.1 QA E2E Audit
+# Requirements: v3.1.1 QA Bug Fixes
 
-**Milestone:** v3.1 — QA E2E Audit
-**Created:** 2026-02-27
-**Status:** Roadmap complete — phases assigned
-
----
-
-## Auth Flows
-
-- [x] **AUTH-01**: Login with email/password succeeds and lands on dashboard with correct business data
-- [x] **AUTH-02**: Signup creates account, redirects to onboarding, and session is established
-- [x] **AUTH-03**: Password reset sends email, reset link works, new password accepted
-- [x] **AUTH-04**: Session persists across page refresh, tab switch, and browser navigation (back/forward)
-- [x] **AUTH-05**: Invalid credentials show clear error messages (not generic server errors)
-
-## Onboarding
-
-- [x] **ONB-01**: First-business onboarding wizard completes all 4 steps and creates business + campaign
-- [x] **ONB-02**: Additional business creation (?mode=new) completes 3-step wizard without affecting existing businesses
-- [x] **ONB-03**: Onboarding draft persistence works (refresh mid-wizard retains entered data)
-
-## Dashboard
-
-- [x] **DASH-01**: KPI widgets show correct numbers matching database counts
-- [x] **DASH-02**: Sparkline charts render with data (not empty/broken when data exists)
-- [x] **DASH-03**: Ready-to-Send queue populates with completed jobs awaiting enrollment
-- [x] **DASH-04**: Needs Attention alerts show failed sends/unresolved feedback with dismiss working
-- [x] **DASH-05**: Recent activity feed shows latest campaign events with correct timestamps
-- [ ] **DASH-06**: Clicking KPI cards navigates to correct destination (/analytics) — FAIL: KPIWidgets removed from dashboard
-- [x] **DASH-07**: Getting Started card/components are NOT visible (hidden for production)
-- [x] **DASH-08**: Dashboard empty state renders correctly for a business with zero data
-- [x] **DASH-09**: Loading skeletons display during data fetch (not blank screen) — PARTIAL: no loading.tsx
-- [x] **DASH-10**: Mobile layout renders correctly (bottom sheet, compact KPI bar) — PARTIAL: 17px overflow
-- [x] **DASH-11**: Dark mode renders without visual artifacts (no muddy colors, correct contrast)
-
-## Jobs
-
-- [x] **JOBS-01**: Jobs table displays with correct columns, sorting, and pagination
-- [x] **JOBS-02**: Add Job drawer opens, form validates, and creates job successfully
-- [x] **JOBS-03**: Edit Job drawer loads existing data and saves changes
-- [x] **JOBS-04**: Job detail drawer shows complete information
-- [x] **JOBS-05**: Service type filter only shows business's enabled service types
-- [x] **JOBS-06**: Status filter works (scheduled/completed/do_not_send)
-- [x] **JOBS-07**: Mark Complete action transitions job from scheduled to completed
-- [x] **JOBS-08**: Completing a job with a matching campaign triggers enrollment (verify in DB)
-- [x] **JOBS-09**: Campaign selector dropdown shows available campaigns + "one-off" option
-- [x] **JOBS-10**: Empty state renders correctly for business with zero jobs
-
-## Campaigns
-
-- [x] **CAMP-01**: Campaign list displays all campaigns with correct status badges
-- [x] **CAMP-02**: Campaign detail page shows touch sequence, enrollment list, and analytics
-- [x] **CAMP-03**: Campaign edit sheet opens and saves changes (touch timing, templates)
-- [x] **CAMP-04**: Campaign preset picker shows 3 options with correct descriptions
-- [x] **CAMP-05**: Pausing a campaign sets enrollments to "frozen" (not "stopped") — verify in DB
-- [x] **CAMP-06**: Resuming a paused campaign restores frozen enrollments to "active" — verify in DB
-- [x] **CAMP-07**: Template preview modal shows correct template content per touch
-- [x] **CAMP-08**: Campaign analytics show correct enrollment/send/conversion counts
-- [x] **CAMP-09**: Enrollment conflict states display correctly (conflict, queue_after, skipped badges)
-- [x] **CAMP-10**: Creating a new campaign from preset works end-to-end
-
-## History & Activity
-
-- [x] **HIST-01**: History page displays send logs with correct status badges
-- [x] **HIST-02**: Status chip filter works (filter by delivered/failed/bounced/etc.)
-- [x] **HIST-03**: Date preset chips work (Today, Week, Month, 3 Months)
-- [x] **HIST-04**: Resend button only appears on failed/bounced rows
-- [x] **HIST-05**: Bulk select only selects failed/bounced rows
-
-## Analytics
-
-- [x] **ANLYT-01**: Analytics page shows metrics with correct numbers
-- [x] **ANLYT-02**: Service type breakdown table displays with correct data
-- [x] **ANLYT-03**: Empty state renders correctly when no data exists
-
-## Feedback
-
-- [x] **FDBK-01**: Feedback page lists submitted feedback with ratings
-- [x] **FDBK-02**: Feedback resolution workflow works (mark resolved, add notes)
-- [x] **FDBK-03**: Empty state renders correctly when no feedback exists
-
-## Billing
-
-- [x] **BILL-01**: Billing page shows current plan tier and pooled usage count
-- [x] **BILL-02**: Usage count reflects sends across ALL user-owned businesses (pooled)
-- [x] **BILL-03**: Plan comparison section displays correctly
-
-## Settings
-
-- [x] **SETT-01**: General tab: business name, Google review link, sender name editable and save
-- [x] **SETT-02**: General tab: form link section shows shareable URL with copy button
-- [x] **SETT-03**: Templates tab: template list displays with channel badges (email/SMS)
-- [x] **SETT-04**: Templates tab: create/edit/delete template works
-- [x] **SETT-05**: Services tab: service type toggles work and save
-- [x] **SETT-06**: Services tab: custom service names display and are editable
-- [x] **SETT-07**: Customers tab: customer list displays with search and filters
-- [x] **SETT-08**: Customers tab: add/edit/archive customer works
-- [x] **SETT-09**: All settings changes persist after page refresh
-
-## Businesses (Agency)
-
-- [x] **BIZ-01**: Businesses page shows card grid with all user-owned businesses
-- [x] **BIZ-02**: Business cards display name, service type, Google rating, reviews gained
-- [x] **BIZ-03**: Business detail drawer opens with all agency metadata fields
-- [x] **BIZ-04**: Editing metadata in drawer persists to database
-- [x] **BIZ-05**: Notes auto-save works (type, wait, refresh — notes retained)
-- [x] **BIZ-06**: "Switch to this business" button in drawer works correctly
-- [x] **BIZ-07**: "Add Business" button initiates new business creation flow
-
-## Business Switcher & Data Isolation
-
-- [x] **MULTI-01**: Business switcher dropdown shows all user-owned businesses
-- [x] **MULTI-02**: Selecting a different business updates all page data to show that business's data
-- [x] **MULTI-03**: Mobile business switcher is accessible and functional
-- [x] **MULTI-04**: Business A's jobs do NOT appear when Business B is active (SQL verification)
-- [x] **MULTI-05**: Business A's customers do NOT appear when Business B is active
-- [x] **MULTI-06**: Business A's campaigns do NOT appear when Business B is active
-- [x] **MULTI-07**: Business A's send logs do NOT appear when Business B is active
-- [x] **MULTI-08**: Rapid business switching (5+ times in 10 seconds) doesn't break state
-- [x] **MULTI-09**: Two different users cannot see each other's businesses or data
-
-## Public Job Completion Form
-
-- [x] **FORM-01**: Form loads at /complete/[token] without authentication
-- [x] **FORM-02**: Form shows business name and enabled service types
-- [x] **FORM-03**: Form validates required fields (name, phone or email, service type)
-- [x] **FORM-04**: Successful submission creates job + customer record in database
-- [x] **FORM-05**: Mobile layout has large touch targets and is usable on phone viewport
-- [x] **FORM-06**: Invalid/missing token shows 404 page (not crash or blank)
-
-## Cross-Cutting Edge Cases
-
-- [x] **EDGE-01**: Long business name (50+ chars) displays correctly in sidebar, switcher, cards (truncated, no overflow)
-- [x] **EDGE-02**: Long customer name (50+ chars) displays correctly in tables and drawers
-- [x] **EDGE-03**: Special characters in all text fields (quotes, ampersands, < >) display correctly (no XSS, no broken rendering)
-- [x] **EDGE-04**: Every page renders correctly at mobile viewport (375px width)
-- [x] **EDGE-05**: Every page renders correctly at tablet viewport (768px width)
-- [x] **EDGE-06**: Loading skeletons appear on all data pages during fetch
-- [x] **EDGE-07**: Empty states render correctly on all pages when no data exists
-- [x] **EDGE-08**: Form validation errors display clearly on all forms (red borders, error messages)
-- [x] **EDGE-09**: Dark mode renders without artifacts on all tested pages
-
-## Report Deliverables
-
-- [ ] **RPT-01**: Per-page findings file exists for each tested route (docs/qa-v3.1/)
-- [ ] **RPT-02**: Each finding has severity (Critical/High/Medium/Low), location, and description
-- [ ] **RPT-03**: Summary report exists with overall health scorecard and priority fix list
-- [ ] **RPT-04**: Screenshots captured for every finding (desktop + mobile where relevant)
+**Milestone:** v3.1.1 — QA Bug Fixes
+**Created:** 2026-03-03
+**Status:** Roadmap pending
 
 ---
+
+## v3.1.1 Requirements
+
+All requirements are bug fixes discovered during the v3.1 QA E2E Audit. Each has a known fix documented in the QA findings.
+
+### Campaigns
+
+- [ ] **CAMP-FIX-01**: Apply frozen enrollment migration to database and add error handling to `toggleCampaignStatus()` so constraint violations surface to the user instead of being silently swallowed *(Critical)*
+- [ ] **CAMP-FIX-02**: Add 'frozen' key to `ENROLLMENT_STATUS_LABELS` in `lib/constants/campaigns.ts` *(Medium)*
+- [ ] **CAMP-FIX-03**: Add "Frozen" stat card to campaign detail page showing count of frozen enrollments *(Low)*
+- [ ] **CAMP-FIX-04**: Fix `resolveTemplate()` in touch-sequence-display.tsx to filter system templates by campaign service type before falling back to channel-only match *(Low)*
+
+### Dashboard
+
+- [ ] **DASH-FIX-01**: Restore KPI card navigation to /analytics — either re-add KPIWidgets or update right panel compact cards to link to /analytics *(Medium)*
+- [ ] **DASH-FIX-02**: Fix mobile header overflow at 375px by hiding "View Campaigns" secondary button on mobile (`hidden sm:flex`) *(Medium)*
+
+### History
+
+- [ ] **HIST-FIX-01**: Fix timezone bug in `getSendLogs` — replace `setHours(23,59,59,999)` with UTC-explicit `new Date(dateTo + 'T23:59:59.999Z')` *(Medium)*
+
+### Onboarding
+
+- [ ] **ONB-FIX-01**: Add missing `software_used TEXT` column to businesses table via migration *(Medium)*
+
+### Jobs
+
+- [ ] **JOBS-FIX-01**: Wire column header sort click handlers using TanStack `header.column.getToggleSortingHandler()` *(Low)*
+
+### Public Form
+
+- [ ] **FORM-FIX-01**: Increase ServiceTypeSelect trigger height from h-10 (40px) to h-12 (48px) to meet 44px touch target minimum *(Low)*
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Marketing pages (landing, pricing) | Dashboard-only scope for this milestone |
-| Google OAuth end-to-end | Requires Google consent screen, untestable in Playwright |
-| Email/SMS delivery | External service dependency (Resend, Twilio) |
-| Stripe payment processing | Requires real Stripe test environment |
-| Cron job execution | Server-side automation, not UI-testable |
-| Accessibility (a11y) | Explicitly excluded from scope |
-| Performance/load testing | Separate concern, not in QA audit |
-| Review funnel public page (/r/[token]) | Depends on cron having sent campaign touches |
-
----
+| New features | Fix-only milestone — no new capabilities |
+| Marketing page updates | Dashboard-only scope |
+| Performance optimization | Separate concern |
+| Accessibility improvements beyond touch targets | Separate milestone |
 
 ## Traceability
 
-| REQ-ID | Phase | Status |
-|--------|-------|--------|
-| AUTH-01 | Phase 59 | Complete |
-| AUTH-02 | Phase 59 | Complete |
-| AUTH-03 | Phase 59 | Complete |
-| AUTH-04 | Phase 59 | Complete |
-| AUTH-05 | Phase 59 | Complete |
-| ONB-01 | Phase 60 | Complete |
-| ONB-02 | Phase 60 | Complete |
-| ONB-03 | Phase 60 | Complete |
-| DASH-01 | Phase 61 | Complete |
-| DASH-02 | Phase 61 | Complete |
-| DASH-03 | Phase 61 | Complete |
-| DASH-04 | Phase 61 | Complete |
-| DASH-05 | Phase 61 | Complete |
-| DASH-06 | Phase 61 | FAIL — KPIWidgets removed |
-| DASH-07 | Phase 61 | Complete |
-| DASH-08 | Phase 61 | Complete (partial) |
-| DASH-09 | Phase 61 | Complete (partial) |
-| DASH-10 | Phase 61 | Complete (partial) |
-| DASH-11 | Phase 61 | Complete |
-| JOBS-01 | Phase 62 | Complete |
-| JOBS-02 | Phase 62 | Complete |
-| JOBS-03 | Phase 62 | Complete |
-| JOBS-04 | Phase 62 | Complete |
-| JOBS-05 | Phase 62 | Complete |
-| JOBS-06 | Phase 62 | Complete |
-| JOBS-07 | Phase 62 | Complete |
-| JOBS-08 | Phase 62 | Complete |
-| JOBS-09 | Phase 62 | Complete |
-| JOBS-10 | Phase 62 | Complete |
-| CAMP-01 | Phase 63 | Complete |
-| CAMP-02 | Phase 63 | Complete |
-| CAMP-03 | Phase 63 | Complete |
-| CAMP-04 | Phase 63 | Complete |
-| CAMP-05 | Phase 63 | Complete |
-| CAMP-06 | Phase 63 | Complete |
-| CAMP-07 | Phase 63 | Complete |
-| CAMP-08 | Phase 63 | Complete |
-| CAMP-09 | Phase 63 | Complete |
-| CAMP-10 | Phase 63 | Complete |
-| HIST-01 | Phase 64 | Complete |
-| HIST-02 | Phase 64 | Complete |
-| HIST-03 | Phase 64 | Complete |
-| HIST-04 | Phase 64 | Complete |
-| HIST-05 | Phase 64 | Complete |
-| ANLYT-01 | Phase 64 | Complete |
-| ANLYT-02 | Phase 64 | Complete |
-| ANLYT-03 | Phase 64 | Complete |
-| FDBK-01 | Phase 64 | Complete |
-| FDBK-02 | Phase 64 | Complete |
-| FDBK-03 | Phase 64 | Complete |
-| BILL-01 | Phase 65 | Complete |
-| BILL-02 | Phase 65 | Complete |
-| BILL-03 | Phase 65 | Complete |
-| SETT-01 | Phase 65 | Complete |
-| SETT-02 | Phase 65 | Complete |
-| SETT-03 | Phase 65 | Complete |
-| SETT-04 | Phase 65 | Complete |
-| SETT-05 | Phase 65 | Complete |
-| SETT-06 | Phase 65 | Complete |
-| SETT-07 | Phase 65 | Complete |
-| SETT-08 | Phase 65 | Complete |
-| SETT-09 | Phase 65 | Complete |
-| BIZ-01 | Phase 66 | Complete |
-| BIZ-02 | Phase 66 | Complete |
-| BIZ-03 | Phase 66 | Complete |
-| BIZ-04 | Phase 66 | Complete |
-| BIZ-05 | Phase 66 | Complete |
-| BIZ-06 | Phase 66 | Complete |
-| BIZ-07 | Phase 66 | Complete |
-| MULTI-01 | Phase 66 | Complete |
-| MULTI-02 | Phase 66 | Complete |
-| MULTI-03 | Phase 66 | Complete |
-| MULTI-04 | Phase 66 | Complete |
-| MULTI-05 | Phase 66 | Complete |
-| MULTI-06 | Phase 66 | Complete |
-| MULTI-07 | Phase 66 | Complete |
-| MULTI-08 | Phase 66 | Complete |
-| MULTI-09 | Phase 66 | Complete |
-| FORM-01 | Phase 67 | Complete |
-| FORM-02 | Phase 67 | Complete |
-| FORM-03 | Phase 67 | Complete |
-| FORM-04 | Phase 67 | Complete |
-| FORM-05 | Phase 67 | Complete |
-| FORM-06 | Phase 67 | Complete |
-| EDGE-01 | Phase 67 | Complete |
-| EDGE-02 | Phase 67 | Complete |
-| EDGE-03 | Phase 67 | Complete |
-| EDGE-04 | Phase 67 | Complete |
-| EDGE-05 | Phase 67 | Complete |
-| EDGE-06 | Phase 67 | Complete |
-| EDGE-07 | Phase 67 | Complete |
-| EDGE-08 | Phase 67 | Complete |
-| EDGE-09 | Phase 67 | Complete |
-| RPT-01 | Phase 67 | Pending |
-| RPT-02 | Phase 67 | Pending |
-| RPT-03 | Phase 67 | Pending |
-| RPT-04 | Phase 67 | Pending |
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| CAMP-FIX-01 | TBD | Pending |
+| CAMP-FIX-02 | TBD | Pending |
+| CAMP-FIX-03 | TBD | Pending |
+| CAMP-FIX-04 | TBD | Pending |
+| DASH-FIX-01 | TBD | Pending |
+| DASH-FIX-02 | TBD | Pending |
+| HIST-FIX-01 | TBD | Pending |
+| ONB-FIX-01 | TBD | Pending |
+| JOBS-FIX-01 | TBD | Pending |
+| FORM-FIX-01 | TBD | Pending |
 
 **Coverage:**
-- v3.1 requirements: 97 total (note: initial estimate was 74; final count from listed requirements is 97)
-- Mapped to phases: 97/97
-- Unmapped: 0
+- v3.1.1 requirements: 10 total
+- Mapped to phases: 0 (pending roadmap)
+- Unmapped: 10
 
 ---
-*Requirements defined: 2026-02-27*
-*Last updated: 2026-02-27 — traceability table complete, all 97 requirements mapped to phases 59-67*
+*Requirements defined: 2026-03-03*
+*Last updated: 2026-03-03 after initial definition*
