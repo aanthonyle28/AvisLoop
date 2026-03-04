@@ -5,30 +5,41 @@
 See: .planning/PROJECT.md (updated 2026-03-03)
 
 **Core value:** Turn job completions into Google reviews automatically -- multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** v3.1.1 QA Bug Fixes -- COMPLETE. All 10 bugs resolved. Ready for production deployment.
+**Current focus:** Phase 70 -- Reputation Audit Lead-Gen Tool (in progress)
 
 ## Current Position
 
-Phase: 69 of 69 (Dashboard, History, and Misc Fixes)
-Plan: 1 of 1 COMPLETE
-Milestone: **v3.1.1 QA Bug Fixes -- COMPLETE**
-Status: Phase 69 complete ✓ -- all v3.1.1 bug fixes done
+Phase: 70 of 70 (Reputation Audit Lead-Gen Tool)
+Plan: 1 of 3 COMPLETE
+Milestone: **Phase 70: Reputation Audit Lead-Gen Tool -- In Progress**
+Status: Plan 70-01 complete -- foundation layer done
 
-Progress: [██████████] 100% (2 of 2 phases complete)
+Progress: [░░░░░░░░░░] ~33% of phase 70 (plan 1 of 3)
 
-Last activity: 2026-03-04 -- Phase 69 executed (6 bugs fixed, 3 commits)
+Last activity: 2026-03-04 -- Phase 70 Plan 01 executed (5 files, 2 commits)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 261
+- Total plans completed (project): 262
 - v3.0 plans completed: 15/15
 - v3.1 plans completed: 17/17
 - v3.1.1 plans completed: 2/2 (COMPLETE)
+- Phase 70 plans completed: 1/3
 
 *Updated after each plan completion*
 
 ## Accumulated Context
+
+### Key Decisions for Phase 70 (Reputation Audit Lead-Gen)
+
+| Decision | Rationale |
+|----------|-----------|
+| Migration date 20260306 (not 20260303) | 20260303 taken by frozen_enrollment_status, 20260305 taken by add_brand_voice |
+| Continuous rating formula (rating - 2.0) / 3.0 * 60 | Smoother scoring curve vs arbitrary tiers; 5.0 = 60pts, 4.8 = 56pts |
+| fixedWindow for audit rate limit | Daily budget resets at midnight UTC (vs slidingWindow inconsistent resets) |
+| Gap priority: critical/low-visibility before general gaps | Most severe issues should appear first in gaps array |
+| Idempotent policies with DO $$ IF NOT EXISTS guards | Migration safe to run multiple times without error |
 
 ### Key Decisions for v3.1.1
 
@@ -74,7 +85,7 @@ Last activity: 2026-03-04 -- Phase 69 executed (6 bugs fixed, 3 commits)
 
 ### Pending Todos (MANUAL - DB MIGRATIONS)
 
-Two idempotent migrations must be applied via Supabase Dashboard SQL Editor before production:
+Three idempotent migrations must be applied via Supabase Dashboard SQL Editor before production:
 
 1. **Phase 68:** `supabase/migrations/20260303_apply_frozen_enrollment_status.sql`
    - Adds 'frozen' to campaign_enrollments status check constraint
@@ -84,16 +95,21 @@ Two idempotent migrations must be applied via Supabase Dashboard SQL Editor befo
    - Adds software_used column to businesses table
    - Required for onboarding CRM platform step to save
 
+3. **Phase 70:** `supabase/migrations/20260306_audit_tables.sql`
+   - Creates audit_reports and audit_leads tables with RLS + anon GRANTs
+   - Required before Phase 70 audit API routes can store lead data
+
 ### Blockers/Concerns
 
 - Phase 21-08: Twilio A2P campaign approval required for production SMS testing (brand approved, campaign pending)
-- 2 DB migrations pending manual Supabase Dashboard SQL Editor application (see above)
+- 3 DB migrations pending manual Supabase Dashboard SQL Editor application (see above)
+- Phase 70 Plan 01 user setup: GOOGLE_PLACES_API_KEY must be configured before Plan 02 API routes can be tested
 
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Phase 69 complete (all 6 bugs fixed). v3.1.1 milestone DONE.
+Stopped at: Phase 70 Plan 01 complete (foundation layer: types, scoring, places-client, rate-limit, migration).
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
 Active business: Audit Test HVAC (businessId: 6ed94b54-6f35-4ede-8dcb-28f562052042)
-Next action: Apply 2 pending DB migrations via Supabase Dashboard, then production deployment
+Next action: Execute Phase 70 Plan 02 (API routes: /api/audit/search and /api/audit/report)
