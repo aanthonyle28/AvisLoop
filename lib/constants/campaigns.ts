@@ -89,6 +89,7 @@ export const ENROLLMENT_STATUS_LABELS: Record<string, string> = {
   active: 'Active',
   completed: 'Completed',
   stopped: 'Stopped',
+  frozen: 'Frozen',
 }
 
 // Stop reason display labels

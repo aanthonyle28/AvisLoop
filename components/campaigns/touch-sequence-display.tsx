@@ -17,21 +17,34 @@ interface TouchData {
 interface TouchSequenceDisplayProps {
   touches: TouchData[]
   templates: MessageTemplate[]
+  serviceType?: string | null
 }
 
 function resolveTemplate(
   touch: TouchData,
-  templates: MessageTemplate[]
+  templates: MessageTemplate[],
+  serviceType?: string | null
 ): { name: string; subject: string; body: string; channel: 'email' | 'sms' } | null {
+  // 1. Explicit template_id takes priority
   if (touch.template_id) {
     const found = templates.find(t => t.id === touch.template_id)
     return found
       ? { name: found.name, subject: found.subject, body: found.body, channel: touch.channel as 'email' | 'sms' }
       : null
   }
-  const systemTemplate = templates.find(
-    t => t.is_default && t.channel === touch.channel
-  )
+
+  // 2. Try service-type-specific system template
+  if (serviceType) {
+    const serviceMatch = templates.find(
+      t => t.is_default && t.channel === touch.channel && t.service_type === serviceType
+    )
+    if (serviceMatch) {
+      return { name: serviceMatch.name, subject: serviceMatch.subject, body: serviceMatch.body, channel: touch.channel as 'email' | 'sms' }
+    }
+  }
+
+  // 3. Fall back to any system template for this channel
+  const systemTemplate = templates.find(t => t.is_default && t.channel === touch.channel)
   return systemTemplate
     ? { name: systemTemplate.name, subject: systemTemplate.subject, body: systemTemplate.body, channel: touch.channel as 'email' | 'sms' }
     : null
@@ -43,7 +56,7 @@ function formatDelay(hours: number, index: number): string {
   return `${Math.round(hours / 24)}d ${anchor}`
 }
 
-export function TouchSequenceDisplay({ touches, templates }: TouchSequenceDisplayProps) {
+export function TouchSequenceDisplay({ touches, templates, serviceType }: TouchSequenceDisplayProps) {
   const [previewTemplate, setPreviewTemplate] = useState<{
     name: string; subject: string; body: string; channel: 'email' | 'sms'
   } | null>(null)
@@ -80,7 +93,7 @@ export function TouchSequenceDisplay({ touches, templates }: TouchSequenceDispla
                 variant="ghost"
                 size="icon-sm"
                 onClick={() => {
-                  setPreviewTemplate(resolveTemplate(touch, templates))
+                  setPreviewTemplate(resolveTemplate(touch, templates, serviceType))
                   setPreviewOpen(true)
                 }}
                 aria-label={`Preview touch ${touch.touch_number} template`}

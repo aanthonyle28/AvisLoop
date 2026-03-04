@@ -94,7 +94,7 @@ export default async function CampaignDetailPage({ params, searchParams }: Campa
       </div>
 
       {/* Stats cards */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <Card className="bg-muted/40">
           <CardContent className="pt-5 pb-4 px-5">
             <p className="text-xs text-muted-foreground font-medium mb-1">Active</p>
@@ -111,6 +111,12 @@ export default async function CampaignDetailPage({ params, searchParams }: Campa
           <CardContent className="pt-5 pb-4 px-5">
             <p className="text-xs text-muted-foreground font-medium mb-1">Stopped</p>
             <p className="text-2xl font-bold">{counts.stopped}</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-muted/40">
+          <CardContent className="pt-5 pb-4 px-5">
+            <p className="text-xs text-muted-foreground font-medium mb-1">Frozen</p>
+            <p className="text-2xl font-bold">{counts.frozen}</p>
           </CardContent>
         </Card>
       </div>
@@ -133,6 +139,7 @@ export default async function CampaignDetailPage({ params, searchParams }: Campa
           <TouchSequenceDisplay
             touches={campaign.campaign_touches}
             templates={templates}
+            serviceType={campaign.service_type}
           />
         </CardContent>
       </Card>
@@ -177,6 +184,7 @@ export default async function CampaignDetailPage({ params, searchParams }: Campa
                       variant={
                         enrollment.status === 'active' ? 'default' :
                         enrollment.status === 'completed' ? 'secondary' :
+                        enrollment.status === 'frozen' ? 'secondary' :
                         'outline'
                       }
                     >
