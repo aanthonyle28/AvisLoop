@@ -5,18 +5,18 @@
 See: .planning/PROJECT.md (updated 2026-03-03)
 
 **Core value:** Turn job completions into Google reviews automatically -- multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
-**Current focus:** Phase 70 -- Reputation Audit Lead-Gen Tool (in progress)
+**Current focus:** Phase 70 -- Reputation Audit Lead-Gen Tool (COMPLETE)
 
 ## Current Position
 
 Phase: 70 of 70 (Reputation Audit Lead-Gen Tool)
-Plan: 2 of 3 COMPLETE
-Milestone: **Phase 70: Reputation Audit Lead-Gen Tool -- In Progress**
-Status: Plan 70-02 complete -- API routes + UI components done
+Plan: 3 of 3 COMPLETE
+Milestone: **Phase 70: Reputation Audit Lead-Gen Tool -- COMPLETE**
+Status: All plans complete -- shareable report page + results component shipped
 
-Progress: [█████░░░░░] ~67% of phase 70 (plan 2 of 3)
+Progress: [██████████] 100% of phase 70 (plan 3 of 3)
 
-Last activity: 2026-03-04 -- Phase 70 Plan 02 executed (5 files created, 1 bug fix, 2 commits)
+Last activity: 2026-03-04 -- Phase 70 Plan 03 executed (2 files created, typecheck + lint pass)
 
 ## Performance Metrics
 
@@ -25,13 +25,13 @@ Last activity: 2026-03-04 -- Phase 70 Plan 02 executed (5 files created, 1 bug f
 - v3.0 plans completed: 15/15
 - v3.1 plans completed: 17/17
 - v3.1.1 plans completed: 2/2 (COMPLETE)
-- Phase 70 plans completed: 2/3
+- Phase 70 plans completed: 3/3 (COMPLETE)
 
 *Updated after each plan completion*
 
 ## Accumulated Context
 
-### Key Decisions for Phase 70 (Reputation Audit Lead-Gen)
+### Key Decisions for Phase 70 (Reputation Audit Lead-Gen) -- COMPLETE
 
 | Decision | Rationale |
 |----------|-----------|
@@ -43,6 +43,10 @@ Last activity: 2026-03-04 -- Phase 70 Plan 02 executed (5 files created, 1 bug f
 | Re-fetch Places API in submit route | Google TOS prohibits caching raw API responses; fresh fetch required |
 | Fire-and-forget lead insert | audit_leads is supplementary analytics; audit_report is the critical insert |
 | Inline red for validation errors, toast for server errors | Validation is local/actionable; server errors (rate limit, 500) warrant global notification |
+| 'use client' on AuditResults | navigator.clipboard requires browser context (copy-link share button) |
+| maybeSingle() on report fetch | Avoids PGRST116 crash for nonexistent reportIds — returns null cleanly |
+| Normalize gaps_json from JSONB | Supabase may return JSONB as string or object depending on driver version |
+| Fire-and-forget view_count increment | Does not block render; failure is non-critical analytics |
 
 ### Key Decisions for v3.1.1
 
@@ -111,8 +115,8 @@ Three idempotent migrations must be applied via Supabase Dashboard SQL Editor be
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Phase 70 Plan 02 complete (API routes + UI: search/submit routes, audit-form, score-badge, landing page).
+Stopped at: Phase 70 Plan 03 complete -- shareable /audit/[reportId] report page + AuditResults component.
 Resume file: None
 QA test account: audit-test@avisloop.com / AuditTest123!
 Active business: Audit Test HVAC (businessId: 6ed94b54-6f35-4ede-8dcb-28f562052042)
-Next action: Execute Phase 70 Plan 03 (shareable report page /audit/[reportId])
+Next action: Apply DB migration 20260306_audit_tables.sql, set GOOGLE_PLACES_API_KEY, then test full audit flow end-to-end
