@@ -19,24 +19,24 @@ All requirements are bug fixes discovered during the v3.1 QA E2E Audit. Each has
 
 ### Dashboard
 
-- [ ] **DASH-FIX-01**: Restore KPI card navigation to /analytics — either re-add KPIWidgets or update right panel compact cards to link to /analytics *(Medium)*
-- [ ] **DASH-FIX-02**: Fix mobile header overflow at 375px by hiding "View Campaigns" secondary button on mobile (`hidden sm:flex`) *(Medium)*
+- [x] **DASH-FIX-01**: Restore KPI card navigation to /analytics — either re-add KPIWidgets or update right panel compact cards to link to /analytics *(Medium)*
+- [x] **DASH-FIX-02**: Fix mobile header overflow at 375px by hiding "View Campaigns" secondary button on mobile (`hidden sm:flex`) *(Medium)*
 
 ### History
 
-- [ ] **HIST-FIX-01**: Fix timezone bug in `getSendLogs` — replace `setHours(23,59,59,999)` with UTC-explicit `new Date(dateTo + 'T23:59:59.999Z')` *(Medium)*
+- [x] **HIST-FIX-01**: Fix timezone bug in `getSendLogs` — replace `setHours(23,59,59,999)` with UTC-explicit `new Date(dateTo + 'T23:59:59.999Z')` *(Medium)*
 
 ### Onboarding
 
-- [ ] **ONB-FIX-01**: Add missing `software_used TEXT` column to businesses table via migration *(Medium)*
+- [x] **ONB-FIX-01**: Add missing `software_used TEXT` column to businesses table via migration *(Medium)*
 
 ### Jobs
 
-- [ ] **JOBS-FIX-01**: Wire column header sort click handlers using TanStack `header.column.getToggleSortingHandler()` *(Low)*
+- [x] **JOBS-FIX-01**: Wire column header sort click handlers using TanStack `header.column.getToggleSortingHandler()` *(Low)*
 
 ### Public Form
 
-- [ ] **FORM-FIX-01**: Increase ServiceTypeSelect trigger height from h-10 (40px) to h-12 (48px) to meet 44px touch target minimum *(Low)*
+- [x] **FORM-FIX-01**: Increase ServiceTypeSelect trigger height from h-10 (40px) to h-11 (44px) to meet 44px touch target minimum *(Low)*
 
 ## Out of Scope
 
@@ -55,12 +55,12 @@ All requirements are bug fixes discovered during the v3.1 QA E2E Audit. Each has
 | CAMP-FIX-02 | Phase 68 | Complete |
 | CAMP-FIX-03 | Phase 68 | Complete |
 | CAMP-FIX-04 | Phase 68 | Complete |
-| DASH-FIX-01 | Phase 69 | Pending |
-| DASH-FIX-02 | Phase 69 | Pending |
-| HIST-FIX-01 | Phase 69 | Pending |
-| ONB-FIX-01 | Phase 69 | Pending |
-| JOBS-FIX-01 | Phase 69 | Pending |
-| FORM-FIX-01 | Phase 69 | Pending |
+| DASH-FIX-01 | Phase 69 | Complete |
+| DASH-FIX-02 | Phase 69 | Complete |
+| HIST-FIX-01 | Phase 69 | Complete |
+| ONB-FIX-01 | Phase 69 | Complete |
+| JOBS-FIX-01 | Phase 69 | Complete |
+| FORM-FIX-01 | Phase 69 | Complete |
 
 **Coverage:**
 - v3.1.1 requirements: 10 total
@@ -69,4 +69,4 @@ All requirements are bug fixes discovered during the v3.1 QA E2E Audit. Each has
 
 ---
 *Requirements defined: 2026-03-03*
-*Last updated: 2026-03-04 after Phase 68 execution*
+*Last updated: 2026-03-04 after Phase 69 execution — all requirements complete*

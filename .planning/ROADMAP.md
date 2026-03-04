@@ -22,7 +22,7 @@ AvisLoop is a review follow-up system for home service businesses. v1.0 through 
 - **v2.5.4 Code Review (Phases 41-44)** - Phases 50-51 (complete 2026-02-27)
 - **v3.0 Agency Mode** - Phases 52-58 (complete 2026-02-27)
 - **v3.1 QA E2E Audit** - Phases 59-67 (complete 2026-03-03)
-- **v3.1.1 QA Bug Fixes** - Phases 68-69 (in progress)
+- **v3.1.1 QA Bug Fixes** - Phases 68-69 (complete 2026-03-04)
 
 ## Phases
 
@@ -990,10 +990,10 @@ Plans:
   4. The onboarding CRM platform step successfully saves the selected software to the database -- the software_used column exists on the businesses table
   5. Clicking a column header on the Jobs table toggles sort order for that column -- ascending, descending, and unsorted states cycle correctly
   6. The ServiceTypeSelect trigger element has a minimum height of 44px -- meeting the WCAG touch target accessibility requirement
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 69-01-PLAN.md -- Fix KPI navigation, mobile overflow, timezone bug, software_used column, sort handlers, touch target
+- [x] 69-01-PLAN.md -- Fix KPI navigation, mobile overflow, timezone bug, software_used column, sort handlers, touch target
 
 ---
 
@@ -1067,5 +1067,5 @@ See individual phase sections above for requirements, success criteria, and depe
 | **67** | **v3.1 QA E2E Audit** | **3/3** | **Complete** | **2026-03-03** |
 
 | **68** | **v3.1.1 QA Bug Fixes** | **1/1** | **Complete** | **2026-03-04** |
-| 69 | v3.1.1 QA Bug Fixes | 0/TBD | Not started | - |
-**Total:** 259 plans complete across shipped phases.
+| **69** | **v3.1.1 QA Bug Fixes** | **1/1** | **Complete** | **2026-03-04** |
+**Total:** 261 plans complete across shipped phases.
