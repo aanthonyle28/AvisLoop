@@ -16,6 +16,7 @@ import {
   createNewBusinessCampaign,
   saveNewBusinessBrandVoice,
   completeNewBusinessOnboarding,
+  deleteIncompleteNewBusiness,
 } from '@/lib/actions/create-additional-business'
 import { switchBusiness } from '@/lib/actions/active-business'
 import { CAMPAIGN_PRESETS } from '@/lib/constants/campaigns'
@@ -25,6 +26,7 @@ import {
   type ServiceTypeValue,
 } from '@/lib/validations/job'
 import { BRAND_VOICE_PRESETS, type BrandVoicePresetKey } from '@/lib/validations/onboarding'
+import { X } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import type { CampaignWithTouches } from '@/lib/types/database'
@@ -526,6 +528,7 @@ export function CreateBusinessWizard({ campaignPresets }: CreateBusinessWizardPr
   const router = useRouter()
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [newBusinessId, setNewBusinessId] = useState<string | null>(null)
+  const [isCancelling, startCancelTransition] = useTransition()
 
   const handleStep1Complete = (businessId: string) => {
     setNewBusinessId(businessId)
@@ -555,6 +558,16 @@ export function CreateBusinessWizard({ campaignPresets }: CreateBusinessWizardPr
     router.push('/dashboard')
   }
 
+  const handleCancel = () => {
+    startCancelTransition(async () => {
+      // If a business was already created (step 2+), clean it up
+      if (newBusinessId) {
+        await deleteIncompleteNewBusiness(newBusinessId)
+      }
+      router.push('/businesses')
+    })
+  }
+
   const handleGoBackToStep1 = () => {
     setStep(1)
   }
@@ -565,6 +578,20 @@ export function CreateBusinessWizard({ campaignPresets }: CreateBusinessWizardPr
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 pb-20">
+      {/* Cancel button — top right */}
+      <div className="fixed top-4 right-4 z-50">
+        <button
+          type="button"
+          onClick={handleCancel}
+          disabled={isCancelling}
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+          aria-label="Cancel and go back"
+        >
+          <X size={16} weight="bold" />
+          Cancel
+        </button>
+      </div>
+
       <div className="w-full max-w-lg space-y-8">
         {step === 1 && <BusinessSetupStep onComplete={handleStep1Complete} />}
 

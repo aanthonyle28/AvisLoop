@@ -30,6 +30,11 @@ export function BusinessesClient({ businesses, activeBusinessId }: BusinessesCli
     setSelectedBusiness(updated)
   }
 
+  const handleBusinessDeleted = (businessId: string) => {
+    setLocalBusinesses((prev) => prev.filter((b) => b.id !== businessId))
+    setSelectedBusiness(null)
+  }
+
   return (
     <div className='space-y-6'>
       {/* Page header */}
@@ -80,7 +85,9 @@ export function BusinessesClient({ businesses, activeBusinessId }: BusinessesCli
         onOpenChange={setDrawerOpen}
         business={selectedBusiness}
         isActive={selectedBusiness?.id === activeBusinessId}
+        businessCount={localBusinesses.length}
         onBusinessUpdated={handleBusinessUpdated}
+        onBusinessDeleted={handleBusinessDeleted}
       />
     </div>
   )

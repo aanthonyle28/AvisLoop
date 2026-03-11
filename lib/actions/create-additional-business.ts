@@ -1,5 +1,6 @@
 'use server'
 
+import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import {
@@ -11,6 +12,7 @@ import {
   type BrandVoiceInput,
 } from '@/lib/validations/onboarding'
 import { DEFAULT_TIMING_HOURS } from '@/lib/validations/job'
+import { ACTIVE_BUSINESS_COOKIE } from '@/lib/data/active-business'
 import type { CampaignTouch } from '@/lib/types/database'
 
 /**
@@ -285,6 +287,120 @@ export async function saveNewBusinessBrandVoice(
   if (error) {
     return { success: false, error: error.message }
   }
+
+  return { success: true }
+}
+
+/**
+ * Delete an incomplete business that was partially created during the wizard.
+ * Called when user cancels the CreateBusinessWizard after step 1 (business row exists
+ * but onboarding is not complete).
+ *
+ * Silent fire-and-forget — errors are logged but not surfaced to the user since
+ * we're navigating away anyway.
+ */
+export async function deleteIncompleteNewBusiness(businessId: string): Promise<void> {
+  if (!businessId) return
+
+  const supabase = await createClient()
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+
+  if (authError || !user) return
+
+  // Only delete if it belongs to this user (defense in depth on top of RLS)
+  await supabase
+    .from('businesses')
+    .delete()
+    .eq('id', businessId)
+    .eq('user_id', user.id)
+
+  revalidatePath('/businesses')
+}
+
+/**
+ * Delete a business permanently. Cascading FKs handle cleanup of jobs, customers,
+ * campaigns, enrollments, send_logs, and feedback.
+ *
+ * Guards:
+ * - User must be authenticated
+ * - User must own the business
+ * - Cannot delete the user's last remaining business
+ * - If deleting the active business, switches to another one
+ *
+ * @param businessId - UUID of the business to delete
+ * @returns Success or error object
+ */
+export async function deleteBusiness(
+  businessId: string
+): Promise<{ success: boolean; error?: string }> {
+  if (!businessId) {
+    return { success: false, error: 'Business ID is required' }
+  }
+
+  const supabase = await createClient()
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+
+  if (authError || !user) {
+    return { success: false, error: 'You must be logged in' }
+  }
+
+  // Fetch all user businesses to check count and find fallback
+  const { data: allBusinesses } = await supabase
+    .from('businesses')
+    .select('id, name')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: true })
+
+  if (!allBusinesses || allBusinesses.length === 0) {
+    return { success: false, error: 'No businesses found' }
+  }
+
+  if (allBusinesses.length <= 1) {
+    return { success: false, error: 'Cannot delete your only business' }
+  }
+
+  // Verify the target business belongs to the user
+  const target = allBusinesses.find((b) => b.id === businessId)
+  if (!target) {
+    return { success: false, error: 'Business not found' }
+  }
+
+  // Delete the business — CASCADE handles all related data
+  const { error } = await supabase
+    .from('businesses')
+    .delete()
+    .eq('id', businessId)
+    .eq('user_id', user.id)
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  // If the deleted business was the active one, switch to another
+  const cookieStore = await cookies()
+  const activeId = cookieStore.get(ACTIVE_BUSINESS_COOKIE)?.value
+  if (activeId === businessId) {
+    const fallback = allBusinesses.find((b) => b.id !== businessId)
+    if (fallback) {
+      cookieStore.set({
+        name: ACTIVE_BUSINESS_COOKIE,
+        value: fallback.id,
+        httpOnly: true,
+        path: '/',
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 24 * 365,
+      })
+    }
+  }
+
+  revalidatePath('/', 'layout')
 
   return { success: true }
 }

@@ -15,13 +15,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
-import { PencilSimple, ArrowsClockwise, Star } from '@phosphor-icons/react'
+import { PencilSimple, ArrowsClockwise, Star, Trash } from '@phosphor-icons/react'
 import { format, parseISO } from 'date-fns'
 import { toast } from 'sonner'
 import type { Business } from '@/lib/types/database'
 import type { BusinessMetadataInput } from '@/lib/validations/business-metadata'
 import { updateBusinessMetadata, updateBusinessNotes } from '@/lib/actions/business-metadata'
 import { switchBusiness } from '@/lib/actions/active-business'
+import { DeleteBusinessDialog } from '@/components/businesses/delete-business-dialog'
 import { cn } from '@/lib/utils'
 
 interface BusinessDetailDrawerProps {
@@ -29,7 +30,9 @@ interface BusinessDetailDrawerProps {
   onOpenChange: (open: boolean) => void
   business: Business | null
   isActive: boolean
+  businessCount: number
   onBusinessUpdated: (updated: Business) => void
+  onBusinessDeleted: (businessId: string) => void
 }
 
 export function BusinessDetailDrawer({
@@ -37,11 +40,14 @@ export function BusinessDetailDrawer({
   onOpenChange,
   business,
   isActive,
+  businessCount,
   onBusinessUpdated,
+  onBusinessDeleted,
 }: BusinessDetailDrawerProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isSwitching, setIsSwitching] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [formData, setFormData] = useState<Partial<BusinessMetadataInput>>({})
 
   // Notes auto-save state — exact pattern from customer-detail-drawer.tsx
@@ -566,8 +572,32 @@ export function BusinessDetailDrawer({
               {isSwitching ? 'Switching...' : 'Switch to this business'}
             </Button>
           )}
+          {businessCount > 1 && (
+            <Button
+              onClick={() => setDeleteDialogOpen(true)}
+              variant='ghost'
+              className='w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10'
+            >
+              <Trash className='mr-2 h-4 w-4' />
+              Delete Business
+            </Button>
+          )}
         </SheetFooter>
       </SheetContent>
+
+      {/* Delete confirmation dialog */}
+      {business && (
+        <DeleteBusinessDialog
+          businessId={business.id}
+          businessName={business.name}
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          onDeleted={() => {
+            onOpenChange(false)
+            onBusinessDeleted(business.id)
+          }}
+        />
+      )}
     </Sheet>
   )
 }
