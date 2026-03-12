@@ -260,7 +260,7 @@ export function BusinessDetailDrawer({
                       {business.google_rating_start !== null ? (
                         <>
                           <Star size={12} weight='fill' className='text-amber-400' />
-                          {business.google_rating_start.toFixed(1)}
+                          {Number(business.google_rating_start).toFixed(1)}
                         </>
                       ) : (
                         <span className='text-muted-foreground'>Not set</span>
@@ -273,7 +273,7 @@ export function BusinessDetailDrawer({
                       {business.google_rating_current !== null ? (
                         <>
                           <Star size={12} weight='fill' className='text-amber-400' />
-                          {business.google_rating_current.toFixed(1)}
+                          {Number(business.google_rating_current).toFixed(1)}
                         </>
                       ) : (
                         <span className='text-muted-foreground'>Not set</span>
@@ -475,7 +475,7 @@ export function BusinessDetailDrawer({
                     <span className='text-muted-foreground'>Monthly Fee</span>
                     <span className='font-medium'>
                       {business.monthly_fee !== null ? (
-                        `$${business.monthly_fee.toFixed(2)}`
+                        `$${Number(business.monthly_fee).toFixed(2)}`
                       ) : (
                         <span className='text-muted-foreground'>Not set</span>
                       )}

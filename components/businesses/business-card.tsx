@@ -20,8 +20,10 @@ export function BusinessCard({ business, isActive }: BusinessCardProps) {
     ? `${formatServiceType(primaryType)}${overflowCount > 0 ? ` +${overflowCount}` : ''}`
     : 'No services'
 
-  // Google rating display
-  const rating = business.google_rating_current
+  // Google rating display — NUMERIC columns come back as strings from PostgREST
+  const rating = business.google_rating_current !== null
+    ? Number(business.google_rating_current)
+    : null
 
   // Reviews gained: current - start (null if both are null)
   const reviewCountCurrent = business.review_count_current

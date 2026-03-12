@@ -87,7 +87,7 @@ export function AuditResults({ report }: AuditResultsProps) {
             </p>
             {report.rating_snapshot != null ? (
               <p className="text-2xl font-bold">
-                {report.rating_snapshot.toFixed(1)}
+                {Number(report.rating_snapshot).toFixed(1)}
               </p>
             ) : (
               <p className="text-sm text-muted-foreground">No rating</p>

@@ -32,7 +32,7 @@ export async function getBusiness(businessId: string): Promise<BusinessWithTempl
       )
     `)
     .eq('id', businessId)
-    .single()
+    .maybeSingle()
 
   return business
 }
@@ -72,7 +72,7 @@ export async function getServiceTypeSettings(businessId: string): Promise<{
     .from('businesses')
     .select('service_types_enabled, service_type_timing, custom_service_names')
     .eq('id', businessId)
-    .single()
+    .maybeSingle()
 
   if (!business) return null
 

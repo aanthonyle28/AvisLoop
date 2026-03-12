@@ -38,7 +38,7 @@ export async function getActiveBusiness(): Promise<Business | null> {
       .select('*')
       .eq('id', activeId)
       .eq('user_id', user.id)
-      .single()
+      .maybeSingle()
 
     if (business) {
       return business
