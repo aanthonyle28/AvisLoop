@@ -34,8 +34,17 @@ export function BusinessSwitcher() {
     startTransition(async () => {
       const result = await switchBusiness(id)
       if (result?.error) {
+        if (result.error === 'Not authenticated') {
+          router.push('/login')
+          return
+        }
         toast.error('Failed to switch business')
+        return
       }
+      // Force full re-fetch of all server components so the new business
+      // context is picked up. revalidatePath alone isn't sufficient on Vercel
+      // because the client-side router may serve stale RSC payloads.
+      router.refresh()
     })
   }
 

@@ -24,15 +24,14 @@ export async function switchBusiness(businessId: string): Promise<{ error?: stri
     return { error: 'Not authenticated' }
   }
 
-  // Verify ownership — .single() is correct here because we query by primary key with
-  // ownership check, which always returns exactly 0 or 1 rows. The PGRST116 error on
-  // 0 rows is the desired "not found" signal.
+  // Verify ownership — use .maybeSingle() to return null gracefully instead of
+  // throwing PGRST116 when the business doesn't exist or isn't owned by the user.
   const { data: business } = await supabase
     .from('businesses')
     .select('id')
     .eq('id', businessId)
     .eq('user_id', user.id)
-    .single()
+    .maybeSingle()
 
   if (!business) {
     return { error: 'Business not found' }

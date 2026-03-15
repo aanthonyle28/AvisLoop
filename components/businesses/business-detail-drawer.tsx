@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   Sheet,
   SheetContent,
@@ -44,6 +45,7 @@ export function BusinessDetailDrawer({
   onBusinessUpdated,
   onBusinessDeleted,
 }: BusinessDetailDrawerProps) {
+  const router = useRouter()
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isSwitching, setIsSwitching] = useState(false)
@@ -144,6 +146,10 @@ export function BusinessDetailDrawer({
     if (!result.error) {
       toast.success(`Switched to ${business.name}`)
       onOpenChange(false)
+      // Force full re-fetch so new business context is picked up in production
+      router.refresh()
+    } else if (result.error === 'Not authenticated') {
+      router.push('/login')
     } else {
       toast.error(result.error)
     }
