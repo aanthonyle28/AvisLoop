@@ -29,10 +29,10 @@ export default async function IntakePage({ params }: Props) {
 
   const supabase = createServiceRoleClient()
 
-  // Resolve agency from intake_token
+  // Validate token exists (don't need business details — form creates a NEW business)
   const { data: business } = await supabase
     .from('businesses')
-    .select('id, name')
+    .select('id')
     .eq('intake_token', token)
     .single()
 
@@ -41,10 +41,7 @@ export default async function IntakePage({ params }: Props) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 flex items-center justify-center p-4">
       <div className="w-full max-w-lg">
-        <ClientIntakeForm
-          agencyName={business.name}
-          token={token}
-        />
+        <ClientIntakeForm token={token} />
       </div>
     </div>
   )

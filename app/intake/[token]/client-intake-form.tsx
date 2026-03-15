@@ -17,11 +17,10 @@ import {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 interface ClientIntakeFormProps {
-  agencyName: string
   token: string
 }
 
-export function ClientIntakeForm({ agencyName, token }: ClientIntakeFormProps) {
+export function ClientIntakeForm({ token }: ClientIntakeFormProps) {
   const [submitted, setSubmitted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -115,7 +114,7 @@ export function ClientIntakeForm({ agencyName, token }: ClientIntakeFormProps) {
         </div>
         <h2 className="text-2xl font-bold">You&apos;re all set!</h2>
         <p className="text-muted-foreground">
-          Your business has been added to {agencyName}&apos;s account. They&apos;ll take it from here.
+          Your business details have been submitted. We&apos;ll take it from here.
         </p>
       </div>
     )
@@ -127,7 +126,7 @@ export function ClientIntakeForm({ agencyName, token }: ClientIntakeFormProps) {
     <div className="bg-card border rounded-xl shadow-sm p-6 sm:p-8 space-y-6">
       {/* Header */}
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-bold">Welcome to {agencyName}</h1>
+        <h1 className="text-2xl font-bold">Client Intake</h1>
         <p className="text-muted-foreground">
           Fill in your business details to get started with automated review management.
         </p>
