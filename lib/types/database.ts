@@ -59,6 +59,8 @@ export interface Business {
   brand_voice: string | null
   // Public job completion form token (generated on demand via Settings)
   form_token: string | null
+  // Public client intake form token (generated on demand via Businesses page)
+  intake_token: string | null
 }
 
 // Message channel literal union

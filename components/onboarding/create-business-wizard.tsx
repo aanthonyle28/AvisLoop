@@ -27,6 +27,7 @@ import {
 } from '@/lib/validations/job'
 import { BRAND_VOICE_PRESETS, type BrandVoicePresetKey } from '@/lib/validations/onboarding'
 import { X } from '@phosphor-icons/react'
+import { Checkbox } from '@/components/ui/checkbox'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import type { CampaignWithTouches } from '@/lib/types/database'
@@ -509,24 +510,118 @@ function BrandVoiceCreateStep({ newBusinessId, onComplete, onGoBack }: Step3Prop
   )
 }
 
+// ─── Step 4: SMS Consent ────────────────────────────────────────────────────
+
+interface Step4Props {
+  onComplete: () => void
+  onGoBack: () => void
+}
+
+function SMSConsentCreateStep({ onComplete, onGoBack }: Step4Props) {
+  const [acknowledged, setAcknowledged] = useState(false)
+  const [isPending, startTransition] = useTransition()
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!acknowledged) {
+      toast.error('You must acknowledge SMS consent requirements to continue')
+      return
+    }
+    startTransition(async () => {
+      onComplete()
+    })
+  }
+
+  return (
+    <div className="space-y-8">
+      {/* Heading */}
+      <div className="text-center space-y-2">
+        <h1 className="text-3xl font-bold">SMS consent requirements</h1>
+        <p className="text-muted-foreground text-lg">
+          Important information about sending text messages to customers
+        </p>
+      </div>
+
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Info card with TCPA requirements */}
+        <div className="border rounded-lg p-6 bg-card space-y-4">
+          <h3 className="font-semibold text-lg">Key requirements:</h3>
+          <ul className="space-y-3 list-disc list-inside text-sm">
+            <li>
+              You must have written consent from customers before sending SMS messages
+            </li>
+            <li>
+              Customers can opt out at any time by replying STOP
+            </li>
+            <li>
+              You must keep records of when and how consent was obtained (TCPA compliance)
+            </li>
+            <li>
+              Messages will only be sent during business hours (8 AM - 9 PM local time)
+            </li>
+          </ul>
+        </div>
+
+        {/* Acknowledgment checkbox */}
+        <div className="border border-info-border bg-info-bg rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <Checkbox
+              id="create-biz-sms-consent"
+              checked={acknowledged}
+              onCheckedChange={(checked) => setAcknowledged(checked === true)}
+              className="mt-0.5"
+            />
+            <Label
+              htmlFor="create-biz-sms-consent"
+              className="text-sm cursor-pointer leading-relaxed"
+            >
+              I understand that I must obtain written consent from customers before sending them SMS messages, and I will maintain records of consent as required by TCPA regulations.
+            </Label>
+          </div>
+        </div>
+
+        {/* Button row */}
+        <div className="flex gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onGoBack}
+            disabled={isPending}
+            className="flex-1 h-12 text-base"
+          >
+            Back
+          </Button>
+          <Button
+            type="submit"
+            disabled={isPending || !acknowledged}
+            className="flex-1 h-12 text-base"
+          >
+            {isPending ? 'Completing...' : 'Complete Setup'}
+          </Button>
+        </div>
+      </form>
+    </div>
+  )
+}
+
 // ─── Wizard Shell ─────────────────────────────────────────────────────────────
 
 /**
- * CreateBusinessWizard — 3-step wizard for adding a second/nth business.
+ * CreateBusinessWizard — 4-step wizard for adding a second/nth business.
  *
  * Step 1: Business Setup (name, phone, services)
  * Step 2: Campaign Preset
  * Step 3: Brand Voice (skippable)
+ * Step 4: SMS Consent
  *
  * Calls ONLY the scoped server actions from create-additional-business.ts.
  * NEVER calls saveBusinessBasics, saveServicesOffered, createCampaignFromPreset,
  * acknowledgeSMSConsent, or markOnboardingComplete.
- *
- * No localStorage draft persistence (intentional — wizard is only 3 steps).
  */
 export function CreateBusinessWizard({ campaignPresets }: CreateBusinessWizardProps) {
   const router = useRouter()
-  const [step, setStep] = useState<1 | 2 | 3>(1)
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1)
   const [newBusinessId, setNewBusinessId] = useState<string | null>(null)
   const [isCancelling, startCancelTransition] = useTransition()
 
@@ -540,6 +635,10 @@ export function CreateBusinessWizard({ campaignPresets }: CreateBusinessWizardPr
   }
 
   const handleStep3Complete = () => {
+    setStep(4)
+  }
+
+  const handleStep4Complete = () => {
     if (!newBusinessId) return
     handleAutoComplete(newBusinessId)
   }
@@ -574,6 +673,10 @@ export function CreateBusinessWizard({ campaignPresets }: CreateBusinessWizardPr
 
   const handleGoBackToStep2 = () => {
     setStep(2)
+  }
+
+  const handleGoBackToStep3 = () => {
+    setStep(3)
   }
 
   return (
@@ -611,10 +714,17 @@ export function CreateBusinessWizard({ campaignPresets }: CreateBusinessWizardPr
             onGoBack={handleGoBackToStep2}
           />
         )}
+
+        {step === 4 && newBusinessId && (
+          <SMSConsentCreateStep
+            onComplete={handleStep4Complete}
+            onGoBack={handleGoBackToStep3}
+          />
+        )}
       </div>
 
       {/* Progress bar fixed at bottom */}
-      <OnboardingProgress currentStep={step} totalSteps={3} />
+      <OnboardingProgress currentStep={step} totalSteps={4} />
     </div>
   )
 }
