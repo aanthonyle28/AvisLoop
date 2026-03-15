@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Skeleton } from '@/components/ui/skeleton'
+import { SmsConsentForm } from '@/components/customers/sms-consent-form'
 import { CustomerAutocomplete } from './customer-autocomplete'
 import { ServiceTypeSelect } from './service-type-select'
 import { CampaignSelector, CAMPAIGN_DO_NOT_SEND, CAMPAIGN_ONE_OFF } from './campaign-selector'
@@ -66,6 +67,9 @@ export function AddJobSheet({ open, onOpenChange, customers, isLoadingData }: Ad
   const [status, setStatus] = useState<JobStatus>('scheduled')
   const [notes, setNotes] = useState('')
 
+  // SMS consent (for new customers, defaults to consented)
+  const [smsConsent, setSmsConsent] = useState({ consented: true, method: '', notes: '' })
+
   // Campaign choice: campaign UUID, CAMPAIGN_DO_NOT_SEND, or CAMPAIGN_ONE_OFF
   const [campaignChoice, setCampaignChoice] = useState<string | null>(null)
 
@@ -80,6 +84,7 @@ export function AddJobSheet({ open, onOpenChange, customers, isLoadingData }: Ad
       setServiceType('')
       setStatus('scheduled')
       setNotes('')
+      setSmsConsent({ consented: true, method: '', notes: '' })
       setCampaignChoice(null)
     }
   }, [open])
@@ -129,6 +134,11 @@ export function AddJobSheet({ open, onOpenChange, customers, isLoadingData }: Ad
       formData.set('customerEmail', customerEmail)
       formData.set('customerPhone', customerPhone)
     }
+
+    // SMS consent (applies to new inline customers)
+    formData.set('smsConsented', smsConsent.consented ? 'true' : 'false')
+    if (smsConsent.method) formData.set('smsConsentMethod', smsConsent.method)
+    if (smsConsent.notes) formData.set('smsConsentNotes', smsConsent.notes)
 
     formData.set('serviceType', serviceType)
     formData.set('notes', notes)
@@ -313,6 +323,15 @@ export function AddJobSheet({ open, onOpenChange, customers, isLoadingData }: Ad
                   <p className="text-sm text-destructive">{state.fieldErrors.notes[0]}</p>
                 )}
               </div>
+
+              {/* SMS Consent */}
+              <SmsConsentForm
+                initialConsented={smsConsent.consented}
+                onConsentChange={(consented, method, notes) =>
+                  setSmsConsent({ consented, method: method || '', notes: notes || '' })
+                }
+                mode="inline"
+              />
             </div>
           </SheetBody>
 

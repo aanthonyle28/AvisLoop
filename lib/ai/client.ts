@@ -17,6 +17,7 @@ const google = createGoogleGenerativeAI({
 
 // OpenRouter provider for DeepSeek V3 - 5% of calls
 // Uses OpenAI-compatible API with custom baseURL
+// If structured output fails, fallback chain uses GPT-4o-mini instead
 const openrouter = createOpenAI({
   apiKey: process.env.OPENROUTER_API_KEY,
   baseURL: 'https://openrouter.ai/api/v1',
@@ -27,9 +28,9 @@ const openrouter = createOpenAI({
 // ============================================================
 
 export const MODELS = {
-  GEMINI_FLASH: 'gemini-2.0-flash',
+  GEMINI_FLASH: 'gemini-2.5-flash',
   GPT_4O_MINI: 'gpt-4o-mini',
-  DEEPSEEK_V3: 'deepseek/deepseek-chat-v3-0324',
+  DEEPSEEK_V3: 'deepseek/deepseek-chat-v3.1',
 } as const
 
 export type ModelId = typeof MODELS[keyof typeof MODELS]

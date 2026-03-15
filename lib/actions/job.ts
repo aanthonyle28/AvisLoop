@@ -54,6 +54,9 @@ export async function createJob(
   const enrollInCampaign = enrollInCampaignValue === 'true' || enrollInCampaignValue === null
   const campaignId = formData.get('campaignId') as string | null
   const campaignOverride = formData.get('campaignOverride') as string | null
+  const smsConsented = formData.get('smsConsented') as string | null
+  const smsConsentMethod = formData.get('smsConsentMethod') as string | null
+  const smsConsentNotes = formData.get('smsConsentNotes') as string | null
 
   // Defensive check: service type must be provided and valid before Zod validation
   if (!serviceType) {
@@ -82,6 +85,8 @@ export async function createJob(
       // Create new customer as side effect
       const phoneResult = customerPhone ? parseAndValidatePhone(customerPhone) : null
 
+      const consentStatus = smsConsented === 'true' ? 'opted_in' : smsConsented === 'false' ? 'opted_out' : 'unknown'
+
       const { data: newCustomer, error: customerError } = await supabase
         .from('customers')
         .insert({
@@ -92,7 +97,13 @@ export async function createJob(
           phone_status: phoneResult?.status || 'missing',
           status: 'active',
           opted_out: false,
-          sms_consent_status: 'unknown',
+          sms_consent_status: consentStatus,
+          ...(consentStatus !== 'unknown' ? {
+            sms_consent_at: new Date().toISOString(),
+            sms_consent_source: 'job_creation',
+            sms_consent_method: smsConsentMethod || null,
+            sms_consent_notes: smsConsentNotes || null,
+          } : {}),
           tags: [],
         })
         .select('id')
