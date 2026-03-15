@@ -1,5 +1,6 @@
 'use server'
 
+import { randomBytes } from 'crypto'
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { getActiveBusiness } from '@/lib/data/active-business'
@@ -37,10 +38,14 @@ export async function markOnboardingComplete(): Promise<{
 
   const supabase = await createClient()
 
+  // Auto-generate intake_token if not already set
+  const intakeToken = business.intake_token || randomBytes(24).toString('base64url')
+
   const { error } = await supabase
     .from('businesses')
     .update({
-      onboarding_completed_at: new Date().toISOString()
+      onboarding_completed_at: new Date().toISOString(),
+      ...(business.intake_token ? {} : { intake_token: intakeToken }),
     })
     .eq('id', business.id)
 

@@ -1,5 +1,6 @@
 'use server'
 
+import { randomBytes } from 'crypto'
 import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
@@ -226,12 +227,16 @@ export async function completeNewBusinessOnboarding(
     return { success: false, error: 'You must be logged in' }
   }
 
+  // Auto-generate intake_token for this new business
+  const intakeToken = randomBytes(24).toString('base64url')
+
   const { error } = await supabase
     .from('businesses')
     .update({
       sms_consent_acknowledged: true,
       sms_consent_acknowledged_at: new Date().toISOString(),
       onboarding_completed_at: new Date().toISOString(),
+      intake_token: intakeToken,
     })
     .eq('id', businessId)
     .eq('user_id', user.id)
