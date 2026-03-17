@@ -15,6 +15,10 @@ export const metadata: Metadata = {
     template: "%s | AvisLoop",
   },
   description: "Simple review requests for busy businesses. Get more reviews without the hassle.",
+  icons: {
+    icon: "/icon.svg",
+    apple: "/apple-icon.png",
+  },
 };
 
 const kumbhSans = Kumbh_Sans({
