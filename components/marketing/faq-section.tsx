@@ -8,7 +8,7 @@ const faqs = [
   {
     question: "How does AvisLoop's managed review service work?",
     answer:
-      "We handle everything. After your free audit, we connect your Google Business Profile, build your review campaigns, and map your competitors. You just submit a quick form after each job — name, contact info, service type. We take it from there: automated follow-ups, AI review responses, and monthly performance reports.",
+      "We handle everything. After a quick onboarding call, we connect your Google Business Profile, build your review campaigns, and map your competitors. You just submit a quick form after each job — name, contact info, service type. We take it from there: automated follow-ups, AI review responses, and monthly performance reports.",
   },
   {
     question: "What do I actually need to do as a business owner?",

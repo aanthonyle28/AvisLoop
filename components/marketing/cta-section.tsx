@@ -11,9 +11,8 @@ export function CTASection() {
           </h2>
 
           <p className="text-primary-foreground/60 text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
-            In 15 minutes, we&apos;ll audit your Google profile, map your
-            top competitors, and show you exactly how many reviews you need
-            to close the gap. No pitch, no pressure.
+            In 15 minutes, we&apos;ll walk you through how it works, answer
+            your questions, and get you set up. No pitch, no pressure.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -22,7 +21,7 @@ export function CTASection() {
               className="bg-accent hover:bg-accent/90 text-white motion-safe:hover:-translate-y-0.5"
               asChild
             >
-              <Link href="/#pricing">Book Your Free Reputation Audit</Link>
+              <Link href="https://calendly.com/anthony-le-avisloop/avisloop-demo-onboarding-call" target="_blank" rel="noopener noreferrer">Book a Call</Link>
             </Button>
             <Button
               size="lg"
@@ -35,7 +34,7 @@ export function CTASection() {
           </div>
 
           <p className="text-primary-foreground/40 text-xs mt-8 tracking-wide">
-            Takes 15 minutes &middot; No commitment &middot; Cancel anytime
+            Free 15-minute call &middot; No commitment &middot; Cancel anytime
           </p>
         </div>
       </div>

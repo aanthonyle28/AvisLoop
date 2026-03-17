@@ -39,7 +39,7 @@ export function HeroV2() {
                   size="lg"
                   className="bg-accent hover:bg-accent/90 text-white"
                 >
-                  <Link href="/#pricing">Book Your Free Reputation Audit</Link>
+                  <Link href="https://calendly.com/anthony-le-avisloop/avisloop-demo-onboarding-call" target="_blank" rel="noopener noreferrer">Book a Call</Link>
                 </Button>
                 <Button
                   asChild

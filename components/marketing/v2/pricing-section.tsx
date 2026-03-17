@@ -69,14 +69,14 @@ export function PricingSection() {
                 size="lg"
                 className="w-full bg-accent hover:bg-accent/90 text-white"
               >
-                <Link href="/#pricing">
-                  Book Your Free Reputation Audit
+                <Link href="https://calendly.com/anthony-le-avisloop/avisloop-demo-onboarding-call" target="_blank" rel="noopener noreferrer">
+                  Book a Call
                 </Link>
               </Button>
 
               <div className="mt-5 flex items-center justify-center gap-2 text-xs text-muted-foreground">
                 <ShieldCheck weight="fill" className="h-4 w-4 text-accent/60" />
-                <span>Free 15-minute audit call &middot; No commitment required</span>
+                <span>Free 15-minute call &middot; No commitment required</span>
               </div>
             </div>
 

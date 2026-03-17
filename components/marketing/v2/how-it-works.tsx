@@ -13,7 +13,7 @@ const steps = [
     step: '01',
     title: 'We Set Everything Up',
     description:
-      'Book your free audit. We connect your Google profile, configure your campaigns, and map your competitors.',
+      'Book a quick call. We connect your Google profile, configure your campaigns, and map your competitors.',
   },
   {
     icon: ClipboardText,
