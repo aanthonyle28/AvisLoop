@@ -38,7 +38,7 @@ const tiers: Tier[] = [
       "No credit card required",
     ],
     cta: "Start Free Trial",
-    href: "/auth/sign-up",
+    href: "https://calendly.com/anthony-le-avisloop/avisloop-demo-onboarding-call",
   },
   {
     name: "Basic",
@@ -52,8 +52,8 @@ const tiers: Tier[] = [
       "Campaign analytics",
       "Email support",
     ],
-    cta: "Get Started",
-    href: "/auth/sign-up",
+    cta: "Book a Call",
+    href: "https://calendly.com/anthony-le-avisloop/avisloop-demo-onboarding-call",
     recommended: true,
   },
   {
@@ -68,8 +68,8 @@ const tiers: Tier[] = [
       "Priority support",
       "Advanced analytics",
     ],
-    cta: "Upgrade to Pro",
-    href: "/auth/sign-up",
+    cta: "Book a Call",
+    href: "https://calendly.com/anthony-le-avisloop/avisloop-demo-onboarding-call",
   },
 ];
 
@@ -121,7 +121,7 @@ export function PricingTable() {
               variant={tier.recommended ? "default" : "outline"}
               className="w-full"
             >
-              <Link href={tier.href}>{tier.cta}</Link>
+              <Link href={tier.href} target="_blank" rel="noopener noreferrer">{tier.cta}</Link>
             </Button>
           </CardFooter>
         </InteractiveCard>

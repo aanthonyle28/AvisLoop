@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-// Redirect to the template's auth/sign-up page
+// Signup disabled — agency-only model, no self-serve signups
 export default function SignupPage() {
-  redirect("/auth/sign-up");
+  redirect("/auth/login");
 }

@@ -71,7 +71,7 @@ export function Hero() {
                 className="text-base px-8 bg-foreground text-background hover:bg-foreground/90"
                 asChild
               >
-                <Link href="/auth/sign-up">Get Started Free</Link>
+                <Link href="https://calendly.com/anthony-le-avisloop/avisloop-demo-onboarding-call" target="_blank" rel="noopener noreferrer">Get Started</Link>
               </Button>
               <Button
                 size="lg"

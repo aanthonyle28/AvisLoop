@@ -1,10 +1,6 @@
-import { AuthSplitLayout } from '@/components/auth/auth-split-layout'
-import { SignUpForm } from '@/components/sign-up-form'
+import { redirect } from 'next/navigation'
 
+// Signup disabled — agency-only model, no self-serve signups
 export default function Page() {
-  return (
-    <AuthSplitLayout>
-      <SignUpForm />
-    </AuthSplitLayout>
-  )
+  redirect('/auth/login')
 }
