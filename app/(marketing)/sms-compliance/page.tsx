@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "SMS Compliance - AvisLoop",
   description:
     "How AvisLoop collects and manages SMS consent for review request messaging. TCPA compliance documentation.",
-  robots: { index: false, follow: false },
+  robots: { index: true, follow: true },
 };
 
 export default function SmsCompliancePage() {
