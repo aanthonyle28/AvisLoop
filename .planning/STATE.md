@@ -10,27 +10,27 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 ## Current Position
 
 Phase: 71 — Bug Fix + Data Model
-Plan: Not started
+Plan: 01 of 1 complete
 Milestone: v4.0 Web Design Agency Pivot
-Status: Roadmap defined, ready to plan Phase 71
+Status: Phase 71 complete — ready for Phase 72
 
-Last activity: 2026-03-18 — Roadmap created for v4.0
+Last activity: 2026-03-19 — Completed 71-01-PLAN.md (data model migrations)
 
 ```
 [Phase 71] [Phase 72] [Phase 73] [Phase 74] [Phase 75]
     |           |           |           |           |
- Next up    Planned    Planned     Planned     Planned
+ COMPLETE   Next up    Planned     Planned     Planned
 ```
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 261
+- Total plans completed (project): 262
 - v3.0 plans completed: 15/15
 - v3.1 plans completed: 17/17
 - v3.1.1 plans completed: 2/2 (COMPLETE)
 - Phase 70 plans completed: 0/3 (in progress)
-- v4.0 plans completed: 0
+- v4.0 plans completed: 1 (Phase 71-01)
 
 *Updated after each plan completion*
 
@@ -49,10 +49,10 @@ Four idempotent migrations must be applied via Supabase Dashboard SQL Editor:
 3. **Phase 70:** `supabase/migrations/20260306_audit_tables.sql`
    - Creates audit_reports and audit_leads tables with RLS + anon GRANTs
 
-4. **Pre-v4.0 (Phase 71 includes this):** `supabase/migrations/20260305000100_add_brand_voice.sql`
-   - Adds brand_voice column to businesses table
-   - Required to fix onboarding error: "Could not find the 'brand_voice' column"
-   - BUG-01 in Phase 71 covers this
+4. **Phase 71 (BUG-01):** `supabase/migrations/20260319000100_apply_brand_voice.sql`
+   - Idempotent re-application of brand_voice column (IF NOT EXISTS)
+   - Fixes onboarding error: "Could not find the 'brand_voice' column"
+   - Also apply: 20260319000200_add_client_type.sql, 20260319000300_create_web_projects.sql, 20260319000400_create_ticket_tables.sql
 
 ### Key Architecture Decisions for v4.0
 
@@ -77,7 +77,7 @@ Four idempotent migrations must be applied via Supabase Dashboard SQL Editor:
 
 ## Session Continuity
 
-Last session: 2026-03-18
-Stopped at: Roadmap created for v4.0 -- ready to plan Phase 71
+Last session: 2026-03-19
+Stopped at: Completed 71-01-PLAN.md — all 4 data model migrations authored
 Resume file: None
-Next action: Run /gsd:plan-phase 71
+Next action: Apply migrations via supabase db push, then run /gsd:execute-phase 72
