@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
-import { ChatCircleText, CheckCircle, Clock, ArrowRight } from '@phosphor-icons/react'
+import { ChatCircleText, CheckCircle, Clock, ArrowRight, Paperclip, X, SpinnerGap } from '@phosphor-icons/react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { PortalTicketThread } from './portal-ticket-thread'
@@ -42,10 +42,68 @@ export function ClientPortal({ token, project, quota, initialTickets }: ClientPo
   const [showForm, setShowForm] = useState(false)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [attachments, setAttachments] = useState<{ name: string; storagePath: string; readUrl: string }[]>([])
+  const [uploading, setUploading] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const projectLabel = project.domain ?? project.client_name ?? 'Your Project'
   const quotaPercent = quota.limit > 0 ? Math.min(100, (quota.used / quota.limit) * 100) : 0
+
+  async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files
+    if (!files?.length) return
+    if (attachments.length + files.length > 5) {
+      toast.error('Maximum 5 files per request')
+      return
+    }
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf']
+
+    for (const file of Array.from(files)) {
+      if (!allowedTypes.includes(file.type)) {
+        toast.error(`${file.name}: File type not allowed`)
+        continue
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error(`${file.name}: Exceeds 10MB limit`)
+        continue
+      }
+
+      setUploading((c) => c + 1)
+      try {
+        const urlRes = await fetch('/api/portal/upload-url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, filename: file.name, contentType: file.type }),
+        })
+        if (!urlRes.ok) {
+          toast.error(`Failed to upload ${file.name}`)
+          continue
+        }
+        const { signedUploadUrl, storagePath, readUrl } = await urlRes.json() as {
+          signedUploadUrl: string; storagePath: string; readUrl: string | null
+        }
+
+        const putRes = await fetch(signedUploadUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': file.type },
+          body: file,
+        })
+        if (!putRes.ok) {
+          toast.error(`Upload failed for ${file.name}`)
+          continue
+        }
+
+        setAttachments((prev) => [...prev, { name: file.name, storagePath, readUrl: readUrl ?? storagePath }])
+      } catch {
+        toast.error(`Upload failed for ${file.name}`)
+      } finally {
+        setUploading((c) => c - 1)
+      }
+    }
+    // Reset input so the same file can be re-selected
+    e.target.value = ''
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -59,7 +117,12 @@ export function ClientPortal({ token, project, quota, initialTickets }: ClientPo
       const res = await fetch('/api/portal/tickets', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, title: title.trim(), description: description.trim() || undefined }),
+        body: JSON.stringify({
+          token,
+          title: title.trim(),
+          description: description.trim() || undefined,
+          attachmentUrls: attachments.length > 0 ? attachments.map((a) => a.storagePath) : undefined,
+        }),
       })
 
       const data = await res.json() as { error?: string; overLimit?: boolean }
@@ -73,6 +136,7 @@ export function ClientPortal({ token, project, quota, initialTickets }: ClientPo
       setShowForm(false)
       setTitle('')
       setDescription('')
+      setAttachments([])
       router.refresh()
     } catch {
       toast.error('Something went wrong. Please try again.')
@@ -160,8 +224,53 @@ export function ClientPortal({ token, project, quota, initialTickets }: ClientPo
                   disabled={isSubmitting}
                 />
               </div>
+              {/* Attachments */}
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-foreground block">
+                  Attachments <span className="text-muted-foreground">(optional — screenshots, PDFs)</span>
+                </label>
+                <label
+                  className="flex items-center gap-2 px-3 py-2 rounded-md border border-dashed border-border text-sm text-muted-foreground cursor-pointer hover:border-foreground/40 transition-colors"
+                >
+                  <Paperclip size={16} />
+                  {uploading > 0 ? (
+                    <span className="flex items-center gap-1.5">
+                      <SpinnerGap size={14} className="animate-spin" />
+                      Uploading {uploading} file{uploading !== 1 ? 's' : ''}...
+                    </span>
+                  ) : (
+                    <span>Add files (PNG, JPG, PDF — max 10MB each)</span>
+                  )}
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/jpeg,image/png,image/gif,image/webp,application/pdf"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                    disabled={isSubmitting || attachments.length >= 5}
+                  />
+                </label>
+                {attachments.length > 0 && (
+                  <ul className="space-y-1">
+                    {attachments.map((file, i) => (
+                      <li key={i} className="flex items-center justify-between rounded-md bg-muted px-3 py-1.5 text-sm">
+                        <span className="truncate max-w-[240px]">{file.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => setAttachments((prev) => prev.filter((_, idx) => idx !== i))}
+                          className="ml-2 text-muted-foreground hover:text-destructive transition-colors"
+                          aria-label={`Remove ${file.name}`}
+                        >
+                          <X size={14} />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
               <div className="flex gap-2">
-                <Button type="submit" disabled={isSubmitting || title.trim().length < 3}>
+                <Button type="submit" disabled={isSubmitting || uploading > 0 || title.trim().length < 3}>
                   {isSubmitting ? 'Submitting...' : 'Submit Request'}
                 </Button>
                 <Button

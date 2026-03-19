@@ -45,6 +45,7 @@ export async function POST(request: NextRequest) {
   }
 
   const { token, title, description } = parsed.data
+  const attachmentUrls = (body as Record<string, unknown>).attachmentUrls as string[] | undefined
 
   const supabase = createServiceRoleClient()
 
@@ -101,6 +102,21 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  // Step 5: Return success
+  // Step 5: If attachments were uploaded, insert a message with them
+  if (attachmentUrls?.length && result.ticket_id) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any)
+      .from('ticket_messages')
+      .insert({
+        ticket_id: result.ticket_id,
+        business_id: project.business_id,
+        author_type: 'client',
+        author_name: 'Client',
+        body: description || 'Attached files',
+        attachment_urls: attachmentUrls,
+      })
+  }
+
+  // Step 6: Return success
   return NextResponse.json({ success: true, ticketId: result.ticket_id }, { status: 201 })
 }
