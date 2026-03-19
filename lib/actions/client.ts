@@ -87,6 +87,48 @@ export async function createWebDesignClient(
 }
 
 /**
+ * Create a web_projects row for an existing business.
+ * Called during onboarding when client_type is web_design or both.
+ */
+export async function createWebDesignProject(
+  businessId: string,
+  input: {
+    ownerName?: string
+    ownerEmail?: string
+    ownerPhone?: string
+    domain?: string
+    subscriptionTier: 'basic' | 'advanced'
+    hasReviewAddon: boolean
+  }
+): Promise<{ success: true } | { success: false; error: string }> {
+  const supabase = await createClient()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) return { success: false, error: 'Not authenticated' }
+
+  const { randomBytes } = await import('crypto')
+  const portalToken = randomBytes(24).toString('base64url')
+  const monthlyFee = input.subscriptionTier === 'advanced' ? 299 : 199
+
+  const { error } = await supabase
+    .from('web_projects')
+    .insert({
+      business_id: businessId,
+      status: 'discovery',
+      subscription_tier: input.subscriptionTier,
+      subscription_monthly_fee: monthlyFee,
+      has_review_addon: input.hasReviewAddon,
+      client_name: input.ownerName || null,
+      client_email: input.ownerEmail || null,
+      client_phone: input.ownerPhone || null,
+      domain: input.domain || null,
+      portal_token: portalToken,
+    })
+
+  if (error) return { success: false, error: error.message }
+  return { success: true }
+}
+
+/**
  * Update editable fields for a web design client (businesses row).
  * Validates input with Zod, then persists to the database.
  * Revalidates /clients so the page reflects changes immediately.

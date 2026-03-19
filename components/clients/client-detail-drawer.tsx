@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { PencilSimple, Ticket, Copy, LinkSimple } from '@phosphor-icons/react'
+import { PencilSimple, Ticket, LinkSimple } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { format, parseISO } from 'date-fns'
 import { toast } from 'sonner'

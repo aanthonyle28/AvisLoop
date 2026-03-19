@@ -54,6 +54,13 @@ function BusinessSetupStep({ onComplete }: Step1Props) {
   const [selected, setSelected] = useState<string[]>([])
   const [customServiceNames, setCustomServiceNames] = useState<string[]>([])
   const [customServiceInput, setCustomServiceInput] = useState('')
+  // Web design fields
+  const [ownerName, setOwnerName] = useState('')
+  const [ownerEmail, setOwnerEmail] = useState('')
+  const [ownerPhone, setOwnerPhone] = useState('')
+  const [domain, setDomain] = useState('')
+  const [tier, setTier] = useState<'basic' | 'advanced'>('basic')
+  const [hasReviewAddon, setHasReviewAddon] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
@@ -108,7 +115,24 @@ function BusinessSetupStep({ onComplete }: Step1Props) {
 
       const newBusinessId = basicsResult.businessId
 
-      // Step 1b: Save service types scoped to the new business (skip for web_design-only)
+      // Step 1b: For web design clients, create the web_project row
+      if (clientType === 'web_design' || clientType === 'both') {
+        const { createWebDesignProject } = await import('@/lib/actions/client')
+        const projResult = await createWebDesignProject(newBusinessId, {
+          ownerName: ownerName.trim(),
+          ownerEmail: ownerEmail.trim(),
+          ownerPhone: ownerPhone.trim(),
+          domain: domain.trim(),
+          subscriptionTier: tier,
+          hasReviewAddon: clientType === 'both' || hasReviewAddon,
+        })
+        if (!projResult.success) {
+          setError(projResult.error || 'Failed to create web project')
+          return
+        }
+      }
+
+      // Step 1c: Save service types scoped to the new business (skip for web_design-only)
       if (clientType !== 'web_design' && selected.length > 0) {
         const servicesResult = await saveNewBusinessServices(newBusinessId, {
           serviceTypes: selected as ServiceTypeValue[],
@@ -131,7 +155,9 @@ function BusinessSetupStep({ onComplete }: Step1Props) {
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold">Set up your new business</h1>
         <p className="text-muted-foreground text-lg">
-          This info appears in your review request messages.
+          {clientType === 'web_design' ? 'Enter the client details for this web design project.' :
+           clientType === 'both' ? 'Set up this client for web design and review management.' :
+           'This info appears in your review request messages.'}
         </p>
       </div>
 
@@ -196,6 +222,95 @@ function BusinessSetupStep({ onComplete }: Step1Props) {
               className="text-lg h-12"
             />
           </div>
+
+          {/* Web design fields */}
+          {(clientType === 'web_design' || clientType === 'both') && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="owner-name">Owner / Contact name</Label>
+                <Input
+                  id="owner-name"
+                  value={ownerName}
+                  onChange={(e) => setOwnerName(e.target.value)}
+                  placeholder="e.g. John Smith"
+                  disabled={isPending}
+                  className="text-lg h-12"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="owner-email">Owner email</Label>
+                <Input
+                  id="owner-email"
+                  type="email"
+                  value={ownerEmail}
+                  onChange={(e) => setOwnerEmail(e.target.value)}
+                  placeholder="john@example.com"
+                  disabled={isPending}
+                  className="text-lg h-12"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="owner-phone">Owner phone</Label>
+                <Input
+                  id="owner-phone"
+                  type="tel"
+                  value={ownerPhone}
+                  onChange={(e) => setOwnerPhone(e.target.value)}
+                  placeholder="(555) 123-4567"
+                  disabled={isPending}
+                  className="text-lg h-12"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="client-domain">Domain</Label>
+                <Input
+                  id="client-domain"
+                  value={domain}
+                  onChange={(e) => setDomain(e.target.value)}
+                  placeholder="e.g. sunrisehvac.com"
+                  disabled={isPending}
+                  className="text-lg h-12"
+                />
+              </div>
+              <div className="space-y-3">
+                <Label>Subscription tier</Label>
+                <div className="flex gap-2">
+                  {([
+                    { value: 'basic' as const, label: 'Basic — $199/mo', desc: '1-4 pages, 2 revisions/mo' },
+                    { value: 'advanced' as const, label: 'Advanced — $299/mo', desc: '4-10 pages, 4 revisions/mo' },
+                  ]).map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setTier(opt.value)}
+                      disabled={isPending}
+                      className={cn(
+                        'flex-1 px-3 py-3 rounded-lg border text-left transition-colors',
+                        tier === opt.value
+                          ? 'bg-foreground text-background border-foreground'
+                          : 'bg-background border-border hover:border-foreground/50'
+                      )}
+                    >
+                      <p className="text-sm font-medium">{opt.label}</p>
+                      <p className={cn('text-xs mt-0.5', tier === opt.value ? 'text-background/70' : 'text-muted-foreground')}>{opt.desc}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {clientType === 'both' && (
+                <div className="flex items-center gap-3 rounded-lg border border-border p-3">
+                  <Checkbox
+                    id="review-addon"
+                    checked={hasReviewAddon}
+                    onCheckedChange={(checked) => setHasReviewAddon(checked === true)}
+                  />
+                  <Label htmlFor="review-addon" className="cursor-pointer text-sm">
+                    Include review automation add-on (+$99/mo)
+                  </Label>
+                </div>
+              )}
+            </>
+          )}
 
           {clientType !== 'web_design' && (
             <div className="space-y-2">
@@ -663,7 +778,7 @@ export function CreateBusinessWizard({ campaignPresets }: CreateBusinessWizardPr
   const router = useRouter()
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1)
   const [newBusinessId, setNewBusinessId] = useState<string | null>(null)
-  const [newClientType, setNewClientType] = useState<ClientType>('reputation')
+  const [, setNewClientType] = useState<ClientType>('reputation')
   const [isCancelling, startCancelTransition] = useTransition()
 
   const handleStep1Complete = (businessId: string, clientType: ClientType) => {
