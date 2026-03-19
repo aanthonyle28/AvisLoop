@@ -30,6 +30,7 @@ const NAV_LINKS = [
   { label: 'Process', href: '#process' },
   { label: 'Pricing', href: '#pricing' },
   { label: 'Reviews', href: '/reputation' },
+  { label: 'FAQ', href: '#faq' },
 ];
 
 /* ─── Hero ─────────────────────────────────────────────── */
