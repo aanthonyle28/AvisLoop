@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { EnvelopeSimple, ArrowRight, SpinnerGap } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 
@@ -11,7 +10,6 @@ interface LookupResult {
 }
 
 export function ClientPortalLookup() {
-  const router = useRouter()
   const [email, setEmail] = useState('')
   const [results, setResults] = useState<LookupResult[]>([])
   const [searched, setSearched] = useState(false)
@@ -35,7 +33,7 @@ export function ClientPortalLookup() {
 
       // If exactly one result, navigate directly
       if (data.results.length === 1) {
-        router.push(data.results[0].portalPath)
+        window.open(data.results[0].portalPath, '_blank')
       }
     } catch {
       setResults([])
@@ -95,7 +93,7 @@ export function ClientPortalLookup() {
             <button
               key={result.portalPath}
               type="button"
-              onClick={() => router.push(result.portalPath)}
+              onClick={() => window.open(result.portalPath, '_blank')}
               className="w-full flex items-center justify-between rounded-lg border border-border bg-card px-4 py-3 text-left hover:bg-muted transition-colors"
             >
               <span className="font-medium text-sm">{result.name}</span>
