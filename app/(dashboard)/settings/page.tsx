@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { getActiveBusiness } from '@/lib/data/active-business'
+import { getAuthUser } from '@/lib/supabase/auth'
 import { SettingsTabs } from '@/components/settings/settings-tabs'
 import { getServiceTypeSettings } from '@/lib/data/business'
 import { getAvailableTemplates } from '@/lib/data/message-template'
@@ -18,15 +19,15 @@ export const metadata = {
 
 // Async component that fetches and renders settings content
 async function SettingsContent() {
-  const supabase = await createClient()
-
-  // Verify user is authenticated
-  const { data: { user } } = await supabase.auth.getUser()
+  // Use cached auth to avoid redundant getUser() calls (prevents refresh token race)
+  const user = await getAuthUser()
   if (!user) {
     redirect('/login')
   }
 
-  // Resolve active business
+  const supabase = await createClient()
+
+  // Resolve active business (cached per-request, shares auth with getAuthUser)
   const activeBusiness = await getActiveBusiness()
   if (!activeBusiness) {
     redirect('/onboarding')

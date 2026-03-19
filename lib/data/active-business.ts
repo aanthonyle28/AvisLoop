@@ -1,5 +1,7 @@
+import { cache } from 'react'
 import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/supabase/auth'
 import type { Business } from '@/lib/types/database'
 
 /**
@@ -11,6 +13,12 @@ export const ACTIVE_BUSINESS_COOKIE = 'active_business_id'
 /**
  * Resolve which business is currently active for the authenticated user.
  *
+ * Wrapped in React.cache() so multiple Server Components calling this in the
+ * same request (e.g., layout + page) share a single result instead of each
+ * creating independent Supabase clients and calling getUser() concurrently.
+ * This eliminates the refresh-token race condition that caused auth failures
+ * and redirects to /login during business switching.
+ *
  * Resolution order:
  * 1. If `active_business_id` cookie is set and references a business the user owns → return that business
  * 2. If cookie is missing or references a business the user does NOT own → fall back to the first
@@ -20,14 +28,12 @@ export const ACTIVE_BUSINESS_COOKIE = 'active_business_id'
  * IMPORTANT: Do NOT call cookies().set() here. Server Components cannot set cookies —
  * only Server Actions can. This function is safe to call from any Server Component.
  */
-export async function getActiveBusiness(): Promise<Business | null> {
+export const getActiveBusiness = cache(async (): Promise<Business | null> => {
+  const user = await getAuthUser()
+  if (!user) return null
+
   const cookieStore = await cookies()
   const supabase = await createClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return null
-  }
 
   const activeId = cookieStore.get(ACTIVE_BUSINESS_COOKIE)?.value
 
@@ -58,21 +64,20 @@ export async function getActiveBusiness(): Promise<Business | null> {
     .limit(1)
 
   return data?.[0] ?? null
-}
+})
 
 /**
  * Return all businesses owned by the authenticated user, ordered by creation date.
  * Used by the layout to populate the business switcher dropdown.
  *
+ * Wrapped in React.cache() for per-request deduplication (same rationale as getActiveBusiness).
  * Returns an empty array if the user is not authenticated or has no businesses.
  */
-export async function getUserBusinesses(): Promise<Array<{ id: string; name: string }>> {
-  const supabase = await createClient()
+export const getUserBusinesses = cache(async (): Promise<Array<{ id: string; name: string }>> => {
+  const user = await getAuthUser()
+  if (!user) return []
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return []
-  }
+  const supabase = await createClient()
 
   const { data } = await supabase
     .from('businesses')
@@ -81,4 +86,4 @@ export async function getUserBusinesses(): Promise<Array<{ id: string; name: str
     .order('created_at', { ascending: true })
 
   return data ?? []
-}
+})

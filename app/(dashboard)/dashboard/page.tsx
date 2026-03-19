@@ -1,4 +1,5 @@
 import { getActiveBusiness } from '@/lib/data/active-business'
+import { getAuthUser } from '@/lib/supabase/auth'
 import { getServiceTypeSettings } from '@/lib/data/business'
 import {
   getDashboardKPIs,
@@ -8,7 +9,6 @@ import {
 } from '@/lib/data/dashboard'
 import { getJobCounts } from '@/lib/data/jobs'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
 
 import { DashboardClient } from '@/components/dashboard/dashboard-client'
 import { getSetupProgress } from '@/lib/data/onboarding'
@@ -43,9 +43,8 @@ export default async function DashboardPage() {
     redirect('/onboarding')
   }
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
+  // Use cached auth to avoid redundant getUser() calls (prevents refresh token race)
+  const user = await getAuthUser()
   const fullName = (user?.user_metadata?.full_name as string | undefined) ?? ''
   const firstName = fullName.split(' ')[0] || ''
 

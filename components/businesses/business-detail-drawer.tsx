@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
   Sheet,
@@ -57,7 +56,6 @@ export function BusinessDetailDrawer({
   onBusinessDeleted,
   webProject,
 }: BusinessDetailDrawerProps) {
-  const router = useRouter()
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isSwitching, setIsSwitching] = useState(false)
@@ -157,14 +155,18 @@ export function BusinessDetailDrawer({
     if (!business) return
     setIsSwitching(true)
     const result = await switchBusiness(business.id)
-    setIsSwitching(false)
     if (!result.error) {
       toast.success(`Switched to ${business.name}`)
-      onOpenChange(false)
-      router.refresh()
+      // Full page reload to ensure cookies and server components are fully
+      // in sync. router.refresh() can serve stale RSC payloads on Vercel.
+      // Reload preserves the current page.
+      window.location.reload()
     } else if (result.error === 'Not authenticated') {
-      router.push('/login')
+      setIsSwitching(false)
+      // Try a full reload — middleware will refresh the session
+      window.location.reload()
     } else {
+      setIsSwitching(false)
       toast.error(result.error)
     }
   }

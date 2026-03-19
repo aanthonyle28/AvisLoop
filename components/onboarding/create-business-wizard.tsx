@@ -816,7 +816,8 @@ export function CreateBusinessWizard({ campaignPresets }: CreateBusinessWizardPr
       toast.error(switchResult.error || 'Failed to switch business')
       return
     }
-    router.push('/dashboard')
+    // Full page navigation to ensure cookies are fully applied
+    window.location.href = '/dashboard'
   }
 
   const handleCancel = () => {

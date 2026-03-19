@@ -35,16 +35,19 @@ export function BusinessSwitcher() {
       const result = await switchBusiness(id)
       if (result?.error) {
         if (result.error === 'Not authenticated') {
-          router.push('/login')
+          // Instead of immediately redirecting to /login, try a full page
+          // reload first. The middleware will refresh the session on the
+          // next request. Only redirect to login if that also fails.
+          window.location.reload()
           return
         }
         toast.error('Failed to switch business')
         return
       }
-      // Force full re-fetch of all server components so the new business
-      // context is picked up. revalidatePath alone isn't sufficient on Vercel
-      // because the client-side router may serve stale RSC payloads.
-      router.refresh()
+      // Full page reload to ensure cookies and server components are fully
+      // in sync. router.refresh() alone can serve stale RSC payloads on Vercel.
+      // Reload (not redirect) preserves the current page.
+      window.location.reload()
     })
   }
 

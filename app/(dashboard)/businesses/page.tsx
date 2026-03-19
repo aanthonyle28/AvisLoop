@@ -3,7 +3,6 @@ import { getActiveBusiness } from '@/lib/data/active-business'
 import { getUserBusinessesWithMetadata } from '@/lib/data/businesses'
 import { BusinessesClient } from '@/components/businesses/businesses-client'
 import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
 import type { WebProject } from '@/lib/types/database'
 
 export const metadata = {
@@ -12,10 +11,17 @@ export const metadata = {
 }
 
 export default async function BusinessesPage() {
+  // Don't redirect on null — this page shows ALL businesses and must remain
+  // accessible even if the active-business cookie is stale or missing.
   const activeBusiness = await getActiveBusiness()
-  if (!activeBusiness) redirect('/onboarding')
 
   const businesses = await getUserBusinessesWithMetadata()
+
+  // If the user truly has no businesses, redirect to onboarding
+  if (businesses.length === 0) {
+    const { redirect } = await import('next/navigation')
+    redirect('/onboarding')
+  }
 
   // Fetch web projects for all businesses (for web_design/both client types)
   const supabase = await createClient()
@@ -50,21 +56,24 @@ export default async function BusinessesPage() {
     }
   }
 
-  // Ensure the active business has an intake_token (backfill for existing businesses)
-  let intakeToken = activeBusiness.intake_token
+  // Use active business if available, otherwise use the first business
+  const effectiveBusiness = activeBusiness ?? businesses[0]
+
+  // Ensure the effective business has an intake_token (backfill for existing businesses)
+  let intakeToken = effectiveBusiness.intake_token
   if (!intakeToken) {
     intakeToken = randomBytes(24).toString('base64url')
     await supabase
       .from('businesses')
       .update({ intake_token: intakeToken })
-      .eq('id', activeBusiness.id)
+      .eq('id', effectiveBusiness.id)
   }
 
   return (
     <div className="container py-6 space-y-8">
       <BusinessesClient
         businesses={businesses}
-        activeBusinessId={activeBusiness.id}
+        activeBusinessId={effectiveBusiness.id}
         intakeToken={intakeToken}
         webProjectMap={webProjectMap}
         ticketCountMap={ticketCountMap}
