@@ -56,7 +56,7 @@ export function BusinessCard({ business, isActive, webProject, openTicketCount =
   const tier = webProject?.subscription_tier ?? null
 
   return (
-    <InteractiveCard hoverAccent="amber" className="p-6">
+    <InteractiveCard hoverAccent="amber" className="p-6 h-full flex flex-col">
       {/* Header row: business name + active badge */}
       <div className="flex items-start justify-between gap-2 mb-4">
         <h3 className="font-semibold text-base leading-tight truncate">
@@ -96,8 +96,8 @@ export function BusinessCard({ business, isActive, webProject, openTicketCount =
 
       {/* Conditional content based on client type */}
       {isWebDesign ? (
-        /* Web design fields: domain, status, tier */
-        <div className="space-y-3">
+        /* Web design fields: domain, tier, tickets */
+        <div className="space-y-3 flex-1">
           {/* Domain */}
           <div className="flex items-center gap-1.5">
             <Globe size={14} weight="regular" className="text-muted-foreground shrink-0" />

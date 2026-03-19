@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Buildings, Plus, Copy } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { BusinessCard } from '@/components/businesses/business-card'
 import { BusinessDetailDrawer } from '@/components/businesses/business-detail-drawer'
 import { toast } from 'sonner'
@@ -57,29 +56,16 @@ export function BusinessesClient({ businesses, activeBusinessId, intakeToken, we
           <h1 className='text-3xl font-bold tracking-tight'>Businesses</h1>
           <p className='text-muted-foreground mt-1'>Manage your client businesses</p>
         </div>
-        <Button asChild>
-          <Link href="/onboarding?mode=new">
-            <Plus size={16} weight="bold" />
-            Add Business
-          </Link>
-        </Button>
-      </div>
-
-      {/* Client intake link — always visible */}
-      <div className="border rounded-lg p-4 bg-card space-y-2">
-        <h3 className="font-medium text-sm">Client Intake Link</h3>
-        <p className="text-sm text-muted-foreground">
-          Share this link with new clients. They fill in their business details, and it shows up here automatically.
-        </p>
-        <div className="flex gap-2">
-          <Input
-            value={intakeUrl}
-            readOnly
-            className="text-sm font-mono"
-            onClick={(e) => (e.target as HTMLInputElement).select()}
-          />
-          <Button variant="outline" size="icon" onClick={handleCopyIntakeLink} aria-label="Copy link">
-            <Copy size={16} />
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handleCopyIntakeLink} className="gap-1.5">
+            <Copy size={14} />
+            Intake Link
+          </Button>
+          <Button asChild size="sm">
+            <Link href="/onboarding?mode=new">
+              <Plus size={14} weight="bold" />
+              Add Business
+            </Link>
           </Button>
         </div>
       </div>
@@ -97,10 +83,11 @@ export function BusinessesClient({ businesses, activeBusinessId, intakeToken, we
         </div>
       ) : (
         /* Card grid */
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch'>
           {localBusinesses.map((business) => (
             <div
               key={business.id}
+              className="h-full"
               onClick={() => {
                 setSelectedBusiness(business)
                 setDrawerOpen(true)
