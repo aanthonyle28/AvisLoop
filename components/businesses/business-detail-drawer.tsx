@@ -134,11 +134,19 @@ export function BusinessDetailDrawer({
   async function handleSave() {
     if (!business) return
     setIsSaving(true)
-    const result = await updateBusinessMetadata(business.id, formData)
+    // Auto-compute monthly_fee from plan + add-on
+    const ct = formData.client_type ?? business.client_type
+    const t = formData.web_design_tier ?? business.web_design_tier
+    const hasWeb = ct === 'web_design' || ct === 'both'
+    const hasRev = ct === 'reputation' || ct === 'both'
+    const webFee = hasWeb ? (t === 'advanced' ? 299 : 199) : 0
+    const reviewFee = hasRev ? 99 : 0
+    const computedData = { ...formData, monthly_fee: webFee + reviewFee }
+    const result = await updateBusinessMetadata(business.id, computedData)
     setIsSaving(false)
     if (result.success) {
       toast.success('Changes saved')
-      onBusinessUpdated({ ...business, ...formData })
+      onBusinessUpdated({ ...business, ...computedData })
       setIsEditing(false)
     } else {
       toast.error(result.error || 'Failed to save')
@@ -390,28 +398,58 @@ export function BusinessDetailDrawer({
               </div>
             )}
 
-            {/* Shared: Monthly Fee & Start Date */}
+            {/* Billing — computed from plan + review add-on */}
             <div>
               <h4 className='text-sm font-medium mb-3'>Billing</h4>
-              {isEditing ? (
-                <div className='space-y-3'>
-                  <div className='space-y-1.5'>
-                    <Label className='text-xs'>Monthly Fee ($)</Label>
-                    <Input type='number' step='0.01' min='0' value={formData.monthly_fee ?? ''}
-                      onChange={(e) => updateField('monthly_fee', e.target.value ? Number(e.target.value) : null)} placeholder='299.00' />
+              {(() => {
+                const ct = isEditing ? formData.client_type ?? business.client_type : business.client_type
+                const t = isEditing ? formData.web_design_tier ?? business.web_design_tier : business.web_design_tier
+                const webFee = t === 'advanced' ? 299 : t === 'basic' ? 199 : 0
+                const reviewFee = 99
+                const hasWeb = ct === 'web_design' || ct === 'both'
+                const hasRev = ct === 'reputation' || ct === 'both'
+                const total = (hasWeb ? webFee : 0) + (hasRev ? reviewFee : 0)
+
+                return isEditing ? (
+                  <div className='space-y-3'>
+                    {/* Web design fee is auto-calculated from tier */}
+                    {hasWeb && (
+                      <ReadOnlyField label='Web Design' value={`$${webFee}/mo (${t ?? 'basic'})`} />
+                    )}
+                    {/* Review fee — checkbox for both, fixed display for review-only */}
+                    {ct === 'both' && (
+                      <div className='flex items-center justify-between'>
+                        <Label className='text-xs'>Review Add-on ($99/mo)</Label>
+                        <Switch checked={true} disabled />
+                      </div>
+                    )}
+                    {ct === 'reputation' && (
+                      <ReadOnlyField label='Review Management' value='$99/mo' />
+                    )}
+                    <div className='pt-2 border-t border-border/50'>
+                      <ReadOnlyField label='Total MRR' value={<span className='text-base font-bold'>${total}/mo</span>} />
+                    </div>
+                    <div className='space-y-1.5'>
+                      <Label className='text-xs'>Start Date</Label>
+                      <Input type='date' value={formData.start_date ?? ''}
+                        onChange={(e) => updateField('start_date', e.target.value || null)} />
+                    </div>
                   </div>
-                  <div className='space-y-1.5'>
-                    <Label className='text-xs'>Start Date</Label>
-                    <Input type='date' value={formData.start_date ?? ''}
-                      onChange={(e) => updateField('start_date', e.target.value || null)} />
+                ) : (
+                  <div className='space-y-2'>
+                    {hasWeb && (
+                      <ReadOnlyField label='Web Design' value={`$${webFee}/mo (${(business.web_design_tier ?? 'basic')})`} />
+                    )}
+                    {hasRev && (
+                      <ReadOnlyField label='Review Management' value='$99/mo' />
+                    )}
+                    <div className='pt-2 border-t border-border/50'>
+                      <ReadOnlyField label='Total MRR' value={<span className='text-base font-bold'>${total}/mo</span>} />
+                    </div>
+                    <ReadOnlyField label='Start Date' value={business.start_date ? format(parseISO(business.start_date), 'MMM d, yyyy') : null} />
                   </div>
-                </div>
-              ) : (
-                <div className='space-y-2'>
-                  <ReadOnlyField label='Monthly Fee' value={business.monthly_fee !== null ? `$${Number(business.monthly_fee).toFixed(2)}` : null} />
-                  <ReadOnlyField label='Start Date' value={business.start_date ? format(parseISO(business.start_date), 'MMM d, yyyy') : null} />
-                </div>
-              )}
+                )
+              })()}
             </div>
 
             {/* Notes */}
