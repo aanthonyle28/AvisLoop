@@ -8,20 +8,27 @@ const CALENDLY_URL =
 
 const basicFeatures = [
   '1–4 page professional website',
-  'Mobile-optimized design',
+  'Mobile-optimized responsive design',
+  'On-page SEO setup (meta tags, schema, sitemap)',
+  'Google Business Profile optimization',
   '2 revision requests per month',
   'Client portal access',
   'Ongoing hosting and maintenance',
+  'SSL certificate included',
   'Domain setup included',
 ];
 
 const advancedFeatures = [
   '4–10 page professional website',
-  'Mobile-optimized design',
+  'Mobile-optimized responsive design',
+  'Full SEO setup (on-page, local SEO, Google Maps)',
+  'Google Business Profile optimization',
   '4 revision requests per month',
   'Client portal access',
   'Ongoing hosting and maintenance',
+  'SSL certificate included',
   'Domain setup included',
+  'Contact form and lead capture',
   'Priority support',
 ];
 
