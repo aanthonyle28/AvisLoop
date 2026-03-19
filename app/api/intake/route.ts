@@ -7,14 +7,8 @@ import { DEFAULT_TIMING_HOURS, type ServiceTypeValue } from '@/lib/validations/j
 /**
  * POST /api/intake — Public client intake form submission.
  *
- * Flow:
- * 1. Rate limit by IP
- * 2. Validate body against Zod schema
- * 3. Resolve agency owner from intake_token (service-role)
- * 4. Create new business under that owner (INSERT)
- * 5. Save service types + timing
- * 6. Mark onboarding complete + SMS consent acknowledged
- * 7. Return 201
+ * Creates a new business under the agency owner with design brief data,
+ * service types, and optional review management configuration.
  */
 export async function POST(request: NextRequest) {
   // 1. Rate limit
@@ -45,10 +39,20 @@ export async function POST(request: NextRequest) {
 
   const {
     businessName,
-    phone,
-    googleReviewLink,
+    ownerName,
+    ownerEmail,
+    ownerPhone,
     serviceTypes,
     customServiceNames,
+    description,
+    targetAudience,
+    brandColors,
+    currentWebsite,
+    inspirationUrls,
+    assetPaths,
+    wantsReviewManagement,
+    googleReviewLink,
+    smsConsentAcknowledged,
     token,
   } = parsed.data
 
@@ -67,14 +71,38 @@ export async function POST(request: NextRequest) {
 
   const ownerId = ownerBusiness.user_id
 
-  // 4. Create new business under the agency owner (PURE INSERT)
+  // 4. Determine client_type based on review management add-on
+  const clientType = wantsReviewManagement ? 'both' : 'web_design'
+
+  // 5. Build intake_data JSONB for design brief
+  const parsedInspirationUrls = (inspirationUrls || '')
+    .split('\n')
+    .map((u) => u.trim())
+    .filter((u) => u.length > 0)
+
+  const intakeData = {
+    description: description || undefined,
+    targetAudience: targetAudience || undefined,
+    brandColors: brandColors || undefined,
+    currentWebsite: currentWebsite || undefined,
+    inspirationUrls: parsedInspirationUrls.length > 0 ? parsedInspirationUrls : undefined,
+    assetPaths: assetPaths && assetPaths.length > 0 ? assetPaths : undefined,
+  }
+
+  // 6. Create new business under the agency owner (PURE INSERT)
   const { data: newBusiness, error: insertError } = await supabase
     .from('businesses')
     .insert({
       user_id: ownerId,
       name: businessName,
-      phone: phone || null,
-      google_review_link: googleReviewLink || null,
+      phone: ownerPhone || null,
+      owner_name: ownerName || null,
+      owner_email: ownerEmail || null,
+      owner_phone: ownerPhone || null,
+      google_review_link: wantsReviewManagement ? (googleReviewLink || null) : null,
+      client_type: clientType,
+      domain: currentWebsite || null,
+      intake_data: intakeData,
     })
     .select('id')
     .single()
@@ -84,22 +112,28 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to create business' }, { status: 500 })
   }
 
-  // 5. Save service types + timing
+  // 7. Save service types + timing + consent
   const timingMap: Record<string, number> = {}
   for (const serviceType of serviceTypes) {
     timingMap[serviceType] = DEFAULT_TIMING_HOURS[serviceType as ServiceTypeValue]
   }
 
+  const updatePayload: Record<string, unknown> = {
+    service_types_enabled: serviceTypes,
+    service_type_timing: timingMap,
+    custom_service_names: serviceTypes.includes('other') ? customServiceNames : [],
+    onboarding_completed_at: new Date().toISOString(),
+  }
+
+  // Only set SMS consent if review management was requested
+  if (wantsReviewManagement && smsConsentAcknowledged) {
+    updatePayload.sms_consent_acknowledged = true
+    updatePayload.sms_consent_acknowledged_at = new Date().toISOString()
+  }
+
   const { error: updateError } = await supabase
     .from('businesses')
-    .update({
-      service_types_enabled: serviceTypes,
-      service_type_timing: timingMap,
-      custom_service_names: serviceTypes.includes('other') ? customServiceNames : [],
-      sms_consent_acknowledged: true,
-      sms_consent_acknowledged_at: new Date().toISOString(),
-      onboarding_completed_at: new Date().toISOString(),
-    })
+    .update(updatePayload)
     .eq('id', newBusiness.id)
 
   if (updateError) {

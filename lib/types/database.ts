@@ -77,6 +77,17 @@ export interface Business {
   live_website_url: string | null
   // Client relationship status for web design clients
   status: 'active' | 'paused' | 'churned' | null
+  // Design brief captured from public client intake form
+  intake_data: IntakeData | null
+}
+
+export interface IntakeData {
+  description?: string
+  targetAudience?: string
+  brandColors?: string
+  currentWebsite?: string
+  inspirationUrls?: string[]
+  assetPaths?: string[]
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -18,21 +18,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 /**
  * Public client intake form page — no authentication required.
  *
- * Flow:
- * 1. Resolve agency from intake_token (service-role, bypasses RLS)
- * 2. Render ClientIntakeForm with agency name for branding
- *
- * Uses service role client since this is a public (unauthenticated) page.
+ * Resolves agency from intake_token and renders the design-brief-first
+ * intake form with optional review management add-on.
  */
 export default async function IntakePage({ params }: Props) {
   const { token } = await params
 
   const supabase = createServiceRoleClient()
 
-  // Validate token exists (don't need business details — form creates a NEW business)
   const { data: business } = await supabase
     .from('businesses')
-    .select('id')
+    .select('id, name')
     .eq('intake_token', token)
     .single()
 
@@ -41,7 +37,7 @@ export default async function IntakePage({ params }: Props) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 flex items-center justify-center p-4">
       <div className="w-full max-w-lg">
-        <ClientIntakeForm token={token} />
+        <ClientIntakeForm token={token} agencyName={business.name} />
       </div>
     </div>
   )
