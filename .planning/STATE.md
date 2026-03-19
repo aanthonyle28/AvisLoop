@@ -10,16 +10,16 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 ## Current Position
 
 Phase: 73 — Ticket System
-Plan: 02 of 3 complete
+Plan: 03 of 3 complete
 Milestone: v4.0 Web Design Agency Pivot
-Status: In progress
+Status: Phase complete
 
-Last activity: 2026-03-19 — Completed 73-02-PLAN.md (Ticket UI: data layer, server actions, operator ticket management UI, /clients/[id]/tickets page)
+Last activity: 2026-03-19 — Completed 73-03-PLAN.md (Ticket attachments: signed URL upload, AttachmentUploader, all-tickets cross-client view)
 
 ```
 [Phase 71] [Phase 72] [Phase 73] [Phase 74] [Phase 75]
     |           |           |           |           |
- COMPLETE   COMPLETE   In prog    Planned     Planned
+ COMPLETE   COMPLETE   COMPLETE   Planned     Planned
 ```
 
 ## Performance Metrics
@@ -30,7 +30,7 @@ Last activity: 2026-03-19 — Completed 73-02-PLAN.md (Ticket UI: data layer, se
 - v3.1 plans completed: 17/17
 - v3.1.1 plans completed: 2/2 (COMPLETE)
 - Phase 70 plans completed: 0/3 (in progress)
-- v4.0 plans completed: 6 (Phase 71-01, 71-02, 72-01, 72-02, 73-01, 73-02)
+- v4.0 plans completed: 7 (Phase 71-01, 71-02, 72-01, 72-02, 73-01, 73-02, 73-03)
 
 *Updated after each plan completion*
 
@@ -79,6 +79,13 @@ Four idempotent migrations must be applied via Supabase Dashboard SQL Editor:
 - **RPC result as data?.[0]**: supabase.rpc() return type is flexible (scalar or array); safe access pattern used in createTicket action
 - **ticket-list unused props via eslint-disable**: projectDomain and subscriptionTier forwarded to TicketList for future use; linter suppressed cleanly
 
+### Key Decisions (73-03)
+
+- **Signed URL upload pattern**: `POST /api/tickets/upload-url` issues a 60s signed upload URL; browser PUTs file directly to Supabase Storage — bypasses Next.js 1MB body limit
+- **Pre-generate 1-year read URL**: stored in `ticket_messages.attachment_urls` at upload time, no re-signing needed on view
+- **All-tickets client-side filtering**: capped at 200 results, instant client filter changes without server round-trips
+- **Supabase Storage bucket `revision-attachments` requires manual creation**: private bucket, 10MB limit, allowed MIME types — must be created in Supabase Dashboard before attachments work
+
 ### Blockers/Concerns
 
 - 4 DB migrations pending manual Supabase Dashboard SQL Editor application (see above -- Phase 71 will create additional migrations)
@@ -96,6 +103,6 @@ Four idempotent migrations must be applied via Supabase Dashboard SQL Editor:
 ## Session Continuity
 
 Last session: 2026-03-19
-Stopped at: Completed 73-02-PLAN.md — ticket data layer + operator UI (TicketList, TicketDetailDrawer, NewTicketForm, /clients/[id]/tickets page)
+Stopped at: Completed 73-03-PLAN.md — ticket attachments (signed URL upload, AttachmentUploader) and all-tickets cross-client view
 Resume file: None
-Next action: Phase 73-03 (client portal ticket view / all-tickets operator view)
+Next action: Phase 74 (client portal Route Handler for ticket submission)
