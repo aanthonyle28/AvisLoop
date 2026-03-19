@@ -61,6 +61,87 @@ export interface Business {
   form_token: string | null
   // Public client intake form token (generated on demand via Businesses page)
   intake_token: string | null
+  // Web design pivot discriminator (DATA-01)
+  // 'reputation' = review automation only (default for all existing rows)
+  // 'web_design' = web design CRM features only
+  // 'both' = all features
+  client_type: 'reputation' | 'web_design' | 'both'
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Web Design Project types (v4.0 pivot)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type WebProjectStatus =
+  | 'discovery'
+  | 'design'
+  | 'development'
+  | 'review'
+  | 'live'
+  | 'maintenance'
+  | 'paused'
+  | 'cancelled'
+
+export type WebDesignTier = 'basic' | 'advanced'
+
+export interface WebProject {
+  id: string
+  business_id: string
+  project_name: string | null
+  domain: string | null
+  vercel_project_id: string | null
+  status: WebProjectStatus
+  subscription_tier: WebDesignTier | null
+  subscription_started_at: string | null    // DATE as ISO string
+  subscription_monthly_fee: number | null   // USD
+  has_review_addon: boolean
+  client_name: string | null
+  client_email: string | null
+  client_phone: string | null
+  kickoff_date: string | null               // DATE as ISO string
+  target_launch_date: string | null         // DATE as ISO string
+  launched_at: string | null                // TIMESTAMPTZ as ISO string
+  portal_token: string | null
+  page_count: number | null
+  project_notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type TicketStatus = 'open' | 'in_progress' | 'waiting_client' | 'resolved' | 'closed'
+export type TicketPriority = 'low' | 'normal' | 'high' | 'urgent'
+export type TicketSource = 'agency' | 'client_portal'
+
+export interface ProjectTicket {
+  id: string
+  project_id: string
+  business_id: string
+  title: string
+  description: string | null
+  status: TicketStatus
+  priority: TicketPriority
+  source: TicketSource
+  is_revision: boolean
+  is_overage: boolean
+  resolved_at: string | null
+  resolved_by: string | null              // UUID of auth.users
+  internal_notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type TicketAuthorType = 'agency' | 'client'
+
+export interface TicketMessage {
+  id: string
+  ticket_id: string
+  business_id: string
+  author_type: TicketAuthorType
+  author_name: string | null
+  body: string
+  attachment_urls: string[] | null
+  created_at: string
+  // No updated_at: messages are append-only
 }
 
 // Message channel literal union
