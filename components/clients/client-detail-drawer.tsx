@@ -528,7 +528,7 @@ export function ClientDetailDrawer({
                 variant="outline"
                 className="w-full justify-start"
               >
-                <Link href={`/clients/${client.id}/tickets`}>
+                <Link href={client.web_project ? `/clients/${client.web_project.id}/tickets` : `/clients/tickets`}>
                   <Ticket className="mr-2 h-4 w-4" />
                   View Tickets ({client.revisions_used_this_month ?? 0} this month)
                 </Link>

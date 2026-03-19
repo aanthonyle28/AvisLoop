@@ -22,7 +22,6 @@ export async function generateMetadata({ params }: TicketsPageProps) {
     .from('web_projects')
     .select('domain')
     .eq('id', id)
-    .eq('business_id', activeBusiness.id)
     .maybeSingle()
 
   return {
@@ -38,17 +37,17 @@ export default async function TicketsPage({ params }: TicketsPageProps) {
 
   const supabase = await createClient()
 
-  // Verify project belongs to this business
+  // Verify project belongs to one of the user's businesses (RLS handles ownership)
   const { data: project } = await supabase
     .from('web_projects')
     .select('*')
     .eq('id', id)
-    .eq('business_id', activeBusiness.id)
     .maybeSingle()
 
   if (!project) notFound()
 
   const webProject = project as WebProject
+  const businessId = webProject.business_id
 
   // Determine monthly revision limit from project subscription tier
   const monthlyLimit = webProject.subscription_tier
@@ -57,8 +56,8 @@ export default async function TicketsPage({ params }: TicketsPageProps) {
 
   // Fetch tickets and monthly usage in parallel
   const [tickets, monthlyCount] = await Promise.all([
-    getProjectTickets(id, activeBusiness.id),
-    getMonthlyTicketCount(id, activeBusiness.id),
+    getProjectTickets(id, businessId),
+    getMonthlyTicketCount(id, businessId),
   ])
 
   return (
