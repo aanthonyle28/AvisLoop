@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 
 ## Current Position
 
-Phase: 72 — Web Design CRM
-Plan: 02 of 2 complete (Phase COMPLETE — awaiting human verification)
+Phase: 73 — Ticket System
+Plan: 01 of 3 complete
 Milestone: v4.0 Web Design Agency Pivot
-Status: Phase 72 complete — awaiting human verify checkpoint for 72-02
+Status: In progress
 
-Last activity: 2026-03-19 — Completed 72-02-PLAN.md (UI: /clients page, MRR bar, table, filters, detail drawer, sidebar nav)
+Last activity: 2026-03-19 — Completed 73-01-PLAN.md (Ticket DB: atomic RPC, overage columns, constants, composite types)
 
 ```
 [Phase 71] [Phase 72] [Phase 73] [Phase 74] [Phase 75]
@@ -30,7 +30,7 @@ Last activity: 2026-03-19 — Completed 72-02-PLAN.md (UI: /clients page, MRR ba
 - v3.1 plans completed: 17/17
 - v3.1.1 plans completed: 2/2 (COMPLETE)
 - Phase 70 plans completed: 0/3 (in progress)
-- v4.0 plans completed: 4 (Phase 71-01, 71-02, 72-01, 72-02)
+- v4.0 plans completed: 5 (Phase 71-01, 71-02, 72-01, 72-02, 73-01)
 
 *Updated after each plan completion*
 
@@ -66,9 +66,16 @@ Four idempotent migrations must be applied via Supabase Dashboard SQL Editor:
 - **Portal token**: 192-bit randomBytes base64url token, same pattern as /complete/[token] and /intake/[token]
 - **Zero new npm packages**: react-dropzone, supabase storage, stripe all already installed
 
+### Key Decisions (73-01)
+
+- **Additive-only migration pattern**: Use `ADD COLUMN IF NOT EXISTS` + `CREATE OR REPLACE FUNCTION` when extending tables created in earlier migrations — never recreate
+- **TicketStatus union extension**: Extended rather than replaced to maintain backwards compatibility with existing code using old status values
+- **RPC author_type mapping**: `submit_ticket_with_limit_check` maps `'client_portal'` → `'client'` author_type internally to satisfy ticket_messages CHECK constraint
+
 ### Blockers/Concerns
 
 - 4 DB migrations pending manual Supabase Dashboard SQL Editor application (see above -- Phase 71 will create additional migrations)
+- 73-01 migration (20260319000600) also needs manual application
 - Phase 21-08: Twilio A2P campaign approval required for production SMS testing
 
 ### Cross-Cutting Concerns
@@ -82,6 +89,6 @@ Four idempotent migrations must be applied via Supabase Dashboard SQL Editor:
 ## Session Continuity
 
 Last session: 2026-03-19
-Stopped at: Completed 72-02-PLAN.md — /clients UI (awaiting human-verify checkpoint)
+Stopped at: Completed 73-01-PLAN.md — ticket data layer (migration, RPC, constants, types)
 Resume file: None
-Next action: After checkpoint approved — Phase 73 (Ticket System)
+Next action: Phase 73-02 (data functions calling submit_ticket_with_limit_check)
