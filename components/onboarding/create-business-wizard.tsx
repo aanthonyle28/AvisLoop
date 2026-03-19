@@ -47,7 +47,7 @@ interface Step1Props {
 }
 
 function BusinessSetupStep({ onComplete }: Step1Props) {
-  const [clientType, setClientType] = useState<ClientType>('reputation')
+  const [clientType, setClientType] = useState<ClientType>('web_design')
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [googleReviewLink, setGoogleReviewLink] = useState('')

@@ -15,9 +15,10 @@ interface BusinessesClientProps {
   activeBusinessId: string
   intakeToken: string
   webProjectMap: Record<string, WebProject>
+  ticketCountMap: Record<string, number>
 }
 
-export function BusinessesClient({ businesses, activeBusinessId, intakeToken, webProjectMap }: BusinessesClientProps) {
+export function BusinessesClient({ businesses, activeBusinessId, intakeToken, webProjectMap, ticketCountMap }: BusinessesClientProps) {
   const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
 
@@ -105,7 +106,7 @@ export function BusinessesClient({ businesses, activeBusinessId, intakeToken, we
                 setDrawerOpen(true)
               }}
             >
-              <BusinessCard business={business} isActive={business.id === activeBusinessId} webProject={webProjectMap[business.id] ?? null} />
+              <BusinessCard business={business} isActive={business.id === activeBusinessId} webProject={webProjectMap[business.id] ?? null} openTicketCount={ticketCountMap[business.id] ?? 0} />
             </div>
           ))}
         </div>

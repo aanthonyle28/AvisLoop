@@ -9,9 +9,10 @@ interface AppShellProps {
   children: React.ReactNode
   pageTitle?: string
   dashboardBadge?: number
+  ticketBadge?: number
 }
 
-export function AppShell({ children, pageTitle, dashboardBadge }: AppShellProps) {
+export function AppShell({ children, pageTitle, dashboardBadge, ticketBadge }: AppShellProps) {
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       {/* Skip link for keyboard navigation - must be first focusable element */}
@@ -21,7 +22,7 @@ export function AppShell({ children, pageTitle, dashboardBadge }: AppShellProps)
       <NavigationProgressBar />
 
       {/* Desktop sidebar */}
-      <Sidebar dashboardBadge={dashboardBadge} />
+      <Sidebar dashboardBadge={dashboardBadge} ticketBadge={ticketBadge} />
 
       {/* Main content area — flex column so children can fill height for independent scrolling */}
       <main id="main-content" className="flex-1 flex flex-col min-h-0">

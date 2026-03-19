@@ -33,6 +33,23 @@ export default async function BusinessesPage() {
     }
   }
 
+  // Fetch open ticket counts per project for web design businesses
+  const projectIds = webProjects?.map((wp) => wp.id) ?? []
+  const ticketCountMap: Record<string, number> = {}
+  if (projectIds.length > 0) {
+    const { data: ticketCounts } = await supabase
+      .from('project_tickets')
+      .select('project_id')
+      .in('project_id', projectIds)
+      .in('status', ['open', 'submitted', 'in_progress'])
+    if (ticketCounts) {
+      for (const t of ticketCounts) {
+        const bizId = webProjects?.find((wp) => wp.id === t.project_id)?.business_id
+        if (bizId) ticketCountMap[bizId] = (ticketCountMap[bizId] || 0) + 1
+      }
+    }
+  }
+
   // Ensure the active business has an intake_token (backfill for existing businesses)
   let intakeToken = activeBusiness.intake_token
   if (!intakeToken) {
@@ -50,6 +67,7 @@ export default async function BusinessesPage() {
         activeBusinessId={activeBusiness.id}
         intakeToken={intakeToken}
         webProjectMap={webProjectMap}
+        ticketCountMap={ticketCountMap}
       />
     </div>
   )

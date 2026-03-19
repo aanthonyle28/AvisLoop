@@ -43,9 +43,10 @@ const mainNav: NavItem[] = [
 
 interface SidebarProps {
   dashboardBadge?: number
+  ticketBadge?: number
 }
 
-export function Sidebar({ dashboardBadge }: SidebarProps = {}) {
+export function Sidebar({ dashboardBadge, ticketBadge }: SidebarProps = {}) {
   const pathname = usePathname()
   const { openAddJob } = useAddJob()
   const [isCollapsed, setIsCollapsed] = useLocalStorage('sidebarCollapsed', false)
@@ -154,7 +155,7 @@ export function Sidebar({ dashboardBadge }: SidebarProps = {}) {
             key={item.href}
             item={{
               ...item,
-              badge: item.href === '/dashboard' ? dashboardBadge : undefined,
+              badge: item.href === '/dashboard' ? dashboardBadge : item.href === '/clients/tickets' ? ticketBadge : undefined,
             }}
           />
         ))}

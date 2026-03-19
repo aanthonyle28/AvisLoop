@@ -1,4 +1,4 @@
-import { Star, TrendUp, TrendDown, Globe } from '@phosphor-icons/react/dist/ssr'
+import { Star, TrendUp, TrendDown, Globe, Ticket } from '@phosphor-icons/react/dist/ssr'
 import { InteractiveCard } from '@/components/ui/card'
 import type { Business, WebProject } from '@/lib/types/database'
 
@@ -6,6 +6,7 @@ interface BusinessCardProps {
   business: Business
   isActive: boolean
   webProject?: WebProject | null
+  openTicketCount?: number
 }
 
 function formatServiceType(type: string): string {
@@ -28,7 +29,7 @@ function getStatusColor(status: string): string {
   }
 }
 
-export function BusinessCard({ business, isActive, webProject }: BusinessCardProps) {
+export function BusinessCard({ business, isActive, webProject, openTicketCount = 0 }: BusinessCardProps) {
   const clientType = business.client_type
 
   // Service type badge: show first enabled type + overflow count
@@ -137,6 +138,16 @@ export function BusinessCard({ business, isActive, webProject }: BusinessCardPro
             <div>
               <span className="inline-block text-xs font-medium bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
                 {tier === 'basic' ? 'Basic' : 'Advanced'}
+              </span>
+            </div>
+          )}
+
+          {/* Open ticket count */}
+          {openTicketCount > 0 && (
+            <div className="flex items-center gap-1.5">
+              <Ticket size={14} className="text-amber-500 shrink-0" />
+              <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
+                {openTicketCount} open ticket{openTicketCount !== 1 ? 's' : ''}
               </span>
             </div>
           )}

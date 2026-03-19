@@ -4,6 +4,7 @@ import { BusinessSettingsProvider } from '@/components/providers/business-settin
 import { getDashboardCounts } from '@/lib/data/dashboard'
 import { getServiceTypeSettings } from '@/lib/data/business'
 import { getActiveBusiness, getUserBusinesses } from '@/lib/data/active-business'
+import { createClient } from '@/lib/supabase/server'
 import type { ServiceType } from '@/lib/types/database'
 
 export default async function DashboardGroupLayout({
@@ -23,15 +24,24 @@ export default async function DashboardGroupLayout({
   let enabledServiceTypes: ServiceType[] = []
   let customServiceNames: string[] = []
   let dashboardBadge = 0
+  let ticketBadge = 0
 
   if (business) {
-    const [serviceSettings, counts] = await Promise.all([
+    const supabase = await createClient()
+    const [serviceSettings, counts, ticketCountResult] = await Promise.all([
       getServiceTypeSettings(business.id),
       getDashboardCounts(business.id).catch(() => ({ total: 0 })),
+      supabase
+        .from('project_tickets')
+        .select('id', { count: 'exact', head: true })
+        .eq('business_id', business.id)
+        .in('status', ['open', 'submitted', 'in_progress'])
+        .then(({ count }) => count ?? 0),
     ])
     enabledServiceTypes = (serviceSettings?.serviceTypesEnabled || []) as ServiceType[]
     customServiceNames = serviceSettings?.customServiceNames || []
     dashboardBadge = counts.total
+    ticketBadge = ticketCountResult
   }
 
   return (
@@ -43,7 +53,7 @@ export default async function DashboardGroupLayout({
       businesses={businesses}
     >
       <AddJobProvider>
-        <AppShell dashboardBadge={dashboardBadge}>
+        <AppShell dashboardBadge={dashboardBadge} ticketBadge={ticketBadge}>
           {children}
         </AppShell>
       </AddJobProvider>
