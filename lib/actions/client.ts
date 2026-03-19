@@ -38,7 +38,7 @@ export async function createWebDesignClient(
     .insert({
       user_id: user.id,
       name: businessName,
-      client_type: 'web_design',
+      client_type: hasReviewAddon ? 'both' : 'web_design',
       owner_name: ownerName || null,
       owner_email: ownerEmail || null,
       owner_phone: ownerPhone || null,
@@ -82,6 +82,7 @@ export async function createWebDesignClient(
   }
 
   revalidatePath('/clients')
+  revalidatePath('/businesses')
   return { success: true, businessId: business.id }
 }
 
