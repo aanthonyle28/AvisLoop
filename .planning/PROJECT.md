@@ -2,11 +2,11 @@
 
 ## What This Is
 
-AvisLoop is a review follow-up system for home service businesses (HVAC, plumbing, electrical, cleaning, roofing, etc.). After a job is completed, AvisLoop triggers a multi-touch SMS + email sequence that personalizes the ask, sends at the right time, and helps manage reputation outcomes. Optimized for home services first, but works for any local service business. The core promise: "Complete the job, AvisLoop handles the follow-up — the right message, at the right time, on the right channel."
+AvisLoop is a web design agency platform for home service businesses. The primary offering is affordable, professionally designed websites (Basic $199/mo for 1-4 pages, Advanced $299/mo for 4-10 pages) with automated review request follow-up as a $99/mo add-on. The platform includes an internal CRM for managing web design clients, a ticket/revision tracking system with monthly limits, and a lightweight client portal for submitting requests and viewing history. Solo agency operator model — one user manages all client businesses.
 
 ## Core Value
 
-Turn job completions into Google reviews automatically — multi-touch follow-up sequences that send the right message at the right time without the business owner thinking about it.
+Provide home service businesses with professional websites and optional automated review management — all managed through a single agency dashboard.
 
 ## Requirements
 
@@ -47,12 +47,13 @@ Turn job completions into Google reviews automatically — multi-touch follow-up
 
 ### Active
 
-**v3.1.1 QA Bug Fixes**
-- Fix all 10 bugs discovered during v3.1 QA E2E Audit
-- 1 Critical: frozen enrollment migration unapplied + silent error swallowing
-- 4 Medium: enrollment status labels, timezone bug, missing DB column, mobile overflow
-- 4 Low: missing stat card, template fallback, sort handlers, touch target size
-- 1 Medium (dashboard): KPIWidgets removed — navigation to /analytics broken
+**v4.0 Web Design Agency Pivot**
+- Web design CRM page for managing clients (contact details, subscription tier, domain, MRR, status)
+- Ticket/revision tracking system with monthly limits (Basic: 2/mo, Advanced: 4/mo, $50 overage)
+- Lightweight client portal via unique URL (submit tickets, view history)
+- Landing page pivot to web design services (review request becomes add-on page)
+- Pricing: Basic $199/mo (1-4 pages), Advanced $299/mo (4-10 pages), Review add-on $99/mo
+- Bug fix: brand_voice column missing from businesses table
 
 ### Out of Scope
 
@@ -127,26 +128,24 @@ Turn job completions into Google reviews automatically — multi-touch follow-up
 | Dashboard test step cards | Guided walkthrough instead of checklist | Good — auto-detection of completion |
 | Test sends excluded from quota | Fair for users learning the product | Good — is_test flag in database |
 
-## Current Milestone: v3.1.1 QA Bug Fixes
+## Current Milestone: v4.0 Web Design Agency Pivot
 
-**Goal:** Fix all 10 bugs discovered during the v3.1 QA E2E Audit — from the critical frozen enrollment migration to low-severity touch target sizing.
+**Goal:** Transform AvisLoop from a self-serve review request SaaS into a web design agency platform for home service businesses, with review automation as an add-on service.
 
-**Bug inventory:**
-- **BUG-CAMP-04 (Critical):** Frozen enrollment migration unapplied + toggleCampaignStatus swallows errors
-- **BUG-CAMP-01 (Medium):** ENROLLMENT_STATUS_LABELS missing 'frozen' key
-- **BUG-CAMP-02 (Low):** No "Frozen" stat card on campaign detail page
-- **BUG-CAMP-03 (Low):** resolveTemplate() falls back to wrong service type
-- **BUG-HIST-01 (Medium):** getSendLogs timezone bug in date range filter
-- **BUG-ONB-01 (Medium):** software_used column missing from businesses table
-- **BUG-DASH-06 (Medium):** KPIWidgets removed from dashboard — no /analytics navigation
-- **BUG-DASH-10 (Medium):** Mobile header overflow 17px at 375px
-- **BUG-JOBS-01 (Low):** Column header clicks don't sort rows
-- **BUG-FORM-01 (Low):** ServiceTypeSelect trigger below 44px touch target
+**Target features:**
+- Web design client CRM with dedicated `/clients` page
+- Ticket/revision tracking with monthly limits and $50 overage billing
+- Client portal (unique URL per client) for ticket submission and history
+- New marketing landing page for web design services
+- Review request as secondary add-on page
+- Updated pricing: Basic $199/mo, Advanced $299/mo, Review add-on $99/mo
+- Bug fix: apply brand_voice migration to resolve onboarding error
 
 **Key decisions:**
-- Fix all severities — ship clean before production
-- Group by area (campaigns, dashboard, misc) for efficient execution
-- Verify each fix against original QA finding
+- Solo agency model — only the agency owner uses the full dashboard
+- Clients access a lightweight portal via unique token URL (same pattern as `/complete/[token]`)
+- Existing review/reputation features preserved but repositioned as add-on
+- Client card extends existing business model — removes competitive analysis, adds web design fields
 
 ---
-*Last updated: 2026-03-03 after v3.1.1 QA Bug Fixes milestone started*
+*Last updated: 2026-03-18 after v4.0 Web Design Agency Pivot milestone started*
