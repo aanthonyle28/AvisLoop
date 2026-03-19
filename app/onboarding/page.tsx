@@ -24,7 +24,7 @@ import { CreateBusinessWizard } from '@/components/onboarding/create-business-wi
 export default async function OnboardingPage({
   searchParams,
 }: {
-  searchParams: Promise<{ step?: string; mode?: string }>
+  searchParams: Promise<{ step?: string; mode?: string; businessId?: string }>
 }) {
   // Auth check
   const supabase = await createClient()
@@ -39,6 +39,8 @@ export default async function OnboardingPage({
   // Parse params early — mode=new bypasses the "already completed" redirect
   const params = await searchParams
   const isNewBusinessMode = params.mode === 'new'
+  const isReviewSetupMode = params.mode === 'review-setup'
+  const targetBusinessId = params.businessId ?? null
 
   // Get active business (may be null for brand-new users)
   const activeBusiness = await getActiveBusiness()
@@ -46,8 +48,8 @@ export default async function OnboardingPage({
   // Check onboarding status (handles null business gracefully)
   const status = activeBusiness ? await getOnboardingStatus(activeBusiness.id) : null
 
-  // If already complete, go to dashboard — UNLESS we're creating a new business
-  if (status?.completed && !isNewBusinessMode) {
+  // If already complete, go to dashboard — UNLESS we're creating a new business or setting up review
+  if (status?.completed && !isNewBusinessMode && !isReviewSetupMode) {
     redirect('/dashboard')
   }
 
@@ -78,6 +80,33 @@ export default async function OnboardingPage({
     sms_consent_acknowledged: business.sms_consent_acknowledged || false,
     brand_voice: business.brand_voice || null,
   } : null
+
+  // Review setup mode — for existing web_design businesses upgrading to review management
+  if (isReviewSetupMode && targetBusinessId) {
+    // Switch to the target business first if needed
+    const targetBusiness = targetBusinessId
+      ? await getBusiness(targetBusinessId)
+      : business
+
+    const reviewSetupBusiness = targetBusiness ? {
+      name: targetBusiness.name,
+      phone: targetBusiness.phone || null,
+      google_review_link: targetBusiness.google_review_link || null,
+      software_used: targetBusiness.software_used || null,
+      service_types_enabled: targetBusiness.service_types_enabled || null,
+      custom_service_names: targetBusiness.custom_service_names || null,
+      sms_consent_acknowledged: targetBusiness.sms_consent_acknowledged || false,
+      brand_voice: targetBusiness.brand_voice || null,
+    } : null
+
+    return (
+      <OnboardingWizard
+        initialStep={1}
+        business={reviewSetupBusiness}
+        campaignPresets={presets || []}
+      />
+    )
+  }
 
   if (isNewBusinessMode) {
     return (

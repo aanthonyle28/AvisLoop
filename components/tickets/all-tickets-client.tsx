@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import {
   Select,
@@ -63,6 +63,11 @@ export function AllTicketsClient({ tickets: initialTickets, businesses }: AllTic
   const [tickets, setTickets] = useState(initialTickets)
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [businessFilter, setBusinessFilter] = useState<string>('all')
+
+  // Sync tickets when server re-renders with new data (e.g., business switch)
+  useEffect(() => {
+    setTickets(initialTickets)
+  }, [initialTickets])
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedTicket, setSelectedTicket] = useState<TicketWithContext | null>(null)
   const [drawerMessages, setDrawerMessages] = useState<TicketMessage[]>([])

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import {
   Sheet,
   SheetContent,
@@ -215,6 +216,20 @@ export function BusinessDetailDrawer({
                 )}>
                   {business.client_type === 'reputation' ? 'Review' : business.client_type === 'web_design' ? 'Web Design' : 'Web + Review'}
                 </span>
+              )}
+              {/* Contextual upgrade prompts */}
+              {!isEditing && business.client_type === 'web_design' && (
+                <p className='text-xs text-muted-foreground mt-2'>
+                  Want to add review management? Edit Details → change type to &quot;Both&quot;, save, then set up services and campaigns via{' '}
+                  <Link href={`/onboarding?mode=review-setup&businessId=${business.id}`} className='text-primary underline'>
+                    Review Setup
+                  </Link>
+                </p>
+              )}
+              {!isEditing && business.client_type === 'reputation' && (
+                <p className='text-xs text-muted-foreground mt-2'>
+                  Want to add web design? Edit Details → change type to &quot;Both&quot;, then add a web project from the detail view.
+                </p>
               )}
             </div>
 
