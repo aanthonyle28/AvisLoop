@@ -10,16 +10,16 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 ## Current Position
 
 Phase: 76 — V4 Design System Rollout
-Plan: 04 of 6 complete
+Plan: 05 of 6 complete
 Milestone: v4.0 Web Design Agency Pivot
 Status: In progress
 
-Last activity: 2026-03-19 — Completed 76-04-PLAN.md (redesigned /pricing and /client-portal with V4 design language)
+Last activity: 2026-03-19 — Completed 76-05-PLAN.md (V4 nav+footer in (marketing) layout, legal page breadcrumbs)
 
 ```
 [Phase 71] [Phase 72] [Phase 73] [Phase 74] [Phase 75] [Phase 76]
     |           |           |           |           |       |
- COMPLETE   COMPLETE   COMPLETE   COMPLETE   COMPLETE   01-02-03-04 done
+ COMPLETE   COMPLETE   COMPLETE   COMPLETE   COMPLETE   01-02-03-04-05 done
 ```
 
 ## Performance Metrics
@@ -30,7 +30,7 @@ Last activity: 2026-03-19 — Completed 76-04-PLAN.md (redesigned /pricing and /
 - v3.1 plans completed: 17/17
 - v3.1.1 plans completed: 2/2 (COMPLETE)
 - Phase 70 plans completed: 0/3 (in progress)
-- v4.0 plans completed: 15 (Phase 71-01, 71-02, 72-01, 72-02, 73-01, 73-02, 73-03, 74-01, 74-02, 75-01, 75-02, 76-01, 76-02, 76-03, 76-04)
+- v4.0 plans completed: 16 (Phase 71-01, 71-02, 72-01, 72-02, 73-01, 73-02, 73-03, 74-01, 74-02, 75-01, 75-02, 76-01, 76-02, 76-03, 76-04, 76-05)
 
 *Updated after each plan completion*
 
@@ -120,6 +120,14 @@ Four idempotent migrations must be applied via Supabase Dashboard SQL Editor:
 - **Reviews Add-On CTA links to /reputation**: Consistent with homepage; "Learn More" → /reputation, not Calendly
 - **ClientPortalLookup unchanged**: Preserved exactly as imported — only wrapped with V4 visual treatment
 
+### Key Decisions (76-05)
+
+- **authSlot prop pattern**: `AuthSlot` async server component resolves user auth and passes result as prop to `MarketingNav` client component — keeps client boundary minimal, no client-side auth fetch
+- **ThemeSwitcher inside AuthSlot**: Co-located with auth-sensitive nav right side; cleaner than splitting it out
+- **Fixed nav + h-16 spacer**: Spacer div after MarketingNav so child pages don't need individual pt-16 overrides
+- **Nav links are page routes not anchors**: (marketing) layout wraps interior pages; links to /reputation and /pricing as routes, not hash anchors
+- **sms-compliance narrowed to max-w-3xl**: Consistent readability standard with privacy and terms pages
+
 ### Blockers/Concerns
 
 - 4 DB migrations pending manual Supabase Dashboard SQL Editor application (see above -- Phase 71 will create additional migrations)
@@ -137,6 +145,6 @@ Four idempotent migrations must be applied via Supabase Dashboard SQL Editor:
 ## Session Continuity
 
 Last session: 2026-03-19
-Stopped at: Completed 76-04-PLAN.md — redesigned /pricing and /client-portal with V4 design language
+Stopped at: Completed 76-05-PLAN.md — V4 nav+footer in (marketing) layout, legal page breadcrumbs
 Resume file: None
-Next action: Phase 76-05 — update (marketing) layout with V4Nav + V4Footer
+Next action: Phase 76-06 — final plan in V4 Design System Rollout phase
