@@ -1,14 +1,5 @@
 import type { Metadata } from "next";
-import { HeroV2 } from "@/components/marketing/v2/hero-v2";
-import { SocialProofStrip } from "@/components/marketing/v2/social-proof-strip";
-import { WhyAvisLoop } from "@/components/marketing/v2/features-bento";
-import { ServicesSection } from "@/components/marketing/v2/services-section";
-import { HowItWorksSection } from "@/components/marketing/v2/how-it-works";
-import { AnimatedStatsSection } from "@/components/marketing/v2/animated-stats";
-import { Testimonials } from "@/components/marketing/testimonials";
-import { PricingSection } from "@/components/marketing/v2/pricing-section";
-import { FAQSection } from "@/components/marketing/faq-section";
-import { CTASection } from "@/components/marketing/cta-section";
+import { ReputationContent } from "./_components/reputation-content";
 
 const baseUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -128,16 +119,7 @@ export default function ReputationPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      <HeroV2 />
-      <SocialProofStrip />
-      <ServicesSection />
-      <HowItWorksSection />
-      <WhyAvisLoop />
-      <AnimatedStatsSection />
-      <Testimonials />
-      <PricingSection />
-      <FAQSection />
-      <CTASection />
+      <ReputationContent />
     </>
   );
 }
