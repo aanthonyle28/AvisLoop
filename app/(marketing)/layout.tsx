@@ -47,16 +47,19 @@ export default function MarketingLayout({
             </Link>
             <div className="hidden md:flex items-center gap-1">
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/#features">Services</Link>
+                <Link href="/#services">Services</Link>
               </Button>
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/#how-it-works">How It Works</Link>
+                <Link href="/#process">How It Works</Link>
               </Button>
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/#pricing">Pricing</Link>
               </Button>
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/#faq">FAQ</Link>
+              </Button>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/reputation">Reputation</Link>
               </Button>
             </div>
           </div>
@@ -90,7 +93,7 @@ export default function MarketingLayout({
                 <span>AvisLoop</span>
               </Link>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Managed Google review service for HVAC, plumbing, electrical, and home service businesses. More reviews, better ratings, zero effort.
+                Professional websites and reputation management for HVAC, plumbing, electrical, and home service businesses.
               </p>
             </div>
 
@@ -100,7 +103,7 @@ export default function MarketingLayout({
               <ul className="space-y-3 text-sm">
                 <li>
                   <Link
-                    href="/#features"
+                    href="/#services"
                     className="text-muted-foreground hover:text-foreground transition-colors"
                   >
                     What We Do
@@ -108,7 +111,7 @@ export default function MarketingLayout({
                 </li>
                 <li>
                   <Link
-                    href="/#how-it-works"
+                    href="/#process"
                     className="text-muted-foreground hover:text-foreground transition-colors"
                   >
                     How It Works
@@ -128,6 +131,14 @@ export default function MarketingLayout({
                     className="text-muted-foreground hover:text-foreground transition-colors"
                   >
                     FAQ
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/reputation"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Review Service
                   </Link>
                 </li>
               </ul>
@@ -177,7 +188,7 @@ export default function MarketingLayout({
               &copy; 2026 AvisLoop. All rights reserved.
             </p>
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <span>Google review management for home service businesses</span>
+              <span>Web design and reputation management for home service businesses</span>
             </div>
           </div>
         </div>

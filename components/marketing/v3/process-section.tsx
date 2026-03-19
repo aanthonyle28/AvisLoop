@@ -36,7 +36,7 @@ const steps = [
 export function ProcessSection() {
   return (
     <section
-      id="how-it-works"
+      id="process"
       className="py-24 md:py-32 scroll-mt-20"
     >
       <div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">

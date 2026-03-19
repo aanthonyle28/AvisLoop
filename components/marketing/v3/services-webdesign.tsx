@@ -50,7 +50,7 @@ const services = [
 export function ServicesWebDesign() {
   return (
     <section
-      id="features"
+      id="services"
       className="py-24 md:py-32 scroll-mt-20 bg-muted/30 border-y border-border/30"
     >
       <div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
