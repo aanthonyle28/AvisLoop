@@ -1,72 +1,125 @@
-# Requirements: v3.1.1 QA Bug Fixes
+# Requirements: v4.0 Web Design Agency Pivot
 
-**Milestone:** v3.1.1 — QA Bug Fixes
-**Created:** 2026-03-03
-**Status:** Roadmap complete
+**Defined:** 2026-03-18
+**Core Value:** Provide home service businesses with professional websites and optional automated review management — all managed through a single agency dashboard.
 
----
+## v4.0 Requirements
 
-## v3.1.1 Requirements
+### Data Model & Business Extension
 
-All requirements are bug fixes discovered during the v3.1 QA E2E Audit. Each has a known fix documented in the QA findings.
+- [ ] **DATA-01**: Businesses table has a `client_type` discriminator column (`reputation` | `web_design` | `both`) that branches behavior across the app
+- [ ] **DATA-02**: Business record includes web design fields: owner_name, owner_email, owner_phone, web_design_tier (basic/advanced), has_review_addon, monthly_fee, start_date, invoice_date, status (active/paused/churned), vercel_project_url, domain, live_website_url
+- [ ] **DATA-03**: `web_projects` table exists with business_id, project_name, page_count, status (setup/live/maintenance), launched_at, and relevant project metadata
+- [ ] **DATA-04**: Business card on /businesses page removes competitive analysis fields and shows web design fields when client_type is web_design or both
 
-### Campaigns
+### Web Design CRM
 
-- [x] **CAMP-FIX-01**: Apply frozen enrollment migration to database and add error handling to `toggleCampaignStatus()` so constraint violations surface to the user instead of being silently swallowed *(Critical)*
-- [x] **CAMP-FIX-02**: Add 'frozen' key to `ENROLLMENT_STATUS_LABELS` in `lib/constants/campaigns.ts` *(Medium)*
-- [x] **CAMP-FIX-03**: Add "Frozen" stat card to campaign detail page showing count of frozen enrollments *(Low)*
-- [x] **CAMP-FIX-04**: Fix `resolveTemplate()` in touch-sequence-display.tsx to filter system templates by campaign service type before falling back to channel-only match *(Low)*
+- [ ] **CRM-01**: A dedicated `/clients` page shows a table of all web design clients with columns: business name, owner name, tier, status, domain, MRR, revisions used this month
+- [ ] **CRM-02**: Table is filterable by status (active/paused/churned) and tier (basic/advanced)
+- [ ] **CRM-03**: Clicking a client row opens a detail view showing full business info, project details, ticket history, and revision usage (X of Y remaining)
+- [ ] **CRM-04**: Agency operator can edit client details (contact info, tier, domain, Vercel project, status) from the detail view
+- [ ] **CRM-05**: CRM page shows total MRR summary across all active web design clients
 
-### Dashboard
+### Ticket & Revision Tracking
 
-- [x] **DASH-FIX-01**: Restore KPI card navigation to /analytics — either re-add KPIWidgets or update right panel compact cards to link to /analytics *(Medium)*
-- [x] **DASH-FIX-02**: Fix mobile header overflow at 375px by hiding "View Campaigns" secondary button on mobile (`hidden sm:flex`) *(Medium)*
+- [ ] **TICK-01**: `project_tickets` table exists with business_id, title, description, status (submitted/in_progress/completed), priority, created_at, updated_at, completed_at
+- [ ] **TICK-02**: `ticket_messages` table exists for threaded updates — both client and agency can add messages with optional file attachments
+- [ ] **TICK-03**: Monthly revision limits enforced atomically: Basic plan gets 2/month, Advanced gets 4/month, no rollover
+- [ ] **TICK-04**: When a client reaches their monthly limit, form blocks submission and displays a message offering additional requests at $50 each
+- [ ] **TICK-05**: Client confirms $50 overage before submitting — overage requests are tracked separately for billing
+- [ ] **TICK-06**: Agency operator can view all tickets across all clients in a single view, filterable by status and client
+- [ ] **TICK-07**: Agency operator can update ticket status (submitted → in_progress → completed) and add completion notes
+- [ ] **TICK-08**: File/screenshot attachments supported on tickets via Supabase Storage (10MB limit, images + PDF)
 
-### History
+### Client Portal
 
-- [x] **HIST-FIX-01**: Fix timezone bug in `getSendLogs` — replace `setHours(23,59,59,999)` with UTC-explicit `new Date(dateTo + 'T23:59:59.999Z')` *(Medium)*
+- [ ] **PORT-01**: Each web design client has a unique portal token generating a permanent URL at `/portal/[token]`
+- [ ] **PORT-02**: Portal loads without authentication — client accesses via bookmarkable link
+- [ ] **PORT-03**: Portal displays "X of Y revisions remaining this month" prominently
+- [ ] **PORT-04**: Client can submit a revision request with title, description, and optional file attachment from the portal
+- [ ] **PORT-05**: Portal shows client's ticket history with current status and any agency responses/messages
+- [ ] **PORT-06**: Portal is rate-limited to prevent abuse (Upstash Redis, same pattern as existing public routes)
+- [ ] **PORT-07**: Invalid or missing portal tokens show a clear error page (not a crash)
 
-### Onboarding
+### Marketing & Landing Page
 
-- [x] **ONB-FIX-01**: Add missing `software_used TEXT` column to businesses table via migration *(Medium)*
+- [ ] **MKT-01**: New homepage at `/` positions AvisLoop as a web design agency for home service businesses with hero, services overview, pricing cards, and CTA
+- [ ] **MKT-02**: Existing review/reputation landing page content moves to a secondary page (e.g., `/reputation` or `/reviews`) accessible from the homepage
+- [ ] **MKT-03**: Pricing section displays three offerings: Basic $199/mo (1-4 pages, 2 revisions/mo), Advanced $299/mo (4-10 pages, 4 revisions/mo), Review add-on $99/mo
+- [ ] **MKT-04**: Landing page follows existing brand design system (Kumbh Sans, warm palette, Phosphor icons)
+- [ ] **MKT-05**: Landing page is responsive and works well on mobile (375px+)
 
-### Jobs
+### Bug Fix
 
-- [x] **JOBS-FIX-01**: Wire column header sort click handlers using TanStack `header.column.getToggleSortingHandler()` *(Low)*
+- [ ] **BUG-01**: Apply `brand_voice` column migration to businesses table to resolve "Could not find the 'brand_voice' column" error during onboarding
 
-### Public Form
+## Future Requirements
 
-- [x] **FORM-FIX-01**: Increase ServiceTypeSelect trigger height from h-10 (40px) to h-11 (44px) to meet 44px touch target minimum *(Low)*
+### Stripe Billing Integration (v4.1)
+
+- **BILL-01**: Stripe products/prices for Basic ($199), Advanced ($299), and Review add-on ($99)
+- **BILL-02**: Webhook handler updated to iterate all subscription items and map new price IDs
+- **BILL-03**: $50 overage invoicing via Stripe one-time invoice API
+- **BILL-04**: Billing page shows web design subscription status alongside review add-on status
+
+### Enhanced Portal (v4.2)
+
+- **PORT-08**: Portal token regeneration ("Regenerate link" button for security rotation)
+- **PORT-09**: Agency branding on portal (custom agency name instead of "AvisLoop")
+- **PORT-10**: Email notifications to client when ticket status changes
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| New features | Fix-only milestone — no new capabilities |
-| Marketing page updates | Dashboard-only scope |
-| Performance optimization | Separate concern |
-| Accessibility improvements beyond touch targets | Separate milestone |
+| Stripe billing automation for web design tiers | Deferred to v4.1 — manual invoicing sufficient for solo agency MVP |
+| Client login with email/password | Token-based portal is simpler and better for non-technical clients |
+| Annotation/visual markup tools | Anti-feature — home service clients describe changes in plain English |
+| Kanban/Gantt/milestone project management | Overbuilding — 3-state ticket system is sufficient for revision tracking |
+| Multi-agency support (multiple operators) | Solo agency model — 1 user = 1 account |
+| Portfolio/gallery in landing page | Can use static screenshots initially; dynamic portfolio is v4.2+ |
+| Automated ticket escalation | Manual management sufficient at solo-operator scale |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CAMP-FIX-01 | Phase 68 | Complete |
-| CAMP-FIX-02 | Phase 68 | Complete |
-| CAMP-FIX-03 | Phase 68 | Complete |
-| CAMP-FIX-04 | Phase 68 | Complete |
-| DASH-FIX-01 | Phase 69 | Complete |
-| DASH-FIX-02 | Phase 69 | Complete |
-| HIST-FIX-01 | Phase 69 | Complete |
-| ONB-FIX-01 | Phase 69 | Complete |
-| JOBS-FIX-01 | Phase 69 | Complete |
-| FORM-FIX-01 | Phase 69 | Complete |
+| DATA-01 | TBD | Pending |
+| DATA-02 | TBD | Pending |
+| DATA-03 | TBD | Pending |
+| DATA-04 | TBD | Pending |
+| CRM-01 | TBD | Pending |
+| CRM-02 | TBD | Pending |
+| CRM-03 | TBD | Pending |
+| CRM-04 | TBD | Pending |
+| CRM-05 | TBD | Pending |
+| TICK-01 | TBD | Pending |
+| TICK-02 | TBD | Pending |
+| TICK-03 | TBD | Pending |
+| TICK-04 | TBD | Pending |
+| TICK-05 | TBD | Pending |
+| TICK-06 | TBD | Pending |
+| TICK-07 | TBD | Pending |
+| TICK-08 | TBD | Pending |
+| PORT-01 | TBD | Pending |
+| PORT-02 | TBD | Pending |
+| PORT-03 | TBD | Pending |
+| PORT-04 | TBD | Pending |
+| PORT-05 | TBD | Pending |
+| PORT-06 | TBD | Pending |
+| PORT-07 | TBD | Pending |
+| MKT-01 | TBD | Pending |
+| MKT-02 | TBD | Pending |
+| MKT-03 | TBD | Pending |
+| MKT-04 | TBD | Pending |
+| MKT-05 | TBD | Pending |
+| BUG-01 | TBD | Pending |
 
 **Coverage:**
-- v3.1.1 requirements: 10 total
-- Mapped to phases: 10/10
-- Unmapped: 0
+- v4.0 requirements: 30 total
+- Mapped to phases: 0
+- Unmapped: 30 ⚠️
 
 ---
-*Requirements defined: 2026-03-03*
-*Last updated: 2026-03-04 after Phase 69 execution — all requirements complete*
+*Requirements defined: 2026-03-18*
+*Last updated: 2026-03-18 after initial definition*
