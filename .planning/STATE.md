@@ -5,32 +5,32 @@
 See: .planning/PROJECT.md (updated 2026-03-18)
 
 **Core value:** Provide home service businesses with professional websites and optional automated review management -- all managed through a single agency dashboard.
-**Current focus:** v4.0 Web Design Agency Pivot -- Phase 72 (Web Design CRM)
+**Current focus:** v4.0 Web Design Agency Pivot -- Phase 73 (Ticket System)
 
 ## Current Position
 
 Phase: 73 — Ticket System
-Plan: 01 of 3 complete
+Plan: 02 of 3 complete
 Milestone: v4.0 Web Design Agency Pivot
 Status: In progress
 
-Last activity: 2026-03-19 — Completed 73-01-PLAN.md (Ticket DB: atomic RPC, overage columns, constants, composite types)
+Last activity: 2026-03-19 — Completed 73-02-PLAN.md (Ticket UI: data layer, server actions, operator ticket management UI, /clients/[id]/tickets page)
 
 ```
 [Phase 71] [Phase 72] [Phase 73] [Phase 74] [Phase 75]
     |           |           |           |           |
- COMPLETE   In prog    Planned     Planned     Planned
+ COMPLETE   COMPLETE   In prog    Planned     Planned
 ```
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 263
+- Total plans completed (project): 264
 - v3.0 plans completed: 15/15
 - v3.1 plans completed: 17/17
 - v3.1.1 plans completed: 2/2 (COMPLETE)
 - Phase 70 plans completed: 0/3 (in progress)
-- v4.0 plans completed: 5 (Phase 71-01, 71-02, 72-01, 72-02, 73-01)
+- v4.0 plans completed: 6 (Phase 71-01, 71-02, 72-01, 72-02, 73-01, 73-02)
 
 *Updated after each plan completion*
 
@@ -72,6 +72,13 @@ Four idempotent migrations must be applied via Supabase Dashboard SQL Editor:
 - **TicketStatus union extension**: Extended rather than replaced to maintain backwards compatibility with existing code using old status values
 - **RPC author_type mapping**: `submit_ticket_with_limit_check` maps `'client_portal'` → `'client'` author_type internally to satisfy ticket_messages CHECK constraint
 
+### Key Decisions (73-02)
+
+- **window.location.reload() after ticket creation**: pragmatic over optimistic update — ensures server-rendered list reflects DB state without complex state management across 3 components
+- **Drawer messages as prop []**: No per-drawer fetch triggered on open; messages render from page-level fetch. Sufficient for MVP, can be enhanced later
+- **RPC result as data?.[0]**: supabase.rpc() return type is flexible (scalar or array); safe access pattern used in createTicket action
+- **ticket-list unused props via eslint-disable**: projectDomain and subscriptionTier forwarded to TicketList for future use; linter suppressed cleanly
+
 ### Blockers/Concerns
 
 - 4 DB migrations pending manual Supabase Dashboard SQL Editor application (see above -- Phase 71 will create additional migrations)
@@ -89,6 +96,6 @@ Four idempotent migrations must be applied via Supabase Dashboard SQL Editor:
 ## Session Continuity
 
 Last session: 2026-03-19
-Stopped at: Completed 73-01-PLAN.md — ticket data layer (migration, RPC, constants, types)
+Stopped at: Completed 73-02-PLAN.md — ticket data layer + operator UI (TicketList, TicketDetailDrawer, NewTicketForm, /clients/[id]/tickets page)
 Resume file: None
-Next action: Phase 73-02 (data functions calling submit_ticket_with_limit_check)
+Next action: Phase 73-03 (client portal ticket view / all-tickets operator view)
