@@ -19,6 +19,7 @@ const eslintConfig = [
       "qa-*.mjs",
       "test-*.mjs",
       "_temp_*.js",
+      "e2e/**",
     ],
   },
   ...compat.extends("next/core-web-vitals", "next/typescript"),
