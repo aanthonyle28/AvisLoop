@@ -194,15 +194,13 @@ export async function updateInternalNotes(
 export async function fetchTicketMessages(
   ticketId: string
 ): Promise<TicketMessage[]> {
-  const business = await getActiveBusiness()
-  if (!business) return []
-
   const supabase = await createClient()
+
+  // RLS ensures user can only see messages for businesses they own
   const { data, error } = await supabase
     .from('ticket_messages')
     .select('*')
     .eq('ticket_id', ticketId)
-    .eq('business_id', business.id)
     .order('created_at', { ascending: true })
 
   if (error || !data) return []
