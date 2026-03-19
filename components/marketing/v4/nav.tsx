@@ -51,32 +51,32 @@ export function V4Nav({ links = DEFAULT_LINKS, calendlyUrl = DEFAULT_CALENDLY, r
         }}
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between h-16 px-6 lg:px-10">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5">
-            <svg viewBox="0 0 28 28" fill="none" className="w-6 h-6" aria-hidden="true">
-              <path
-                d="M13.9614 13.9428C13.9614 13.9428 15.6661 8.28761 13.1687 5.6657C9.39938 1.70861 2.46616 5.36825 1.25864 10.7178C1.06397 11.5803 0.964999 12.4675 1.01126 13.3511C1.39358 20.6533 9.24432 25.3666 16.2932 23.6446C17.7686 23.2841 19.1513 22.7512 20.2657 21.9762C27.8097 16.7301 26.9724 8.28761 26.9724 8.28761"
-                stroke={ACCENT}
-                strokeWidth="2"
-              />
-            </svg>
-            <span className="text-lg font-bold tracking-tight">AvisLoop</span>
-          </Link>
-
-          {/* Desktop links */}
-          <div className="hidden md:flex items-center gap-8">
-            {links.map((l) => (
-              <a
-                key={l.label}
-                href={l.href}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {l.label}
-              </a>
-            ))}
+          {/* Left — Logo + links */}
+          <div className="flex items-center gap-8">
+            <Link href="/" className="flex items-center gap-2.5">
+              <svg viewBox="0 0 28 28" fill="none" className="w-6 h-6" aria-hidden="true">
+                <path
+                  d="M13.9614 13.9428C13.9614 13.9428 15.6661 8.28761 13.1687 5.6657C9.39938 1.70861 2.46616 5.36825 1.25864 10.7178C1.06397 11.5803 0.964999 12.4675 1.01126 13.3511C1.39358 20.6533 9.24432 25.3666 16.2932 23.6446C17.7686 23.2841 19.1513 22.7512 20.2657 21.9762C27.8097 16.7301 26.9724 8.28761 26.9724 8.28761"
+                  stroke={ACCENT}
+                  strokeWidth="2"
+                />
+              </svg>
+              <span className="text-lg font-bold tracking-tight">AvisLoop</span>
+            </Link>
+            <div className="hidden md:flex items-center gap-6">
+              {links.map((l) => (
+                <a
+                  key={l.label}
+                  href={l.href}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {l.label}
+                </a>
+              ))}
+            </div>
           </div>
 
-          {/* Desktop right side — CTAs + theme/auth */}
+          {/* Right — CTAs + theme/auth */}
           <div className="hidden md:flex items-center gap-3">
             {rightSlot}
             <Link
