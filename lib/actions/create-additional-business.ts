@@ -51,6 +51,7 @@ export async function createAdditionalBusiness(
       name,
       phone: phone || null,
       google_review_link: googleReviewLink || null,
+      client_type: (input as { clientType?: string }).clientType || 'reputation',
     })
     .select('id')
     .single()

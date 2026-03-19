@@ -40,11 +40,14 @@ interface CreateBusinessWizardProps {
 
 // ─── Step 1: Business Setup ───────────────────────────────────────────────────
 
+type ClientType = 'reputation' | 'web_design' | 'both'
+
 interface Step1Props {
-  onComplete: (businessId: string) => void
+  onComplete: (businessId: string, clientType: ClientType) => void
 }
 
 function BusinessSetupStep({ onComplete }: Step1Props) {
+  const [clientType, setClientType] = useState<ClientType>('reputation')
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [googleReviewLink, setGoogleReviewLink] = useState('')
@@ -84,7 +87,7 @@ function BusinessSetupStep({ onComplete }: Step1Props) {
       return
     }
 
-    if (selected.length === 0) {
+    if (clientType !== 'web_design' && selected.length === 0) {
       setError('Select at least one service type')
       return
     }
@@ -95,7 +98,8 @@ function BusinessSetupStep({ onComplete }: Step1Props) {
         name: name.trim(),
         phone: phone.trim(),
         googleReviewLink: googleReviewLink.trim(),
-      })
+        clientType,
+      } as Parameters<typeof createAdditionalBusiness>[0] & { clientType: ClientType })
 
       if (!basicsResult.success) {
         setError(basicsResult.error || 'Failed to create business')
@@ -104,18 +108,20 @@ function BusinessSetupStep({ onComplete }: Step1Props) {
 
       const newBusinessId = basicsResult.businessId
 
-      // Step 1b: Save service types scoped to the new business
-      const servicesResult = await saveNewBusinessServices(newBusinessId, {
-        serviceTypes: selected as ServiceTypeValue[],
-        customServiceNames: selected.includes('other') ? customServiceNames : [],
-      })
+      // Step 1b: Save service types scoped to the new business (skip for web_design-only)
+      if (clientType !== 'web_design' && selected.length > 0) {
+        const servicesResult = await saveNewBusinessServices(newBusinessId, {
+          serviceTypes: selected as ServiceTypeValue[],
+          customServiceNames: selected.includes('other') ? customServiceNames : [],
+        })
 
-      if (!servicesResult.success) {
-        setError(servicesResult.error || 'Failed to save service types')
-        return
+        if (!servicesResult.success) {
+          setError(servicesResult.error || 'Failed to save service types')
+          return
+        }
       }
 
-      onComplete(newBusinessId)
+      onComplete(newBusinessId, clientType)
     })
   }
 
@@ -131,6 +137,38 @@ function BusinessSetupStep({ onComplete }: Step1Props) {
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Client type selector */}
+        <div className="space-y-3">
+          <div>
+            <h2 className="text-lg font-semibold">What type of client is this?</h2>
+            <p className="text-sm text-muted-foreground">Choose the services this client needs.</p>
+          </div>
+          <div className="flex gap-2">
+            {([
+              { value: 'reputation' as const, label: 'Review Management' },
+              { value: 'web_design' as const, label: 'Web Design' },
+              { value: 'both' as const, label: 'Both' },
+            ]).map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setClientType(option.value)}
+                disabled={isPending}
+                className={cn(
+                  'flex-1 px-3 py-2.5 rounded-lg border text-sm font-medium transition-colors',
+                  clientType === option.value
+                    ? 'bg-foreground text-background border-foreground'
+                    : 'bg-background border-border hover:border-foreground/50'
+                )}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <Separator />
+
         {/* Business info fields */}
         <div className="space-y-4">
           <div className="space-y-2">
@@ -159,24 +197,26 @@ function BusinessSetupStep({ onComplete }: Step1Props) {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="google-review-link">Google review link</Label>
-            <Input
-              id="google-review-link"
-              type="url"
-              value={googleReviewLink}
-              onChange={(e) => setGoogleReviewLink(e.target.value)}
-              placeholder="https://g.page/r/..."
-              disabled={isPending}
-              className="text-lg h-12"
-            />
-          </div>
+          {clientType !== 'web_design' && (
+            <div className="space-y-2">
+              <Label htmlFor="google-review-link">Google review link</Label>
+              <Input
+                id="google-review-link"
+                type="url"
+                value={googleReviewLink}
+                onChange={(e) => setGoogleReviewLink(e.target.value)}
+                placeholder="https://g.page/r/..."
+                disabled={isPending}
+                className="text-lg h-12"
+              />
+            </div>
+          )}
         </div>
 
-        <Separator />
+        {clientType !== 'web_design' && <Separator />}
 
-        {/* Service types */}
-        <div className="space-y-3">
+        {/* Service types — only for reputation or both */}
+        {clientType !== 'web_design' && <div className="space-y-3">
           <div>
             <h2 className="text-lg font-semibold">What services do you offer?</h2>
             <p className="text-sm text-muted-foreground">
@@ -255,14 +295,14 @@ function BusinessSetupStep({ onComplete }: Step1Props) {
               )}
             </div>
           )}
-        </div>
+        </div>}
 
         {error && <p className="text-sm text-error-text">{error}</p>}
 
         <Button
           type="submit"
           className="w-full h-12 text-base"
-          disabled={isPending || selected.length === 0}
+          disabled={isPending || (clientType !== 'web_design' && selected.length === 0)}
         >
           {isPending ? 'Saving...' : 'Continue'}
         </Button>
@@ -623,10 +663,17 @@ export function CreateBusinessWizard({ campaignPresets }: CreateBusinessWizardPr
   const router = useRouter()
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1)
   const [newBusinessId, setNewBusinessId] = useState<string | null>(null)
+  const [newClientType, setNewClientType] = useState<ClientType>('reputation')
   const [isCancelling, startCancelTransition] = useTransition()
 
-  const handleStep1Complete = (businessId: string) => {
+  const handleStep1Complete = (businessId: string, clientType: ClientType) => {
     setNewBusinessId(businessId)
+    setNewClientType(clientType)
+    // Web design clients skip campaign/brand voice/SMS steps — go straight to completion
+    if (clientType === 'web_design') {
+      handleAutoComplete(businessId)
+      return
+    }
     setStep(2)
   }
 
