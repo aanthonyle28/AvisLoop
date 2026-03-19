@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/service-role'
+import { checkPortalRateLimit } from '@/lib/rate-limit'
 
 const BUCKET = 'revision-attachments'
 const ALLOWED_MIME_TYPES = new Set([
@@ -17,6 +18,13 @@ const ALLOWED_MIME_TYPES = new Set([
  * Body: { token, filename, contentType }
  */
 export async function POST(request: NextRequest) {
+  // C-1: Rate limit portal upload URL generation
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rateLimitResult = await checkPortalRateLimit(ip)
+  if (!rateLimitResult.success) {
+    return NextResponse.json({ error: 'Too many requests.' }, { status: 429 })
+  }
+
   let body: Record<string, string>
   try {
     body = (await request.json()) as Record<string, string>
@@ -27,6 +35,11 @@ export async function POST(request: NextRequest) {
   const { token, filename, contentType } = body
   if (!token || !filename || !contentType) {
     return NextResponse.json({ error: 'token, filename, and contentType are required' }, { status: 400 })
+  }
+
+  // C-2: Validate token format (randomBytes(24) produces 32-char base64url)
+  if (token.length < 32) {
+    return NextResponse.json({ error: 'Invalid token format' }, { status: 400 })
   }
 
   if (!ALLOWED_MIME_TYPES.has(contentType)) {

@@ -27,6 +27,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'token, ticketId, and body are required' }, { status: 400 })
   }
 
+  if (token.length < 32) {
+    return NextResponse.json({ error: 'Invalid token format' }, { status: 400 })
+  }
+
   if (messageBody.length > 5000) {
     return NextResponse.json({ error: 'Reply too long (max 5000 characters)' }, { status: 400 })
   }

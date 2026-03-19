@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const portalTicketSchema = z.object({
-  token: z.string().min(1, 'Portal token is required'),
+  token: z.string().min(32, 'Invalid portal token'),
   title: z
     .string()
     .min(3, 'Title must be at least 3 characters')

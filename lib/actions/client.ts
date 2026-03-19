@@ -119,6 +119,7 @@ export async function updateClientDetails(
     .from('businesses')
     .update(parsed.data)
     .eq('id', businessId)
+    .eq('user_id', user.id) // C-3: ownership guard (defense in depth beyond RLS)
 
   if (error) {
     console.error('Failed to update client details:', error)

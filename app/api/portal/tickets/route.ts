@@ -45,7 +45,16 @@ export async function POST(request: NextRequest) {
   }
 
   const { token, title, description } = parsed.data
-  const attachmentUrls = (body as Record<string, unknown>).attachmentUrls as string[] | undefined
+  // C-5: Validate attachment URLs — must be string[], max 5, and prefixed with correct business/project path
+  const rawAttachments = (body as Record<string, unknown>).attachmentUrls
+  let attachmentUrls: string[] | undefined
+  if (Array.isArray(rawAttachments) && rawAttachments.length > 0) {
+    const validPaths = rawAttachments
+      .filter((u): u is string => typeof u === 'string' && u.length <= 500)
+      .slice(0, 5)
+    // Will validate prefix after project is resolved (below)
+    attachmentUrls = validPaths.length > 0 ? validPaths : undefined
+  }
 
   const supabase = createServiceRoleClient()
 
@@ -100,6 +109,12 @@ export async function POST(request: NextRequest) {
       },
       { status: 429 }
     )
+  }
+
+  // C-5: Validate attachment path prefixes match this project
+  if (attachmentUrls?.length) {
+    const expectedPrefix = `${project.business_id}/${project.id}/`
+    attachmentUrls = attachmentUrls.filter((url: string) => url.startsWith(expectedPrefix))
   }
 
   // Step 5: If attachments were uploaded, insert a message with them

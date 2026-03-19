@@ -123,7 +123,7 @@ export async function updateTicketStatus(
     .from('project_tickets')
     .update(updates)
     .eq('id', ticketId)
-    // RLS policy handles ownership — no need to scope by active business
+    .eq('business_id', business.id) // C-4: ownership guard (defense in depth beyond RLS)
 
   if (error) {
     console.error('[updateTicketStatus] error:', error)

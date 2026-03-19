@@ -74,9 +74,14 @@ DECLARE
   v_author_type TEXT;
 BEGIN
   -- 1. Lock the web_projects row to serialize concurrent submissions.
+  --    Also verifies p_business_id matches the project (H-5: prevents cross-business injection).
   --    Any concurrent call for the same project_id will block here until
   --    this transaction commits or rolls back.
-  PERFORM id FROM web_projects WHERE id = p_project_id FOR UPDATE;
+  PERFORM id FROM web_projects WHERE id = p_project_id AND business_id = p_business_id FOR UPDATE;
+  IF NOT FOUND THEN
+    RETURN QUERY SELECT 'invalid_project'::TEXT, NULL::UUID, 0::INT, p_monthly_limit::INT;
+    RETURN;
+  END IF;
 
   -- 2. Count non-overage tickets submitted in the current calendar month
   --    for this project. Only non-overage tickets consume the monthly limit.
