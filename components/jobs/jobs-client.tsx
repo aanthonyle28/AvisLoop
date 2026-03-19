@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Plus } from '@phosphor-icons/react'
+import { Plus, LinkSimple, Check } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { JobTable } from './job-table'
 import { JobFilters, type JobFiltersState } from './job-filters'
 import { EmptyState } from './empty-state'
 import { useAddJob } from './add-job-provider'
+import { toast } from 'sonner'
 import type { JobWithEnrollment, Customer } from '@/lib/types/database'
 
 interface JobsClientProps {
@@ -18,11 +19,14 @@ interface JobsClientProps {
   campaignMap?: Map<string, { campaignName: string; firstTouchDelay: number }>
   /** Map of campaign UUID to name/delay for campaign_override display */
   campaignNames?: Map<string, { campaignName: string; firstTouchDelay: number }>
+  /** Token for the public job completion form */
+  formToken?: string | null
 }
 
-export function JobsClient({ initialJobs, totalJobs, customers, campaignMap, campaignNames }: JobsClientProps) {
+export function JobsClient({ initialJobs, totalJobs, customers, campaignMap, campaignNames, formToken }: JobsClientProps) {
   const searchParams = useSearchParams()
   const { openAddJob } = useAddJob()
+  const [copied, setCopied] = useState(false)
   const [filters, setFilters] = useState<JobFiltersState>({
     status: null,
     serviceType: null,
@@ -37,6 +41,19 @@ export function JobsClient({ initialJobs, totalJobs, customers, campaignMap, cam
       window.history.replaceState({}, '', '/jobs')
     }
   }, [searchParams, openAddJob])
+
+  const handleCopyFormLink = async () => {
+    if (!formToken) return
+    const url = `${window.location.origin}/complete/${formToken}`
+    try {
+      await navigator.clipboard.writeText(url)
+      setCopied(true)
+      toast.success('Form link copied')
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      toast.error('Failed to copy')
+    }
+  }
 
   // Filter jobs client-side (for initial load, server-side filtering for large datasets)
   const filteredJobs = initialJobs.filter(job => {
@@ -61,10 +78,22 @@ export function JobsClient({ initialJobs, totalJobs, customers, campaignMap, cam
             Track your service jobs &middot; {totalJobs} total
           </p>
         </div>
-        <Button onClick={openAddJob}>
-          <Plus className="mr-2 h-4 w-4" weight="bold" />
-          Add Job
-        </Button>
+        <div className="flex items-center gap-2">
+          {formToken && (
+            <Button variant="outline" onClick={handleCopyFormLink} aria-label="Copy job completion form link">
+              {copied ? (
+                <Check className="mr-2 h-4 w-4" />
+              ) : (
+                <LinkSimple className="mr-2 h-4 w-4" />
+              )}
+              {copied ? 'Copied!' : 'Copy Form Link'}
+            </Button>
+          )}
+          <Button onClick={openAddJob}>
+            <Plus className="mr-2 h-4 w-4" weight="bold" />
+            Add Job
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}

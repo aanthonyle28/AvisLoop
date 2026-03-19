@@ -57,27 +57,28 @@ export function SettingsTabs({
       </TabsList>
 
       {/* General — Business Profile + Job Completion Form */}
-      <TabsContent value="general">
-        <section className="border border-border rounded-lg p-6 bg-card shadow-sm">
-          <h2 className="text-xl font-semibold mb-4">Business Profile</h2>
+      <TabsContent value="general" className="space-y-6">
+        <div className="rounded-xl border border-border bg-card p-6">
+          <h2 className="text-lg font-semibold mb-1">Business Profile</h2>
+          <p className="text-sm text-muted-foreground mb-5">
+            Basic info for {business?.name || 'your business'}. This applies to the currently selected client.
+          </p>
           <BusinessSettingsForm initialData={business} templates={templates} />
-        </section>
+        </div>
 
         {business && (
-          <div className="mt-6">
-            <FormLinkSection
-              formToken={formToken ?? null}
-              businessName={business.name}
-            />
-          </div>
+          <FormLinkSection
+            formToken={formToken ?? null}
+            businessName={business.name}
+          />
         )}
       </TabsContent>
 
       {/* Templates — Message Templates */}
-      <TabsContent value="templates">
-        <section className="border border-border rounded-lg p-6 bg-card shadow-sm">
-          <h2 className="text-xl font-semibold mb-4">Message Templates</h2>
-          <p className="text-muted-foreground mb-4">
+      <TabsContent value="templates" className="space-y-6">
+        <div className="rounded-xl border border-border bg-card p-6">
+          <h2 className="text-lg font-semibold mb-1">Message Templates</h2>
+          <p className="text-sm text-muted-foreground mb-5">
             Create templates for email and SMS review requests. Use variables like
             {' '}{'{{CUSTOMER_NAME}}'}, {'{{BUSINESS_NAME}}'}, {'{{REVIEW_LINK}}'}.
           </p>
@@ -86,23 +87,26 @@ export function SettingsTabs({
 
           {business && (
             <div className="mt-6 pt-6 border-t border-border">
-              <h3 className="text-lg font-medium mb-4">Create New Template</h3>
+              <h3 className="text-base font-medium mb-4">Create New Template</h3>
               <MessageTemplateForm />
             </div>
           )}
 
           {!business && (
-            <p className="text-warning text-sm mt-4">
+            <p className="text-amber-600 dark:text-amber-400 text-sm mt-4">
               Save your business profile first (in General tab) before creating custom templates.
             </p>
           )}
-        </section>
+        </div>
       </TabsContent>
 
       {/* Services — Service Types */}
       <TabsContent value="services">
-        <section className="border border-border rounded-lg p-6 bg-card shadow-sm">
-          <h2 className="text-xl font-semibold mb-4">Service Types</h2>
+        <div className="rounded-xl border border-border bg-card p-6">
+          <h2 className="text-lg font-semibold mb-1">Service Types</h2>
+          <p className="text-sm text-muted-foreground mb-5">
+            Configure which services this business offers and campaign timing for each.
+          </p>
           <ServiceTypesSection
             initialEnabled={serviceTypeSettings?.serviceTypesEnabled || []}
             initialTiming={serviceTypeSettings?.serviceTypeTiming || {
@@ -112,34 +116,33 @@ export function SettingsTabs({
             initialCooldownDays={business?.review_cooldown_days ?? 30}
             initialCustomServiceNames={serviceTypeSettings?.customServiceNames || []}
           />
-        </section>
+        </div>
       </TabsContent>
 
       {/* Messaging — Brand Voice + AI Personalization */}
-      <TabsContent value="messaging">
-        <section className="border border-border rounded-lg p-6 bg-card shadow-sm space-y-8">
+      <TabsContent value="messaging" className="space-y-6">
+        <div className="rounded-xl border border-border bg-card p-6">
           <BrandVoiceSection currentValue={business?.brand_voice ?? null} />
+        </div>
 
-          <div className="border-t border-border pt-6">
-            <h2 className="text-xl font-semibold mb-4">AI Personalization</h2>
-            <p className="text-muted-foreground mb-4">
-              Messages are automatically personalized using AI before sending. View
-              performance stats and LLM usage for your account.
-            </p>
-            <PersonalizationSection summary={personalizationSummary} />
-          </div>
-        </section>
+        <div className="rounded-xl border border-border bg-card p-6">
+          <h2 className="text-lg font-semibold mb-1">AI Personalization</h2>
+          <p className="text-sm text-muted-foreground mb-5">
+            Messages are automatically personalized using AI before sending.
+          </p>
+          <PersonalizationSection summary={personalizationSummary} />
+        </div>
       </TabsContent>
 
       {/* Integrations — API key & webhook */}
       <TabsContent value="integrations">
-        <section className="border border-border rounded-lg p-6 bg-card shadow-sm">
-          <h2 className="text-xl font-semibold mb-4">Integrations</h2>
-          <p className="text-muted-foreground mb-4">
+        <div className="rounded-xl border border-border bg-card p-6">
+          <h2 className="text-lg font-semibold mb-1">Integrations</h2>
+          <p className="text-sm text-muted-foreground mb-5">
             Connect external tools like Zapier or Make to automatically add customers.
           </p>
           <IntegrationsSection hasExistingKey={hasApiKey} />
-        </section>
+        </div>
       </TabsContent>
 
       {/* Customers — Customer Management */}
@@ -153,23 +156,23 @@ export function SettingsTabs({
             hasReviewLink={!!business.google_review_link}
           />
         ) : (
-          <section className="border border-border rounded-lg p-6 bg-card shadow-sm">
+          <div className="rounded-xl border border-border bg-card p-6">
             <p className="text-muted-foreground">
               Save your business profile first (in General tab) to manage customers.
             </p>
-          </section>
+          </div>
         )}
       </TabsContent>
 
       {/* Account — Danger Zone */}
       <TabsContent value="account">
-        <section className="border border-destructive/30 rounded-lg p-6 bg-card shadow-sm">
-          <h2 className="text-xl font-semibold mb-2 text-destructive">Danger Zone</h2>
-          <p className="text-muted-foreground mb-4">
+        <div className="rounded-xl border border-destructive/30 bg-card p-6">
+          <h2 className="text-lg font-semibold mb-1 text-destructive">Danger Zone</h2>
+          <p className="text-sm text-muted-foreground mb-5">
             Permanently delete your account and all associated data. This action cannot be undone.
           </p>
           <DeleteAccountDialog hasPasswordAuth={hasPasswordAuth} />
-        </section>
+        </div>
       </TabsContent>
     </Tabs>
   )

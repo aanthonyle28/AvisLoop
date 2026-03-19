@@ -30,29 +30,46 @@ export async function updateBusiness(
     googleReviewLink: formData.get('googleReviewLink') || '',
     defaultSenderName: formData.get('defaultSenderName') || '',
     defaultTemplateId: formData.get('defaultTemplateId') || '',
+    ownerName: formData.get('ownerName') || '',
+    ownerEmail: formData.get('ownerEmail') || '',
+    ownerPhone: formData.get('ownerPhone') || '',
+    domain: formData.get('domain') || '',
+    liveWebsiteUrl: formData.get('liveWebsiteUrl') || '',
+    vercelProjectUrl: formData.get('vercelProjectUrl') || '',
   })
 
   if (!parsed.success) {
     return { fieldErrors: parsed.error.flatten().fieldErrors }
   }
 
-  const { name, phone, googleReviewLink, defaultSenderName, defaultTemplateId } = parsed.data
+  const {
+    name, phone, googleReviewLink, defaultSenderName, defaultTemplateId,
+    ownerName, ownerEmail, ownerPhone, domain, liveWebsiteUrl, vercelProjectUrl,
+  } = parsed.data
 
   const existingBusiness = await getActiveBusiness()
 
   const supabase = await createClient()
 
+  const updateData = {
+    name,
+    phone: phone || null,
+    google_review_link: googleReviewLink || null,
+    default_sender_name: defaultSenderName || null,
+    default_template_id: defaultTemplateId || null,
+    owner_name: ownerName || null,
+    owner_email: ownerEmail || null,
+    owner_phone: ownerPhone || null,
+    domain: domain || null,
+    live_website_url: liveWebsiteUrl || null,
+    vercel_project_url: vercelProjectUrl || null,
+  }
+
   if (existingBusiness) {
     // Update existing business (scoped by PK — safe)
     const { error } = await supabase
       .from('businesses')
-      .update({
-        name,
-        phone: phone || null,
-        google_review_link: googleReviewLink || null,
-        default_sender_name: defaultSenderName || null,
-        default_template_id: defaultTemplateId || null,
-      })
+      .update(updateData)
       .eq('id', existingBusiness.id)
 
     if (error) {
@@ -67,14 +84,7 @@ export async function updateBusiness(
 
     const { error } = await supabase
       .from('businesses')
-      .insert({
-        user_id: user.id,
-        name,
-        phone: phone || null,
-        google_review_link: googleReviewLink || null,
-        default_sender_name: defaultSenderName || null,
-        default_template_id: defaultTemplateId || null,
-      })
+      .insert({ user_id: user.id, ...updateData })
 
     if (error) {
       return { error: error.message }
@@ -83,6 +93,7 @@ export async function updateBusiness(
 
   revalidatePath('/settings')
   revalidatePath('/dashboard')
+  revalidatePath('/businesses')
   return { success: true }
 }
 

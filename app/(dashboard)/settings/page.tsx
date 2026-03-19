@@ -57,9 +57,9 @@ async function SettingsContent() {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border px-6 py-4">
-        <h1 className="text-3xl font-bold">Settings</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
         <p className="text-muted-foreground mt-1">
-          Configure your business profile and message templates
+          Configuring <span className="font-medium text-foreground">{business?.name || 'your business'}</span>
         </p>
       </div>
 

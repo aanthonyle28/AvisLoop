@@ -30,6 +30,40 @@ export const businessSchema = z.object({
     .uuid('Invalid template ID')
     .optional()
     .or(z.literal('')),
+  // Web design fields
+  ownerName: z
+    .string()
+    .max(100, 'Owner name must be less than 100 characters')
+    .trim()
+    .optional()
+    .or(z.literal('')),
+  ownerEmail: z
+    .string()
+    .email('Please enter a valid email')
+    .optional()
+    .or(z.literal('')),
+  ownerPhone: z
+    .string()
+    .max(20, 'Phone number too long')
+    .trim()
+    .optional()
+    .or(z.literal('')),
+  domain: z
+    .string()
+    .max(100, 'Domain must be less than 100 characters')
+    .trim()
+    .optional()
+    .or(z.literal('')),
+  liveWebsiteUrl: z
+    .string()
+    .url('Please enter a valid URL')
+    .optional()
+    .or(z.literal('')),
+  vercelProjectUrl: z
+    .string()
+    .url('Please enter a valid URL')
+    .optional()
+    .or(z.literal('')),
 })
 
 // Type exports

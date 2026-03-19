@@ -51,6 +51,7 @@ export default async function JobsPage() {
         customers={customers}
         campaignMap={campaignMap}
         campaignNames={campaignNames}
+        formToken={business.form_token}
       />
     </div>
   )

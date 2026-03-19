@@ -87,8 +87,8 @@ export function FormLinkSection({ formToken, businessName }: FormLinkSectionProp
   }
 
   return (
-    <section className="border border-border rounded-lg p-6 bg-card shadow-sm">
-      <h2 className="text-xl font-semibold mb-2">Job Completion Form</h2>
+    <section className="rounded-xl border border-border bg-card p-6">
+      <h2 className="text-lg font-semibold mb-1">Job Completion Form</h2>
       <p className="text-muted-foreground mb-4">
         Share this link with technicians so they can submit completed jobs on-site — no{' '}
         {businessName ? `${businessName} or ` : ''}AvisLoop account needed.
