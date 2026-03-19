@@ -1,18 +1,38 @@
-import { Star, TrendUp, TrendDown } from '@phosphor-icons/react/dist/ssr'
+import { Star, TrendUp, TrendDown, Globe } from '@phosphor-icons/react/dist/ssr'
 import { InteractiveCard } from '@/components/ui/card'
-import type { Business } from '@/lib/types/database'
+import type { Business, WebProject } from '@/lib/types/database'
 
 interface BusinessCardProps {
   business: Business
   isActive: boolean
+  webProject?: WebProject | null
 }
 
 function formatServiceType(type: string): string {
   return type.charAt(0).toUpperCase() + type.slice(1)
 }
 
-export function BusinessCard({ business, isActive }: BusinessCardProps) {
+function getStatusColor(status: string): string {
+  switch (status) {
+    case 'live':
+      return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+    case 'discovery':
+    case 'design':
+    case 'development':
+    case 'review':
+      return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+    case 'maintenance':
+      return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+    default:
+      return 'bg-muted text-muted-foreground'
+  }
+}
+
+export function BusinessCard({ business, isActive, webProject }: BusinessCardProps) {
+  const clientType = business.client_type
+
   // Service type badge: show first enabled type + overflow count
+  // Only shown for reputation and both clients (web_design clients don't have HVAC/plumbing)
   const enabledTypes = business.service_types_enabled ?? []
   const primaryType = enabledTypes[0]
   const overflowCount = enabledTypes.length - 1
@@ -42,6 +62,12 @@ export function BusinessCard({ business, isActive }: BusinessCardProps) {
       ? (reviewCountCurrent ?? 0) - (competitorCount ?? 0)
       : null
 
+  // Web design display values
+  const isWebDesign = clientType === 'web_design' || clientType === 'both'
+  const domain = webProject?.domain ?? null
+  const projectStatus = webProject?.status ?? null
+  const tier = webProject?.subscription_tier ?? null
+
   return (
     <InteractiveCard hoverAccent="amber" className="p-6">
       {/* Header row: business name + active badge */}
@@ -56,67 +82,124 @@ export function BusinessCard({ business, isActive }: BusinessCardProps) {
         )}
       </div>
 
-      {/* Service type badge */}
-      <div className="mb-4">
-        <span className="inline-block text-xs font-medium bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
-          {serviceTypeLabel}
-        </span>
-      </div>
+      {/* Client type badge — only shown for web_design and both */}
+      {clientType === 'web_design' && (
+        <div className="mb-3">
+          <span className="inline-block text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 px-2 py-0.5 rounded-full">
+            Web Design
+          </span>
+        </div>
+      )}
+      {clientType === 'both' && (
+        <div className="mb-3">
+          <span className="inline-block text-xs font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded-full">
+            Web + Review
+          </span>
+        </div>
+      )}
 
-      {/* Google rating */}
-      <div className="flex items-center gap-1.5 mb-3">
-        {rating !== null ? (
-          <>
-            <Star
-              size={16}
-              weight="fill"
-              className="text-amber-400 shrink-0"
-            />
-            <span className="text-2xl font-bold leading-none">
-              {rating.toFixed(1)}
-            </span>
-            <span className="text-xs text-muted-foreground">/ 5.0</span>
-          </>
-        ) : (
-          <span className="text-sm text-muted-foreground">No rating</span>
-        )}
-      </div>
+      {/* Service type badge — shown for reputation and both clients only */}
+      {(clientType === 'reputation' || clientType === 'both') && (
+        <div className="mb-4">
+          <span className="inline-block text-xs font-medium bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
+            {serviceTypeLabel}
+          </span>
+        </div>
+      )}
 
-      {/* Reviews gained */}
-      <div className="mb-2">
-        {reviewsGained === null ? (
-          <span className="text-xs text-muted-foreground">No review data</span>
-        ) : reviewsGained > 0 ? (
-          <span className="text-xs font-medium text-success">
-            +{reviewsGained} reviews gained
-          </span>
-        ) : (
-          <span className="text-xs text-muted-foreground">0 reviews gained</span>
-        )}
-      </div>
+      {/* Conditional content based on client type */}
+      {isWebDesign ? (
+        /* Web design fields: domain, status, tier */
+        <div className="space-y-3">
+          {/* Domain */}
+          <div className="flex items-center gap-1.5">
+            <Globe size={14} weight="regular" className="text-muted-foreground shrink-0" />
+            {domain ? (
+              <span className="text-sm text-foreground truncate">{domain}</span>
+            ) : (
+              <span className="text-sm text-muted-foreground">No domain set</span>
+            )}
+          </div>
 
-      {/* Competitive gap indicator */}
-      <div>
-        {!hasCurrentCount && !hasCompetitorCount ? (
-          <span className="text-xs text-muted-foreground">No competitor data</span>
-        ) : !hasCurrentCount || !hasCompetitorCount ? (
-          <span className="text-xs text-muted-foreground">Incomplete data</span>
-        ) : competitiveGap !== null && competitiveGap > 0 ? (
-          <span className="flex items-center gap-1 text-xs font-medium text-success">
-            <TrendUp size={12} weight="bold" className="shrink-0" />
-            {competitiveGap} ahead of {business.competitor_name ?? 'competitor'}
-          </span>
-        ) : competitiveGap !== null && competitiveGap < 0 ? (
-          <span className="flex items-center gap-1 text-xs font-medium text-destructive">
-            <TrendDown size={12} weight="bold" className="shrink-0" />
-            {Math.abs(competitiveGap)} behind {business.competitor_name ?? 'competitor'}
-          </span>
-        ) : (
-          <span className="text-xs text-muted-foreground">
-            Tied with {business.competitor_name ?? 'competitor'}
-          </span>
-        )}
-      </div>
+          {/* Project status badge */}
+          <div>
+            {projectStatus ? (
+              <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full capitalize ${getStatusColor(projectStatus)}`}>
+                {projectStatus.replace('_', ' ')}
+              </span>
+            ) : (
+              <span className="text-xs text-muted-foreground">No project</span>
+            )}
+          </div>
+
+          {/* Subscription tier chip */}
+          {tier && (
+            <div>
+              <span className="inline-block text-xs font-medium bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
+                {tier === 'basic' ? 'Basic' : 'Advanced'}
+              </span>
+            </div>
+          )}
+        </div>
+      ) : (
+        /* Reputation fields: Google rating, reviews gained, competitive gap */
+        <>
+          {/* Google rating */}
+          <div className="flex items-center gap-1.5 mb-3">
+            {rating !== null ? (
+              <>
+                <Star
+                  size={16}
+                  weight="fill"
+                  className="text-amber-400 shrink-0"
+                />
+                <span className="text-2xl font-bold leading-none">
+                  {rating.toFixed(1)}
+                </span>
+                <span className="text-xs text-muted-foreground">/ 5.0</span>
+              </>
+            ) : (
+              <span className="text-sm text-muted-foreground">No rating</span>
+            )}
+          </div>
+
+          {/* Reviews gained */}
+          <div className="mb-2">
+            {reviewsGained === null ? (
+              <span className="text-xs text-muted-foreground">No review data</span>
+            ) : reviewsGained > 0 ? (
+              <span className="text-xs font-medium text-success">
+                +{reviewsGained} reviews gained
+              </span>
+            ) : (
+              <span className="text-xs text-muted-foreground">0 reviews gained</span>
+            )}
+          </div>
+
+          {/* Competitive gap indicator */}
+          <div>
+            {!hasCurrentCount && !hasCompetitorCount ? (
+              <span className="text-xs text-muted-foreground">No competitor data</span>
+            ) : !hasCurrentCount || !hasCompetitorCount ? (
+              <span className="text-xs text-muted-foreground">Incomplete data</span>
+            ) : competitiveGap !== null && competitiveGap > 0 ? (
+              <span className="flex items-center gap-1 text-xs font-medium text-success">
+                <TrendUp size={12} weight="bold" className="shrink-0" />
+                {competitiveGap} ahead of {business.competitor_name ?? 'competitor'}
+              </span>
+            ) : competitiveGap !== null && competitiveGap < 0 ? (
+              <span className="flex items-center gap-1 text-xs font-medium text-destructive">
+                <TrendDown size={12} weight="bold" className="shrink-0" />
+                {Math.abs(competitiveGap)} behind {business.competitor_name ?? 'competitor'}
+              </span>
+            ) : (
+              <span className="text-xs text-muted-foreground">
+                Tied with {business.competitor_name ?? 'competitor'}
+              </span>
+            )}
+          </div>
+        </>
+      )}
     </InteractiveCard>
   )
 }
