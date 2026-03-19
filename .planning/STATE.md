@@ -10,16 +10,16 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 ## Current Position
 
 Phase: 76 — V4 Design System Rollout
-Plan: 02 of ? complete
+Plan: 03 of 6 complete
 Milestone: v4.0 Web Design Agency Pivot
 Status: In progress
 
-Last activity: 2026-03-19 — Completed 76-02-PLAN.md (promoted V4 homepage to /, removed /new and old V3 homepage)
+Last activity: 2026-03-19 — Completed 76-03-PLAN.md (redesigned /reputation with V4 design language, preserved all SEO)
 
 ```
 [Phase 71] [Phase 72] [Phase 73] [Phase 74] [Phase 75] [Phase 76]
     |           |           |           |           |       |
- COMPLETE   COMPLETE   COMPLETE   COMPLETE   COMPLETE   01-02 done
+ COMPLETE   COMPLETE   COMPLETE   COMPLETE   COMPLETE   01-02-03 done
 ```
 
 ## Performance Metrics
@@ -30,7 +30,7 @@ Last activity: 2026-03-19 — Completed 76-02-PLAN.md (promoted V4 homepage to /
 - v3.1 plans completed: 17/17
 - v3.1.1 plans completed: 2/2 (COMPLETE)
 - Phase 70 plans completed: 0/3 (in progress)
-- v4.0 plans completed: 13 (Phase 71-01, 71-02, 72-01, 72-02, 73-01, 73-02, 73-03, 74-01, 74-02, 75-01, 75-02, 76-01, 76-02)
+- v4.0 plans completed: 14 (Phase 71-01, 71-02, 72-01, 72-02, 73-01, 73-02, 73-03, 74-01, 74-02, 75-01, 75-02, 76-01, 76-02, 76-03)
 
 *Updated after each plan completion*
 
@@ -106,6 +106,13 @@ Four idempotent migrations must be applied via Supabase Dashboard SQL Editor:
 - **Delete (marketing)/page.tsx**: Required to avoid Next.js route conflict — two route groups cannot both define `/`
 - **Client Portal in V4Nav**: Added as outline-style button in both desktop and mobile nav; mirrors old marketing layout behavior
 
+### Key Decisions (76-03)
+
+- **Client component in _components/**: `page.tsx` stays as Server Component for metadata export; `ReputationContent` in `_components/reputation-content.tsx` is the 'use client' Framer Motion component
+- **No V4Nav/V4Footer on /reputation**: The `(marketing)` layout already wraps the route with nav + footer — adding V4Nav would duplicate it
+- **Single pricing card**: /reputation sells one product ($99/mo add-on); the 3-col grid from homepage is unnecessary and confusing here
+- **FAQ content duplicated in data and JSON-LD**: Intentional — the V4FAQ component and JSON-LD schema must both contain all 8 Q&As for correct structured data and visible UX
+
 ### Blockers/Concerns
 
 - 4 DB migrations pending manual Supabase Dashboard SQL Editor application (see above -- Phase 71 will create additional migrations)
@@ -123,6 +130,6 @@ Four idempotent migrations must be applied via Supabase Dashboard SQL Editor:
 ## Session Continuity
 
 Last session: 2026-03-19
-Stopped at: Completed 76-02-PLAN.md — promoted V4 homepage to /, removed /new and old V3 homepage
+Stopped at: Completed 76-03-PLAN.md — redesigned /reputation with V4 design language
 Resume file: None
-Next action: Phase 76-03 — next plan in V4 Design System Rollout phase
+Next action: Phase 76-04 — next plan in V4 Design System Rollout phase
