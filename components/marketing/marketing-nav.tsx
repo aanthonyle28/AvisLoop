@@ -7,8 +7,12 @@ import { ArrowRight, List, X } from '@phosphor-icons/react';
 
 const ACCENT = 'hsl(21 58% 53%)';
 
+const CALENDLY =
+  'https://calendly.com/anthony-le-avisloop/avisloop-demo-onboarding-call';
+
 const NAV_LINKS = [
-  { label: 'Reputation', href: '/reputation' },
+  { label: 'Web Design', href: '/' },
+  { label: 'Reviews', href: '/reputation' },
   { label: 'Pricing', href: '/pricing' },
 ];
 
@@ -131,13 +135,15 @@ export function MarketingNav({ authSlot }: MarketingNavProps) {
               >
                 Client Portal
               </Link>
-              <Link
-                href="/#pricing"
+              <a
+                href={CALENDLY}
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={() => setMobileOpen(false)}
                 className="mt-4 inline-flex items-center gap-2 rounded-full bg-foreground text-background px-8 py-3 text-lg font-medium"
               >
                 Book a Call <ArrowRight size={18} />
-              </Link>
+              </a>
             </div>
           </motion.div>
         )}

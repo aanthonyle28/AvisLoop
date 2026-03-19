@@ -39,8 +39,10 @@ async function AuthSlot() {
   return (
     <div className="flex items-center gap-2">
       <ThemeSwitcher />
-      <Link
-        href="/#pricing"
+      <a
+        href="https://calendly.com/anthony-le-avisloop/avisloop-demo-onboarding-call"
+        target="_blank"
+        rel="noopener noreferrer"
         className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2 text-sm font-medium hover:bg-foreground/90 transition-colors"
       >
         Book a Call
@@ -54,7 +56,7 @@ async function AuthSlot() {
         >
           <path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z" />
         </svg>
-      </Link>
+      </a>
     </div>
   );
 }

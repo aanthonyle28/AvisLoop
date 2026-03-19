@@ -20,6 +20,154 @@ import {
 const CALENDLY =
   'https://calendly.com/anthony-le-avisloop/avisloop-demo-onboarding-call';
 
+/* ─── Review Funnel Graphic ─────────────────────────────── */
+
+function ReviewFunnelGraphic() {
+  const ACCENT_COLOR = 'hsl(21 58% 53%)';
+
+  return (
+    <div className="relative w-full max-w-md mx-auto">
+      {/* Subtle glow behind the card */}
+      <div className="absolute -inset-4 bg-accent/5 rounded-3xl blur-2xl" />
+
+      <div className="relative bg-card/80 backdrop-blur-sm border border-border/40 rounded-2xl p-6 shadow-xl">
+        {/* Header bar */}
+        <div className="flex items-center gap-2 mb-5">
+          <div className="w-2.5 h-2.5 rounded-full bg-red-400/60" />
+          <div className="w-2.5 h-2.5 rounded-full bg-yellow-400/60" />
+          <div className="w-2.5 h-2.5 rounded-full bg-green-400/60" />
+          <span className="ml-2 text-[10px] text-muted-foreground/40 font-mono">AvisLoop Review Funnel</span>
+        </div>
+
+        {/* Step 1: Job completed */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 1.2, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="flex items-center gap-3 mb-3"
+        >
+          <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
+            <Check weight="bold" size={14} style={{ color: ACCENT_COLOR }} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold truncate">Job Completed — AC Repair</p>
+            <p className="text-[10px] text-muted-foreground">Patricia Johnson • HVAC</p>
+          </div>
+          <span className="text-[9px] text-muted-foreground/40 shrink-0">10s ago</span>
+        </motion.div>
+
+        {/* Step 2: Follow-ups sent */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 1.6, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="ml-4 border-l-2 border-border/30 pl-5 py-2 mb-3"
+        >
+          <div className="flex items-center gap-2 mb-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-accent" />
+            <span className="text-[10px] text-muted-foreground">Touch 1 — Email sent</span>
+            <span className="text-[9px] text-green-500 font-medium ml-auto">Delivered</span>
+          </div>
+          <div className="flex items-center gap-2 mb-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-accent" />
+            <span className="text-[10px] text-muted-foreground">Touch 2 — SMS sent</span>
+            <span className="text-[9px] text-green-500 font-medium ml-auto">Delivered</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30" />
+            <span className="text-[10px] text-muted-foreground/40">Touch 3 — Scheduled</span>
+            <span className="text-[9px] text-muted-foreground/30 ml-auto">In 48h</span>
+          </div>
+        </motion.div>
+
+        {/* Step 3: Rating received */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 2.0, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="flex items-center gap-3 mb-3"
+        >
+          <div className="w-8 h-8 rounded-lg bg-yellow-500/10 flex items-center justify-center shrink-0">
+            <Star weight="fill" size={14} className="text-yellow-500" />
+          </div>
+          <div className="flex-1">
+            <p className="text-xs font-semibold">Customer rated: 5 stars</p>
+            <div className="flex gap-0.5 mt-0.5">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} weight="fill" size={10} className="text-yellow-500" />
+              ))}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Step 4: Routed to Google */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 2.4, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="bg-green-500/5 border border-green-500/20 rounded-xl p-3 flex items-center gap-3"
+        >
+          <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center shrink-0">
+            <svg viewBox="0 0 24 24" className="w-4 h-4" aria-hidden="true">
+              <path
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
+                fill="#4285F4"
+              />
+              <path
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                fill="#34A853"
+              />
+              <path
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                fill="#FBBC05"
+              />
+              <path
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                fill="#EA4335"
+              />
+            </svg>
+          </div>
+          <div className="flex-1">
+            <p className="text-xs font-semibold text-green-700 dark:text-green-400">Redirected to Google Reviews</p>
+            <p className="text-[10px] text-green-600/60 dark:text-green-400/60">5-star review → public review page</p>
+          </div>
+          <motion.div
+            animate={{ scale: [1, 1.15, 1] }}
+            transition={{ delay: 2.8, duration: 0.6 }}
+          >
+            <Check weight="bold" size={16} className="text-green-500" />
+          </motion.div>
+        </motion.div>
+
+        {/* Divider with "or" */}
+        <div className="flex items-center gap-3 my-3">
+          <div className="flex-1 h-px bg-border/30" />
+          <span className="text-[9px] text-muted-foreground/30 uppercase tracking-widest">if 1–3 stars</span>
+          <div className="flex-1 h-px bg-border/30" />
+        </div>
+
+        {/* Alternative: Private feedback */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 0.5 }}
+          transition={{ delay: 2.6, duration: 0.5 }}
+          className="bg-muted/30 border border-border/20 rounded-xl p-3 flex items-center gap-3"
+        >
+          <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
+            <svg viewBox="0 0 256 256" className="w-4 h-4 text-muted-foreground/60" fill="currentColor" aria-hidden="true">
+              <path d="M232,96a8,8,0,0,0-8,8v88a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V104a8,8,0,0,0-16,0v88a24,24,0,0,0,24,24H216a24,24,0,0,0,24-24V104A8,8,0,0,0,232,96ZM80.34,69.66a8,8,0,0,1,0-11.32l40-40a8,8,0,0,1,11.32,0l40,40a8,8,0,0,1-11.32,11.32L136,45.66V136a8,8,0,0,1-16,0V45.66L93.66,69.66A8,8,0,0,1,80.34,69.66Z" />
+            </svg>
+          </div>
+          <div>
+            <p className="text-xs font-medium text-muted-foreground/60">Redirected to Private Feedback</p>
+            <p className="text-[10px] text-muted-foreground/30">Negative reviews stay off Google</p>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Hero ──────────────────────────────────────────────── */
 
 function Hero() {
@@ -33,7 +181,7 @@ function Hero() {
   return (
     <section
       ref={ref}
-      className="relative min-h-svh flex items-end overflow-hidden pb-20 pt-32"
+      className="relative min-h-svh flex items-center overflow-hidden pt-24 pb-16 lg:pb-20"
     >
       <FloatingShapes />
 
@@ -41,15 +189,12 @@ function Hero() {
         style={{ opacity }}
         className="max-w-7xl mx-auto w-full px-6 lg:px-10"
       >
-        <div className="grid lg:grid-cols-2 gap-16 items-end">
-          {/* Left — headline */}
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          {/* Left — headline + CTA */}
           <div>
-            <AccentBar
-              delay={0.3}
-              className="mb-8"
-            />
+            <AccentBar delay={0.3} className="mb-8" />
 
-            <h1 className="text-[clamp(2.8rem,7vw,6.5rem)] font-black leading-[0.92] tracking-[-0.03em]">
+            <h1 className="text-[clamp(2.4rem,6vw,5.5rem)] font-black leading-[0.92] tracking-[-0.03em]">
               <motion.span
                 className="block"
                 initial={{ opacity: 0, y: 60 }}
@@ -75,22 +220,23 @@ function Hero() {
                 You run jobs.
               </motion.span>
             </h1>
-          </div>
 
-          {/* Right — description + CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:pb-4"
-          >
-            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-md">
+            <motion.p
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="mt-8 text-lg md:text-xl text-muted-foreground leading-relaxed max-w-md"
+            >
               Automated follow-ups, AI review responses, and a smart review
-              funnel that protects your Google rating — all fully managed for
-              HVAC, plumbing, electrical, and home service businesses.
-            </p>
+              funnel that protects your Google rating.
+            </motion.p>
 
-            <div className="mt-10 flex flex-wrap gap-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              className="mt-8 flex flex-wrap gap-4"
+            >
               <a
                 href={CALENDLY}
                 target="_blank"
@@ -99,10 +245,7 @@ function Hero() {
               >
                 Book a Call
                 <span className="flex items-center justify-center w-6 h-6 rounded-full bg-accent text-white">
-                  <ArrowRight
-                    size={14}
-                    className="group-hover:translate-x-0.5 transition-transform"
-                  />
+                  <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
                 </span>
               </a>
               <a
@@ -111,13 +254,28 @@ function Hero() {
               >
                 See Pricing
               </a>
-            </div>
+            </motion.div>
 
-            <div className="mt-8 flex gap-6 text-xs text-muted-foreground/60">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.3, duration: 0.5 }}
+              className="mt-6 flex gap-6 text-xs text-muted-foreground/60"
+            >
               <span>$99/mo add-on</span>
               <span>No contracts</span>
               <span>Cancel anytime</span>
-            </div>
+            </motion.div>
+          </div>
+
+          {/* Right — Review Funnel UI Mockup */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className="hidden lg:block"
+          >
+            <ReviewFunnelGraphic />
           </motion.div>
         </div>
 
@@ -125,8 +283,8 @@ function Hero() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.8, duration: 0.8 }}
-          className="mt-16 flex items-center gap-3"
+          transition={{ delay: 2.5, duration: 0.8 }}
+          className="mt-12 flex items-center gap-3"
         >
           <motion.div
             animate={{ y: [0, 6, 0] }}
