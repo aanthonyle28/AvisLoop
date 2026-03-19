@@ -61,6 +61,9 @@ export default function MarketingLayout({
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/reputation">Reputation</Link>
               </Button>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/client-portal">Client Portal</Link>
+              </Button>
             </div>
           </div>
 

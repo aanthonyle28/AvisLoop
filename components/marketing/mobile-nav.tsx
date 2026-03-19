@@ -37,6 +37,9 @@ export function MobileNav() {
             <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setOpen(false)}>
               <Link href="/reputation">Reputation</Link>
             </Button>
+            <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setOpen(false)}>
+              <Link href="/client-portal">Client Portal</Link>
+            </Button>
           </div>
         </div>
       )}
