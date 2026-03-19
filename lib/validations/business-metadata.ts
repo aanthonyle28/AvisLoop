@@ -8,6 +8,7 @@ import { z } from 'zod'
  * updateBusinessNotes() action with a simple length check.
  */
 export const businessMetadataSchema = z.object({
+  client_type: z.enum(['reputation', 'web_design', 'both']).optional(),
   google_rating_start: z.number().min(1).max(5).nullable().optional(),
   google_rating_current: z.number().min(1).max(5).nullable().optional(),
   review_count_start: z.number().int().min(0).nullable().optional(),

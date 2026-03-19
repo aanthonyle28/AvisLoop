@@ -106,6 +106,7 @@ export function BusinessDetailDrawer({
   const handleStartEditing = () => {
     if (!business) return
     setFormData({
+      client_type: business.client_type,
       google_rating_start: business.google_rating_start,
       google_rating_current: business.google_rating_current,
       review_count_start: business.review_count_start,
@@ -176,6 +177,41 @@ export function BusinessDetailDrawer({
 
         <SheetBody>
           <div className='space-y-6'>
+            {/* Section 0: Client Type */}
+            <div>
+              <h4 className='text-sm font-medium mb-3'>Client Type</h4>
+              {isEditing ? (
+                <div className='flex gap-2'>
+                  {(['reputation', 'web_design', 'both'] as const).map((type) => (
+                    <button
+                      key={type}
+                      type='button'
+                      onClick={() => setFormData((prev) => ({ ...prev, client_type: type }))}
+                      className={cn(
+                        'px-3 py-1.5 rounded-full text-xs font-medium border transition-colors',
+                        formData.client_type === type
+                          ? 'bg-foreground text-background border-foreground'
+                          : 'bg-background text-foreground border-border hover:border-foreground/50'
+                      )}
+                    >
+                      {type === 'reputation' ? 'Review' : type === 'web_design' ? 'Web Design' : 'Both'}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <span className={cn(
+                  'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+                  business.client_type === 'web_design'
+                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                    : business.client_type === 'both'
+                      ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                      : 'bg-muted text-muted-foreground'
+                )}>
+                  {business.client_type === 'reputation' ? 'Review' : business.client_type === 'web_design' ? 'Web Design' : 'Web + Review'}
+                </span>
+              )}
+            </div>
+
             {/* Section 1: Google Performance */}
             <div>
               <h4 className='text-sm font-medium mb-3'>Google Performance</h4>
