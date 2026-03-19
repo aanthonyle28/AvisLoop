@@ -339,12 +339,83 @@ export function ClientPortal({ token, project, quota, initialTickets }: ClientPo
                         <PortalTicketThread messages={ticket.ticket_messages} />
                       </div>
                     )}
+                    {/* Reply form — only for open tickets */}
+                    {!isResolved && (
+                      <TicketReplyForm token={token} ticketId={ticket.id} />
+                    )}
                   </CardContent>
                 </Card>
               )
             })}
           </div>
         )}
+      </div>
+    </div>
+  )
+}
+
+/** Inline reply form for a single ticket */
+function TicketReplyForm({ token, ticketId }: { token: string; ticketId: string }) {
+  const router = useRouter()
+  const [replyOpen, setReplyOpen] = useState(false)
+  const [replyText, setReplyText] = useState('')
+  const [sending, setSending] = useState(false)
+
+  if (!replyOpen) {
+    return (
+      <button
+        type="button"
+        onClick={() => setReplyOpen(true)}
+        className="ml-6 mt-2 text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors"
+      >
+        Reply
+      </button>
+    )
+  }
+
+  async function handleSendReply() {
+    if (!replyText.trim()) return
+    setSending(true)
+    try {
+      const res = await fetch('/api/portal/tickets/reply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, ticketId, body: replyText.trim() }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as Record<string, string>
+        toast.error(data.error ?? 'Failed to send reply')
+        return
+      }
+      toast.success('Reply sent')
+      setReplyText('')
+      setReplyOpen(false)
+      router.refresh()
+    } catch {
+      toast.error('Something went wrong')
+    } finally {
+      setSending(false)
+    }
+  }
+
+  return (
+    <div className="ml-6 mt-3 space-y-2">
+      <textarea
+        value={replyText}
+        onChange={(e) => setReplyText(e.target.value)}
+        placeholder="Type your reply..."
+        rows={2}
+        maxLength={5000}
+        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 resize-none"
+        disabled={sending}
+      />
+      <div className="flex gap-2">
+        <Button size="sm" onClick={handleSendReply} disabled={sending || !replyText.trim()}>
+          {sending ? 'Sending...' : 'Send Reply'}
+        </Button>
+        <Button size="sm" variant="outline" onClick={() => { setReplyOpen(false); setReplyText('') }} disabled={sending}>
+          Cancel
+        </Button>
       </div>
     </div>
   )

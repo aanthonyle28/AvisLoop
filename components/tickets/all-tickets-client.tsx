@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useMemo, useCallback } from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import {
   Select,
@@ -10,7 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import type { TicketWithContext } from '@/lib/types/database'
+import type { TicketWithContext, TicketMessage, TicketStatus } from '@/lib/types/database'
+import { TicketDetailDrawer } from '@/components/tickets/ticket-detail-drawer'
 
 interface AllTicketsClientProps {
   tickets: TicketWithContext[]
@@ -58,10 +58,24 @@ function PriorityBadge({ priority }: { priority: string }) {
   )
 }
 
-export function AllTicketsClient({ tickets, businesses }: AllTicketsClientProps) {
-  const router = useRouter()
+export function AllTicketsClient({ tickets: initialTickets, businesses }: AllTicketsClientProps) {
+  const [tickets, setTickets] = useState(initialTickets)
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [businessFilter, setBusinessFilter] = useState<string>('all')
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [selectedTicket, setSelectedTicket] = useState<TicketWithContext | null>(null)
+  const [drawerMessages, setDrawerMessages] = useState<TicketMessage[]>([])
+
+  const handleTicketClick = useCallback((ticket: TicketWithContext) => {
+    setSelectedTicket(ticket)
+    setDrawerMessages([])
+    setDrawerOpen(true)
+  }, [])
+
+  const handleStatusChange = useCallback((ticketId: string, status: TicketStatus) => {
+    setTickets((prev) => prev.map((t) => t.id === ticketId ? { ...t, status } : t))
+    setSelectedTicket((prev) => prev?.id === ticketId ? { ...prev, status } : prev)
+  }, [])
 
   const filtered = useMemo(() => {
     return tickets.filter((t) => {
@@ -87,6 +101,7 @@ export function AllTicketsClient({ tickets, businesses }: AllTicketsClientProps)
   const hasActiveFilters = statusFilter !== 'all' || businessFilter !== 'all'
 
   return (
+    <>
     <div className="space-y-6">
       {/* Page header */}
       <div>
@@ -213,9 +228,7 @@ export function AllTicketsClient({ tickets, businesses }: AllTicketsClientProps)
               {filtered.map((ticket) => (
                 <tr
                   key={ticket.id}
-                  onClick={() =>
-                    router.push(`/clients/${ticket.project_id}/tickets`)
-                  }
+                  onClick={() => handleTicketClick(ticket)}
                   className="hover:bg-muted/50 cursor-pointer transition-colors"
                 >
                   <td className="px-4 py-3">
@@ -257,5 +270,15 @@ export function AllTicketsClient({ tickets, businesses }: AllTicketsClientProps)
         </div>
       )}
     </div>
+
+    <TicketDetailDrawer
+      open={drawerOpen}
+      onOpenChange={setDrawerOpen}
+      ticket={selectedTicket}
+      messages={drawerMessages}
+      onStatusChange={handleStatusChange}
+      onMessageSent={() => {}}
+    />
+    </>
   )
 }
