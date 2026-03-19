@@ -20,15 +20,16 @@ const DEFAULT_LINKS = [
   { label: 'Process', href: '#process' },
   { label: 'Pricing', href: '#pricing' },
   { label: 'Reviews', href: '/reputation' },
-  { label: 'FAQ', href: '#faq' },
 ];
 
 interface NavProps {
   links?: { label: string; href: string }[];
   calendlyUrl?: string;
+  /** Slot for theme switcher or auth controls rendered next to CTAs */
+  rightSlot?: React.ReactNode;
 }
 
-export function V4Nav({ links = DEFAULT_LINKS, calendlyUrl = DEFAULT_CALENDLY }: NavProps) {
+export function V4Nav({ links = DEFAULT_LINKS, calendlyUrl = DEFAULT_CALENDLY, rightSlot }: NavProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { scrollY } = useScroll();
@@ -73,6 +74,11 @@ export function V4Nav({ links = DEFAULT_LINKS, calendlyUrl = DEFAULT_CALENDLY }:
                 {l.label}
               </a>
             ))}
+          </div>
+
+          {/* Desktop right side — CTAs + theme/auth */}
+          <div className="hidden md:flex items-center gap-3">
+            {rightSlot}
             <Link
               href="/client-portal"
               className="inline-flex items-center rounded-full border border-border px-5 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
@@ -90,14 +96,17 @@ export function V4Nav({ links = DEFAULT_LINKS, calendlyUrl = DEFAULT_CALENDLY }:
             </a>
           </div>
 
-          {/* Mobile toggle */}
-          <button
-            onClick={() => setMobileOpen(true)}
-            className="md:hidden p-2 -mr-2"
-            aria-label="Open menu"
-          >
-            <List size={22} />
-          </button>
+          {/* Mobile right side */}
+          <div className="flex md:hidden items-center gap-1">
+            {rightSlot}
+            <button
+              onClick={() => setMobileOpen(true)}
+              className="p-2 -mr-2"
+              aria-label="Open menu"
+            >
+              <List size={22} />
+            </button>
+          </div>
         </div>
       </motion.nav>
 

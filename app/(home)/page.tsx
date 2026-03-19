@@ -16,6 +16,7 @@ import { V4Nav } from '@/components/marketing/v4/nav';
 import { V4Footer } from '@/components/marketing/v4/footer';
 import { FloatingShapes, MarqueeRow, AccentBar, SectionDivider } from '@/components/marketing/v4/shared';
 import { V4Stats, V4Testimonials, V4FAQ } from '@/components/marketing/v4/sections';
+import { ThemeSwitcher } from '@/components/theme-switcher';
 
 /* ─── Constants ────────────────────────────────────────── */
 
@@ -533,7 +534,7 @@ function FinalCTA() {
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <V4Nav links={NAV_LINKS} calendlyUrl={CALENDLY} />
+      <V4Nav links={NAV_LINKS} calendlyUrl={CALENDLY} rightSlot={<ThemeSwitcher />} />
       <Hero />
       <Marquee />
       <Services />
