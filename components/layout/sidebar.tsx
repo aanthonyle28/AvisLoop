@@ -18,6 +18,7 @@ import {
   House,
   Plus,
   Buildings,
+  Ticket,
 } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { LogoMark } from '@/components/ui/logomark'
@@ -39,6 +40,7 @@ const mainNav: NavItem[] = [
   { icon: ClockCounterClockwise, label: 'History', href: '/history' },
   { icon: ChatCircleText, label: 'Feedback', href: '/feedback' },
   { icon: Buildings, label: 'Clients', href: '/clients' },
+  { icon: Ticket, label: 'Tickets', href: '/clients/tickets' },
 ]
 
 interface SidebarProps {

@@ -20,7 +20,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { PencilSimple } from '@phosphor-icons/react'
+import { PencilSimple, Ticket, Copy, LinkSimple } from '@phosphor-icons/react'
+import Link from 'next/link'
 import { format, parseISO } from 'date-fns'
 import { toast } from 'sonner'
 import { updateClientDetails } from '@/lib/actions/client'
@@ -513,14 +514,40 @@ export function ClientDetailDrawer({
               </Button>
             </>
           ) : (
-            <Button
-              onClick={handleStartEditing}
-              variant="outline"
-              className="w-full justify-start"
-            >
-              <PencilSimple className="mr-2 h-4 w-4" />
-              Edit Details
-            </Button>
+            <>
+              <Button
+                onClick={handleStartEditing}
+                variant="outline"
+                className="w-full justify-start"
+              >
+                <PencilSimple className="mr-2 h-4 w-4" />
+                Edit Details
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                className="w-full justify-start"
+              >
+                <Link href={`/clients/${client.id}/tickets`}>
+                  <Ticket className="mr-2 h-4 w-4" />
+                  View Tickets ({client.revisions_used_this_month ?? 0} this month)
+                </Link>
+              </Button>
+              {client.web_project?.portal_token && (
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-xs"
+                  onClick={() => {
+                    const url = `${window.location.origin}/portal/${client.web_project!.portal_token}`
+                    navigator.clipboard.writeText(url)
+                    toast.success('Portal link copied')
+                  }}
+                >
+                  <LinkSimple className="mr-2 h-4 w-4" />
+                  Copy Portal Link
+                </Button>
+              )}
+            </>
           )}
         </SheetFooter>
       </SheetContent>
