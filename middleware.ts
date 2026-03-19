@@ -24,6 +24,7 @@ const APP_ROUTES = [
   "/activity",
   "/feedback",
   "/businesses",
+  "/clients",
 ];
 
 // Routes that belong to the marketing (root) domain
