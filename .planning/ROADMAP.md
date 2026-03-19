@@ -23,6 +23,7 @@ AvisLoop is a review follow-up system for home service businesses. v1.0 through 
 - **v3.0 Agency Mode** - Phases 52-58 (complete 2026-02-27)
 - **v3.1 QA E2E Audit** - Phases 59-67 (complete 2026-03-03)
 - **v3.1.1 QA Bug Fixes** - Phases 68-69 (complete 2026-03-04)
+- **v4.0 Web Design Agency Pivot** - Phases 71-75 (in progress)
 
 ## Phases
 
@@ -1017,6 +1018,82 @@ Plans:
 
 ---
 
+### v4.0 Web Design Agency Pivot (Phases 71-75)
+
+**Milestone Goal:** Transform AvisLoop from a review automation SaaS into a web design agency platform for home service businesses. The agency operator gets an internal CRM for managing web design clients, a ticket/revision system with monthly limits and overage billing, a lightweight client portal (token-secured, no login required), and a new marketing homepage positioning AvisLoop as a web design agency with review automation as a paid add-on. A bug fix resolves the brand_voice column error blocking onboarding.
+
+**Coverage:** 30 requirements across 5 categories (DATA, CRM, TICK, PORT, MKT) + 1 bug fix (BUG)
+
+**Build order rationale:** Schema first -- every phase depends on the discriminator column, web_projects table, and ticket tables existing with correct RLS. CRM second -- the operator must create projects and generate portal tokens before clients can access anything. Ticket system third -- dashboard management UI must exist before the portal submits into it. Client portal fourth -- depends on all three prior phases. Marketing last -- no application dependencies; existing content preserved at /reputation before homepage changes.
+
+---
+
+### Phase 71: Bug Fix + Data Model
+**Goal**: The brand_voice column error is resolved so onboarding works, and the full data model for the web design pivot exists -- discriminator column, web_projects table, ticket tables -- with correct RLS, TypeScript types, and no risk of bloating the businesses table.
+**Depends on**: Phase 70 (last shipped phase)
+**Requirements**: BUG-01, DATA-01, DATA-02, DATA-03, DATA-04
+**Success Criteria** (what must be TRUE):
+  1. Completing the onboarding wizard no longer throws "Could not find the 'brand_voice' column" -- the wizard completes end-to-end without error
+  2. The businesses table has a client_type column ('reputation' | 'web_design' | 'both') -- verified by direct DB query
+  3. The web_projects table exists with business_id, project_name, page_count, status, launched_at, portal_token, and web design tier/billing fields -- RLS policies verified
+  4. The project_tickets and ticket_messages tables exist with correct columns, business_id denormalization, and RLS policies -- a test row inserted as the business owner is not visible to any other user
+  5. TypeScript types are regenerated and reflect all new tables and columns -- pnpm typecheck passes with zero errors
+  6. The /businesses page BusinessCard removes competitive analysis fields and renders web design fields (tier badge, domain, status) when client_type is web_design or both
+**Plans**: TBD
+
+### Phase 72: Web Design CRM
+**Goal**: The agency operator has a dedicated /clients page showing all web design clients in a sortable, filterable table with a detail view for full project info, inline editing, and a total MRR summary -- giving the operator a single place to manage the entire client roster.
+**Depends on**: Phase 71 (web_projects table and client_type discriminator exist)
+**Requirements**: CRM-01, CRM-02, CRM-03, CRM-04, CRM-05
+**Success Criteria** (what must be TRUE):
+  1. Navigating to /clients shows a table with one row per web design client -- columns include business name, owner name, tier, status, domain, MRR, and revisions used this month
+  2. Filtering by status (active/paused/churned) and tier (basic/advanced) correctly scopes the displayed rows -- a "basic + active" filter shows only matching clients
+  3. Clicking a client row opens a detail view showing full business info, project details, ticket history, and revision usage (X of Y remaining) -- all data is accurate against the database
+  4. The operator can edit client contact info, tier, domain, Vercel project URL, and status from the detail view -- changes persist after page refresh
+  5. A summary bar at the top of /clients shows total MRR across all active web design clients -- the number matches the sum of monthly_fee values for active clients
+**Plans**: TBD
+
+### Phase 73: Ticket System
+**Goal**: The agency operator can view, manage, and respond to revision tickets across all clients from a single operator view -- and monthly revision limits are enforced atomically (no race conditions) with overage confirmation before submission.
+**Depends on**: Phase 72 (CRM exists; projects have IDs the ticket UI links to; portal_token generation happens here before Phase 74 needs it)
+**Requirements**: TICK-01, TICK-02, TICK-03, TICK-04, TICK-05, TICK-06, TICK-07, TICK-08
+**Success Criteria** (what must be TRUE):
+  1. An operator view shows all tickets across all clients, filterable by status (submitted/in_progress/completed) and client -- the count matches a direct DB query
+  2. The operator can update a ticket status (submitted to in_progress to completed) and add completion notes -- changes persist and are immediately visible
+  3. Monthly revision limits are enforced atomically -- two simultaneous submissions from the same client cannot exceed the monthly limit (Basic: 2, Advanced: 4)
+  4. When a client has reached their monthly limit, the submission form blocks and displays a message offering additional requests at $50 each -- submission is blocked until overage is confirmed
+  5. Overage-confirmed tickets are tracked separately in the database and flagged for billing follow-up
+  6. File and screenshot attachments (images + PDF, 10MB max) can be uploaded on tickets via Supabase Storage -- uploads succeed and are retrievable via signed URLs
+  7. Threaded ticket messages are supported -- both agency and client authors are visually distinguished in the thread
+**Plans**: TBD
+
+### Phase 74: Client Portal
+**Goal**: Each web design client can access their portal via a permanent bookmarkable URL (no login required), see their revision quota, submit revision requests with optional attachments, and view their ticket history -- with rate limiting preventing abuse.
+**Depends on**: Phase 73 (ticket tables exist and operator UI is working; portal_token generated in Phase 73)
+**Requirements**: PORT-01, PORT-02, PORT-03, PORT-04, PORT-05, PORT-06, PORT-07
+**Success Criteria** (what must be TRUE):
+  1. A client can navigate to /portal/[token] without logging in and see their business name and current revision quota (X of Y remaining this month) prominently displayed
+  2. The client can submit a revision request with title, description, and optional file attachment -- submission creates a project_tickets row visible to the operator in the dashboard
+  3. The portal displays the client's full ticket history with current status and any agency response messages for each ticket
+  4. Submitting beyond the configured rate limit from the same portal token is blocked -- the form shows a clear rate-limit error, not a server crash
+  5. Navigating to /portal/[invalid-or-missing-token] shows a clear error page explaining the link is invalid -- not a 500 error or blank screen
+**Plans**: TBD
+
+### Phase 75: Marketing Landing Page
+**Goal**: The homepage positions AvisLoop as a web design agency for home service businesses -- with services overview, pricing, and CTAs -- while the existing reputation/review content is preserved intact at /reputation so no SEO equity is lost.
+**Depends on**: Phase 74 (all features built and accurately describable in marketing copy)
+**Requirements**: MKT-01, MKT-02, MKT-03, MKT-04, MKT-05
+**Success Criteria** (what must be TRUE):
+  1. The homepage at / shows a hero, services overview, pricing cards (Basic $199/mo, Advanced $299/mo, Review add-on $99/mo), and a CTA -- the page positions AvisLoop as a web design agency, not a review request tool
+  2. The existing homepage content (review/reputation copy) is accessible at /reputation with no broken links or missing sections -- the content is identical to what previously existed at /
+  3. The pricing section shows all three offerings with correct tier details: Basic ($199/mo, 1-4 pages, 2 revisions/mo), Advanced ($299/mo, 4-10 pages, 4 revisions/mo), and Review add-on ($99/mo)
+  4. The landing page renders correctly at 375px mobile viewport -- no horizontal overflow, no truncated text in hero or pricing cards
+  5. All components use the existing brand design system (Kumbh Sans, warm palette, Phosphor icons) -- no new fonts, color libraries, or icon sets introduced
+**Plans**: TBD
+
+
+---
+
 ## Phase Details
 
 See individual phase sections above for requirements, success criteria, and dependencies.
@@ -1089,4 +1166,9 @@ See individual phase sections above for requirements, success criteria, and depe
 | **68** | **v3.1.1 QA Bug Fixes** | **1/1** | **Complete** | **2026-03-04** |
 | **69** | **v3.1.1 QA Bug Fixes** | **1/1** | **Complete** | **2026-03-04** |
 | 70 | Reputation Audit Lead-Gen | 0/3 | Planned | - |
+| 71 | v4.0 Web Design Agency Pivot | 0/TBD | Planned | - |
+| 72 | v4.0 Web Design Agency Pivot | 0/TBD | Planned | - |
+| 73 | v4.0 Web Design Agency Pivot | 0/TBD | Planned | - |
+| 74 | v4.0 Web Design Agency Pivot | 0/TBD | Planned | - |
+| 75 | v4.0 Web Design Agency Pivot | 0/TBD | Planned | - |
 **Total:** 261 plans complete across shipped phases.
