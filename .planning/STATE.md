@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-03-18)
 
 **Core value:** Provide home service businesses with professional websites and optional automated review management -- all managed through a single agency dashboard.
-**Current focus:** v4.0 Web Design Agency Pivot -- Phase 71 (Bug Fix + Data Model)
+**Current focus:** v4.0 Web Design Agency Pivot -- Phase 72 (Web Project Data Layer)
 
 ## Current Position
 
 Phase: 71 — Bug Fix + Data Model
-Plan: 01 of 1 complete
+Plan: 02 of 2 complete
 Milestone: v4.0 Web Design Agency Pivot
-Status: Phase 71 complete — ready for Phase 72
+Status: Phase 71 COMPLETE — ready for Phase 72
 
-Last activity: 2026-03-19 — Completed 71-01-PLAN.md (data model migrations)
+Last activity: 2026-03-19 — Completed 71-02-PLAN.md (TypeScript types + BusinessCard client_type rendering)
 
 ```
 [Phase 71] [Phase 72] [Phase 73] [Phase 74] [Phase 75]
@@ -30,7 +30,7 @@ Last activity: 2026-03-19 — Completed 71-01-PLAN.md (data model migrations)
 - v3.1 plans completed: 17/17
 - v3.1.1 plans completed: 2/2 (COMPLETE)
 - Phase 70 plans completed: 0/3 (in progress)
-- v4.0 plans completed: 1 (Phase 71-01)
+- v4.0 plans completed: 2 (Phase 71-01, 71-02)
 
 *Updated after each plan completion*
 
@@ -78,6 +78,6 @@ Four idempotent migrations must be applied via Supabase Dashboard SQL Editor:
 ## Session Continuity
 
 Last session: 2026-03-19
-Stopped at: Completed 71-01-PLAN.md — all 4 data model migrations authored
+Stopped at: Completed 71-02-PLAN.md — TypeScript types + BusinessCard client_type rendering
 Resume file: None
-Next action: Apply migrations via supabase db push, then run /gsd:execute-phase 72
+Next action: Run /gsd:execute-phase 72 (Web Project data layer + businesses page wiring)
