@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import { Plus } from '@phosphor-icons/react'
 import {
   Select,
   SelectContent,
@@ -8,8 +9,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
 import { ClientTable } from './client-table'
 import { ClientDetailDrawer } from './client-detail-drawer'
+import { AddClientSheet } from './add-client-sheet'
 import type { WebDesignClient } from '@/lib/data/clients'
 
 interface ClientsClientProps {
@@ -24,6 +27,7 @@ export function ClientsClient({ clients }: ClientsClientProps) {
   const [tierFilter, setTierFilter] = useState<TierFilter>('all')
   const [selectedClient, setSelectedClient] = useState<WebDesignClient | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [addSheetOpen, setAddSheetOpen] = useState(false)
   const [localClients, setLocalClients] = useState<WebDesignClient[]>(clients)
 
   // Sync localClients when prop changes (e.g. after revalidatePath fires)
@@ -56,6 +60,10 @@ export function ClientsClient({ clients }: ClientsClientProps) {
           <h1 className="text-3xl font-bold tracking-tight">Clients</h1>
           <p className="text-muted-foreground mt-1">Web design client roster</p>
         </div>
+        <Button onClick={() => setAddSheetOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          Add Client
+        </Button>
       </div>
 
       {/* Filters row */}
@@ -105,6 +113,12 @@ export function ClientsClient({ clients }: ClientsClientProps) {
         onOpenChange={setDrawerOpen}
         client={selectedClient}
         onClientUpdated={handleClientUpdated}
+      />
+
+      {/* Add client sheet */}
+      <AddClientSheet
+        open={addSheetOpen}
+        onOpenChange={setAddSheetOpen}
       />
     </div>
   )
