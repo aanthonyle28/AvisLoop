@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 ## Current Position
 
 Phase: 72 — Web Design CRM
-Plan: 01 of 2 complete
+Plan: 02 of 2 complete (Phase COMPLETE — awaiting human verification)
 Milestone: v4.0 Web Design Agency Pivot
-Status: In progress — 72-01 complete, 72-02 (UI) next
+Status: Phase 72 complete — awaiting human verify checkpoint for 72-02
 
-Last activity: 2026-03-19 — Completed 72-01-PLAN.md (data layer: getWebDesignClients, getClientMrrSummary, updateClientDetails, /clients middleware)
+Last activity: 2026-03-19 — Completed 72-02-PLAN.md (UI: /clients page, MRR bar, table, filters, detail drawer, sidebar nav)
 
 ```
 [Phase 71] [Phase 72] [Phase 73] [Phase 74] [Phase 75]
@@ -30,7 +30,7 @@ Last activity: 2026-03-19 — Completed 72-01-PLAN.md (data layer: getWebDesignC
 - v3.1 plans completed: 17/17
 - v3.1.1 plans completed: 2/2 (COMPLETE)
 - Phase 70 plans completed: 0/3 (in progress)
-- v4.0 plans completed: 3 (Phase 71-01, 71-02, 72-01)
+- v4.0 plans completed: 4 (Phase 71-01, 71-02, 72-01, 72-02)
 
 *Updated after each plan completion*
 
@@ -54,10 +54,14 @@ Four idempotent migrations must be applied via Supabase Dashboard SQL Editor:
    - Fixes onboarding error: "Could not find the 'brand_voice' column"
    - Also apply: 20260319000200_add_client_type.sql, 20260319000300_create_web_projects.sql, 20260319000400_create_ticket_tables.sql
 
+5. **Phase 72 (DATA-02):** `supabase/migrations/20260319000500_add_web_design_business_fields.sql`
+   - Adds nullable web design columns to businesses table: owner_name, owner_email, owner_phone, web_design_tier, domain, vercel_project_url, live_website_url, status
+   - Required for /clients CRM edit flow to persist changes
+
 ### Key Architecture Decisions for v4.0
 
 - **Extend, don't replace**: businesses table gets only a client_type discriminator column; web-design-specific data lives in the new web_projects table
-- **Table boundaries (hold the line)**: web_projects holds domain, tier, billing, portal_token; businesses table gets only client_type
+- **Table boundaries (revised 72-02)**: web design client contact/billing fields (owner_name, web_design_tier, domain, etc.) live on the businesses table for simpler single-row updates; web_projects holds project-specific data (project_name, page_count, project status, portal_token)
 - **Atomic ticket limits**: monthly revision limit enforcement via Postgres RPC (check + insert in one transaction) -- identical pattern to campaign enrollment RPCs
 - **Portal token**: 192-bit randomBytes base64url token, same pattern as /complete/[token] and /intake/[token]
 - **Zero new npm packages**: react-dropzone, supabase storage, stripe all already installed
@@ -78,6 +82,6 @@ Four idempotent migrations must be applied via Supabase Dashboard SQL Editor:
 ## Session Continuity
 
 Last session: 2026-03-19
-Stopped at: Completed 72-01-PLAN.md — data layer for /clients (getWebDesignClients, getClientMrrSummary, updateClientDetails, middleware)
+Stopped at: Completed 72-02-PLAN.md — /clients UI (awaiting human-verify checkpoint)
 Resume file: None
-Next action: Run /gsd:execute-phase 72 plan 02 (UI for /clients page)
+Next action: After checkpoint approved — Phase 73 (Ticket System)
