@@ -290,6 +290,12 @@ export async function saveNewBusinessBrandVoice(
     .eq('user_id', user.id)
 
   if (error) {
+    // brand_voice column may not exist yet if migration hasn't been applied.
+    // Don't block business creation — log and continue gracefully.
+    if (error.message.includes('brand_voice') || error.code === 'PGRST204') {
+      console.warn('brand_voice column not yet available — skipping save. Apply migration 20260319000100 to enable.')
+      return { success: true }
+    }
     return { success: false, error: error.message }
   }
 

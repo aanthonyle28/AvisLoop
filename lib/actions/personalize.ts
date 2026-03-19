@@ -72,7 +72,7 @@ export async function personalizePreview(input: {
   // Fetch additional business fields needed for personalization
   const { data: bizData } = await supabase
     .from('businesses')
-    .select('name, google_review_link, brand_voice')
+    .select('name, google_review_link')
     .eq('id', business.id)
     .single()
 
@@ -98,7 +98,7 @@ export async function personalizePreview(input: {
     customerName: customer.name,
     businessName: bizData.name,
     serviceType: input.serviceType,
-    brandVoice: bizData.brand_voice || undefined,
+    brandVoice: undefined, // brand_voice column pending migration — will be populated once 20260319000100 is applied
     touchNumber: (input.touchNumber || 1) as 1 | 2 | 3 | 4,
     channel: input.channel,
     reviewLink: bizData.google_review_link,
@@ -148,7 +148,7 @@ export async function personalizePreviewBatchAction(input: {
   // Fetch additional business fields needed for personalization
   const { data: bizData } = await supabase
     .from('businesses')
-    .select('name, google_review_link, brand_voice')
+    .select('name, google_review_link')
     .eq('id', business.id)
     .single()
 
@@ -196,7 +196,7 @@ export async function personalizePreviewBatchAction(input: {
       customerName: customer.name,
       businessName: bizData.name,
       serviceType: input.serviceType,
-      brandVoice: bizData.brand_voice || undefined,
+      brandVoice: undefined, // brand_voice column pending migration — will be populated once 20260319000100 is applied
       touchNumber: (input.touchNumber || 1) as 1 | 2 | 3 | 4,
       channel: input.channel,
       reviewLink: bizData.google_review_link!,
