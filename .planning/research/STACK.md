@@ -1,379 +1,231 @@
-# Technology Stack: Playwright E2E QA Audit
+# Technology Stack: v4.0 Web Design Agency Pivot
 
-**Project:** AvisLoop — Comprehensive E2E QA audit milestone
-**Researched:** 2026-02-27
-**Milestone Type:** Subsequent — adding Playwright test suite to existing Next.js 15 + Supabase app
-**Confidence:** HIGH (Playwright 1.58.1 already installed; patterns verified against official docs + community)
+**Project:** AvisLoop — v4.0 Web Design Agency Pivot
+**Researched:** 2026-03-18
+**Milestone Type:** Subsequent — adding web design CRM, client portal, ticket system to existing Next.js 15 + Supabase app
+**Confidence:** HIGH (all new capabilities verified against official Supabase docs and current package versions)
 
 ---
 
 ## Executive Summary
 
-**One new dev dependency needed: `@axe-core/playwright`.** Playwright 1.58.1 is already in `package.json`. Everything else — screenshot capture, visual diff, device emulation, cookie manipulation, accessibility scanning — is available via built-in Playwright APIs or that single axe package. Do not add Cypress, Percy, or any additional test runner.
+**Three new capabilities needed; zero new npm packages required.**
+
+The v4.0 pivot adds: (1) a client portal via unique URL, (2) a ticket/revision tracking system with monthly limits, (3) file/screenshot uploads for revision requests. Every one of these can be built using existing stack primitives. The token-secured public URL pattern already exists twice in the codebase (`/complete/[token]` and `/intake/[token]`). Supabase Storage is already provisioned but unused — activate it with a bucket and RLS policies. `react-dropzone` is already in `package.json` (v14.3.8) and used in three existing components. Stripe already handles billing.
+
+The only structural additions are: a Supabase Storage bucket (`revision-attachments`, private), two new database tables (`tickets`, `ticket_attachments`), and billing logic for the $50 overage charge using Stripe's existing `stripe.invoiceItems.create()` + `stripe.invoices.create()` API.
 
 ---
 
-## Core Tooling
+## What Is Already in Place (Do NOT Re-Research or Re-Implement)
 
-### Already Installed
+| Capability | Existing Implementation | Location |
+|------------|------------------------|----------|
+| Token-secured public URL (no auth) | DB token stored in `businesses.form_token`, resolved via service-role client | `/app/complete/[token]/page.tsx` |
+| Second public token pattern | DB token stored in `businesses.intake_token` | `/app/intake/[token]/page.tsx` |
+| HMAC token generation | `createHmac('sha256', secret)` with timing-safe comparison | `/lib/review/token.ts` |
+| Drag-and-drop file input | `useDropzone` from `react-dropzone` v14.3.8 | 3 existing components |
+| Service-role Supabase client (bypasses RLS) | `createServiceRoleClient()` | `/lib/supabase/service-role.ts` |
+| Stripe billing + overage concepts | `stripe` v20.2.0, API version `2026-01-28.clover` | `/lib/stripe/client.ts` |
+| Server actions with Zod validation | Pattern used throughout 22 `lib/actions/` files | `/lib/actions/` |
 
-| Package | Version | Role |
-|---------|---------|------|
-| `playwright` | 1.58.1 | Browser automation, test runner, assertions, screenshot |
+---
 
-Playwright includes: `@playwright/test` runner, `expect` with visual matchers (`toHaveScreenshot`), device emulation dictionary, cookie/storage APIs, and accessibility tree snapshots.
+## New Capabilities Required
 
-### Add One Dev Dependency
+### 1. File Uploads (Revision Attachments)
 
-| Package | Version | Role | Why |
-|---------|---------|------|-----|
-| `@axe-core/playwright` | latest | WCAG accessibility scan | Playwright's built-in `page.accessibility.snapshot()` gives tree structure only. `@axe-core/playwright` runs the full axe-core engine against the live DOM, catching color contrast, missing labels, duplicate IDs, and 50+ other WCAG 2.1 AA rules automatically. |
+**Decision: Supabase Storage with signed upload URLs**
 
-**Install:**
-```bash
-pnpm add -D @axe-core/playwright
+Supabase Storage is already part of the project (same Supabase project, same `@supabase/supabase-js` client). No new service, no new credentials, no new SDK.
+
+**Upload flow:**
+1. Client selects file via `useDropzone` (already installed)
+2. Client calls a Server Action: `createSignedUploadUrl(ticketId, filename)`
+3. Server Action validates ownership, generates signed URL via `supabase.storage.from('revision-attachments').createSignedUploadUrl(path)` (expires in 2 hours — sufficient for form session)
+4. Client uploads directly to Supabase from browser using `supabase.storage.from('revision-attachments').uploadToSignedUrl(path, token, file)`
+5. Server Action stores the resulting `storage_path` in `ticket_attachments` table
+
+**Why signed URLs over Server Action streaming:** Next.js Server Actions have a default 1MB body limit. Signed URLs let the browser upload directly to Supabase Storage, bypassing Next.js entirely. This is the officially recommended pattern for Supabase + Next.js file uploads. (Source: [Supabase signed upload URL docs](https://supabase.com/docs/reference/javascript/storage-from-createsigneduploadurl), [official Next.js + Supabase storage guide](https://supalaunch.com/blog/file-upload-nextjs-supabase))
+
+**Bucket configuration:**
+- Name: `revision-attachments`
+- Visibility: Private (requires signed URL to read — clients cannot guess other clients' file URLs)
+- Per-file size limit: 10MB (configured at bucket level; global Supabase limit is 50MB on free tier, 500GB on Pro)
+- Allowed content types: `image/*`, `application/pdf` (screenshots + PDFs are the revision use case)
+
+**Storage path structure:**
+```
+revision-attachments/
+  {business_id}/
+    {ticket_id}/
+      {uuid}-{filename}
 ```
 
-### Do NOT Add
+This structure allows a simple RLS policy: agency owner can access any file under their business_id.
 
-| Package | Reason |
-|---------|--------|
-| Cypress | Already have Playwright; two E2E runners is pure overhead |
-| Percy / Chromatic | `toHaveScreenshot()` built into Playwright — no external service needed for an audit |
-| Vitest / Jest | Audit tests are E2E by nature; unit test runner adds no value here |
-| `playwright-testing-library` | Playwright 1.5x has `getByRole`, `getByLabel`, `getByText` built in — no wrapper needed |
-| `faker` / `@faker-js/faker` | Audit is read-heavy; data generation only needed if writing mutations, which this audit avoids |
+**RLS policy pattern for `storage.objects`:**
+```sql
+-- Agency owner can upload to their business folder
+CREATE POLICY "agency_owner_insert"
+ON storage.objects FOR INSERT
+TO authenticated
+WITH CHECK (
+  bucket_id = 'revision-attachments'
+  AND (storage.foldername(name))[1] IN (
+    SELECT id::text FROM businesses WHERE user_id = auth.uid()
+  )
+);
+
+-- Agency owner can read their business files
+CREATE POLICY "agency_owner_select"
+ON storage.objects FOR SELECT
+TO authenticated
+USING (
+  bucket_id = 'revision-attachments'
+  AND (storage.foldername(name))[1] IN (
+    SELECT id::text FROM businesses WHERE user_id = auth.uid()
+  )
+);
+
+-- Clients (unauthenticated) cannot read directly — must use signed read URLs
+-- Agency owner generates signed read URLs when serving previews
+```
+
+**Client access to files:** Client portal pages (unauthenticated) should display attachment previews via signed read URLs generated server-side using the service-role client. Signed read URLs can have short expiry (1 hour is sufficient for a portal session).
+
+**Do NOT use:**
+- External file storage (S3, Cloudinary, UploadThing) — adds credentials, cost, and integration complexity when Supabase Storage is already provisioned
+- Multipart form uploads through Next.js API routes — 1MB body limit makes this fragile
+- Public bucket — clients should not be able to enumerate other clients' files by guessing paths
 
 ---
 
-## Authentication Pattern
+### 2. Client Portal (Token-Secured, No Login)
 
-### The Right Approach: UI Login + storageState
+**Decision: DB-stored token in `businesses` table, identical pattern to `/complete/[token]`**
 
-**Use UI-based login stored to a JSON file, not API-based token injection.**
+The codebase already has two working examples of this pattern. The client portal at `/portal/[token]` will be a third instance. Do not introduce JWTs, sessions, or any auth library for this.
 
-Rationale: AvisLoop uses Supabase's `@supabase/ssr` package, which stores auth tokens in cookies managed by the server. `context.addCookies()` can set Playwright-visible cookies, but Supabase's SSR library re-validates and re-issues session cookies on each server request. The only reliable way to get a fully valid, server-accepted Supabase session in a Playwright browser context is to perform the actual UI login flow once and capture the resulting cookie jar via `storageState`.
+**Token storage:** Add a `portal_token` column to the `businesses` table (TEXT, nullable, unique partial index on non-null values). This is identical to the existing `form_token` and `intake_token` columns.
 
-**Setup file (`e2e/auth.setup.ts`):**
+**Token generation:** Use `randomBytes(32).toString('hex')` — same approach as `form_token`. The token does not need to be HMAC-signed because it never leaves the server except as an opaque URL; it is validated by DB lookup, not by cryptographic verification of its own contents.
+
+**Route:** `/portal/[token]/page.tsx` — Server Component that:
+1. Creates service-role Supabase client (bypasses RLS — this is a public page)
+2. Looks up `businesses` by `portal_token`
+3. Returns 404 via `notFound()` if not found (same as existing patterns)
+4. Renders `<ClientPortalShell>` with business data
+
+**What clients see at `/portal/[token]`:**
+- Their own open and closed tickets
+- Ticket submission form
+- Attachment uploads for new tickets
+- Monthly revision quota meter ("2 of 2 revisions used this month")
+
+**Security model:** The token is a secret URL — anyone with the link can view/submit tickets for that business. This is intentional (same model as Google Doc share links). If a token is compromised, the agency regenerates it in the dashboard; the old token becomes invalid immediately.
+
+**Do NOT use:**
+- JWT cookies or sessions for client portal — adds complexity, clients cannot "log in" as a concept
+- Magic link emails — out of scope for v4.0 MVP
+- Separate `client_portal_sessions` table — the token IS the session; stateless is simpler
+
+---
+
+### 3. Ticket/Revision Monthly Limits and $50 Overage
+
+**Decision: Application-level limit enforcement + Stripe one-time invoice for overage**
+
+**Limit enforcement pattern (no new packages):**
+
+Track usage per business per billing month in the `tickets` table. At ticket creation time, count existing tickets for that `business_id` in the current billing month:
+
 ```typescript
-import { test as setup, expect } from '@playwright/test'
-import path from 'path'
+const { count } = await supabase
+  .from('tickets')
+  .select('*', { count: 'exact', head: true })
+  .eq('business_id', businessId)
+  .gte('created_at', startOfBillingMonth.toISOString())
 
-const authFile = path.join(__dirname, '.auth/user.json')
+const planLimit = business.plan === 'basic' ? 2 : 4 // Basic: 2/mo, Advanced: 4/mo
+const isOverage = count >= planLimit
+```
 
-setup('authenticate', async ({ page }) => {
-  await page.goto('/auth/login')
-  await page.getByLabel('Email').fill(process.env.E2E_TEST_EMAIL!)
-  await page.getByLabel('Password').fill(process.env.E2E_TEST_PASSWORD!)
-  await page.getByRole('button', { name: 'Sign in' }).click()
-  // Wait for redirect to dashboard — confirms cookies are set
-  await expect(page).toHaveURL('/dashboard')
-  await page.context().storageState({ path: authFile })
+**Overage billing — Stripe one-time invoice (no metered billing complexity):**
+
+For the $50 overage, do NOT use Stripe Billing Meters or metered subscription items. Those are designed for high-frequency usage billing and require webhook infrastructure and reconciliation logic. For a simple $50 fixed overage charge:
+
+```typescript
+// When a ticket is submitted beyond the plan limit:
+await stripe.invoiceItems.create({
+  customer: stripeCustomerId,
+  amount: 5000, // $50.00 in cents
+  currency: 'usd',
+  description: `Revision overage — ${businessName} (${month})`,
+})
+
+const invoice = await stripe.invoices.create({
+  customer: stripeCustomerId,
+  auto_advance: true, // Automatically finalize and charge
 })
 ```
 
-**`playwright.config.ts` projects:**
-```typescript
-projects: [
-  { name: 'setup', testMatch: /.*\.setup\.ts/ },
-  {
-    name: 'chromium',
-    use: {
-      ...devices['Desktop Chrome'],
-      storageState: 'e2e/.auth/user.json',
-    },
-    dependencies: ['setup'],
-  },
-  {
-    name: 'mobile',
-    use: {
-      ...devices['iPhone 14'],
-      storageState: 'e2e/.auth/user.json',
-    },
-    dependencies: ['setup'],
-  },
-],
-```
+This creates an immediate one-off invoice that charges the card on file. No subscription changes, no proration, no meter events. The Stripe API version already in use (`2026-01-28.clover`) supports this.
 
-**Security:** Add `e2e/.auth/` to `.gitignore` immediately. These JSON files contain live Supabase session cookies.
-
-### Multi-Business Context Switching
-
-The `active_business_id` cookie is set by a Next.js server action (`switchBusiness()`). It is NOT a Supabase auth cookie — it is application-level. Playwright **can** inject this cookie directly via `context.addCookies()` because it only needs to survive the HTTP request to the Next.js server (not round-trip through Supabase's SSR validation).
-
-**Pattern for switching business context in tests:**
-```typescript
-// In a test or beforeEach
-await context.addCookies([{
-  name: 'active_business_id',
-  value: BUSINESS_B_UUID,
-  domain: 'localhost',
-  path: '/',
-  httpOnly: true,
-  sameSite: 'Lax',
-}])
-await page.reload() // Server re-renders with new active business
-await expect(page.getByText('Business B Name')).toBeVisible()
-```
-
-This works because `cookies()` from `next/headers` reads the cookie from the incoming HTTP request, which Playwright sets correctly at the browser level.
+**Why not metered billing:** Stripe's metered/usage-based billing requires Billing Meters (a newer feature), adds significant webhook complexity for reconciliation, and is overkill for a product where overages are rare and fixed-price. One-time invoice items are simpler, more transparent to clients, and already supported by the existing Stripe integration. (Source: [Stripe flat fee with overages](https://docs.stripe.com/billing/subscriptions/usage-based-v1/use-cases/flat-fee-and-overages))
 
 ---
 
-## Selector Strategy
+### 4. Web Design Agency Landing Page
 
-**Priority order (most to least preferred):**
+**Decision: No new frameworks — build with existing Tailwind + Radix + Phosphor stack**
 
-1. `getByRole()` — semantic, accessibility-aligned, resilient
-2. `getByLabel()` — for form inputs
-3. `getByText()` — for unique visible text
-4. `getByTestId()` — add `data-testid` attributes only where semantic selectors are genuinely ambiguous
-5. CSS selectors — last resort; never use nth-child or positional selectors
+The existing landing page (`/app/(marketing)/page.tsx`) already uses:
+- Custom React component sections (`hero-v2.tsx`, `features-bento.tsx`, `how-it-works.tsx`, etc.)
+- Tailwind CSS for layout
+- `react-countup` for animated statistics
+- Phosphor Icons
 
-**Why this order:** The audit's own accessibility findings (see UX-AUDIT.md) flag missing aria-labels as High severity. Tests that use `getByRole()` simultaneously verify semantic HTML is correct. If `getByRole('button', { name: 'Complete Job' })` fails to find the button, that is itself an accessibility bug.
+The v4.0 pivot replaces the copy and restructures sections — it does not require a different framework or component library. The 2026 landing page conversion research confirms the winning pattern is: clear 8-word headline → one CTA → social proof above the fold → product demonstration → pricing. All of this is buildable with the existing stack.
 
-**Never use:**
-- XPath
-- CSS attribute selectors based on class names (`[class*="btn-primary"]`)
-- Positional locators (`nth(0)`)
+**Key conversion patterns to implement (no new packages):**
+- Hero: Agency value prop ("We handle your entire online presence") + single CTA ("Book a free audit")
+- Social proof strip: Logos or review star ratings immediately below hero
+- Service tiers: Clear 3-card pricing (Basic $199/mo / Advanced $299/mo / Review Add-on $99/mo) with "Most popular" tag
+- How it works: 3-step visual (We build → You approve → We maintain)
+- FAQ: Radix Accordion (already in use via `@radix-ui/react-tabs`) or simple Tailwind toggle
 
----
+**Calendly embed (already in production):** The existing codebase already uses a Calendly "Book a call" link (per the recent commit `fix(marketing): replace reputation audit CTAs with Calendly book-a-call links`). The v4.0 landing page should use the same Calendly link pattern — no embed SDK needed, a simple link-out is sufficient for conversion.
 
-## Screenshot Strategy
-
-### viewport sizes to capture
-
-```typescript
-// Desktop: 1280x800 (standard audit baseline)
-// Mobile: 390x844 (iPhone 14 — representative of real usage)
-// Tablet: 768x1024 (iPad — catches layout breakpoints)
-```
-
-### Light + Dark mode
-
-```typescript
-// In playwright.config.ts, define two project variants
-{
-  name: 'chromium-dark',
-  use: {
-    ...devices['Desktop Chrome'],
-    colorScheme: 'dark',
-    storageState: 'e2e/.auth/user.json',
-  },
-  dependencies: ['setup'],
-},
-```
-
-### Screenshot configuration for audit (not visual regression)
-
-For an audit, screenshots are **evidence documents**, not regression baselines. Avoid `toHaveScreenshot()` pixel-diff assertions for the audit — they create maintenance overhead. Instead:
-
-```typescript
-// Capture for documentation, not assertion
-await page.screenshot({
-  path: `e2e/screenshots/${pageName}-desktop-light.png`,
-  fullPage: true,
-})
-```
-
-Use `toHaveScreenshot()` assertions only for specific components where pixel-exact regression is explicitly desired (e.g., KPI chart rendering). For an audit, prefer behavioral assertions.
-
-### Animation control
-
-Disable CSS animations globally to get stable screenshots:
-
-```typescript
-// playwright.config.ts
-use: {
-  actionTimeout: 10_000,
-  screenshot: 'on',
-  // Disable animations for stable screenshots
-}
-
-// Or in test
-await page.emulateMedia({ reducedMotion: 'reduce' })
-```
+**Do NOT add:**
+- Animation libraries (Framer Motion, GSAP) — existing `motion-safe:` Tailwind transitions are sufficient
+- Landing page builders (Webflow, Unbounce) — maintaining two codebases creates drift
+- Video hosting (Loom embed) — listed as out of scope in PROJECT.md
 
 ---
 
-## Accessibility Testing
+## Complete Package Delta
 
-### Pattern: @axe-core/playwright
+| Package | Action | Version | Reason |
+|---------|--------|---------|--------|
+| `@supabase/supabase-js` | Already installed (use storage API) | `latest` | Supabase Storage uses the same client |
+| `react-dropzone` | Already installed | `^14.3.8` | Used in CSV import; reuse for file upload |
+| `stripe` | Already installed (use invoiceItems API) | `^20.2.0` | One-time invoice for $50 overage |
+| `zod` | Already installed | `^4.3.6` | Ticket form validation |
 
-```typescript
-import { checkA11y } from '@axe-core/playwright'
-// OR use the AxeBuilder class from @axe-core/playwright
-
-import AxeBuilder from '@axe-core/playwright'
-
-test('dashboard has no WCAG 2.1 AA violations', async ({ page }) => {
-  await page.goto('/dashboard')
-  await page.waitForLoadState('networkidle')
-
-  const results = await new AxeBuilder({ page })
-    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-    .analyze()
-
-  // Log violations with context for the audit report
-  if (results.violations.length > 0) {
-    console.log(JSON.stringify(results.violations, null, 2))
-  }
-
-  expect(results.violations).toHaveLength(0)
-})
-```
-
-### Known limitations of automated accessibility testing
-
-Automated axe scans catch ~30-40% of WCAG issues: color contrast, missing labels, duplicate IDs, invalid ARIA roles. They do NOT catch: keyboard trap detection, logical reading order, focus management quality, or screen reader announcement content. Axe is a filter, not a complete audit.
-
-For AvisLoop specifically, the UX-AUDIT.md identified:
-- Icon buttons missing `aria-label` (High) — axe catches this
-- Checkbox 16px touch target (High) — axe does NOT catch this (size is not a WCAG violation, just WCAG mobile guidance)
-- Input height 36px (Medium) — axe does NOT catch this
+**Net new packages: 0**
 
 ---
 
-## Test Configuration
+## New Environment Variables
 
-### playwright.config.ts skeleton
+No new environment variables needed. All required secrets already exist:
+- `SUPABASE_SERVICE_ROLE_KEY` — already used for public route service-role client
+- `STRIPE_SECRET_KEY` — already used for billing
+- `NEXT_PUBLIC_SUPABASE_URL` — needed by client-side `uploadToSignedUrl`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` — needed by client-side Supabase client for storage uploads
 
-```typescript
-import { defineConfig, devices } from '@playwright/test'
-
-export default defineConfig({
-  testDir: './e2e',
-  fullyParallel: false, // Serial for Supabase connection limit sanity
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : 2, // Supabase free tier: limit connections
-  reporter: [
-    ['html', { outputFolder: 'e2e/report' }],
-    ['list'],
-  ],
-  use: {
-    baseURL: 'http://localhost:3000',
-    trace: 'on-first-retry',
-    screenshot: 'only-on-failure',
-  },
-  projects: [
-    { name: 'setup', testMatch: /.*\.setup\.ts/ },
-    {
-      name: 'desktop',
-      use: {
-        ...devices['Desktop Chrome'],
-        storageState: 'e2e/.auth/user.json',
-      },
-      dependencies: ['setup'],
-    },
-    {
-      name: 'mobile',
-      use: {
-        ...devices['iPhone 14'],
-        storageState: 'e2e/.auth/user.json',
-      },
-      dependencies: ['setup'],
-    },
-  ],
-  webServer: {
-    command: 'pnpm dev',
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-  },
-})
-```
-
-**Why `workers: 1` in CI:** Supabase free tier limits concurrent DB connections. Parallel workers each open their own connection pool. Running serially avoids `FATAL: remaining connection slots are reserved` errors.
-
----
-
-## Test Directory Structure
-
-```
-e2e/
-├── .auth/                    # gitignored — storageState JSON files
-│   └── user.json
-├── auth.setup.ts             # Auth setup project
-├── fixtures/
-│   └── index.ts              # Shared fixtures (page factory, context with business cookie)
-├── pages/                    # Page Object classes (optional — use for complex pages)
-│   ├── dashboard.page.ts
-│   └── jobs.page.ts
-├── tests/
-│   ├── auth/
-│   │   ├── login.spec.ts
-│   │   ├── signup.spec.ts
-│   │   └── password-reset.spec.ts
-│   ├── dashboard/
-│   │   └── dashboard.spec.ts
-│   ├── jobs/
-│   │   └── jobs.spec.ts
-│   ├── campaigns/
-│   │   └── campaigns.spec.ts
-│   ├── businesses/           # Multi-business / agency tests
-│   │   └── businesses.spec.ts
-│   ├── settings/
-│   │   └── settings.spec.ts
-│   └── public/
-│       ├── review-funnel.spec.ts  # /r/[token]
-│       └── complete-form.spec.ts  # /complete/[token]
-├── screenshots/              # Captured screenshots for audit report
-└── report/                   # HTML report output
-```
-
----
-
-## Routes Under Test
-
-Full inventory of AvisLoop routes to cover:
-
-### Public (no auth)
-| Route | Notes |
-|-------|-------|
-| `/` | Marketing landing |
-| `/pricing` | Pricing page |
-| `/auth/login` | Login form |
-| `/auth/sign-up` | Sign up form |
-| `/auth/forgot-password` | Password reset |
-| `/r/[token]` | Review funnel (HMAC token required) |
-| `/complete/[token]` | Job completion form (HMAC token required) |
-
-### Authenticated (dashboard group)
-| Route | Key Things to Test |
-|-------|-------------------|
-| `/dashboard` | KPIs load, Ready-to-Send queue, Attention alerts |
-| `/jobs` | Table loads, Add Job sheet, status toggle |
-| `/campaigns` | Campaign cards, touch editor, pause/resume |
-| `/campaigns/[id]` | Campaign detail, enrollment list |
-| `/analytics` | Charts render, service type breakdown |
-| `/history` | Filter controls, status badges, resend action |
-| `/feedback` | Feedback list, resolution workflow |
-| `/customers` | Table, search, tags, CSV import |
-| `/businesses` | Agency card grid, detail drawer |
-| `/billing` | Plan info, usage meter |
-| `/settings` | All tabs render, form saves |
-| `/onboarding` | Multi-step wizard completes |
-
-### Edge Cases to Cover
-- Business switcher: switch from Business A to Business B, verify all pages reflect new context
-- Empty states: fresh business with no data
-- Long data: customer name 80+ chars, business name 60+ chars
-- Quota limits: behavior when send limit reached
-- Mobile layout: all dashboard pages at 390px width
-
----
-
-## Environment Variables for Tests
-
-```bash
-# .env.test (gitignored)
-E2E_TEST_EMAIL=test@example.com
-E2E_TEST_PASSWORD=testpassword123
-E2E_TEST_BUSINESS_ID_A=uuid-for-business-a
-E2E_TEST_BUSINESS_ID_B=uuid-for-business-b
-```
-
-**Strategy:** Use a dedicated Supabase test account with pre-seeded data. Do NOT use production accounts. Create seed data once (jobs, customers, campaigns) and treat it as stable read-only fixtures for the audit.
+**One migration task:** Create the `revision-attachments` storage bucket. This can be done via Supabase Dashboard UI or a migration using the Supabase Management API. The bucket does not need a migration file since storage buckets are managed separately from schema migrations in Supabase.
 
 ---
 
@@ -381,45 +233,64 @@ E2E_TEST_BUSINESS_ID_B=uuid-for-business-b
 
 | Considered | Decision | Reason |
 |------------|----------|--------|
-| `playwright-testing-library` | No | Playwright 1.5x has `getByRole/Label/Text` natively |
-| Cypress | No | Playwright already installed |
-| Percy / Chromatic | No | `toHaveScreenshot()` is sufficient for this audit |
-| `msw` (Mock Service Worker) | No | Audit should test real app behavior, not mocked |
-| `@playwright/test-ct` (Component Testing) | No | E2E audit tests full pages, not isolated components |
-| Visual regression CI pipeline | No | Out of scope for audit milestone; screenshots are evidence docs |
-| Database seeding scripts (complex) | No | Use Supabase UI to create stable test data once |
-| Separate staging database | No | Local dev against local Supabase is sufficient for audit |
+| UploadThing / Cloudinary / S3 | No | Supabase Storage is already provisioned; zero benefit from adding a third-party file service |
+| Stripe Billing Meters (metered billing) | No | $50 fixed overage is simpler and more appropriate for a one-time invoice item; metered billing adds webhook complexity for no gain |
+| JWT sessions for client portal | No | DB token lookup is stateless and already proven in two existing routes |
+| Framer Motion | No | Tailwind `motion-safe:` transitions cover all landing page animation needs |
+| Separate auth system for clients | No | Clients do not have accounts; token URL IS the access credential |
+| CKEditor / Quill / rich text | No | Ticket descriptions are plain text; a `<textarea>` is sufficient for v4.0 |
+| Real-time (Supabase Realtime / WebSockets) | No | Client portal is read-on-load; no live update requirement in v4.0 |
+| `@tus/client` (resumable uploads) | No | Revision attachments are ≤10MB; standard signed URL upload is reliable at this size |
 
 ---
 
-## Scripts to Add to package.json
+## Supabase Storage — New Bucket Setup
 
-```json
-{
-  "scripts": {
-    "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui",
-    "test:e2e:report": "playwright show-report e2e/report",
-    "test:e2e:update": "playwright test --update-snapshots"
-  }
-}
+```sql
+-- Run in Supabase Dashboard or as a one-time script
+-- (NOT a schema migration — storage buckets live outside schema migrations)
+
+-- Bucket is private by default; all access via RLS or signed URLs
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'revision-attachments',
+  'revision-attachments',
+  false,               -- private bucket
+  10485760,            -- 10MB per file
+  ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf']
+);
 ```
+
+RLS policies for `storage.objects` should be added in a migration file alongside the `tickets` and `ticket_attachments` table migrations so they are tracked in version control.
+
+---
+
+## Integration Points with Existing Stack
+
+| New Feature | Integrates With | Integration Point |
+|-------------|-----------------|-------------------|
+| Client portal `/portal/[token]` | Existing `businesses` table | New `portal_token` column (same pattern as `form_token`, `intake_token`) |
+| Ticket creation | Existing `businesses` table | `business_id` FK; `portal_token` resolves business on public portal |
+| File uploads | Supabase Storage (new bucket) | `createSignedUploadUrl()` in Server Action → client uploads directly |
+| Overage billing | Existing Stripe customer ID on business | `stripe.invoiceItems.create()` + `stripe.invoices.create()` |
+| Revision quota | New `tickets` table | Count query with billing month window |
+| Agency dashboard (ticket list) | Existing dashboard layout | New route `/app/(dashboard)/tickets/` using existing `getActiveBusiness()` pattern |
 
 ---
 
 ## Sources
 
-- Playwright 1.58 auth patterns: [playwright.dev/docs/auth](https://playwright.dev/docs/auth) — HIGH confidence (official docs)
-- Playwright visual comparisons: [playwright.dev/docs/test-snapshots](https://playwright.dev/docs/test-snapshots) — HIGH confidence (official docs)
-- Playwright emulation: [playwright.dev/docs/emulation](https://playwright.dev/docs/emulation) — HIGH confidence (official docs)
-- Playwright accessibility: [playwright.dev/docs/accessibility-testing](https://playwright.dev/docs/accessibility-testing) — HIGH confidence (official docs)
-- Next.js Playwright guide: [nextjs.org/docs/app/guides/testing/playwright](https://nextjs.org/docs/app/guides/testing/playwright) — HIGH confidence (official, fetched 2026-02-27)
-- Supabase REST auth in Playwright: [mokkapps.de/blog/login-at-supabase-via-rest-api-in-playwright-e2e-test](https://mokkapps.de/blog/login-at-supabase-via-rest-api-in-playwright-e2e-test) — MEDIUM confidence (third-party, verified against Playwright auth docs)
-- Next.js cookies() + Playwright compatibility: [github.com/vercel/next.js/discussions/62254](https://github.com/vercel/next.js/discussions/62254) — HIGH confidence (explains why UI login + storageState is required over API injection)
-- axe-core/playwright npm: [npmjs.com/package/axe-playwright](https://www.npmjs.com/package/axe-playwright) — MEDIUM confidence (package exists, API confirmed via official Playwright a11y docs)
+- Supabase Storage signed upload URL: [supabase.com/docs/reference/javascript/storage-from-createsigneduploadurl](https://supabase.com/docs/reference/javascript/storage-from-createsigneduploadurl) — HIGH confidence (official docs, updated recently)
+- Supabase Storage access control (RLS): [supabase.com/docs/guides/storage/security/access-control](https://supabase.com/docs/guides/storage/security/access-control) — HIGH confidence (official docs)
+- Supabase Storage file size limits: [supabase.com/docs/guides/storage/uploads/file-limits](https://supabase.com/docs/guides/storage/uploads/file-limits) — HIGH confidence (official docs; free tier: 50MB/file, Pro: up to 500GB/file)
+- Supabase Storage bucket fundamentals: [supabase.com/docs/guides/storage/buckets/fundamentals](https://supabase.com/docs/guides/storage/buckets/fundamentals) — HIGH confidence (official docs)
+- Stripe flat fee with overages: [docs.stripe.com/billing/subscriptions/usage-based-v1/use-cases/flat-fee-and-overages](https://docs.stripe.com/billing/subscriptions/usage-based-v1/use-cases/flat-fee-and-overages) — HIGH confidence (official Stripe docs)
+- Next.js 1MB server action body limit (motivation for signed URLs): [signed URL upload pattern for Next.js](https://medium.com/@olliedoesdev/signed-url-file-uploads-with-nextjs-and-supabase-74ba91b65fe0) — MEDIUM confidence (third-party, consistent with official Next.js body size documentation)
+- react-dropzone current version: [npmjs.com/package/react-dropzone](https://www.npmjs.com/package/react-dropzone) — HIGH confidence (confirmed v14.3.8 already in package.json)
+- SaaS landing page conversion patterns 2026: [saasframe.io/blog/10-saas-landing-page-trends-for-2026-with-real-examples](https://www.saasframe.io/blog/10-saas-landing-page-trends-for-2026-with-real-examples) — MEDIUM confidence (WebSearch, not official)
 
 ---
 
-*Stack research for: Playwright E2E QA Audit milestone*
-*Researched: 2026-02-27*
-*Confidence: HIGH — Playwright 1.58.1 confirmed installed; auth + cookie patterns verified against official sources*
+*Stack research for: v4.0 Web Design Agency Pivot*
+*Researched: 2026-03-18*
+*Confidence: HIGH — all new capabilities use existing installed packages; patterns verified against official Supabase and Stripe documentation*

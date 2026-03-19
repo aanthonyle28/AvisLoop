@@ -1,862 +1,633 @@
-# Architecture: QA Audit Structure for AvisLoop
-
-**Project:** AvisLoop QA Audit — Comprehensive UI/UX + Functional Review
-**Researched:** 2026-02-27
-**Confidence:** HIGH (direct codebase analysis of all routes, components, and layout)
-
----
-
-## Overview
-
-This document answers: **how should a Playwright-driven QA audit be structured for the AvisLoop 15+ route Next.js app?**
-
-The audit covers all routes currently in scope, tests against a pre-existing test account (`audit-test@avisloop.com / AuditTest123!`), and produces per-page findings files plus a summary report. The audit is **findings-only** — no fixes are implemented.
-
----
-
-## App Map: Full Route Inventory
-
-Before defining phases, here is every auditable surface in the app:
-
-### Public Routes (no auth required)
-| Route | Type | Notes |
-|-------|------|-------|
-| `/` | Marketing landing | Hero, features, pricing, CTA sections |
-| `/pricing` | Marketing | Plan comparison table |
-| `/privacy` | Static | Privacy policy |
-| `/terms` | Static | Terms of service |
-| `/login` | Auth | Email/password + Google OAuth |
-| `/signup` | Auth | Registration form |
-| `/auth/forgot-password` | Auth | Password reset email |
-| `/auth/update-password` | Auth | Post-reset password change |
-| `/r/[token]` | Review funnel | HMAC-signed token, star rating, Google/feedback routing |
-| `/complete/[token]` | Job form | DB token, public technician form |
-
-### Auth Flow Routes
-| Route | Type | Notes |
-|-------|------|-------|
-| `/auth/callback` | Redirect handler | OAuth + magic link landing |
-| `/auth/sign-up-success` | Confirmation | Post-signup "check email" page |
-| `/verify-email` | Confirmation | Email verification flow |
-
-### Onboarding (no dashboard shell)
-| Route | Type | Notes |
-|-------|------|-------|
-| `/onboarding` | 4-step wizard | First business: steps 1-4 |
-| `/onboarding?mode=new` | 3-step wizard | Additional business: CreateBusinessWizard |
-
-### Dashboard Routes (require auth + business)
-| Route | Component | Key Interactions |
-|-------|-----------|-----------------|
-| `/dashboard` | DashboardClient | KPI cards, ready-to-send queue, attention alerts, right panel |
-| `/jobs` | JobsClient | Table, add/edit drawers, mark-complete, filters |
-| `/campaigns` | CampaignsPageShell | Campaign list, preset picker, edit sheet, QuickSendModal |
-| `/campaigns/[id]` | CampaignDetailShell | Stats, touch sequence, enrollments list, edit/pause/delete |
-| `/campaigns/new` | Redirect | Redirects back to /campaigns |
-| `/analytics` | ServiceTypeBreakdown | Service-type chart, metrics table |
-| `/history` | HistoryClient | Table, filters, date presets, bulk retry |
-| `/feedback` | FeedbackList | Stats cards, feedback list, resolve workflow |
-| `/billing` | BillingPage | Plan cards, usage display, Stripe checkout |
-| `/settings` | SettingsTabs | 7 tabs: General, Templates, Services, Messaging, Integrations, Customers, Account |
-| `/businesses` | BusinessesClient | Card grid, BusinessDetailDrawer, metadata editing |
-| `/send` | SendPage (legacy) | Quick send tab, bulk send tab |
-| `/customers` | CustomersClient (legacy) | Table, add/edit, CSV import — now in Settings > Customers |
-
-### Shared UI (appears on every dashboard page)
-| Component | Location | Notes |
-|-----------|----------|-------|
-| Sidebar (desktop) | Left, 256px | Business switcher, nav items, Add Job button, collapsed state |
-| BottomNav (mobile) | Fixed bottom | Dashboard, Jobs, Campaigns, History — 4 items |
-| PageHeader (mobile) | Top | Business switcher, account menu |
-| MobileFAB | Fixed bottom-right | Add Job, mobile only |
-| NavigationProgressBar | Top | Page transition indicator |
-
----
-
-## Phase Grouping Architecture
-
-### Grouping Principles
-
-**1. Group by data dependency:** Pages that depend on the same pre-existing data should be tested in the same session. Creating a job in Phase 2 means Phase 3 (campaigns) can test enrollment without creating a job again.
-
-**2. Group by shared layout:** Pages sharing the same shell (dashboard layout) can reuse a single authenticated browser context. Public pages run in a separate context.
-
-**3. Group by complexity:** High-complexity pages with many interactions (Jobs, Campaigns, Settings) get their own phases. Low-complexity read-only pages (Analytics, Billing) share a phase.
-
-**4. Build data progressively:** The audit sequence intentionally creates test data that later phases depend on. Auth phase creates the account. Onboarding creates the business. Jobs phase creates the first job. That job powers the campaign, history, and analytics phases.
-
-### The Data Dependency Chain
-
-```
-Phase 1 (Auth) — creates authenticated session
-     ↓
-Phase 2 (Onboarding) — creates first business with campaign preset
-     ↓
-Phase 3 (Dashboard) — reads business data; tests empty state first
-     ↓
-Phase 4 (Jobs) — creates 3-5 test jobs; triggers enrollment
-     ↓ (jobs now enrolled in campaigns)
-Phase 5 (Campaigns) — reads enrollments from Phase 4
-     ↓ (campaign sends history)
-Phase 6 (History + Analytics + Feedback) — reads send logs from Phase 5
-     ↓
-Phase 7 (Settings) — reads + modifies business config; safe to change
-     ↓
-Phase 8 (Businesses) — tests multi-business creation + switcher
-     ↓
-Phase 9 (Public Pages) — stateless, no session needed, test last
-```
-
----
-
-## Phase Breakdown: Recommended Structure
-
-### Phase QA-01: Authentication Flows
-
-**Routes covered:**
-- `/login`
-- `/signup`
-- `/auth/forgot-password`
-- `/auth/update-password`
-
-**Scope per route:**
-
-`/login`
-- Desktop and mobile viewports
-- Email/password login with valid credentials (audit-test@avisloop.com)
-- Error state: wrong password
-- Error state: unregistered email
-- "Forgot password" link present and navigates
-- Google OAuth button present and labeled correctly
-- Redirect to /dashboard after successful login
-- Redirect to /dashboard if already logged in
-- Dark mode rendering
-
-`/signup`
-- Form fields: name, email, password
-- Password strength indicator (if present)
-- Error state: existing email
-- Error state: weak password
-- Redirect to /auth/sign-up-success after submission
-- Google OAuth button present
-
-`/auth/forgot-password`
-- Email field renders, submit triggers confirmation state
-- Error state: invalid email
-
-**Viewport plan:** Desktop (1440×900) and Mobile (390×844) for all auth screens.
-
-**Data requirements:** No pre-existing data. Uses audit-test@avisloop.com for login tests.
-
-**Known complexities:**
-- Google OAuth cannot be fully tested via Playwright without real OAuth flow — document as "functional check only, interactive flow not testable via automation"
-- Password reset requires email delivery — test up to form submission only
-
----
-
-### Phase QA-02: Onboarding Wizard
-
-**Routes covered:**
-- `/onboarding` (fresh state — may need a secondary account)
-- `/onboarding?mode=new` (additional business creation)
-
-**Scope:**
-
-`/onboarding` (first business)
-- All 4 steps render (Business Basics, Campaign Preset, CRM Platform, SMS Consent)
-- Step validation: required fields block progression
-- Business name, phone, Google review link inputs
-- Service type multi-select (8 types + custom names)
-- Campaign preset picker (Gentle / Standard / Aggressive descriptions)
-- CRM platform step is skippable
-- SMS consent acknowledgement required
-- Progress indicator updates correctly
-- Completion redirects to /dashboard
-- "Back" navigation between steps
-
-`/onboarding?mode=new`
-- Creates CreateBusinessWizard (3-step: basics, services, SMS consent)
-- Does NOT redirect away if user already has a completed business
-- Completion redirects to /dashboard with new business active
-
-**Viewport plan:** Desktop + Mobile. Mobile especially important — onboarding must work on phone.
-
-**Data requirements:**
-- Primary test account should already have completed onboarding — use ?mode=new to test wizard without destroying existing data
-- Fresh first-time flow is ideally tested against a second test account (audit-test2@avisloop.com) OR by noting that it cannot be replicated with the primary account
-
-**Known complexities:**
-- Form state persists in localStorage — test refresh mid-wizard
-- Draft restoration validation
-
----
-
-### Phase QA-03: Dashboard
-
-**Routes covered:**
-- `/dashboard`
-
-**Scope:**
-- Two-column DashboardShell layout (left: main content, right: RightPanel)
-- KPI cards: 6 total (Reviews This Month, Average Rating, Conversion Rate, Requests Sent, Active Sequences, Pending)
-- Each KPI card clickable, links to correct destination
-- Sparklines render on KPI cards (14-day history)
-- ReadyToSendQueue: job cards, empty state variant
-- AttentionAlerts: alert cards, dismiss behavior
-- WelcomeCard: visible on new accounts, hidden once dismissed
-- Getting Started card in RightPanel
-- Greeting changes with time of day
-- Sidebar business switcher visible (desktop)
-- Mobile: bottom nav, PageHeader, MobileFAB visible
-- Mobile: bottom sheet (if jobs in queue)
-- Dark mode rendering of all widgets
-
-**Viewport plan:** Desktop (1440×900), Tablet (768×1024), Mobile (390×844).
-
-**Data requirements:** Test account should have at least some job history so KPIs show non-zero values. If empty, document empty state appearance.
-
----
-
-### Phase QA-04: Jobs
-
-**Routes covered:**
-- `/jobs`
-
-**Scope:**
-- Page header, description, table renders
-- Filter controls: status filter (all / completed / do_not_send), service type filter
-- Job table columns: customer name, service type, status badge, campaign, date, actions
-- "Add Job" button in header opens AddJobSheet
-- AddJobSheet: customer autocomplete, service type select, notes, campaign selector, status toggle
-- Customer autocomplete searches existing customers by name + email
-- New customer inline creation within AddJobSheet
-- Conflict detection on job creation (customer already in active campaign)
-- MarkComplete button on scheduled jobs
-- Job status toggle (completed / do_not_send)
-- EditJobSheet: pre-filled with existing data
-- JobDetailDrawer: opens on row click, shows all fields
-- Delete confirmation dialog
-- CampaignSelector shows "Auto-detect" vs specific campaign vs "One-off"
-- Empty state when no jobs
-- Loading skeleton during data fetch
-- Mobile: all actions accessible (Add Job via FAB, table scrolls horizontally)
-
-**Data outcome:** Create 3 test jobs during this phase — these become the test data for Phases 5 and 6.
-
-**Known complexities:**
-- Enrollment conflict dialog (Replace / Skip / Queue) requires a job to already be enrolled in an active campaign — create scenario if possible
-- CSV import dialog exists (csv-job-import-dialog.tsx) — test button triggers dialog
-
----
-
-### Phase QA-05: Campaigns
-
-**Routes covered:**
-- `/campaigns`
-- `/campaigns/[id]`
-
-**Scope — `/campaigns`:**
-- Preset picker visible for new users (or after deleting all campaigns)
-- Campaign list cards: name, service type, status badge, touch count
-- "New Campaign" flow: duplicate from preset
-- QuickSendModal: send to specific customer directly
-- CampaignList actions: Edit, Pause/Resume, Delete
-- Edit sheet (TouchSequenceEditor): add/remove touches, channel toggle, delay hours, template picker
-- Template preview modal opens from touch editor
-- Campaign pause: enrollments freeze (badge shows "Frozen")
-- Campaign resume: enrollments reactivate
-- Delete with enrollment reassignment dialog
-- Empty state when no campaigns
-
-**Scope — `/campaigns/[id]`:**
-- Stats cards: Active, Completed, Stopped counts
-- CampaignStats: touch stats, stop reasons chart
-- Touch sequence display: each touch with channel, delay, template name
-- "AI Personalized" badge visible if personalization enabled
-- Enrollments list with status badges
-- Pagination if >20 enrollments
-- "Back to campaigns" link works
-- Edit/Pause/Delete accessible from detail view
-
-**Viewport plan:** Desktop primary. Campaign detail is information-dense — verify readability at 1280px.
-
-**Data requirements:** Phase 4 jobs must exist and be enrolled. At least one campaign should have enrollments so the detail page shows data.
-
----
-
-### Phase QA-06: History, Analytics, and Feedback
-
-**Routes covered:**
-- `/history`
-- `/analytics`
-- `/feedback`
-
-These three pages are grouped because they are primarily read-only displays of data produced by the jobs and campaigns phases. Testing them together is efficient.
-
-**Scope — `/history`:**
-- Table: customer, channel, status badge, template, date
-- Status filter (Radix Select): all, sent, failed, bounced, reviewed
-- Date preset chips: Today, Week, Month, 3M
-- Custom date range picker
-- Search by customer name or email
-- "Retry" inline action on failed messages
-- Bulk retry: select multiple failed/bounced, batch action
-- Send log drawer: click row opens detail with template content
-- Pagination (50 per page)
-- Empty state
-- Loading skeleton
-
-**Scope — `/analytics`:**
-- ServiceTypeBreakdown renders (chart or table)
-- Service type rows with metrics: total sent, reviews, conversion rate
-- Empty state if no data
-- Page header and description
-
-**Scope — `/feedback`:**
-- Stats cards: Total, Unresolved, Resolved, Avg Rating
-- FeedbackList: each item shows customer name, rating stars, feedback text, date
-- Resolve workflow: "Mark Resolved" button, adds internal notes
-- Filter by resolved/unresolved
-- Empty state
-
-**Viewport plan:** Desktop primary. History table requires horizontal space — test at 1280px and 768px for comparison.
-
----
-
-### Phase QA-07: Settings
-
-**Routes covered:**
-- `/settings` (all 7 tabs)
-
-Settings is the most complex single page in the app. Each tab is functionally independent and warrants its own checklist.
-
-**Tab: General**
-- Business name, phone, email fields
-- Google review link field
-- Form save / validation
-- FormLinkSection: shows form token URL, copy button, "Regenerate" action
-
-**Tab: Templates**
-- TemplateList renders (email + SMS templates)
-- Create new template: channel toggle, subject (email only), body, variables
-- Edit template: pre-filled form
-- Delete template: confirmation dialog
-- System templates visible (is_default = true) — no edit/delete buttons
-- "Use as base" copies system template
-
-**Tab: Services**
-- 8 service type toggles
-- Custom service names input (when "other" enabled)
-- Timing sliders/inputs per service type
-- Review cooldown days input (7-90 range)
-- Save button triggers immediate update
-
-**Tab: Messaging**
-- PersonalizationSection: AI stats display (personalized count, last used)
-- API key status indicator
-
-**Tab: Integrations**
-- Generate API key button (first time)
-- Reveal/hide API key
-- Copy API key
-- Regenerate warning dialog
-- Webhook URL display
-
-**Tab: Customers**
-- Full CustomersClient embedded: search, table, add, edit, CSV import
-- SMS consent status column
-- Bulk operations: archive, delete selected
-- CustomerDetailDrawer: notes auto-save, SMS consent editing
-
-**Tab: Account**
-- Change password section (only if email auth, not OAuth-only)
-- Delete account: confirmation dialog with "type your email" guard
-
-**Viewport plan:** Desktop primary (settings is content-heavy). Verify tab overflow on mobile (horizontal scroll on TabsList).
-
----
-
-### Phase QA-08: Businesses Page and Business Switcher
-
-**Routes covered:**
-- `/businesses`
-- Business switcher (sidebar + mobile header — appears on every dashboard page)
-
-**Scope — `/businesses`:**
-- Card grid: all user-owned businesses shown
-- BusinessCard: business name, address, agency metadata preview
-- BusinessDetailDrawer opens on card click
-- Drawer: Google rating start/current, review count start/current, monthly fee, start date, GBP access toggle, competitor info, notes
-- Notes auto-save (debounce — type and wait 500ms)
-- GBP access toggle updates immediately
-- "Add Business" button opens CreateBusinessWizard (same as /onboarding?mode=new)
-- Active business card visually distinguished
-- "Switch to this business" action in drawer
-
-**Scope — Business Switcher:**
-- Desktop sidebar: shows current business name
-- Single-business users: plain text (no dropdown)
-- Multi-business users: Radix DropdownMenu with all businesses
-- Check mark on active business
-- Selecting different business switches context (all pages reload with new business data)
-- Mobile PageHeader: BusinessSwitcher renders same behavior at top of screen
-
-**Data requirements:** Requires at least 2 businesses to test multi-business switcher. Phase 8 should CREATE a second business as its first action.
-
-**Viewport plan:** Desktop + Mobile. Switcher behavior must be verified on both.
-
----
-
-### Phase QA-09: Public Pages and Review Funnel
-
-**Routes covered:**
-- `/` (marketing landing)
-- `/pricing`
-- `/privacy`, `/terms`
-- `/r/[token]` (review funnel)
-- `/complete/[token]` (public job form)
-
-These routes require no authentication and can be tested in a fresh browser context.
-
-**Scope — `/` landing:**
-- Hero section renders: heading, subheading, CTAs
-- All landing page sections present (features, how it works, pricing, FAQ)
-- CTA buttons navigate to /signup and /login
-- Sticky header (if present)
-- Mobile responsive: hamburger menu or equivalent
-- Dark mode
-- Animation elements do not break layout
-
-**Scope — `/pricing`:**
-- Plan cards present (Basic, Pro)
-- Feature lists accurate
-- CTA buttons navigate to signup
-
-**Scope — `/r/[token]` review funnel:**
-- Valid token: star rating UI renders with business name and customer name
-- Click 4-5 stars: redirects to Google review link (or shows "No Google link configured" state)
-- Click 1-3 stars: shows private feedback form
-- Submit feedback: success state
-- Invalid/expired token: 404 page
-- FTC footer text present
-
-**Scope — `/complete/[token]` job form:**
-- Valid token: form renders with business name and service type options
-- Required fields: customer name, phone or email, service type
-- Submit: success state
-- Invalid token: 404 page
-- Mobile-optimized layout (this form is used on phones by technicians)
-
-**Data requirements for review funnel:** Need a valid HMAC-signed review token. This requires having a customer enrolled in a campaign that has sent a touch. If touch-sending is not available in test environment, test with a manually crafted token or note as "environment-dependent."
-
-**Data requirements for job form:** Need the form_token from Settings > General > Form Link section. Copy it during Phase QA-07 and use it here.
-
----
-
-## Test Data Strategy
-
-### Primary Approach: Use Existing Test Account
-
-The test account `audit-test@avisloop.com / AuditTest123!` is the primary audit subject. Do NOT create test data speculatively — survey what exists first, document it, then create only what is needed for specific interaction tests.
-
-### Data Creation Sequence
-
-```
-Before Phase QA-03:
-  - Verify test account has at least 1 business with onboarding complete
-  - Note: campaign preset selected, services configured
-
-During Phase QA-04 (Jobs):
-  - Create 3 test jobs:
-    Job A: HVAC, Patricia Johnson, pjohnson@test.com — mark complete (triggers enrollment)
-    Job B: Plumbing, Marcus Rodriguez, mrodriguez@test.com — mark complete
-    Job C: Cleaning, Sarah Chen, schen@test.com — status do_not_send (excluded from queue)
-  - These 3 jobs become the test corpus for all subsequent phases
-
-During Phase QA-08 (Businesses):
-  - Create 1 additional business: "Test Business 2"
-  - Use this to test multi-business switcher
-  - After switcher tests, switch back to original business
-```
-
-### Data Isolation Rules
-
-1. **Never delete data that later phases depend on.** Delete operations should only be tested on items created specifically for that test (create then delete, within same phase).
-
-2. **Use unique identifiers in test data.** Prefix customer names with "AUDIT_" so test data is recognizable: "AUDIT_Patricia Johnson". This makes cleanup obvious if needed later.
-
-3. **Campaign configuration:** Do not change existing campaign configurations — only observe. If you must test a destructive action (delete campaign), create a throwaway campaign first.
-
-4. **Settings changes:** The Settings tab tests can freely modify service timing, cooldown, and template settings. These are test-account-only and expected to change.
-
-### What Cannot Be Tested via Playwright
-
-| Feature | Why Not Testable | How to Document |
-|---------|-----------------|-----------------|
-| Google OAuth flow | Requires interactive OAuth | Note: "Button present, full OAuth flow not automatable" |
-| Actual email/SMS delivery | No real Twilio/Resend in test env | Note: "Send action triggers correctly, delivery not verifiable" |
-| Stripe checkout | Redirects to external Stripe | Note: "Checkout button navigates to Stripe; completion flow uses test webhook" |
-| Password reset (full flow) | Requires email inbox access | Note: "Form submission confirmed; link delivery not verifiable" |
-| Review token creation | Requires campaign touch to have sent | Note: "Token-based flow requires sent touch; test with pre-generated token if available" |
-
----
-
-## Screenshot Strategy
-
-### Viewport Definitions
-
-| Name | Dimensions | Use |
-|------|-----------|-----|
-| `desktop` | 1440×900 | Primary audit viewport |
-| `tablet` | 768×1024 | Sidebar auto-collapse range |
-| `mobile` | 390×844 | iPhone 14 equivalent |
-
-### Theme Coverage
-
-- **Light mode:** Always captured
-- **Dark mode:** Capture for: landing page, dashboard, jobs, settings (General tab)
-- Mechanism: set `document.documentElement.classList.add('dark')` via `page.evaluate()` before screenshot
-
-### Naming Convention
-
-```
-[phase]-[route-slug]-[state]-[viewport]-[theme].png
-
-Examples:
-  qa01-login-default-desktop-light.png
-  qa01-login-error-desktop-light.png
-  qa04-jobs-add-job-sheet-open-desktop-light.png
-  qa04-jobs-table-populated-mobile-light.png
-  qa03-dashboard-full-desktop-dark.png
-```
-
-### Screenshot Moments
-
-For each page, capture at minimum:
-1. **Default state** — page as it loads, no interactions
-2. **Key interaction state** — the most important interactive element open (drawer, dialog, sheet)
-3. **Empty state** — if the page has a distinct empty state
-4. **Mobile** — at 390×844
-
-For complex pages with multiple interaction states (Jobs, Campaigns, Settings), capture additional states:
-- Each tab (Settings)
-- Sheet open + sheet closed (Jobs)
-- Campaign list + campaign detail
-
-### Screenshot Storage
-
-Store all screenshots in: `.planning/qa-audit/screenshots/`
-
-Organize by phase:
-```
-.planning/qa-audit/screenshots/
-  qa01-auth/
-  qa02-onboarding/
-  qa03-dashboard/
-  qa04-jobs/
-  qa05-campaigns/
-  qa06-history-analytics-feedback/
-  qa07-settings/
-  qa08-businesses/
-  qa09-public/
-```
-
----
-
-## Report Template: Per-Page Findings File
-
-Each page gets one findings file at `.planning/qa-audit/findings/[phase]-[page].md`.
-
-```markdown
-# QA Findings: [Page Name]
-
-**Route:** /path/to/page
-**Phase:** QA-0X
-**Audited:** [date]
-**Viewport tested:** desktop (1440×900), mobile (390×844)
-**Theme tested:** light + dark
-
-## Summary
-
-[2-3 sentence overview of overall page health]
-
-**Status:** [PASS / PASS WITH ISSUES / FAIL]
-
----
-
-## Findings
-
-### [F-01] [Finding Title]
-
-**Severity:** [Critical / High / Medium / Low / Info]
-**Category:** [Functional / Visual / Accessibility / Performance / V2 Alignment]
-**Viewport:** [Desktop / Mobile / Both]
-**Theme:** [Light / Dark / Both]
-
-**Description:**
-[What was observed]
-
-**Expected behavior:**
-[What should happen]
-
-**Screenshot:** `screenshots/[phase]-[page]-[state].png`
-
-**Reproduction steps:**
-1. Navigate to [route]
-2. [action]
-3. [action]
-4. Observe: [result]
-
----
-
-### [F-02] [Finding Title]
-[repeat pattern]
-
----
-
-## Passed Checks
-
-| Check | Status | Notes |
-|-------|--------|-------|
-| Page renders without console errors | Pass/Fail | |
-| All navigation links work | Pass/Fail | |
-| Empty state renders correctly | Pass/Fail | |
-| Loading state renders correctly | Pass/Fail | |
-| Mobile layout (390px) renders correctly | Pass/Fail | |
-| Dark mode renders correctly | Pass/Fail | |
-| No layout overflow | Pass/Fail | |
-| Interactive elements respond correctly | Pass/Fail | |
-| Form validation works | Pass/Fail | (if applicable) |
-| V2 alignment: no V1 patterns introduced | Pass/Fail | (if applicable) |
-
----
-
-## Screenshots
-
-| File | Description |
-|------|-------------|
-| `[filename].png` | [description] |
-
----
-
-## Notes
-
-[Any context, caveats, or environment-specific observations]
-```
-
-### Severity Definitions
-
-| Level | Definition | Examples |
-|-------|-----------|---------|
-| Critical | App is broken, data loss possible, security issue | White screen, unhandled error, auth bypass |
-| High | Feature non-functional, significant UX degradation | Form submits but data not saved, modal won't close |
-| Medium | Feature partially works, notable visual defect | Wrong label, missing loading state, minor layout break |
-| Low | Polish issue, minor inconsistency | Typo, minor spacing issue, hover state missing |
-| Info | Observation, question, or improvement suggestion | "Consider adding X here", "This pattern differs from Y page" |
-
----
-
-## Summary Report Template
-
-The summary report lives at `.planning/qa-audit/SUMMARY-REPORT.md`.
-
-```markdown
-# QA Audit Summary Report
-
-**App:** AvisLoop
-**Audit date:** [date range]
-**Auditor:** Claude Code
-**Test account:** audit-test@avisloop.com
-**Build state:** [git commit hash if available]
+# Architecture Patterns: Web Design Agency CRM + Client Portal + Ticket System
+
+**Domain:** Web design agency tooling integrated into an existing reputation management SaaS
+**Researched:** 2026-03-18
+**Overall confidence:** HIGH — based on direct codebase inspection, not inference
 
 ---
 
 ## Executive Summary
 
-[3-4 paragraph overview of overall health, major themes, V2 alignment status]
+AvisLoop already has most of the scaffolding needed for web design agency features. The existing `/businesses` page, `Business` model with agency metadata, cookie-based active-business resolver, token-based public routes (`/complete/[token]`, `/intake/[token]`, `/r/[token]`), and insert-only server action patterns can all be extended rather than replaced. The primary new additions are a `web_projects` table, a `project_tickets` table, and a `/portal/[token]` public route for client-facing access. The biggest architectural decision is whether web design clients live as `businesses` rows (extending the existing multi-tenant model) or as a separate `clients` table.
 
-**Overall status:** [PASS / PASS WITH ISSUES / NEEDS WORK]
-
----
-
-## Findings by Severity
-
-| Severity | Count | Pages Affected |
-|----------|-------|---------------|
-| Critical | X | [list] |
-| High | X | [list] |
-| Medium | X | [list] |
-| Low | X | [list] |
-| Info | X | [list] |
-
-**Total findings:** X
+**Recommendation: Extend the `businesses` table.** Web design clients are structurally identical to reputation management clients — they are organizations the agency manages. Adding a `client_type` discriminator column (`'reputation' | 'web_design' | 'both'`) allows the existing `/businesses` page, `BusinessCard`, `BusinessDetailDrawer`, multi-business switcher, and RLS policies to keep working unchanged. A separate `clients` table would duplicate auth patterns, RLS, and data-layer functions for no architectural gain.
 
 ---
 
-## Findings by Category
+## Existing Architecture Map
 
-| Category | Count | Top Issues |
-|----------|-------|-----------|
-| Functional | X | [summary] |
-| Visual | X | [summary] |
-| Accessibility | X | [summary] |
-| Performance | X | [summary] |
-| V2 Alignment | X | [summary] |
-| Mobile | X | [summary] |
+### Route Groups
 
----
+```
+app/
+├── (marketing)/          # avisloop.com — no auth, separate layout
+│   ├── page.tsx          # Landing page (currently reputation-focused)
+│   ├── pricing/
+│   ├── audit/            # Lead-gen tool (audit_reports table)
+│   └── [privacy, terms, sms-compliance]
+│
+├── (dashboard)/          # app.avisloop.com — auth-protected, shared AppShell
+│   ├── layout.tsx        # BusinessSettingsProvider + AddJobProvider + AppShell
+│   ├── dashboard/
+│   ├── businesses/       # Agency client grid — THE integration point
+│   ├── jobs/
+│   ├── campaigns/
+│   ├── settings/         # 7 tabs including Customers
+│   └── [analytics, history, feedback, billing]
+│
+├── r/[token]/            # Public: review funnel (HMAC-signed token, 30-day expiry)
+├── complete/[token]/     # Public: technician job form (DB token on businesses.form_token)
+├── intake/[token]/       # Public: client intake form (DB token on businesses.intake_token)
+└── onboarding/           # Auth-protected but pre-business wizard
+```
 
-## Phase Results
+### Data Layer Pattern (ARCH-002)
 
-| Phase | Pages | Status | Finding Count | Notes |
-|-------|-------|--------|---------------|-------|
-| QA-01 Auth | login, signup, forgot-password | [status] | X | |
-| QA-02 Onboarding | /onboarding | [status] | X | |
-| QA-03 Dashboard | /dashboard | [status] | X | |
-| QA-04 Jobs | /jobs | [status] | X | |
-| QA-05 Campaigns | /campaigns, /campaigns/[id] | [status] | X | |
-| QA-06 History/Analytics/Feedback | /history, /analytics, /feedback | [status] | X | |
-| QA-07 Settings | /settings (7 tabs) | [status] | X | |
-| QA-08 Businesses | /businesses, switcher | [status] | X | |
-| QA-09 Public | /, /pricing, /r/[token], /complete/[token] | [status] | X | |
+All `lib/data/` functions accept an explicit `businessId` parameter. Callers (Server Components, Server Actions) resolve the active business once via `getActiveBusiness()` and pass the verified ID downstream. This eliminates `.single()` crashes on zero-business users and makes multi-tenant queries predictable. New data functions for web design features must follow this same caller-provides-businessId pattern.
 
----
+### Token-Based Public Routes
 
-## Top 10 Issues
+Three patterns exist, all using the service-role client to bypass RLS:
 
-1. **[Issue title]** — [page] — Severity: [level]
-   [One-line description]
+| Route | Token type | Token location | Revocable |
+|-------|-----------|----------------|-----------|
+| `/r/[token]` | HMAC-signed JWT (30-day expiry) | URL, stateless | Yes — token expires |
+| `/complete/[token]` | Random DB token (192-bit base64url) | `businesses.form_token` | Yes — regenerate resets URL |
+| `/intake/[token]` | Random DB token (192-bit base64url) | `businesses.intake_token` | Yes — regenerate resets URL |
 
-2. ...
+The client portal uses the **DB token pattern** (same as `/complete/` and `/intake/`). A persistent token stored on the web project row gives clients a stable bookmarkable URL. HMAC tokens are wrong here because portals should not expire.
 
----
+### Multi-Tenancy RLS Pattern
 
-## V2 Philosophy Check
+Every tenant table has:
+- `business_id UUID NOT NULL REFERENCES businesses(id)`
+- `ALTER TABLE ... ENABLE ROW LEVEL SECURITY`
+- Policy: `business_id IN (SELECT id FROM businesses WHERE user_id = auth.uid())`
 
-| Principle | Status | Notes |
-|-----------|--------|-------|
-| Jobs are primary object | [status] | |
-| Customers created as side effect | [status] | |
-| No recurring manual action except "Complete Job" | [status] | |
-| Campaigns handle all outreach automatically | [status] | |
-| Navigation order: Dashboard → Jobs → Campaigns first | [status] | |
-| "Add Customer" not prominent in main nav | [status] | |
+The `businesses` table itself is scoped via `WHERE user_id = auth.uid()`. New tables (`web_projects`, `project_tickets`, `ticket_messages`) must follow the same pattern. This is non-negotiable per `CLAUDE.md`.
 
----
+### Sidebar Navigation (current)
 
-## Accessibility Findings
+```typescript
+const mainNav = [
+  { icon: House,                label: 'Dashboard',  href: '/dashboard' },
+  { icon: Briefcase,            label: 'Jobs',       href: '/jobs' },
+  { icon: Megaphone,            label: 'Campaigns',  href: '/campaigns' },
+  { icon: ChartBar,             label: 'Analytics',  href: '/analytics' },
+  { icon: ClockCounterClockwise,label: 'History',    href: '/history' },
+  { icon: ChatCircleText,       label: 'Feedback',   href: '/feedback' },
+]
+```
 
-[List all accessibility findings with WCAG criteria]
-
----
-
-## Mobile Findings
-
-[List all mobile-specific findings]
-
----
-
-## Not Tested / Limitations
-
-| Feature | Reason |
-|---------|--------|
-| Google OAuth full flow | External OAuth provider |
-| Email/SMS delivery verification | No test email provider wired |
-| Stripe checkout completion | External Stripe hosted page |
-| Password reset link delivery | Requires email inbox |
+`/businesses` is NOT in mainNav — it's accessible via the sidebar footer's "Add Business" link and directly via URL.
 
 ---
 
-## Recommended Fix Priority
+## Recommended Architecture
 
-### Immediate (before next release)
-- [Critical and High findings]
+### Component Boundary Diagram
 
-### Next sprint
-- [Medium findings with highest user impact]
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  app.avisloop.com (dashboard)                                   │
+│                                                                 │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │ /businesses (existing page — extend, don't replace)      │   │
+│  │   BusinessCard → shows client_type badge                 │   │
+│  │   BusinessDetailDrawer → tabs: Overview | Web Project    │   │
+│  │   [Add Business] → onboarding wizard (existing)          │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                                                                 │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │ /projects (NEW dashboard page — web design CRM)          │   │
+│  │   ProjectsClient                                         │   │
+│  │   ├── ProjectCard grid (status, domain, client, tier)    │   │
+│  │   ├── ProjectDetailDrawer (info, tickets, notes)         │   │
+│  │   └── [Add Project] → ProjectWizard modal                │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                                                                 │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │ /projects/[id]/tickets (NEW — ticket management)         │   │
+│  │   TicketList with status filters                         │   │
+│  │   TicketDetailDrawer (thread, file links, status)        │   │
+│  │   NewTicketForm (agency-created tickets)                 │   │
+│  └──────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
 
-### Backlog
-- [Low and Info findings]
+┌─────────────────────────────────────────────────────────────────┐
+│  Public routes (no auth)                                        │
+│                                                                 │
+│  /portal/[token]         ← NEW — client-facing portal          │
+│    ├── Project status overview                                  │
+│    ├── Open ticket list                                         │
+│    ├── [Submit Revision Request] → PortalTicketForm             │
+│    └── File upload to Supabase Storage                          │
+│                                                                 │
+│  /intake/[token]         ← EXISTING (client intake form)        │
+│  /complete/[token]       ← EXISTING (job completion form)       │
+└─────────────────────────────────────────────────────────────────┘
 
----
-
-## Files Index
-
-| File | Description |
-|------|-------------|
-| findings/qa01-auth.md | Auth page findings |
-| findings/qa02-onboarding.md | Onboarding findings |
-| findings/qa03-dashboard.md | Dashboard findings |
-| findings/qa04-jobs.md | Jobs findings |
-| findings/qa05-campaigns.md | Campaigns findings |
-| findings/qa06-history.md | History findings |
-| findings/qa06-analytics.md | Analytics findings |
-| findings/qa06-feedback.md | Feedback findings |
-| findings/qa07-settings.md | Settings findings (7 tabs) |
-| findings/qa08-businesses.md | Businesses + switcher findings |
-| findings/qa09-public.md | Public pages + review funnel findings |
-
----
-
-*Audit conducted using Playwright MCP browser automation with manual verification.*
+┌─────────────────────────────────────────────────────────────────┐
+│  avisloop.com (marketing)                                       │
+│                                                                 │
+│  / (homepage)            ← RESTRUCTURE for web design agency   │
+│  /reputation             ← NEW route, existing content moved   │
+│  /pricing                ← Update for dual-service pricing      │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Build Order Rationale
+## New Database Tables
 
-The phases are ordered by data dependency and risk, not alphabetically or by navigation order.
+### businesses table extension
 
-**Why Auth first (QA-01):** Everything else requires a logged-in session. Failing auth blocks the entire audit.
+One new column discriminates between client types. All existing rows default to `'reputation'` — no data migration needed.
 
-**Why Onboarding second (QA-02):** Dashboard and all other pages redirect to /onboarding if business is missing. The test account should already be onboarded, but the wizard itself must be audited, and `?mode=new` creates the second business needed for Phase 8.
+```sql
+ALTER TABLE public.businesses
+  ADD COLUMN IF NOT EXISTS client_type TEXT NOT NULL DEFAULT 'reputation'
+    CHECK (client_type IN ('reputation', 'web_design', 'both'));
+```
 
-**Why Dashboard third (QA-03):** The dashboard consumes data from jobs and campaigns. Test it empty first (documents the zero-state), then revisit after Phase 4 adds data if needed.
+Note: existing agency metadata columns (`competitor_name`, `competitor_review_count`, `google_rating_start`, etc.) remain on the table. They simply won't be displayed for `web_design` clients. Removing them would require a migration and type changes — not worth it. Hide via UI logic.
 
-**Why Jobs fourth (QA-04):** Jobs is the V2 core action. Test it thoroughly. The 3 test jobs created here power phases 5, 6, and will appear in analytics.
+### Table: web_projects
 
-**Why Campaigns fifth (QA-05):** Campaign enrollment happens on job completion. Phase 4 jobs trigger enrollment — Phase 5 observes the result. Testing in this order means enrollment data is present when auditing campaign detail pages.
+One project per client is the initial model. Schema supports multiple projects per client via the 1:many relationship.
 
-**Why History/Analytics/Feedback together (QA-06):** All three are downstream consumers of jobs + campaigns. They are read-heavy with few interactions, so grouping is efficient. No ordering dependency between them.
+```sql
+CREATE TABLE public.web_projects (
+  id                      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  business_id             UUID NOT NULL REFERENCES public.businesses(id) ON DELETE CASCADE,
 
-**Why Settings seventh (QA-07):** Settings modifies business configuration. Testing it after core workflows means configuration changes do not affect earlier phases.
+  -- Project identity
+  domain                  TEXT,                 -- e.g. "plumbingpros.com"
+  vercel_project_id       TEXT,                 -- optional Vercel reference
+  status                  TEXT NOT NULL DEFAULT 'discovery'
+    CHECK (status IN (
+      'discovery', 'design', 'development', 'review', 'live', 'maintenance', 'paused', 'cancelled'
+    )),
 
-**Why Businesses eighth (QA-08):** Creating a second business in Phase 8 would have complicated earlier phases if done earlier (business switcher context changes). Test multi-business after all single-business flows are verified.
+  -- Subscription
+  subscription_tier       TEXT
+    CHECK (subscription_tier IN ('basic', 'growth', 'pro') OR subscription_tier IS NULL),
+  subscription_started_at DATE,
+  subscription_monthly_fee NUMERIC(10,2),
+  next_billing_date       DATE,
 
-**Why Public pages last (QA-09):** No auth dependency. The `/r/[token]` test requires a form_token from Settings (captured in Phase 7) and ideally a sent-touch token (which is present after Phase 5 sends messages). Test last so all dependencies are met.
+  -- Client contact (may differ from business owner)
+  client_name             TEXT,
+  client_email            TEXT,
+  client_phone            TEXT,
+
+  -- Project dates
+  kickoff_date            DATE,
+  target_launch_date      DATE,
+  launched_at             TIMESTAMPTZ,          -- when status moved to 'live'
+
+  -- Portal access (same pattern as businesses.form_token / intake_token)
+  portal_token            TEXT UNIQUE,
+
+  -- Internal notes
+  project_notes           TEXT,
+
+  created_at              TIMESTAMPTZ DEFAULT NOW(),
+  updated_at              TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.web_projects ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "web_projects_owner_all" ON public.web_projects
+  USING (
+    business_id IN (SELECT id FROM businesses WHERE user_id = auth.uid())
+  )
+  WITH CHECK (
+    business_id IN (SELECT id FROM businesses WHERE user_id = auth.uid())
+  );
+
+CREATE INDEX idx_web_projects_business_id ON public.web_projects(business_id);
+CREATE UNIQUE INDEX idx_web_projects_portal_token
+  ON public.web_projects(portal_token) WHERE portal_token IS NOT NULL;
+```
+
+### Table: project_tickets
+
+Revision requests and support tickets. Submitted by clients via portal or by agency internally.
+
+```sql
+CREATE TABLE public.project_tickets (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id      UUID NOT NULL REFERENCES public.web_projects(id) ON DELETE CASCADE,
+  business_id     UUID NOT NULL REFERENCES public.businesses(id) ON DELETE CASCADE,
+  -- business_id denormalized for RLS simplicity (avoids join in policy)
+
+  title           TEXT NOT NULL,
+  description     TEXT,
+  status          TEXT NOT NULL DEFAULT 'open'
+    CHECK (status IN ('open', 'in_progress', 'waiting_client', 'resolved', 'closed')),
+  priority        TEXT NOT NULL DEFAULT 'normal'
+    CHECK (priority IN ('low', 'normal', 'high', 'urgent')),
+  source          TEXT NOT NULL DEFAULT 'agency'
+    CHECK (source IN ('agency', 'client_portal')),
+
+  resolved_at     TIMESTAMPTZ,
+  resolved_by     UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  internal_notes  TEXT,
+
+  created_at      TIMESTAMPTZ DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.project_tickets ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "project_tickets_owner_all" ON public.project_tickets
+  USING (
+    business_id IN (SELECT id FROM businesses WHERE user_id = auth.uid())
+  )
+  WITH CHECK (
+    business_id IN (SELECT id FROM businesses WHERE user_id = auth.uid())
+  );
+
+-- Client portal inserts via service-role after validating portal_token server-side.
+-- No anon INSERT policy needed here — the Route Handler uses service-role client.
+
+CREATE INDEX idx_project_tickets_project_id ON public.project_tickets(project_id);
+CREATE INDEX idx_project_tickets_business_id ON public.project_tickets(business_id);
+CREATE INDEX idx_project_tickets_open
+  ON public.project_tickets(project_id, created_at DESC)
+  WHERE status IN ('open', 'in_progress', 'waiting_client');
+```
+
+### Table: ticket_messages
+
+Threaded reply log per ticket. Supports both agency and client messages.
+
+```sql
+CREATE TABLE public.ticket_messages (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  ticket_id       UUID NOT NULL REFERENCES public.project_tickets(id) ON DELETE CASCADE,
+  business_id     UUID NOT NULL REFERENCES public.businesses(id) ON DELETE CASCADE,
+  -- business_id denormalized again for RLS without a multi-hop join
+
+  author_type     TEXT NOT NULL
+    CHECK (author_type IN ('agency', 'client')),
+  author_name     TEXT,        -- display name: "Sarah @ AvisLoop" or client name
+  body            TEXT NOT NULL,
+  attachment_urls TEXT[],      -- Supabase Storage public URLs
+
+  created_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.ticket_messages ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "ticket_messages_owner_all" ON public.ticket_messages
+  USING (
+    business_id IN (SELECT id FROM businesses WHERE user_id = auth.uid())
+  )
+  WITH CHECK (
+    business_id IN (SELECT id FROM businesses WHERE user_id = auth.uid())
+  );
+
+-- Portal writes go through service-role (Route Handler), no anon policy needed.
+
+CREATE INDEX idx_ticket_messages_ticket_id
+  ON public.ticket_messages(ticket_id, created_at);
+```
+
+**Why denormalize `business_id` onto `project_tickets` and `ticket_messages`?**
+
+The alternative is a two-hop join in RLS policies: `ticket_id IN (SELECT id FROM project_tickets WHERE business_id IN (...))`. Postgres evaluates this per-row and it can be slow under load. With `business_id` denormalized, both tables use the same single-hop RLS pattern as every other table in the app. The tradeoff is one extra FK column and the constraint of setting it correctly at insert time.
 
 ---
 
-## Critical Interaction Checklist (Cross-Phase)
+## Component Boundaries
 
-These interactions appear on multiple pages and must be checked consistently:
+### Modified Components (existing — extend, not rewrite)
 
-### Business Switcher (appears on every dashboard page)
-- [ ] Single-business: shows business name, no dropdown
-- [ ] Multi-business: shows dropdown with check on active
-- [ ] Switching business reloads data correctly
-- [ ] Desktop sidebar and mobile header both render it
+| Component | Current | Extension |
+|-----------|---------|-----------|
+| `BusinessCard` (`components/businesses/business-card.tsx`) | Shows Google rating, review delta, monthly fee | Add `client_type` badge. For `web_design` clients, show domain + project status instead of Google rating. Conditionally render via `client_type`. |
+| `BusinessDetailDrawer` (`components/businesses/business-detail-drawer.tsx`) | Shows agency metadata in a single view | Add tabbed layout: "Overview" (existing fields) + "Web Project" tab (loads web_projects row for this business). Only show "Web Project" tab if `client_type !== 'reputation'`. |
+| `BusinessesClient` (`components/businesses/businesses-client.tsx`) | Grid + single drawer | No structural change. Card display adapts via `client_type` prop. |
+| `sidebar.tsx` mainNav | 6 items | Add "Projects" nav item (icon: `Laptop` or `Globe` from Phosphor). |
+| `middleware.ts` APP_ROUTES | Protected path list | Add `/projects` to APP_ROUTES. `/portal` stays out of APP_ROUTES (it is public). |
+| `(dashboard)/layout.tsx` | Fetches active business + service settings + dashboard badge | No change needed. The Projects page fetches its own data. |
 
-### Add Job (sidebar button, mobile FAB, dashboard queue)
-- [ ] Opens AddJobSheet from sidebar button
-- [ ] Opens AddJobSheet from mobile FAB
-- [ ] Sheet closes on save and on cancel
-- [ ] Customer autocomplete fires at 2+ characters
-- [ ] New customer inline creation works
+### New Dashboard Components
 
-### Loading States
-- [ ] loading.tsx skeletons shown on each page (verify all pages have one)
-- [ ] Skeleton matches the shape of the loaded content
-- [ ] No layout shift between skeleton and content
+| Component | File | Purpose |
+|-----------|------|---------|
+| `ProjectsClient` | `components/projects/projects-client.tsx` | Client component for /projects page — grid + drawer state |
+| `ProjectCard` | `components/projects/project-card.tsx` | Card: status badge, domain, client name, subscription tier, open ticket count |
+| `ProjectDetailDrawer` | `components/projects/project-detail-drawer.tsx` | Sheet: project info, recent tickets, notes, generate portal link |
+| `ProjectWizard` | `components/projects/project-wizard.tsx` | Multi-step modal: business selector, domain, status, subscription tier, client contact. Reuses the 3-step modal pattern from `CreateBusinessWizard`. |
+| `TicketList` | `components/tickets/ticket-list.tsx` | Filterable ticket list with status filter (Radix Select, matching History page pattern) and priority badges |
+| `TicketDetailDrawer` | `components/tickets/ticket-detail-drawer.tsx` | Sheet: message thread (chronological), reply form, file links, status/priority controls |
+| `NewTicketForm` | `components/tickets/new-ticket-form.tsx` | Sheet form for agency-created tickets |
 
-### Empty States
-- [ ] Each page has a distinct empty state component
-- [ ] Empty state copy is V2-aligned (does not say "add customers")
-- [ ] Empty state includes a meaningful CTA
+### New Public Components
 
-### Error States
-- [ ] 404 page renders for unknown routes
-- [ ] Error boundary catches component errors (history/error.tsx exists — verify it triggers)
+| Component | File | Purpose |
+|-----------|------|---------|
+| `ClientPortal` | `components/portal/client-portal.tsx` | Main portal view: project status, open ticket list, submit button |
+| `PortalTicketForm` | `components/portal/portal-ticket-form.tsx` | Public form: title, description, file upload to Supabase Storage |
+| `PortalTicketThread` | `components/portal/portal-ticket-thread.tsx` | Read-only message thread view for the client |
+
+### New Routes
+
+| Route | Auth | File |
+|-------|------|------|
+| `/projects` | Required | `app/(dashboard)/projects/page.tsx` |
+| `/projects/[id]/tickets` | Required | `app/(dashboard)/projects/[id]/tickets/page.tsx` |
+| `/portal/[token]` | None | `app/portal/[token]/page.tsx` |
+
+### New Data Functions (`lib/data/web-projects.ts`)
+
+All follow caller-provides-businessId pattern:
+
+```typescript
+getWebProjectsByBusiness(businessId: string): Promise<WebProject[]>
+getWebProject(projectId: string, businessId: string): Promise<WebProject | null>
+getWebProjectByPortalToken(token: string): Promise<WebProject | null>  // service-role only
+
+getProjectTickets(projectId: string, businessId: string, filters?: TicketFilters): Promise<ProjectTicket[]>
+getTicketWithMessages(ticketId: string, businessId: string): Promise<{ ticket: ProjectTicket; messages: TicketMessage[] } | null>
+getOpenTicketCounts(businessIds: string[]): Promise<Record<string, number>>  // for ProjectCard badges
+```
+
+### New Server Actions
+
+```typescript
+// lib/actions/web-project.ts
+createWebProject(businessId: string, input: WebProjectInput): Promise<{ id: string } | { error: string }>
+updateWebProject(projectId: string, businessId: string, input: Partial<WebProjectInput>)
+updateProjectNotes(projectId: string, businessId: string, notes: string)  // fire-and-forget, no revalidate
+generatePortalToken(projectId: string, businessId: string): Promise<{ token: string } | { error: string }>
+// ^^ exact pattern as generateFormToken() in lib/actions/form-token.ts
+
+// lib/actions/ticket.ts
+createTicket(projectId: string, businessId: string, input: TicketInput)
+updateTicketStatus(ticketId: string, businessId: string, status: TicketStatus)
+addAgencyMessage(ticketId: string, businessId: string, body: string, attachmentUrls?: string[])
+```
+
+### New Route Handler (Portal Ticket Submission)
+
+```typescript
+// app/api/portal/tickets/route.ts
+// POST — validates portal_token server-side using service-role client, then inserts ticket + first message.
+// Uses service-role to bypass RLS (no session available on public portal).
+```
+
+The portal does NOT use a Server Action for submission because Server Actions require the same-origin cookie session. The portal is unauthenticated, so a Route Handler is the correct approach — matching the pattern of other public API routes in the app (`app/api/`).
+
+---
+
+## Data Flow
+
+### Agency Creates a Web Design Client and Project
+
+```
+1. Agency opens /businesses
+2. Clicks "Add Business" → existing onboarding wizard
+3. At business basics step: selects client_type = 'web_design'
+4. Wizard creates businesses row (client_type = 'web_design')
+5. /businesses shows new card with "Web Design" badge
+6. Agency clicks card → BusinessDetailDrawer
+7. "Web Project" tab → "Create Project" button
+8. ProjectWizard modal: domain, status, tier, client contact, kickoff date
+9. Creates web_projects row linked to business_id
+10. generatePortalToken() stores token on web_projects.portal_token
+11. Portal URL: /portal/[token] — agency copies, shares with client
+```
+
+### Client Submits Revision Request via Portal
+
+```
+1. Client visits /portal/[token] (unauthenticated)
+2. Server Component resolves project via portal_token using service-role client
+3. Renders ClientPortal: project status summary, open tickets
+4. Client clicks "Submit Revision Request"
+5. PortalTicketForm opens
+6. Client fills: title, description, optional file upload
+7. File upload: client-side to Supabase Storage bucket 'ticket-attachments'
+   Path: ticket-attachments/{project_id}/{timestamp}/{filename}
+   Bucket has anon upload policy (size-limited, filetype-restricted)
+8. Form POSTs to /api/portal/tickets with portal_token + form data + attachment URLs
+9. Route Handler:
+   a. Validates portal_token → resolves project_id + business_id via service-role
+   b. Inserts project_tickets row (source = 'client_portal', business_id set from resolved project)
+   c. Inserts ticket_messages row with client's body + attachment URLs
+   d. Optional: sends email notification to agency via Resend
+10. Client sees confirmation
+11. Agency sees new ticket in /projects/[id]/tickets with 'client_portal' source badge
+```
+
+### Agency Manages a Ticket
+
+```
+1. Agency opens /projects/[id]/tickets
+2. Sees TicketList — filter by status (open, in_progress, waiting_client, resolved, closed)
+3. Clicks ticket → TicketDetailDrawer opens
+4. Reads message thread (client message first, then agency replies)
+5. Types reply in reply form → addAgencyMessage() server action
+6. Changes status via dropdown → updateTicketStatus() server action
+7. Client sees updated status + new message on next portal load
+   (no real-time — portal loads fresh on each visit)
+```
+
+---
+
+## Landing Page Restructure
+
+### Current State
+
+`app/(marketing)/page.tsx` is reputation-focused: "Managed Google Review Service for Home Service Businesses." All marketing components are in `components/marketing/v2/`.
+
+### New Structure
+
+The homepage pivots to web design agency services. Reputation management content moves to `/reputation`.
+
+```
+app/(marketing)/
+├── page.tsx            ← Web design agency homepage (new components)
+├── reputation/
+│   └── page.tsx        ← Existing homepage content moved here (minimal change)
+├── pricing/
+│   └── page.tsx        ← Tabbed: web design pricing + reputation pricing
+├── audit/              ← Keep unchanged (reputation lead-gen)
+└── [privacy, terms, sms-compliance]
+
+components/marketing/
+├── v2/                 ← KEEP UNCHANGED — becomes /reputation content
+└── v3/                 ← NEW — web design agency homepage components
+    ├── hero-webdesign.tsx
+    ├── services-webdesign.tsx
+    ├── process-section.tsx
+    ├── portfolio-strip.tsx (optional)
+    └── pricing-webdesign.tsx
+```
+
+**Do not modify or delete `components/marketing/v2/`.** Those components are simply imported into the new `/reputation/page.tsx` rather than `page.tsx`.
+
+Migration path for SEO: add `<link rel="canonical" href="/reputation">` to the new `/reputation` page to consolidate any existing link equity if needed. The existing `page.tsx` URL (`/`) changes meaning but not location — the homepage remains `/`.
+
+---
+
+## Supabase Storage Setup
+
+One new bucket is required:
+
+```
+Bucket name: ticket-attachments
+Public read: YES (URLs are included in ticket_messages.attachment_urls for display)
+Anon upload: YES (clients upload without auth)
+Max file size: 10MB
+Allowed MIME types: image/*, application/pdf, text/plain, video/mp4
+```
+
+RLS-equivalent restriction is handled by the Route Handler: the handler validates the portal_token before the upload path is constructed. The path includes `project_id` so uploads are namespaced. This is the same "security by obscurity on path + server-side validation" approach used by the rest of the app's public routes.
+
+---
+
+## Build Order (Recommended Phase Sequence)
+
+Dependencies flow from schema outward: data model → data layer → dashboard UI → public portal → marketing.
+
+### Phase A: Data Model + Business Extension
+
+1. Migration: add `client_type` to `businesses`
+2. Migration: create `web_projects` table + RLS
+3. Migration: create `project_tickets` table + RLS
+4. Migration: create `ticket_messages` table + RLS
+5. Update `Business` type in `lib/types/database.ts` to include `client_type`
+6. Add `WebProject`, `ProjectTicket`, `TicketMessage` TypeScript types
+7. Add `client_type` field to onboarding wizard step 1 (business basics)
+
+**Why first:** Every downstream component depends on these tables existing. Onboarding wizard change is also here because it controls how new businesses get `client_type` set.
+
+### Phase B: Web Projects CRM (Dashboard)
+
+1. `lib/data/web-projects.ts` — read functions (getWebProjectsByBusiness, getWebProject, getOpenTicketCounts)
+2. `lib/actions/web-project.ts` — write actions (createWebProject, updateWebProject, updateProjectNotes, generatePortalToken)
+3. `components/projects/` — ProjectCard, ProjectDetailDrawer, ProjectWizard
+4. `app/(dashboard)/projects/page.tsx` + `loading.tsx`
+5. Update `sidebar.tsx` mainNav to add Projects item
+6. Update `middleware.ts` APP_ROUTES to add `/projects`
+7. Update `BusinessCard` to show `client_type` badge and conditional metadata display
+8. Add "Web Project" tab to `BusinessDetailDrawer`
+
+**Why second:** Agency needs to create and manage projects before clients can access anything. The portal token is generated here.
+
+### Phase C: Ticket System (Dashboard)
+
+1. `lib/data/tickets.ts` — getProjectTickets, getTicketWithMessages
+2. `lib/actions/ticket.ts` — createTicket, updateTicketStatus, addAgencyMessage
+3. `components/tickets/` — TicketList, TicketDetailDrawer, NewTicketForm
+4. `app/(dashboard)/projects/[id]/tickets/page.tsx` + `loading.tsx`
+5. Add open ticket count badge to ProjectCard (uses getOpenTicketCounts from Phase B)
+
+**Why third:** Ticket table must exist and the dashboard UI must work before the client portal can submit into it.
+
+### Phase D: Client Portal (Public)
+
+1. Supabase Storage bucket `ticket-attachments` (configure in dashboard)
+2. `app/portal/[token]/page.tsx` — Server Component, service-role token validation
+3. `components/portal/` — ClientPortal, PortalTicketForm, PortalTicketThread
+4. `app/api/portal/tickets/route.ts` — Route Handler for portal ticket submission
+5. Optional: Resend email notification to agency on new portal ticket
+
+**Why fourth:** Portal depends on the ticket tables (Phase A), portal_token generation (Phase B), and optionally reads existing tickets (Phase C).
+
+### Phase E: Landing Page Restructure
+
+1. Move existing `app/(marketing)/page.tsx` content to `app/(marketing)/reputation/page.tsx` (copy imports, adjust metadata)
+2. Build `components/marketing/v3/` web design components
+3. Replace `app/(marketing)/page.tsx` with web design homepage
+4. Update `/pricing` page for dual-service presentation
+5. Update meta tags, sitemaps, OG images
+
+**Why last:** Marketing depends on nothing from the app feature set. Doing it last means web design features are proven and can be accurately described in copy. No other phase is blocked by marketing.
+
+---
+
+## Integration Points: What Touches What
+
+| Existing Component | How New Features Hook In |
+|-------------------|--------------------------|
+| `getActiveBusiness()` | Unchanged. `/projects` page calls it to get `businessId`, passes to data functions. |
+| `getUserBusinessesWithMetadata()` | Returns `client_type` once column is added. `BusinessCard` reads it. |
+| `BusinessSettingsProvider` | No change needed. Projects page has its own data fetching. |
+| `onboarding wizard` step 1 | Add `client_type` selector (reputation / web design / both). Defaults to 'reputation' for backward compat. |
+| `CreateBusinessWizard` | Same addition — `client_type` at step 1. |
+| Cookie-based business resolver | Unchanged. Projects are scoped to `businessId` from active business. |
+| `form_token.ts` action | `generatePortalToken()` is a copy-paste of `generateFormToken()` with `web_projects.portal_token` as target. |
+| Rate limiting (`@upstash/ratelimit`) | Apply to `/api/portal/tickets` route handler — same pattern as existing `/api/send`, `/api/cron` routes. |
+
+---
+
+## Anti-Patterns to Avoid
+
+### Anti-Pattern 1: Separate `clients` Table
+
+**What it is:** A new `clients` table for web design clients, separate from `businesses`.
+
+**Why bad:** Duplicates the entire auth/RLS/multi-tenant pattern. Doubles the data layer. Breaks the existing business switcher, `/businesses` page, and all queries scoped to `businesses WHERE user_id = auth.uid()`. Every new table (`web_projects`, `project_tickets`) would need a different FK chain.
+
+**Instead:** `client_type` column on `businesses`. Web design clients are businesses with `client_type = 'web_design'`. One system, one RLS pattern.
+
+### Anti-Pattern 2: Real-Time Portal Updates
+
+**What it is:** WebSocket or Supabase Realtime subscription in the client portal so clients see ticket replies instantly.
+
+**Why bad:** Adds Supabase Realtime complexity to a public unauthenticated page. Requires either a special anon Realtime channel (security implications) or service-role subscription on the client (never do this). The use case does not warrant it.
+
+**Instead:** Server-rendered portal page. Client refreshes to see updates. If real-time feedback becomes critical, add it as a progressive enhancement with a lightweight poll.
+
+### Anti-Pattern 3: HMAC Tokens for Portal
+
+**What it is:** Using HMAC-signed tokens (like `/r/[token]`) for the portal URL.
+
+**Why bad:** HMAC tokens encode expiry. Portal URLs must be permanent bookmarks clients can return to for weeks. An expiring link breaks the UX when clients access the portal from a saved email.
+
+**Instead:** DB tokens (like `form_token`, `intake_token`) — persistent until regenerated by the agency.
+
+### Anti-Pattern 4: Mixing Billing Models
+
+**What it is:** Running web design subscription billing through `getPooledMonthlyUsage()` send-count billing.
+
+**Why bad:** Email/SMS send count is irrelevant to web design subscription tiers. Pooled usage billing tracks message sends, not monthly retainer fees.
+
+**Instead:** Web design subscription state lives on `web_projects.subscription_tier` and `web_projects.subscription_monthly_fee`. Billing enforcement for web design is a separate concern. The existing pooled usage function stays scoped to reputation management sends. If Stripe is needed for web design subscriptions, create a separate Stripe product/price in Phase E or later.
+
+### Anti-Pattern 5: Portal Under the Dashboard Route Group
+
+**What it is:** Placing the portal at `app/(dashboard)/portal/[token]/` instead of `app/portal/[token]/`.
+
+**Why bad:** `app/(dashboard)/layout.tsx` calls `getActiveBusiness()` which calls `supabase.auth.getUser()`. Unauthenticated portal visitors have no session — this returns null — and the layout redirects to `/onboarding`, which redirects to `/login`. Clients cannot access the portal at all.
+
+**Instead:** `app/portal/[token]/page.tsx` at root level, just like `/r/[token]`, `/complete/[token]`, `/intake/[token]`. The middleware only protects paths listed in `APP_ROUTES` — `/portal` is intentionally absent from that list.
+
+### Anti-Pattern 6: Eager `web_projects` Load in Root Layout
+
+**What it is:** Fetching project counts or project data in `app/(dashboard)/layout.tsx` to populate a sidebar badge.
+
+**Why bad:** The root dashboard layout runs on every page navigation. Adding a web_projects query here adds latency for all pages, including Jobs, Campaigns, and Feedback — which have no interest in projects.
+
+**Instead:** Fetch project data only in `app/(dashboard)/projects/page.tsx` and its child routes. If a Projects nav badge is needed, compute it as a lightweight count query scoped to the projects page layout, not the root layout.
+
+---
+
+## Scalability Notes
+
+| Concern | Current scale | Next threshold | Mitigation |
+|---------|--------------|----------------|------------|
+| `/businesses` query | Fetches all rows | ~50+ clients | Add pagination to `getUserBusinessesWithMetadata()` |
+| Open ticket count query | One query per project card | ~20+ projects | Use `getOpenTicketCounts(businessIds[])` with a single GROUP BY query |
+| Ticket message thread | Fetched on drawer open | ~100+ messages per ticket | Paginate or show last 50 messages by default |
+| Portal token lookup | O(1) via unique index | Scales indefinitely | Already indexed |
+| Storage attachments | Per-project paths | Scales with Storage | Supabase Storage scales horizontally |
 
 ---
 
@@ -864,15 +635,36 @@ These interactions appear on multiple pages and must be checked consistently:
 
 | Area | Confidence | Basis |
 |------|------------|-------|
-| Route inventory completeness | HIGH | Direct filesystem inspection of app/ directory |
-| Phase grouping rationale | HIGH | Data dependency analysis of page.tsx files |
-| Test data strategy | HIGH | Based on actual data model and RLS patterns |
-| Screenshot strategy | HIGH | Standard Playwright MCP pattern |
-| Report template structure | HIGH | Derived from existing UX-AUDIT.md + project conventions |
-| Review funnel testability | MEDIUM | Depends on whether a sent touch exists in test account |
-| Onboarding fresh-flow testability | MEDIUM | Primary test account already onboarded; second account needed |
+| Business model extension | HIGH | Direct inspection of Business type, migrations, RLS patterns |
+| Token pattern | HIGH | Inspected all three existing token routes |
+| Route group structure | HIGH | Inspected middleware, layout files, public route files |
+| Data layer pattern | HIGH | Inspected lib/data/ and DECISIONS.md ARCH-001/002 |
+| Ticket message RLS | MEDIUM | Pattern is sound but denormalized business_id is a design choice that could go either way |
+| Supabase Storage policy | MEDIUM | Storage bucket setup not currently used in app; policy syntax needs verification against Supabase docs |
+| Landing page SEO impact | MEDIUM | Moving existing content to /reputation may affect ranking; canonical tag approach is standard practice |
 
 ---
 
-*Research completed: 2026-02-27*
-*Method: Direct codebase analysis — all route files, layout files, component files, and middleware inspected*
+## Sources
+
+Direct codebase inspection:
+- `app/(dashboard)/businesses/page.tsx`
+- `components/businesses/businesses-client.tsx`
+- `components/businesses/business-detail-drawer.tsx`
+- `lib/data/active-business.ts`
+- `lib/data/businesses.ts`
+- `lib/types/database.ts`
+- `lib/actions/form-token.ts`
+- `lib/actions/create-additional-business.ts`
+- `middleware.ts`
+- `app/(dashboard)/layout.tsx`
+- `components/layout/sidebar.tsx`
+- `app/complete/[token]/page.tsx`
+- `app/intake/[token]/page.tsx`
+- `app/r/[token]/page.tsx`
+- `app/(marketing)/page.tsx`
+- `supabase/migrations/20260227000300_add_agency_metadata.sql`
+- `supabase/migrations/20260315000100_add_intake_token.sql`
+- `supabase/migrations/20260306000100_audit_tables.sql`
+- `docs/DECISIONS.md` (ARCH-001 through ARCH-004)
+- `docs/DATA_MODEL.md`

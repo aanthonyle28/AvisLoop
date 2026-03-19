@@ -1,262 +1,219 @@
-# Research Summary: v3.1 QA E2E Audit
+# Project Research Summary
 
-**Project:** AvisLoop — Comprehensive Pre-Production QA Audit
-**Domain:** Multi-tenant SaaS — E2E functional + accessibility audit before first production deployment
-**Researched:** 2026-02-27
-**Confidence:** HIGH (all four research dimensions grounded in direct codebase analysis + official sources)
-
----
+**Project:** AvisLoop — v4.0 Web Design Agency Pivot
+**Domain:** Web design agency platform layered onto existing review automation SaaS
+**Researched:** 2026-03-18
+**Confidence:** HIGH
 
 ## Executive Summary
 
-AvisLoop is preparing for its first production deployment after completing v3.0 Agency Mode (Phases 52-58). The v3.1 milestone is not a feature build — it is a structured QA audit that produces a **findings report** per page/category, screenshots as evidence, and a consolidated summary report. The audit covers 15+ routes across 9 phases, ordered by data dependency rather than navigation order: auth first, public pages last.
+AvisLoop v4.0 pivots from a self-serve review automation SaaS to a managed web design agency platform, while preserving review automation as a paid add-on. The product model is a $199–$299/month managed website subscription for home service businesses (HVAC, plumbing, electrical, roofing, etc.), with a structured revision ticket system, a client-facing portal, and a $99/month review automation bolt-on. The core insight from research is that this entire pivot can be executed without adding a single new npm package — Supabase Storage, react-dropzone, stripe, and zod are already installed, and the token-secured public route pattern already exists twice in the codebase (`/complete/[token]` and `/intake/[token]`).
 
-The recommended approach is Playwright-driven browser automation supplemented by direct database verification. Playwright 1.58.1 is already installed; the only addition needed is `@axe-core/playwright` for WCAG scanning. Authentication uses UI-based login with `storageState` (not API cookie injection) because Supabase's SSR package revalidates sessions server-side on every request. Multi-business context switching uses direct `context.addCookies()` for the `active_business_id` cookie, which is an application-level cookie distinct from the Supabase auth session.
+The recommended approach is to extend the existing `businesses` table with a `client_type` discriminator column (`'reputation' | 'web_design' | 'both'`) and add two new tables (`web_projects`, `project_tickets`) that follow the established multi-tenant RLS pattern. This avoids duplicating the auth/RLS/multi-business architecture for a separate `clients` table. The existing `/businesses` page, `BusinessCard`, `BusinessDetailDrawer`, and cookie-based active-business resolver all keep working without structural change. New features hook in at well-defined boundaries: a new `/projects` dashboard route for operator CRM, a new `/portal/[token]` public route for client access, and a Supabase Storage bucket for revision attachments.
 
-The three highest-risk audit areas are: (1) multi-tenant data isolation under business switching, which is never fully exercised by single-business tests; (2) the enrollment conflict state machine, which has six transition paths only some of which are reachable via UI alone; and (3) the dual-subdomain middleware, which is entirely bypassed on localhost and has never been tested end-to-end in a real domain configuration. The audit must explicitly address these gaps with scenarios beyond the happy path — and critically, must supplement Playwright UI observation with direct Supabase SQL queries to verify server-side automation pipeline state.
+The primary risks are architectural creep in the `businesses` table, race conditions in monthly ticket limit enforcement, Stripe billing model mismatch for multi-product subscriptions, and marketing pivot confusion for existing review automation clients. All four risks are well-understood and have concrete prevention strategies documented in PITFALLS.md. The correct enforcement approach for revision limits is an atomic Postgres RPC (check+insert in one transaction), not an application-level read-then-write. Stripe billing requires separate `web_design_tier` and `review_tier` columns to represent the composite subscription state, not an extension of the single `tier` column.
 
 ---
 
 ## Key Findings
 
-### 1. Stack Additions
+### Recommended Stack
 
-Playwright 1.58.1 is already installed and sufficient for the audit. Add exactly one dev dependency.
+The v4.0 pivot introduces zero new npm packages. All required capabilities exist in the current stack. Supabase Storage (already provisioned) handles file attachments via signed upload URLs — the correct pattern for Next.js where Server Actions have a 1MB body limit. `react-dropzone` (already at v14.3.8) handles the file input UI. The `stripe` SDK (v20.2.0) handles the $50 overage via `stripe.invoiceItems.create()` + `stripe.invoices.create()` — a one-time invoice pattern that is simpler and more appropriate than Stripe Billing Meters for a fixed overage charge. The client portal uses a DB-stored token (`randomBytes(24).toString('base64url')`) identical to the existing `form_token` and `intake_token` patterns.
 
-| Tool | Version | Role | Rationale |
-|------|---------|------|-----------|
-| `@axe-core/playwright` | latest | WCAG 2.1 AA scanning | Playwright's built-in `page.accessibility.snapshot()` gives tree structure only; axe-core runs the full rule engine against the live DOM, catching color contrast, missing labels, and 50+ WCAG rules |
+**Core technologies:**
+- **Supabase Storage** — revision attachment storage, private `ticket-attachments` bucket, signed upload URLs — already provisioned, zero new credentials
+- **react-dropzone v14.3.8** — file input UI for portal attachment uploads — already in package.json, used in 3 existing components
+- **stripe.invoiceItems.create()** — $50 overage billing — already integrated, uses existing Stripe customer ID on business record
+- **DB token (randomBytes 192-bit)** — client portal URL auth — proven in two existing routes (`/complete/[token]`, `/intake/[token]`)
+- **Postgres RPC** — atomic ticket limit enforcement — same approach as existing campaign enrollment RPCs (`claim_due_campaign_touches`)
 
-**Do NOT add:** Cypress, Percy/Chromatic, Vitest, `playwright-testing-library`, Faker. All needed capabilities are built into Playwright 1.5x. `toHaveScreenshot()` replaces Percy; `getByRole/Label/Text` replaces testing-library; screenshots are evidence docs, not pixel-diff regression baselines.
+**New environment variables: 0.** All required secrets already exist in production.
 
-**Auth pattern:** UI login + `storageState` JSON file. API cookie injection does not work because Supabase SSR re-validates and re-issues session cookies on each server request. `e2e/.auth/` must be gitignored immediately.
+### Expected Features
 
-**Parallelism:** `workers: 1` in CI. Supabase free tier limits concurrent DB connections; parallel workers each open their own connection pool and cause `FATAL: remaining connection slots are reserved` errors.
+**Must have (table stakes):**
+- Client portal at `/portal/[token]` — token-secured, no client account required
+- Revision ticket submission form — title, description, optional file attachment
+- Three-status ticket lifecycle — open, in progress, resolved
+- Monthly ticket counter with enforcement — "X of Y revisions remaining" with hard block at limit
+- Operator ticket management view — all tickets across clients, status updates, internal notes
+- Web design plan tier display — Basic ($199/mo, 2 revisions/month) vs Advanced ($299/mo, 4 revisions/month)
+- Pricing page for the agency — two-tier comparison with Calendly CTA (existing pattern)
 
-**New scripts to add to `package.json`:**
-```json
-"test:e2e": "playwright test",
-"test:e2e:ui": "playwright test --ui",
-"test:e2e:report": "playwright show-report e2e/report",
-"test:e2e:update": "playwright test --update-snapshots"
-```
+**Should have (differentiators):**
+- Client dashboard with website health indicators — days active, revisions fulfilled, next reset date, website URL
+- `client_type` badge on BusinessCard — instant visual separation of web design vs review clients
+- Review add-on upsell in portal — display-only section, links to Calendly or Stripe checkout
+- Operator all-clients KPI view — BusinessDetailDrawer extended with web-design-specific metadata
+- Home services niche positioning on landing page — explicit targeting of HVAC, plumbing, electrical, roofing
+- Token regeneration button — agency can invalidate and reissue portal link if compromised
 
----
+**Defer (post-MVP):**
+- Visual annotation for revision requests — high complexity, target audience (home service owners) rarely benefits
+- AI-generated monthly summary — high complexity, low V1 value
+- Before/after screenshot comparison — text-only change log is sufficient for V1
+- Real-time ticket status updates in portal — async load-on-refresh is appropriate at this scale
+- White-label portal branding — unnecessary at $199–$299 price point with a solo operator
 
-### 2. Audit Categories
+**Anti-features (deliberately exclude):**
+- Client account creation / login — adds friction; home service owners are not SaaS users
+- Full Kanban project management — wrong audience; competes with established tools
+- CMS editor for clients — defeats the managed service value proposition
+- Per-ticket invoicing — conflicts with flat monthly fee mental model
+- Rich text editor for tickets — `<textarea>` is sufficient for V1
 
-#### Table Stakes (must pass before production)
+### Architecture Approach
 
-| Category | Code | Why It Blocks Production |
-|----------|------|--------------------------|
-| Authentication and Session Management | A | Broken auth means no one can use the app |
-| Multi-Tenant Data Isolation | B | Cross-tenant data leak is a production-blocking security issue |
-| Core V2 Workflow — Job Completion to Enrollment | C | If "complete job" doesn't trigger enrollment, the product does not work |
-| Enrollment Conflict Handling | D | Most common edge case; broken conflict detection causes double-emails or silent failure |
-| Review Funnel (`/r/[token]`) | E | The money path — broken funnel means zero reviews collected |
-| Public Job Completion Form (`/complete/[token]`) | F | Technician tool; Phase 58 deliverable |
-| History / Send Logs | G | Operators troubleshoot from here; broken filters block recovery from failures |
-| Billing and Send Limit Enforcement | H | Pooled agency billing is new in v3.0; broken enforcement means revenue leakage |
-| Settings — All 7 Tabs | I | Settings configures the entire automation pipeline |
+The architecture follows an "extend, don't replace" principle. The existing `businesses` table becomes the anchor for web design clients via a `client_type` column. Two new tables (`web_projects`, `project_tickets`) follow the established RLS pattern with `business_id` denormalized for efficient single-hop policy enforcement. A new public route `/portal/[token]` follows the identical pattern to `/complete/[token]` and `/intake/[token]`. The dashboard adds a `/projects` route that fetches data with the existing `getActiveBusiness()` + caller-provides-businessId pattern. Web design subscription state lives on `web_projects.subscription_tier`, kept entirely separate from the existing `tier` column that governs review automation send limits.
 
-#### Differentiators (thorough but not deployment-blocking)
+**Major components:**
+1. **`businesses` table extension** — `client_type` column (`'reputation' | 'web_design' | 'both'`) discriminates client categories; existing RLS, switcher, and card grid remain unchanged
+2. **`web_projects` table** — one project per client (MVP), holds domain, tier, billing dates, `portal_token`; standard owner-all RLS policy
+3. **`project_tickets` table** — revision requests with status/priority; `business_id` denormalized for RLS; atomic limit enforcement via Postgres RPC
+4. **`ticket_messages` table** — threaded replies; `business_id` denormalized; `author_type` distinguishes agency vs client messages
+5. **`/portal/[token]` public route** — Server Component, service-role token validation, renders ClientPortal and PortalTicketForm; sits outside the dashboard route group to avoid auth layout interference
+6. **`/projects` dashboard route** — operator CRM for web design clients; ProjectCard grid + ProjectDetailDrawer + TicketList; fetches its own data, does not touch root layout
+7. **`ticket-attachments` Supabase Storage bucket** — private, 10MB file limit, signed upload URLs generated server-side via Server Action
+8. **Marketing restructure** — existing homepage content moves intact to `/reputation`; new `components/marketing/v3/` components for web design agency homepage
 
-| Category | Code | Why It Warrants Thorough Testing |
-|----------|------|----------------------------------|
-| Multi-Business and Agency Workflow | J | Entire v3.0 built this; non-trivial state under context switching |
-| Campaign Management | K | Pause/resume with frozen enrollment preservation is complex state machine |
-| Dashboard | L | First thing users see; wrong KPIs erode trust immediately |
-| Feedback Resolution Workflow | M | Resolution state must persist or owners re-see resolved issues |
-| Analytics | N | Wrong numbers break the value story |
-| Customers Page (Settings Escape Hatch) | O | De-emphasized in V2 but cannot be broken |
-| Onboarding Flow | P | First user experience; two distinct flows (first vs additional business) both need verification |
+### Critical Pitfalls
 
-#### Anti-Features (explicitly excluded from this milestone)
+1. **Businesses table god object** — the `businesses` table already has 30+ columns. Adding web design fields (tier, revision count, domain, hosting status) directly to it produces unmaintainable types and chatty queries. Prevention: web-design-specific data lives in the `web_projects` table. The only new column on `businesses` is `client_type`. Hold this line firmly.
 
-| Item | Reason |
-|------|--------|
-| Cron job end-to-end execution | Timing-dependent; requires production Vercel schedule or manual trigger |
-| Email/SMS delivery confirmation | Requires live Resend/Twilio API with real addresses |
-| Stripe payment processing end-to-end | Requires live Stripe keys; test webhook handler logic only |
-| Google OAuth interactive flow | Requires Supabase redirect URI configured for production domain |
-| Marketing / public pages deep audit | Explicitly out of scope for this milestone |
-| Performance/load testing | No user load to measure yet |
-| WCAG AA full compliance certification | Carry UX Audit findings forward as backlog items; axe scan is sufficient |
-| Persistent Playwright test suite | This milestone produces a findings report, not a maintained test suite |
+2. **Ticket limit race condition** — enforcing monthly revision limits with application-level read-then-write allows concurrent submissions to exceed limits, resulting in unbilled overages and client disputes. Prevention: implement limit check and ticket insert as a single Postgres RPC with `FOR UPDATE` locking, identical to the campaign enrollment atomic RPCs already in the codebase.
 
----
+3. **Stripe multi-product billing mismatch** — the existing `tier` column and `PRICE_TO_TIER` webhook map handle one price ID per business. Web design + review add-on is a two-product subscription; the webhook handler currently reads only `subscription.items.data[0]`. Prevention: add separate `web_design_tier` and `review_tier` columns; update webhook to iterate all subscription items. This must be done before creating any new Stripe products.
 
-### 3. Architecture Decisions
+4. **Client portal token security gaps** — DB tokens in URLs appear in server logs, browser history, and analytics. Prevention: use `randomBytes(24).toString('base64url')` (192-bit), add a "Regenerate portal link" button in the dashboard, log all portal submissions with IP and timestamp, apply Upstash rate limiting scoped by token to the submission API route. Use service-role client for token validation only — all subsequent queries are scoped explicitly by `business_id`.
 
-#### Phase Grouping: 9 Phases in Data-Dependency Order
-
-The audit is structured around data dependency, not page navigation order. Each phase produces data that downstream phases depend on.
-
-```
-QA-01 (Auth) → QA-02 (Onboarding) → QA-03 (Dashboard) → QA-04 (Jobs)
-     ↓
-QA-05 (Campaigns) → QA-06 (History + Analytics + Feedback)
-     ↓
-QA-07 (Settings) → QA-08 (Businesses + Switcher) → QA-09 (Public Pages)
-```
-
-**The data dependency chain:**
-- QA-01 creates the authenticated session
-- QA-02 creates the first business with a campaign preset
-- QA-04 creates 3 test jobs (AUDIT_Patricia Johnson, AUDIT_Marcus Rodriguez, AUDIT_Sarah Chen) that trigger campaign enrollment
-- QA-05 reads the enrollments from QA-04
-- QA-06 reads send logs and analytics produced by QA-05
-- QA-07 generates the `form_token` needed by QA-09
-- QA-08 creates a second business needed for multi-business switcher testing
-- QA-09 uses the `form_token` from QA-07 for the `/complete/[token]` test
-
-#### Data Strategy: Use Existing Test Account + Progressive Creation
-
-- Primary test account: `audit-test@avisloop.com / AuditTest123!`
-- Do NOT create test data speculatively — survey existing data first, document it, then create only what is needed
-- Prefix all created customers with `AUDIT_` for recognizability and cleanup
-- Never delete data that later phases depend on; create throwaway items specifically for destructive-action tests
-
-#### Report Format: Per-Page Findings Files + Summary Report
-
-| Location | Format |
-|----------|--------|
-| `.planning/qa-audit/findings/qa0X-pagename.md` | Per-page findings with severity-tagged issues, passed checks table, screenshots index |
-| `.planning/qa-audit/SUMMARY-REPORT.md` | Consolidated report: findings by severity/category, phase results table, V2 philosophy check, top 10 issues |
-| `.planning/qa-audit/screenshots/qa0X-pagename/` | Screenshots organized by phase |
-
-**Screenshot naming convention:** `[phase]-[route-slug]-[state]-[viewport]-[theme].png`
-
-**Viewport set:** desktop (1440×900), tablet (768×1024), mobile (390×844)
-
-**Theme coverage:** light always; dark for landing page, dashboard, jobs, settings General tab
-
-**Findings severity levels:** Critical / High / Medium / Low / Info
-
-#### Selector Priority (most to least preferred)
-
-1. `getByRole()` — semantic and accessibility-aligned; finding failures here are accessibility bugs
-2. `getByLabel()` — for form inputs
-3. `getByText()` — for unique visible text
-4. `getByTestId()` — add `data-testid` only where semantic selectors are genuinely ambiguous
-5. CSS selectors — last resort only; never use positional or class-based selectors
-
-#### What Cannot Be Tested via Playwright
-
-| Feature | Why Not Testable | How to Document |
-|---------|-----------------|-----------------|
-| Google OAuth full flow | Requires interactive OAuth | Note: "Button present, interactive flow not automatable" |
-| Email/SMS delivery | No real Twilio/Resend in test env | Note: "Send action triggers correctly, delivery not verifiable" |
-| Stripe checkout completion | Redirects to external Stripe | Note: "Checkout button navigates to Stripe; webhook logic tested separately" |
-| Password reset (full flow) | Requires email inbox access | Note: "Form submission confirmed; link delivery not verifiable" |
-| Cron touch processing end-to-end | Requires Vercel cron schedule | Note: "Endpoint auth verified; touch scheduling verified via DB query after enrollment" |
-
----
-
-### 4. Critical Pitfalls
-
-**1. Single-business testing passes while multi-tenant isolation is untested**
-All 22 `lib/data/` functions use the caller-provides-businessId pattern. A test with one user and one business never exercises whether the cookie-based switcher actually scopes data correctly. Supabase RLS policies and application-level scoping are both tested only under multi-user, multi-business conditions.
-**Mitigation:** Require 2 user accounts + 2 businesses per user in all multi-tenant scenarios. Run dedicated cross-contamination checks: create a job in Business B, switch to Business A, confirm it does not appear.
-
-**2. RLS verified for CRUD but not for secondary query paths**
-Analytics aggregations, count queries, autocomplete endpoints, and public-form writes (`/complete/[token]` via service-role) bypass RLS. Service-role means every query in cron and public endpoints must include explicit `business_id` scoping. Standard RLS testing misses these paths.
-**Mitigation:** Audit every `lib/data/` function and cron endpoint file for `business_id` filter presence. Supplement UI testing with direct SQL queries using Supabase's role-switching test utility.
-
-**3. Cron idempotency never tested under double-fire**
-Vercel guarantees at-least-once delivery. `process-campaign-touches` uses an atomic claim RPC. `resolve-enrollment-conflicts` does NOT — it loops over conflicted jobs without atomic claiming, creating a race condition under simultaneous double-fire. Passing tests that only fire the cron once provide false confidence.
-**Mitigation:** Trigger each cron twice in rapid succession; verify no duplicate enrollments or sends. Verify Resend's `idempotencyKey` (`campaign-touch-${enrollment_id}-${touch_number}`) actually prevents duplicate emails.
-
-**4. Dual-subdomain middleware entirely bypassed on localhost**
-`middleware.ts` has an `isLocalhost` check that skips all domain-routing logic. Auth cookie cross-subdomain sharing, business-switcher cookie scoping, and marketing↔app redirect rules have never been tested end-to-end. A misconfiguration produces infinite redirect loops that only appear in production.
-**Mitigation:** Set up a staging subdomain or Vercel preview URL with actual domain config. Run the full V2 smoke test there before production traffic. Explicitly test `/complete/[token]` with no auth cookies present (unauthenticated technician scenario).
-
-**5. Playwright-only audit misses server-side automation pipeline state**
-Playwright proves the UI renders correctly but cannot verify whether campaign enrollment was created, touches were scheduled at the right time, or HMAC token expiry fires. A Playwright test that confirms "the job appears in the list" does NOT confirm the automation pipeline is working.
-**Mitigation:** After every key UI action, query Supabase directly to verify expected DB state: enrollment row exists with correct `touch_1_scheduled_at`, `reviewed_at` set after funnel completion, enrollment `status='stopped'` after rating click.
+5. **Marketing pivot confuses existing review clients** — replacing the homepage without preserving `/reputation` destroys SEO equity and creates confidence crises for existing clients. Prevention: move existing homepage content to `/reputation` intact; never delete `components/marketing/v2/`; add `client_type` selector at onboarding entry point (`?mode=webdesign` branch) so web design clients do not see service types, campaign presets, or SMS consent steps.
 
 ---
 
 ## Implications for Roadmap
 
-The audit milestone is 9 sequential phases. They must not be parallelized because each phase creates data that downstream phases depend on.
+Architecture research provides a clear build order: schema outward. Each phase depends on the one before it. No phase can be safely reordered within the first four.
 
-### Phase QA-01: Authentication Flows
-**Rationale:** Auth is the prerequisite for every other phase. Failing auth blocks the entire audit. Establish a working authenticated session before anything else.
-**Delivers:** Login, signup, password reset, sign-out, session expiry, protected route redirect all confirmed
-**Covers categories:** A (Auth and Session Management)
-**Pitfall to watch:** Google OAuth cannot be fully automated; document as "button present, interactive flow not automatable via Playwright"
-**Research flag:** Standard Supabase auth patterns; well-documented; low surprise risk
+### Phase A: Data Model + Business Extension
 
-### Phase QA-02: Onboarding Wizard
-**Rationale:** Dashboard and all pages redirect to `/onboarding` if business is missing. Both flows (first business 4-step, additional business 3-step) must be audited. `?mode=new` also creates the second business needed for Phase 8.
-**Delivers:** Both onboarding paths confirmed. LocalStorage draft persistence verified. Campaign preset selection creates correct touch sequences.
-**Covers categories:** P (Onboarding)
-**Pitfall to watch:** Primary test account is already onboarded. `?mode=new` wizard tests additional-business creation without destroying existing data. A second test account is needed for the true first-run flow — or document the gap explicitly.
-**Research flag:** Two distinct code paths (upsert vs insert-only); verify both paths separately
+**Rationale:** Every downstream component — dashboard UI, client portal, billing enforcement — depends on these tables existing with correct RLS. This is the foundation; nothing else can be built without it.
 
-### Phase QA-03: Dashboard
-**Rationale:** Dashboard is the first thing users see. Test it in empty-state first (documents zero-state UX), then revisit after Phase 4 populates data if needed.
-**Delivers:** KPI cards, sparklines, ReadyToSendQueue, AttentionAlerts, WelcomeCard, business switcher, mobile layout all confirmed
-**Covers categories:** L (Dashboard)
-**Pitfall to watch:** Sparklines require real historical data; empty-state documents the zero-data experience separately
+**Delivers:** Database schema for `web_projects`, `project_tickets`, `ticket_messages`; `client_type` column on `businesses`; TypeScript types updated; onboarding wizard branched by `?mode=webdesign`.
 
-### Phase QA-04: Jobs
-**Rationale:** Jobs is the V2 core action. Test it thoroughly. The 3 test jobs created here (AUDIT_Patricia Johnson, AUDIT_Marcus Rodriguez, AUDIT_Sarah Chen) power all downstream phases.
-**Delivers:** AddJobSheet, inline customer creation, status toggle, conflict detection dialog (Replace/Skip/Queue), MarkComplete, CampaignSelector all confirmed
-**Covers categories:** C (Core V2 Workflow), D (Conflict Handling — initial scenarios)
-**Pitfall to watch:** Enrollment conflict dialog requires a customer already in an active campaign — create this scenario explicitly
-**Research flag:** Supplement every MarkComplete action with a DB query confirming `campaign_enrollments` row exists
+**Addresses:** Client portal table stakes (table foundation), operator ticket management (schema), web design plan tier distinction (subscription_tier column on web_projects).
 
-### Phase QA-05: Campaigns
-**Rationale:** Campaign enrollment happens on job completion. Phase 4 jobs triggered enrollment — Phase 5 observes and exercises the result. Enrollment data is present when auditing campaign detail pages.
-**Delivers:** Campaign list, preset picker, touch sequence editor, pause/resume with frozen enrollment, delete with reassignment, template preview, campaign detail stats all confirmed
-**Covers categories:** K (Campaign Management), D (Conflict Handling — frozen/resume paths)
-**Pitfall to watch:** Frozen enrollment state machine is the most complex logic in the codebase; verify all frozen → active transitions, not just the happy path. Test campaign pause idempotency.
+**Avoids:**
+- Pitfall 1 (god object — settle the table boundaries before writing any queries)
+- Pitfall 7 (ALTER TABLE lock risk — nullable columns only, no CHECK constraints without NOT VALID)
+- Pitfall 9 (wrong onboarding for web design clients — wizard branch lives here)
 
-### Phase QA-06: History, Analytics, and Feedback
-**Rationale:** All three are downstream consumers of jobs + campaigns data. Read-heavy with few interactions — grouping is efficient. No ordering dependency between these three pages.
-**Delivers:** History filters + date presets + bulk retry, analytics service-type breakdown, feedback resolution workflow all confirmed
-**Covers categories:** G (History), N (Analytics), M (Feedback)
-**Research flag:** Standard CRUD + filter patterns; low risk of surprises. Main verification is that data is correctly scoped to active business.
+**Research flag:** Standard patterns. Schema follows the established RLS pattern from 70 prior phases. No additional research needed.
 
-### Phase QA-07: Settings
-**Rationale:** Settings modifies business configuration. Auditing it after core workflows prevents configuration changes from affecting earlier phases. The `form_token` generated here is required by Phase 9.
-**Delivers:** All 7 tabs (General, Templates, Services, Messaging, Integrations, Customers, Account) confirmed. Form token URL captured for use in Phase 9.
-**Covers categories:** I (Settings), O (Customers)
-**Pitfall to watch:** Settings is the most complex single page — each tab is functionally independent and warrants its own checklist section. Copy the form token URL at end of phase for use in QA-09.
+---
 
-### Phase QA-08: Businesses Page and Business Switcher
-**Rationale:** Creating a second business in Phase 8 (rather than earlier) avoids complicating single-business phases with multi-business context. All single-business flows must be confirmed before exercising the switcher.
-**Delivers:** BusinessDetailDrawer metadata editing, notes auto-save, business switcher (desktop sidebar + mobile header), data isolation between businesses confirmed
-**Covers categories:** J (Multi-Business), B (Tenant Isolation — full cross-business verification)
-**Pitfall to watch:** This is the highest-risk phase for the single-business testing trap (Pitfall 1). Run dedicated cross-contamination scenarios: create job in Business B, switch to Business A, confirm it does not appear. Verify KPIs, campaigns, and history all change after switch.
+### Phase B: Web Projects CRM (Dashboard)
 
-### Phase QA-09: Public Pages and Review Funnel
-**Rationale:** No auth dependency. `/r/[token]` requires a sent touch (available after Phase 5) and `/complete/[token]` requires the `form_token` captured in Phase 7. Test last so all prerequisites are met.
-**Delivers:** Marketing landing page, pricing, review funnel (valid/invalid token, 4-5 star → Google, 1-3 star → feedback form), public job completion form confirmed
-**Covers categories:** E (Review Funnel), F (Public Job Form)
-**Pitfall to watch:** `/complete/[token]` is the only write-accepting public route. Test with invalid tokens (expect 404, not 500), missing required fields (expect server-side validation error), and verify rate limiting applies. Test at 390px mobile — this form is used by technicians on phones in the field.
+**Rationale:** Operator must be able to create projects and generate portal tokens before clients can access anything. The portal URL originates here.
+
+**Delivers:** `/projects` dashboard route; ProjectCard grid; ProjectDetailDrawer; ProjectWizard modal; "Projects" nav item in sidebar; `client_type` badge on BusinessCard; "Web Project" tab in BusinessDetailDrawer; `generatePortalToken()` server action.
+
+**Addresses:** Operator all-clients KPI view (differentiator), client portal authentication (token generation side), `client_type` badge (differentiator).
+
+**Avoids:** Pitfall 10 (mixed client type display — `client_type` badge makes web vs review clients visually distinct).
+
+**Uses:** Existing `CreateBusinessWizard` modal pattern (3-step), `generateFormToken()` pattern for portal token, `getActiveBusiness()` + caller-provides-businessId for all data functions.
+
+**Research flag:** Standard patterns. All component patterns (drawer, wizard, card grid) have working examples in the codebase (`BusinessDetailDrawer`, `CreateBusinessWizard`, `/businesses` page).
+
+---
+
+### Phase C: Ticket System (Dashboard Side)
+
+**Rationale:** The ticket tables must exist and the dashboard management UI must work before the client portal can submit tickets into them and see meaningful responses.
+
+**Delivers:** `/projects/[id]/tickets` route; TicketList with status filter; TicketDetailDrawer with message thread; NewTicketForm; open ticket count badges on ProjectCard; Postgres RPC for atomic ticket limit enforcement; `REVISION_LIMITS` constants file.
+
+**Addresses:** Operator ticket management (table stakes), monthly ticket limit enforcement (table stakes), ticket history and status (table stakes).
+
+**Avoids:**
+- Pitfall 2 (race condition — Postgres RPC is implemented here, not deferred to Phase D)
+- Pitfall 8 (non-atomic limit enforcement from client portal — RPC covers both agency and portal submissions)
+- Pitfall 11 (hardcoded limits — use `REVISION_LIMITS = { basic: 2, advanced: 4 }` constants file from day one)
+
+**Research flag:** Standard patterns for the UI. The Postgres RPC should reference the existing `claim_due_campaign_touches` RPC in `supabase/migrations/` as the model to follow.
+
+---
+
+### Phase D: Client Portal (Public)
+
+**Rationale:** Portal depends on Phase A (tables), Phase B (portal_token generation), and Phase C (tickets to display and submit into). This is the last backend-dependent phase before billing.
+
+**Delivers:** `/portal/[token]` public route; ClientPortal component; PortalTicketForm with file upload to Supabase Storage; `ticket-attachments` bucket (private, signed URLs); `/api/portal/tickets` Route Handler with token validation; Upstash rate limiting on submission route (scoped by token); portal activity logging (IP, timestamp); "Regenerate portal link" button in ProjectDetailDrawer.
+
+**Addresses:** All client portal table stakes — portal access, ticket submission, ticket history, monthly quota display. Token security (critical pitfall).
+
+**Avoids:**
+- Pitfall 3 (token security — 192-bit token, regenerate button built here, rate limiting applied)
+- Pitfall 6 (RLS discipline — service role for token validation only; all subsequent queries scoped by explicit business_id)
+- Pitfall 12 (rate limiting on public submission route)
+
+**Uses:** Existing `/complete/[token]` route as the structural template; existing `checkPublicRateLimit` Upstash infrastructure; `react-dropzone` already installed; Supabase Storage signed upload URL pattern.
+
+**Research flag:** Supabase Storage bucket RLS policy syntax needs verification before writing the migration. ARCHITECTURE.md and STACK.md describe slightly different bucket visibility models — use STACK.md's private bucket + signed read URLs (more secure). Verify policy syntax against official Supabase storage access control docs.
+
+---
+
+### Phase E: Stripe Billing for Web Design Tiers
+
+**Rationale:** Billing can be built after the portal is live and tested. Early clients can be managed with manual Stripe invoices while the billing infrastructure is built correctly. This phase requires the most careful design and must not be rushed.
+
+**Delivers:** New Stripe products/prices for web design Basic ($199) and Advanced ($299); `web_design_tier` and `review_tier` columns on `businesses`; updated Stripe webhook handler that iterates all `subscription.items.data`; `$50 overage` one-time invoice triggered from the ticket submission RPC; billing page updated to show web design plan state.
+
+**Addresses:** Web design plan tier enforcement, overage billing, multi-product subscription support.
+
+**Avoids:**
+- Pitfall 4 (Stripe billing mismatch — separate tier dimensions, webhook iterates all items, not just `data[0]`)
+- Silent `undefined` fallback in `PRICE_TO_TIER` map when new price IDs are not registered
+
+**Research flag:** This phase needs deeper research before planning. Run `/gsd:research-phase` to answer: (1) How does the Stripe webhook handler need to change to handle multi-item subscriptions? (2) Does a review add-on for one business count against the pooled agency send limit or get its own limit? (3) What is the correct Stripe product hierarchy for Basic + Advanced + Review Add-on?
+
+---
+
+### Phase F: Marketing Landing Page Restructure
+
+**Rationale:** Marketing depends on nothing from the application feature set. Doing it last means web design features are live and can be accurately described in copy. Critically, the `/reputation` route must exist and be preserved before the homepage is changed.
+
+**Delivers:** New `components/marketing/v3/` web design agency homepage components; `/reputation` route with existing `v2/` content moved intact; updated `/pricing` page with dual-service tabbed presentation; updated sitemap, OG images, and meta tags; web design–specific FAQ addressing home service owner objections ("Do I need to manage it?", "What if I need changes?").
+
+**Addresses:** Pricing page (table stakes), home services niche positioning (differentiator).
+
+**Avoids:** Pitfall 5 (marketing pivot confusion — existing `v2/` components are never deleted, existing content preserved at `/reputation`; no in-app copy changes for existing review clients).
+
+**Research flag:** Standard patterns. Copy and conversion optimization are content decisions, not technical research. The Calendly CTA pattern already exists in production. An SEO audit of current `/` ranking for review automation keywords is recommended before executing this phase — if meaningful organic traffic exists, plan canonical tags or 301 redirects accordingly.
+
+---
 
 ### Phase Ordering Rationale
 
-- **Data builds progressively:** Each phase creates data consumed by downstream phases; no redundant setup
-- **Risk-first:** Auth and tenant isolation are highest-risk; audited in the first two meaningful phases
-- **No destructive actions in early phases:** Settings changes (Phase 7) and second business creation (Phase 8) are deferred until single-business flows are confirmed
-- **Public routes last:** No auth dependency; all token and form-link prerequisites are available by Phase 9
-- **Read-heavy pages grouped:** History, Analytics, and Feedback share Phase 6 because they are read-only consumers of the same upstream data
+- **Schema first, always** — all five critical pitfalls (god object, race condition, billing mismatch, token security, marketing confusion) are resolved at the data model and architecture design level. Getting the schema right before building UI prevents costly rewrites.
+- **Dashboard before portal** — the operator must create projects and generate portal tokens before clients can access anything. This order makes the portal testable end-to-end the moment it ships.
+- **Billing after portal** — early clients can be managed with manual invoices while billing is built correctly. Rushing billing is the most common cause of subscription billing bugs in pivots.
+- **Marketing last** — avoids shipping copy that describes features not yet built, and allows the actual client portal experience to inform landing page messaging. The `/reputation` preservation is the only time-sensitive constraint; it must be ready before any marketing traffic is redirected.
 
 ### Research Flags
 
-**Phases needing deeper investigation during execution:**
-- **Phase QA-05 (Campaigns):** Frozen enrollment state machine is the most complex logic in the codebase; all 6 transition paths should be explicitly exercised, not just Replace and Skip
-- **Phase QA-08 (Businesses):** Multi-business data isolation under switching is the highest-risk audit scenario; requires a two-user, two-business test matrix plus direct SQL verification at each switch
-- **Phase QA-09 (Public Form):** `/complete/[token]` is the only write-accepting public route; warrants explicit adversarial testing: invalid tokens, missing fields, rate limiting
+**Needs full research-phase before planning:**
+- **Phase E (Stripe Billing):** Multi-product subscription webhooks, pooled usage interaction with review add-on, overage invoice flow. The billing architecture decision (separate tier columns vs composite values) must be made before the first Stripe product is created.
 
-**Phases with standard patterns (low surprise risk):**
-- **Phase QA-01 (Auth):** Supabase handles session management; standard patterns well-documented; main work is methodical scenario coverage
-- **Phase QA-06 (History/Analytics/Feedback):** Standard CRUD + filter patterns; well-tested in prior audits; main check is business-scoping correctness
-- **Phase QA-07 (Settings):** Known entity from prior UX audit; main risk is completeness across 7 tabs, not unexpected behavior
+**Needs doc verification (not full research):**
+- **Phase D (Client Portal):** Supabase Storage bucket RLS policy syntax. Contradiction between STACK.md (private bucket) and ARCHITECTURE.md (public bucket) must be resolved. Recommendation: private bucket with signed read URLs.
+
+**Standard patterns (skip research-phase):**
+- **Phase A (Data Model):** Established RLS migration pattern, repeated 70+ times in this codebase.
+- **Phase B (Projects CRM):** All component patterns have working examples in the codebase.
+- **Phase C (Ticket System):** Postgres RPC pattern exists; the campaign enrollment RPCs are the model.
+- **Phase F (Marketing):** Content work, no novel technical patterns.
 
 ---
 
@@ -264,50 +221,57 @@ The audit milestone is 9 sequential phases. They must not be parallelized becaus
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack (Playwright tooling) | HIGH | Playwright 1.58.1 confirmed installed; auth + cookie patterns verified against official Playwright docs and Next.js App Router guide |
-| Features (audit category scope) | HIGH | Derived from full codebase review of all routes, actions, and data functions; categories map directly to shipped code |
-| Architecture (phase grouping + report format) | HIGH | Data dependency analysis from actual `page.tsx` files; report template derived from existing UX-AUDIT.md conventions |
-| Pitfalls (failure modes) | HIGH | Critical pitfalls grounded in direct code inspection of cron endpoints, middleware, public routes; external sources used for verification only |
+| Stack | HIGH | Zero new packages confirmed by inspecting package.json; all new capabilities verified against official Supabase and Stripe docs; signed URL upload pattern verified against official Next.js + Supabase guides |
+| Features | MEDIUM-HIGH | Table stakes verified against multiple agency portal platforms (ManyRequests, AgencyHandy, SPP.co/Wayfront, Toggl); pricing tier market positioning ($199/$299) is plausible but unvalidated against direct AvisLoop competitors |
+| Architecture | HIGH | Based on direct codebase inspection of all relevant files (routes, middleware, migrations, DECISIONS.md); storage bucket RLS policy syntax is MEDIUM confidence and flagged for verification |
+| Pitfalls | HIGH | Critical pitfalls grounded in actual codebase inspection; external verification from PortSwigger, OWASP, Stripe official docs, and GoCardless engineering blog |
 
-**Overall confidence:** HIGH
+**Overall confidence: HIGH**
 
-### Gaps to Address During Execution
+### Gaps to Address
 
-1. **Second test account for first-run onboarding:** Primary account (`audit-test@avisloop.com`) already has a completed business. Testing the true first-run onboarding flow requires either a second account (`audit-test2@avisloop.com`) or explicit documentation that this scenario is environment-dependent. Decide before Phase QA-02 begins.
+- **Pricing tier market validation:** $199/$299 for home services web design is plausible based on market research but unverified against current direct competitors. Validate with 2–3 prospect conversations before locking in pricing page copy.
 
-2. **Review funnel token availability:** The `/r/[token]` test requires a valid HMAC-signed review token from a sent campaign touch. If the test environment has not run the cron processor, construct a token manually using `lib/review/token.ts` test helpers. Document which approach was used in the Phase QA-09 findings file.
+- **Stripe multi-product billing design:** The interaction between `web_design_tier` and the existing pooled review send limits needs explicit resolution before Phase E. Does purchasing a review add-on for one client count against the agency-level pooled send limit, or does it get its own per-client limit? The current pooled billing (`getPooledMonthlyUsage`) is user-scoped; review add-on is client-scoped. These models are incompatible without a deliberate decision.
 
-3. **Staging subdomain for middleware testing:** The dual-subdomain routing is entirely bypassed on localhost. Full middleware validation requires a staging subdomain or Vercel preview URL with the actual domain configuration. If unavailable during the audit, document explicitly in findings as "middleware cross-subdomain behavior not verified — requires staging environment."
+- **Supabase Storage bucket visibility contradiction:** ARCHITECTURE.md describes a public bucket for ticket attachments; STACK.md describes a private bucket with signed read URLs. These are contradictory. Resolve this before Phase D — recommendation is private bucket (STACK.md approach) for security reasons.
 
-4. **Real device for mobile form testing:** Playwright device emulation does not replicate iOS Safari viewport behavior, system keyboard layout changes, or actual touch target sizes. The `/complete/[token]` technician form is the highest-risk mobile flow. Use a real device or BrowserStack if available; document the testing method in findings.
+- **SEO impact of homepage pivot:** If the current `avisloop.com` homepage ranks for any review automation keywords, moving that content to `/reputation` without 301 redirects will lose that equity. Run a quick SEO audit (Google Search Console, if configured) before Phase F execution.
 
-5. **Database state verification procedure:** The audit execution plan must include explicit DB verification steps after key UI actions. Before execution begins, confirm Supabase dashboard access (or a SQL client) is available for direct table queries. The pitfall research is explicit: Playwright-only testing misses the server-side automation pipeline.
+- **Onboarding wizard branch design:** PITFALLS.md recommends `?mode=webdesign` as a URL param to branch onboarding. ARCHITECTURE.md recommends a `client_type` selector at step 1 of the existing wizard. These need to be reconciled in Phase A planning — one approach, not both.
 
 ---
 
 ## Sources
 
 ### Primary (HIGH confidence — official documentation)
-- [playwright.dev/docs/auth](https://playwright.dev/docs/auth) — storageState pattern, project dependencies
-- [playwright.dev/docs/accessibility-testing](https://playwright.dev/docs/accessibility-testing) — axe-core/playwright integration
-- [playwright.dev/docs/emulation](https://playwright.dev/docs/emulation) — device emulation, color scheme
-- [nextjs.org/docs/app/guides/testing/playwright](https://nextjs.org/docs/app/guides/testing/playwright) — Next.js App Router + Playwright config
-- [github.com/vercel/next.js/discussions/62254](https://github.com/vercel/next.js/discussions/62254) — why UI login + storageState is required over API cookie injection
-- [docs.stripe.com/billing/testing](https://docs.stripe.com/billing/testing) — Stripe test clocks for subscription lifecycle
-- [vercel.com/blog/common-mistakes-with-the-next-js-app-router](https://vercel.com/blog/common-mistakes-with-the-next-js-app-router-and-how-to-fix-them) — stale GET cache in production
-- Direct codebase inspection of all routes, `lib/data/`, `lib/actions/`, `app/api/cron/`, `middleware.ts`, `app/complete/`, `lib/review/` (2026-02-27)
+- Supabase Storage signed upload URL docs — [supabase.com/docs/reference/javascript/storage-from-createsigneduploadurl](https://supabase.com/docs/reference/javascript/storage-from-createsigneduploadurl)
+- Supabase Storage access control (RLS) — [supabase.com/docs/guides/storage/security/access-control](https://supabase.com/docs/guides/storage/security/access-control)
+- Supabase Storage bucket fundamentals — [supabase.com/docs/guides/storage/buckets/fundamentals](https://supabase.com/docs/guides/storage/buckets/fundamentals)
+- Stripe flat fee with overages — [docs.stripe.com/billing/subscriptions/usage-based-v1/use-cases/flat-fee-and-overages](https://docs.stripe.com/billing/subscriptions/usage-based-v1/use-cases/flat-fee-and-overages)
+- Stripe multiple products per subscription — [docs.stripe.com/billing/subscriptions/multiple-products](https://docs.stripe.com/billing/subscriptions/multiple-products)
+- PortSwigger session token in URL — [portswigger.net/kb/issues/00500700_session-token-in-url](https://portswigger.net/kb/issues/00500700_session-token-in-url)
+- OWASP testing for account enumeration — official OWASP Web Security Testing Guide
+- GoCardless engineering blog — zero-downtime Postgres migrations, NOT VALID constraint pattern
+- Direct codebase inspection — all route files, `lib/data/`, `lib/actions/`, middleware, migrations, DECISIONS.md, DATA_MODEL.md (2026-03-18)
 
-### Secondary (MEDIUM confidence — third-party, verified against codebase)
-- [mokkapps.de — Supabase REST auth in Playwright](https://mokkapps.de/blog/login-at-supabase-via-rest-api-in-playwright-e2e-test) — why API token injection fails with Supabase SSR
-- [fixmymess.ai — Tenant isolation checklist](https://fixmymess.ai/blog/tenant-isolation-checklist-saas-prototypes) — secondary query path gaps, cache key scoping
-- [launchdarkly.com — Stripe webhook best practices](https://launchdarkly.com/blog/best-practices-for-testing-stripe-webhook-event-processing/) — duplicate event handling, idempotency
-- [medium.com/cyberark-engineering — Multi-tenant SaaS with Playwright](https://medium.com/cyberark-engineering/scaling-e2e-tests-for-multi-tenant-saas-with-playwright-c85f50e6c2ae) — context isolation patterns
-- [betterstack.com — Playwright best practices](https://betterstack.com/community/guides/testing/playwright-best-practices/) — test isolation, cookie/storage state
-- [prosperasoft.com — RLS misconfigurations](https://prosperasoft.com/blog/database/supabase/supabase-rls-issues/) — insufficient role-based testing, nested policy overrides
+### Secondary (MEDIUM confidence — community consensus, multiple sources)
+- AgencyHandy — client portal best practices, top portal features for design agencies
+- ManyRequests — design subscription service portal patterns, revision limit UX
+- SPP.co / Wayfront — helpdesk feature set for agency portals
+- Toggl — managing design change requests, revision request UX patterns
+- SaasFrame — 2026 SaaS landing page conversion trends
+- Adilo — product repositioning strategies, existing user confusion risks
+- CodeFarm Medium — ticketing system concurrency and race conditions
+
+### Tertiary (MEDIUM confidence — useful directionally, not verified)
+- Web design pricing guides (knapsackcreative, various) — $199–$299 market positioning
+- Home services landing page conversion research (Fermat Commerce, Shopify, Landerlab) — CTA patterns, social proof placement
+- Home services SEO and website must-haves (NextLeft, Home Comfort Marketing)
 
 ---
 
-*Research completed: 2026-02-27*
-*Ready for roadmap: yes*
+*Research completed: 2026-03-18*
+*Synthesized: 2026-03-18*
 *Files synthesized: STACK.md, FEATURES.md, ARCHITECTURE.md, PITFALLS.md*
-*Next step: Roadmap creation (use suggested 9-phase QA structure as starting point)*
+*Ready for roadmap: yes*

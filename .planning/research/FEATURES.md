@@ -1,492 +1,427 @@
-# QA Audit Feature Landscape: Pre-Production Audit
+# Feature Landscape: Web Design Agency Pivot
 
-**Domain:** Multi-tenant SaaS — Comprehensive pre-deployment audit
-**Researched:** 2026-02-27
-**Confidence:** HIGH — based on codebase analysis + standard SaaS QA patterns
-**Milestone type:** QA audit before first production deployment
+**Domain:** Web design agency platform — solo agency operator managing home service business clients
+**Researched:** 2026-03-18
+**Confidence:** MEDIUM-HIGH — ecosystem verified via multiple web sources, patterns drawn from ManyRequests, SPP.co/Wayfront, AgencyHandy, Toggl, and home services agency market research
 
 ---
 
 ## Context
 
-AvisLoop is shipping to production for the first time after completing v3.0 agency mode (Phases
-52-58). The audit goal is to produce a **findings report** — a page-by-page, feature-by-feature
-document of what works, what is broken, and what is risky. This is not a test suite build; it is
-an audit that results in a findings file per category.
+AvisLoop is adding a web design agency layer on top of an existing review automation platform.
+The operator is a solo agency owner. Clients are home service businesses (HVAC, plumbing,
+electrical, roofing, etc.). The product model:
 
-**Scope:** Dashboard app and all its backing systems. Marketing and public pages excluded.
+- **Basic plan ($199/mo):** 1–4 page website, 2 revision tickets/month
+- **Advanced plan ($299/mo):** 4–10 page website, 4 revision tickets/month
+- **Review add-on ($99/mo):** Plugs in AvisLoop's existing review automation
 
-**Output format:** Findings files, one per category, written under `.planning/phases/<N>-qa-audit/`.
+The operator manages everything through the existing AvisLoop dashboard. Clients get a
+lightweight portal to submit revision requests and view history.
+
+Existing platform already provides: multi-business CRM with cards and detail drawers,
+token-secured public URLs, campaign/automation engine, Stripe billing, dashboard with KPIs.
+These existing capabilities reduce build effort significantly.
 
 ---
 
 ## Table Stakes
 
-These must pass before production. Anything broken here is embarrassing or dangerous.
+Features that clients expect when paying $199–$299/month for a managed website. Missing any
+of these makes the product feel unprofessional or incomplete.
 
-### Category A: Authentication and Session Management
+### Revision Request Submission
 
-**Why required:** Broken auth means users cannot use the app. Session leaks mean unauthorized
-access. Every other category depends on this working.
+**Why expected:** The core deliverable of the subscription is that clients can request changes
+to their website. Without a way to submit, track, and confirm completion of requests, the
+product has no accountability mechanism. Email threads are not acceptable at this price point.
 
-| Test Scenario | What We Are Verifying | Risk If Broken |
-|---------------|----------------------|----------------|
-| Email/password signup completes | New user lands on `/onboarding` after confirm email | Users cannot onboard |
-| Login with valid credentials | Session set, redirect to `/dashboard` | Lock-out |
-| Login with wrong password | Generic error shown, no info leak about account existence | Info disclosure |
-| Password reset email sends | User receives email, link works, password changes | Users locked out |
-| Google OAuth signup | New user created, lands on `/onboarding` | OAuth users blocked |
-| Google OAuth login | Existing OAuth user lands on `/dashboard` | OAuth users blocked |
-| Expired session redirect | Unauthenticated request to any `/dashboard/*` route redirects to `/login` | Unauthorized access |
-| Protected route direct URL access | Typing `/dashboard` while logged out redirects, not 404 or data exposure | Unauthorized access |
-| Sign out clears session | After signout, `/dashboard` redirects to `/login` | Session stays alive |
-| Password input toggle | Show/hide password works on login and signup forms | UX bug (minor) |
+| Feature Detail | Complexity | Notes |
+|---------------|------------|-------|
+| Structured submission form (what changed, priority, attachment) | Low | Single form, no workflow branching needed |
+| Confirmation that request was received | Low | Toast + email notification |
+| Status tracking: submitted → in progress → done | Low | 3-state enum, no complex state machine |
+| Ability to see all past requests and their outcomes | Low | Simple list view |
+| Mobile-friendly submission | Low | Existing design system handles this |
 
-**Confidence check:** Supabase handles session management. Auth routes are in middleware. This
-should be HIGH confidence but needs smoke-test verification on deployed environment.
+**Dependency:** Token-secured public URL pattern already exists in codebase for `/complete/[token]`.
+The client portal URL generation can reuse this exact pattern.
 
 ---
 
-### Category B: Multi-Tenant Data Isolation
+### Monthly Ticket Limit Display and Enforcement
 
-**Why required:** This is the most critical security category for a multi-tenant SaaS. If tenant
-A can see tenant B's data, that is a production-blocking bug. RLS policies are the enforcement
-layer; this category verifies they work as intended.
+**Why expected:** Clients paying a flat monthly rate need to know their revision budget.
+Surprising them with "you're out of tickets" or letting them submit unlimited requests creates
+either unhappy clients or unhappy operators. Industry pattern (ManyRequests, Toggl agency
+research) is to surface remaining count prominently and block submission when exhausted.
 
-| Test Scenario | What We Are Verifying | Risk If Broken |
-|---------------|----------------------|----------------|
-| User A cannot read User B's jobs | RLS on jobs table by business ownership | Cross-tenant data leak |
-| User A cannot read User B's customers | RLS on customers table | Cross-tenant data leak |
-| User A cannot read User B's campaigns | RLS on campaigns table | Cross-tenant data leak |
-| User A cannot read User B's send_logs | RLS on send_logs table | Cross-tenant data leak |
-| User A cannot read User B's enrollments | RLS on campaign_enrollments table | Cross-tenant data leak |
-| User A cannot read User B's feedback | RLS on customer_feedback table | Cross-tenant data leak |
-| User A cannot update User B's jobs via direct API call | RLS WITH CHECK on writes | Write privilege escalation |
-| User A cannot delete User B's customers via direct API call | RLS WITH CHECK on deletes | Destructive privilege escalation |
-| Active business cookie from User A rejected if used by User B | `getActiveBusiness()` ownership check | Session fixation-style attack |
-| Multi-business user — business A data never shown when business B is active | Cookie-based resolver isolates correctly | Wrong-business data shown to legitimate user |
-| Newly created second business starts with empty state | No bleed from first business's jobs, customers, campaigns | Data contamination |
+| Feature Detail | Complexity | Notes |
+|---------------|------------|-------|
+| "You have X of Y revisions remaining this month" display | Low | Single counter, reset at billing cycle |
+| Form disabled with clear message when limit reached | Low | Guard at API and portal UI |
+| Operator can see per-client ticket usage in dashboard | Low | Aggregate view on businesses page |
+| Monthly reset (automatic on billing anniversary or calendar month) | Low | Cron or billing webhook trigger |
+| Operator can manually grant extra tickets (override) | Low | Simple integer adjustment column |
 
-**Implementation note:** All data functions use explicit `businessId` from `getActiveBusiness()`
-which verifies `user_id = auth.uid()`. Service-role bypasses use explicit scoping in all queries.
-Still requires manual verification that every path is covered.
+**Enforcement pattern from research:** Document → Surface → Block. The UX pattern is to show
+the limit prominently throughout (not just when exhausted), so clients self-regulate. Blocking
+without warning creates frustration; warnings normalize the constraint.
 
 ---
 
-### Category C: Core V2 Workflow — Job Completion to Campaign Enrollment
+### Ticket History and Status for Client
 
-**Why required:** This is the product's one core automation loop. If "complete job" does not
-trigger campaign enrollment, the product does not work at all.
+**Why expected:** Clients need to trust that their requests are being worked on. Without
+visible status, every submitted ticket feels like it went into a void. Agency churn research
+consistently identifies "lack of communication" as the top reason clients leave.
 
-| Test Scenario | What We Are Verifying | Risk If Broken |
-|---------------|----------------------|----------------|
-| Create job with new customer inline (name + email) | Customer created as side effect, job created | V2 core flow broken |
-| Create job with existing customer by email match | Existing customer linked, no duplicate created | Duplicate customer records |
-| Create job status=completed → enrollment created | Campaign enrollment record inserted with touch_1_scheduled_at set | No reviews ever sent |
-| Create job status=scheduled → no enrollment created | Enrollment NOT created at job creation time | Premature enrollment |
-| Mark scheduled job as complete → enrollment created | `markJobComplete()` triggers enrollment | Technician tap has no effect |
-| Mark job as do_not_send → no enrollment created | `do_not_send` status skips enrollment | Unwanted review requests |
-| service_type_timing respected | Touch 1 scheduled at correct offset from completion time | Review requests sent at wrong time |
-| campaign_override=one_off respected | Enrollment skipped for one-off jobs | One-off job accidentally enrolled |
-| Correct campaign matched by service type | HVAC job enrolls in HVAC campaign, not Plumbing | Wrong campaign |
-| Null service_type campaign = fallback | When no service-specific campaign, global campaign used | Job never enrolled |
-| Update completed job service type → re-enrollment | Old enrollment stopped, new one created for correct campaign | Double enrollment |
+| Feature Detail | Complexity | Notes |
+|---------------|------------|-------|
+| List of all submitted tickets with status badges | Low | Table/list component |
+| Chronological order, most recent first | Low | Sort by created_at DESC |
+| Status visible: submitted, in progress, completed | Low | StatusDot pattern already in codebase |
+| Completion notes from operator (optional) | Low | Text field on ticket, operator-only write |
+| Attachment visibility (screenshots client submitted) | Medium | File storage via Supabase Storage |
 
 ---
 
-### Category D: Campaign Enrollment Conflict Handling
+### Operator Ticket Management (Dashboard Side)
 
-**Why required:** A repeat customer with an active enrollment hitting a new job is the most
-common edge case. Broken conflict detection means either double-enrollment or silent failure.
+**Why expected:** The operator is the other half of this system. They need to see all incoming
+tickets, update status, add notes, and mark complete. Without this, they are managing revisions
+over email, which defeats the purpose.
 
-| Test Scenario | What We Are Verifying | Risk If Broken |
-|---------------|----------------------|----------------|
-| New job for customer with active enrollment shows conflict badge | `enrollment_resolution='conflict'` set on job | Silent enrollment failure |
-| Replace action cancels old enrollment and creates new | `resolveEnrollmentConflict('replace')` works | Double emails sent |
-| Skip action removes job from queue | `resolveEnrollmentConflict('skip')` sets 'skipped' | Job stuck in queue |
-| Queue after action waits for completion | `resolveEnrollmentConflict('queue_after')` sets correct state | Immediate re-enrollment |
-| Undo toast after skip reverts correctly | `revertConflictResolution()` restores conflict state | Cannot undo actions |
-| Review cooldown prevents re-enrollment | Customer who reviewed recently is suppressed | Harassing customers post-review |
-| Pre-flight conflict detection on scheduled job | Conflict detected when creating job, not just at completion | Conflict appears unexpectedly at completion |
-
----
-
-### Category E: Review Funnel (Public Routes)
-
-**Why required:** The review funnel is the product's money path. A broken funnel means customers
-cannot leave reviews, which means zero reviews collected and zero product value delivered.
-
-| Test Scenario | What We Are Verifying | Risk If Broken |
-|---------------|----------------------|----------------|
-| Valid HMAC review token renders review page | Token parsed, customer+business fetched, rating UI shown | No reviews collected |
-| Expired review token (>30 days) shows 404 | `parseReviewToken()` rejects expired tokens | Old link works unexpectedly |
-| Invalid token string shows 404 | Not 500, not data exposure | Error info leak |
-| 4-star rating redirects to Google URL | Correct routing based on rating value | Users sent to feedback instead of Google |
-| 5-star rating redirects to Google URL | Same as above | Users sent to feedback instead of Google |
-| 3-star rating shows private feedback form | Low-rating routing to feedback | Negative reviews accidentally sent to Google |
-| 1-star rating shows private feedback form | Same as above | Negative reviews accidentally sent to Google |
-| Rating submission stops active campaign enrollment | `review_clicked` or `feedback_submitted` stops enrollment | Customer continues receiving messages after reviewing |
-| `reviewed_at` set on send_logs after review click | KPI "Reviews This Month" counts correctly | Dashboard analytics wrong |
-| Feedback form submission stores record | `customer_feedback` row created | Feedback lost |
-| Rate limit on `/api/review/rate` | 429 returned after threshold | DoS vector on public endpoint |
-| Token validated server-side (not client) | No enumeration by toggling token bytes | Customer enumeration attack |
+| Feature Detail | Complexity | Notes |
+|---------------|------------|-------|
+| All-tickets view across all clients | Low | Extends existing businesses/clients page |
+| Filter by client, status, priority | Low | Standard filter pattern |
+| Mark ticket in progress / complete | Low | Status toggle, same pattern as job completion |
+| Add internal notes (not visible to client) | Low | Pattern exists in customer detail drawer |
+| Add completion notes (visible to client) | Low | Separate text field on ticket |
 
 ---
 
-### Category F: Public Job Completion Form (`/complete/[token]`)
+### Client Portal Authentication (Token-Based)
 
-**Why required:** This is the technician's tool for the on-site completion flow. Phase 58
-deliverable. If it does not work, the dispatch-based workflow does not work.
+**Why expected:** Clients need a way to access their portal without creating AvisLoop accounts.
+Home service business owners (plumbers, HVAC techs) are not SaaS-savvy — adding account
+creation friction is a conversion killer. Token-based magic links are the industry standard
+for this use case.
 
-| Test Scenario | What We Are Verifying | Risk If Broken |
-|---------------|----------------------|----------------|
-| Valid form token renders business name and service types | Business resolved from `form_token` column | Technician sees blank or wrong form |
-| Invalid/unknown token shows 404 | Not 500, not another business's form | Token guessing attack |
-| Submit with new customer (email path) | Customer created, job created with status=completed | No review automation triggered |
-| Submit with new customer (phone-only path) | Phone-dedup attempted, customer created | Phone-only customers blocked |
-| Submit with returning customer by email match | Existing customer linked, no duplicate | Duplicate customer records |
-| Submit with returning customer by phone match | Phone dedup as fallback | Duplicate customer records |
-| Active campaign enrollment triggered after submit | Review automation starts | Form submission has no effect |
-| Conflict on public submit sets enrollment_resolution | Conflict surfaced on dashboard for owner to resolve | Silent failure |
-| Review cooldown respected on public submit | Suppressed correctly, job still created | Harassing recent reviewers |
-| Regenerating token invalidates old URL | Old `/complete/<old-token>` returns 404 after regen | Stale links still work |
-| Form is mobile-optimized | Touch targets, layout works on 375px viewport | Technicians cannot use on phone |
-| `noindex, nofollow` set on page | Search engines do not index form | Form URLs indexed publicly |
+| Feature Detail | Complexity | Notes |
+|---------------|------------|-------|
+| Unique portal URL per client (token-secured) | Low | `/portal/[token]` — identical pattern to `/complete/[token]` |
+| No account creation required by client | Low | Stateless token auth |
+| Token regeneration by operator | Low | Already implemented for form_token in settings |
+| Noindex/nofollow on portal pages | Low | Already applied to public form |
 
 ---
 
-### Category G: History / Send Logs
+### Pricing Page for the Agency
 
-**Why required:** Owners troubleshoot from the History page. If filtering or bulk actions are
-broken, operators cannot manage their queue.
+**Why expected:** If the agency is acquiring clients via its own marketing website, the pricing
+page is the core conversion surface. Home service businesses are price-sensitive. They need to
+see clear tier differentiation, understand what they get, and have an obvious next step.
 
-| Test Scenario | What We Are Verifying | Risk If Broken |
-|---------------|----------------------|----------------|
-| History page loads with send records | Page renders, pagination works | Blank history page |
-| Status filter narrows results | Selecting 'failed' shows only failed sends | Filter does nothing |
-| Date preset chips filter correctly | "Today", "This Week", "This Month", "3 Months" produce correct date range | Wrong date range sent |
-| Search by customer name filters | Free-text search narrows results | Search broken |
-| Search by customer email filters | Same path, different field | Search broken |
-| Retry single failed send | Individual retry sends the message | Cannot retry failures |
-| Bulk resend failed/bounced | Bulk action sends to all in selection | Bulk retry broken |
-| History scoped to active business | Switching business shows different history | Cross-tenant history bleed |
+Research on high-converting landing pages for home service targeting (from Fermat Commerce,
+Unbounce, Shopify sources): single focused CTA increases conversion by up to 62%; removing
+nav reduces distraction; social proof near CTA is the highest-leverage addition.
 
----
-
-### Category H: Billing and Send Limit Enforcement
-
-**Why required:** Billing enforcement protects revenue. A broken billing check means users
-exceed plan limits without paying. Pooled billing for agency users is new in v3.0.
-
-| Test Scenario | What We Are Verifying | Risk If Broken |
-|---------------|----------------------|----------------|
-| Free tier (no subscription) — monthly send limit enforced | Sends blocked after limit hit | Unlimited free sends |
-| Paid tier — higher monthly send limit enforced | Paid users get correct limit | Paying users blocked at wrong threshold |
-| Pooled usage: sends across all businesses counted together | `getPooledMonthlyUsage()` sums all businesses | Agency loophole: N businesses = N limits |
-| Single business on Starter: pooled usage = that business's sends | No artificial inflation | Wrong count shown |
-| Billing page shows correct pooled send count | UI reflects server-side state | Confusing billing display |
-| Stripe checkout creates customer and subscription | `createCheckoutSession()` works end-to-end | Users cannot pay |
-| Stripe webhook updates subscription tier | Webhook handler processes events correctly | Payment not reflected in app |
-| Over-limit error message shown to user | Clear error, not silent failure or 500 | User confused why sends stop |
-
----
-
-### Category I: Settings — All Tabs
-
-**Why required:** Settings is how operators configure the entire automation pipeline. Broken
-settings means broken campaigns, which means no reviews.
-
-| Test Scenario | What We Are Verifying | Risk If Broken |
-|---------------|----------------------|----------------|
-| General tab: business name + phone save | Form saves and reflects immediately | Business name stuck |
-| General tab: Google review link saves | Link used by review funnel | Wrong Google link on review redirect |
-| Services tab: enable/disable service types | Affects which campaigns appear and which templates shown | Templates for disabled services shown |
-| Services tab: custom timing per service type saves | `service_type_timing` JSONB field updated | Wrong enrollment timing |
-| Services tab: custom service names save | `custom_service_names` TEXT[] updated | Custom names not shown |
-| Templates tab: create new email template | Template stored for business | No custom templates |
-| Templates tab: edit existing template | Edits persist | Campaign uses stale template |
-| Templates tab: delete user template | Template removed, campaign_touches with this template set to NULL | Orphan template reference |
-| Customers tab: add customer manually | Customer created (settings escape hatch path) | Cannot add customer from Settings |
-| Customers tab: CSV import | Bulk import creates customers + jobs, skips campaign enrollment | Import broken |
-| Form Link tab: generate form token | Token generated, URL shown | Technician form setup impossible |
-| Form Link tab: regenerate token | New token generated, old URL becomes invalid | Cannot rotate compromised token |
-| Danger zone: delete account requires confirmation | Destructive action gated | Accidental deletion |
+| Feature Detail | Complexity | Notes |
+|---------------|------------|-------|
+| Two-tier comparison (Basic vs Advanced) with feature differentiation | Low | Table or card layout |
+| Review add-on call-out | Low | Upsell positioned as complementary |
+| Single primary CTA per tier ("Book a Call" or "Get Started") | Low | Consistent with existing Calendly CTA pattern |
+| Mobile-responsive layout | Low | Existing design system |
+| No signup wall — CTA goes to booking or contact | Low | Reduces friction |
 
 ---
 
 ## Differentiators
 
-These merit thorough testing because they are new or complex enough that bugs would be hard to
-catch without explicit verification.
+Features that would make this agency platform stand out from competitors and justify the
+$199–$299/month price point to skeptical home service business owners.
 
-### Category J: Multi-Business and Agency Workflow
+### Client Dashboard with Website Health Indicators
 
-**Why differentiator:** The entire v3.0 milestone built this. Correctness of business switching
-and data isolation under multi-business conditions is non-trivial.
+**Value proposition:** Instead of a bare ticket list, show the client a lightweight overview:
+"Your website has been live for X days, Y revision requests fulfilled, next billing date Z."
+This makes the subscription feel active and managed rather than dormant.
 
-| Test Scenario | What We Are Verifying | Priority |
-|---------------|----------------------|----------|
-| Create second business via "Add Business" wizard | Insert-only path, new business independent of first | HIGH |
-| Business switcher dropdown shows all businesses | `getUserBusinesses()` fetches correctly | HIGH |
-| Switching businesses changes all page data | Cookie set, revalidatePath clears caches, next load shows correct business data | HIGH |
-| Campaigns page after switch shows new business's campaigns | Not cached from old business | HIGH |
-| Jobs page after switch shows new business's jobs | Same as above | HIGH |
-| Dashboard KPIs reflect switched business | Metrics scoped to new businessId | HIGH |
-| Businesses (clients) page shows all user businesses | Card grid lists all, not just active | MEDIUM |
-| Business detail drawer loads and saves metadata | Agency metadata columns persist | MEDIUM |
-| Notes auto-save in drawer | Debounced save works | MEDIUM |
-| GBP access toggle saves | Boolean column updated | MEDIUM |
-| Reviews gained calculation correct | `current - start` computed correctly | MEDIUM |
-| "Switch to Business" from drawer activates and redirects | Same as switcher dropdown but from different entry point | MEDIUM |
-| Onboarding ?mode=new bypass for additional businesses | Does not redirect completed-onboarding users away | HIGH |
-| Multi-business billing pooled correctly | Switching businesses does not reset the pool count | HIGH |
+**Complexity:** Medium
+**Why differentiating:** Most agencies at this price point send PDF reports or nothing. An
+always-current mini-dashboard creates stickiness and reduces cancellations.
+
+| Feature Detail | Complexity |
+|---------------|------------|
+| Days active counter | Low |
+| Revisions fulfilled this month / total | Low |
+| Current plan name and next reset date | Low |
+| Website URL with one-click visit | Low |
+| AI-generated monthly summary ("This month we completed X changes including...") | High — defer |
 
 ---
 
-### Category K: Campaign Management
+### Before/After or Change Log Visibility
 
-**Why differentiator:** Campaigns are the automation engine. Pause/resume with frozen enrollment
-preservation is complex state management.
+**Value proposition:** When a revision is marked complete, show what changed (text description,
+optionally a before screenshot). Home service clients often forget what they asked for. Showing
+completed work builds perceived value.
 
-| Test Scenario | What We Are Verifying | Priority |
-|---------------|----------------------|----------|
-| Create campaign from preset | Campaign + default touches created | HIGH |
-| Create campaign with custom service type targeting | Unique constraint enforced per service type per business | HIGH |
-| Edit campaign touches (channel, delay, template) | Saved correctly, shows in editor | HIGH |
-| Duplicate service type campaign rejected | 23505 error surfaced as user message | MEDIUM |
-| Pause campaign → active enrollments frozen | All active enrollments get status='frozen' | HIGH |
-| Resume campaign → frozen enrollments restored to active | Touch times recalculated, enrollment continues | HIGH |
-| Delete campaign with active enrollments shows warning | User informed, chooses to reassign or delete | HIGH |
-| Template preview modal shows correct content | Template body and subject rendered | MEDIUM |
-| One-off campaign option on job | `campaign_override='one_off'` skips enrollment | MEDIUM |
-| Campaign analytics show send counts | Touch-level stats rendered | LOW |
+**Complexity:** Medium (screenshots) / Low (text-only change log)
+
+**Recommendation:** Text-only change log first. Screenshots are a nice-to-have that requires
+file storage, comparison UI, and screenshot tooling — not worth the cost for V1.
 
 ---
 
-### Category L: Dashboard
+### "Request a New Page" Upsell Path
 
-**Why differentiator:** Dashboard is the first thing users see. Broken KPIs or wrong data erode
-trust immediately.
+**Value proposition:** When a client on the Basic plan (1–4 pages) wants a 5th page, surface
+an in-portal prompt: "This would exceed your current plan. Upgrade to Advanced or purchase a
+page add-on." This turns scope creep into revenue.
 
-| Test Scenario | What We Are Verifying | Priority |
-|---------------|----------------------|----------|
-| KPI cards render with correct values | Reviews, rating, conversion, requests sent, active sequences | HIGH |
-| Sparklines show 14-day history | SVG renders, data points present | MEDIUM |
-| Ready-to-Enroll queue shows correct jobs | Jobs completed but not enrolled, sorted by completion time | HIGH |
-| Attention alerts appear for conflicts | Jobs with enrollment_resolution='conflict' surfaced | HIGH |
-| Attention alert dismiss persists | Alert does not reappear on reload | MEDIUM |
-| Recent activity feed shows correct events | Campaign events ordered by recency | MEDIUM |
-| Mobile layout renders correctly | Two-column collapses to single, bottom sheet opens | MEDIUM |
-| WelcomeCard shown to new users, hidden after setup | First-run experience triggers and dismisses | LOW |
-| Dashboard scoped to active business | Switching business changes all KPIs | HIGH |
-| Empty state (zero jobs/enrollments) renders cleanly | No null reference crashes | HIGH |
+**Complexity:** Low
+**Why differentiating:** Most agencies handle scope creep via email, which creates awkward
+negotiation. An in-product upgrade prompt is cleaner and captures revenue automatically.
 
 ---
 
-### Category M: Feedback Resolution Workflow
+### Review Add-On Upsell in Portal
 
-**Why differentiator:** Feedback resolution is the follow-up loop for unhappy customers. If the
-resolution state does not persist, owners re-see resolved issues.
+**Value proposition:** The existing AvisLoop review automation is a natural upsell. In the
+client portal, display a section: "Get more Google reviews on autopilot — add Review
+Automation for $99/mo." Clients who are already trusting you with their website are warm leads
+for the review product.
 
-| Test Scenario | What We Are Verifying | Priority |
-|---------------|----------------------|----------|
-| Feedback page lists submitted feedback | Feedback records rendered | HIGH |
-| Resolve feedback marks as resolved | `resolved_at` + `resolved_by` set | HIGH |
-| Resolved feedback hidden by default | Filter shows unresolved by default | MEDIUM |
-| Internal notes on feedback saved | `internal_notes` field persists | MEDIUM |
-| Feedback scoped to active business | Switching business shows correct feedback | HIGH |
-| Empty state shown when no feedback | Not a crash or blank page | LOW |
+**Complexity:** Low — display only, links to operator contact or Stripe checkout
+**Why differentiating:** No competitor in the home-services-website-agency space bundles
+website management with review automation.
 
 ---
 
-### Category N: Analytics
+### Operator "All Clients" KPI View
 
-**Why differentiator:** Analytics surfaces the value story to owners. Wrong numbers break trust.
+**Value proposition:** The existing businesses page already shows client cards. Extending it
+with web-design-specific KPIs (active plan, tickets used this month, website age, churn risk
+signal) gives the solo operator a one-screen health check across all clients.
 
-| Test Scenario | What We Are Verifying | Priority |
-|---------------|----------------------|----------|
-| Analytics page loads | Renders without crash | HIGH |
-| Metrics reflect actual send data | Numbers derived from send_logs, not hardcoded | HIGH |
-| Service type breakdown table shows all enabled types | Rows present for each service | MEDIUM |
-| Date range filter affects metrics | Changing range updates numbers | MEDIUM |
-| Empty analytics state (new business) | Zero values shown cleanly, no crash | HIGH |
-| Analytics scoped to active business | Switching business changes metrics | HIGH |
+**Complexity:** Medium
+**Depends on:** BusinessDetailDrawer already exists; this extends the metadata model with
+web-agency-specific columns.
 
 ---
 
-### Category O: Customers Page (Settings Escape Hatch)
+### Home Services Niche Positioning on Landing Page
 
-**Why differentiator:** Customers is now in Settings (V2 de-emphasis) but still must function
-for edge cases. The page is intentionally deprioritized but cannot be broken.
+**Value proposition:** Generic web design agencies charge $3,000–$15,000 upfront. AvisLoop's
+agency model offers $199/month with ongoing maintenance, no upfront cost, no technical
+knowledge required. Positioning this explicitly for HVAC, plumbing, electrical, roofing,
+painting, handyman businesses (the same service types already in the platform) makes the
+targeting crisp.
 
-| Test Scenario | What We Are Verifying | Priority |
-|---------------|----------------------|----------|
-| Customers page lists records | Table renders, pagination works | HIGH |
-| Search by name and email works | Filter narrows results | MEDIUM |
-| Add customer manually | Customer created, appears in table | MEDIUM |
-| Edit customer (name, email, phone) | Edits persist | MEDIUM |
-| Archive customer | Status set to 'archived', hidden from default view | MEDIUM |
-| SMS consent status display and update | Correct color coding per status | LOW |
-| Customer detail drawer loads | All fields shown, notes auto-save | MEDIUM |
-| Customers scoped to active business | Switching shows correct customers | HIGH |
+**Research finding (MEDIUM confidence, from web searches):** Specialized agencies for home
+services (Blue Corona, iMarket Solutions, Sixth City Marketing) charge $3,000–$10,000+ per
+site with separate maintenance retainers. AvisLoop's subscription model undercuts dramatically
+while bundling maintenance. This is a genuine positioning gap.
+
+**What the landing page needs (based on conversion research):**
+1. Niche-specific headline: name the target customer ("For HVAC, Plumbing & Electrical Companies")
+2. Social proof from home service clients specifically (not generic agency testimonials)
+3. Before/after: low-quality or no website → professional site
+4. Price anchor: compare subscription to one-time agency cost
+5. Trust signals: how many sites built, service areas, operator background
+6. Single CTA: "Book a Free Strategy Call" (Calendly, existing pattern)
+7. FAQ section addressing home service owner objections ("Do I need to manage it?", "What if I need changes?")
+
+**Complexity:** Medium (content-heavy, not technically complex)
 
 ---
 
-### Category P: Onboarding Flow
+### Revision Request with Visual Annotation (Future)
 
-**Why differentiator:** Onboarding is the first experience for real users. A crash here means
-no revenue. Two distinct flows (first business, additional business) both need verification.
+**Value proposition:** Instead of clients describing changes in text ("move the phone number up
+a bit"), let them annotate a screenshot of their live website. This is the pattern used by
+ManyRequests and professional design platforms.
 
-| Test Scenario | What We Are Verifying | Priority |
-|---------------|----------------------|----------|
-| Complete first-business onboarding (all 4 steps) | Business + campaign + SMS consent saved | HIGH |
-| Skip optional steps (CRM platform, review link) | Onboarding completes with defaults | HIGH |
-| Onboarding draft persisted in localStorage | Refresh mid-onboarding restores state | MEDIUM |
-| Completed onboarding redirects to dashboard | Not stuck in loop | HIGH |
-| `/onboarding` redirects away if business already exists | No re-onboarding | HIGH |
-| `/onboarding?mode=new` allows creating second business | Bypass redirect guard works | HIGH |
-| Create additional business (3-step wizard) | Business created, becomes active, redirects | HIGH |
-| Campaign preset selection creates campaign with touches | Gentle/Standard/Aggressive all create different touch sequences | MEDIUM |
-| SMS consent checkbox required | Cannot complete without accepting | MEDIUM |
+**Complexity:** High — requires screenshot capture, annotation canvas, file storage
+**Recommendation:** Deliberately exclude from V1. Text descriptions + file uploads are sufficient
+for 1–4 page simple sites. Annotation tools add significant build cost and rarely matter for
+the target audience (home service business owners are not design-literate enough to use them
+effectively).
 
 ---
 
 ## Anti-Features
 
-Things deliberately excluded from this audit milestone.
+Features to deliberately NOT build. Common mistakes in this domain.
 
-| Item | Why Excluded | What Happens Instead |
-|------|-------------|---------------------|
-| **Cron job end-to-end execution** | Requires production Vercel cron schedule or manual trigger; timing-dependent | Document cron endpoint auth test in Phase K of findings |
-| **Email delivery confirmation** | Requires live Resend API with real addresses; not testable without external dependency | Verify send_log records and status transitions; note as untestable in findings |
-| **SMS delivery** | Twilio A2P pending; blocked on external approval | Document as known blocker; test SMS action logic only |
-| **Stripe payment processing** | Requires live Stripe keys; not auditable in isolation | Test webhook handler logic; note Stripe test-mode as prerequisite |
-| **Google OAuth in isolation** | OAuth flow requires Supabase redirect URI configured for production domain | Test on staging with correct redirect URI; note as domain-dependent |
-| **Marketing / public pages** | Explicitly out of scope per milestone context | Separate marketing QA pass if needed |
-| **Performance/load testing** | No user load to measure; single-user SaaS currently | Flag as future milestone after first real users |
-| **Twilio webhook verification** | Phase 21-08 blocked on A2P approval | Document blocker, test signature validation logic only |
-| **AI personalization quality** | Subjective; depends on OpenAI/Anthropic API availability | Verify personalization toggle setting saves; note as integration dependency |
-| **Dark mode exhaustive audit** | Cosmetic; low deployment risk | Spot-check only during other category walkthroughs |
-| **Accessibility WCAG AA compliance** | Extensive; not a pre-production blocker | Carry UX Audit findings forward as backlog items |
-| **Cross-browser compatibility beyond Chrome** | Narrowed scope for first deploy | Firefox/Safari spot-check only |
-| **Building a persistent test suite** | This milestone produces a findings report, not Playwright test files | A future "test suite" milestone is a separate body of work |
+### Full Project Management (Kanban Boards, Milestones, Gantt Charts)
+
+**Why avoid:** Tools like SuiteDash, Teamwork, and ClickUp offer complete project management.
+Building toward them means competing with established products that have years of development.
+The target client (HVAC owner) does not want to learn a Kanban board. They want to type what
+they need changed and have it happen.
+
+**What to do instead:** Three-status ticket system (submitted, in progress, done). That is the
+full state machine needed for this use case.
+
+---
+
+### Client Account Creation / Login System
+
+**Why avoid:** Requiring clients to create a password, remember credentials, and go through
+email verification adds friction that will cause adoption failure. Home service business owners
+are not SaaS users. Token-based magic link URLs are the correct pattern.
+
+**What to do instead:** Token-secured `/portal/[token]` URL, sent to client via email. No
+account creation. Pattern already proven in codebase with `/complete/[token]`.
+
+---
+
+### White-Label Client Portal (Client Branding Their Own Portal)
+
+**Why avoid:** At $199–$299/month with a solo operator, building white-labeling means building
+a meta-product for agencies-building-for-agencies. The operator IS the agency. The portal
+should be branded as AvisLoop (or the operator's agency name) — not per-client branding.
+
+**What to do instead:** Single consistent portal brand with client name displayed prominently.
+Client sees "Your website managed by [Agency Name]" not a fully custom-branded experience.
+
+---
+
+### Real-Time Chat / Live Support Inside Portal
+
+**Why avoid:** Live chat requires the operator to be available, creates response time
+expectations, and adds infrastructure (WebSockets or third-party chat widget). At solo-operator
+scale, async ticket submission is sufficient and realistic.
+
+**What to do instead:** After ticket submission, notify the operator via email. Operator
+responds by updating ticket status and adding completion notes. This is the correct async
+pattern.
+
+---
+
+### Automated Website Change Deployment
+
+**Why avoid:** Automatically deploying website changes based on ticket submissions would
+require deep integration with whatever CMS/hosting platform the client's site lives on
+(Webflow, Squarespace, WordPress, etc.). The operator handles implementation manually; this
+tool tracks that coordination, it does not replace it.
+
+**What to do instead:** The tool is a coordination layer. The operator does the work in their
+preferred tools; they log the outcome in AvisLoop.
+
+---
+
+### Invoice Generation and Payment Collection Per Ticket
+
+**Why avoid:** Subscription billing (Stripe) already handles recurring charges. Per-ticket
+invoicing adds complexity that conflicts with the "flat monthly fee" mental model. It signals
+to clients that every interaction will cost extra, creating hesitation to submit legitimate
+requests.
+
+**What to do instead:** Monthly subscription covers the included tickets. Scope expansion
+(new pages, etc.) is handled via Stripe plan upgrade or direct conversation. No per-ticket
+billing.
+
+---
+
+### CMS Editor for Clients to Edit Their Own Website
+
+**Why avoid:** If clients can edit their own website, they no longer need the managed service.
+The managed service value is "you don't have to touch it." Adding a client-facing editor
+creates support burden when clients break things, and undercuts the subscription model.
+
+**What to do instead:** Client submits revision requests. Operator implements. This is the
+correct division of responsibility.
 
 ---
 
 ## Feature Dependencies
 
-Understanding which categories block others matters for audit ordering.
+Dependencies on existing AvisLoop features:
 
 ```
-[Auth: Category A] — must pass first
-  └── [Multi-Tenant Isolation: Category B] — requires two test accounts
-  └── [All dashboard categories] — require logged-in session
+[Client portal URL generation]
+  └── Depends on: form_token pattern in /complete/[token] — fully built, reusable
 
-[Job completion workflow: Category C] — prerequisite for:
-  └── [Conflict handling: Category D] — requires active enrollment to conflict against
-  └── [History: Category G] — requires send_logs records
-  └── [Dashboard KPIs: Category L] — requires jobs and enrollments
-  └── [Campaign enrollment: Category K] — exercise enrollment from multiple angles
+[Monthly ticket reset]
+  └── Depends on: Stripe billing webhooks already integrated (subscription events)
+  └── OR: Simple cron job pattern — already established in codebase
 
-[Settings form token: Category I] — prerequisite for:
-  └── [Public job completion form: Category F] — token must exist to test form
+[Client ticket submission form]
+  └── Depends on: Supabase Storage for file attachments (may need enabling/configuring)
+  └── Reuses: existing form components, validation patterns
 
-[Review funnel: Category E] — standalone, but:
-  └── Requires a send_log with a review token to have been generated
-  └── OR a manually constructed token via lib/review/token.ts test helper
+[Operator ticket management view]
+  └── Depends on: existing businesses page and BusinessDetailDrawer
+  └── Extends: agency metadata model (new columns needed: plan_tier, tickets_per_month, etc.)
 
-[Multi-business: Category J] — prerequisite for:
-  └── Verifying all other categories scope correctly after business switch
+[Review add-on upsell in client portal]
+  └── Depends on: existing campaign/review automation system (fully built)
+  └── New: display-only upsell surface in portal
+
+[Pricing page for agency]
+  └── Depends on: existing marketing page infrastructure (Next.js App Router, existing components)
+  └── Complements: existing Calendly CTA pattern (already implemented)
+
+[Stripe enforcement for web design tiers]
+  └── Depends on: existing Stripe integration and billing tier system
+  └── New: separate product/price IDs for web design plans vs review-only plans
 ```
 
 ---
 
-## Suggested Audit Ordering
+## MVP Recommendation
 
-1. **Category A** — Auth (get a working session)
-2. **Category B** — Tenant isolation (set up two test accounts, verify data walls)
-3. **Category I** — Settings (generate form token, set up business correctly before other tests)
-4. **Category P** — Onboarding (both first-business and additional-business flows)
-5. **Category C** — Core job workflow (plant seed for all downstream tests)
-6. **Category D** — Conflict handling (run repeat-customer scenarios)
-7. **Category E** — Review funnel (verify the money path)
-8. **Category F** — Public completion form (verify technician tool)
-9. **Category K** — Campaigns (pause/resume, conflict, management)
-10. **Category L** — Dashboard (verify KPIs reflect all the above)
-11. **Category G** — History (verify send records and bulk actions)
-12. **Category H** — Billing (pooled counts, limit enforcement)
-13. **Category J** — Multi-business switching (run all critical paths again under switched business)
-14. **Category M** — Feedback resolution
-15. **Category N** — Analytics
-16. **Category O** — Customers page
+For the first deployable version of the web design agency features, prioritize:
+
+1. **Client portal with token auth** — the `/portal/[token]` URL that clients receive
+2. **Revision ticket submission** — structured form, file attachment optional for V1
+3. **Ticket status tracking** — three states, visible to both client and operator
+4. **Monthly ticket counter** — "X of Y revisions remaining" with enforcement
+5. **Operator ticket management** — list view across all clients, status updates
+6. **Web design plan tier columns** — extend the businesses table for `web_plan_tier`, `tickets_per_month`, `tickets_used_this_month`
+
+Defer to post-MVP:
+
+- **Before/after change log with screenshots** — text-only change log is sufficient for V1
+- **"Request a new page" upgrade prompt** — nice-to-have, not blocking
+- **AI monthly summary** — high complexity, low V1 value
+- **Operator all-clients KPI view expansion** — the existing businesses page is adequate for tracking
+
+The landing page for the agency itself is a marketing concern, not a product feature —
+it should be designed as a standalone marketing page (or a new section of the existing
+marketing site) and is lower engineering priority than the core client portal experience.
 
 ---
 
 ## Confidence Assessment
 
-| Category | Confidence | Basis |
-|----------|-----------|-------|
-| Auth (A) | HIGH | Supabase standard auth; middleware verified in code |
-| Tenant Isolation (B) | MEDIUM | RLS verified in DATA_MODEL.md; runtime behavior needs manual verification |
-| Core V2 Workflow (C) | HIGH | `createJob`, `markJobComplete`, `enrollJobInCampaign` all reviewed in code |
-| Conflict Handling (D) | MEDIUM | Logic is complex state machine; needs exercise to verify all branches |
-| Review Funnel (E) | HIGH | HMAC token, routing logic, enrollment stop all reviewed in code |
-| Public Form (F) | HIGH | `createPublicJob` and token resolution fully reviewed; Phase 58 deliverable |
-| History (G) | HIGH | Standard CRUD + filter patterns; straightforward to verify |
-| Billing (H) | MEDIUM | Pooled usage logic reviewed; Stripe webhook untestable without live keys |
-| Settings (I) | HIGH | Standard form patterns; tabs reviewed; token generation reviewed |
-| Multi-Business (J) | MEDIUM | Cookie resolver reviewed; runtime behavior after switching needs verification |
-| Campaigns (K) | MEDIUM | Pause/resume frozen enrollment logic is complex; needs end-to-end exercise |
-| Dashboard (L) | MEDIUM | KPI queries reviewed; sparkline data depends on real records |
-| Feedback (M) | HIGH | Straightforward resolution flow |
-| Analytics (N) | MEDIUM | Depends on underlying data being correct |
-| Customers (O) | HIGH | Standard CRUD; well-tested pattern from prior audits |
-| Onboarding (P) | HIGH | Both flows reviewed in code; wizard state machine is well-understood |
+| Area | Confidence | Source Basis |
+|------|------------|-------------|
+| Client portal table stakes | HIGH | Multiple portal platforms (ManyRequests, SPP.co/Wayfront, AgencyHandy) converge on same feature set |
+| Revision ticket UX patterns | HIGH | Toggl research, ManyRequests documentation, general agency tooling research |
+| Monthly limit enforcement pattern | MEDIUM | Inferred from ManyRequests "limit total tasks" feature; no direct documentation of exact UX |
+| Anti-features rationale | HIGH | Based on target customer profile (non-technical home service owners) + solo operator constraints |
+| Home services landing page needs | MEDIUM | Web search results on home services agency websites + general conversion research |
+| Pricing tier market positioning | MEDIUM | Market research via web search; $199–$299 is plausible based on market data but unverified against direct competitors |
 
 ---
 
-## Known Audit Risks
+## Sources
 
-Items that require extra scrutiny during the audit because they are new, complex, or have known
-edge cases.
-
-**1. Service-role bypass in public endpoints**
-`/complete/[token]` and `/r/[token]` use service-role client which bypasses RLS. Every query
-in these files must include explicit `business_id` or `customer_id` scoping. This was
-implemented correctly but is a high-risk pattern that warrants manual code inspection during
-the audit alongside functional testing.
-
-**2. Business switching cache invalidation**
-`switchBusiness()` calls `revalidatePath('/')` which should invalidate all cached server
-component data. Verify that after switching, stale data from the previous business does not
-appear. Test by switching quickly and checking if server component data refreshes.
-
-**3. Pooled billing count across businesses**
-`getPooledMonthlyUsage()` aggregates across all businesses owned by the user, not just the
-active one. The billing page UI must display this correctly and the enforcement must not use the
-per-business count by mistake. Verify by creating a second business and sending from both.
-
-**4. Enrollment conflict state machine completeness**
-The `enrollment_resolution` column drives conflict UI in the dashboard. There are 6 possible
-values (NULL, conflict, queue_after, skipped, suppressed, replace_on_complete). Verify all
-transitions are reachable and correctly surfaced in the UI. The cron `resolve-enrollment-conflicts`
-endpoint auto-resolves stale conflicts after 24h — document this behavior in findings.
-
-**5. HMAC review token expiry**
-Tokens expire after 30 days. Verify that the expiry check actually fires for an expired token
-(requires constructing a token with a backdated timestamp, or finding the token validation code
-and inspecting the expiry logic directly).
-
----
-
-*QA audit feature research for: Pre-Production Audit milestone*
-*Researched: 2026-02-27*
-*Confidence: HIGH — based on full codebase review + standard SaaS QA patterns*
-
----
-
-Sources consulted:
-- [SaaS Multi-Tenancy Architecture and Testing](https://www.qabash.com/saas-multi-tenancy-architecture-testing-2026/)
-- [SaaS Application Testing Best Practices](https://www.virtuosoqa.com/post/testing-saas-applications)
-- [Top Multi-Tenancy Testing Challenges](https://www.netsolutions.com/insights/multi-tenancy-testing-top-challenges-and-solutions/)
-- [Implementing Secure Multi-Tenancy: Developer Checklist](https://dzone.com/articles/secure-multi-tenancy-saas-developer-checklist)
+- [Top 10 Client Portal Software for Design Agencies](https://www.agencyhandy.com/client-portal-for-design-agencies/)
+- [Client Portal Best Practices 2025](https://www.agencyhandy.com/client-portal-best-practices/)
+- [ManyRequests — Design Subscription Services](https://www.manyrequests.com/use-cases/design-subscription-services)
+- [SPP.co / Wayfront Helpdesk Features](https://wayfront.com/features/helpdesk)
+- [Toggl — Managing Design Change Requests](https://toggl.com/blog/design-change-requests)
+- [Landing Page Best Practices 2025 — Fermat Commerce](https://www.fermatcommerce.com/post/landing-page-design)
+- [High-Converting Landing Pages — Shopify](https://www.shopify.com/blog/high-converting-landing-pages)
+- [Social Proof on Landing Pages — Landerlab](https://landerlab.io/blog/social-proof-examples)
+- [Web Design Pricing Guide 2025](https://knapsackcreative.com/blog/web-design/web-design-pricing)
+- [Home Services SEO — NextLeft](https://nextleft.com/blog/how-to-rank-1-the-complete-home-services-seo-guide-for-2025/)
+- [Home Services Website Must-Haves — Local SEO Guide](https://homecomfortmarketing.com/local-seo-home-service-businesses-2025/)
+- [Best CRM for Web Design Agencies](https://taskip.net/crm-for-web-design-agency/)
