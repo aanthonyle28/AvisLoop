@@ -119,7 +119,7 @@ export interface WebProject {
   updated_at: string
 }
 
-export type TicketStatus = 'open' | 'in_progress' | 'waiting_client' | 'resolved' | 'closed'
+export type TicketStatus = 'open' | 'in_progress' | 'waiting_client' | 'resolved' | 'closed' | 'submitted' | 'completed'
 export type TicketPriority = 'low' | 'normal' | 'high' | 'urgent'
 export type TicketSource = 'agency' | 'client_portal'
 
@@ -134,8 +134,10 @@ export interface ProjectTicket {
   source: TicketSource
   is_revision: boolean
   is_overage: boolean
+  overage_fee: number | null             // USD amount charged when is_overage = true (e.g. 50.00)
   resolved_at: string | null
   resolved_by: string | null              // UUID of auth.users
+  completed_at: string | null             // When status → completed
   internal_notes: string | null
   created_at: string
   updated_at: string
@@ -153,6 +155,18 @@ export interface TicketMessage {
   attachment_urls: string[] | null
   created_at: string
   // No updated_at: messages are append-only
+}
+
+/** ProjectTicket with its associated messages — used in TicketDetailDrawer */
+export interface TicketWithMessages {
+  ticket: ProjectTicket
+  messages: TicketMessage[]
+}
+
+/** ProjectTicket extended with project and business name — used in operator all-tickets view */
+export interface TicketWithContext extends ProjectTicket {
+  project: Pick<WebProject, 'id' | 'domain' | 'subscription_tier'>
+  business_name: string
 }
 
 // Message channel literal union
