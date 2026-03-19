@@ -66,6 +66,17 @@ export interface Business {
   // 'web_design' = web design CRM features only
   // 'both' = all features
   client_type: 'reputation' | 'web_design' | 'both'
+  // Web design client fields (DATA-02, added Phase 72)
+  // All nullable — only populated for web_design / both client_type
+  owner_name: string | null
+  owner_email: string | null
+  owner_phone: string | null
+  web_design_tier: 'basic' | 'advanced' | null
+  domain: string | null
+  vercel_project_url: string | null
+  live_website_url: string | null
+  // Client relationship status for web design clients
+  status: 'active' | 'paused' | 'churned' | null
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
