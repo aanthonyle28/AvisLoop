@@ -61,15 +61,15 @@ export default function MarketingLayout({
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/reputation">Reputation</Link>
               </Button>
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/client-portal">Client Portal</Link>
-              </Button>
             </div>
           </div>
 
-          {/* Right side: theme switcher, mobile nav, and auth/user menu */}
+          {/* Right side: client portal + CTA + theme + mobile nav */}
           <div className="flex items-center gap-3">
             <ThemeSwitcher />
+            <Button variant="outline" size="sm" asChild className="hidden sm:inline-flex">
+              <Link href="/client-portal">Client Portal</Link>
+            </Button>
             <Suspense fallback={
               <Button size="sm" asChild>
                 <Link href="/#pricing">Book a Call</Link>

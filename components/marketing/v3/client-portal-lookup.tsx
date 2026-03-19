@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { MagnifyingGlass, ArrowRight, SpinnerGap } from '@phosphor-icons/react'
+import { EnvelopeSimple, ArrowRight, SpinnerGap } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 
 interface LookupResult {
@@ -12,19 +12,23 @@ interface LookupResult {
 
 export function ClientPortalLookup() {
   const router = useRouter()
-  const [query, setQuery] = useState('')
+  const [email, setEmail] = useState('')
   const [results, setResults] = useState<LookupResult[]>([])
   const [searched, setSearched] = useState(false)
   const [loading, setLoading] = useState(false)
 
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault()
-    if (query.trim().length < 2) return
+    if (!email.trim() || !email.includes('@')) return
 
     setLoading(true)
     setSearched(false)
     try {
-      const res = await fetch(`/api/portal/lookup?q=${encodeURIComponent(query.trim())}`)
+      const res = await fetch('/api/portal/lookup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim() }),
+      })
       const data = await res.json() as { results: LookupResult[] }
       setResults(data.results)
       setSearched(true)
@@ -46,22 +50,22 @@ export function ClientPortalLookup() {
       {/* Search form */}
       <form onSubmit={handleSearch} className="space-y-3">
         <div className="relative">
-          <MagnifyingGlass
+          <EnvelopeSimple
             size={18}
             className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
           />
           <input
-            type="text"
-            value={query}
-            onChange={(e) => { setQuery(e.target.value); setSearched(false) }}
-            placeholder="Enter your business name..."
+            type="email"
+            value={email}
+            onChange={(e) => { setEmail(e.target.value); setSearched(false) }}
+            placeholder="Enter your email address..."
             className="w-full rounded-lg border border-input bg-background pl-10 pr-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
             autoFocus
           />
         </div>
         <Button
           type="submit"
-          disabled={loading || query.trim().length < 2}
+          disabled={loading || !email.includes('@')}
           className="w-full h-11"
         >
           {loading ? (
@@ -70,7 +74,7 @@ export function ClientPortalLookup() {
               Searching...
             </span>
           ) : (
-            'Find My Portal'
+            'Access Portal'
           )}
         </Button>
       </form>
@@ -79,14 +83,14 @@ export function ClientPortalLookup() {
       {searched && results.length === 0 && (
         <div className="rounded-lg border border-dashed border-muted-foreground/30 py-8 px-4 text-center">
           <p className="text-sm text-muted-foreground">
-            No business found matching &quot;{query}&quot;
+            No portal found for that email address.
           </p>
         </div>
       )}
 
       {searched && results.length > 1 && (
         <div className="space-y-2">
-          <p className="text-sm text-muted-foreground">Select your business:</p>
+          <p className="text-sm text-muted-foreground">Multiple projects found. Select one:</p>
           {results.map((result) => (
             <button
               key={result.portalPath}

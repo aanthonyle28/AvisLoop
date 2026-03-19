@@ -14,7 +14,7 @@ export default function ClientPortalPage() {
         <div className="text-center space-y-3">
           <h1 className="text-3xl font-bold tracking-tight">Client Portal</h1>
           <p className="text-muted-foreground">
-            Enter your business name to access your project portal.
+            Enter the email address associated with your account to access your project portal.
           </p>
         </div>
 
