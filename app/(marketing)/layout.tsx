@@ -1,13 +1,20 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { Button } from "@/components/ui/button";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { UserMenu } from "@/components/marketing/user-menu";
-import { MobileNav } from "@/components/marketing/mobile-nav";
-import { LogoMark } from "@/components/ui/logomark";
+import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { createClient } from "@/lib/supabase/server";
 
-async function AuthButtons() {
+const ACCENT = 'hsl(21 58% 53%)';
+
+const FOOTER_LINKS = [
+  { label: 'Privacy', href: '/privacy' },
+  { label: 'Terms', href: '/terms' },
+  { label: 'Reputation', href: '/reputation' },
+  { label: 'Client Portal', href: '/client-portal' },
+];
+
+async function AuthSlot() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -20,12 +27,35 @@ async function AuthButtons() {
       }
     : null;
 
-  return userMenuData ? (
-    <UserMenu user={userMenuData} />
-  ) : (
-    <Button size="sm" asChild>
-      <Link href="/#pricing">Book a Call</Link>
-    </Button>
+  if (userMenuData) {
+    return (
+      <div className="flex items-center gap-2">
+        <ThemeSwitcher />
+        <UserMenu user={userMenuData} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <ThemeSwitcher />
+      <Link
+        href="/#pricing"
+        className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-5 py-2 text-sm font-medium hover:bg-foreground/90 transition-colors"
+      >
+        Book a Call
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          fill="currentColor"
+          viewBox="0 0 256 256"
+          aria-hidden="true"
+        >
+          <path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z" />
+        </svg>
+      </Link>
+    </div>
   );
 }
 
@@ -36,163 +66,50 @@ export default function MarketingLayout({
 }) {
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navbar */}
-      <nav className="sticky top-0 z-50 w-full border-b border-border/30 bg-background/80 backdrop-blur-lg supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto max-w-6xl flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-          {/* Logo and nav links */}
-          <div className="flex items-center gap-8">
-            <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-              <LogoMark className="w-7 h-7 text-accent" />
-              <span>AvisLoop</span>
-            </Link>
-            <div className="hidden md:flex items-center gap-1">
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/#services">Services</Link>
-              </Button>
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/#process">How It Works</Link>
-              </Button>
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/#pricing">Pricing</Link>
-              </Button>
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/#faq">FAQ</Link>
-              </Button>
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/reputation">Reputation</Link>
-              </Button>
-            </div>
-          </div>
+      {/* Navbar — V4 style: transparent → frosted glass on scroll */}
+      <MarketingNav
+        authSlot={
+          <Suspense
+            fallback={
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8" />
+              </div>
+            }
+          >
+            <AuthSlot />
+          </Suspense>
+        }
+      />
 
-          {/* Right side: client portal + CTA + theme + mobile nav */}
-          <div className="flex items-center gap-3">
-            <ThemeSwitcher />
-            <Button variant="outline" size="sm" asChild className="hidden sm:inline-flex">
-              <Link href="/client-portal">Client Portal</Link>
-            </Button>
-            <Suspense fallback={
-              <Button size="sm" asChild>
-                <Link href="/#pricing">Book a Call</Link>
-              </Button>
-            }>
-              <AuthButtons />
-            </Suspense>
-            <MobileNav />
-          </div>
-        </div>
-      </nav>
+      {/* Spacer for fixed nav */}
+      <div className="h-16" />
 
       {/* Main content */}
       <main className="flex-1">{children}</main>
 
-      {/* Footer */}
-      <footer className="border-t border-border/40 bg-muted/50">
-        <div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
-            {/* Company info */}
-            <div className="col-span-2 md:col-span-1">
-              <Link href="/" className="flex items-center gap-2 font-bold text-lg mb-4">
-                <LogoMark className="w-6 h-6 text-accent" />
-                <span>AvisLoop</span>
-              </Link>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Professional websites and reputation management for HVAC, plumbing, electrical, and home service businesses.
-              </p>
-            </div>
-
-            {/* Product links */}
-            <div>
-              <h3 className="font-semibold mb-4">Service</h3>
-              <ul className="space-y-3 text-sm">
-                <li>
-                  <Link
-                    href="/#services"
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    What We Do
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/#process"
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    How It Works
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/#pricing"
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    Pricing
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/#faq"
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    FAQ
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/reputation"
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    Review Service
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Company links */}
-            <div>
-              <h3 className="font-semibold mb-4">Company</h3>
-              <ul className="space-y-3 text-sm">
-                <li>
-                  <Link
-                    href="/#pricing"
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    Book a Call
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Legal links */}
-            <div>
-              <h3 className="font-semibold mb-4">Legal</h3>
-              <ul className="space-y-3 text-sm">
-                <li>
-                  <Link
-                    href="/privacy"
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    Privacy Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/terms"
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    Terms of Service
-                  </Link>
-                </li>
-              </ul>
-            </div>
+      {/* Footer — V4 minimal single-row */}
+      <footer className="border-t border-border/20 py-12">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-2.5">
+            <svg viewBox="0 0 28 28" fill="none" className="w-5 h-5" aria-hidden="true">
+              <path
+                d="M13.9614 13.9428C13.9614 13.9428 15.6661 8.28761 13.1687 5.6657C9.39938 1.70861 2.46616 5.36825 1.25864 10.7178C1.06397 11.5803 0.964999 12.4675 1.01126 13.3511C1.39358 20.6533 9.24432 25.3666 16.2932 23.6446C17.7686 23.2841 19.1513 22.7512 20.2657 21.9762C27.8097 16.7301 26.9724 8.28761 26.9724 8.28761"
+                stroke={ACCENT}
+                strokeWidth="2"
+              />
+            </svg>
+            <span className="text-sm text-muted-foreground/60">&copy; 2026 AvisLoop</span>
           </div>
-
-          <div className="mt-12 pt-8 border-t border-border/40 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-muted-foreground">
-              &copy; 2026 AvisLoop. All rights reserved.
-            </p>
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <span>Web design and reputation management for home service businesses</span>
-            </div>
+          <div className="flex gap-6 text-sm text-muted-foreground/40">
+            {FOOTER_LINKS.map((l) => (
+              <Link
+                key={l.label}
+                href={l.href}
+                className="hover:text-foreground transition-colors"
+              >
+                {l.label}
+              </Link>
+            ))}
           </div>
         </div>
       </footer>
