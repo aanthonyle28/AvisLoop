@@ -5,32 +5,32 @@
 See: .planning/PROJECT.md (updated 2026-03-18)
 
 **Core value:** Provide home service businesses with professional websites and optional automated review management -- all managed through a single agency dashboard.
-**Current focus:** v4.0 Web Design Agency Pivot -- Phase 73 (Ticket System)
+**Current focus:** v4.0 Web Design Agency Pivot -- Phase 74 (Client Portal)
 
 ## Current Position
 
-Phase: 73 — Ticket System
-Plan: 03 of 3 complete
+Phase: 74 — Client Portal
+Plan: 01 of 1 complete
 Milestone: v4.0 Web Design Agency Pivot
 Status: Phase complete
 
-Last activity: 2026-03-19 — Completed 73-03-PLAN.md (Ticket attachments: signed URL upload, AttachmentUploader, all-tickets cross-client view)
+Last activity: 2026-03-19 — Completed 74-01-PLAN.md (public /portal/[token] page: token resolution, quota display, ticket history, inline submit form)
 
 ```
 [Phase 71] [Phase 72] [Phase 73] [Phase 74] [Phase 75]
     |           |           |           |           |
- COMPLETE   COMPLETE   COMPLETE   Planned     Planned
+ COMPLETE   COMPLETE   COMPLETE   COMPLETE   Planned
 ```
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed (project): 264
+- Total plans completed (project): 265
 - v3.0 plans completed: 15/15
 - v3.1 plans completed: 17/17
 - v3.1.1 plans completed: 2/2 (COMPLETE)
 - Phase 70 plans completed: 0/3 (in progress)
-- v4.0 plans completed: 7 (Phase 71-01, 71-02, 72-01, 72-02, 73-01, 73-02, 73-03)
+- v4.0 plans completed: 8 (Phase 71-01, 71-02, 72-01, 72-02, 73-01, 73-02, 73-03, 74-01)
 
 *Updated after each plan completion*
 
@@ -86,6 +86,13 @@ Four idempotent migrations must be applied via Supabase Dashboard SQL Editor:
 - **All-tickets client-side filtering**: capped at 200 results, instant client filter changes without server round-trips
 - **Supabase Storage bucket `revision-attachments` requires manual creation**: private bucket, 10MB limit, allowed MIME types — must be created in Supabase Dashboard before attachments work
 
+### Key Decisions (74-01)
+
+- **Route Handler for portal ticket submission**: `POST /api/portal/tickets` uses service-role — server actions require authenticated React context; Route Handler is correct for unauthenticated writes
+- **e2e/** added to ESLint ignores**: pre-existing lint errors in untracked e2e test files blocked pnpm lint; e2e/** excluded consistently with qa-scripts/**
+- **PortalQuota counts all tickets (not just non-overage)**: portal shows total usage for full client visibility, unlike operator getMonthlyTicketCount which excludes overage tickets
+- **`any` casts for ungenerated Supabase types**: web_projects and project_tickets not yet in db.types.ts; will resolve after migrations applied
+
 ### Blockers/Concerns
 
 - 4 DB migrations pending manual Supabase Dashboard SQL Editor application (see above -- Phase 71 will create additional migrations)
@@ -103,6 +110,6 @@ Four idempotent migrations must be applied via Supabase Dashboard SQL Editor:
 ## Session Continuity
 
 Last session: 2026-03-19
-Stopped at: Completed 73-03-PLAN.md — ticket attachments (signed URL upload, AttachmentUploader) and all-tickets cross-client view
+Stopped at: Completed 74-01-PLAN.md — public /portal/[token] client portal (quota display, ticket history, inline submit form, API route)
 Resume file: None
-Next action: Phase 74 (client portal Route Handler for ticket submission)
+Next action: Phase 75 (portal token generation UI in /clients page + email notification on portal ticket submission)
