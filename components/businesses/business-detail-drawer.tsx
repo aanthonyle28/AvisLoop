@@ -228,7 +228,10 @@ export function BusinessDetailDrawer({
               )}
               {!isEditing && business.client_type === 'reputation' && (
                 <p className='text-xs text-muted-foreground mt-2'>
-                  Want to add web design? Edit Details → change type to &quot;Both&quot;, then add a web project from the detail view.
+                  Want to add web design? Edit Details → change type to &quot;Both&quot;, save, then set up the web project via{' '}
+                  <Link href={`/onboarding?mode=web-design-setup&businessId=${business.id}`} className='text-primary underline'>
+                    Web Design Setup
+                  </Link>
                 </p>
               )}
             </div>

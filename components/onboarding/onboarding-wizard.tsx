@@ -8,6 +8,7 @@ import { OnboardingSteps } from './onboarding-steps'
 import { markOnboardingComplete } from '@/lib/actions/onboarding'
 import type { OnboardingBusiness } from '@/lib/types/onboarding'
 import type { CampaignWithTouches } from '@/lib/types/database'
+import { X } from '@phosphor-icons/react'
 
 // Schema for localStorage draft data validation (SEC-04)
 // Using safeParse instead of catch for Zod 4 compatibility
@@ -22,9 +23,8 @@ type StepConfig = {
 const STEPS: StepConfig[] = [
   { id: 1, title: 'Business Setup', skippable: false },
   { id: 2, title: 'Campaign Preset', skippable: false },
-  { id: 3, title: 'CRM Platform', skippable: true },
-  { id: 4, title: 'Brand Voice', skippable: true },
-  { id: 5, title: 'SMS Consent', skippable: false },
+  { id: 3, title: 'Brand Voice', skippable: true },
+  { id: 4, title: 'SMS Consent', skippable: false },
 ]
 
 const STORAGE_KEY = 'onboarding-draft-v4'
@@ -125,8 +125,27 @@ export function OnboardingWizard({
     }
   }, [isSubmitting, router])
 
+  const handleCancel = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY)
+    router.push('/businesses')
+  }, [router])
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 pb-20">
+      {/* Cancel button — top right */}
+      <div className="fixed top-4 right-4 z-50">
+        <button
+          type="button"
+          onClick={handleCancel}
+          disabled={isSubmitting}
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+          aria-label="Cancel and go back"
+        >
+          <X size={16} weight="bold" />
+          Cancel
+        </button>
+      </div>
+
       <div className="w-full max-w-lg space-y-8">
         {/* Step content */}
         <OnboardingSteps

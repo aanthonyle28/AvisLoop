@@ -5,6 +5,7 @@ import { getActiveBusiness } from '@/lib/data/active-business'
 import { getBusiness } from '@/lib/data/business'
 import { OnboardingWizard } from '@/components/onboarding/onboarding-wizard'
 import { CreateBusinessWizard } from '@/components/onboarding/create-business-wizard'
+import { WebDesignSetupForm } from '@/components/onboarding/web-design-setup-form'
 
 /**
  * Onboarding page - standalone full-screen experience (no dashboard shell).
@@ -40,6 +41,7 @@ export default async function OnboardingPage({
   const params = await searchParams
   const isNewBusinessMode = params.mode === 'new'
   const isReviewSetupMode = params.mode === 'review-setup'
+  const isWebDesignSetupMode = params.mode === 'web-design-setup'
   const targetBusinessId = params.businessId ?? null
 
   // Get active business (may be null for brand-new users)
@@ -49,7 +51,7 @@ export default async function OnboardingPage({
   const status = activeBusiness ? await getOnboardingStatus(activeBusiness.id) : null
 
   // If already complete, go to dashboard — UNLESS we're creating a new business or setting up review
-  if (status?.completed && !isNewBusinessMode && !isReviewSetupMode) {
+  if (status?.completed && !isNewBusinessMode && !isReviewSetupMode && !isWebDesignSetupMode) {
     redirect('/dashboard')
   }
 
@@ -106,6 +108,11 @@ export default async function OnboardingPage({
         campaignPresets={presets || []}
       />
     )
+  }
+
+  // Web design setup mode — for existing reputation businesses adding web design
+  if (isWebDesignSetupMode && targetBusinessId) {
+    return <WebDesignSetupForm businessId={targetBusinessId} />
   }
 
   if (isNewBusinessMode) {
