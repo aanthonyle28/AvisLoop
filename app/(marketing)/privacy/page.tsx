@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { CaretLeft } from "@phosphor-icons/react/dist/ssr";
 
 export const metadata: Metadata = {
   title: "Privacy Policy - AvisLoop",
@@ -15,6 +17,17 @@ export default function PrivacyPolicyPage() {
   return (
     <div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16">
       <div className="max-w-3xl mx-auto">
+        {/* Breadcrumb */}
+        <div className="mb-8">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <CaretLeft size={14} />
+            Back to home
+          </Link>
+        </div>
+
         {/* Header */}
         <header className="mb-12">
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">
