@@ -10,16 +10,16 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 ## Current Position
 
 Phase: 76 — V4 Design System Rollout
-Plan: 03 of 6 complete
+Plan: 04 of 6 complete
 Milestone: v4.0 Web Design Agency Pivot
 Status: In progress
 
-Last activity: 2026-03-19 — Completed 76-03-PLAN.md (redesigned /reputation with V4 design language, preserved all SEO)
+Last activity: 2026-03-19 — Completed 76-04-PLAN.md (redesigned /pricing and /client-portal with V4 design language)
 
 ```
 [Phase 71] [Phase 72] [Phase 73] [Phase 74] [Phase 75] [Phase 76]
     |           |           |           |           |       |
- COMPLETE   COMPLETE   COMPLETE   COMPLETE   COMPLETE   01-02-03 done
+ COMPLETE   COMPLETE   COMPLETE   COMPLETE   COMPLETE   01-02-03-04 done
 ```
 
 ## Performance Metrics
@@ -30,7 +30,7 @@ Last activity: 2026-03-19 — Completed 76-03-PLAN.md (redesigned /reputation wi
 - v3.1 plans completed: 17/17
 - v3.1.1 plans completed: 2/2 (COMPLETE)
 - Phase 70 plans completed: 0/3 (in progress)
-- v4.0 plans completed: 14 (Phase 71-01, 71-02, 72-01, 72-02, 73-01, 73-02, 73-03, 74-01, 74-02, 75-01, 75-02, 76-01, 76-02, 76-03)
+- v4.0 plans completed: 15 (Phase 71-01, 71-02, 72-01, 72-02, 73-01, 73-02, 73-03, 74-01, 74-02, 75-01, 75-02, 76-01, 76-02, 76-03, 76-04)
 
 *Updated after each plan completion*
 
@@ -113,6 +113,13 @@ Four idempotent migrations must be applied via Supabase Dashboard SQL Editor:
 - **Single pricing card**: /reputation sells one product ($99/mo add-on); the 3-col grid from homepage is unnecessary and confusing here
 - **FAQ content duplicated in data and JSON-LD**: Intentional — the V4FAQ component and JSON-LD schema must both contain all 8 Q&As for correct structured data and visible UX
 
+### Key Decisions (76-04)
+
+- **Pricing hero uses animate**: Hero headline uses `animate` (fires on mount, above fold); PricingGrid uses `whileInView` for stagger (scroll-triggered)
+- **Client portal uses animate throughout**: Page is short enough to be fully visible — whileInView would never fire
+- **Reviews Add-On CTA links to /reputation**: Consistent with homepage; "Learn More" → /reputation, not Calendly
+- **ClientPortalLookup unchanged**: Preserved exactly as imported — only wrapped with V4 visual treatment
+
 ### Blockers/Concerns
 
 - 4 DB migrations pending manual Supabase Dashboard SQL Editor application (see above -- Phase 71 will create additional migrations)
@@ -130,6 +137,6 @@ Four idempotent migrations must be applied via Supabase Dashboard SQL Editor:
 ## Session Continuity
 
 Last session: 2026-03-19
-Stopped at: Completed 76-03-PLAN.md — redesigned /reputation with V4 design language
+Stopped at: Completed 76-04-PLAN.md — redesigned /pricing and /client-portal with V4 design language
 Resume file: None
-Next action: Phase 76-04 — next plan in V4 Design System Rollout phase
+Next action: Phase 76-05 — update (marketing) layout with V4Nav + V4Footer
