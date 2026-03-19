@@ -183,3 +183,35 @@ export async function checkAuditRateLimit(ip: string): Promise<{
     reset: result.reset,
   }
 }
+
+/**
+ * Per-IP rate limit for the client portal ticket submission endpoint.
+ * Allows 10 submissions per minute per IP to prevent spam while allowing
+ * legitimate clients. Uses fixedWindow so the budget resets cleanly each minute.
+ */
+export const portalRatelimit = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.fixedWindow(10, '1 m'),
+      prefix: 'ratelimit:portal',
+    })
+  : null
+
+/**
+ * Check rate limit for the portal ticket submission endpoint by IP address.
+ * Bypasses in development if Upstash not configured.
+ */
+export async function checkPortalRateLimit(ip: string): Promise<{
+  success: boolean
+  remaining?: number
+}> {
+  if (!portalRatelimit) {
+    return { success: true, remaining: 999 }
+  }
+
+  const result = await portalRatelimit.limit(ip)
+  return {
+    success: result.success,
+    remaining: result.remaining,
+  }
+}
