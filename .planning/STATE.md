@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 ## Current Position
 
 Phase: 74 — Client Portal
-Plan: 01 of 1 complete
+Plan: 02 of 2 complete
 Milestone: v4.0 Web Design Agency Pivot
 Status: Phase complete
 
-Last activity: 2026-03-19 — Completed 74-01-PLAN.md (public /portal/[token] page: token resolution, quota display, ticket history, inline submit form)
+Last activity: 2026-03-19 — Completed 74-02-PLAN.md (portal rate limiting + Zod validation: portalRatelimit, checkPortalRateLimit, portalTicketSchema, route handler refactored)
 
 ```
 [Phase 71] [Phase 72] [Phase 73] [Phase 74] [Phase 75]
@@ -30,7 +30,7 @@ Last activity: 2026-03-19 — Completed 74-01-PLAN.md (public /portal/[token] pa
 - v3.1 plans completed: 17/17
 - v3.1.1 plans completed: 2/2 (COMPLETE)
 - Phase 70 plans completed: 0/3 (in progress)
-- v4.0 plans completed: 8 (Phase 71-01, 71-02, 72-01, 72-02, 73-01, 73-02, 73-03, 74-01)
+- v4.0 plans completed: 9 (Phase 71-01, 71-02, 72-01, 72-02, 73-01, 73-02, 73-03, 74-01, 74-02)
 
 *Updated after each plan completion*
 
@@ -110,6 +110,6 @@ Four idempotent migrations must be applied via Supabase Dashboard SQL Editor:
 ## Session Continuity
 
 Last session: 2026-03-19
-Stopped at: Completed 74-01-PLAN.md — public /portal/[token] client portal (quota display, ticket history, inline submit form, API route)
+Stopped at: Completed 74-02-PLAN.md — portal rate limiting (Upstash fixedWindow 10/min per IP) + Zod validation (portalTicketSchema)
 Resume file: None
 Next action: Phase 75 (portal token generation UI in /clients page + email notification on portal ticket submission)
