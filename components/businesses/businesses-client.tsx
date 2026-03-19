@@ -8,15 +8,16 @@ import { Input } from '@/components/ui/input'
 import { BusinessCard } from '@/components/businesses/business-card'
 import { BusinessDetailDrawer } from '@/components/businesses/business-detail-drawer'
 import { toast } from 'sonner'
-import type { Business } from '@/lib/types/database'
+import type { Business, WebProject } from '@/lib/types/database'
 
 interface BusinessesClientProps {
   businesses: Business[]
   activeBusinessId: string
   intakeToken: string
+  webProjectMap: Record<string, WebProject>
 }
 
-export function BusinessesClient({ businesses, activeBusinessId, intakeToken }: BusinessesClientProps) {
+export function BusinessesClient({ businesses, activeBusinessId, intakeToken, webProjectMap }: BusinessesClientProps) {
   const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
 
@@ -104,7 +105,7 @@ export function BusinessesClient({ businesses, activeBusinessId, intakeToken }: 
                 setDrawerOpen(true)
               }}
             >
-              <BusinessCard business={business} isActive={business.id === activeBusinessId} />
+              <BusinessCard business={business} isActive={business.id === activeBusinessId} webProject={webProjectMap[business.id] ?? null} />
             </div>
           ))}
         </div>
@@ -119,6 +120,7 @@ export function BusinessesClient({ businesses, activeBusinessId, intakeToken }: 
         businessCount={localBusinesses.length}
         onBusinessUpdated={handleBusinessUpdated}
         onBusinessDeleted={handleBusinessDeleted}
+        webProject={selectedBusiness ? webProjectMap[selectedBusiness.id] ?? null : null}
       />
     </div>
   )

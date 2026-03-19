@@ -16,10 +16,10 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
-import { PencilSimple, ArrowsClockwise, Star, Trash } from '@phosphor-icons/react'
+import { PencilSimple, ArrowsClockwise, Star, Trash, Copy, Globe, Link as LinkIcon } from '@phosphor-icons/react'
 import { format, parseISO } from 'date-fns'
 import { toast } from 'sonner'
-import type { Business } from '@/lib/types/database'
+import type { Business, WebProject } from '@/lib/types/database'
 import type { BusinessMetadataInput } from '@/lib/validations/business-metadata'
 import { updateBusinessMetadata, updateBusinessNotes } from '@/lib/actions/business-metadata'
 import { switchBusiness } from '@/lib/actions/active-business'
@@ -34,6 +34,7 @@ interface BusinessDetailDrawerProps {
   businessCount: number
   onBusinessUpdated: (updated: Business) => void
   onBusinessDeleted: (businessId: string) => void
+  webProject?: WebProject | null
 }
 
 export function BusinessDetailDrawer({
@@ -44,6 +45,7 @@ export function BusinessDetailDrawer({
   businessCount,
   onBusinessUpdated,
   onBusinessDeleted,
+  webProject,
 }: BusinessDetailDrawerProps) {
   const router = useRouter()
   const [isEditing, setIsEditing] = useState(false)
@@ -172,7 +174,11 @@ export function BusinessDetailDrawer({
       <SheetContent side='right' className='sm:max-w-lg'>
         <SheetHeader>
           <SheetTitle>{business.name}</SheetTitle>
-          <SheetDescription>Client details and competitive analysis</SheetDescription>
+          <SheetDescription>
+            {business.client_type === 'web_design' ? 'Web design client details' :
+             business.client_type === 'both' ? 'Web design + review client details' :
+             'Client details and competitive analysis'}
+          </SheetDescription>
         </SheetHeader>
 
         <SheetBody>
@@ -212,8 +218,77 @@ export function BusinessDetailDrawer({
               )}
             </div>
 
-            {/* Section 1: Google Performance */}
-            <div>
+            {/* Web Design Details — only for web_design/both */}
+            {(business.client_type === 'web_design' || business.client_type === 'both') && (
+              <div className='space-y-3'>
+                <h4 className='text-sm font-medium'>Web Design Details</h4>
+                <div className='space-y-2'>
+                  {webProject?.domain && (
+                    <div className='flex justify-between text-sm'>
+                      <span className='text-muted-foreground flex items-center gap-1.5'><Globe size={14} /> Domain</span>
+                      <span className='font-medium'>{webProject.domain}</span>
+                    </div>
+                  )}
+                  {webProject?.subscription_tier && (
+                    <div className='flex justify-between text-sm'>
+                      <span className='text-muted-foreground'>Plan</span>
+                      <span className='font-medium capitalize'>
+                        {webProject.subscription_tier} — ${webProject.subscription_monthly_fee ?? (webProject.subscription_tier === 'advanced' ? 299 : 199)}/mo
+                      </span>
+                    </div>
+                  )}
+                  {webProject?.has_review_addon && (
+                    <div className='flex justify-between text-sm'>
+                      <span className='text-muted-foreground'>Review Add-on</span>
+                      <span className='font-medium text-green-600'>Active — $99/mo</span>
+                    </div>
+                  )}
+                  {webProject?.status && (
+                    <div className='flex justify-between text-sm'>
+                      <span className='text-muted-foreground'>Project Status</span>
+                      <span className='font-medium capitalize'>{webProject.status}</span>
+                    </div>
+                  )}
+                  {webProject?.page_count && (
+                    <div className='flex justify-between text-sm'>
+                      <span className='text-muted-foreground'>Pages</span>
+                      <span className='font-medium'>{webProject.page_count}</span>
+                    </div>
+                  )}
+                </div>
+                {/* Portal Link — copyable */}
+                {webProject?.portal_token && (
+                  <div className='mt-3 space-y-1.5'>
+                    <h4 className='text-sm font-medium flex items-center gap-1.5'><LinkIcon size={14} /> Client Portal Link</h4>
+                    <div className='flex gap-2'>
+                      <input
+                        readOnly
+                        value={typeof window !== 'undefined' ? `${window.location.origin}/portal/${webProject.portal_token}` : `/portal/${webProject.portal_token}`}
+                        className='flex-1 text-xs font-mono bg-muted rounded px-2 py-1.5 border border-border truncate'
+                        onClick={(e) => (e.target as HTMLInputElement).select()}
+                      />
+                      <Button
+                        variant='outline'
+                        size='sm'
+                        onClick={() => {
+                          const url = `${window.location.origin}/portal/${webProject.portal_token}`
+                          navigator.clipboard.writeText(url)
+                          toast.success('Portal link copied')
+                        }}
+                      >
+                        <Copy size={14} />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+                {!webProject && (
+                  <p className='text-sm text-muted-foreground italic'>No web project created yet. Add one from the /clients page.</p>
+                )}
+              </div>
+            )}
+
+            {/* Section 1: Google Performance — only for reputation/both */}
+            {(business.client_type === 'reputation' || business.client_type === 'both') && <div>
               <h4 className='text-sm font-medium mb-3'>Google Performance</h4>
               {isEditing ? (
                 <div className='grid grid-cols-2 gap-3'>
@@ -362,10 +437,10 @@ export function BusinessDetailDrawer({
                     )}
                 </div>
               )}
-            </div>
+            </div>}
 
-            {/* Section 2: Competitive Analysis */}
-            <div>
+            {/* Section 2: Competitive Analysis — only for reputation/both */}
+            {(business.client_type === 'reputation' || business.client_type === 'both') && <div>
               <h4 className='text-sm font-medium mb-3'>Competitive Analysis</h4>
               {isEditing ? (
                 <div className='space-y-3'>
@@ -456,7 +531,7 @@ export function BusinessDetailDrawer({
                   </div>
                 </>
               )}
-            </div>
+            </div>}
 
             {/* Section 3: Agency Details */}
             <div>
