@@ -5,21 +5,21 @@
 See: .planning/PROJECT.md (updated 2026-03-18)
 
 **Core value:** Provide home service businesses with professional websites and optional automated review management -- all managed through a single agency dashboard.
-**Current focus:** v4.0 Web Design Agency Pivot -- Phase 75 (Marketing Landing Page)
+**Current focus:** v4.0 Web Design Agency Pivot -- Phase 76 (V4 Design System Rollout)
 
 ## Current Position
 
-Phase: 75 — Marketing Landing Page
-Plan: 02 of 2 complete
+Phase: 76 — V4 Design System Rollout
+Plan: 01 of ? complete
 Milestone: v4.0 Web Design Agency Pivot
-Status: Phase complete
+Status: In progress
 
-Last activity: 2026-03-19 — Completed 75-02-PLAN.md (new web design agency homepage at /, updated marketing nav with /reputation link, corrected anchor hrefs)
+Last activity: 2026-03-19 — Completed 76-01-PLAN.md (extracted shared V4 design system components from app/new/page.tsx monolith)
 
 ```
-[Phase 71] [Phase 72] [Phase 73] [Phase 74] [Phase 75]
-    |           |           |           |           |
- COMPLETE   COMPLETE   COMPLETE   COMPLETE   COMPLETE
+[Phase 71] [Phase 72] [Phase 73] [Phase 74] [Phase 75] [Phase 76]
+    |           |           |           |           |       |
+ COMPLETE   COMPLETE   COMPLETE   COMPLETE   COMPLETE   01 done
 ```
 
 ## Performance Metrics
@@ -30,7 +30,7 @@ Last activity: 2026-03-19 — Completed 75-02-PLAN.md (new web design agency hom
 - v3.1 plans completed: 17/17
 - v3.1.1 plans completed: 2/2 (COMPLETE)
 - Phase 70 plans completed: 0/3 (in progress)
-- v4.0 plans completed: 11 (Phase 71-01, 71-02, 72-01, 72-02, 73-01, 73-02, 73-03, 74-01, 74-02, 75-01, 75-02)
+- v4.0 plans completed: 12 (Phase 71-01, 71-02, 72-01, 72-02, 73-01, 73-02, 73-03, 74-01, 74-02, 75-01, 75-02, 76-01)
 
 *Updated after each plan completion*
 
@@ -93,6 +93,13 @@ Four idempotent migrations must be applied via Supabase Dashboard SQL Editor:
 - **PortalQuota counts all tickets (not just non-overage)**: portal shows total usage for full client visibility, unlike operator getMonthlyTicketCount which excludes overage tickets
 - **`any` casts for ungenerated Supabase types**: web_projects and project_tickets not yet in db.types.ts; will resolve after migrations applied
 
+### Key Decisions (76-01)
+
+- **Named exports only**: All v4 shared components use named exports (`export function V4Nav`) — enables tree-shaking and matches App Router conventions
+- **Data stays in page**: Content data (stats values, testimonials, FAQ text) remains as page-local constants — section components accept data via props
+- **AccentBar uses whileInView**: Fires on scroll for all interior sections; Hero overrides with explicit animate + delay since it's above-the-fold
+- **V4 component paths**: `components/marketing/v4/{nav,footer,shared,sections}.tsx` — all subsequent marketing pages import from here
+
 ### Blockers/Concerns
 
 - 4 DB migrations pending manual Supabase Dashboard SQL Editor application (see above -- Phase 71 will create additional migrations)
@@ -110,6 +117,6 @@ Four idempotent migrations must be applied via Supabase Dashboard SQL Editor:
 ## Session Continuity
 
 Last session: 2026-03-19
-Stopped at: Completed 75-02-PLAN.md — new web design agency homepage at /, updated marketing nav with /reputation link and corrected anchor hrefs
+Stopped at: Completed 76-01-PLAN.md — extracted shared V4 design system into components/marketing/v4/
 Resume file: None
-Next action: Phase 75 complete — next phase TBD
+Next action: Phase 76-02 — next plan in V4 Design System Rollout phase
