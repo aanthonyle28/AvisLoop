@@ -122,5 +122,26 @@ export async function getPortalTickets(projectId: string): Promise<PortalTicket[
     return []
   }
 
-  return (data ?? []) as PortalTicket[]
+  // Generate signed read URLs for attachment storage paths
+  const tickets = (data ?? []) as PortalTicket[]
+  for (const ticket of tickets) {
+    for (const msg of ticket.ticket_messages) {
+      if (msg.attachment_urls?.length) {
+        const signedUrls: string[] = []
+        for (const path of msg.attachment_urls) {
+          if (path.startsWith('http')) {
+            signedUrls.push(path)
+          } else {
+            const { data: urlData } = await supabase.storage
+              .from('revision-attachments')
+              .createSignedUrl(path, 60 * 60) // 1 hour
+            signedUrls.push(urlData?.signedUrl ?? path)
+          }
+        }
+        msg.attachment_urls = signedUrls
+      }
+    }
+  }
+
+  return tickets
 }

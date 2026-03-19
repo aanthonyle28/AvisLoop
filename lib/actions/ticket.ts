@@ -8,7 +8,7 @@ import {
   DEFAULT_REVISION_LIMIT,
   OVERAGE_FEE_USD,
 } from '@/lib/constants/tickets'
-import type { TicketStatus } from '@/lib/types/database'
+import type { TicketStatus, TicketMessage } from '@/lib/types/database'
 
 interface CreateTicketInput {
   projectId: string
@@ -185,4 +185,49 @@ export async function updateInternalNotes(
     .update({ internal_notes: notes, updated_at: new Date().toISOString() })
     .eq('id', ticketId)
     .eq('business_id', business.id)
+}
+
+/**
+ * Fetch messages for a ticket (callable from client components via server action).
+ * Returns signed URLs for any attachments.
+ */
+export async function fetchTicketMessages(
+  ticketId: string
+): Promise<TicketMessage[]> {
+  const business = await getActiveBusiness()
+  if (!business) return []
+
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('ticket_messages')
+    .select('*')
+    .eq('ticket_id', ticketId)
+    .eq('business_id', business.id)
+    .order('created_at', { ascending: true })
+
+  if (error || !data) return []
+
+  // Generate signed read URLs for any attachment storage paths
+  const messages = data as TicketMessage[]
+  for (const msg of messages) {
+    if (msg.attachment_urls?.length) {
+      const { createServiceRoleClient } = await import('@/lib/supabase/service-role')
+      const serviceSupabase = createServiceRoleClient()
+      const signedUrls: string[] = []
+      for (const path of msg.attachment_urls) {
+        // If already a signed URL (starts with http), keep as-is
+        if (path.startsWith('http')) {
+          signedUrls.push(path)
+        } else {
+          const { data: urlData } = await serviceSupabase.storage
+            .from('revision-attachments')
+            .createSignedUrl(path, 60 * 60) // 1 hour
+          signedUrls.push(urlData?.signedUrl ?? path)
+        }
+      }
+      msg.attachment_urls = signedUrls
+    }
+  }
+
+  return messages
 }

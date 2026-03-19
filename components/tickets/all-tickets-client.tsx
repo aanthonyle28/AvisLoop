@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/select'
 import type { TicketWithContext, TicketMessage, TicketStatus } from '@/lib/types/database'
 import { TicketDetailDrawer } from '@/components/tickets/ticket-detail-drawer'
+import { fetchTicketMessages } from '@/lib/actions/ticket'
 
 interface AllTicketsClientProps {
   tickets: TicketWithContext[]
@@ -66,10 +67,13 @@ export function AllTicketsClient({ tickets: initialTickets, businesses }: AllTic
   const [selectedTicket, setSelectedTicket] = useState<TicketWithContext | null>(null)
   const [drawerMessages, setDrawerMessages] = useState<TicketMessage[]>([])
 
-  const handleTicketClick = useCallback((ticket: TicketWithContext) => {
+  const handleTicketClick = useCallback(async (ticket: TicketWithContext) => {
     setSelectedTicket(ticket)
     setDrawerMessages([])
     setDrawerOpen(true)
+    // Fetch messages from server
+    const messages = await fetchTicketMessages(ticket.id)
+    setDrawerMessages(messages)
   }, [])
 
   const handleStatusChange = useCallback((ticketId: string, status: TicketStatus) => {

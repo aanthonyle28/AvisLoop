@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react'
 import { TicketList } from '@/components/tickets/ticket-list'
 import { TicketDetailDrawer } from '@/components/tickets/ticket-detail-drawer'
 import { NewTicketForm } from '@/components/tickets/new-ticket-form'
+import { fetchTicketMessages } from '@/lib/actions/ticket'
 import type {
   ProjectTicket,
   TicketMessage,
@@ -38,10 +39,13 @@ export function TicketsPageClient({
   // New ticket form state
   const [newTicketOpen, setNewTicketOpen] = useState(false)
 
-  const handleTicketSelect = useCallback((ticket: ProjectTicket) => {
+  const handleTicketSelect = useCallback(async (ticket: ProjectTicket) => {
     setSelectedTicket(ticket)
-    setDrawerMessages([]) // will be fetched fresh on open
+    setDrawerMessages([])
     setDrawerOpen(true)
+    // Fetch messages with signed attachment URLs
+    const messages = await fetchTicketMessages(ticket.id)
+    setDrawerMessages(messages)
   }, [])
 
   const handleStatusChange = useCallback(
