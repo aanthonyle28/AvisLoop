@@ -13,21 +13,7 @@ function formatServiceType(type: string): string {
   return type.charAt(0).toUpperCase() + type.slice(1)
 }
 
-function getStatusColor(status: string): string {
-  switch (status) {
-    case 'live':
-      return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-    case 'discovery':
-    case 'design':
-    case 'development':
-    case 'review':
-      return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-    case 'maintenance':
-      return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-    default:
-      return 'bg-muted text-muted-foreground'
-  }
-}
+
 
 export function BusinessCard({ business, isActive, webProject, openTicketCount = 0 }: BusinessCardProps) {
   const clientType = business.client_type
@@ -66,7 +52,7 @@ export function BusinessCard({ business, isActive, webProject, openTicketCount =
   // Web design display values
   const isWebDesign = clientType === 'web_design' || clientType === 'both'
   const domain = webProject?.domain ?? null
-  const projectStatus = webProject?.status ?? null
+
   const tier = webProject?.subscription_tier ?? null
 
   return (
@@ -119,17 +105,6 @@ export function BusinessCard({ business, isActive, webProject, openTicketCount =
               <span className="text-sm text-foreground truncate">{domain}</span>
             ) : (
               <span className="text-sm text-muted-foreground">No domain set</span>
-            )}
-          </div>
-
-          {/* Project status badge */}
-          <div>
-            {projectStatus ? (
-              <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full capitalize ${getStatusColor(projectStatus)}`}>
-                {projectStatus.replace('_', ' ')}
-              </span>
-            ) : (
-              <span className="text-xs text-muted-foreground">No project</span>
             )}
           </div>
 

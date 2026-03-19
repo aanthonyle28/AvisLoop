@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { formatDistanceToNow } from 'date-fns'
+import { LinkSimple as LinkIcon } from '@phosphor-icons/react'
+import { toast } from 'sonner'
 import {
   Select,
   SelectContent,
@@ -16,6 +18,7 @@ import { fetchTicketMessages } from '@/lib/actions/ticket'
 interface AllTicketsClientProps {
   tickets: TicketWithContext[]
   businesses: Array<{ id: string; name: string }>
+  portalToken?: string | null
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -59,7 +62,7 @@ function PriorityBadge({ priority }: { priority: string }) {
   )
 }
 
-export function AllTicketsClient({ tickets: initialTickets, businesses }: AllTicketsClientProps) {
+export function AllTicketsClient({ tickets: initialTickets, businesses, portalToken }: AllTicketsClientProps) {
   const [tickets, setTickets] = useState(initialTickets)
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [businessFilter, setBusinessFilter] = useState<string>('all')
@@ -113,9 +116,25 @@ export function AllTicketsClient({ tickets: initialTickets, businesses }: AllTic
     <>
     <div className="space-y-6">
       {/* Page header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">All Revision Tickets</h1>
-        <p className="text-muted-foreground mt-1">Across all web design clients</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Revision Tickets</h1>
+          <p className="text-muted-foreground mt-1">Manage revision requests</p>
+        </div>
+        {portalToken && (
+          <button
+            type="button"
+            onClick={() => {
+              const url = `${window.location.origin}/portal/${portalToken}`
+              navigator.clipboard.writeText(url)
+              toast.success('Portal link copied')
+            }}
+            className="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-md border border-border text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          >
+            <LinkIcon size={14} />
+            Copy Portal Link
+          </button>
+        )}
       </div>
 
       {/* Filters */}
