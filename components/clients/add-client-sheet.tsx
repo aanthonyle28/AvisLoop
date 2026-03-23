@@ -22,11 +22,12 @@ interface AddClientSheetProps {
   onOpenChange: (open: boolean) => void
 }
 
-type SubscriptionTier = 'basic' | 'advanced'
+type SubscriptionTier = 'starter' | 'growth' | 'pro'
 
 const TIER_LABELS: Record<SubscriptionTier, string> = {
-  basic: 'Basic — $199/mo',
-  advanced: 'Advanced — $299/mo',
+  starter: 'Starter — $149/mo',
+  growth: 'Growth — $249/mo',
+  pro: 'Pro — $349/mo',
 }
 
 export function AddClientSheet({ open, onOpenChange }: AddClientSheetProps) {
@@ -38,7 +39,7 @@ export function AddClientSheet({ open, onOpenChange }: AddClientSheetProps) {
   const [ownerEmail, setOwnerEmail] = useState('')
   const [ownerPhone, setOwnerPhone] = useState('')
   const [domain, setDomain] = useState('')
-  const [subscriptionTier, setSubscriptionTier] = useState<SubscriptionTier>('basic')
+  const [subscriptionTier, setSubscriptionTier] = useState<SubscriptionTier>('starter')
   const [hasReviewAddon, setHasReviewAddon] = useState(false)
 
   // Reset form when sheet closes
@@ -49,7 +50,7 @@ export function AddClientSheet({ open, onOpenChange }: AddClientSheetProps) {
       setOwnerEmail('')
       setOwnerPhone('')
       setDomain('')
-      setSubscriptionTier('basic')
+      setSubscriptionTier('starter')
       setHasReviewAddon(false)
     }
   }, [open])
@@ -65,7 +66,7 @@ export function AddClientSheet({ open, onOpenChange }: AddClientSheetProps) {
         ownerPhone: ownerPhone || '',
         domain: domain || '',
         subscriptionTier,
-        hasReviewAddon,
+        hasReviewAddon: subscriptionTier === 'pro' ? true : hasReviewAddon,
       })
 
       if (result.success) {
@@ -173,24 +174,35 @@ export function AddClientSheet({ open, onOpenChange }: AddClientSheetProps) {
                 </div>
               </div>
 
-              {/* Review Add-on */}
-              <div className="flex items-center gap-3 rounded-lg border border-input p-3">
-                <input
-                  id="hasReviewAddon"
-                  type="checkbox"
-                  checked={hasReviewAddon}
-                  onChange={(e) => setHasReviewAddon(e.target.checked)}
-                  className="h-4 w-4 rounded border-input accent-primary"
-                />
-                <div>
-                  <Label htmlFor="hasReviewAddon" className="cursor-pointer font-medium">
-                    Review Add-on
-                  </Label>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Include automated review management for this client
-                  </p>
+              {/* Review Add-on — included in Pro, optional add-on for Starter/Growth */}
+              {subscriptionTier === 'pro' ? (
+                <div className="flex items-center gap-3 rounded-lg border border-input p-3 bg-muted/30">
+                  <div>
+                    <p className="text-sm font-medium">Review Management</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Included with Pro plan at no extra cost
+                    </p>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="flex items-center gap-3 rounded-lg border border-input p-3">
+                  <input
+                    id="hasReviewAddon"
+                    type="checkbox"
+                    checked={hasReviewAddon}
+                    onChange={(e) => setHasReviewAddon(e.target.checked)}
+                    className="h-4 w-4 rounded border-input accent-primary"
+                  />
+                  <div>
+                    <Label htmlFor="hasReviewAddon" className="cursor-pointer font-medium">
+                      Review Add-on (+$99/mo)
+                    </Label>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Include automated review management for this client
+                    </p>
+                  </div>
+                </div>
+              )}
 
             </div>
           </SheetBody>

@@ -142,9 +142,10 @@ export function TicketList({
       ? tickets
       : tickets.filter((t) => t.status === statusFilter)
 
-  const quotaPercent = monthlyLimit > 0 ? (monthlyCount / monthlyLimit) * 100 : 0
-  const isAtLimit = monthlyCount >= monthlyLimit
-  const isNearLimit = quotaPercent >= 80 && !isAtLimit
+  const isUnlimited = monthlyLimit === -1
+  const quotaPercent = !isUnlimited && monthlyLimit > 0 ? (monthlyCount / monthlyLimit) * 100 : 0
+  const isAtLimit = !isUnlimited && monthlyCount >= monthlyLimit
+  const isNearLimit = !isUnlimited && quotaPercent >= 80 && !isAtLimit
 
   return (
     <div className="space-y-4">
@@ -164,7 +165,9 @@ export function TicketList({
           >
             {isAtLimit && <Warning size={14} weight="bold" className="shrink-0" />}
             {isNearLimit && <Warning size={14} className="shrink-0" />}
-            {monthlyCount} of {monthlyLimit} revisions used this month
+            {isUnlimited
+              ? `${monthlyCount} revisions this month (unlimited)`
+              : `${monthlyCount} of ${monthlyLimit} revisions used this month`}
           </p>
         </div>
         <Button size="sm" onClick={onNewTicket}>

@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { getActiveBusiness } from '@/lib/data/active-business'
 import { createClient } from '@/lib/supabase/server'
 import { getProjectTickets, getMonthlyTicketCount } from '@/lib/data/tickets'
-import { REVISION_LIMITS, DEFAULT_REVISION_LIMIT } from '@/lib/constants/tickets'
+import { REVISION_LIMITS, DEFAULT_REVISION_LIMIT, isUnlimitedTier } from '@/lib/constants/tickets'
 import { TicketsPageClient } from '@/components/tickets/tickets-page-client'
 import { ArrowLeft } from '@phosphor-icons/react/dist/ssr'
 import type { WebProject } from '@/lib/types/database'
@@ -50,9 +50,12 @@ export default async function TicketsPage({ params }: TicketsPageProps) {
   const businessId = webProject.business_id
 
   // Determine monthly revision limit from project subscription tier
-  const monthlyLimit = webProject.subscription_tier
-    ? (REVISION_LIMITS[webProject.subscription_tier] ?? DEFAULT_REVISION_LIMIT)
-    : DEFAULT_REVISION_LIMIT
+  const unlimited = isUnlimitedTier(webProject.subscription_tier)
+  const monthlyLimit = unlimited
+    ? -1
+    : webProject.subscription_tier
+      ? (REVISION_LIMITS[webProject.subscription_tier] ?? DEFAULT_REVISION_LIMIT)
+      : DEFAULT_REVISION_LIMIT
 
   // Fetch tickets and monthly usage in parallel
   const [tickets, monthlyCount] = await Promise.all([

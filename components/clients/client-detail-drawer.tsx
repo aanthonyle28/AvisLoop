@@ -35,9 +35,10 @@ interface ClientDetailDrawerProps {
   onClientUpdated: (updated: WebDesignClient) => void
 }
 
-function getTierLimit(tier: 'basic' | 'advanced' | null | undefined): number | null {
-  if (tier === 'basic') return 2
-  if (tier === 'advanced') return 4
+/** Returns the monthly revision limit for a tier, or null if unlimited / unset */
+function getTierLimit(tier: 'starter' | 'growth' | 'pro' | null | undefined): number | null {
+  if (tier === 'starter') return 2
+  if (tier === 'growth' || tier === 'pro') return null // unlimited
   return null
 }
 
@@ -276,7 +277,7 @@ export function ClientDetailDrawer({
                         setFormData((prev) => ({
                           ...prev,
                           web_design_tier:
-                            v === '' ? null : (v as 'basic' | 'advanced'),
+                            v === '' ? null : (v as 'starter' | 'growth' | 'pro'),
                         }))
                       }
                     >
@@ -284,8 +285,9 @@ export function ClientDetailDrawer({
                         <SelectValue placeholder="Select tier" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="basic">Basic</SelectItem>
-                        <SelectItem value="advanced">Advanced</SelectItem>
+                        <SelectItem value="starter">Starter — $149/mo</SelectItem>
+                        <SelectItem value="growth">Growth — $249/mo</SelectItem>
+                        <SelectItem value="pro">Pro — $349/mo</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -466,7 +468,17 @@ export function ClientDetailDrawer({
             {/* Section 5: Revision Quota (always read-only) */}
             <div>
               <h4 className="text-sm font-medium mb-3">Revision Quota</h4>
-              {tierLimit !== null ? (
+              {client.web_design_tier === 'growth' || client.web_design_tier === 'pro' ? (
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Used this month</span>
+                    <span className="font-medium">
+                      {client.revisions_used_this_month}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Unlimited revisions included</p>
+                </div>
+              ) : tierLimit !== null ? (
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Used this month</span>

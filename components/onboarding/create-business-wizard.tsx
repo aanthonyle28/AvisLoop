@@ -59,7 +59,7 @@ function BusinessSetupStep({ onComplete }: Step1Props) {
   const [ownerEmail, setOwnerEmail] = useState('')
   const [ownerPhone, setOwnerPhone] = useState('')
   const [domain, setDomain] = useState('')
-  const [tier, setTier] = useState<'basic' | 'advanced'>('basic')
+  const [tier, setTier] = useState<'starter' | 'growth' | 'pro'>('starter')
   const [hasReviewAddon, setHasReviewAddon] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -124,7 +124,7 @@ function BusinessSetupStep({ onComplete }: Step1Props) {
           ownerPhone: ownerPhone.trim(),
           domain: domain.trim(),
           subscriptionTier: tier,
-          hasReviewAddon: clientType === 'both' || hasReviewAddon,
+          hasReviewAddon: tier === 'pro' || clientType === 'both' || hasReviewAddon,
         })
         if (!projResult.success) {
           setError(projResult.error || 'Failed to create web project')
@@ -274,10 +274,11 @@ function BusinessSetupStep({ onComplete }: Step1Props) {
               </div>
               <div className="space-y-3">
                 <Label>Subscription tier</Label>
-                <div className="flex gap-2">
+                <div className="grid gap-2">
                   {([
-                    { value: 'basic' as const, label: 'Basic — $199/mo', desc: '1-4 pages, 2 revisions/mo' },
-                    { value: 'advanced' as const, label: 'Advanced — $299/mo', desc: '4-10 pages, 4 revisions/mo' },
+                    { value: 'starter' as const, label: 'Starter — $149/mo', desc: 'Single-page, 2 revisions/mo' },
+                    { value: 'growth' as const, label: 'Growth — $249/mo', desc: 'Up to 5 pages, unlimited revisions' },
+                    { value: 'pro' as const, label: 'Pro — $349/mo', desc: '5+ service area pages, unlimited revisions, reviews included' },
                   ]).map((opt) => (
                     <button
                       key={opt.value}
@@ -285,7 +286,7 @@ function BusinessSetupStep({ onComplete }: Step1Props) {
                       onClick={() => setTier(opt.value)}
                       disabled={isPending}
                       className={cn(
-                        'flex-1 px-3 py-3 rounded-lg border text-left transition-colors',
+                        'px-3 py-3 rounded-lg border text-left transition-colors',
                         tier === opt.value
                           ? 'bg-foreground text-background border-foreground'
                           : 'bg-background border-border hover:border-foreground/50'
@@ -297,7 +298,7 @@ function BusinessSetupStep({ onComplete }: Step1Props) {
                   ))}
                 </div>
               </div>
-              {clientType === 'both' && (
+              {clientType === 'both' && tier !== 'pro' && (
                 <div className="flex items-center gap-3 rounded-lg border border-border p-3">
                   <Checkbox
                     id="review-addon"
@@ -308,6 +309,11 @@ function BusinessSetupStep({ onComplete }: Step1Props) {
                     Include review automation add-on (+$99/mo)
                   </Label>
                 </div>
+              )}
+              {clientType === 'both' && tier === 'pro' && (
+                <p className="text-xs text-muted-foreground px-1">
+                  Review management is included with the Pro plan.
+                </p>
               )}
             </>
           )}

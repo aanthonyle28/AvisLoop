@@ -10,7 +10,7 @@ export const createClientSchema = z.object({
   ownerEmail: z.string().email('Invalid email').optional().or(z.literal('')),
   ownerPhone: z.string().max(50).optional().or(z.literal('')),
   domain: z.string().max(500).optional().or(z.literal('')),
-  subscriptionTier: z.enum(['basic', 'advanced']),
+  subscriptionTier: z.enum(['starter', 'growth', 'pro']),
   hasReviewAddon: z.boolean(),
 })
 
@@ -32,7 +32,7 @@ export const clientUpdateSchema = z.object({
     .optional()
     .or(z.literal('')),
   owner_phone: z.string().max(50).nullable().optional(),
-  web_design_tier: z.enum(['basic', 'advanced']).nullable().optional(),
+  web_design_tier: z.enum(['starter', 'growth', 'pro']).nullable().optional(),
   domain: z.string().max(500).nullable().optional(),
   vercel_project_url: z
     .string()

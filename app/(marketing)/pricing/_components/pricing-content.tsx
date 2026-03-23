@@ -14,16 +14,18 @@ const CALENDLY =
 
 const plans = [
   {
-    name: 'Basic',
-    price: '199',
-    tagline: 'Small service businesses',
+    name: 'Starter',
+    price: '149',
+    tagline: 'Solo operators',
     features: [
-      '1–4 page custom website',
+      'Single-page custom website',
       'Mobile-optimized design',
-      'On-page SEO',
+      'Basic on-page SEO',
       '2 revisions / month',
       'Client revision portal',
-      'Hosting & SSL included',
+      'Hosting, SSL & domain included',
+      'Email support',
+      'Review add-on available (+$99/mo)',
     ],
     dark: false,
     popular: false,
@@ -32,18 +34,18 @@ const plans = [
     external: true,
   },
   {
-    name: 'Advanced',
-    price: '299',
+    name: 'Growth',
+    price: '249',
     tagline: 'Growing companies',
     features: [
-      '4–10 page custom website',
+      'Up to 5-page custom website',
       'Mobile-optimized design',
-      'Full SEO + local + Maps',
-      '4 revisions / month',
+      'Advanced local SEO',
+      'Unlimited revisions',
       'Client revision portal',
-      'Hosting & SSL included',
-      'Lead capture forms',
+      'Hosting, SSL & domain included',
       'Priority support',
+      'Review add-on available (+$99/mo)',
     ],
     dark: true,
     popular: true,
@@ -52,21 +54,24 @@ const plans = [
     external: true,
   },
   {
-    name: 'Reviews Add-On',
-    price: '99',
-    tagline: 'Add to any plan',
+    name: 'Pro',
+    price: '349',
+    tagline: 'Maximum growth',
     features: [
-      'Automated review campaigns',
-      'AI-personalized messages',
-      'Email + SMS follow-ups',
-      'Smart review funnel',
-      'Competitor tracking',
+      'Up to 5 + service area pages',
+      'Mobile-optimized design',
+      'Advanced local SEO',
+      'Unlimited revisions',
+      'Client revision portal',
+      'Hosting, SSL & domain included',
+      'Priority support',
+      'Review management included',
     ],
     dark: false,
     popular: false,
-    cta: 'Learn More',
-    href: '/reputation',
-    external: false,
+    cta: 'Get Started',
+    href: CALENDLY,
+    external: true,
   },
 ];
 
@@ -75,11 +80,15 @@ const plans = [
 const faqs: [string, string][] = [
   [
     "What's included in the monthly fee?",
-    'Your monthly fee covers everything: website hosting, SSL certificate, all code and design updates, and ongoing maintenance. There are no hidden fees, no domain markup, and no surprise invoices. Basic includes 2 revision requests per month; Advanced includes 4.',
+    'Your monthly fee covers everything: website hosting, SSL certificate, domain, all code and design updates, and ongoing maintenance. There are no hidden fees, no domain markup, and no surprise invoices. Starter includes 2 revision requests per month; Growth and Pro include unlimited revisions.',
   ],
   [
-    'What if I need more revisions?',
-    'Additional revisions beyond your monthly limit are available at $50 each. We confirm the scope before starting so there are no surprise charges. You can also upgrade to Advanced at any time to get 4 revisions per month.',
+    'What if I need more revisions on Starter?',
+    'Additional revisions beyond your 2/month Starter limit are available at $50 each. We confirm the scope before starting so there are no surprise charges. You can also upgrade to Growth at any time for unlimited revisions.',
+  ],
+  [
+    'What about the one-time launch package?',
+    'Each plan includes a one-time launch package ($499 Starter, $999 Growth, $1,499 Pro) that covers your initial website build — custom design, content setup, and launch. After launch, you only pay the monthly fee.',
   ],
   [
     'Do I own my website?',
@@ -95,7 +104,7 @@ const faqs: [string, string][] = [
   ],
   [
     'What is the Review Add-On?',
-    'The Review Add-On ($99/mo) adds automated review management to any web design plan. After each job, you fill out a short form. We send personalized follow-up messages, route happy customers to Google reviews, and keep negative feedback private so you can resolve it first.',
+    'Review management ($99/mo) is available as an add-on for Starter and Growth plans, and is included at no extra cost with Pro. After each job, we send personalized follow-up messages, route happy customers to Google reviews, and keep negative feedback private so you can resolve it first.',
   ],
 ];
 

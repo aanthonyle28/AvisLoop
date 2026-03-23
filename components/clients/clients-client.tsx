@@ -20,7 +20,7 @@ interface ClientsClientProps {
 }
 
 type StatusFilter = 'all' | 'active' | 'paused' | 'churned'
-type TierFilter = 'all' | 'basic' | 'advanced'
+type TierFilter = 'all' | 'starter' | 'growth' | 'pro'
 
 export function ClientsClient({ clients }: ClientsClientProps) {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
@@ -92,8 +92,9 @@ export function ClientsClient({ clients }: ClientsClientProps) {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Tiers</SelectItem>
-            <SelectItem value="basic">Basic</SelectItem>
-            <SelectItem value="advanced">Advanced</SelectItem>
+            <SelectItem value="starter">Starter</SelectItem>
+            <SelectItem value="growth">Growth</SelectItem>
+            <SelectItem value="pro">Pro</SelectItem>
           </SelectContent>
         </Select>
       </div>

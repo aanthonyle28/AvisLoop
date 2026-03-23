@@ -115,9 +115,9 @@ function Hero() {
             </div>
 
             <div className="mt-8 flex gap-6 text-xs text-muted-foreground/60">
-              <span>From $199/mo</span>
+              <span>From $149/mo</span>
               <span>No contracts</span>
-              <span>$0 upfront</span>
+              <span>Cancel anytime</span>
             </div>
           </motion.div>
         </div>

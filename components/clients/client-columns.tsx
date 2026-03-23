@@ -4,10 +4,11 @@ import { type ColumnDef } from '@tanstack/react-table'
 import { StatusDot } from '@/components/ui/status-dot'
 import type { WebDesignClient } from '@/lib/data/clients'
 
-function getTierLimit(tier: 'basic' | 'advanced' | null | undefined): number | null {
-  if (tier === 'basic') return 2
-  if (tier === 'advanced') return 4
-  return null
+function getTierLabel(tier: string | null | undefined): { label: string; isUnlimited: boolean; limit: number | null } {
+  if (tier === 'starter') return { label: 'Starter', isUnlimited: false, limit: 2 }
+  if (tier === 'growth') return { label: 'Growth', isUnlimited: true, limit: null }
+  if (tier === 'pro') return { label: 'Pro', isUnlimited: true, limit: null }
+  return { label: '', isUnlimited: false, limit: null }
 }
 
 export const clientColumns: ColumnDef<WebDesignClient>[] = [
@@ -36,16 +37,16 @@ export const clientColumns: ColumnDef<WebDesignClient>[] = [
     cell: ({ row }) => {
       const tier = row.original.web_design_tier
       if (!tier) return <span className="text-muted-foreground text-xs">—</span>
-      if (tier === 'advanced') {
-        return (
-          <span className="inline-flex items-center rounded-md bg-primary px-2 py-1 text-xs font-medium text-primary-foreground">
-            Advanced
-          </span>
-        )
-      }
+      const { label } = getTierLabel(tier)
+      const isPro = tier === 'pro'
+      const isGrowth = tier === 'growth'
       return (
-        <span className="inline-flex items-center rounded-md bg-muted px-2 py-1 text-xs font-medium text-muted-foreground">
-          Basic
+        <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${
+          isPro ? 'bg-primary px-2 py-1 text-primary-foreground' :
+          isGrowth ? 'bg-primary/10 text-primary' :
+          'bg-muted text-muted-foreground'
+        }`}>
+          {label}
         </span>
       )
     },
@@ -96,13 +97,16 @@ export const clientColumns: ColumnDef<WebDesignClient>[] = [
     header: 'Revisions',
     cell: ({ row }) => {
       const used = row.original.revisions_used_this_month
-      const tierLimit = getTierLimit(row.original.web_design_tier)
-      if (tierLimit === null) {
+      const { isUnlimited, limit } = getTierLabel(row.original.web_design_tier)
+      if (!limit && !isUnlimited) {
         return <span className="text-muted-foreground text-xs">—</span>
+      }
+      if (isUnlimited) {
+        return <span className="text-sm">{used}</span>
       }
       return (
         <span className="text-sm">
-          {used} / {tierLimit}
+          {used} / {limit}
         </span>
       )
     },

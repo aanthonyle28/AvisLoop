@@ -44,7 +44,29 @@ export async function updateBusinessMetadata(
     return { error: error.message }
   }
 
+  // Sync changed fields to web_projects so the portal reads correct data
+  const webProjectUpdates: Record<string, unknown> = {}
+  if (parsed.data.web_design_tier !== undefined) {
+    webProjectUpdates.subscription_tier = parsed.data.web_design_tier
+  }
+  if (parsed.data.owner_email !== undefined) {
+    webProjectUpdates.client_email = parsed.data.owner_email
+  }
+  if (parsed.data.owner_name !== undefined) {
+    webProjectUpdates.client_name = parsed.data.owner_name
+  }
+  if (parsed.data.owner_phone !== undefined) {
+    webProjectUpdates.client_phone = parsed.data.owner_phone
+  }
+  if (Object.keys(webProjectUpdates).length > 0) {
+    await supabase
+      .from('web_projects')
+      .update(webProjectUpdates)
+      .eq('business_id', businessId)
+  }
+
   revalidatePath('/businesses')
+  revalidatePath('/clients')
   return { success: true }
 }
 

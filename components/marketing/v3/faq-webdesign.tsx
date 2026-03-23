@@ -13,7 +13,7 @@ const faqs = [
   {
     question: 'What if I need to make changes?',
     answer:
-      'You get a dedicated client portal at a permanent URL. Submit your revision request — title, description, optional screenshot — and we complete it within 48 hours. Basic plan includes 2 revisions per month, Advanced includes 4.',
+      'You get a dedicated client portal at a permanent URL. Submit your revision request — title, description, optional screenshot — and we complete it within 48 hours. Starter plan includes 2 revisions per month; Growth and Pro include unlimited revisions.',
   },
   {
     question: 'How is this different from paying a web designer once?',
@@ -23,7 +23,7 @@ const faqs = [
   {
     question: 'What if I need more changes than my plan allows?',
     answer:
-      'Additional revision requests beyond your monthly limit are available at $50 each, confirmed before submission so there are no surprise charges. You can also upgrade to Advanced any time to get 4 revisions per month.',
+      'On the Starter plan, additional revision requests beyond your 2/month limit are available at $50 each, confirmed before submission so there are no surprise charges. You can also upgrade to Growth or Pro for unlimited revisions.',
   },
   {
     question: 'Do I own my website?',
@@ -38,7 +38,7 @@ const faqs = [
   {
     question: 'What is the Review Add-On?',
     answer:
-      'An optional $99/month add-on that plugs in automated review management. You get multi-touch email and SMS campaigns after each job, a smart review funnel (routes 4–5 star ratings to Google, keeps 1–3 star ratings private), and AI-generated responses posted to your Google profile.',
+      'Review management ($99/month) is available as an add-on for Starter and Growth plans, and is included at no extra cost with Pro. You get multi-touch email and SMS campaigns after each job, a smart review funnel (routes 4–5 star ratings to Google, keeps 1–3 star ratings private), and AI-generated responses posted to your Google profile.',
   },
   {
     question: 'Can I cancel anytime?',

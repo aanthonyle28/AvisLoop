@@ -71,7 +71,7 @@ export interface Business {
   owner_name: string | null
   owner_email: string | null
   owner_phone: string | null
-  web_design_tier: 'basic' | 'advanced' | null
+  web_design_tier: 'starter' | 'growth' | 'pro' | null
   domain: string | null
   vercel_project_url: string | null
   live_website_url: string | null
@@ -104,7 +104,7 @@ export type WebProjectStatus =
   | 'paused'
   | 'cancelled'
 
-export type WebDesignTier = 'basic' | 'advanced'
+export type WebDesignTier = 'starter' | 'growth' | 'pro'
 
 export interface WebProject {
   id: string

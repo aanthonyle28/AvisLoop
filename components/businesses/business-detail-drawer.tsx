@@ -116,7 +116,7 @@ export function BusinessDetailDrawer({
       owner_email: business.owner_email,
       owner_phone: business.owner_phone,
       domain: business.domain,
-      web_design_tier: business.web_design_tier as 'basic' | 'advanced' | null,
+      web_design_tier: business.web_design_tier as 'starter' | 'growth' | 'pro' | null,
       live_website_url: business.live_website_url,
       vercel_project_url: business.vercel_project_url,
       // Shared
@@ -137,8 +137,9 @@ export function BusinessDetailDrawer({
     const t = formData.web_design_tier ?? business.web_design_tier
     const hasWeb = ct === 'web_design' || ct === 'both'
     const hasRev = ct === 'reputation' || ct === 'both'
-    const webFee = hasWeb ? (t === 'advanced' ? 299 : 199) : 0
-    const reviewFee = hasRev ? 99 : 0
+    const webFee = hasWeb ? (t === 'pro' ? 349 : t === 'growth' ? 249 : 149) : 0
+    // Pro plan includes review management at no extra cost
+    const reviewFee = (hasRev && t !== 'pro') ? 99 : 0
     const computedData = { ...formData, monthly_fee: webFee + reviewFee }
     const result = await updateBusinessMetadata(business.id, computedData)
     setIsSaving(false)
@@ -268,11 +269,15 @@ export function BusinessDetailDrawer({
                     <div className='space-y-1.5'>
                       <Label className='text-xs'>Subscription Tier</Label>
                       <div className='flex gap-2'>
-                        {(['basic', 'advanced'] as const).map((t) => (
-                          <button key={t} type='button' onClick={() => updateField('web_design_tier', t)}
+                        {([
+                          { value: 'starter' as const, label: 'Starter $149' },
+                          { value: 'growth' as const, label: 'Growth $249' },
+                          { value: 'pro' as const, label: 'Pro $349' },
+                        ]).map((opt) => (
+                          <button key={opt.value} type='button' onClick={() => updateField('web_design_tier', opt.value)}
                             className={cn('flex-1 px-3 py-2 rounded-lg border text-sm font-medium transition-colors',
-                              formData.web_design_tier === t ? 'bg-foreground text-background border-foreground' : 'bg-background border-border hover:border-foreground/50')}>
-                            {t === 'basic' ? 'Basic $199' : 'Advanced $299'}
+                              formData.web_design_tier === opt.value ? 'bg-foreground text-background border-foreground' : 'bg-background border-border hover:border-foreground/50')}>
+                            {opt.label}
                           </button>
                         ))}
                       </div>
@@ -307,7 +312,7 @@ export function BusinessDetailDrawer({
                       <span className='flex items-center gap-1'><Globe size={12} />{business.domain}</span>
                     ) : null} />
                     <ReadOnlyField label='Plan' value={business.web_design_tier ? (
-                      <span className='capitalize'>{business.web_design_tier} — ${business.web_design_tier === 'advanced' ? 299 : 199}/mo</span>
+                      <span className='capitalize'>{business.web_design_tier} — ${business.web_design_tier === 'pro' ? 349 : business.web_design_tier === 'growth' ? 249 : 149}/mo</span>
                     ) : null} />
                     <ReadOnlyField label='Status' value={business.status ? (
                       <span className='capitalize'>{business.status}</span>
@@ -406,20 +411,24 @@ export function BusinessDetailDrawer({
               {(() => {
                 const ct = isEditing ? formData.client_type ?? business.client_type : business.client_type
                 const t = isEditing ? formData.web_design_tier ?? business.web_design_tier : business.web_design_tier
-                const webFee = t === 'advanced' ? 299 : t === 'basic' ? 199 : 0
-                const reviewFee = 99
+                const webFee = t === 'pro' ? 349 : t === 'growth' ? 249 : t === 'starter' ? 149 : 0
                 const hasWeb = ct === 'web_design' || ct === 'both'
                 const hasRev = ct === 'reputation' || ct === 'both'
+                // Pro includes review management; others pay $99 add-on
+                const reviewFee = (hasRev && t !== 'pro') ? 99 : 0
                 const total = (hasWeb ? webFee : 0) + (hasRev ? reviewFee : 0)
 
                 return isEditing ? (
                   <div className='space-y-3'>
                     {/* Web design fee is auto-calculated from tier */}
                     {hasWeb && (
-                      <ReadOnlyField label='Web Design' value={`$${webFee}/mo (${t ?? 'basic'})`} />
+                      <ReadOnlyField label='Web Design' value={`$${webFee}/mo (${t ?? 'starter'})`} />
                     )}
-                    {/* Review fee — checkbox for both, fixed display for review-only */}
-                    {ct === 'both' && (
+                    {/* Review fee — Pro includes it; others pay $99 add-on */}
+                    {ct === 'both' && t === 'pro' && (
+                      <ReadOnlyField label='Review Management' value='Included in Pro' />
+                    )}
+                    {ct === 'both' && t !== 'pro' && (
                       <div className='flex items-center justify-between'>
                         <Label className='text-xs'>Review Add-on ($99/mo)</Label>
                         <Switch checked={true} disabled />
@@ -440,9 +449,12 @@ export function BusinessDetailDrawer({
                 ) : (
                   <div className='space-y-2'>
                     {hasWeb && (
-                      <ReadOnlyField label='Web Design' value={`$${webFee}/mo (${(business.web_design_tier ?? 'basic')})`} />
+                      <ReadOnlyField label='Web Design' value={`$${webFee}/mo (${(business.web_design_tier ?? 'starter')})`} />
                     )}
-                    {hasRev && (
+                    {hasRev && t === 'pro' && (
+                      <ReadOnlyField label='Review Management' value='Included in Pro' />
+                    )}
+                    {hasRev && t !== 'pro' && (
                       <ReadOnlyField label='Review Management' value='$99/mo' />
                     )}
                     <div className='pt-2 border-t border-border/50'>

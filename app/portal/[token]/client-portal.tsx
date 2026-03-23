@@ -47,7 +47,8 @@ export function ClientPortal({ token, project, quota, initialTickets }: ClientPo
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const projectLabel = project.domain ?? project.client_name ?? 'Your Project'
-  const quotaPercent = quota.limit > 0 ? Math.min(100, (quota.used / quota.limit) * 100) : 0
+  const isUnlimited = quota.limit === -1
+  const quotaPercent = !isUnlimited && quota.limit > 0 ? Math.min(100, (quota.used / quota.limit) * 100) : 0
 
   async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files
@@ -158,23 +159,36 @@ export function ClientPortal({ token, project, quota, initialTickets }: ClientPo
         <CardHeader className="pb-3">
           <p className="text-xs text-muted-foreground uppercase tracking-wider">Monthly Revisions</p>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold">{quota.remaining}</span>
-            <span className="text-muted-foreground text-sm">
-              of {quota.limit} remaining this month
-            </span>
+            {isUnlimited ? (
+              <>
+                <span className="text-3xl font-bold">{quota.used}</span>
+                <span className="text-muted-foreground text-sm">
+                  submitted this month (unlimited)
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="text-3xl font-bold">{quota.remaining}</span>
+                <span className="text-muted-foreground text-sm">
+                  of {quota.limit} remaining this month
+                </span>
+              </>
+            )}
           </div>
         </CardHeader>
         <CardContent className="pt-0 space-y-3">
-          {/* Progress bar */}
-          <div className="h-2 rounded-full bg-muted overflow-hidden">
-            <div
-              className="h-2 rounded-full bg-orange-500 transition-all"
-              style={{ width: `${quotaPercent}%` }}
-            />
-          </div>
+          {/* Progress bar — only for capped plans */}
+          {!isUnlimited && (
+            <div className="h-2 rounded-full bg-muted overflow-hidden">
+              <div
+                className="h-2 rounded-full bg-orange-500 transition-all"
+                style={{ width: `${quotaPercent}%` }}
+              />
+            </div>
+          )}
 
-          {/* Warning when exhausted */}
-          {quota.remaining === 0 && (
+          {/* Warning when exhausted (only for capped plans) */}
+          {!isUnlimited && quota.remaining === 0 && (
             <div className="rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-3 py-2">
               <p className="text-xs text-amber-700 dark:text-amber-400">
                 Monthly limit reached — contact your agency for additional requests.
@@ -186,7 +200,7 @@ export function ClientPortal({ token, project, quota, initialTickets }: ClientPo
           {!showForm ? (
             <Button
               onClick={() => setShowForm(true)}
-              disabled={quota.remaining === 0}
+              disabled={!isUnlimited && quota.remaining === 0}
               className="w-full sm:w-auto"
             >
               <ArrowRight size={16} className="mr-2" />

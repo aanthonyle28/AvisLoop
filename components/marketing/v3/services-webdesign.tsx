@@ -31,7 +31,7 @@ const services = [
     icon: Star,
     title: 'Review Automation Add-On',
     description:
-      'Optional $99/month add-on: automated Google review campaigns, AI-personalized messages (email + SMS), and a smart review funnel that keeps negative feedback private.',
+      'Available as a $99/month add-on for Starter and Growth, or included with Pro: automated Google review campaigns, AI-personalized messages (email + SMS), and a smart review funnel that keeps negative feedback private.',
   },
   {
     icon: Layout,

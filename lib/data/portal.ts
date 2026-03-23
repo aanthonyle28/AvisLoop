@@ -69,8 +69,9 @@ export async function resolvePortalToken(token: string): Promise<PortalProject |
  * and return quota details based on the subscription tier.
  *
  * Tier limits:
- *   basic    → 2 revisions/month
- *   advanced → 4 revisions/month
+ *   starter  → 2 revisions/month
+ *   growth   → Unlimited (represented as -1)
+ *   pro      → Unlimited (represented as -1)
  *   unknown  → 2 (fail-safe default)
  */
 export async function getPortalQuota(
@@ -78,6 +79,9 @@ export async function getPortalQuota(
   tier: string | null
 ): Promise<PortalQuota> {
   const supabase = createServiceRoleClient()
+
+  // Growth and Pro have unlimited revisions
+  const isUnlimited = tier === 'growth' || tier === 'pro'
 
   const startOfCurrentMonth = new Date(
     new Date().getFullYear(),
@@ -93,7 +97,13 @@ export async function getPortalQuota(
     .gte('created_at', startOfCurrentMonth.toISOString())
 
   const used = error ? 0 : (count ?? 0)
-  const limit = tier === 'basic' ? 2 : tier === 'advanced' ? 4 : 2
+
+  if (isUnlimited) {
+    // -1 signals unlimited to the UI
+    return { used, limit: -1, remaining: -1 }
+  }
+
+  const limit = 2 // starter and unknown default
   const remaining = Math.max(0, limit - used)
 
   return { used, limit, remaining }

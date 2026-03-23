@@ -17,7 +17,7 @@ export const businessMetadataSchema = z.object({
   owner_email: z.string().max(200).nullable().optional(),
   owner_phone: z.string().max(50).nullable().optional(),
   domain: z.string().max(200).nullable().optional(),
-  web_design_tier: z.enum(['basic', 'advanced']).nullable().optional(),
+  web_design_tier: z.enum(['starter', 'growth', 'pro']).nullable().optional(),
   live_website_url: z.string().max(500).nullable().optional(),
   vercel_project_url: z.string().max(500).nullable().optional(),
   // Shared fields

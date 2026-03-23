@@ -24,7 +24,7 @@ export async function createWebDesignClient(
   }
 
   const { businessName, ownerName, ownerEmail, ownerPhone, domain, subscriptionTier, hasReviewAddon } = parsed.data
-  const monthlyFee = subscriptionTier === 'advanced' ? 299 : 199
+  const monthlyFee = subscriptionTier === 'pro' ? 349 : subscriptionTier === 'growth' ? 249 : 149
 
   const supabase = await createClient()
   const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -97,7 +97,7 @@ export async function createWebDesignProject(
     ownerEmail?: string
     ownerPhone?: string
     domain?: string
-    subscriptionTier: 'basic' | 'advanced'
+    subscriptionTier: 'starter' | 'growth' | 'pro'
     hasReviewAddon: boolean
   }
 ): Promise<{ success: true } | { success: false; error: string }> {
@@ -107,7 +107,7 @@ export async function createWebDesignProject(
 
   const { randomBytes } = await import('crypto')
   const portalToken = randomBytes(24).toString('base64url')
-  const monthlyFee = input.subscriptionTier === 'advanced' ? 299 : 199
+  const monthlyFee = input.subscriptionTier === 'pro' ? 349 : input.subscriptionTier === 'growth' ? 249 : 149
 
   const { error } = await supabase
     .from('web_projects')
@@ -166,6 +166,27 @@ export async function updateClientDetails(
   if (error) {
     console.error('Failed to update client details:', error)
     return { error: error.message }
+  }
+
+  // Sync changed fields to web_projects so the portal reads correct data
+  const webProjectUpdates: Record<string, unknown> = {}
+  if (parsed.data.web_design_tier !== undefined) {
+    webProjectUpdates.subscription_tier = parsed.data.web_design_tier
+  }
+  if (parsed.data.owner_email !== undefined) {
+    webProjectUpdates.client_email = parsed.data.owner_email
+  }
+  if (parsed.data.owner_name !== undefined) {
+    webProjectUpdates.client_name = parsed.data.owner_name
+  }
+  if (parsed.data.owner_phone !== undefined) {
+    webProjectUpdates.client_phone = parsed.data.owner_phone
+  }
+  if (Object.keys(webProjectUpdates).length > 0) {
+    await supabase
+      .from('web_projects')
+      .update(webProjectUpdates)
+      .eq('business_id', businessId)
   }
 
   revalidatePath('/clients')

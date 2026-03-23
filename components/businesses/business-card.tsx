@@ -112,7 +112,7 @@ export function BusinessCard({ business, isActive, webProject, openTicketCount =
           {tier && (
             <div>
               <span className="inline-block text-xs font-medium bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
-                {tier === 'basic' ? 'Basic' : 'Advanced'}
+                {tier === 'starter' ? 'Starter' : tier === 'growth' ? 'Growth' : 'Pro'}
               </span>
             </div>
           )}

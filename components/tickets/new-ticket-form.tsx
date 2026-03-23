@@ -46,7 +46,8 @@ export function NewTicketForm({
   // Local count that may be updated if the RPC returns a fresh over_limit count
   const [monthlyCount, setMonthlyCount] = useState(initialMonthlyCount)
 
-  const isAtLimit = monthlyCount >= monthlyLimit
+  const isUnlimited = monthlyLimit === -1
+  const isAtLimit = !isUnlimited && monthlyCount >= monthlyLimit
   const isOverSubmit = isAtLimit && !overageConfirmed
 
   function handleClose(nextOpen: boolean) {
@@ -98,8 +99,8 @@ export function NewTicketForm({
     })
   }
 
-  const quotaPercent = monthlyLimit > 0 ? (monthlyCount / monthlyLimit) * 100 : 0
-  const isNearLimit = quotaPercent >= 80 && !isAtLimit
+  const quotaPercent = !isUnlimited && monthlyLimit > 0 ? (monthlyCount / monthlyLimit) * 100 : 0
+  const isNearLimit = !isUnlimited && quotaPercent >= 80 && !isAtLimit
 
   return (
     <Sheet open={open} onOpenChange={handleClose}>
@@ -117,7 +118,9 @@ export function NewTicketForm({
                   : 'text-muted-foreground'
               )}
             >
-              {monthlyCount} of {monthlyLimit} revisions used this month
+              {isUnlimited
+                ? `${monthlyCount} revisions this month (unlimited)`
+                : `${monthlyCount} of ${monthlyLimit} revisions used this month`}
             </div>
           </SheetDescription>
         </SheetHeader>
@@ -133,7 +136,7 @@ export function NewTicketForm({
                   className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5"
                 />
                 <p className="text-sm text-amber-800 dark:text-amber-200">
-                  You&apos;ve used all {monthlyLimit} revisions for this month.
+                  You&apos;ve used all {monthlyLimit} revisions this month.
                   Additional requests are available at{' '}
                   <strong>$50 each</strong>.
                 </p>

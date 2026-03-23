@@ -7,6 +7,7 @@ import {
   REVISION_LIMITS,
   DEFAULT_REVISION_LIMIT,
   OVERAGE_FEE_USD,
+  isUnlimitedTier,
 } from '@/lib/constants/tickets'
 import type { TicketStatus, TicketMessage } from '@/lib/types/database'
 
@@ -51,8 +52,12 @@ export async function createTicket(
 
   // Determine monthly limit from subscription tier (single source of truth)
   const tier = input.subscriptionTier ?? null
-  const monthlyLimit =
-    tier && REVISION_LIMITS[tier] ? REVISION_LIMITS[tier] : DEFAULT_REVISION_LIMIT
+  const unlimited = isUnlimitedTier(tier)
+  const monthlyLimit = unlimited
+    ? 999999
+    : (tier && REVISION_LIMITS[tier] !== undefined && REVISION_LIMITS[tier] > 0)
+      ? REVISION_LIMITS[tier]
+      : DEFAULT_REVISION_LIMIT
 
   const { data, error } = await supabase.rpc('submit_ticket_with_limit_check', {
     p_project_id: input.projectId,

@@ -6,37 +6,35 @@ import { Check, ShieldCheck } from '@phosphor-icons/react/dist/ssr';
 const CALENDLY_URL =
   'https://calendly.com/anthony-le-avisloop/avisloop-demo-onboarding-call';
 
-const basicFeatures = [
-  '1–4 page professional website',
+const starterFeatures = [
+  'Single-page professional website',
   'Mobile-optimized responsive design',
-  'On-page SEO setup (meta tags, schema, sitemap)',
+  'Basic on-page SEO',
   '2 revision requests per month',
   'Client portal access',
-  'Ongoing hosting and maintenance',
-  'SSL certificate included',
-  'Domain setup included',
+  'Hosting, SSL & domain included',
+  'Email support',
 ];
 
-const advancedFeatures = [
-  '4–10 page professional website',
+const growthFeatures = [
+  'Up to 5-page professional website',
   'Mobile-optimized responsive design',
-  'Full SEO setup (on-page, local SEO, Google Maps)',
-  '4 revision requests per month',
+  'Advanced local SEO',
+  'Unlimited revision requests',
   'Client portal access',
-  'Ongoing hosting and maintenance',
-  'SSL certificate included',
-  'Domain setup included',
-  'Contact form and lead capture',
+  'Hosting, SSL & domain included',
   'Priority support',
 ];
 
-const addonFeatures = [
-  'Automated multi-touch review campaigns',
-  'AI-personalized messages (email + SMS)',
-  'Smart review funnel (4–5 stars → Google, 1–3 stays private)',
-  'AI-written responses posted to Google',
-  'Monthly performance reports',
-  'Competitor tracking',
+const proFeatures = [
+  'Up to 5 + service area pages',
+  'Mobile-optimized responsive design',
+  'Advanced local SEO',
+  'Unlimited revision requests',
+  'Client portal access',
+  'Hosting, SSL & domain included',
+  'Priority support',
+  'Review management included',
 ];
 
 function FeatureList({ features }: { features: string[] }) {
@@ -78,13 +76,13 @@ export function PricingWebDesign() {
 
         {/* Cards grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-          {/* Card 1 — Basic */}
+          {/* Card 1 — Starter */}
           <FadeIn direction="up" delay={80}>
             <div className="rounded-2xl border border-border/50 bg-card p-8 flex flex-col h-full">
               {/* Badge */}
               <div className="mb-6">
                 <span className="inline-flex items-center rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
-                  Basic
+                  Starter
                 </span>
               </div>
 
@@ -92,18 +90,20 @@ export function PricingWebDesign() {
               <div className="mb-2">
                 <div className="flex items-baseline gap-1">
                   <span className="text-5xl font-extrabold tracking-tight text-foreground">
-                    $199
+                    $149
                   </span>
                   <span className="text-base text-muted-foreground">/month</span>
                 </div>
                 <p className="text-sm text-muted-foreground mt-1">
-                  For small service businesses
+                  For solo operators
                 </p>
               </div>
 
               <div className="my-6 border-t border-border/30" />
 
-              <FeatureList features={basicFeatures} />
+              <FeatureList features={starterFeatures} />
+
+              <p className="text-xs text-muted-foreground mt-4">Review add-on available (+$99/mo)</p>
 
               <div className="mt-8">
                 <Button
@@ -124,7 +124,7 @@ export function PricingWebDesign() {
             </div>
           </FadeIn>
 
-          {/* Card 2 — Advanced (highlighted) */}
+          {/* Card 2 — Growth (highlighted) */}
           <FadeIn direction="up" delay={160}>
             <div className="relative rounded-2xl border-2 border-accent bg-card p-8 flex flex-col h-full shadow-[0_4px_20px_rgba(217,119,6,0.12)]">
               {/* Best Value pill */}
@@ -137,7 +137,7 @@ export function PricingWebDesign() {
               {/* Badge */}
               <div className="mb-6">
                 <span className="inline-flex items-center rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
-                  Advanced
+                  Growth
                 </span>
               </div>
 
@@ -145,7 +145,7 @@ export function PricingWebDesign() {
               <div className="mb-2">
                 <div className="flex items-baseline gap-1">
                   <span className="text-5xl font-extrabold tracking-tight text-foreground">
-                    $299
+                    $249
                   </span>
                   <span className="text-base text-muted-foreground">/month</span>
                 </div>
@@ -156,7 +156,9 @@ export function PricingWebDesign() {
 
               <div className="my-6 border-t border-border/30" />
 
-              <FeatureList features={advancedFeatures} />
+              <FeatureList features={growthFeatures} />
+
+              <p className="text-xs text-muted-foreground mt-4">Review add-on available (+$99/mo)</p>
 
               <div className="mt-8">
                 <Button
@@ -176,13 +178,13 @@ export function PricingWebDesign() {
             </div>
           </FadeIn>
 
-          {/* Card 3 — Review Add-On */}
+          {/* Card 3 — Pro */}
           <FadeIn direction="up" delay={240}>
             <div className="rounded-2xl border border-border/50 bg-card p-8 flex flex-col h-full">
               {/* Badge */}
               <div className="mb-6">
                 <span className="inline-flex items-center rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
-                  Add-On
+                  Pro
                 </span>
               </div>
 
@@ -190,27 +192,20 @@ export function PricingWebDesign() {
               <div className="mb-2">
                 <div className="flex items-baseline gap-1">
                   <span className="text-5xl font-extrabold tracking-tight text-foreground">
-                    $99
+                    $349
                   </span>
                   <span className="text-base text-muted-foreground">/month</span>
                 </div>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Add to any plan
+                  Maximum growth
                 </p>
               </div>
 
-              <p className="text-sm text-foreground/80 mt-1 mb-2 leading-snug">
-                Add Google review automation to your plan
-              </p>
-
               <div className="my-6 border-t border-border/30" />
 
-              <FeatureList features={addonFeatures} />
+              <FeatureList features={proFeatures} />
 
-              <div className="mt-8 flex flex-col gap-3">
-                <Button asChild size="lg" variant="outline" className="w-full">
-                  <Link href="/reputation">Learn More</Link>
-                </Button>
+              <div className="mt-8">
                 <Button
                   asChild
                   size="lg"

@@ -114,8 +114,8 @@ export function HeroWebDesign() {
               {/* Subtitle */}
               <p className="mt-6 text-lg text-muted-foreground max-w-md leading-relaxed">
                 We build and maintain professional websites for HVAC, plumbing,
-                electrical, and roofing companies. Starting at $199/month — no
-                upfront cost, no contracts, no technical knowledge needed.
+                electrical, and roofing companies. Starting at $149/month — no
+                contracts, cancel anytime, no technical knowledge needed.
               </p>
 
               {/* CTA buttons */}

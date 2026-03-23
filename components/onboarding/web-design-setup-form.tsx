@@ -25,7 +25,7 @@ export function WebDesignSetupForm({ businessId }: WebDesignSetupFormProps) {
   const [ownerEmail, setOwnerEmail] = useState('')
   const [ownerPhone, setOwnerPhone] = useState('')
   const [domain, setDomain] = useState('')
-  const [tier, setTier] = useState<'basic' | 'advanced'>('basic')
+  const [tier, setTier] = useState<'starter' | 'growth' | 'pro'>('starter')
   const [error, setError] = useState<string | null>(null)
 
   function handleSubmit(e: React.FormEvent) {
@@ -126,10 +126,11 @@ export function WebDesignSetupForm({ businessId }: WebDesignSetupFormProps) {
             </div>
             <div className="space-y-3">
               <Label>Subscription tier</Label>
-              <div className="flex gap-2">
+              <div className="grid gap-2">
                 {([
-                  { value: 'basic' as const, label: 'Basic — $199/mo', desc: '1-4 pages, 2 revisions/mo' },
-                  { value: 'advanced' as const, label: 'Advanced — $299/mo', desc: '4-10 pages, 4 revisions/mo' },
+                  { value: 'starter' as const, label: 'Starter — $149/mo', desc: 'Single-page, 2 revisions/mo' },
+                  { value: 'growth' as const, label: 'Growth — $249/mo', desc: 'Up to 5 pages, unlimited revisions' },
+                  { value: 'pro' as const, label: 'Pro — $349/mo', desc: '5+ service area pages, unlimited revisions, reviews included' },
                 ]).map((opt) => (
                   <button
                     key={opt.value}
@@ -137,7 +138,7 @@ export function WebDesignSetupForm({ businessId }: WebDesignSetupFormProps) {
                     onClick={() => setTier(opt.value)}
                     disabled={isPending}
                     className={cn(
-                      'flex-1 px-3 py-3 rounded-lg border text-left transition-colors',
+                      'px-3 py-3 rounded-lg border text-left transition-colors',
                       tier === opt.value
                         ? 'bg-foreground text-background border-foreground'
                         : 'bg-background border-border hover:border-foreground/50'

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/service-role'
 import { checkPortalRateLimit } from '@/lib/rate-limit'
 import { portalTicketSchema } from '@/lib/validations/portal-ticket'
-import { REVISION_LIMITS, DEFAULT_REVISION_LIMIT } from '@/lib/constants/tickets'
+import { REVISION_LIMITS, DEFAULT_REVISION_LIMIT, isUnlimitedTier } from '@/lib/constants/tickets'
 
 /**
  * POST /api/portal/tickets — Public portal ticket submission.
@@ -71,8 +71,13 @@ export async function POST(request: NextRequest) {
   }
 
   const tier = project.subscription_tier as string | null
-  const monthlyLimit =
-    tier && REVISION_LIMITS[tier] ? REVISION_LIMITS[tier] : DEFAULT_REVISION_LIMIT
+  const unlimited = isUnlimitedTier(tier)
+  // For unlimited tiers, pass a very high limit so the RPC never rejects
+  const monthlyLimit = unlimited
+    ? 999999
+    : (tier && REVISION_LIMITS[tier] !== undefined && REVISION_LIMITS[tier] > 0)
+      ? REVISION_LIMITS[tier]
+      : DEFAULT_REVISION_LIMIT
 
   // Step 4: Enforce monthly quota — atomic check + insert via RPC
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
