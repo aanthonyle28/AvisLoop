@@ -4,9 +4,20 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
-import { ChatCircleText, CheckCircle, Clock, ArrowRight, Paperclip, X, SpinnerGap } from '@phosphor-icons/react'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import {
+  PaperPlaneTilt,
+  CheckCircle,
+  Clock,
+  Paperclip,
+  X,
+  SpinnerGap,
+  ArrowRight,
+  ChatCircleText,
+  CaretDown,
+  Files,
+  Infinity as InfinityIcon,
+} from '@phosphor-icons/react'
+import { cn } from '@/lib/utils'
 import { PortalTicketThread } from './portal-ticket-thread'
 import type { PortalProject, PortalQuota, PortalTicket } from '@/lib/data/portal'
 
@@ -17,25 +28,43 @@ interface ClientPortalProps {
   initialTickets: PortalTicket[]
 }
 
-/** Tailwind class + label for each ticket status */
-function getStatusDisplay(status: string): { label: string; className: string } {
+/* ─── Status display helper ──────────────────────────── */
+
+function getStatusDisplay(status: string): { label: string; dot: string } {
   switch (status) {
     case 'open':
     case 'submitted':
-      return { label: 'Open', className: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' }
+      return { label: 'Open', dot: 'bg-amber-500' }
     case 'in_progress':
-      return { label: 'In Progress', className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' }
+      return { label: 'In Progress', dot: 'bg-blue-500' }
     case 'waiting_client':
-      return { label: 'Waiting on You', className: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' }
+      return { label: 'Waiting on You', dot: 'bg-purple-500' }
     case 'resolved':
     case 'completed':
-      return { label: 'Resolved', className: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' }
+      return { label: 'Resolved', dot: 'bg-green-500' }
     case 'closed':
-      return { label: 'Closed', className: 'bg-muted text-muted-foreground' }
+      return { label: 'Closed', dot: 'bg-muted-foreground' }
     default:
-      return { label: status, className: 'bg-muted text-muted-foreground' }
+      return { label: status, dot: 'bg-muted-foreground' }
   }
 }
+
+/* ─── Logo SVG ───────────────────────────────────────── */
+
+function PortalLogo() {
+  return (
+    <svg viewBox="0 0 28 28" fill="none" className="w-5 h-5" aria-hidden="true">
+      <path
+        d="M13.9614 13.9428C13.9614 13.9428 15.6661 8.28761 13.1687 5.6657C9.39938 1.70861 2.46616 5.36825 1.25864 10.7178C1.06397 11.5803 0.964999 12.4675 1.01126 13.3511C1.39358 20.6533 9.24432 25.3666 16.2932 23.6446C17.7686 23.2841 19.1513 22.7512 20.2657 21.9762C27.8097 16.7301 26.9724 8.28761 26.9724 8.28761"
+        stroke="currentColor"
+        strokeWidth="2"
+        className="text-accent"
+      />
+    </svg>
+  )
+}
+
+/* ─── Main Portal ────────────────────────────────────── */
 
 export function ClientPortal({ token, project, quota, initialTickets }: ClientPortalProps) {
   const router = useRouter()
@@ -45,10 +74,18 @@ export function ClientPortal({ token, project, quota, initialTickets }: ClientPo
   const [attachments, setAttachments] = useState<{ name: string; storagePath: string; readUrl: string }[]>([])
   const [uploading, setUploading] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [expandedTicket, setExpandedTicket] = useState<string | null>(
+    initialTickets.length > 0 ? initialTickets[0].id : null
+  )
 
   const projectLabel = project.domain ?? project.client_name ?? 'Your Project'
   const isUnlimited = quota.limit === -1
   const quotaPercent = !isUnlimited && quota.limit > 0 ? Math.min(100, (quota.used / quota.limit) * 100) : 0
+  const isExhausted = !isUnlimited && quota.remaining === 0
+
+  const openCount = initialTickets.filter(
+    (t) => t.status !== 'resolved' && t.status !== 'completed' && t.status !== 'closed'
+  ).length
 
   async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files
@@ -102,7 +139,6 @@ export function ClientPortal({ token, project, quota, initialTickets }: ClientPo
         setUploading((c) => c - 1)
       }
     }
-    // Reset input so the same file can be re-selected
     e.target.value = ''
   }
 
@@ -147,70 +183,131 @@ export function ClientPortal({ token, project, quota, initialTickets }: ClientPo
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-4 sm:p-6 space-y-6">
-      {/* Header */}
-      <div>
-        <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Client Portal</p>
-        <h1 className="text-2xl font-bold tracking-tight">{projectLabel}</h1>
-      </div>
+    <div className="min-h-screen bg-background text-foreground">
+      {/* ── Top bar ── */}
+      <header className="border-b border-border/20">
+        <div className="max-w-3xl mx-auto px-5 sm:px-8 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <PortalLogo />
+            <span className="text-sm font-semibold tracking-tight">AvisLoop</span>
+          </div>
+          <span className="text-xs tracking-[0.15em] uppercase text-muted-foreground/50 font-medium">
+            Client Portal
+          </span>
+        </div>
+      </header>
 
-      {/* Quota card */}
-      <Card className="overflow-hidden">
-        <CardHeader className="pb-3">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider">Monthly Revisions</p>
-          <div className="flex items-baseline gap-2">
+      <main className="max-w-3xl mx-auto px-5 sm:px-8 py-10 sm:py-14 space-y-10">
+        {/* ── Hero header ── */}
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-accent mb-3">
+            {projectLabel}
+          </p>
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight leading-[1.1]">
+            Your Revisions,<br />
+            <span className="text-muted-foreground">One Place.</span>
+          </h1>
+        </div>
+
+        {/* ── Stats row ── */}
+        <div className="grid grid-cols-3 gap-3">
+          <div className="rounded-2xl border border-border/30 bg-card p-5">
+            <p className="text-[10px] tracking-[0.15em] uppercase text-muted-foreground/60 font-medium mb-1.5">
+              This Month
+            </p>
+            <p className="text-2xl font-black tracking-tight">{quota.used}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {isUnlimited ? 'submitted' : `of ${quota.limit}`}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-border/30 bg-card p-5">
+            <p className="text-[10px] tracking-[0.15em] uppercase text-muted-foreground/60 font-medium mb-1.5">
+              {isUnlimited ? 'Plan' : 'Remaining'}
+            </p>
             {isUnlimited ? (
-              <>
-                <span className="text-3xl font-bold">{quota.used}</span>
-                <span className="text-muted-foreground text-sm">
-                  submitted this month (unlimited)
-                </span>
-              </>
+              <div className="flex items-center gap-1.5">
+                <InfinityIcon size={22} weight="bold" className="text-accent" />
+                <p className="text-sm font-bold text-accent mt-0.5">Unlimited</p>
+              </div>
             ) : (
               <>
-                <span className="text-3xl font-bold">{quota.remaining}</span>
-                <span className="text-muted-foreground text-sm">
-                  of {quota.limit} remaining this month
-                </span>
+                <p className={cn('text-2xl font-black tracking-tight', isExhausted && 'text-red-500')}>
+                  {quota.remaining}
+                </p>
+                <p className="text-xs text-muted-foreground mt-0.5">revisions left</p>
               </>
             )}
           </div>
-        </CardHeader>
-        <CardContent className="pt-0 space-y-3">
-          {/* Progress bar — only for capped plans */}
-          {!isUnlimited && (
-            <div className="h-2 rounded-full bg-muted overflow-hidden">
+          <div className="rounded-2xl border border-border/30 bg-card p-5">
+            <p className="text-[10px] tracking-[0.15em] uppercase text-muted-foreground/60 font-medium mb-1.5">
+              In Progress
+            </p>
+            <p className="text-2xl font-black tracking-tight">{openCount}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">open tickets</p>
+          </div>
+        </div>
+
+        {/* ── Progress bar (capped plans only) ── */}
+        {!isUnlimited && (
+          <div className="space-y-2">
+            <div className="h-1.5 rounded-full bg-border/30 overflow-hidden">
               <div
-                className="h-2 rounded-full bg-orange-500 transition-all"
+                className={cn(
+                  'h-1.5 rounded-full transition-all duration-500',
+                  isExhausted ? 'bg-red-500' : quotaPercent >= 80 ? 'bg-amber-500' : 'bg-accent'
+                )}
                 style={{ width: `${quotaPercent}%` }}
               />
             </div>
-          )}
-
-          {/* Warning when exhausted (only for capped plans) */}
-          {!isUnlimited && quota.remaining === 0 && (
-            <div className="rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-3 py-2">
-              <p className="text-xs text-amber-700 dark:text-amber-400">
+            {isExhausted && (
+              <p className="text-xs text-red-500 dark:text-red-400">
                 Monthly limit reached — contact your agency for additional requests.
               </p>
-            </div>
-          )}
+            )}
+          </div>
+        )}
 
-          {/* Submit button + inline form */}
+        {/* ── Submit section ── */}
+        <div className="rounded-2xl border border-border/30 bg-card overflow-hidden">
           {!showForm ? (
-            <Button
-              onClick={() => setShowForm(true)}
-              disabled={!isUnlimited && quota.remaining === 0}
-              className="w-full sm:w-auto"
-            >
-              <ArrowRight size={16} className="mr-2" />
-              Submit Revision Request
-            </Button>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-3 pt-1">
+            <div className="p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <label htmlFor="portal-title" className="text-xs font-medium text-foreground block mb-1">
-                  Title <span className="text-destructive">*</span>
+                <h2 className="text-lg font-bold tracking-tight">Need a change?</h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Submit a revision request and we&apos;ll get it done within 48 hours.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowForm(true)}
+                disabled={isExhausted}
+                className={cn(
+                  'inline-flex items-center gap-2.5 rounded-full px-6 py-3 text-sm font-semibold transition-colors shrink-0',
+                  isExhausted
+                    ? 'bg-muted text-muted-foreground cursor-not-allowed'
+                    : 'bg-foreground text-background hover:bg-foreground/90'
+                )}
+              >
+                <PaperPlaneTilt size={16} weight="fill" />
+                New Request
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-5">
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-lg font-bold tracking-tight">New Revision Request</h2>
+                <button
+                  type="button"
+                  onClick={() => { setShowForm(false); setTitle(''); setDescription(''); setAttachments([]) }}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="Close form"
+                >
+                  <X size={18} weight="bold" />
+                </button>
+              </div>
+
+              <div>
+                <label htmlFor="portal-title" className="text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground block mb-2">
+                  Title <span className="text-accent">*</span>
                 </label>
                 <input
                   id="portal-title"
@@ -220,13 +317,15 @@ export function ClientPortal({ token, project, quota, initialTickets }: ClientPo
                   placeholder="e.g. Update hero headline text"
                   required
                   minLength={3}
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 disabled:opacity-50"
+                  className="w-full rounded-xl border border-border/40 bg-background px-4 py-3 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/50 transition-all disabled:opacity-50"
                   disabled={isSubmitting}
+                  autoFocus
                 />
               </div>
+
               <div>
-                <label htmlFor="portal-description" className="text-xs font-medium text-foreground block mb-1">
-                  Description <span className="text-muted-foreground">(optional)</span>
+                <label htmlFor="portal-description" className="text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground block mb-2">
+                  Description <span className="text-muted-foreground/50 normal-case tracking-normal font-normal">(optional)</span>
                 </label>
                 <textarea
                   id="portal-description"
@@ -234,26 +333,32 @@ export function ClientPortal({ token, project, quota, initialTickets }: ClientPo
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Describe what you'd like changed..."
                   rows={3}
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 disabled:opacity-50 resize-none"
+                  className="w-full rounded-xl border border-border/40 bg-background px-4 py-3 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/50 transition-all disabled:opacity-50 resize-none"
                   disabled={isSubmitting}
                 />
               </div>
+
               {/* Attachments */}
               <div className="space-y-2">
-                <label className="text-xs font-medium text-foreground block">
-                  Attachments <span className="text-muted-foreground">(optional — screenshots, PDFs)</span>
+                <label className="text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground block">
+                  Attachments
                 </label>
                 <label
-                  className="flex items-center gap-2 px-3 py-2 rounded-md border border-dashed border-border text-sm text-muted-foreground cursor-pointer hover:border-foreground/40 transition-colors"
+                  className={cn(
+                    'flex items-center gap-3 px-4 py-3 rounded-xl border border-dashed transition-colors cursor-pointer',
+                    attachments.length >= 5
+                      ? 'border-border/20 text-muted-foreground/30 cursor-not-allowed'
+                      : 'border-border/40 text-muted-foreground hover:border-accent/40 hover:text-accent'
+                  )}
                 >
                   <Paperclip size={16} />
                   {uploading > 0 ? (
-                    <span className="flex items-center gap-1.5">
+                    <span className="flex items-center gap-1.5 text-sm">
                       <SpinnerGap size={14} className="animate-spin" />
                       Uploading {uploading} file{uploading !== 1 ? 's' : ''}...
                     </span>
                   ) : (
-                    <span>Add files (PNG, JPG, PDF — max 10MB each)</span>
+                    <span className="text-sm">Drop files or click to browse (PNG, JPG, PDF)</span>
                   )}
                   <input
                     type="file"
@@ -265,14 +370,17 @@ export function ClientPortal({ token, project, quota, initialTickets }: ClientPo
                   />
                 </label>
                 {attachments.length > 0 && (
-                  <ul className="space-y-1">
+                  <ul className="space-y-1.5">
                     {attachments.map((file, i) => (
-                      <li key={i} className="flex items-center justify-between rounded-md bg-muted px-3 py-1.5 text-sm">
-                        <span className="truncate max-w-[240px]">{file.name}</span>
+                      <li key={i} className="flex items-center justify-between rounded-lg bg-muted/50 px-3 py-2 text-sm">
+                        <span className="flex items-center gap-2 truncate">
+                          <Files size={14} className="text-muted-foreground shrink-0" />
+                          <span className="truncate max-w-[260px]">{file.name}</span>
+                        </span>
                         <button
                           type="button"
                           onClick={() => setAttachments((prev) => prev.filter((_, idx) => idx !== i))}
-                          className="ml-2 text-muted-foreground hover:text-destructive transition-colors"
+                          className="ml-2 text-muted-foreground hover:text-red-500 transition-colors"
                           aria-label={`Remove ${file.name}`}
                         >
                           <X size={14} />
@@ -283,92 +391,148 @@ export function ClientPortal({ token, project, quota, initialTickets }: ClientPo
                 )}
               </div>
 
-              <div className="flex gap-2">
-                <Button type="submit" disabled={isSubmitting || uploading > 0 || title.trim().length < 3}>
-                  {isSubmitting ? 'Submitting...' : 'Submit Request'}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => { setShowForm(false); setTitle(''); setDescription('') }}
-                  disabled={isSubmitting}
+              <div className="flex gap-3 pt-1">
+                <button
+                  type="submit"
+                  disabled={isSubmitting || uploading > 0 || title.trim().length < 3}
+                  className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-6 py-3 text-sm font-semibold hover:bg-foreground/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Cancel
-                </Button>
+                  {isSubmitting ? (
+                    <>
+                      <SpinnerGap size={14} className="animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <ArrowRight size={14} weight="bold" />
+                      Submit Request
+                    </>
+                  )}
+                </button>
               </div>
             </form>
           )}
-        </CardContent>
-      </Card>
-
-      {/* Ticket history */}
-      <div>
-        <div className="flex items-center gap-2 mb-3">
-          <ChatCircleText size={18} className="text-muted-foreground" />
-          <h2 className="font-semibold">Revision History</h2>
-          {initialTickets.length > 0 && (
-            <span className="text-xs bg-muted text-muted-foreground rounded-full px-2 py-0.5">
-              {initialTickets.length}
-            </span>
-          )}
         </div>
 
-        {initialTickets.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-muted-foreground/30 py-10 px-6 text-center">
-            <p className="text-sm text-muted-foreground">
-              No revision requests yet. Submit your first request above.
-            </p>
+        {/* ── Ticket history ── */}
+        <div>
+          <div className="flex items-center gap-2.5 mb-5">
+            <ChatCircleText size={18} weight="fill" className="text-accent" />
+            <h2 className="text-xl font-bold tracking-tight">Revision History</h2>
+            {initialTickets.length > 0 && (
+              <span className="text-xs bg-accent/10 text-accent rounded-full px-2.5 py-0.5 font-semibold">
+                {initialTickets.length}
+              </span>
+            )}
           </div>
-        ) : (
-          <div className="space-y-4">
-            {initialTickets.map((ticket) => {
-              const { label, className } = getStatusDisplay(ticket.status)
-              const isResolved = ticket.status === 'resolved' || ticket.status === 'completed' || ticket.status === 'closed'
-              return (
-                <Card key={ticket.id}>
-                  <CardContent className="pt-4 pb-4">
-                    <div className="flex items-start justify-between gap-3 mb-2">
-                      <div className="flex items-start gap-2">
-                        {isResolved ? (
-                          <CheckCircle size={18} className="text-green-600 mt-0.5 shrink-0" />
-                        ) : (
-                          <Clock size={18} className="text-muted-foreground mt-0.5 shrink-0" />
+
+          {initialTickets.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-border/30 py-16 px-6 text-center">
+              <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
+                <ChatCircleText size={22} className="text-muted-foreground/40" />
+              </div>
+              <p className="text-sm text-muted-foreground">
+                No revision requests yet. Submit your first request above.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {initialTickets.map((ticket) => {
+                const { label, dot } = getStatusDisplay(ticket.status)
+                const isResolved = ticket.status === 'resolved' || ticket.status === 'completed' || ticket.status === 'closed'
+                const isExpanded = expandedTicket === ticket.id
+
+                return (
+                  <div
+                    key={ticket.id}
+                    className="rounded-2xl border border-border/30 bg-card overflow-hidden transition-colors"
+                  >
+                    {/* Ticket header — always visible, clickable */}
+                    <button
+                      type="button"
+                      onClick={() => setExpandedTicket(isExpanded ? null : ticket.id)}
+                      className="w-full flex items-center gap-3 p-4 sm:p-5 text-left hover:bg-muted/30 transition-colors"
+                    >
+                      {isResolved ? (
+                        <CheckCircle size={18} weight="fill" className="text-green-500 shrink-0" />
+                      ) : (
+                        <Clock size={18} weight="fill" className="text-amber-500 shrink-0" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-sm truncate">{ticket.title}</h3>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {format(new Date(ticket.created_at), 'MMM d, yyyy')}
+                          {ticket.ticket_messages.length > 0 && (
+                            <span className="ml-2 text-muted-foreground/50">
+                              {ticket.ticket_messages.length} message{ticket.ticket_messages.length !== 1 ? 's' : ''}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2.5 shrink-0">
+                        <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                          <span className={cn('w-1.5 h-1.5 rounded-full', dot)} />
+                          {label}
+                        </span>
+                        <CaretDown
+                          size={14}
+                          weight="bold"
+                          className={cn(
+                            'text-muted-foreground/40 transition-transform duration-200',
+                            isExpanded && 'rotate-180'
+                          )}
+                        />
+                      </div>
+                    </button>
+
+                    {/* Expanded content */}
+                    {isExpanded && (
+                      <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-0 border-t border-border/20">
+                        {ticket.description && (
+                          <p className="text-sm text-muted-foreground mt-3 whitespace-pre-wrap leading-relaxed">
+                            {ticket.description}
+                          </p>
                         )}
-                        <h3 className="font-medium text-sm leading-snug">{ticket.title}</h3>
-                      </div>
-                      <span className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${className}`}>
-                        {label}
-                      </span>
-                    </div>
-                    {ticket.description && (
-                      <p className="text-xs text-muted-foreground mb-2 ml-6 whitespace-pre-wrap">
-                        {ticket.description}
-                      </p>
-                    )}
-                    <p className="text-xs text-muted-foreground ml-6">
-                      Submitted {format(new Date(ticket.created_at), 'MMM d, yyyy')}
-                    </p>
-                    {ticket.ticket_messages.length > 0 && (
-                      <div className="ml-6">
-                        <PortalTicketThread messages={ticket.ticket_messages} />
+                        {ticket.ticket_messages.length > 0 && (
+                          <div className="mt-4">
+                            <PortalTicketThread messages={ticket.ticket_messages} />
+                          </div>
+                        )}
+                        {/* Reply form — only for open tickets */}
+                        {!isResolved && (
+                          <TicketReplyForm token={token} ticketId={ticket.id} />
+                        )}
                       </div>
                     )}
-                    {/* Reply form — only for open tickets */}
-                    {!isResolved && (
-                      <TicketReplyForm token={token} ticketId={ticket.id} />
-                    )}
-                  </CardContent>
-                </Card>
-              )
-            })}
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      </main>
+
+      {/* ── Footer ── */}
+      <footer className="border-t border-border/20 py-8">
+        <div className="max-w-3xl mx-auto px-5 sm:px-8 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <PortalLogo />
+            <span className="text-xs text-muted-foreground/40">&copy; 2026 AvisLoop</span>
           </div>
-        )}
-      </div>
+          <a
+            href="mailto:support@avisloop.com"
+            className="text-xs text-muted-foreground/40 hover:text-foreground transition-colors"
+          >
+            Need help?
+          </a>
+        </div>
+      </footer>
     </div>
   )
 }
 
-/** Inline reply form for a single ticket */
+/* ─── Ticket Reply Form ──────────────────────────────── */
+
 function TicketReplyForm({ token, ticketId }: { token: string; ticketId: string }) {
   const router = useRouter()
   const [replyOpen, setReplyOpen] = useState(false)
@@ -380,8 +544,9 @@ function TicketReplyForm({ token, ticketId }: { token: string; ticketId: string 
       <button
         type="button"
         onClick={() => setReplyOpen(true)}
-        className="ml-6 mt-2 text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors"
+        className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-accent transition-colors"
       >
+        <ChatCircleText size={13} />
         Reply
       </button>
     )
@@ -413,23 +578,32 @@ function TicketReplyForm({ token, ticketId }: { token: string; ticketId: string 
   }
 
   return (
-    <div className="ml-6 mt-3 space-y-2">
+    <div className="mt-4 space-y-3">
       <textarea
         value={replyText}
         onChange={(e) => setReplyText(e.target.value)}
         placeholder="Type your reply..."
         rows={2}
         maxLength={5000}
-        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 resize-none"
+        className="w-full rounded-xl border border-border/40 bg-background px-4 py-3 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/50 resize-none"
         disabled={sending}
+        autoFocus
       />
       <div className="flex gap-2">
-        <Button size="sm" onClick={handleSendReply} disabled={sending || !replyText.trim()}>
+        <button
+          onClick={handleSendReply}
+          disabled={sending || !replyText.trim()}
+          className="inline-flex items-center gap-1.5 rounded-full bg-foreground text-background px-5 py-2 text-xs font-semibold hover:bg-foreground/90 transition-colors disabled:opacity-50"
+        >
           {sending ? 'Sending...' : 'Send Reply'}
-        </Button>
-        <Button size="sm" variant="outline" onClick={() => { setReplyOpen(false); setReplyText('') }} disabled={sending}>
+        </button>
+        <button
+          onClick={() => { setReplyOpen(false); setReplyText('') }}
+          disabled={sending}
+          className="rounded-full border border-border/40 px-5 py-2 text-xs font-medium text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+        >
           Cancel
-        </Button>
+        </button>
       </div>
     </div>
   )

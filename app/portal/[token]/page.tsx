@@ -39,13 +39,11 @@ export default async function PortalPage({ params }: Props) {
   ])
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
-      <ClientPortal
-        token={token}
-        project={project}
-        quota={quota}
-        initialTickets={tickets}
-      />
-    </div>
+    <ClientPortal
+      token={token}
+      project={project}
+      quota={quota}
+      initialTickets={tickets}
+    />
   )
 }
