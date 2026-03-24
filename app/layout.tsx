@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Kumbh_Sans } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -50,6 +51,7 @@ export default function RootLayout({
           </a>
           {children}
           <Toaster position="top-right" richColors />
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>
