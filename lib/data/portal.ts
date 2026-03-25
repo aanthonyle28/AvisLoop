@@ -1,5 +1,6 @@
 import 'server-only'
 import { createServiceRoleClient } from '@/lib/supabase/service-role'
+import { REVISION_LIMITS, DEFAULT_REVISION_LIMIT, isUnlimitedTier } from '@/lib/constants/tickets'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Portal-specific types (subset of WebProject / ProjectTicket for public view)
@@ -68,9 +69,9 @@ export async function resolvePortalToken(token: string): Promise<PortalProject |
  * Count revision tickets submitted in the current calendar month for a project
  * and return quota details based on the subscription tier.
  *
- * Tier limits:
+ * Tier limits are defined in lib/constants/tickets.ts (single source of truth):
  *   starter  → 2 revisions/month
- *   growth   → Unlimited (represented as -1)
+ *   growth   → 4 revisions/month
  *   pro      → Unlimited (represented as -1)
  *   unknown  → 2 (fail-safe default)
  */
@@ -80,8 +81,7 @@ export async function getPortalQuota(
 ): Promise<PortalQuota> {
   const supabase = createServiceRoleClient()
 
-  // Growth and Pro have unlimited revisions
-  const isUnlimited = tier === 'growth' || tier === 'pro'
+  const unlimited = isUnlimitedTier(tier)
 
   const startOfCurrentMonth = new Date(
     new Date().getFullYear(),
@@ -98,12 +98,14 @@ export async function getPortalQuota(
 
   const used = error ? 0 : (count ?? 0)
 
-  if (isUnlimited) {
+  if (unlimited) {
     // -1 signals unlimited to the UI
     return { used, limit: -1, remaining: -1 }
   }
 
-  const limit = 2 // starter and unknown default
+  const limit = (tier && REVISION_LIMITS[tier] !== undefined && REVISION_LIMITS[tier] > 0)
+    ? REVISION_LIMITS[tier]
+    : DEFAULT_REVISION_LIMIT
   const remaining = Math.max(0, limit - used)
 
   return { used, limit, remaining }

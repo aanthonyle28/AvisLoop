@@ -2,7 +2,7 @@
  * Monthly revision ticket limits per web design subscription tier.
  *
  * Starter:  2 revisions/month
- * Growth:   Unlimited (-1)
+ * Growth:   4 revisions/month
  * Pro:      Unlimited (-1)
  *
  * -1 means unlimited — callers must check for this value and skip enforcement.
@@ -12,7 +12,7 @@
  */
 export const REVISION_LIMITS: Record<string, number> = {
   starter: 2,
-  growth: -1,
+  growth: 4,
   pro: -1,
 } as const
 

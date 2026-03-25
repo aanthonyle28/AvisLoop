@@ -23,6 +23,7 @@ const plans = [
       'Basic on-page SEO',
       '2 revisions / month',
       'Client revision portal',
+      'Lead capture forms',
       'Hosting, SSL & domain included',
       'Email support',
       'Review add-on available (+$99/mo)',
@@ -41,8 +42,9 @@ const plans = [
       'Up to 5-page custom website',
       'Mobile-optimized design',
       'Advanced local SEO',
-      'Unlimited revisions',
+      '4 revisions / month',
       'Client revision portal',
+      'Lead capture forms',
       'Hosting, SSL & domain included',
       'Priority support',
       'Review add-on available (+$99/mo)',
@@ -63,6 +65,7 @@ const plans = [
       'Advanced local SEO',
       'Unlimited revisions',
       'Client revision portal',
+      'Lead capture forms',
       'Hosting, SSL & domain included',
       'Priority support',
       'Review management included',
@@ -80,11 +83,11 @@ const plans = [
 const faqs: [string, string][] = [
   [
     "What's included in the monthly fee?",
-    'Your monthly fee covers everything: website hosting, SSL certificate, domain, all code and design updates, and ongoing maintenance. There are no hidden fees, no domain markup, and no surprise invoices. Starter includes 2 revision requests per month; Growth and Pro include unlimited revisions.',
+    'Your monthly fee covers everything: website hosting, SSL certificate, domain, all code and design updates, and ongoing maintenance. There are no hidden fees, no domain markup, and no surprise invoices. Starter includes 2 revision requests per month, Growth includes 4, and Pro includes unlimited revisions.',
   ],
   [
-    'What if I need more revisions on Starter?',
-    'Additional revisions beyond your 2/month Starter limit are available at $50 each. We confirm the scope before starting so there are no surprise charges. You can also upgrade to Growth at any time for unlimited revisions.',
+    'What if I need more revisions?',
+    'Additional revisions beyond your monthly limit are available at $50 each. We confirm the scope before starting so there are no surprise charges. You can also upgrade your plan at any time for more revisions.',
   ],
   [
     'What about the one-time launch package?',

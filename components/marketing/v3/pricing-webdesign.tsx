@@ -12,6 +12,7 @@ const starterFeatures = [
   'Basic on-page SEO',
   '2 revision requests per month',
   'Client portal access',
+  'Lead capture forms',
   'Hosting, SSL & domain included',
   'Email support',
 ];
@@ -20,8 +21,9 @@ const growthFeatures = [
   'Up to 5-page professional website',
   'Mobile-optimized responsive design',
   'Advanced local SEO',
-  'Unlimited revision requests',
+  '4 revision requests per month',
   'Client portal access',
+  'Lead capture forms',
   'Hosting, SSL & domain included',
   'Priority support',
 ];
@@ -32,6 +34,7 @@ const proFeatures = [
   'Advanced local SEO',
   'Unlimited revision requests',
   'Client portal access',
+  'Lead capture forms',
   'Hosting, SSL & domain included',
   'Priority support',
   'Review management included',
