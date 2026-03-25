@@ -341,50 +341,57 @@ const pageTestimonials = [
 
 const plans = [
   {
-    name: 'Basic',
-    price: '199',
-    desc: 'Small service businesses',
+    name: 'Starter',
+    price: '149',
+    desc: 'Solo operators',
     features: [
-      '1–4 page custom website',
-      'Mobile-optimized',
-      'On-page SEO',
+      'Single-page custom website',
+      'Mobile-optimized design',
+      'Basic on-page SEO',
       '2 revisions / month',
-      'Client portal',
-      'Hosting & SSL included',
+      'Client revision portal',
+      'Lead capture forms',
+      'Hosting, SSL & domain included',
+      'Review add-on available (+$99/mo)',
     ],
     dark: false,
     cta: 'Get Started',
   },
   {
-    name: 'Advanced',
-    price: '299',
+    name: 'Growth',
+    price: '249',
     desc: 'Growing companies',
     features: [
-      '4–10 page custom website',
-      'Mobile-optimized',
-      'Full SEO + local + Maps',
+      'Up to 5-page custom website',
+      'Mobile-optimized design',
+      'Advanced local SEO',
       '4 revisions / month',
-      'Client portal',
-      'Hosting & SSL included',
+      'Client revision portal',
       'Lead capture forms',
+      'Hosting, SSL & domain included',
       'Priority support',
+      'Review add-on available (+$99/mo)',
     ],
     dark: true,
     cta: 'Get Started',
   },
   {
-    name: 'Reviews',
-    price: '99',
-    desc: 'Add to any plan',
+    name: 'Pro',
+    price: '349',
+    desc: 'Maximum growth',
     features: [
-      'Automated review campaigns',
-      'AI-personalized messages',
-      'Email + SMS',
-      'Smart review funnel',
-      'Competitor tracking',
+      'Up to 5 + service area pages',
+      'Mobile-optimized design',
+      'Advanced local SEO',
+      'Unlimited revisions',
+      'Client revision portal',
+      'Lead capture forms',
+      'Hosting, SSL & domain included',
+      'Priority support',
+      'Review management included',
     ],
     dark: false,
-    cta: 'Learn More',
+    cta: 'Get Started',
   },
 ];
 
@@ -447,9 +454,9 @@ function Pricing() {
               </ul>
 
               <a
-                href={plan.name === 'Reviews' ? '/reputation' : CALENDLY}
-                target={plan.name === 'Reviews' ? undefined : '_blank'}
-                rel={plan.name === 'Reviews' ? undefined : 'noopener noreferrer'}
+                href={CALENDLY}
+                target="_blank"
+                rel="noopener noreferrer"
                 className={`mt-8 flex items-center justify-center gap-2 rounded-full py-3.5 text-sm font-semibold transition-colors ${
                   plan.dark
                     ? 'bg-accent text-white hover:bg-accent/90'
@@ -472,7 +479,7 @@ function Pricing() {
 const pageFaqs: [string, string][] = [
   ['Do I manage the website myself?', 'No. We handle hosting, updates, security, and content changes. You submit requests through your portal. We do everything else.'],
   ['How is this different from a one-time designer?', 'One-time design costs $3K–$15K upfront and goes stale immediately. We keep your site current every month for a flat fee.'],
-  ['What if I need more revisions?', 'Additional revisions are $50 each, confirmed before we start. Or upgrade to Advanced for 4/month.'],
+  ['What if I need more revisions?', 'Additional revisions beyond your monthly limit are $50 each, confirmed before we start. You can also upgrade your plan at any time for more revisions.'],
   ['Do I own my website?', 'Yes. Your domain, your content. If you cancel, we export everything.'],
   ['What businesses do you work with?', 'HVAC, plumbing, electrical, roofing, painting, cleaning, handyman, and general contracting.'],
   ['Can I cancel anytime?', 'Yes. No contracts, no fees. We earn your business every month.'],
