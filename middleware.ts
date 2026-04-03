@@ -78,6 +78,18 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // --- Skip auth for public routes ---
+  // These routes don't need authentication. Running getUser() on them risks
+  // clearing auth cookies via setAll() if the Supabase library encounters any
+  // issue (token refresh race, network blip, etc.). Proven by diagnostic:
+  // visiting /portal/[token] in the same browser as a logged-in user wiped
+  // the auth cookies.
+  const PUBLIC_PREFIXES = ["/portal", "/r/", "/intake", "/api/portal", "/api/feedback", "/api/review", "/api/audit", "/complete", "/sms-consent"];
+  const isPublicRoute = PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+  if (isPublicRoute) {
+    return NextResponse.next({ request });
+  }
+
   // --- Supabase Auth Handling ---
   //
   // IMPORTANT: The supabaseResponse variable must be the response object returned
