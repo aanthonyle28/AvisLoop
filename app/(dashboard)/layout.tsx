@@ -14,16 +14,16 @@ export default async function DashboardGroupLayout({
 }: {
   children: React.ReactNode
 }) {
-  // Auth check — middleware skips redirect when auth cookies exist (to avoid
-  // race conditions with concurrent token refresh). This layout is the
-  // definitive fallback: if there's truly no valid session, redirect to login.
-  const user = await getAuthUser()
-  if (!user) redirect('/login')
-
-  const [business, businesses] = await Promise.all([
+  // Auth + business data in parallel. All three use React.cache() internally,
+  // so getAuthUser() is deduplicated across getActiveBusiness/getUserBusinesses.
+  // Middleware skips redirect when auth cookies exist (race condition guard);
+  // this layout is the definitive fallback for truly unauthenticated access.
+  const [user, business, businesses] = await Promise.all([
+    getAuthUser(),
     getActiveBusiness(),
     getUserBusinesses(),
   ])
+  if (!user) redirect('/login')
 
   const businessId = business?.id ?? ''
   const businessName = business?.name ?? ''

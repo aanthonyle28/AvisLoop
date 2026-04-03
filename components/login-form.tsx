@@ -43,26 +43,20 @@ export function LoginForm({
     }
 
     try {
-      // POST to Route Handler — NOT a Server Action.
-      // Route Handlers reliably set cookies via Set-Cookie headers.
-      // Server Actions in Next.js don't always deliver Set-Cookie to the browser.
       const res = await fetch("/api/auth/signin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
-        credentials: "same-origin",
       });
 
       const data = await res.json();
 
       if (!res.ok || data.error) {
         setError(data.error || "Login failed");
-        setPending(false);
         return;
       }
 
-      // Cookies are set by the Route Handler response.
-      // Do a full page navigation to dashboard to ensure cookies are sent.
+      // Full page navigation so browser sends the freshly set cookies
       const isLocalhost =
         window.location.hostname === "localhost" ||
         window.location.hostname === "127.0.0.1";
@@ -71,6 +65,7 @@ export function LoginForm({
         : "https://app.avisloop.com/dashboard";
     } catch {
       setError("Network error. Please try again.");
+    } finally {
       setPending(false);
     }
   }

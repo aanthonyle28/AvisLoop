@@ -6,7 +6,6 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import {
   signUpSchema,
-  signInSchema,
   resetPasswordSchema,
   updatePasswordSchema,
 } from '@/lib/validations/auth'
@@ -61,50 +60,6 @@ export async function signUp(
   }
 
   redirect('/verify-email')
-}
-
-export async function signIn(
-  _prevState: AuthActionState | null,
-  formData: FormData
-): Promise<AuthActionState> {
-  // Rate limit by IP
-  const headersList = await headers()
-  const ip = headersList.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
-  const rateLimitResult = await checkAuthRateLimit(ip)
-  if (!rateLimitResult.success) {
-    return { error: 'Too many attempts. Please wait a moment and try again.' }
-  }
-
-  const supabase = await createClient()
-
-  const parsed = signInSchema.safeParse({
-    email: formData.get('email'),
-    password: formData.get('password'),
-  })
-
-  if (!parsed.success) {
-    return { fieldErrors: parsed.error.flatten().fieldErrors }
-  }
-
-  const { email, password } = parsed.data
-
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  })
-
-  if (error) {
-    return { error: error.message }
-  }
-
-  revalidatePath('/', 'layout')
-
-  // DO NOT call redirect() here. In Next.js Server Actions, redirect() can
-  // interfere with Set-Cookie headers reaching the browser, especially for
-  // cross-origin redirects. Instead, return success and let the client
-  // component handle navigation with window.location.href, which guarantees
-  // cookies are processed before the page navigation begins.
-  return { success: true }
 }
 
 export async function signOut(): Promise<never> {

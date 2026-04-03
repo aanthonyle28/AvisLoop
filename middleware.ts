@@ -6,6 +6,10 @@ const APP_DOMAIN = "app.avisloop.com";
 const MARKETING_DOMAIN = "avisloop.com";
 const COOKIE_DOMAIN = ".avisloop.com";
 
+// Supabase auth cookie base name — derived from project ref in SUPABASE_URL
+const SUPABASE_PROJECT_REF = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!).hostname.split(".")[0];
+const AUTH_COOKIE_BASE = `sb-${SUPABASE_PROJECT_REF}-auth-token`;
+
 // Routes that belong to the app (dashboard) subdomain
 const APP_ROUTES = [
   "/dashboard",
@@ -78,53 +82,25 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // --- Skip auth for public routes ---
-  // These routes don't need authentication. Running getUser() on them risks
-  // clearing auth cookies via setAll() if the Supabase library encounters any
-  // issue (token refresh race, network blip, etc.). Proven by diagnostic:
-  // visiting /portal/[token] in the same browser as a logged-in user wiped
-  // the auth cookies.
-  const PUBLIC_PREFIXES = ["/portal", "/r/", "/intake", "/api/portal", "/api/feedback", "/api/review", "/api/audit", "/complete", "/sms-consent"];
-  const isPublicRoute = PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(prefix));
-  if (isPublicRoute) {
-    return NextResponse.next({ request });
-  }
-
   // --- Clean up stale unchunked auth cookies ---
   // Supabase SSR v0.8+ uses chunked cookies (.0, .1, etc.). Older sessions may
   // have left an unchunked cookie with the same base name. When both exist, the
   // library reads the stale unchunked one first, finds it expired, and clears
-  // ALL auth cookies — killing the valid chunked session. Delete the stale
-  // unchunked cookie if chunked cookies also exist.
-  const AUTH_COOKIE_BASE = "sb-fejcjippksmsgpesgidc-auth-token";
+  // ALL auth cookies — killing the valid chunked session.
   const hasUnchunked = request.cookies.has(AUTH_COOKIE_BASE);
   const hasChunked = request.cookies.has(`${AUTH_COOKIE_BASE}.0`);
   const staleCleanupNeeded = hasUnchunked && hasChunked;
 
   if (staleCleanupNeeded) {
-    // Remove the stale unchunked cookie from the request so the Supabase
-    // client only sees the valid chunked cookies.
     request.cookies.delete(AUTH_COOKIE_BASE);
   }
 
   // --- Supabase Auth Handling ---
-  //
-  // IMPORTANT: The supabaseResponse variable must be the response object returned
-  // at the end of this function (or have its cookies copied to any redirect).
-  // When Supabase refreshes an expired JWT, it calls setAll() to write updated
-  // session cookies. Those cookies MUST reach the browser or the session drops
-  // on the very next request.
-  //
-  // Rules (from @supabase/ssr docs):
-  // 1. setAll() must NOT replace supabaseResponse — just update cookies on it.
-  // 2. Any redirect response must copy cookies from supabaseResponse before returning.
-  // 3. Always return supabaseResponse (not a new NextResponse.next()) on the happy path.
-
   const supabaseResponse = NextResponse.next({
     request,
   });
 
-  // If stale cookie cleanup was needed, also clear it from the browser via Set-Cookie
+  // Clear the stale unchunked cookie from the browser
   if (staleCleanupNeeded) {
     supabaseResponse.cookies.set(AUTH_COOKIE_BASE, "", {
       maxAge: 0,
@@ -142,17 +118,12 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          // Step 1: write updated cookies back to the request (for downstream middleware/handlers)
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           );
-          // Step 2: write updated cookies onto the EXISTING supabaseResponse.
-          // DO NOT replace supabaseResponse with a new NextResponse.next() here —
-          // that would discard any previously set cookies/headers on the response.
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, {
               ...options,
-              // Set domain for cross-subdomain auth in production
               domain: isLocalhost ? undefined : COOKIE_DOMAIN,
             })
           );
@@ -161,11 +132,6 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // CRITICAL: Always use getUser(), never getSession()
-  // getUser() validates the JWT signature with Supabase servers.
-  // If the access token is expired, Supabase will refresh it here and call
-  // setAll() above to write the new token — which is why setAll() must update
-  // supabaseResponse in-place (not replace it).
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -175,36 +141,26 @@ export async function middleware(request: NextRequest) {
     (r) => r !== "/login" && r !== "/signup"
   );
 
-  // Helper: create a redirect response that carries the refreshed auth cookies.
-  // Without this, a token refresh + redirect would lose the new session cookie,
-  // causing the "every navigation breaks" loop.
+  // Helper: create a redirect that carries refreshed auth cookies.
   function redirectWithCookies(url: URL | string): NextResponse {
     const redirectResponse = NextResponse.redirect(url);
-    // Copy all cookies (including any refreshed Supabase session token) to the redirect
     supabaseResponse.cookies.getAll().forEach(({ name, value }) => {
-      redirectResponse.cookies.set(
-        name,
-        value,
-        // Preserve the full options (httpOnly, sameSite, etc.) from supabaseResponse
-        supabaseResponse.cookies.get(name) as Parameters<typeof redirectResponse.cookies.set>[2]
-      );
+      // Re-read the cookie options that setAll() wrote to supabaseResponse
+      const existing = supabaseResponse.cookies.get(name);
+      redirectResponse.cookies.set(name, existing?.value ?? value, {
+        path: "/",
+        sameSite: "lax" as const,
+        secure: !isLocalhost,
+        domain: isLocalhost ? undefined : COOKIE_DOMAIN,
+      });
     });
     return redirectResponse;
   }
 
-  // Redirect unauthenticated users trying to access protected routes.
-  //
-  // IMPORTANT: Only redirect when there are NO auth cookies at all (user never
-  // logged in). When auth cookies ARE present but getUser() returned null, it's
-  // likely a race condition: another concurrent request (prefetch, revalidation)
-  // consumed the one-time-use refresh token first. Redirecting here would clear
-  // the fresh cookies that the other request just set, causing a logout loop.
-  //
-  // The dashboard layout handles the true "no session" case by checking
-  // getAuthUser() and redirecting to /login if null.
-  const hasAuthCookies = request.cookies.getAll().some(
-    (c) => c.name.startsWith("sb-") && c.name.includes("auth-token")
-  );
+  // Only redirect to /login when there are NO auth cookies (user never logged in).
+  // When cookies exist but getUser() returned null (race condition with concurrent
+  // token refresh), pass through — the dashboard layout has a fallback auth check.
+  const hasAuthCookies = hasChunked || hasUnchunked;
 
   if (
     !user &&
@@ -242,19 +198,11 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - images - .svg, .png, .jpg, .jpeg, .gif, .webp
-     * - portal/* (public client portal — must never touch auth cookies)
-     * - r/* (public review funnel)
-     * - intake/* (public intake form)
-     * - complete/* (public job completion)
-     * - sms-consent (public SMS consent page)
-     * - api/portal/* (portal API endpoints)
-     * - api/feedback/* (public feedback submission)
-     * - api/review/* (public review endpoints)
-     * - api/audit/* (public audit endpoints)
+     * - _next/static, _next/image (Next.js internals)
+     * - favicon.ico and image files
+     * - Public routes that must never touch auth cookies:
+     *   portal, r/, intake, complete, sms-consent,
+     *   api/portal, api/feedback, api/review, api/audit
      */
     "/((?!_next/static|_next/image|favicon.ico|portal|r/|intake|complete|sms-consent|api/portal|api/feedback|api/review|api/audit|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
