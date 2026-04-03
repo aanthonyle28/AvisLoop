@@ -8,6 +8,7 @@ import { render } from '@react-email/render'
 import { adjustForQuietHours } from '@/lib/utils/quiet-hours'
 import { DEFAULT_EMAIL_RATE_LIMIT, DEFAULT_SMS_RATE_LIMIT } from '@/lib/constants/campaigns'
 import { personalizeWithFallback } from '@/lib/ai/fallback'
+import { sendSms } from '@/lib/sms/send-sms'
 import type { ClaimedCampaignTouch } from '@/lib/types/database'
 
 // Initialize rate limiters (lazy - only if Redis env vars present)
@@ -188,10 +189,21 @@ export async function GET(request: Request) {
             failed++
           }
         } else {
-          // SMS - TODO: Implement in Phase 21
-          // For now, mark as skipped with reason
-          await markTouchSkipped(supabase, touch, 'sms_not_implemented')
-          skipped++
+          const sendResult = await sendSmsTouch(
+            supabase,
+            touch,
+            business,
+            customer,
+            job?.service_type,
+            campaign?.personalization_enabled !== false,
+            job?.notes,
+            business.brand_voice
+          )
+          if (sendResult.success) {
+            sent++
+          } else {
+            failed++
+          }
         }
 
       } catch (error) {
@@ -367,6 +379,132 @@ async function sendEmailTouch(
   await updateEnrollmentAfterSend(supabase, touch)
 
   // Update customer tracking - use atomic increment to avoid race conditions
+  await supabase.rpc('increment_customer_send_count', {
+    p_customer_id: touch.customer_id,
+    p_sent_at: new Date().toISOString(),
+  })
+
+  return { success: true }
+}
+
+/**
+ * Send SMS touch via Twilio and update enrollment state.
+ * Attempts LLM personalization for SMS body; falls back to template on failure.
+ */
+async function sendSmsTouch(
+  supabase: ReturnType<typeof createServiceRoleClient>,
+  touch: ClaimedCampaignTouch,
+  business: { id: string; name: string; google_review_link: string | null; default_sender_name: string | null; brand_voice?: string | null },
+  customer: { id: string; name: string; phone: string | null; send_count: number | null },
+  serviceType: string | undefined,
+  personalizationEnabled: boolean,
+  jobNotes?: string | null,
+  brandVoice?: string | null
+): Promise<{ success: boolean; error?: string }> {
+  if (!business.google_review_link) {
+    await markTouchFailed(supabase, touch, 'No review link configured')
+    return { success: false, error: 'No review link' }
+  }
+
+  if (!customer.phone) {
+    await markTouchSkipped(supabase, touch, 'no_phone')
+    return { success: false, error: 'No phone number' }
+  }
+
+  // Fetch template if specified
+  let templateBody = ''
+  if (touch.template_id) {
+    const { data: template } = await supabase
+      .from('message_templates')
+      .select('body')
+      .eq('id', touch.template_id)
+      .single()
+
+    if (template) {
+      templateBody = template.body || ''
+    }
+  }
+
+  // Fallback body if no template
+  if (!templateBody) {
+    templateBody = `Hi ${customer.name}, thanks for choosing ${business.name}! We'd love your feedback: ${business.google_review_link}`
+  }
+
+  // Attempt LLM personalization (failure never blocks sends)
+  let finalBody = templateBody
+  if (personalizationEnabled) {
+    try {
+      const result = await personalizeWithFallback({
+        template: templateBody,
+        customerName: customer.name,
+        businessName: business.name,
+        serviceType,
+        jobNotes: jobNotes || undefined,
+        brandVoice: brandVoice || undefined,
+        touchNumber: (touch.touch_number as 1 | 2 | 3 | 4),
+        channel: 'sms',
+        reviewLink: business.google_review_link,
+        isRepeatCustomer: (customer.send_count || 0) > 1,
+        businessId: business.id,
+      })
+      if (result.personalized) {
+        finalBody = result.message
+      }
+    } catch (error) {
+      console.warn('SMS personalization error (non-blocking):', error)
+    }
+  }
+
+  // Create send_log entry
+  const { data: sendLog, error: logError } = await supabase
+    .from('send_logs')
+    .insert({
+      business_id: touch.business_id,
+      customer_id: touch.customer_id,
+      template_id: touch.template_id,
+      campaign_id: touch.campaign_id,
+      campaign_enrollment_id: touch.enrollment_id,
+      touch_number: touch.touch_number,
+      channel: 'sms',
+      status: 'pending',
+      subject: finalBody,
+    })
+    .select('id')
+    .single()
+
+  if (logError || !sendLog) {
+    await markTouchFailed(supabase, touch, 'Failed to create send log')
+    return { success: false, error: 'Send log creation failed' }
+  }
+
+  // Send via Twilio
+  const smsResult = await sendSms({
+    to: customer.phone,
+    body: finalBody,
+    businessId: business.id,
+    customerId: customer.id,
+    sendLogId: sendLog.id,
+  })
+
+  // Update send_log with result
+  await supabase
+    .from('send_logs')
+    .update({
+      status: smsResult.success ? 'sent' : 'failed',
+      provider_message_id: smsResult.messageSid ? { twilio_sid: smsResult.messageSid } : null,
+      error_message: smsResult.error || null,
+    })
+    .eq('id', sendLog.id)
+
+  if (!smsResult.success) {
+    await markTouchFailed(supabase, touch, smsResult.error || 'SMS send failed')
+    return { success: false, error: smsResult.error }
+  }
+
+  // Update enrollment - mark touch sent and schedule next
+  await updateEnrollmentAfterSend(supabase, touch)
+
+  // Update customer tracking
   await supabase.rpc('increment_customer_send_count', {
     p_customer_id: touch.customer_id,
     p_sent_at: new Date().toISOString(),
