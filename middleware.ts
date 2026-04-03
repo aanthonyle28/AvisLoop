@@ -79,7 +79,19 @@ export async function middleware(request: NextRequest) {
   }
 
   // --- Supabase Auth Handling ---
-  let supabaseResponse = NextResponse.next({
+  //
+  // IMPORTANT: The supabaseResponse variable must be the response object returned
+  // at the end of this function (or have its cookies copied to any redirect).
+  // When Supabase refreshes an expired JWT, it calls setAll() to write updated
+  // session cookies. Those cookies MUST reach the browser or the session drops
+  // on the very next request.
+  //
+  // Rules (from @supabase/ssr docs):
+  // 1. setAll() must NOT replace supabaseResponse — just update cookies on it.
+  // 2. Any redirect response must copy cookies from supabaseResponse before returning.
+  // 3. Always return supabaseResponse (not a new NextResponse.next()) on the happy path.
+
+  const supabaseResponse = NextResponse.next({
     request,
   });
 
@@ -92,12 +104,13 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
+          // Step 1: write updated cookies back to the request (for downstream middleware/handlers)
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           );
-          supabaseResponse = NextResponse.next({
-            request,
-          });
+          // Step 2: write updated cookies onto the EXISTING supabaseResponse.
+          // DO NOT replace supabaseResponse with a new NextResponse.next() here —
+          // that would discard any previously set cookies/headers on the response.
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, {
               ...options,
@@ -111,7 +124,10 @@ export async function middleware(request: NextRequest) {
   );
 
   // CRITICAL: Always use getUser(), never getSession()
-  // getUser() validates the JWT signature, getSession() doesn't
+  // getUser() validates the JWT signature with Supabase servers.
+  // If the access token is expired, Supabase will refresh it here and call
+  // setAll() above to write the new token — which is why setAll() must update
+  // supabaseResponse in-place (not replace it).
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -121,18 +137,34 @@ export async function middleware(request: NextRequest) {
     (r) => r !== "/login" && r !== "/signup"
   );
 
+  // Helper: create a redirect response that carries the refreshed auth cookies.
+  // Without this, a token refresh + redirect would lose the new session cookie,
+  // causing the "every navigation breaks" loop.
+  function redirectWithCookies(url: URL | string): NextResponse {
+    const redirectResponse = NextResponse.redirect(url);
+    // Copy all cookies (including any refreshed Supabase session token) to the redirect
+    supabaseResponse.cookies.getAll().forEach(({ name, value }) => {
+      redirectResponse.cookies.set(
+        name,
+        value,
+        // Preserve the full options (httpOnly, sameSite, etc.) from supabaseResponse
+        supabaseResponse.cookies.get(name) as Parameters<typeof redirectResponse.cookies.set>[2]
+      );
+    });
+    return redirectResponse;
+  }
+
   // Redirect unauthenticated users trying to access protected routes
   if (
     !user &&
     protectedPaths.some((path) => pathname.startsWith(path))
   ) {
-    // Redirect to login on the app domain
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     if (!isLocalhost && isAppDomain) {
       url.host = APP_DOMAIN;
     }
-    return NextResponse.redirect(url);
+    return redirectWithCookies(url);
   }
 
   // Redirect authenticated users away from auth pages to dashboard
@@ -148,7 +180,7 @@ export async function middleware(request: NextRequest) {
     if (!isLocalhost) {
       url.host = APP_DOMAIN;
     }
-    return NextResponse.redirect(url);
+    return redirectWithCookies(url);
   }
 
   return supabaseResponse;
