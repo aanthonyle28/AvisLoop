@@ -154,9 +154,23 @@ export async function middleware(request: NextRequest) {
     return redirectResponse;
   }
 
-  // Redirect unauthenticated users trying to access protected routes
+  // Redirect unauthenticated users trying to access protected routes.
+  //
+  // IMPORTANT: Only redirect when there are NO auth cookies at all (user never
+  // logged in). When auth cookies ARE present but getUser() returned null, it's
+  // likely a race condition: another concurrent request (prefetch, revalidation)
+  // consumed the one-time-use refresh token first. Redirecting here would clear
+  // the fresh cookies that the other request just set, causing a logout loop.
+  //
+  // The dashboard layout handles the true "no session" case by checking
+  // getAuthUser() and redirecting to /login if null.
+  const hasAuthCookies = request.cookies.getAll().some(
+    (c) => c.name.startsWith("sb-") && c.name.includes("auth-token")
+  );
+
   if (
     !user &&
+    !hasAuthCookies &&
     protectedPaths.some((path) => pathname.startsWith(path))
   ) {
     const url = request.nextUrl.clone();

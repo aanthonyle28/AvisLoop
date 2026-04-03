@@ -1,9 +1,11 @@
+import { redirect } from 'next/navigation'
 import { AppShell } from '@/components/layout/app-shell'
 import { AddJobProvider } from '@/components/jobs/add-job-provider'
 import { BusinessSettingsProvider } from '@/components/providers/business-settings-provider'
 import { getDashboardCounts } from '@/lib/data/dashboard'
 import { getServiceTypeSettings } from '@/lib/data/business'
 import { getActiveBusiness, getUserBusinesses } from '@/lib/data/active-business'
+import { getAuthUser } from '@/lib/supabase/auth'
 import { createClient } from '@/lib/supabase/server'
 import type { ServiceType } from '@/lib/types/database'
 
@@ -12,6 +14,12 @@ export default async function DashboardGroupLayout({
 }: {
   children: React.ReactNode
 }) {
+  // Auth check — middleware skips redirect when auth cookies exist (to avoid
+  // race conditions with concurrent token refresh). This layout is the
+  // definitive fallback: if there's truly no valid session, redirect to login.
+  const user = await getAuthUser()
+  if (!user) redirect('/login')
+
   const [business, businesses] = await Promise.all([
     getActiveBusiness(),
     getUserBusinesses(),
