@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, useEffect } from "react";
 import { updatePassword, type AuthActionState } from "@/lib/actions/auth";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,14 @@ export function UpdatePasswordForm({
 }: React.ComponentPropsWithoutRef<"div">) {
   const [state, formAction, pending] = useActionState<AuthActionState | null, FormData>(updatePassword, null);
   const [passwordValue, setPasswordValue] = useState('');
+
+  // Navigate to dashboard on success (same pattern as LoginForm)
+  useEffect(() => {
+    if (state?.success) {
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      window.location.href = isLocalhost ? '/dashboard' : 'https://app.avisloop.com/dashboard'
+    }
+  }, [state?.success]);
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>

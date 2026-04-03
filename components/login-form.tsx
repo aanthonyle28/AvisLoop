@@ -22,6 +22,18 @@ export function LoginForm({
     setDismissed(false);
   }, [state]);
 
+  // On successful login, do a full page navigation to dashboard.
+  // This ensures Set-Cookie headers from the Server Action are processed
+  // by the browser before navigation begins. Using window.location.href
+  // instead of Next.js redirect() avoids cross-origin RSC fetch issues.
+  useEffect(() => {
+    if (state?.success) {
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      const dashboardUrl = isLocalhost ? '/dashboard' : 'https://app.avisloop.com/dashboard'
+      window.location.href = dashboardUrl
+    }
+  }, [state?.success]);
+
   const showError = state?.error && !dismissed;
 
   return (

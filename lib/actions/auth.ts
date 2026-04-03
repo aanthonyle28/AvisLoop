@@ -99,16 +99,12 @@ export async function signIn(
 
   revalidatePath('/', 'layout')
 
-  // Redirect directly to app domain to avoid cross-origin RSC fetch issues.
-  // When the login form is on the marketing domain (avisloop.com), a relative
-  // redirect('/dashboard') causes an RSC fetch to avisloop.com/dashboard, which
-  // middleware redirects to app.avisloop.com. The cross-origin redirect in the
-  // fetch strips credentials, losing the session. Using an absolute URL forces
-  // a full page navigation that carries cookies correctly.
-  const hostname = headersList.get('host') || ''
-  const isLocalhost = hostname.includes('localhost') || hostname.includes('127.0.0.1')
-  const dashboardUrl = isLocalhost ? '/dashboard' : 'https://app.avisloop.com/dashboard'
-  redirect(dashboardUrl)
+  // DO NOT call redirect() here. In Next.js Server Actions, redirect() can
+  // interfere with Set-Cookie headers reaching the browser, especially for
+  // cross-origin redirects. Instead, return success and let the client
+  // component handle navigation with window.location.href, which guarantees
+  // cookies are processed before the page navigation begins.
+  return { success: true }
 }
 
 export async function signOut(): Promise<never> {
@@ -177,13 +173,7 @@ export async function updatePassword(
   }
 
   revalidatePath('/', 'layout')
-
-  // Same cross-origin redirect fix as signIn — see comment there
-  const headersList = await headers()
-  const hostname = headersList.get('host') || ''
-  const isLocalhost = hostname.includes('localhost') || hostname.includes('127.0.0.1')
-  const dashboardUrl = isLocalhost ? '/dashboard' : 'https://app.avisloop.com/dashboard'
-  redirect(dashboardUrl)
+  return { success: true }
 }
 
 export async function deleteAccount(password?: string): Promise<AuthActionState> {
