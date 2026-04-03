@@ -90,6 +90,23 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next({ request });
   }
 
+  // --- Clean up stale unchunked auth cookies ---
+  // Supabase SSR v0.8+ uses chunked cookies (.0, .1, etc.). Older sessions may
+  // have left an unchunked cookie with the same base name. When both exist, the
+  // library reads the stale unchunked one first, finds it expired, and clears
+  // ALL auth cookies — killing the valid chunked session. Delete the stale
+  // unchunked cookie if chunked cookies also exist.
+  const AUTH_COOKIE_BASE = "sb-fejcjippksmsgpesgidc-auth-token";
+  const hasUnchunked = request.cookies.has(AUTH_COOKIE_BASE);
+  const hasChunked = request.cookies.has(`${AUTH_COOKIE_BASE}.0`);
+  const staleCleanupNeeded = hasUnchunked && hasChunked;
+
+  if (staleCleanupNeeded) {
+    // Remove the stale unchunked cookie from the request so the Supabase
+    // client only sees the valid chunked cookies.
+    request.cookies.delete(AUTH_COOKIE_BASE);
+  }
+
   // --- Supabase Auth Handling ---
   //
   // IMPORTANT: The supabaseResponse variable must be the response object returned
@@ -106,6 +123,15 @@ export async function middleware(request: NextRequest) {
   const supabaseResponse = NextResponse.next({
     request,
   });
+
+  // If stale cookie cleanup was needed, also clear it from the browser via Set-Cookie
+  if (staleCleanupNeeded) {
+    supabaseResponse.cookies.set(AUTH_COOKIE_BASE, "", {
+      maxAge: 0,
+      path: "/",
+      domain: isLocalhost ? undefined : COOKIE_DOMAIN,
+    });
+  }
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
