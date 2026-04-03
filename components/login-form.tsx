@@ -1,7 +1,6 @@
 "use client";
 
-import { useActionState, useState, useEffect } from "react";
-import { signIn, type AuthActionState } from "@/lib/actions/auth";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,27 +13,67 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-  const [state, formAction, pending] = useActionState<AuthActionState | null, FormData>(signIn, null);
+  const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+  const [pending, setPending] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
-  // Reset dismissed state when a new error arrives
-  useEffect(() => {
+  const showError = error && !dismissed;
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError(null);
+    setFieldErrors({});
     setDismissed(false);
-  }, [state]);
+    setPending(true);
 
-  // On successful login, do a full page navigation to dashboard.
-  // This ensures Set-Cookie headers from the Server Action are processed
-  // by the browser before navigation begins. Using window.location.href
-  // instead of Next.js redirect() avoids cross-origin RSC fetch issues.
-  useEffect(() => {
-    if (state?.success) {
-      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-      const dashboardUrl = isLocalhost ? '/dashboard' : 'https://app.avisloop.com/dashboard'
-      window.location.href = dashboardUrl
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    if (!email) {
+      setFieldErrors({ email: ["Email is required"] });
+      setPending(false);
+      return;
     }
-  }, [state?.success]);
+    if (!password) {
+      setFieldErrors({ password: ["Password is required"] });
+      setPending(false);
+      return;
+    }
 
-  const showError = state?.error && !dismissed;
+    try {
+      // POST to Route Handler — NOT a Server Action.
+      // Route Handlers reliably set cookies via Set-Cookie headers.
+      // Server Actions in Next.js don't always deliver Set-Cookie to the browser.
+      const res = await fetch("/api/auth/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+        credentials: "same-origin",
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        setError(data.error || "Login failed");
+        setPending(false);
+        return;
+      }
+
+      // Cookies are set by the Route Handler response.
+      // Do a full page navigation to dashboard to ensure cookies are sent.
+      const isLocalhost =
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1";
+      window.location.href = isLocalhost
+        ? "/dashboard"
+        : "https://app.avisloop.com/dashboard";
+    } catch {
+      setError("Network error. Please try again.");
+      setPending(false);
+    }
+  }
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -47,7 +86,7 @@ export function LoginForm({
       </div>
 
       {/* Email/Password Form */}
-      <form action={formAction} noValidate className="space-y-4">
+      <form onSubmit={handleSubmit} noValidate className="space-y-4">
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="login-email">Email</Label>
@@ -58,11 +97,19 @@ export function LoginForm({
               placeholder="m@example.com"
               aria-label="Email address"
               required
-              aria-invalid={!!state?.fieldErrors?.email}
-              aria-describedby={state?.fieldErrors?.email ? "login-email-error" : undefined}
+              aria-invalid={!!fieldErrors.email}
+              aria-describedby={
+                fieldErrors.email ? "login-email-error" : undefined
+              }
             />
-            {state?.fieldErrors?.email && (
-              <p id="login-email-error" role="alert" className="text-sm text-error-text">{state.fieldErrors.email[0]}</p>
+            {fieldErrors.email && (
+              <p
+                id="login-email-error"
+                role="alert"
+                className="text-sm text-error-text"
+              >
+                {fieldErrors.email[0]}
+              </p>
             )}
           </div>
           <div className="space-y-2">
@@ -80,11 +127,19 @@ export function LoginForm({
               name="password"
               required
               autoComplete="current-password"
-              aria-invalid={!!state?.fieldErrors?.password}
-              aria-describedby={state?.fieldErrors?.password ? "login-password-error" : undefined}
+              aria-invalid={!!fieldErrors.password}
+              aria-describedby={
+                fieldErrors.password ? "login-password-error" : undefined
+              }
             />
-            {state?.fieldErrors?.password && (
-              <p id="login-password-error" role="alert" className="text-sm text-error-text">{state.fieldErrors.password[0]}</p>
+            {fieldErrors.password && (
+              <p
+                id="login-password-error"
+                role="alert"
+                className="text-sm text-error-text"
+              >
+                {fieldErrors.password[0]}
+              </p>
             )}
           </div>
           {showError && (
@@ -94,7 +149,7 @@ export function LoginForm({
               onClick={() => setDismissed(true)}
               aria-label="Dismiss error"
             >
-              {state.error}
+              {error}
             </button>
           )}
         </div>
