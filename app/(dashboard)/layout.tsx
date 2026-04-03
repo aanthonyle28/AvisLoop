@@ -2,7 +2,6 @@ import { redirect } from 'next/navigation'
 import { AppShell } from '@/components/layout/app-shell'
 import { AddJobProvider } from '@/components/jobs/add-job-provider'
 import { BusinessSettingsProvider } from '@/components/providers/business-settings-provider'
-import { AuthListener } from '@/components/auth/auth-listener'
 import { getDashboardCounts } from '@/lib/data/dashboard'
 import { getServiceTypeSettings } from '@/lib/data/business'
 import { getActiveBusiness, getUserBusinesses } from '@/lib/data/active-business'
@@ -61,7 +60,6 @@ export default async function DashboardGroupLayout({
       businessName={businessName}
       businesses={businesses}
     >
-      <AuthListener />
       <AddJobProvider>
         <AppShell dashboardBadge={dashboardBadge} ticketBadge={ticketBadge}>
           {children}

@@ -71,6 +71,7 @@ export async function GET(request: NextRequest) {
     hostname,
     environment: process.env.NODE_ENV,
     cookieDomainSetting: process.env.NODE_ENV === 'production' ? '.avisloop.com' : undefined,
+    allCookieNames: allRequestCookies.map(c => c.name),
     requestCookies: {
       total: allRequestCookies.length,
       authCookies: authCookies.map(c => ({
