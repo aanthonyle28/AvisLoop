@@ -220,7 +220,16 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - images - .svg, .png, .jpg, .jpeg, .gif, .webp
+     * - portal/* (public client portal — must never touch auth cookies)
+     * - r/* (public review funnel)
+     * - intake/* (public intake form)
+     * - complete/* (public job completion)
+     * - sms-consent (public SMS consent page)
+     * - api/portal/* (portal API endpoints)
+     * - api/feedback/* (public feedback submission)
+     * - api/review/* (public review endpoints)
+     * - api/audit/* (public audit endpoints)
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|portal|r/|intake|complete|sms-consent|api/portal|api/feedback|api/review|api/audit|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
