@@ -9,7 +9,7 @@
  * Required environment variables:
  *   - TWILIO_ACCOUNT_SID: Your Twilio Account SID
  *   - TWILIO_AUTH_TOKEN: Your Twilio Auth Token
- *   - TWILIO_PHONE_NUMBER: Your Twilio phone number (E.164 format)
+ *   - TWILIO_MESSAGING_SERVICE_SID: Your Twilio Messaging Service SID (A2P 10DLC)
  *
  * @module lib/sms/twilio
  */
@@ -21,10 +21,10 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID
 const authToken = process.env.TWILIO_AUTH_TOKEN
 
 /**
- * The Twilio phone number to send SMS from (E.164 format)
- * Must be a number that has been registered with your A2P 10DLC campaign
+ * The Twilio Messaging Service SID for A2P 10DLC compliant sending.
+ * The Messaging Service automatically selects the best number from its sender pool.
  */
-export const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER
+export const TWILIO_MESSAGING_SERVICE_SID = process.env.TWILIO_MESSAGING_SERVICE_SID
 
 // Validate env vars at module load (fail fast pattern)
 if (!accountSid || !authToken) {
@@ -41,12 +41,12 @@ export const twilioClient = accountSid && authToken
 
 /**
  * Check if SMS sending is available
- * Requires both the Twilio client to be initialized and a phone number configured
+ * Requires both the Twilio client and a Messaging Service SID configured
  *
  * @returns true if SMS can be sent, false otherwise
  */
 export function isSmsEnabled(): boolean {
-  return twilioClient !== null && !!TWILIO_PHONE_NUMBER
+  return twilioClient !== null && !!TWILIO_MESSAGING_SERVICE_SID
 }
 
 /**
@@ -66,17 +66,16 @@ export function getTwilioClient() {
 }
 
 /**
- * Get the Twilio phone number, throwing if not configured
- * Use this when sending SMS and phone number is required
+ * Get the Twilio Messaging Service SID, throwing if not configured
  *
- * @throws Error if TWILIO_PHONE_NUMBER is not set
- * @returns The Twilio phone number in E.164 format
+ * @throws Error if TWILIO_MESSAGING_SERVICE_SID is not set
+ * @returns The Messaging Service SID
  */
-export function getTwilioPhoneNumber(): string {
-  if (!TWILIO_PHONE_NUMBER) {
+export function getTwilioMessagingServiceSid(): string {
+  if (!TWILIO_MESSAGING_SERVICE_SID) {
     throw new Error(
-      'Twilio phone number not configured. Set TWILIO_PHONE_NUMBER environment variable.'
+      'Twilio Messaging Service SID not configured. Set TWILIO_MESSAGING_SERVICE_SID environment variable.'
     )
   }
-  return TWILIO_PHONE_NUMBER
+  return TWILIO_MESSAGING_SERVICE_SID
 }

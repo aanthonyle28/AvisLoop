@@ -11,7 +11,7 @@
  * @module lib/sms/send-sms
  */
 
-import { twilioClient, TWILIO_PHONE_NUMBER, isSmsEnabled } from './twilio'
+import { twilioClient, TWILIO_MESSAGING_SERVICE_SID, isSmsEnabled } from './twilio'
 import type { SendSmsParams, SendSmsResult } from './types'
 
 /**
@@ -82,11 +82,11 @@ export async function sendSms(params: SendSmsParams): Promise<SendSmsResult> {
     }
   }
 
-  // Validate phone number
-  if (!TWILIO_PHONE_NUMBER) {
+  // Validate Messaging Service SID
+  if (!TWILIO_MESSAGING_SERVICE_SID) {
     return {
       success: false,
-      error: 'Twilio phone number not configured. Set TWILIO_PHONE_NUMBER environment variable.',
+      error: 'Twilio Messaging Service SID not configured. Set TWILIO_MESSAGING_SERVICE_SID environment variable.',
     }
   }
 
@@ -99,7 +99,7 @@ export async function sendSms(params: SendSmsParams): Promise<SendSmsResult> {
     const message = await twilioClient.messages.create({
       body: bodyWithFooter,
       to: params.to,
-      from: TWILIO_PHONE_NUMBER,
+      messagingServiceSid: TWILIO_MESSAGING_SERVICE_SID,
       // Status callback for delivery tracking (will be implemented in 21-04)
       statusCallback: process.env.NEXT_PUBLIC_SITE_URL
         ? `${process.env.NEXT_PUBLIC_SITE_URL}/api/webhooks/twilio/status`
