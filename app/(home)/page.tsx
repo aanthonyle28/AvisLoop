@@ -29,7 +29,7 @@ const NAV_LINKS = [
   { label: 'Services', href: '#services' },
   { label: 'Process', href: '#process' },
   { label: 'Pricing', href: '#pricing' },
-  { label: 'Reviews', href: '/reputation' },
+  { label: 'Review Management', href: '/reputation' },
   { label: 'FAQ', href: '#faq' },
 ];
 
@@ -269,7 +269,7 @@ function Services() {
 /* ─── Stats data ────────────────────────────────────────── */
 
 const pageStats = [
-  { value: '$0', label: 'Upfront cost', detail: 'No deposits, no hidden fees' },
+  { value: '$499', label: 'Launch package', detail: 'One-time setup, starting at' },
   { value: '48', suffix: 'hr', label: 'Turnaround', detail: 'Revisions completed fast' },
   { value: '99.9', suffix: '%', label: 'Uptime', detail: 'Your site stays online' },
   { value: '0', label: 'Lock-in contracts', detail: 'Cancel anytime, no penalties' },
@@ -343,6 +343,7 @@ const plans = [
   {
     name: 'Starter',
     price: '149',
+    launch: '499',
     desc: 'Solo operators',
     features: [
       'Single-page custom website',
@@ -360,6 +361,7 @@ const plans = [
   {
     name: 'Growth',
     price: '249',
+    launch: '999',
     desc: 'Growing companies',
     features: [
       'Up to 5-page custom website',
@@ -378,6 +380,7 @@ const plans = [
   {
     name: 'Pro',
     price: '349',
+    launch: '1,499',
     desc: 'Maximum growth',
     features: [
       'Up to 5 + service area pages',
@@ -442,15 +445,30 @@ function Pricing() {
                 <span className="text-5xl font-black tracking-tight">${plan.price}</span>
                 <span className={`text-base ml-1 ${plan.dark ? 'text-background/40' : 'text-muted-foreground'}`}>/mo</span>
               </div>
-              <p className={`text-sm mb-8 ${plan.dark ? 'text-background/40' : 'text-muted-foreground'}`}>{plan.desc}</p>
+              <p className={`text-sm ${plan.dark ? 'text-background/40' : 'text-muted-foreground'}`}>{plan.desc}</p>
+              <p className={`text-xs mt-1 mb-8 ${plan.dark ? 'text-background/30' : 'text-muted-foreground/60'}`}>
+                + ${plan.launch} one-time launch package
+              </p>
 
               <ul className="space-y-3 flex-1">
-                {plan.features.map((f) => (
-                  <li key={f} className="flex items-start gap-3">
-                    <Check weight="bold" size={14} className="text-accent shrink-0 mt-0.5" />
-                    <span className={`text-sm ${plan.dark ? 'text-background/70' : ''}`}>{f}</span>
-                  </li>
-                ))}
+                {plan.features.map((f) => {
+                  const isReviewLink = f.toLowerCase().includes('review');
+                  return (
+                    <li key={f} className="flex items-start gap-3">
+                      <Check weight="bold" size={14} className="text-accent shrink-0 mt-0.5" />
+                      {isReviewLink ? (
+                        <a
+                          href="/reputation"
+                          className={`text-sm underline decoration-accent/40 underline-offset-2 hover:decoration-accent transition-colors ${plan.dark ? 'text-background/70 hover:text-background' : 'hover:text-accent'}`}
+                        >
+                          {f}
+                        </a>
+                      ) : (
+                        <span className={`text-sm ${plan.dark ? 'text-background/70' : ''}`}>{f}</span>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
 
               <a
@@ -477,12 +495,34 @@ function Pricing() {
 /* ─── FAQ data ──────────────────────────────────────────── */
 
 const pageFaqs: [string, string][] = [
-  ['Do I manage the website myself?', 'No. We handle hosting, updates, security, and content changes. You submit requests through your portal. We do everything else.'],
-  ['How is this different from a one-time designer?', 'One-time design costs $3K–$15K upfront and goes stale immediately. We keep your site current every month for a flat fee.'],
-  ['What if I need more revisions?', 'Additional revisions beyond your monthly limit are $50 each, confirmed before we start. You can also upgrade your plan at any time for more revisions.'],
-  ['Do I own my website?', 'Yes. Your domain, your content. If you cancel, we export everything.'],
-  ['What businesses do you work with?', 'HVAC, plumbing, electrical, roofing, painting, cleaning, handyman, and general contracting.'],
-  ['Can I cancel anytime?', 'Yes. No contracts, no fees. We earn your business every month.'],
+  [
+    "What's included in the monthly fee?",
+    'Your monthly fee covers everything: website hosting, SSL certificate, domain, all code and design updates, and ongoing maintenance. There are no hidden fees, no domain markup, and no surprise invoices. Starter includes 2 revision requests per month, Growth includes 4, and Pro includes unlimited revisions.',
+  ],
+  [
+    'What if I need more revisions?',
+    'Additional revisions beyond your monthly limit are available at $50 each. We confirm the scope before starting so there are no surprise charges. You can also upgrade your plan at any time for more revisions.',
+  ],
+  [
+    'What about the one-time launch package?',
+    'Each plan includes a one-time launch package ($499 Starter, $999 Growth, $1,499 Pro) that covers your initial website build \u2014 custom design, content setup, and launch. After launch, you only pay the monthly fee.',
+  ],
+  [
+    'Do I own my website?',
+    'Yes. Your domain is yours, your content is yours. If you ever cancel, we export everything and hand it over. You are never locked into AvisLoop to keep your website running.',
+  ],
+  [
+    'Can I cancel anytime?',
+    'Yes. There are no long-term contracts and no cancellation fees. We operate month-to-month because we prefer to earn your business every month with results rather than lock you into an agreement.',
+  ],
+  [
+    'How is this different from hiring a designer?',
+    'A freelance designer charges $3,000\u2013$15,000 upfront for a site that goes stale immediately with no ongoing support. AvisLoop is a managed service \u2014 we build it, host it, maintain it, and update it every month for a flat fee. One invoice, everything included.',
+  ],
+  [
+    'What is the Review Add-On?',
+    'Review management ($99/mo) is available as an add-on for Starter and Growth plans, and is included at no extra cost with Pro. After each job, we send personalized follow-up messages, route happy customers to Google reviews, and keep negative feedback private so you can resolve it first.',
+  ],
 ];
 
 /* ─── Final CTA ────────────────────────────────────────── */
@@ -530,7 +570,7 @@ function FinalCTA() {
           transition={{ delay: 0.6, duration: 0.5 }}
           className="mt-6 text-xs text-muted-foreground/40 tracking-widest uppercase"
         >
-          15 min &middot; no commitment &middot; $0 upfront
+          15 min &middot; no commitment &middot; no contracts
         </motion.p>
       </div>
     </section>

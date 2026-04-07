@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 
 const MARKETING_LINKS = [
   { label: 'Web Design', href: '/' },
-  { label: 'Reviews', href: '/reputation' },
+  { label: 'Review Management', href: '/reputation' },
   { label: 'Pricing', href: '/pricing' },
 ];
 

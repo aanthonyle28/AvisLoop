@@ -19,7 +19,7 @@ const DEFAULT_LINKS = [
   { label: 'Services', href: '#services' },
   { label: 'Process', href: '#process' },
   { label: 'Pricing', href: '#pricing' },
-  { label: 'Reviews', href: '/reputation' },
+  { label: 'Review Management', href: '/reputation' },
   { label: 'FAQ', href: '#faq' },
 ];
 

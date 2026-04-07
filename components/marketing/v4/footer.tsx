@@ -5,7 +5,7 @@ import Link from 'next/link';
 const DEFAULT_LINKS = [
   { label: 'Privacy', href: '/privacy' },
   { label: 'Terms', href: '/terms' },
-  { label: 'Reviews', href: '/reputation' },
+  { label: 'Review Management', href: '/reputation' },
   { label: 'Client Portal', href: '/client-portal' },
 ];
 

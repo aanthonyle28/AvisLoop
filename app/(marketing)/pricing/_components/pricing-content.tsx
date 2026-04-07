@@ -16,6 +16,7 @@ const plans = [
   {
     name: 'Starter',
     price: '149',
+    launch: '499',
     tagline: 'Solo operators',
     features: [
       'Single-page custom website',
@@ -37,6 +38,7 @@ const plans = [
   {
     name: 'Growth',
     price: '249',
+    launch: '999',
     tagline: 'Growing companies',
     features: [
       'Up to 5-page custom website',
@@ -58,6 +60,7 @@ const plans = [
   {
     name: 'Pro',
     price: '349',
+    launch: '1,499',
     tagline: 'Maximum growth',
     features: [
       'Up to 5 + service area pages',
@@ -156,28 +159,47 @@ function PricingGrid() {
             </span>
           </div>
           <p
-            className={`text-sm mb-8 ${
+            className={`text-sm ${
               plan.dark ? 'text-background/40' : 'text-muted-foreground'
             }`}
           >
             {plan.tagline}
           </p>
+          <p
+            className={`text-xs mt-1 mb-8 ${
+              plan.dark ? 'text-background/30' : 'text-muted-foreground/60'
+            }`}
+          >
+            + ${plan.launch} one-time launch package
+          </p>
 
           <ul className="space-y-3 flex-1">
-            {plan.features.map((f) => (
-              <li key={f} className="flex items-start gap-3">
-                <Check
-                  weight="bold"
-                  size={14}
-                  className="text-accent shrink-0 mt-0.5"
-                />
-                <span
-                  className={`text-sm ${plan.dark ? 'text-background/70' : ''}`}
-                >
-                  {f}
-                </span>
-              </li>
-            ))}
+            {plan.features.map((f) => {
+              const isReviewLink = f.toLowerCase().includes('review');
+              return (
+                <li key={f} className="flex items-start gap-3">
+                  <Check
+                    weight="bold"
+                    size={14}
+                    className="text-accent shrink-0 mt-0.5"
+                  />
+                  {isReviewLink ? (
+                    <a
+                      href="/reputation"
+                      className={`text-sm underline decoration-accent/40 underline-offset-2 hover:decoration-accent transition-colors ${plan.dark ? 'text-background/70 hover:text-background' : 'hover:text-accent'}`}
+                    >
+                      {f}
+                    </a>
+                  ) : (
+                    <span
+                      className={`text-sm ${plan.dark ? 'text-background/70' : ''}`}
+                    >
+                      {f}
+                    </span>
+                  )}
+                </li>
+              );
+            })}
           </ul>
 
           <a
@@ -226,7 +248,7 @@ export function PricingContent() {
             transition={{ delay: 0.4, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="text-lg md:text-xl text-muted-foreground max-w-lg leading-relaxed"
           >
-            No setup fees. No contracts. Cancel anytime.
+            One-time launch package + monthly fee. No contracts. Cancel anytime.
           </motion.p>
 
           <motion.div

@@ -12,113 +12,116 @@ interface FloatingShapesProps {
 export function FloatingShapes({ className }: FloatingShapesProps) {
   return (
     <div
-      className={`absolute inset-0 overflow-hidden pointer-events-none ${className ?? ''}`}
+      className={`absolute inset-0 overflow-hidden pointer-events-none motion-reduce:hidden ${className ?? ''}`}
       aria-hidden="true"
     >
-      {/* Gradient orbs — background layer */}
+      {/* Gradient orbs — background layer (static, keep on all devices) */}
       <div className="absolute top-[8%] right-[5%] w-[45vw] h-[45vw] max-w-[650px] max-h-[650px] rounded-full bg-[hsl(21_58%_53%/0.12)] blur-[120px]" />
       <div className="absolute bottom-[0%] left-[0%] w-[35vw] h-[35vw] max-w-[500px] max-h-[500px] rounded-full bg-[hsl(38_85%_60%/0.08)] blur-[90px]" />
 
-      {/* Large ring — top right */}
-      <motion.div
-        className="absolute top-[12%] right-[8%] w-32 h-32 md:w-44 md:h-44 rounded-full border-[2.5px] border-accent/25"
-        animate={{
-          y: [0, -25, 0],
-          rotate: [0, 120, 0],
-        }}
-        transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
-      />
+      {/* Animated shapes — hidden on mobile for performance */}
+      <div className="hidden md:contents">
+        {/* Large ring — top right */}
+        <motion.div
+          className="absolute top-[12%] right-[8%] w-44 h-44 rounded-full border-[2.5px] border-accent/25"
+          animate={{
+            y: [0, -25, 0],
+            rotate: [0, 120, 0],
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
+        />
 
-      {/* Filled accent circle */}
-      <motion.div
-        className="absolute top-[28%] right-[25%] w-5 h-5 rounded-full bg-accent/30"
-        animate={{
-          y: [0, 35, 0],
-          x: [0, -20, 0],
-        }}
-        transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
-      />
+        {/* Filled accent circle */}
+        <motion.div
+          className="absolute top-[28%] right-[25%] w-5 h-5 rounded-full bg-accent/30"
+          animate={{
+            y: [0, 35, 0],
+            x: [0, -20, 0],
+          }}
+          transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
+        />
 
-      {/* Tilting card shape */}
-      <motion.div
-        className="absolute bottom-[22%] right-[14%] w-24 h-24 md:w-32 md:h-32 rounded-2xl border-[2.5px] border-accent/15 bg-accent/[0.04]"
-        animate={{
-          y: [0, 18, 0],
-          rotate: [15, -8, 15],
-        }}
-        transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut' }}
-      />
+        {/* Tilting card shape */}
+        <motion.div
+          className="absolute bottom-[22%] right-[14%] w-32 h-32 rounded-2xl border-[2.5px] border-accent/15 bg-accent/[0.04]"
+          animate={{
+            y: [0, 18, 0],
+            rotate: [15, -8, 15],
+          }}
+          transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut' }}
+        />
 
-      {/* Dot cluster — right */}
-      <motion.div
-        className="absolute top-[50%] right-[6%] flex gap-2.5"
-        animate={{
-          y: [0, -16, 0],
-          opacity: [0.4, 0.8, 0.4],
-        }}
-        transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
-      >
-        <div className="w-2.5 h-2.5 rounded-full bg-accent/40" />
-        <div className="w-2.5 h-2.5 rounded-full bg-accent/25" />
-        <div className="w-2.5 h-2.5 rounded-full bg-accent/15" />
-      </motion.div>
+        {/* Dot cluster — right */}
+        <motion.div
+          className="absolute top-[50%] right-[6%] flex gap-2.5"
+          animate={{
+            y: [0, -16, 0],
+            opacity: [0.4, 0.8, 0.4],
+          }}
+          transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <div className="w-2.5 h-2.5 rounded-full bg-accent/40" />
+          <div className="w-2.5 h-2.5 rounded-full bg-accent/25" />
+          <div className="w-2.5 h-2.5 rounded-full bg-accent/15" />
+        </motion.div>
 
-      {/* Large ring — bottom left */}
-      <motion.div
-        className="absolute bottom-[8%] left-[6%] w-40 h-40 md:w-56 md:h-56 rounded-full border-[2px] border-border/20"
-        animate={{
-          y: [0, 30, 0],
-          rotate: [0, -80, 0],
-          scale: [1, 1.06, 1],
-        }}
-        transition={{ duration: 24, repeat: Infinity, ease: 'easeInOut' }}
-      />
+        {/* Large ring — bottom left */}
+        <motion.div
+          className="absolute bottom-[8%] left-[6%] w-56 h-56 rounded-full border-[2px] border-border/20"
+          animate={{
+            y: [0, 30, 0],
+            rotate: [0, -80, 0],
+            scale: [1, 1.06, 1],
+          }}
+          transition={{ duration: 24, repeat: Infinity, ease: 'easeInOut' }}
+        />
 
-      {/* Diamond — upper left */}
-      <motion.div
-        className="absolute top-[20%] left-[12%] w-8 h-8 border-[2px] border-accent/30 bg-accent/[0.06]"
-        style={{ borderRadius: 5 }}
-        animate={{
-          y: [0, -22, 0],
-          rotate: [45, 135, 45],
-        }}
-        transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
-      />
+        {/* Diamond — upper left */}
+        <motion.div
+          className="absolute top-[20%] left-[12%] w-8 h-8 border-[2px] border-accent/30 bg-accent/[0.06]"
+          style={{ borderRadius: 5 }}
+          animate={{
+            y: [0, -22, 0],
+            rotate: [45, 135, 45],
+          }}
+          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+        />
 
-      {/* Horizontal bar — mid left */}
-      <motion.div
-        className="absolute top-[42%] left-[4%] w-20 h-[3px] rounded-full bg-accent/25 origin-left"
-        animate={{
-          scaleX: [0.4, 1, 0.4],
-          opacity: [0.3, 0.7, 0.3],
-        }}
-        transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-      />
+        {/* Horizontal bar — mid left */}
+        <motion.div
+          className="absolute top-[42%] left-[4%] w-20 h-[3px] rounded-full bg-accent/25 origin-left"
+          animate={{
+            scaleX: [0.4, 1, 0.4],
+            opacity: [0.3, 0.7, 0.3],
+          }}
+          transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+        />
 
-      {/* Small circle — mid left */}
-      <motion.div
-        className="absolute top-[60%] left-[18%] w-3 h-3 rounded-full bg-accent/20"
-        animate={{
-          y: [0, 20, 0],
-          x: [0, 10, 0],
-        }}
-        transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-      />
+        {/* Small circle — mid left */}
+        <motion.div
+          className="absolute top-[60%] left-[18%] w-3 h-3 rounded-full bg-accent/20"
+          animate={{
+            y: [0, 20, 0],
+            x: [0, 10, 0],
+          }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+        />
 
-      {/* Cross / plus shape — right */}
-      <motion.div
-        className="absolute top-[38%] right-[16%]"
-        animate={{
-          rotate: [0, 180, 0],
-          opacity: [0.2, 0.5, 0.2],
-        }}
-        transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
-      >
-        <div className="relative w-6 h-6">
-          <div className="absolute top-1/2 left-0 w-full h-[2.5px] -translate-y-1/2 bg-accent/30 rounded-full" />
-          <div className="absolute left-1/2 top-0 h-full w-[2.5px] -translate-x-1/2 bg-accent/30 rounded-full" />
-        </div>
-      </motion.div>
+        {/* Cross / plus shape — right */}
+        <motion.div
+          className="absolute top-[38%] right-[16%]"
+          animate={{
+            rotate: [0, 180, 0],
+            opacity: [0.2, 0.5, 0.2],
+          }}
+          transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <div className="relative w-6 h-6">
+            <div className="absolute top-1/2 left-0 w-full h-[2.5px] -translate-y-1/2 bg-accent/30 rounded-full" />
+            <div className="absolute left-1/2 top-0 h-full w-[2.5px] -translate-x-1/2 bg-accent/30 rounded-full" />
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 }
@@ -187,9 +190,9 @@ export function MarqueeRow({ items, reverse = false, accent = false }: MarqueeRo
   // Triple the items so the strip is wide enough that the 50% translate produces a seamless loop
   const tripled = [...items, ...items, ...items];
   return (
-    <div className="flex overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)]">
+    <div className="flex overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)] motion-reduce:overflow-x-auto">
       <motion.div
-        className="flex shrink-0 gap-3"
+        className="flex shrink-0 gap-3 motion-reduce:animate-none"
         animate={{ x: reverse ? ['0%', '-33.333%'] : ['-33.333%', '0%'] }}
         transition={{ x: { duration: 60, repeat: Infinity, ease: 'linear' } }}
       >
