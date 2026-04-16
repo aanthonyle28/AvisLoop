@@ -277,7 +277,7 @@ function BusinessSetupStep({ onComplete }: Step1Props) {
                 <div className="grid gap-2">
                   {([
                     { value: 'starter' as const, label: 'Starter — $149/mo', desc: 'Single-page, 2 revisions/mo' },
-                    { value: 'growth' as const, label: 'Growth — $249/mo', desc: 'Up to 5 pages, unlimited revisions' },
+                    { value: 'growth' as const, label: 'Growth — $249/mo', desc: 'Up to 5 pages, 4 revisions/month' },
                     { value: 'pro' as const, label: 'Pro — $349/mo', desc: '5+ service area pages, unlimited revisions, reviews included' },
                   ]).map((opt) => (
                     <button

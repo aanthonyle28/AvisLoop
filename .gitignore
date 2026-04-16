@@ -38,9 +38,37 @@ nul
 .claude/
 .agents/
 .playwright-mcp/
+.agent/
+.commandcode/
+.factory/
+.goose/
+.kilocode/
+.kiro/
+.neovate/
+.openhands/
+.pi/
+.qoder/
+.roo/
+.trae/
+.windsurf/
+.zencoder/
+skills-lock.json
 
 # Test files
 test-*.csv
+test-*.mjs
+e2e/.auth/
+playwright-report/
+test-results/
+
+# QA artifacts
+qa-*.png
+qa-*.mjs
+qa-scripts/
+
+# Temp files
+_temp_*.js
+AvisLoop.planningphases*
 
 # Scratch notes
 docs/notes

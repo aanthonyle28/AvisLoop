@@ -13,7 +13,7 @@ const faqs = [
   {
     question: 'What if I need to make changes?',
     answer:
-      'You get a dedicated client portal at a permanent URL. Submit your revision request — title, description, optional screenshot — and we complete it within 48 hours. Starter plan includes 2 revisions per month; Growth and Pro include unlimited revisions.',
+      'You get a dedicated client portal at a permanent URL. Submit your revision request — title, description, optional screenshot — and we complete it within 48 hours. Starter plan includes 2 revisions per month, Growth includes 4, and Pro includes unlimited revisions.',
   },
   {
     question: 'How is this different from paying a web designer once?',
@@ -23,7 +23,7 @@ const faqs = [
   {
     question: 'What if I need more changes than my plan allows?',
     answer:
-      'On the Starter plan, additional revision requests beyond your 2/month limit are available at $50 each, confirmed before submission so there are no surprise charges. You can also upgrade to Growth or Pro for unlimited revisions.',
+      'Additional revision requests beyond your monthly limit are available at $50 each, confirmed before submission so there are no surprise charges. You can also upgrade your plan at any time for more revisions.',
   },
   {
     question: 'Do I own my website?',

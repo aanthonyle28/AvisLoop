@@ -38,7 +38,8 @@ interface ClientDetailDrawerProps {
 /** Returns the monthly revision limit for a tier, or null if unlimited / unset */
 function getTierLimit(tier: 'starter' | 'growth' | 'pro' | null | undefined): number | null {
   if (tier === 'starter') return 2
-  if (tier === 'growth' || tier === 'pro') return null // unlimited
+  if (tier === 'growth') return 4
+  if (tier === 'pro') return null // unlimited
   return null
 }
 
@@ -468,7 +469,7 @@ export function ClientDetailDrawer({
             {/* Section 5: Revision Quota (always read-only) */}
             <div>
               <h4 className="text-sm font-medium mb-3">Revision Quota</h4>
-              {client.web_design_tier === 'growth' || client.web_design_tier === 'pro' ? (
+              {client.web_design_tier === 'pro' ? (
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Used this month</span>

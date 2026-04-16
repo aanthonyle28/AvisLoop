@@ -6,7 +6,7 @@ import type { WebDesignClient } from '@/lib/data/clients'
 
 function getTierLabel(tier: string | null | undefined): { label: string; isUnlimited: boolean; limit: number | null } {
   if (tier === 'starter') return { label: 'Starter', isUnlimited: false, limit: 2 }
-  if (tier === 'growth') return { label: 'Growth', isUnlimited: true, limit: null }
+  if (tier === 'growth') return { label: 'Growth', isUnlimited: false, limit: 4 }
   if (tier === 'pro') return { label: 'Pro', isUnlimited: true, limit: null }
   return { label: '', isUnlimited: false, limit: null }
 }

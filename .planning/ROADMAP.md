@@ -23,7 +23,8 @@ AvisLoop is a review follow-up system for home service businesses. v1.0 through 
 - **v3.0 Agency Mode** - Phases 52-58 (complete 2026-02-27)
 - **v3.1 QA E2E Audit** - Phases 59-67 (complete 2026-03-03)
 - **v3.1.1 QA Bug Fixes** - Phases 68-69 (complete 2026-03-04)
-- **v4.0 Web Design Agency Pivot** - Phases 71-75 (in progress)
+- **v4.0 Web Design Agency Pivot** - Phases 71-75 (complete)
+- **v4.1 V4 Design System Rollout** - Phase 76 (planned)
 
 ## Phases
 
@@ -1091,6 +1092,24 @@ Plans:
   5. All components use the existing brand design system (Kumbh Sans, warm palette, Phosphor icons) -- no new fonts, color libraries, or icon sets introduced
 **Plans**: TBD
 
+
+---
+
+### Phase 76: V4 Design System Rollout
+**Goal**: All marketing pages use the V4 design language (Framer Motion animations, dark/light alternating sections, oversized typography, floating geometric shapes, pill CTAs). The new V4 landing page becomes the homepage. The reputation page, pricing page, client portal page, and legal pages are redesigned. Old V2/V3 marketing components are removed.
+**Depends on**: Phase 75 (V4 landing page created at /new)
+**Requirements**: Visual consistency across all marketing pages, SEO preservation, no broken links, client portal functionality preserved
+**Success Criteria** (what must be TRUE):
+  1. The homepage at `/` is the V4 Framer Motion design (FloatingShapes, dark Services, Stats, testimonial carousel, etc.)
+  2. `/reputation` uses V4 design language with preserved SEO metadata and FAQ structured data
+  3. `/pricing` has V4-styled 3-column pricing grid with Framer Motion animations
+  4. `/client-portal` lookup form works with V4 visual treatment
+  5. `/privacy`, `/terms`, `/sms-compliance` have improved typography without content changes
+  6. Marketing layout nav/footer match V4 design (transparent→frosted glass nav, minimal footer)
+  7. All unused V2/V3 marketing components are removed
+  8. Client Portal link is accessible from nav and footer on all marketing pages
+  9. `pnpm lint && pnpm typecheck` pass
+**Plans**: 76-01 through 76-06
 
 ---
 
